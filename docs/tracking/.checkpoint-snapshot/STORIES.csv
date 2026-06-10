@@ -1,10 +1,10 @@
 id,role,user_story,status,spec_ref,notes
 S01,devotee,As a devotee I want to subscribe to a Panchangam calendar feed for my city so Tithi/Nakshatra appear in my calendar,pending,2026-06-10-panchangam-design.md,
-S02,devotee,As a devotee I want to see Ekadashi clearly marked in my calendar so I know to prepare for my fast,pending,2026-06-10-panchangam-design.md,
-S03,devotee,As a devotee I want Amavasya / Pournami / Pradosham / Shani Pradosham highlighted in my calendar,pending,2026-06-10-panchangam-design.md,
-S04,devotee,As a devotee I want to see Rahu Kalam / Gulika / Yamagandam / Varjyam / Durmuhurtham timings in the day description so I can plan around them,pending,2026-06-10-panchangam-design.md,
-S05,devotee,As a devotee I want to see Brahma Muhurta / Abhijit Muhurta / Amrita Kalam timings in the day description so I can use them for auspicious activities,pending,2026-06-10-panchangam-design.md,
-S06,devotee,As a devotee I want to see Choghadiya blocks and full Panchangam metadata in the day description,pending,2026-06-10-panchangam-design.md,
+S02,devotee,As a devotee I want Ekadashi days marked visually in my calendar so I can see them at a glance and set my own fast reminder,pending,2026-06-10-panchangam-design.md,special days get ⚡ prefix in event title
+S03,devotee,As a devotee I want Amavasya / Pournami / Pradosham / Shani Pradosham visually highlighted in my calendar so I am aware of them in advance,pending,2026-06-10-panchangam-design.md,special days get ⚡ prefix in event title
+S04,devotee,As a devotee I want to tap any day in my calendar and see Rahu Kalam / Gulika / Yamagandam / Varjyam / Durmuhurtham timings so I can plan around them,pending,2026-06-10-panchangam-design.md,timings in event description
+S05,devotee,As a devotee I want to tap any day in my calendar and see Brahma Muhurta / Abhijit Muhurta / Amrita Kalam timings so I can use them for auspicious activities,pending,2026-06-10-panchangam-design.md,timings in event description
+S06,devotee,As a devotee I want to tap any day in my calendar and see Choghadiya timings and full Panchangam metadata,pending,2026-06-10-panchangam-design.md,timings in event description
 S07,devotee,As a devotee I want to get the full day metadata (Samvatsara / Maasam / Paksham / Vaaram / solar and lunar signs) in the calendar event description,pending,2026-06-10-panchangam-design.md,
 S08,devotee,As a devotee I want to pick my city and calculation system on a landing page and get my webcal subscription URL,pending,2026-06-10-panchangam-design.md,
 S09,scholar/priest,As a scholar or priest I want to choose Surya Siddhanta or Vakya system for ritual-accurate timings,pending,2026-06-10-panchangam-design.md,
