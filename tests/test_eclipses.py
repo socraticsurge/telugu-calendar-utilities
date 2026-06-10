@@ -30,3 +30,44 @@ def test_solar_eclipse_not_visible_from_hyderabad():
     assert result.visible is False
     assert result.sutak_start is None
     assert result.sutak_end is None
+
+
+def test_list_eclipses_in_range_finds_known_lunar():
+    from telugu_panchangam.eclipses import list_eclipses_in_range
+    from telugu_panchangam.engines.utils import local_midnight_jd
+    from datetime import date
+    jd_start = local_midnight_jd(date(2025, 9, 1), 'Asia/Kolkata')
+    jd_end = local_midnight_jd(date(2025, 9, 30), 'Asia/Kolkata')
+    eclipses = list_eclipses_in_range(jd_start, jd_end)
+    kinds = [e['kind'] for e in eclipses]
+    assert 'Lunar' in kinds
+
+
+def test_list_eclipses_in_range_no_eclipse_empty_period():
+    from telugu_panchangam.eclipses import list_eclipses_in_range
+    from telugu_panchangam.engines.utils import local_midnight_jd
+    from datetime import date
+    jd_start = local_midnight_jd(date(2024, 6, 14), 'UTC')
+    jd_end = local_midnight_jd(date(2024, 6, 16), 'UTC')
+    eclipses = list_eclipses_in_range(jd_start, jd_end)
+    assert eclipses == []
+
+
+def test_get_eclipse_from_precomputed_matches_get_eclipse_for_date():
+    from telugu_panchangam.eclipses import (
+        list_eclipses_in_range, get_eclipse_from_precomputed, get_eclipse_for_date
+    )
+    from telugu_panchangam.engines.utils import local_midnight_jd
+    from datetime import date
+    eclipse_date = date(2025, 9, 7)
+    jd_start = local_midnight_jd(date(2025, 9, 1), 'Asia/Kolkata')
+    jd_end = local_midnight_jd(date(2025, 9, 30), 'Asia/Kolkata')
+    precomputed = list_eclipses_in_range(jd_start, jd_end)
+    HYD = next(c for c in __import__('telugu_panchangam.cities', fromlist=['CITIES']).CITIES if c.name == 'Hyderabad')
+    direct = get_eclipse_for_date(eclipse_date, HYD)
+    from_cache = get_eclipse_from_precomputed(eclipse_date, precomputed, HYD)
+    assert direct is not None
+    assert from_cache is not None
+    assert direct.kind == from_cache.kind
+    assert direct.subtype == from_cache.subtype
+    assert direct.visible == from_cache.visible

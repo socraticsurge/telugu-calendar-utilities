@@ -275,7 +275,7 @@ class DrikGanitaEngine(PanchangamEngine):
 
         return karanas
 
-    def calculate(self, d: date, location: Location) -> PanchangamDay:
+    def calculate(self, d: date, location: Location, include_eclipse: bool = True) -> PanchangamDay:
         geopos = [location.lon, location.lat, 0.0]
         jd_midnight = local_midnight_jd(d, location.timezone)
 
@@ -322,7 +322,7 @@ class DrikGanitaEngine(PanchangamEngine):
         samvatsara = self._samvatsara(jd_sunrise)
         maasam = self._maasam(jd_sunrise)
 
-        eclipse = get_eclipse_for_date(d, location)
+        eclipse = get_eclipse_for_date(d, location) if include_eclipse else None
         special_yogas = get_special_yogas(vaaram, tithi_span.name, nakshatra_span.name)
 
         return PanchangamDay(

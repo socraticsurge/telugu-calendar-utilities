@@ -5,9 +5,11 @@ import os
 import sys
 
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.eclipses import list_eclipses_in_range, get_eclipse_from_precomputed
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
+from telugu_panchangam.engines.utils import local_midnight_jd
 from telugu_panchangam.generators.ics import ICSGenerator
 
 ENGINES = {
@@ -33,6 +35,12 @@ def generate_feeds(
     locations = [c for c in CITIES if city_names is None or c.name in city_names]
     generator = ICSGenerator()
 
+    jd_start = local_midnight_jd(start, 'UTC')
+    jd_end = local_midnight_jd(end + timedelta(days=1), 'UTC')
+    print('  Pre-computing eclipses for the generation window...')
+    precomputed_eclipses = list_eclipses_in_range(jd_start, jd_end)
+    print(f'  Found {len(precomputed_eclipses)} eclipse(s).')
+
     for system in systems:
         if system not in ENGINES:
             print(f'Unknown system: {system}', file=sys.stderr)
@@ -43,7 +51,9 @@ def generate_feeds(
             days = []
             d = start
             while d <= end:
-                days.append(engine.calculate(d, location))
+                day = engine.calculate(d, location, include_eclipse=False)
+                day.eclipse = get_eclipse_from_precomputed(d, precomputed_eclipses, location)
+                days.append(day)
                 d += timedelta(days=1)
 
             raw = generator.generate(days, system)

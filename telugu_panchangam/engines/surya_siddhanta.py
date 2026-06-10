@@ -82,7 +82,7 @@ def ss_elongation(jd: float) -> float:
 
 class SuryaSiddhantaEngine(PanchangamEngine):
 
-    def calculate(self, d: date, location: Location) -> PanchangamDay:
+    def calculate(self, d: date, location: Location, include_eclipse: bool = True) -> PanchangamDay:
         geopos = [location.lon, location.lat, 0.0]
         jd_midnight = local_midnight_jd(d, location.timezone)
 
@@ -120,7 +120,7 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         maasam     = self._maasam(jd_sunrise)
         special    = self._special_flags(tithi_idx, weekday, jd_sunrise, jd_sunset)
 
-        eclipse    = get_eclipse_for_date(d, location)
+        eclipse    = get_eclipse_for_date(d, location) if include_eclipse else None
         special_yogas = get_special_yogas(vaaram, tithi_span.name, nak_span.name)
 
         return PanchangamDay(
