@@ -1,7 +1,7 @@
 # src/generators/ics.py
 from datetime import timedelta
 import pytz
-from icalendar import Calendar, Event, vDate, vText
+from icalendar import Calendar, Event, vText
 
 from src.models.panchangam_day import PanchangamDay, Window
 
@@ -36,8 +36,8 @@ class ICSGenerator:
 
         title = self._title(day)
         event.add('summary', vText(title))
-        event.add('dtstart', vDate(day.date))
-        event.add('dtend', vDate(day.date + timedelta(days=1)))
+        event.add('dtstart', day.date)
+        event.add('dtend', day.date + timedelta(days=1))
         event.add('description', vText(self._description(day, tz)))
         event.add('uid', f'{day.date.isoformat()}-{day.location.name.lower()}-{day.system}@telugu-panchangam')
 
