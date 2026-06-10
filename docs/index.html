@@ -114,6 +114,13 @@
         <label for="tp-system">System</label>
         <select id="tp-system"></select>
       </div>
+      <div class="selector">
+        <label for="tp-date">Date</label>
+        <input type="date" id="tp-date"
+               style="font-size:0.85rem;padding:0.4rem 0.6rem;border-radius:8px;
+                      border:1px solid var(--indigo-border);background:var(--indigo-bg);
+                      color:var(--indigo);font-weight:600;min-width:140px;font-family:inherit;">
+      </div>
     </div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.</p>
@@ -382,6 +389,8 @@
   }
 
   function todayStamp() {
+    const val = document.getElementById('tp-date')?.value;
+    if (val) return val.replace(/-/g, '');
     const d = new Date();
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -500,7 +509,9 @@
   }
 
   function formatToday() {
-    return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const val = document.getElementById('tp-date')?.value;
+    const d = val ? new Date(val + 'T00:00:00') : new Date();
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   function renderPreview(container, event) {
@@ -587,6 +598,9 @@
 
   document.getElementById('tp-city').addEventListener('change', loadPreview);
   document.getElementById('tp-system').addEventListener('change', loadPreview);
+  const todayISO = new Date().toISOString().slice(0, 10);
+  document.getElementById('tp-date').value = todayISO;
+  document.getElementById('tp-date').addEventListener('change', loadPreview);
   document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
   document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
 
