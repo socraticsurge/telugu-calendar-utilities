@@ -34,6 +34,17 @@ _DAGDHA_YOGA: dict[str, set[int]] = {
     'Guruvaram': {6}, 'Shukravaram': {8}, 'Shanivaram': {9},
 }
 
+_PUSHKARA_VARAS: set[str] = {'Adivaram', 'Mangalavaram', 'Shanivaram'}
+
+_DVIPUSHKARA_TITHIS: set[int] = {2, 7, 12}
+_DVIPUSHKARA_NAKSHATRAS: set[str] = {'Mrigashira', 'Chitra', 'Dhanishtha'}
+
+_TRIPUSHKARA_TITHIS: set[int] = {3, 8, 13}
+_TRIPUSHKARA_NAKSHATRAS: set[str] = {
+    'Krittika', 'Punarvasu', 'Uttara Phalguni',
+    'Vishakha', 'Uttara Ashadha', 'Purva Bhadrapada',
+}
+
 
 def _tithi_number(tithi_name: str) -> int:
     """1-15 tithi number within either paksha (Pratipat=1 ... Pournami/Amavasya=15)."""
@@ -57,5 +68,11 @@ def get_special_yogas(vaaram: str, tithi_name: str, nakshatra_name: str) -> list
 
     if tithi_number in _DAGDHA_YOGA.get(vaaram, set()):
         yogas.append('Dagdha Yoga')
+
+    if vaaram in _PUSHKARA_VARAS:
+        if tithi_number in _DVIPUSHKARA_TITHIS and nakshatra_name in _DVIPUSHKARA_NAKSHATRAS:
+            yogas.append('Dvipushkara Yoga')
+        if tithi_number in _TRIPUSHKARA_TITHIS and nakshatra_name in _TRIPUSHKARA_NAKSHATRAS:
+            yogas.append('Tripushkara Yoga')
 
     return yogas

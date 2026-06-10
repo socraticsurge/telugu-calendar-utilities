@@ -47,3 +47,40 @@ def test_no_yoga():
     # Mangalavaram + Chitra + tithi number 3 matches none of the four tables.
     result = get_special_yogas('Mangalavaram', 'Shukla Tritiya', 'Chitra')
     assert result == []
+
+
+def test_dvipushkara_yoga_match():
+    # Adivaram + Shukla Dwitiya (tithi 2) + Mrigashira
+    result = get_special_yogas('Adivaram', 'Shukla Dwitiya', 'Mrigashira')
+    assert 'Dvipushkara Yoga' in result
+
+
+def test_dvipushkara_yoga_no_match_wrong_vara():
+    result = get_special_yogas('Somavaram', 'Shukla Dwitiya', 'Mrigashira')
+    assert 'Dvipushkara Yoga' not in result
+
+
+def test_dvipushkara_yoga_no_match_wrong_nakshatra():
+    result = get_special_yogas('Adivaram', 'Shukla Dwitiya', 'Rohini')
+    assert 'Dvipushkara Yoga' not in result
+
+
+def test_tripushkara_yoga_match():
+    # Mangalavaram + Shukla Tritiya (tithi 3) + Krittika
+    result = get_special_yogas('Mangalavaram', 'Shukla Tritiya', 'Krittika')
+    assert 'Tripushkara Yoga' in result
+
+
+def test_tripushkara_yoga_no_match_wrong_vara():
+    result = get_special_yogas('Guruvaram', 'Shukla Tritiya', 'Krittika')
+    assert 'Tripushkara Yoga' not in result
+
+
+def test_dvipushkara_and_tripushkara_not_both_on_same_day():
+    # Same vara (Adivaram) but different tithis — Dwitiya(2) is Dvipushkara, Tritiya(3) is Tripushkara
+    result_dvi = get_special_yogas('Adivaram', 'Shukla Dwitiya', 'Mrigashira')
+    result_tri = get_special_yogas('Adivaram', 'Shukla Tritiya', 'Krittika')
+    assert 'Dvipushkara Yoga' in result_dvi
+    assert 'Tripushkara Yoga' not in result_dvi
+    assert 'Tripushkara Yoga' in result_tri
+    assert 'Dvipushkara Yoga' not in result_tri
