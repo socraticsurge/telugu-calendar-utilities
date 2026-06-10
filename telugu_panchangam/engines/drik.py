@@ -15,6 +15,8 @@ from telugu_panchangam.engines.utils import (
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.eclipses import get_eclipse_for_date
+from telugu_panchangam.special_yogas import get_special_yogas
 
 # Rahu Kalam, Gulika, Yamagandam: 1-indexed part of day (1=first, 8=last)
 # Weekday: 0=Sunday, 1=Monday, ..., 6=Saturday
@@ -320,6 +322,9 @@ class DrikGanitaEngine(PanchangamEngine):
         samvatsara = self._samvatsara(jd_sunrise)
         maasam = self._maasam(jd_sunrise)
 
+        eclipse = get_eclipse_for_date(d, location)
+        special_yogas = get_special_yogas(vaaram, tithi_span.name, nakshatra_span.name)
+
         return PanchangamDay(
             date=d,
             location=location,
@@ -356,4 +361,6 @@ class DrikGanitaEngine(PanchangamEngine):
             is_shani_pradosham=special['is_shani_pradosham'],
             is_soma_pradosham=special['is_soma_pradosham'],
             is_sankranti=special['is_sankranti'],
+            eclipse=eclipse,
+            special_yogas=special_yogas,
         )

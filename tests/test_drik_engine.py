@@ -123,3 +123,17 @@ def test_sankranti_on_mesha_sankranti():
     # Mesha Sankranti 2024: ~April 14
     result = ENGINE.calculate(date(2024, 4, 14), HYD)
     assert result.is_sankranti is True
+
+def test_eclipse_field_present_and_none_on_non_eclipse_day():
+    # Use a date with no eclipse
+    result = ENGINE.calculate(date(2024, 3, 26), HYD)
+    assert result.eclipse is None
+
+def test_eclipse_populated_on_known_eclipse_date():
+    result = ENGINE.calculate(date(2025, 9, 7), HYD)
+    assert result.eclipse is not None
+    assert result.eclipse.kind == 'Lunar'
+
+def test_special_yogas_field_is_list():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert isinstance(result.special_yogas, list)
