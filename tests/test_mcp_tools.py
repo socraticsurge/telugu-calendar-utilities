@@ -151,6 +151,37 @@ def test_get_special_days_special_yogas_key_present():
         assert isinstance(day['special_yogas'], list)
 
 
+def test_get_panchangam_range_basic():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam_range
+    result = json.loads(tool_get_panchangam_range('2026-06-10', '2026-06-12', 'Hyderabad'))
+    assert 'days' in result
+    assert len(result['days']) == 3
+    day = result['days'][0]
+    for key in ('date', 'vaaram', 'tithi', 'nakshatra', 'sunrise', 'sunset',
+                'auspicious', 'inauspicious', 'special_days', 'special_yogas'):
+        assert key in day, f"Missing key in range day: {key}"
+
+
+def test_get_panchangam_range_exceeds_limit():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam_range
+    result = json.loads(tool_get_panchangam_range('2026-01-01', '2026-06-01', 'Hyderabad'))
+    assert 'error' in result
+
+
+def test_get_panchangam_range_invalid_dates():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam_range
+    result = json.loads(tool_get_panchangam_range('2026-06-12', '2026-06-10', 'Hyderabad'))
+    assert 'error' in result
+
+
+def test_get_panchangam_range_auspicious_keys():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam_range
+    result = json.loads(tool_get_panchangam_range('2026-06-10', '2026-06-10', 'Hyderabad'))
+    day = result['days'][0]
+    assert 'brahma_muhurta' in day['auspicious']
+    assert 'rahu_kalam' in day['inauspicious']
+
+
 def test_choghadiya_has_end_time():
     from telugu_panchangam.mcp.tools import tool_get_panchangam
     result = json.loads(tool_get_panchangam('2026-06-10', 'Hyderabad', 'drik'))

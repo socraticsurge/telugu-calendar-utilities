@@ -1,6 +1,6 @@
 import json
 import calendar
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Optional
 
 import pytz
@@ -214,6 +214,73 @@ def tool_get_muhurta(
                 'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
                 'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
             },
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_get_panchangam_range(
+    start_date: str,
+    end_date: str,
+    city: str,
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    """Return a compact Panchangam summary for each day in [start_date, end_date]. Maximum span: 31 days."""
+    try:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if end < start:
+            raise ValueError("end_date must be >= start_date.")
+        if (end - start).days > 30:
+            raise ValueError("Date range exceeds 31-day limit. Use multiple calls for longer spans.")
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        engine = _ENGINES[system]
+        tz = loc.timezone
+
+        days = []
+        d = start
+        while d <= end:
+            day = engine.calculate(d, loc)
+            specials = _special_events(day)
+            days.append({
+                'date': d.isoformat(),
+                'vaaram': day.vaaram,
+                'tithi': day.tithi.name,
+                'nakshatra': day.nakshatra.name,
+                'yoga': day.yoga.name,
+                'sunrise': _fmt_time(day.sunrise, tz),
+                'sunset': _fmt_time(day.sunset, tz),
+                'auspicious': {
+                    'brahma_muhurta':  _window_to_dict(day.brahma_muhurta, tz),
+                    'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz) if day.abhijit_muhurta else None,
+                    'amrita_kalam':    [_window_to_dict(w, tz) for w in day.amrita_kalam],
+                },
+                'inauspicious': {
+                    'rahu_kalam':   _window_to_dict(day.rahu_kalam, tz),
+                    'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
+                    'yamagandam':   _window_to_dict(day.yamagandam, tz),
+                    'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
+                    'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+                },
+                'eclipse': _eclipse_to_dict(day.eclipse, tz),
+                'special_yogas': day.special_yogas,
+                'special_days': specials,
+                'is_special': bool(specials),
+            })
+            d += timedelta(days=1)
+
+        return json.dumps({
+            'start_date': start_date,
+            'end_date': end_date,
+            'city': city,
+            'system': system,
+            'days': days,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
