@@ -87,3 +87,8 @@ def test_all_22_cities_vakya():
         days = [ENGINE.calculate(REF_DATE, loc)]
         raw = gen.generate(days, 'vakya')
         assert len(raw) > 0, f'Empty for {loc.name}'
+
+def test_eclipse_and_special_yogas_fields_present():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.eclipse is None or hasattr(result.eclipse, 'kind')
+    assert isinstance(result.special_yogas, list)

@@ -15,6 +15,8 @@ from telugu_panchangam.engines.utils import (
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.eclipses import get_eclipse_for_date
+from telugu_panchangam.special_yogas import get_special_yogas
 
 _KALI_EPOCH_JD    = 588465.5
 _CIVIL_DAYS       = 1_577_917_828
@@ -118,6 +120,9 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         maasam     = self._maasam(jd_sunrise)
         special    = self._special_flags(tithi_idx, weekday, jd_sunrise, jd_sunset)
 
+        eclipse    = get_eclipse_for_date(d, location)
+        special_yogas = get_special_yogas(vaaram, tithi_span.name, nak_span.name)
+
         return PanchangamDay(
             date=d, location=location, system='surya_siddhanta',
             samvatsara=samvatsara, ayanam=ayanam, rituvu=rituvu,
@@ -135,6 +140,8 @@ class SuryaSiddhantaEngine(PanchangamEngine):
             varjyam=self._varjyam(nak_span),
             durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset),
             choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
+            eclipse=eclipse,
+            special_yogas=special_yogas,
             **special,
         )
 

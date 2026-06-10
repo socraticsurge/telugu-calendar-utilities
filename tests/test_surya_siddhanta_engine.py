@@ -115,3 +115,8 @@ def test_is_pournami_on_ss_pournami_date():
 def test_ss_tithi_start_end_valid():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.tithi.start < result.tithi.end
+
+def test_eclipse_and_special_yogas_fields_present():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.eclipse is None or hasattr(result.eclipse, 'kind')
+    assert isinstance(result.special_yogas, list)
