@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telugu Panchangam Calendar Feeds</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; line-height: 1.6; }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .subtitle { color: #555; margin-bottom: 2rem; }
+    h2 { font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem; }
+    select, button { font-size: 1rem; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid #ccc; }
+    button { background: #2563eb; color: white; border-color: #2563eb; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .picker { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .url-box { background: #f4f4f4; padding: 0.75rem 1rem; border-radius: 6px; font-family: monospace; font-size: 0.9rem; word-break: break-all; margin-bottom: 0.75rem; min-height: 2.5rem; }
+    .system-desc { background: #f9f9f9; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; }
+    .system-desc dt { font-weight: 600; margin-top: 0.5rem; }
+    .steps { padding-left: 1.25rem; }
+    .steps li { margin-bottom: 0.4rem; }
+    footer { margin-top: 3rem; font-size: 0.8rem; color: #888; border-top: 1px solid #eee; padding-top: 1rem; }
+  </style>
+</head>
+<body>
+
+<h1>Telugu Panchangam</h1>
+<p class="subtitle">Subscribe to a Telugu Panchangam calendar feed. Every day shows Tithi, Nakshatra, Yoga, auspicious and inauspicious timings, and special day markers — directly in your calendar.</p>
+
+<h2>1. Pick your city and calculation system</h2>
+<div class="picker">
+  <select id="city">
+    <optgroup label="Telugu Heartland">
+      <option>Hyderabad</option><option>Vijayawada</option><option>Visakhapatnam</option>
+      <option>Tirupati</option><option>Warangal</option><option>Guntur</option>
+      <option>Nizamabad</option><option>Rajahmundry</option><option>Kurnool</option>
+      <option>Nellore</option>
+    </optgroup>
+    <optgroup label="Major Indian Metros">
+      <option>Bengaluru</option><option>Chennai</option><option>Mumbai</option><option>Delhi</option>
+    </optgroup>
+    <optgroup label="International">
+      <option>Dallas</option><option>San Jose</option><option>San Francisco</option>
+      <option>Edison</option><option>New York</option><option>London</option>
+      <option>Sydney</option><option>Dubai</option>
+    </optgroup>
+  </select>
+  <select id="system">
+    <option value="drik">Drik Ganita</option>
+    <option value="surya-siddhanta">Surya Siddhanta</option>
+    <option value="vakya">Vakya</option>
+  </select>
+</div>
+
+<div class="system-desc">
+  <dl>
+    <dt>Drik Ganita</dt><dd>Modern observational astronomy. Most accurate for actual sky events (sunrise, moonrise). Used by popular digital Panchangam apps.</dd>
+    <dt>Surya Siddhanta</dt><dd>Ancient classical system. Used by Tirumala Tirupati Devasthanams and most temple rituals.</dd>
+    <dt>Vakya</dt><dd>Traditional South Indian system using pre-computed correction tables. Widely followed by Telugu and Tamil printed Panchangams.</dd>
+  </dl>
+</div>
+
+<h2>2. Get your subscription URL</h2>
+<div class="url-box" id="url-display">Select city and system above</div>
+<button onclick="copyUrl()">Copy URL</button>
+<span id="copy-confirm" style="margin-left:0.75rem;color:#16a34a;display:none;">Copied!</span>
+
+<h2>3. Subscribe in your calendar app</h2>
+<ul class="steps">
+  <li><strong>Google Calendar:</strong> Open Google Calendar → Other calendars (+ icon) → From URL → paste the URL → Add calendar</li>
+  <li><strong>Apple Calendar:</strong> File → New Calendar Subscription → paste URL → Subscribe</li>
+  <li><strong>Outlook:</strong> Add Calendar → From Internet → paste URL</li>
+</ul>
+<p>Your calendar will refresh automatically each month with updated Panchangam data.</p>
+
+<h2>What's in each day's event</h2>
+<p>Each day appears as an all-day banner event (no calendar blocking). Tap any day to see:</p>
+<ul>
+  <li>Samvatsara, Maasam, Paksham, Vaaram</li>
+  <li>Tithi, Nakshatra, Yoga, Karana — with start/end times</li>
+  <li>Sunrise, Sunset, Moonrise, Moonset</li>
+  <li>Auspicious: Brahma Muhurta, Abhijit Muhurta, Amrita Kalam</li>
+  <li>Inauspicious: Rahu Kalam, Gulika Kalam, Yamagandam, Varjyam, Durmuhurtham</li>
+  <li>Choghadiya blocks</li>
+</ul>
+<p>Special days (Ekadashi, Amavasya, Pournami, Pradosham, Sankranti) are marked with ⚡ in the title so they stand out at a glance.</p>
+
+<footer>
+  Telugu Panchangam is open source. Feeds are regenerated on the 1st of each month covering 18 months ahead.
+  <a href="https://github.com/rcvk/telugu-calendar-utilities">GitHub</a>
+</footer>
+
+<script>
+  const BASE = 'https://rcvk.github.io/telugu-calendar-utilities/feeds/';
+
+  function slug(name) {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '');
+  }
+
+  function updateUrl() {
+    const city = document.getElementById('city').value;
+    const system = document.getElementById('system').value;
+    const url = `webcal://${BASE.replace('https://', '')}${slug(city)}-${system}.ics`;
+    document.getElementById('url-display').textContent = url;
+  }
+
+  function copyUrl() {
+    const url = document.getElementById('url-display').textContent;
+    navigator.clipboard.writeText(url).then(() => {
+      const el = document.getElementById('copy-confirm');
+      el.style.display = 'inline';
+      setTimeout(() => el.style.display = 'none', 2000);
+    });
+  }
+
+  document.getElementById('city').addEventListener('change', updateUrl);
+  document.getElementById('system').addEventListener('change', updateUrl);
+  updateUrl();
+</script>
+</body>
+</html>
