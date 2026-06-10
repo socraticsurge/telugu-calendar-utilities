@@ -149,3 +149,14 @@ def test_get_special_days_special_yogas_key_present():
     for day in result['special_days']:
         assert 'special_yogas' in day
         assert isinstance(day['special_yogas'], list)
+
+
+def test_choghadiya_has_end_time():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam
+    result = json.loads(tool_get_panchangam('2026-06-10', 'Hyderabad', 'drik'))
+    chog = result['choghadiya']
+    assert len(chog) == 8
+    for entry in chog:
+        assert 'end' in entry, "Choghadiya entry missing 'end'"
+        assert len(entry['end']) == 5
+        assert entry['end'][2] == ':'

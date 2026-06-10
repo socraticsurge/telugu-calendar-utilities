@@ -170,7 +170,7 @@ def tool_get_panchangam(
                 'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
             },
             'choghadiya': [
-                {'name': w.name, 'start': _fmt_time(w.start, tz)}
+                {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
                 for w in day.choghadiya
             ],
             'eclipse': _eclipse_to_dict(day.eclipse, tz),
