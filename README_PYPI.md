@@ -68,7 +68,7 @@ Lists special days in a given month: Ekadashi (fasting), Amavasya (new moon), Po
 | System | Basis | Best for |
 |--------|-------|----------|
 | `drik` | Swiss Ephemeris (pyswisseph) + Lahiri ayanamsa | Modern apps, accurate sky events |
-| `surya_siddhanta` | Mean-motion algorithms from classical SS text | Temple rituals, TTD-style timing |
+| `surya_siddhanta` | Mean-motion algorithms from classical SS text | Traditions rooted in classical siddhantic calculation |
 | `vakya` | Surya Siddhanta + published correction tables | Traditional Telugu/Tamil printed Panchangams |
 
 ## Source

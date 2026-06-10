@@ -34,7 +34,7 @@ Visit the landing page to pick your city and calculation system and copy your `w
 | System | Basis | Best for |
 |--------|-------|----------|
 | **Drik Ganita** | Swiss Ephemeris (pyswisseph) + Lahiri ayanamsa | Modern apps, accurate sky events |
-| **Surya Siddhanta** | Mean-motion algorithms from classical SS text | Temple rituals, TTD-style timing |
+| **Surya Siddhanta** | Mean-motion algorithms from classical SS text | Traditions rooted in classical siddhantic calculation |
 | **Vakya** | Surya Siddhanta + published correction tables | Traditional Telugu/Tamil printed Panchangams |
 
 ## MCP Server

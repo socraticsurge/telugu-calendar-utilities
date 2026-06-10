@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telugu Panchangam Calendar Feeds</title>
+  <title>AstroChaganti's Panchangam — Calendar Feeds</title>
   <style>
     :root {
       --indigo: #4338ca; --indigo-bg: #eef2ff; --indigo-border: #c7d2fe;
@@ -20,7 +20,7 @@
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
     @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 2px 12px rgba(67,56,202,0.07), 0 1px 3px rgba(0,0,0,0.05); }
+    .card { background: #fff; border: 1px solid #dbe2ea; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 4px 18px rgba(100,116,139,0.18), 0 1px 3px rgba(15,23,42,0.08); }
     .card h2 { margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
     .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
 
@@ -42,7 +42,13 @@
     .app-panel ol { margin: 0; padding-left: 1.1rem; color: #475569; columns: 2; column-gap: 1.5rem; }
     .app-panel ol li { margin-bottom: 0.2rem; break-inside: avoid; }
 
-    .preview-card { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+    .preview-card { border: 1px solid #dbe2ea; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
+    .preview-body { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+    .preview-col + .preview-col { border-left: 1px solid #f1f5f9; }
+    @media (max-width: 620px) {
+      .preview-body { grid-template-columns: 1fr; }
+      .preview-col + .preview-col { border-left: none; border-top: 1px solid #f1f5f9; }
+    }
     .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; }
     .preview-head .date { font-weight: 700; font-size: 0.9rem; }
     .preview-head .meta { font-size: 0.72rem; opacity: 0.85; margin-top: 0.1rem; }
@@ -60,7 +66,7 @@
     .preview-note { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0 0; }
     .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
 
-    .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; }
+    .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
     .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
     .sys-card.ss { background: var(--amber-bg); border: 1px solid var(--amber-border); }
     .sys-card.vakya { background: var(--green-bg); border: 1px solid var(--green-border); }
@@ -99,7 +105,7 @@
 
   <div class="hero">
     <div><span class="sunmoon">🌅</span></div>
-    <h1>Telugu Panchangam</h1>
+    <h1>AstroChaganti's Panchangam</h1>
     <div class="tagline">Subscribe to Tithi, Nakshatra, Muhurtams, Eclipses &amp; more — right in your calendar</div>
   </div>
 
@@ -213,39 +219,41 @@
     </div>
 
     <div class="sys-card ss">
-      <h3>🛕 Surya Siddhanta — The Classical Temple Standard</h3>
-      <p>Based on mean-motion formulas from the Surya Siddhanta, a foundational astronomical text composed
-      over a thousand years ago. Tirumala Tirupati Devasthanams (TTD) and most South Indian temples still
-      use this system for festival dates and ritual timings — so if you're following a temple-aligned
-      vratam or muhurtam, this is usually the calendar your priest follows.</p>
+      <h3>🛕 Surya Siddhanta — The Classical Siddhantic Method</h3>
+      <p>Computes positions using the mean-motion formulas of the Surya Siddhanta, the most influential
+      classical Sanskrit astronomy treatise. Timings follow the traditional siddhantic framework rather
+      than the observed sky, so Tithi and Nakshatra boundaries can differ from Drik Ganita by anywhere
+      from minutes to an hour or more. Choose it if your tradition is rooted in classical siddhantic
+      calculation rather than modern ephemerides.</p>
       <button class="read-more" data-more="Read more about Surya Siddhanta ▾" data-less="Show less ▴" onclick="toggleReadMore('ss-more', this)">Read more about Surya Siddhanta ▾</button>
       <div class="expanded" id="ss-more">
-        <strong>What it computes:</strong> Planetary positions from mean-motion formulas codified in the Surya Siddhanta, a text composed roughly between 400–600 CE. Instead of tracking actual sky positions, it uses long-period average orbital cycles with bija (seed) corrections. The result diverges from true sky positions by several arc-minutes for the Sun and up to a degree for the Moon — enough to shift a Tithi boundary by 30–90 minutes compared to Drik Ganita.
+        <strong>What it computes:</strong> Planetary longitudes from the mean-motion model codified in the Surya Siddhanta (the received text dates to roughly 400–800 CE, building on older material). Instead of tracking the actual sky, it counts long-period average orbital revolutions from the Kali epoch and applies the classical manda (equation-of-centre) correction. The result diverges from true positions — modestly for the Sun, up to a degree or more for the Moon — which can move a Tithi boundary by 30–90 minutes versus Drik Ganita, occasionally landing an observance on a different calendar day.
         <br/><br/>
-        <strong>Who uses it:</strong> Tirumala Tirupati Devasthanams (TTD) and most major South Indian temple trusts base their official panchangams on Surya Siddhanta calculations reviewed by a Panchanga Nirnayam committee. If you observe Ekadashi on the day your temple announces rather than the day a modern app shows, this is the system that matches your priest's calendar.
+        <strong>Who it's for:</strong> Communities and almanac lineages that compute from the siddhantic framework. Important honesty note: there is no single "the" Surya Siddhanta panchangam — every traditional lineage applies its own bija (correction) constants and conventions, so two siddhantic panchangams rarely agree to the minute, and this feed won't exactly match any particular institution's published calendar either. Treat it as a faithful rendering of the classical method, and use the preview above to compare against the panchangam your family or temple actually follows.
         <br/><br/>
-        <strong>Gotcha:</strong> The practical gap between Surya Siddhanta and Drik is usually minutes, but for Tithi-sensitive observances (Ekadashi, Amavasya, Pournami) the boundary can fall on different calendar dates — which is why families sometimes fast on different days without either being "wrong."
+        <strong>Gotcha:</strong> For Tithi-sensitive observances (Ekadashi, Amavasya, Pournami) the siddhantic and observational boundaries can fall on different dates — which is why two families can fast on different days without either being "wrong."
       </div>
     </div>
 
     <div class="sys-card vakya">
       <h3>📜 Vakya — Traditional Printed Panchangam</h3>
       <p>Builds on Surya Siddhanta with "Vakyas" — pre-computed correction tables passed down through
-      generations of traditional astronomers. This is the basis for most printed Telugu and Tamil
-      panchangams sold in stores each year, and is preferred by households following long-standing family
-      or regional conventions.</p>
+      generations of traditional almanac-makers. Many printed Telugu and Tamil panchangams sold each year
+      descend from this tradition, so it suits households following a long-standing family or regional
+      printed panchangam.</p>
       <button class="read-more" data-more="Read more about Vakya ▾" data-less="Show less ▴" onclick="toggleReadMore('vakya-more', this)">Read more about Vakya ▾</button>
       <div class="expanded" id="vakya-more">
-        <strong>What it computes:</strong> Builds on Surya Siddhanta mean motions but layers in vakyas — short verse-encoded correction tables that account for the Moon's variable speed (it moves faster near perigee, slower near apogee). The word "vakya" means "sentence": each correction value is encoded as a Sanskrit syllable sequence that a trained astronomer could recite from memory. This approach dates to approximately the 9th–10th century CE in South India.
+        <strong>What it computes:</strong> Builds on Surya Siddhanta mean motions but layers in vakyas — pre-computed correction sequences that account for the Moon's variable speed (faster near perigee, slower near apogee). The word "vakya" means "sentence": each correction value was traditionally encoded as a memorable Sanskrit syllable sequence, attributed to the Vararuci and later Madhava traditions of South India. It let an almanac-maker produce a full panchangam by lookup and arithmetic, with no ephemeris needed.
         <br/><br/>
-        <strong>Who uses it:</strong> Most printed Telugu and Tamil panchangams sold annually — the physical booklets with the new Samvatsara on the cover — use Vakya calculations. Different publishers (Viswanatha Siddhanthi, TTD printed calendar, etc.) may use slightly different vakya tables, which is why two printed panchangams from the same year can show Tithi end-times that differ by 5–15 minutes.
+        <strong>Who it's for:</strong> Households that follow a traditional printed almanac. Many printed Telugu and Tamil panchangams descend from the vakya tradition, but publishers differ in which tables and corrections they use — two printed panchangams for the same year routinely disagree by 5–15 minutes on Tithi end-times. This feed implements the vakya approach as a correction layer over Surya Siddhanta; it represents the tradition's method, not any single publisher's booklet. Compare a few days in the preview against your printed panchangam to see how closely they align.
         <br/><br/>
-        <strong>Gotcha:</strong> Vakya's lunar corrections can make it more accurate than plain Surya Siddhanta for moonrise and Tithi timings, but it's still less precise than Drik Ganita for solar events like sunrise. If your family's tradition is "we follow the printed panchangam," Vakya is the system that matches it.
+        <strong>Gotcha:</strong> Vakya's lunar corrections improve on plain Surya Siddhanta for Moon-dependent timings, but it remains less precise than Drik Ganita for observable events like sunrise and moonrise. If your rule is "we follow our printed panchangam," pick whichever of Vakya or Surya Siddhanta matches it more closely in the preview.
       </div>
     </div>
 
     <p class="tip">Not sure? Drik Ganita is a safe modern default. If your family or temple follows a
-    specific printed panchangam, match it to Surya Siddhanta or Vakya instead.</p>
+    specific printed panchangam, use the preview above to compare a few days against it and pick the
+    system that matches most closely — no two traditional panchangams agree to the minute, and that's normal.</p>
   </div>
 
   <div class="card">
@@ -254,18 +262,19 @@
       <code style="background:var(--indigo-bg);color:var(--indigo);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.8rem;">mcp-server-panchangam</code>
       is a standard <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
       server that gives AI assistants direct access to Panchangam calculations — ask Claude or any
-      MCP-compatible agent for today's Tithi, a muhurta for next Tuesday, or special days in the coming month,
-      and it calls the engine directly rather than guessing.
+      MCP-compatible agent for today's Tithi, a muhurta for next Tuesday, special days in the coming month,
+      or a day-by-day comparison across a date range, and it calls the engine directly rather than guessing.
     </p>
 
     <div class="mcp-tools">
       <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
       <div class="mcp-tool"><code>get_muhurta</code><span>Auspicious &amp; inauspicious windows only — faster for "is this a good time?" queries</span></div>
+      <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
       <div class="mcp-tool"><code>get_special_days</code><span>Ekadashi, Amavasya, Pournami, Pradosham, Sankranti and Eclipses for a month</span></div>
       <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
     </div>
 
-    <p style="font-size:0.82rem;color:#475569;margin:0.75rem 0 0.25rem;">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. Supports all three calculation systems.</p>
+    <p style="font-size:0.82rem;color:#475569;margin:0.75rem 0 0.25rem;">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. You can also pass coordinates directly; the timezone is derived automatically. Supports all three calculation systems.</p>
 
     <div class="mcp-clients">
       <span class="mcp-client">Claude Desktop</span>
@@ -296,7 +305,7 @@
   </div>
 
   <footer>
-    Telugu Panchangam is open source. Feeds are regenerated on the 1st of each month covering 18 months ahead.
+    AstroChaganti's Panchangam is open source. Feeds are regenerated on the 1st of each month covering 18 months ahead.
     <a href="https://github.com/socraticsurge/telugu-calendar-utilities">GitHub</a>
   </footer>
 </div>
@@ -521,50 +530,54 @@
     const groupHead = (label, cls) => `<tr class="group-head ${cls || ''}"><td colspan="2">${label}</td></tr>`;
     const span = entry => entry ? `${entry.name} <span style="color:#94a3b8;">(${entry.start} – ${entry.end})</span>` : '—';
 
-    let rows = '';
-    if (data.tithi) rows += row('Tithi', span(data.tithi));
-    if (data.nakshatra) rows += row('Nakshatra', span(data.nakshatra));
-    if (data.yoga) rows += row('Yoga', span(data.yoga));
-    if (data.karana) rows += row('Karana', data.karana);
+    let left = '';
+    if (data.tithi) left += row('Tithi', span(data.tithi));
+    if (data.nakshatra) left += row('Nakshatra', span(data.nakshatra));
+    if (data.yoga) left += row('Yoga', span(data.yoga));
+    if (data.karana) left += row('Karana', data.karana);
 
-    if (data.ayanam) rows += row('Ayanam / Rituvu', `${data.ayanam} · ${data.rituvu}`);
-    rows += groupHead('Sky');
-    rows += row('Sunrise / Sunset', `${data.sunrise} / ${data.sunset}`);
-    rows += row('Moonrise / Moonset', `${data.moonrise} / ${data.moonset}`);
+    if (data.ayanam) left += row('Ayanam / Rituvu', `${data.ayanam} · ${data.rituvu}`);
+    left += groupHead('Sky');
+    left += row('Sunrise / Sunset', `${data.sunrise} / ${data.sunset}`);
+    left += row('Moonrise / Moonset', `${data.moonrise} / ${data.moonset}`);
+    if (data.choghadiya.length) {
+      left += groupHead('🕐 Choghadiya');
+      data.choghadiya.forEach(c => { left += row(c.name, `${c.start} – ${c.end}`); });
+    }
 
+    let right = '';
     if (data.auspicious.length) {
-      rows += groupHead('🟢 Auspicious', 'good');
-      data.auspicious.forEach(e => { rows += row(e.name, `${e.start} – ${e.end}`); });
+      right += groupHead('🟢 Auspicious', 'good');
+      data.auspicious.forEach(e => { right += row(e.name, `${e.start} – ${e.end}`); });
     }
     if (data.inauspicious.length) {
-      rows += groupHead('🔴 Inauspicious', 'bad');
-      data.inauspicious.forEach(e => { rows += row(e.name, `${e.start} – ${e.end}`); });
+      right += groupHead('🔴 Inauspicious', 'bad');
+      data.inauspicious.forEach(e => { right += row(e.name, `${e.start} – ${e.end}`); });
     }
     if (data.eclipse) {
       const e = data.eclipse;
       const emoji = e.kind === 'Solar' ? '🌒' : '🌕';
-      rows += groupHead(`${emoji} Eclipse`);
-      rows += row('Type', `${e.kind} Eclipse (${e.subtype})`);
-      rows += row('Visibility', e.visible ? 'Visible from this location' : 'Not visible from this location');
-      if (e.window) rows += row('Eclipse window', `${e.window.start} – ${e.window.end}`);
-      if (e.sutak) rows += row('Sutak', `${e.sutak.start} – ${e.sutak.end}`);
-    }
-    if (data.choghadiya.length) {
-      rows += groupHead('🕐 Choghadiya');
-      data.choghadiya.forEach(c => { rows += row(c.name, `${c.start} – ${c.end}`); });
+      right += groupHead(`${emoji} Eclipse`);
+      right += row('Type', `${e.kind} Eclipse (${e.subtype})`);
+      right += row('Visibility', e.visible ? 'Visible from this location' : 'Not visible from this location');
+      if (e.window) right += row('Eclipse window', `${e.window.start} – ${e.window.end}`);
+      if (e.sutak) right += row('Sutak', `${e.sutak.start} – ${e.sutak.end}`);
     }
     if (data.yogas.length) {
-      rows += groupHead('✨ Special Yogas');
-      data.yogas.forEach(y => { rows += row('', y); });
+      right += groupHead('✨ Special Yogas');
+      data.yogas.forEach(y => { right += row('', y); });
     }
 
+    const cols = [left, right].filter(Boolean)
+      .map(rows => `<div class="preview-col"><table class="preview-table">${rows}</table></div>`)
+      .join('');
     container.innerHTML = `
       <div class="preview-card">
         <div class="preview-head">
           <div class="date">${formatToday()}${special}</div>
           <div class="meta">${data.meta}</div>
         </div>
-        <table class="preview-table">${rows}</table>
+        <div class="preview-body">${cols}</div>
       </div>
     `;
   }
