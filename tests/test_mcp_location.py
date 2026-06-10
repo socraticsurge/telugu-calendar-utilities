@@ -20,7 +20,9 @@ def test_predefined_city_case_insensitive():
 
 def test_predefined_city_london():
     from telugu_panchangam.mcp.location import resolve_location
-    lat, lon, tz = resolve_location('London')
+    with patch('telugu_panchangam.mcp.location._GEOCODER') as mock_gc:
+        lat, lon, tz = resolve_location('London')
+        mock_gc.geocode.assert_not_called()
     assert abs(lat - 51.507) < 0.01
     assert tz == 'Europe/London'
 
@@ -44,5 +46,5 @@ def test_unresolvable_city_raises_value_error():
     from telugu_panchangam.mcp.location import resolve_location
     with patch('telugu_panchangam.mcp.location._GEOCODER') as mock_gc:
         mock_gc.geocode.return_value = None
-        with pytest.raises(ValueError, match="Unknown city"):
+        with pytest.raises(ValueError, match=r"Unknown city.*list_supported_cities\(\)"):
             resolve_location('xyznotacity123abc')
