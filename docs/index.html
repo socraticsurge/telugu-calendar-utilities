@@ -20,7 +20,7 @@
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
     @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 2px 12px rgba(67,56,202,0.07), 0 1px 3px rgba(0,0,0,0.05); }
     .card h2 { margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
     .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
 
@@ -78,6 +78,18 @@
     .expanded a { color: inherit; font-weight: 600; }
 
     .tip { font-size: 0.8rem; color: #94a3b8; margin-bottom: 0; }
+
+    .mcp-tagline { font-size: 0.85rem; color: #475569; margin: 0 0 1rem; }
+    .mcp-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; }
+    .mcp-tool { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.8rem; }
+    .mcp-tool code { display: block; font-size: 0.78rem; color: var(--indigo); font-weight: 700; margin-bottom: 0.2rem; }
+    .mcp-tool span { font-size: 0.75rem; color: #64748b; }
+    .mcp-install { background: #1e1b4b; border-radius: 10px; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+    .mcp-install h4 { margin: 0 0 0.5rem; font-size: 0.7rem; color: #818cf8; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .mcp-install pre { margin: 0; font-size: 0.78rem; color: #e2e8f0; font-family: monospace; white-space: pre-wrap; line-height: 1.6; }
+    .mcp-clients { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
+    .mcp-client { font-size: 0.75rem; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.2rem 0.6rem; font-weight: 600; }
+
     footer { text-align: center; font-size: 0.8rem; color: #94a3b8; padding: 1.5rem 0; }
     footer a { color: var(--indigo); }
   </style>
@@ -181,13 +193,11 @@
       is the default in most modern digital panchangam apps.</p>
       <button class="read-more" data-more="Read more about Drik Ganita ▾" data-less="Show less ▴" onclick="toggleReadMore('drik-more', this)">Read more about Drik Ganita ▾</button>
       <div class="expanded" id="drik-more">
-        Drik Ganita ("observation-based calculation") replaced older mean-motion methods once accurate
-        ephemeris data became widely available. It directly computes the true positions of the sun and
-        moon for a given place and time, so sunrise/sunset and Tithi/Nakshatra transitions match what
-        you'd observe in the sky. Most contemporary panchangam websites and apps use this as their
-        default.
+        <strong>What it computes:</strong> True geocentric positions of the Sun and Moon using the Swiss Ephemeris — the same engine that powers professional astronomy software. It applies the Lahiri ayanamsa (also called Chitrapaksha), which is India's government-adopted standard since 1955 and is specified by the Indian Astronomical Ephemeris. Because calculations are grounded in actual sky positions, sunrise and sunset times will match your weather app, and Tithi/Nakshatra boundaries reflect exactly when the sky transitions occur at your location.
         <br/><br/>
-        References: <a href="https://en.wikipedia.org/wiki/Hindu_calendar" target="_blank" rel="noopener">Wikipedia — Hindu calendar</a> · <a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">DrikPanchang.com</a>
+        <strong>Who uses it:</strong> The default for most modern digital panchangam apps and websites. If you're comparing against Prokerala, AstroSeek, or any app that doesn't specify a system, it's almost certainly Drik Ganita.
+        <br/><br/>
+        <strong>Gotcha:</strong> A small number of traditional institutions still associate "Drik" specifically with the Krishnamurti (KP) ayanamsa variant. If you hear someone say Drik results differ from what you see here, ask which ayanamsa they're using — this implementation uses Lahiri.
       </div>
     </div>
 
@@ -199,13 +209,11 @@
       vratam or muhurtam, this is usually the calendar your priest follows.</p>
       <button class="read-more" data-more="Read more about Surya Siddhanta ▾" data-less="Show less ▴" onclick="toggleReadMore('ss-more', this)">Read more about Surya Siddhanta ▾</button>
       <div class="expanded" id="ss-more">
-        The Surya Siddhanta's mean-motion approach predates modern observational astronomy by centuries,
-        yet remains the liturgical standard for many institutions because changing it would shift centuries
-        of established festival dates. Differences from Drik Ganita are usually small (minutes to hours)
-        but can occasionally shift a tithi-based festival by a full day — which is why some festival dates
-        differ between a TTD-style panchangam and a modern app.
+        <strong>What it computes:</strong> Planetary positions from mean-motion formulas codified in the Surya Siddhanta, a text composed roughly between 400–600 CE. Instead of tracking actual sky positions, it uses long-period average orbital cycles with bija (seed) corrections. The result diverges from true sky positions by several arc-minutes for the Sun and up to a degree for the Moon — enough to shift a Tithi boundary by 30–90 minutes compared to Drik Ganita.
         <br/><br/>
-        References: <a href="https://en.wikipedia.org/wiki/Surya_Siddhanta" target="_blank" rel="noopener">Wikipedia — Surya Siddhanta</a> · <a href="https://www.tirumala.org/" target="_blank" rel="noopener">Tirumala Tirupati Devasthanams</a>
+        <strong>Who uses it:</strong> Tirumala Tirupati Devasthanams (TTD) and most major South Indian temple trusts base their official panchangams on Surya Siddhanta calculations reviewed by a Panchanga Nirnayam committee. If you observe Ekadashi on the day your temple announces rather than the day a modern app shows, this is the system that matches your priest's calendar.
+        <br/><br/>
+        <strong>Gotcha:</strong> The practical gap between Surya Siddhanta and Drik is usually minutes, but for Tithi-sensitive observances (Ekadashi, Amavasya, Pournami) the boundary can fall on different calendar dates — which is why families sometimes fast on different days without either being "wrong."
       </div>
     </div>
 
@@ -217,17 +225,63 @@
       or regional conventions.</p>
       <button class="read-more" data-more="Read more about Vakya ▾" data-less="Show less ▴" onclick="toggleReadMore('vakya-more', this)">Read more about Vakya ▾</button>
       <div class="expanded" id="vakya-more">
-        Vakya panchangams use short verse-encoded correction tables (vakyas) that approximate planetary
-        positions without needing modern computation — a method refined and handed down for generations
-        in Tamil Nadu, Andhra Pradesh, and Telangana. Many families follow the specific printed panchangam
-        their household has used for decades, which is typically Vakya-based.
+        <strong>What it computes:</strong> Builds on Surya Siddhanta mean motions but layers in vakyas — short verse-encoded correction tables that account for the Moon's variable speed (it moves faster near perigee, slower near apogee). The word "vakya" means "sentence": each correction value is encoded as a Sanskrit syllable sequence that a trained astronomer could recite from memory. This approach dates to approximately the 9th–10th century CE in South India.
         <br/><br/>
-        References: <a href="https://en.wikipedia.org/wiki/Pancanga" target="_blank" rel="noopener">Wikipedia — Pañcāṅga</a> · <a href="https://www.drikpanchang.com/panchang/about-panchang.html" target="_blank" rel="noopener">DrikPanchang — About Panchang</a>
+        <strong>Who uses it:</strong> Most printed Telugu and Tamil panchangams sold annually — the physical booklets with the new Samvatsara on the cover — use Vakya calculations. Different publishers (Viswanatha Siddhanthi, TTD printed calendar, etc.) may use slightly different vakya tables, which is why two printed panchangams from the same year can show Tithi end-times that differ by 5–15 minutes.
+        <br/><br/>
+        <strong>Gotcha:</strong> Vakya's lunar corrections can make it more accurate than plain Surya Siddhanta for moonrise and Tithi timings, but it's still less precise than Drik Ganita for solar events like sunrise. If your family's tradition is "we follow the printed panchangam," Vakya is the system that matches it.
       </div>
     </div>
 
     <p class="tip">Not sure? Drik Ganita is a safe modern default. If your family or temple follows a
     specific printed panchangam, match it to Surya Siddhanta or Vakya instead.</p>
+  </div>
+
+  <div class="card">
+    <h2>🤖 Use Panchangam in AI Assistants</h2>
+    <p class="mcp-tagline">
+      <code style="background:var(--indigo-bg);color:var(--indigo);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.8rem;">mcp-server-panchangam</code>
+      is a standard <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
+      server that gives AI assistants direct access to Panchangam calculations — ask Claude or any
+      MCP-compatible agent for today's Tithi, a muhurta for next Tuesday, or special days in the coming month,
+      and it calls the engine directly rather than guessing.
+    </p>
+
+    <div class="mcp-tools">
+      <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
+      <div class="mcp-tool"><code>get_muhurta</code><span>Auspicious &amp; inauspicious windows only — faster for "is this a good time?" queries</span></div>
+      <div class="mcp-tool"><code>get_special_days</code><span>Ekadashi, Amavasya, Pournami, Pradosham, Sankranti and Eclipses for a month</span></div>
+      <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
+    </div>
+
+    <p style="font-size:0.82rem;color:#475569;margin:0.75rem 0 0.25rem;">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. Supports all three calculation systems.</p>
+
+    <div class="mcp-clients">
+      <span class="mcp-client">Claude Desktop</span>
+      <span class="mcp-client">Claude Code</span>
+      <span class="mcp-client">Cursor</span>
+      <span class="mcp-client">Windsurf</span>
+      <span class="mcp-client">Any MCP client</span>
+    </div>
+
+    <div class="mcp-install">
+      <h4>Claude Desktop — add to claude_desktop_config.json</h4>
+      <pre>{
+  "mcpServers": {
+    "panchangam": {
+      "command": "uvx",
+      "args": ["mcp-server-panchangam"]
+    }
+  }
+}</pre>
+    </div>
+
+    <div class="mcp-install">
+      <h4>Claude Code — run once in terminal</h4>
+      <pre>claude mcp add panchangam -- uvx mcp-server-panchangam</pre>
+    </div>
+
+    <p class="tip">Available on <a href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">PyPI</a> · No API key required · Works offline for pre-configured cities</p>
   </div>
 
   <footer>
@@ -419,9 +473,14 @@
         data.eclipse.sutak = { start: m[1].trim(), end: m[2].trim() };
         continue;
       }
-      // Special yoga entries: "  Yoga Name"
+      // Special yoga entries: "  Yoga Name" (new format)
       if (section === 'specialyogas' && (m = line.match(/^\s+(.+)$/))) {
         data.yogas.push(m[1].trim());
+        continue;
+      }
+      // Backward compat: old "Yogas: X, Y" single-line format
+      if ((m = line.match(/^Yogas:\s+(.+)$/))) {
+        data.yogas = m[1].trim().split(/,\s*/);
         continue;
       }
     }
