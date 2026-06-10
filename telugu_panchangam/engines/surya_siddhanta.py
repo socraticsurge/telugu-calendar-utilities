@@ -4,17 +4,17 @@ from datetime import date
 
 import pytz
 
-from src.engines.base import (
+from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, RITUVU_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
     VAARAM_NAMES, MAASAM_NAMES, SAMVATSARA_NAMES,
     KARANA_REPEATING, KARANA_FIXED,
 )
-from src.engines.utils import (
+from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
-from src.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 
 _KALI_EPOCH_JD    = 588465.5
 _CIVIL_DAYS       = 1_577_917_828

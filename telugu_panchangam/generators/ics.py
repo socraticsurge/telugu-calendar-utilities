@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytz
 from icalendar import Calendar, Event, vText
 
-from src.models.panchangam_day import PanchangamDay, Window
+from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 
 
 SYSTEM_LABELS = {

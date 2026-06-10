@@ -1,9 +1,9 @@
 # tests/test_ics_generator.py
 from datetime import date, datetime, timezone
 from icalendar import Calendar
-from src.generators.ics import ICSGenerator
-from src.engines.drik import DrikGanitaEngine
-from src.cities import CITIES
+from telugu_panchangam.generators.ics import ICSGenerator
+from telugu_panchangam.engines.drik import DrikGanitaEngine
+from telugu_panchangam.cities import CITIES
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 ENGINE = DrikGanitaEngine()

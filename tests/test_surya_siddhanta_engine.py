@@ -1,13 +1,13 @@
 from datetime import date, datetime, timezone
-from src.engines.surya_siddhanta import SuryaSiddhantaEngine, ss_sun_longitude, ss_moon_longitude
-from src.cities import CITIES
+from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine, ss_sun_longitude, ss_moon_longitude
+from telugu_panchangam.cities import CITIES
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 ENGINE = SuryaSiddhantaEngine()
 REF_DATE = date(2024, 3, 25)
 
 def test_calculate_returns_panchangam_day():
-    from src.models.panchangam_day import PanchangamDay
+    from telugu_panchangam.models.panchangam_day import PanchangamDay
     result = ENGINE.calculate(REF_DATE, HYD)
     assert isinstance(result, PanchangamDay)
 
@@ -26,25 +26,25 @@ def test_sunrise_hour_hyderabad():
     assert utc_hour in (0, 1)
 
 def test_ss_sun_longitude_range():
-    from src.engines.utils import local_midnight_jd
+    from telugu_panchangam.engines.utils import local_midnight_jd
     jd = local_midnight_jd(REF_DATE, 'Asia/Kolkata')
     lon = ss_sun_longitude(jd)
     assert 0.0 <= lon < 360.0
 
 def test_ss_moon_longitude_range():
-    from src.engines.utils import local_midnight_jd
+    from telugu_panchangam.engines.utils import local_midnight_jd
     jd = local_midnight_jd(REF_DATE, 'Asia/Kolkata')
     lon = ss_moon_longitude(jd)
     assert 0.0 <= lon < 360.0
 
 def test_ss_sun_in_meena_on_ref_date():
-    from src.engines.utils import local_midnight_jd
+    from telugu_panchangam.engines.utils import local_midnight_jd
     jd = local_midnight_jd(REF_DATE, 'Asia/Kolkata')
     lon = ss_sun_longitude(jd)
     assert 320.0 < lon < 360.0
 
 def test_tithi_name_is_valid():
-    from src.engines.base import TITHI_NAMES
+    from telugu_panchangam.engines.base import TITHI_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.tithi.name in TITHI_NAMES
 
@@ -54,8 +54,8 @@ def test_tithi_has_start_end():
 
 def test_paksham_shukla_on_ref():
     # SS Pournami falls on 2024-03-24 (one day before Drik); on 2024-03-25 SS is Krishna paksha
-    from src.engines.surya_siddhanta import ss_elongation
-    from src.engines.utils import get_sunrise, local_midnight_jd
+    from telugu_panchangam.engines.surya_siddhanta import ss_elongation
+    from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd
     geopos = [HYD.lon, HYD.lat, 0.0]
     jd_mid = local_midnight_jd(REF_DATE, HYD.timezone)
     jd_sr  = get_sunrise(jd_mid, geopos)
@@ -66,12 +66,12 @@ def test_paksham_shukla_on_ref():
     assert result.paksham == expected_paksham
 
 def test_nakshatra_valid():
-    from src.engines.base import NAKSHATRA_NAMES
+    from telugu_panchangam.engines.base import NAKSHATRA_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.nakshatra.name in NAKSHATRA_NAMES
 
 def test_yoga_valid():
-    from src.engines.base import YOGA_NAMES
+    from telugu_panchangam.engines.base import YOGA_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.yoga.name in YOGA_NAMES
 
@@ -101,7 +101,7 @@ def test_samvatsara_nonempty():
     assert result.samvatsara != ''
 
 def test_maasam_valid():
-    from src.engines.base import MAASAM_NAMES
+    from telugu_panchangam.engines.base import MAASAM_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.maasam in MAASAM_NAMES
 

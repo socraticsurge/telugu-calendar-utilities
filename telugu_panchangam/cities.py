@@ -1,4 +1,4 @@
-from src.models.panchangam_day import Location
+from telugu_panchangam.models.panchangam_day import Location
 
 CITIES: list[Location] = [
     # Telugu Heartland — AP & Telangana

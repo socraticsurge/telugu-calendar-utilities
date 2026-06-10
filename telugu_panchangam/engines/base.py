@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from src.models.panchangam_day import Location, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 
 TITHI_NAMES: list[str] = [
     # Shukla Paksha (0-14)

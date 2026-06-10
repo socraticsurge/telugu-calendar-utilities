@@ -2,21 +2,21 @@
 import math
 from datetime import date
 
-from src.engines.surya_siddhanta import (
+from telugu_panchangam.engines.surya_siddhanta import (
     SuryaSiddhantaEngine,
     ss_sun_longitude, ss_moon_longitude,
     _KALI_EPOCH_JD, _CIVIL_DAYS, _MOON_REVS, _MOON_APOGEE_REVS,
     _MOON_MANDA_R,
 )
-from src.engines.utils import (
+from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
-from src.engines.base import (
+from telugu_panchangam.engines.base import (
     RASHI_NAMES, RITUVU_NAMES, VAARAM_NAMES, MAASAM_NAMES, SAMVATSARA_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, KARANA_REPEATING, KARANA_FIXED,
 )
-from src.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 
 # ---------------------------------------------------------------------------
 # Vakya correction table — 9-phase correction over the 248-year Moon cycle

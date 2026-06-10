@@ -26,7 +26,7 @@ jobs:
         run: python -m pytest tests/ -v
 
       - name: Generate feeds
-        run: python -m src.generate
+        run: python -m telugu_panchangam.generate
 
       - name: Rebuild landing page
         run: python scripts/build_landing_page.py

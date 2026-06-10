@@ -2,7 +2,7 @@
 import os
 import tempfile
 from datetime import date
-from src.generate import generate_feeds
+from telugu_panchangam.generate import generate_feeds
 
 def test_generate_creates_ics_files():
     with tempfile.TemporaryDirectory() as tmpdir:

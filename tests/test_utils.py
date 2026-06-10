@@ -1,5 +1,5 @@
 from datetime import datetime, timezone, date
-from src.engines.utils import (
+from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
     moon_sun_elongation, moon_longitude, sun_longitude,
 )

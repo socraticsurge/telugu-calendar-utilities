@@ -4,11 +4,11 @@ from datetime import date, timedelta
 import os
 import sys
 
-from src.cities import CITIES
-from src.engines.drik import DrikGanitaEngine
-from src.engines.surya_siddhanta import SuryaSiddhantaEngine
-from src.engines.vakya import VakyaEngine
-from src.generators.ics import ICSGenerator
+from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
+from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
+from telugu_panchangam.engines.vakya import VakyaEngine
+from telugu_panchangam.generators.ics import ICSGenerator
 
 ENGINES = {
     'drik': DrikGanitaEngine,

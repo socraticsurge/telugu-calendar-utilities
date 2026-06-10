@@ -3,18 +3,18 @@ from datetime import date, datetime, timezone
 import swisseph as swe
 import pytz
 
-from src.engines.base import (
+from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, RITUVU_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
     VAARAM_NAMES, MAASAM_NAMES, SAMVATSARA_NAMES,
     KARANA_REPEATING, KARANA_FIXED,
 )
-from src.engines.utils import (
+from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
     sun_longitude, moon_longitude, moon_sun_elongation,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
-from src.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 
 # Rahu Kalam, Gulika, Yamagandam: 1-indexed part of day (1=first, 8=last)
 # Weekday: 0=Sunday, 1=Monday, ..., 6=Saturday

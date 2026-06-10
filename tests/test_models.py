@@ -1,5 +1,5 @@
 from datetime import date, datetime, timezone
-from src.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 
 def test_location_fields():
     loc = Location(name='Hyderabad', lat=17.385, lon=78.4867, timezone='Asia/Kolkata')
