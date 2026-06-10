@@ -92,7 +92,9 @@ def test_special_yogas_in_description():
     cal = Calendar.from_ical(raw)
     events = [c for c in cal.walk() if c.name == 'VEVENT']
     description = str(events[0].get('description'))
-    assert 'Yogas: Sarvartha Siddhi Yoga, Dagdha Yoga' in description
+    assert '─ Special Yogas ─' in description
+    assert '  Sarvartha Siddhi Yoga' in description
+    assert '  Dagdha Yoga' in description
 
 
 def test_no_yogas_section_when_empty():

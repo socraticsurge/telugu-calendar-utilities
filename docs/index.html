@@ -361,8 +361,8 @@
     const data = {
       meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
       sunrise: null, sunset: null, moonrise: null, moonset: null,
-      auspicious: [], inauspicious: [],
-      eclipse: null, yogas: null,
+      auspicious: [], inauspicious: [], choghadiya: [],
+      eclipse: null, yogas: [],
     };
     let section = null;
     for (const raw of description.split('\n')) {
@@ -370,15 +370,18 @@
       if (!line.trim()) { section = null; continue; }
 
       let m;
-      if ((m = line.match(/^Samvatsara: (.+) \| (.+) Maasam \| (.+) Paksham \| (.+)$/))) {
-        data.meta = `${m[1]} Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4]}`;
+      // Header: "Samvatsara  ·  Maasam  ·  Paksham  ·  Vaaram"
+      if ((m = line.match(/^(.+?)\s+·\s+(.+?) Maasam\s+·\s+(.+?) Paksham\s+·\s+(.+)$/))) {
+        data.meta = `${m[1]} Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4].trim()}`;
         continue;
       }
-      if ((m = line.match(/^Sunrise: (\d{2}:\d{2}) \| Sunset: (\d{2}:\d{2}) \| Moonrise: (\d{2}:\d{2}) \| Moonset: (\d{2}:\d{2})$/))) {
+      // Sky: "Sunrise HH:MM  ·  Sunset HH:MM  ·  Moonrise HH:MM  ·  Moonset HH:MM"
+      if ((m = line.match(/^Sunrise (\d{2}:\d{2})\s+·\s+Sunset (\d{2}:\d{2})\s+·\s+Moonrise (\d{2}:\d{2})\s+·\s+Moonset (\d{2}:\d{2})$/))) {
         [, data.sunrise, data.sunset, data.moonrise, data.moonset] = m;
         continue;
       }
-      if ((m = line.match(/^(Tithi|Nakshatra|Yoga):\s+(.+?)\s+(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})$/))) {
+      // Pancha anga rows
+      if ((m = line.match(/^(Tithi|Nakshatra|Yoga):\s+(.+?)\s{2,}(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})$/))) {
         data[m[1].toLowerCase()] = { name: m[2].trim(), start: m[3], end: m[4] };
         continue;
       }
@@ -386,27 +389,39 @@
         data.karana = m[1].trim();
         continue;
       }
-      if (line === 'Auspicious:') { section = 'auspicious'; continue; }
-      if (line === 'Inauspicious:') { section = 'inauspicious'; continue; }
-      if (section && (m = line.match(/^\s*(.+?)\s{2,}(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s*$/))) {
+      // Section headers
+      if (line === '─ Auspicious ─') { section = 'auspicious'; continue; }
+      if (line === '─ Inauspicious ─') { section = 'inauspicious'; continue; }
+      if (line === '─ Choghadiya ─') { section = 'choghadiya'; continue; }
+      if (line === '─ Eclipse ─') { section = 'eclipse'; continue; }
+      if (line === '─ Special Yogas ─') { section = 'specialyogas'; continue; }
+      // Auspicious / inauspicious entries: "  Name           HH:MM – HH:MM"
+      if ((section === 'auspicious' || section === 'inauspicious') &&
+          (m = line.match(/^\s+(.+?)\s{2,}(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s*$/))) {
         data[section].push({ name: m[1].trim(), start: m[2], end: m[3] });
         continue;
       }
-      if ((m = line.match(/^. (Solar|Lunar) Eclipse \((.+?)\) — (.+)$/))) {
-        section = 'eclipse';
+      // Choghadiya entries: "  HH:MM – HH:MM  Name"
+      if (section === 'choghadiya' && (m = line.match(/^\s+(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s+(.+)$/))) {
+        data.choghadiya.push({ start: m[1], end: m[2], name: m[3].trim() });
+        continue;
+      }
+      // Eclipse detail line: "  🌒 Solar Eclipse (Total) — visible/not visible..."
+      if (section === 'eclipse' && (m = line.match(/^\s+.\s+(Solar|Lunar) Eclipse \((.+?)\)\s*[—-]\s*(.+)$/))) {
         data.eclipse = { kind: m[1], subtype: m[2], visible: !m[3].includes('not visible'), window: null, sutak: null };
         continue;
       }
-      if (section === 'eclipse' && (m = line.match(/^\s+Eclipse:\s+(.+?)\s*[–-]\s*(.+)$/))) {
+      if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Window:\s+(.+?)\s*[–-]\s*(.+)$/))) {
         data.eclipse.window = { start: m[1].trim(), end: m[2].trim() };
         continue;
       }
-      if (section === 'eclipse' && (m = line.match(/^\s+Sutak:\s+(.+?)\s*[–-]\s*(.+)$/))) {
+      if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Sutak:\s+(.+?)\s*[–-]\s*(.+)$/))) {
         data.eclipse.sutak = { start: m[1].trim(), end: m[2].trim() };
         continue;
       }
-      if ((m = line.match(/^Yogas:\s+(.+)$/))) {
-        data.yogas = m[1].trim();
+      // Special yoga entries: "  Yoga Name"
+      if (section === 'specialyogas' && (m = line.match(/^\s+(.+)$/))) {
+        data.yogas.push(m[1].trim());
         continue;
       }
     }
@@ -451,9 +466,13 @@
       if (e.window) rows += row('Eclipse window', `${e.window.start} – ${e.window.end}`);
       if (e.sutak) rows += row('Sutak', `${e.sutak.start} – ${e.sutak.end}`);
     }
-    if (data.yogas) {
+    if (data.choghadiya.length) {
+      rows += groupHead('🕐 Choghadiya');
+      data.choghadiya.forEach(c => { rows += row(c.name, `${c.start} – ${c.end}`); });
+    }
+    if (data.yogas.length) {
       rows += groupHead('✨ Special Yogas');
-      rows += row('Active today', data.yogas);
+      data.yogas.forEach(y => { rows += row('', y); });
     }
 
     container.innerHTML = `
