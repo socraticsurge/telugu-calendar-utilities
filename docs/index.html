@@ -136,6 +136,10 @@
     <div class="url-box" id="sub-url">—</div>
     <button class="btn" onclick="copyUrl()">Copy URL</button>
     <span class="copy-confirm" id="copy-confirm">Copied!</span>
+    <a id="sub-https-link" href="#" target="_blank" rel="noopener"
+       style="margin-left:0.75rem;font-size:0.8rem;color:var(--indigo);font-weight:600;">
+      Open feed in browser ↗
+    </a>
 
     <h3 class="sub" style="margin-top:1.25rem;">2 · Add it to your calendar</h3>
     <div class="app-tabs">
@@ -338,6 +342,8 @@
     const system = document.getElementById('sub-system').value;
     const url = `webcal://${FEED_BASE_URL.replace('https://', '')}${feedFilename(city, system)}`;
     document.getElementById('sub-url').textContent = url;
+    const httpsUrl = `${FEED_BASE_URL}${feedFilename(city, system)}`;
+    document.getElementById('sub-https-link').href = httpsUrl;
   }
 
   function copyUrl() {
