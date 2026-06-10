@@ -43,28 +43,37 @@
     .app-panel ol li { margin-bottom: 0.2rem; break-inside: avoid; }
 
     .preview-card { border: 1px solid #dbe2ea; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
-    .preview-body { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
-    .preview-col + .preview-col { border-left: 1px solid #f1f5f9; }
-    @media (max-width: 620px) {
-      .preview-body { grid-template-columns: 1fr; }
-      .preview-col + .preview-col { border-left: none; border-top: 1px solid #f1f5f9; }
-    }
     .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; }
     .preview-head .date { font-weight: 700; font-size: 0.9rem; }
     .preview-head .meta { font-size: 0.72rem; opacity: 0.85; margin-top: 0.1rem; }
     .preview-head .badge { display: inline-block; background: #fbbf24; color: #78350f; font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
 
-    .preview-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-    .preview-table tr { border-bottom: 1px solid #f1f5f9; }
-    .preview-table tr:last-child { border-bottom: none; }
-    .preview-table td { padding: 0.4rem 0.9rem; vertical-align: top; }
-    .preview-table td.k { color: #94a3b8; font-weight: 600; width: 38%; white-space: nowrap; }
-    .preview-table td.v { color: #1e1b4b; }
-    .preview-table td .time { color: #94a3b8; font-size: 0.73rem; white-space: nowrap; }
-    .yoga-chip { display: inline-block; background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.75rem; font-weight: 600; margin: 0.1rem 0.25rem 0.1rem 0; }
-    .preview-table .group-head td { background: #f8fafc; color: var(--indigo); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.3rem 0.9rem; }
-    .preview-table .group-head.good td { color: #16a34a; }
-    .preview-table .group-head.bad td { color: #dc2626; }
+    .flag-strip { background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); padding: 0.45rem 0.9rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+    .special-chip { display: inline-block; background: #fff; color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.75rem; font-weight: 700; }
+    .yoga-chip { display: inline-block; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.75rem; font-weight: 600; }
+
+    .anga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; padding: 0.7rem 0.9rem 0.25rem; }
+    @media (max-width: 620px) { .anga-grid { grid-template-columns: repeat(2, 1fr); } }
+    .anga-cell { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px; padding: 0.45rem 0.4rem; text-align: center; }
+    .anga-label { font-size: 0.62rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; }
+    .anga-name { font-size: 0.84rem; font-weight: 700; color: #1e1b4b; margin-top: 0.1rem; }
+    .anga-time { font-size: 0.66rem; color: #64748b; margin-top: 0.05rem; white-space: nowrap; }
+    .preview-head .meta.sky { margin-top: 0.25rem; opacity: 1; font-size: 0.78rem; }
+
+    .tile-strip { border-top: 1px solid #f1f5f9; padding: 0.6rem 0.9rem 0.75rem; }
+    .strip-title { font-size: 0.7rem; font-weight: 700; color: var(--indigo); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem; }
+    .strip-title.good-t { color: #16a34a; }
+    .strip-title.bad-t { color: #dc2626; }
+    .win-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.3rem; }
+    .chog-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .chog-grid { grid-template-columns: repeat(4, 1fr); } }
+    .chog-cell { border-radius: 6px; padding: 0.3rem 0.15rem; text-align: center; }
+    .chog-cell.good { background: var(--green-bg); border: 1px solid var(--green-border); }
+    .chog-cell.bad { background: #fef2f2; border: 1px solid #fecaca; }
+    .chog-name { font-size: 0.72rem; font-weight: 700; }
+    .chog-cell.good .chog-name { color: var(--green); }
+    .chog-cell.bad .chog-name { color: #b91c1c; }
+    .chog-time { font-size: 0.6rem; color: #64748b; white-space: nowrap; }
     .preview-note { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0 0; }
     .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
 
@@ -442,7 +451,7 @@
       meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
       sunrise: null, sunset: null, moonrise: null, moonset: null,
       auspicious: [], inauspicious: [], choghadiya: [],
-      eclipse: null, yogas: [], ayanam: null, rituvu: null,
+      eclipse: null, yogas: [], ayanam: null, rituvu: null, special: [],
     };
     let section = null;
     for (const raw of description.split('\n')) {
@@ -452,6 +461,10 @@
       let m;
       // Header: "Samvatsara  ·  Maasam  ·  Paksham  ·  Vaaram"
       if ((m = line.match(/^(.+?)\s+·\s+(.+?) Maasam\s+·\s+(.+?) Paksham\s+·\s+(.+)$/))) {
+        data.samvatsara = m[1].trim();
+        data.maasam = m[2].trim();
+        data.paksham = m[3].trim();
+        data.vaaram = m[4].trim();
         data.meta = `${m[1]} Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4].trim()}`;
         continue;
       }
@@ -493,7 +506,7 @@
         continue;
       }
       // Eclipse detail line: "  🌒 Solar Eclipse (Total) — visible/not visible..."
-      if (section === 'eclipse' && (m = line.match(/^\s+.\s+(Solar|Lunar) Eclipse \((.+?)\)\s*[—-]\s*(.+)$/))) {
+      if (section === 'eclipse' && (m = line.match(/^\s*\S+\s+(Solar|Lunar) Eclipse \((.+?)\)\s*[—-]\s*(.+)$/))) {
         data.eclipse = { kind: m[1], subtype: m[2], visible: !m[3].includes('not visible'), window: null, sutak: null };
         continue;
       }
@@ -515,6 +528,11 @@
         data.yogas = m[1].trim().split(/,\s*/);
         continue;
       }
+      // Trailing special-day line: "⚡ Ekadashi — fasting day  ·  Pradosham"
+      if ((m = line.match(/^⚡\s*(.+)$/))) {
+        data.special = m[1].split(/\s+·\s+/).map(s => s.trim());
+        continue;
+      }
     }
     return data;
   }
@@ -528,64 +546,84 @@
   function renderPreview(container, event) {
     const data = parseDescription(event.description);
     const special = event.summary.includes('⚡') ? '<span class="badge">Special day</span>' : '';
-    const row = (k, v) => `<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`;
-    const groupHead = (label, cls) => `<tr class="group-head ${cls || ''}"><td colspan="2">${label}</td></tr>`;
-    const span = entry => entry ? `${entry.name}<div class="time">${entry.start} – ${entry.end}</div>` : '—';
-
-    let left = '';
-    if (data.tithi) left += row('Tithi', span(data.tithi));
-    if (data.nakshatra) left += row('Nakshatra', span(data.nakshatra));
-    if (data.yoga) left += row('Yoga', span(data.yoga));
-    if (data.karana) {
-      const karanas = data.karana.split(/\s+\/\s+/).map(k => {
-        const m = k.match(/^(.*?)\s+(\d{2}:\d{2}\s*[–-]\s*\d{2}:\d{2})$/);
-        return m ? `${m[1]}<div class="time">${m[2]}</div>` : k;
-      }).join('');
-      left += row('Karana', karanas);
-    }
-
-    if (data.ayanam) left += row('Ayanam / Rituvu', `${data.ayanam} · ${data.rituvu}`);
-    left += groupHead('Sky');
-    left += row('Sunrise / Sunset', `${data.sunrise} / ${data.sunset}`);
-    left += row('Moonrise / Moonset', `${data.moonrise} / ${data.moonset}`);
-    if (data.choghadiya.length) {
-      left += groupHead('🕐 Choghadiya');
-      data.choghadiya.forEach(c => { left += row(c.name, `${c.start} – ${c.end}`); });
-    }
-
-    let right = '';
-    if (data.auspicious.length) {
-      right += groupHead('🟢 Auspicious', 'good');
-      data.auspicious.forEach(e => { right += row(e.name, `${e.start} – ${e.end}`); });
-    }
-    if (data.inauspicious.length) {
-      right += groupHead('🔴 Inauspicious', 'bad');
-      data.inauspicious.forEach(e => { right += row(e.name, `${e.start} – ${e.end}`); });
-    }
+    // 1 · Why today is special — flags right under the header, with the reason.
+    let flags = '';
+    data.special
+      .filter(s => !(data.eclipse && /Eclipse/.test(s)))
+      .forEach(s => { flags += `<span class="special-chip">⚡ ${s}</span>`; });
     if (data.eclipse) {
       const e = data.eclipse;
       const emoji = e.kind === 'Solar' ? '🌒' : '🌕';
-      right += groupHead(`${emoji} Eclipse`);
-      right += row('Type', `${e.kind} Eclipse (${e.subtype})`);
-      right += row('Visibility', e.visible ? 'Visible from this location' : 'Not visible from this location');
-      if (e.window) right += row('Eclipse window', `${e.window.start} – ${e.window.end}`);
-      if (e.sutak) right += row('Sutak', `${e.sutak.start} – ${e.sutak.end}`);
+      let txt = `${emoji} ${e.kind} Eclipse (${e.subtype}) — ${e.visible ? 'visible here' : 'not visible here'}`;
+      if (e.visible && e.window) txt += ` · ${e.window.start} – ${e.window.end}`;
+      if (e.visible && e.sutak) txt += ` · Sutak ${e.sutak.start} – ${e.sutak.end}`;
+      flags += `<span class="special-chip">${txt}</span>`;
     }
-    if (data.yogas.length) {
-      right += groupHead('✨ Special Yogas');
-      right += `<tr><td colspan="2" style="padding:0.5rem 0.9rem;">${data.yogas.map(y => `<span class="yoga-chip">${y}</span>`).join('')}</td></tr>`;
+    data.yogas.forEach(y => { flags += `<span class="yoga-chip">✨ ${y}</span>`; });
+    const flagStrip = flags ? `<div class="flag-strip">${flags}</div>` : '';
+
+    // 2 · What the day is — Pancha Anga as hero tiles, sky as a slim strip.
+    const angaTile = (label, entry) => entry
+      ? `<div class="anga-cell"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${entry.start} – ${entry.end}</div></div>`
+      : '';
+    let anga = angaTile('Tithi', data.tithi) + angaTile('Nakshatra', data.nakshatra) + angaTile('Nitya Yoga', data.yoga);
+    if (data.karana) {
+      const karanas = data.karana.split(/\s+\/\s+/).map(k => {
+        const m = k.match(/^(.*?)\s+(\d{2}:\d{2}\s*[–-]\s*\d{2}:\d{2})$/);
+        return m ? `<div class="anga-time"><b>${m[1]}</b> ${m[2]}</div>` : `<div class="anga-time">${k}</div>`;
+      }).join('');
+      anga += `<div class="anga-cell"><div class="anga-label">Karana</div>${karanas}</div>`;
+    }
+    const angaGrid = anga ? `<div class="anga-grid">${anga}</div>` : '';
+
+    // Header context lines: year context · month context · today's sky frame.
+    const metaLines = data.samvatsara
+      ? `<div class="meta">${data.samvatsara} Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
+         <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>
+         <div class="meta sky">🌅 ${data.sunrise} – ${data.sunset} &nbsp;·&nbsp; 🌙 ${data.moonrise} – ${data.moonset}</div>`
+      : `<div class="meta">${data.meta}</div>`;
+
+    // 3 · When to act or avoid — tile strips in the same language as Choghadiya.
+    // An observance occurring twice (e.g. Durmuhurtham) is one tile, two windows.
+    const groupWins = list => {
+      const order = [];
+      const byName = new Map();
+      list.forEach(e => {
+        if (!byName.has(e.name)) { byName.set(e.name, []); order.push(e.name); }
+        byName.get(e.name).push(`${e.start}–${e.end}`);
+      });
+      return order.map(name => ({ name, times: byName.get(name) }));
+    };
+    const winCell = (e, cls) =>
+      `<div class="chog-cell ${cls}"><div class="chog-name">${e.name}</div>${e.times.map(t => `<div class="chog-time">${t}</div>`).join('')}</div>`;
+    let windows = '';
+    if (data.auspicious.length) {
+      windows += `<div class="tile-strip"><div class="strip-title good-t">🟢 Auspicious</div><div class="win-grid">${groupWins(data.auspicious).map(e => winCell(e, 'good')).join('')}</div></div>`;
+    }
+    if (data.inauspicious.length) {
+      windows += `<div class="tile-strip"><div class="strip-title bad-t">🔴 Avoid</div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
     }
 
-    const cols = [left, right].filter(Boolean)
-      .map(rows => `<div class="preview-col"><table class="preview-table">${rows}</table></div>`)
-      .join('');
+    // 4 · The day's timeline — Choghadiya as a full-width colour-coded strip.
+    const CHOG_GOOD = new Set(['Amrit', 'Shubh', 'Labh', 'Char']);
+    let chog = '';
+    if (data.choghadiya.length) {
+      chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — the day in 8 blocks</div><div class="chog-grid">` +
+        data.choghadiya.map(c =>
+          `<div class="chog-cell ${CHOG_GOOD.has(c.name) ? 'good' : 'bad'}"><div class="chog-name">${c.name}</div><div class="chog-time">${c.start}–${c.end}</div></div>`
+        ).join('') + `</div></div>`;
+    }
+
     container.innerHTML = `
       <div class="preview-card">
         <div class="preview-head">
           <div class="date">${formatToday()}${special}</div>
-          <div class="meta">${data.meta}</div>
+          ${metaLines}
         </div>
-        <div class="preview-body">${cols}</div>
+        ${flagStrip}
+        ${angaGrid}
+        ${windows}
+        ${chog}
       </div>
     `;
   }
@@ -596,7 +634,10 @@
     const container = document.getElementById('tp-result');
     container.innerHTML = '<p class="preview-error">Loading…</p>';
     try {
-      const res = await fetch(`feeds/${feedFilename(city, system)}`);
+      // Relative path on the deployed site; fall back to the live feed URL
+      // so the page also works when previewed locally without a feeds/ dir.
+      let res = await fetch(`feeds/${feedFilename(city, system)}`).catch(() => null);
+      if (!res || !res.ok) res = await fetch(`${FEED_BASE_URL}${feedFilename(city, system)}`);
       if (!res.ok) throw new Error('fetch failed');
       const text = await res.text();
       const event = findTodayEvent(text);
