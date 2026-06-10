@@ -1,0 +1,242 @@
+import json
+import calendar
+from datetime import date, datetime
+from typing import Optional
+
+import pytz
+
+from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
+from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
+from telugu_panchangam.engines.vakya import VakyaEngine
+from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
+from telugu_panchangam.mcp.location import resolve_location
+
+_ENGINES = {
+    'drik': DrikGanitaEngine(),
+    'surya_siddhanta': SuryaSiddhantaEngine(),
+    'vakya': VakyaEngine(),
+}
+
+_TIMEZONE_COUNTRY = {
+    'Asia/Kolkata': 'India',
+    'America/Chicago': 'USA',
+    'America/Los_Angeles': 'USA',
+    'America/New_York': 'USA',
+    'Europe/London': 'UK',
+    'Australia/Sydney': 'Australia',
+    'Asia/Dubai': 'UAE',
+}
+
+
+def _parse_date(date_str: str) -> date:
+    try:
+        return datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        raise ValueError(f"Invalid date '{date_str}'. Expected YYYY-MM-DD.")
+
+
+def _validate_system(system: str) -> None:
+    if system not in _ENGINES:
+        raise ValueError(
+            f"Invalid system '{system}'. Must be one of: drik, surya_siddhanta, vakya."
+        )
+
+
+def _resolve_city(
+    city: str,
+    latitude: Optional[float],
+    longitude: Optional[float],
+    timezone: Optional[str],
+) -> Location:
+    if latitude is not None and longitude is not None and timezone is not None:
+        return Location(name=city or 'Custom', lat=float(latitude), lon=float(longitude), timezone=timezone)
+    lat, lon, tz = resolve_location(city)
+    return Location(name=city, lat=lat, lon=lon, timezone=tz)
+
+
+def _fmt_time(dt: datetime, tz_str: str) -> str:
+    return dt.astimezone(pytz.timezone(tz_str)).strftime('%H:%M')
+
+
+def _span_to_dict(span, tz: str) -> dict:
+    return {
+        'name': span.name,
+        'start': _fmt_time(span.start, tz),
+        'end': _fmt_time(span.end, tz),
+    }
+
+
+def _window_to_dict(window, tz: str) -> dict:
+    return {
+        'start': _fmt_time(window.start, tz),
+        'end': _fmt_time(window.end, tz),
+    }
+
+
+def _special_events(day: PanchangamDay) -> list[str]:
+    events = []
+    if day.is_ekadashi:         events.append('Ekadashi — fasting day')
+    if day.is_amavasya:         events.append('Amavasya')
+    if day.is_pournami:         events.append('Pournami')
+    if day.is_shani_pradosham:  events.append('Shani Pradosham')
+    elif day.is_soma_pradosham: events.append('Soma Pradosham')
+    elif day.is_pradosham:      events.append('Pradosham')
+    if day.is_sankranti:        events.append('Sankranti')
+    return events
+
+
+def tool_list_supported_cities() -> str:
+    return json.dumps([
+        {
+            'name': c.name,
+            'latitude': c.lat,
+            'longitude': c.lon,
+            'timezone': c.timezone,
+            'country': _TIMEZONE_COUNTRY.get(c.timezone, 'Unknown'),
+        }
+        for c in CITIES
+    ])
+
+
+def tool_get_panchangam(
+    date_str: str,
+    city: str,
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        d = _parse_date(date_str)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        day = _ENGINES[system].calculate(d, loc)
+        tz = loc.timezone
+        specials = _special_events(day)
+        return json.dumps({
+            'date': date_str,
+            'city': city,
+            'system': system,
+            'metadata': {
+                'samvatsara': day.samvatsara,
+                'ayanam': day.ayanam,
+                'rituvu': day.rituvu,
+                'maasam': day.maasam,
+                'paksham': day.paksham,
+                'vaaram': day.vaaram,
+                'solar_sign': day.solar_sign,
+                'lunar_sign': day.lunar_sign,
+            },
+            'pancha_anga': {
+                'tithi':     _span_to_dict(day.tithi, tz),
+                'nakshatra': _span_to_dict(day.nakshatra, tz),
+                'yoga':      _span_to_dict(day.yoga, tz),
+                'karana':    [_span_to_dict(k, tz) for k in day.karana],
+            },
+            'sky': {
+                'sunrise':  _fmt_time(day.sunrise, tz),
+                'sunset':   _fmt_time(day.sunset, tz),
+                'moonrise': _fmt_time(day.moonrise, tz),
+                'moonset':  _fmt_time(day.moonset, tz),
+            },
+            'auspicious': {
+                'brahma_muhurta':  _window_to_dict(day.brahma_muhurta, tz),
+                'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz) if day.abhijit_muhurta else None,
+                'amrita_kalam':    [_window_to_dict(w, tz) for w in day.amrita_kalam],
+            },
+            'inauspicious': {
+                'rahu_kalam':   _window_to_dict(day.rahu_kalam, tz),
+                'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
+                'yamagandam':   _window_to_dict(day.yamagandam, tz),
+                'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
+                'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+            },
+            'choghadiya': [
+                {'name': w.name, 'start': _fmt_time(w.start, tz)}
+                for w in day.choghadiya
+            ],
+            'special_days': specials,
+            'is_special': bool(specials),
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_get_muhurta(
+    date_str: str,
+    city: str,
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        d = _parse_date(date_str)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        day = _ENGINES[system].calculate(d, loc)
+        tz = loc.timezone
+        return json.dumps({
+            'date': date_str,
+            'city': city,
+            'system': system,
+            'auspicious': {
+                'brahma_muhurta':  _window_to_dict(day.brahma_muhurta, tz),
+                'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz) if day.abhijit_muhurta else None,
+                'amrita_kalam':    [_window_to_dict(w, tz) for w in day.amrita_kalam],
+            },
+            'inauspicious': {
+                'rahu_kalam':   _window_to_dict(day.rahu_kalam, tz),
+                'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
+                'yamagandam':   _window_to_dict(day.yamagandam, tz),
+                'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
+                'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+            },
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_get_special_days(
+    year: int,
+    month: int,
+    city: str,
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        if not 1 <= month <= 12:
+            raise ValueError(f"Invalid month {month}. Must be 1–12.")
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        engine = _ENGINES[system]
+        _, days_in_month = calendar.monthrange(year, month)
+        special_days = []
+        for day_num in range(1, days_in_month + 1):
+            d = date(year, month, day_num)
+            day = engine.calculate(d, loc)
+            events = _special_events(day)
+            if events:
+                special_days.append({
+                    'date': d.isoformat(),
+                    'tithi': day.tithi.name,
+                    'events': events,
+                })
+        return json.dumps({
+            'year': year,
+            'month': month,
+            'city': city,
+            'system': system,
+            'special_days': special_days,
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
