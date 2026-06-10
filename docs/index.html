@@ -88,7 +88,7 @@
   <div class="hero">
     <div><span class="sunmoon">🌅</span></div>
     <h1>Telugu Panchangam</h1>
-    <div class="tagline">Subscribe to Tithi, Nakshatra, Muhurtams &amp; more — right in your calendar</div>
+    <div class="tagline">Subscribe to Tithi, Nakshatra, Muhurtams, Eclipses &amp; more — right in your calendar</div>
   </div>
 
   <div class="card">
@@ -362,6 +362,7 @@
       meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
       sunrise: null, sunset: null, moonrise: null, moonset: null,
       auspicious: [], inauspicious: [],
+      eclipse: null, yogas: null,
     };
     let section = null;
     for (const raw of description.split('\n')) {
@@ -389,6 +390,23 @@
       if (line === 'Inauspicious:') { section = 'inauspicious'; continue; }
       if (section && (m = line.match(/^\s*(.+?)\s{2,}(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s*$/))) {
         data[section].push({ name: m[1].trim(), start: m[2], end: m[3] });
+        continue;
+      }
+      if ((m = line.match(/^. (Solar|Lunar) Eclipse \((.+?)\) — (.+)$/))) {
+        section = 'eclipse';
+        data.eclipse = { kind: m[1], subtype: m[2], visible: !m[3].includes('not visible'), window: null, sutak: null };
+        continue;
+      }
+      if (section === 'eclipse' && (m = line.match(/^\s+Eclipse:\s+(.+?)\s*[–-]\s*(.+)$/))) {
+        data.eclipse.window = { start: m[1].trim(), end: m[2].trim() };
+        continue;
+      }
+      if (section === 'eclipse' && (m = line.match(/^\s+Sutak:\s+(.+?)\s*[–-]\s*(.+)$/))) {
+        data.eclipse.sutak = { start: m[1].trim(), end: m[2].trim() };
+        continue;
+      }
+      if ((m = line.match(/^Yogas:\s+(.+)$/))) {
+        data.yogas = m[1].trim();
         continue;
       }
     }
@@ -423,6 +441,19 @@
     if (data.inauspicious.length) {
       rows += groupHead('🔴 Inauspicious', 'bad');
       data.inauspicious.forEach(e => { rows += row(e.name, `${e.start} – ${e.end}`); });
+    }
+    if (data.eclipse) {
+      const e = data.eclipse;
+      const emoji = e.kind === 'Solar' ? '🌒' : '🌕';
+      rows += groupHead(`${emoji} Eclipse`);
+      rows += row('Type', `${e.kind} Eclipse (${e.subtype})`);
+      rows += row('Visibility', e.visible ? 'Visible from this location' : 'Not visible from this location');
+      if (e.window) rows += row('Eclipse window', `${e.window.start} – ${e.window.end}`);
+      if (e.sutak) rows += row('Sutak', `${e.sutak.start} – ${e.sutak.end}`);
+    }
+    if (data.yogas) {
+      rows += groupHead('✨ Special Yogas');
+      rows += row('Active today', data.yogas);
     }
 
     container.innerHTML = `

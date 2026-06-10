@@ -91,9 +91,3 @@ pytest tests/ -v
 python -m telugu_panchangam.generate   # writes to feeds/
 ```
 
-## Roadmap
-
-- **Plan A** ✅ — Drik Ganita engine + ICS pipeline + landing page
-- **Plan B** ✅ — Surya Siddhanta engine
-- **Plan C** ✅ — Vakya engine
-- **Phase 2** — MCP server (`get_panchangam(date, location, system)` for AI assistants), Tarabalam personalization, Chrome extension
