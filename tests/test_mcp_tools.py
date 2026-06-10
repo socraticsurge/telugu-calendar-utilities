@@ -107,3 +107,4 @@ def test_get_special_days_invalid_month():
     from telugu_panchangam.mcp.tools import tool_get_special_days
     result = json.loads(tool_get_special_days(2026, 13, 'Hyderabad', 'drik'))
     assert 'error' in result
+    assert 'Invalid month' in result['error']

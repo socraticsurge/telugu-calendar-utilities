@@ -222,8 +222,8 @@ def tool_get_special_days(
         for day_num in range(1, days_in_month + 1):
             d = date(year, month, day_num)
             day = engine.calculate(d, loc)
-            events = _special_events(day)
-            if events:
+            if day.is_ekadashi or day.is_amavasya or day.is_pournami or day.is_pradosham or day.is_sankranti:
+                events = _special_events(day)
                 special_days.append({
                     'date': d.isoformat(),
                     'tithi': day.tithi.name,
