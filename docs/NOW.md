@@ -1,6 +1,6 @@
 ## Right now
-- Phase: not started
-- Status: setup
-- What I need from you: run through Phase 1 (Roles & User Stories) to get started
+- Phase: - of -
+- Status: ▶ in progress
+- What I need from you: nothing — walk away
 - Stories done this phase: none
 - Next up: -
