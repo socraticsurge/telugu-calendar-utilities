@@ -1,3 +1,0 @@
-# Handoff
-
-Nothing in progress.
