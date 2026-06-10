@@ -14,7 +14,9 @@ def test_predefined_city_resolves_without_network():
 
 def test_predefined_city_case_insensitive():
     from telugu_panchangam.mcp.location import resolve_location
-    lat, lon, tz = resolve_location('hyderabad')
+    with patch('telugu_panchangam.mcp.location._GEOCODER') as mock_gc:
+        lat, lon, tz = resolve_location('hyderabad')
+        mock_gc.geocode.assert_not_called()
     assert tz == 'Asia/Kolkata'
 
 
@@ -48,3 +50,16 @@ def test_unresolvable_city_raises_value_error():
         mock_gc.geocode.return_value = None
         with pytest.raises(ValueError, match=r"Unknown city.*list_supported_cities\(\)"):
             resolve_location('xyznotacity123abc')
+
+
+def test_timezone_not_found_raises_value_error():
+    from telugu_panchangam.mcp.location import resolve_location
+    mock_loc = MagicMock()
+    mock_loc.latitude = 0.0
+    mock_loc.longitude = 0.0
+    with patch('telugu_panchangam.mcp.location._GEOCODER') as mock_gc, \
+         patch('telugu_panchangam.mcp.location._TF') as mock_tf:
+        mock_gc.geocode.return_value = mock_loc
+        mock_tf.timezone_at.return_value = None
+        with pytest.raises(ValueError, match="Could not determine timezone"):
+            resolve_location('Some Ocean Point')
