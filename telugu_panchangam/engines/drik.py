@@ -7,7 +7,7 @@ from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, RITUVU_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
     VAARAM_NAMES, MAASAM_NAMES,
-    KARANA_REPEATING, KARANA_FIXED, samvatsara_name,
+    KARANA_REPEATING, KARANA_FIXED, samvatsara_name, maasam_name,
 )
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
@@ -206,12 +206,8 @@ class DrikGanitaEngine(PanchangamEngine):
         return samvatsara_name(jd_sunrise, maasam)
 
     def _maasam(self, jd_sunrise: float) -> str:
-        """Lunar month name based on Sun's sign at the most recent Amavasya."""
-        jd_amavasya = previous_new_moon(moon_sun_elongation, jd_sunrise)
-        sun_lon_at_nm = sun_longitude(jd_amavasya)
-        solar_sign_idx = int(sun_lon_at_nm / 30.0) % 12
-        maasam_idx = (solar_sign_idx - 11) % 12
-        return MAASAM_NAMES[maasam_idx]
+        """Amanta lunar month name, with Adhika/Nija prefix when applicable."""
+        return maasam_name(moon_sun_elongation, sun_longitude, jd_sunrise)
 
     def _special_flags(self, tithi_idx: int, weekday: int,
                         jd_sunrise: float, jd_sunset: float) -> dict:

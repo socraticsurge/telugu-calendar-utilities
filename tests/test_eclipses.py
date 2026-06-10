@@ -75,3 +75,24 @@ def test_get_eclipse_from_precomputed_matches_get_eclipse_for_date():
     assert direct.end == from_cache.end
     assert direct.sutak_start == from_cache.sutak_start
     assert direct.sutak_end == from_cache.sutak_end
+
+
+def test_lunar_eclipse_visible_at_moonrise_partial_phases():
+    """2026-03-03 total lunar eclipse: maximum occurs before moonrise in India,
+    but the later phases are visible after moonrise — must count as visible."""
+    result = get_eclipse_for_date(date(2026, 3, 3), HYD)
+    assert result is not None
+    assert result.kind == 'Lunar'
+    assert result.subtype == 'Total'
+    assert result.visible is True
+    assert result.sutak_start is not None
+
+
+def test_lunar_eclipse_partial_visibility_london():
+    """2025-03-14 total lunar eclipse: moon sets during the eclipse in London;
+    partial phases above the horizon must count as visible."""
+    london = next(c for c in CITIES if c.name == 'London')
+    result = get_eclipse_for_date(date(2025, 3, 14), london)
+    assert result is not None
+    assert result.kind == 'Lunar'
+    assert result.visible is True

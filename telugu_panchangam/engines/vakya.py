@@ -15,6 +15,7 @@ from telugu_panchangam.engines.utils import (
 from telugu_panchangam.engines.base import (
     RASHI_NAMES, RITUVU_NAMES, VAARAM_NAMES, MAASAM_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, KARANA_REPEATING, KARANA_FIXED,
+    maasam_name,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 from telugu_panchangam.eclipses import get_eclipse_for_date
@@ -176,7 +177,4 @@ class VakyaEngine(SuryaSiddhantaEngine):
         }
 
     def _maasam(self, jd_sunrise: float) -> str:
-        jd_amavasya = previous_new_moon(vakya_elongation, jd_sunrise)
-        sun_lon = ss_sun_longitude(jd_amavasya)
-        idx = (int(sun_lon / 30.0) % 12 - 11) % 12
-        return MAASAM_NAMES[idx]
+        return maasam_name(vakya_elongation, ss_sun_longitude, jd_sunrise)

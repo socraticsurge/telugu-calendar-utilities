@@ -95,10 +95,35 @@ def samvatsara_name(jd: float, maasam: str) -> str:
     than at the mean solar boundary. Offset +12 anchors the cycle so that
     Kali 5128 (2026-27 CE) is Parabhava.
     """
-    maasa_num = MAASAM_NAMES.index(maasam) + 1
+    base = maasam.removeprefix('Adhika ').removeprefix('Nija ')
+    maasa_num = MAASAM_NAMES.index(base) + 1
     ahargana = jd - _KALI_EPOCH_JD
     kali_elapsed = int((ahargana + (4 - maasa_num) * 30) / _SIDEREAL_YEAR_DAYS)
     return SAMVATSARA_NAMES[(kali_elapsed + 12) % 60]
+
+
+def maasam_name(elongation_func, sun_longitude_func, jd_sunrise: float) -> str:
+    """Amanta lunar month name at jd_sunrise, with Adhika/Nija prefix.
+
+    The month is named from the sun's sign at its starting new moon. When the
+    sun occupies the same sign at both bounding new moons, the month contains
+    no sankranti and is Adhika; the following month repeats the name as Nija.
+    """
+    from telugu_panchangam.engines.utils import next_new_moon, previous_new_moon
+
+    nm_start = previous_new_moon(elongation_func, jd_sunrise)
+    sign_start = int(sun_longitude_func(nm_start) / 30.0) % 12
+    name = MAASAM_NAMES[(sign_start - 11) % 12]
+
+    nm_end = next_new_moon(elongation_func, nm_start + 1.0)
+    if sign_start == int(sun_longitude_func(nm_end) / 30.0) % 12:
+        return f'Adhika {name}'
+
+    nm_prev = previous_new_moon(elongation_func, nm_start - 1.0)
+    if sign_start == int(sun_longitude_func(nm_prev) / 30.0) % 12:
+        return f'Nija {name}'
+
+    return name
 
 
 class PanchangamEngine(ABC):

@@ -56,3 +56,24 @@ def test_default_feed_window(today, expected_end):
     start, end = default_feed_window(today)
     assert start == date(today.year, today.month, 1)
     assert end == expected_end
+
+
+# --- Adhika / Nija maasam (drik; SS and vakya month boundaries differ by design) ---
+
+@pytest.mark.parametrize('d,expected', [
+    (date(2026, 5, 10), 'Vaishakha'),
+    (date(2026, 5, 20), 'Adhika Jyeshtha'),
+    (date(2026, 6, 10), 'Adhika Jyeshtha'),
+    (date(2026, 6, 20), 'Nija Jyeshtha'),
+    (date(2026, 7, 20), 'Ashadha'),
+    (date(2023, 8, 1), 'Adhika Shravana'),
+], ids=lambda v: str(v))
+def test_adhika_nija_maasam_drik(d, expected):
+    result = DrikGanitaEngine().calculate(d, HYD, include_eclipse=False)
+    assert result.maasam == expected
+
+
+def test_samvatsara_valid_during_adhika_maasam():
+    """samvatsara_name must handle the Adhika/Nija prefix in maasam."""
+    result = DrikGanitaEngine().calculate(date(2026, 6, 10), HYD, include_eclipse=False)
+    assert result.samvatsara == 'Parabhava'

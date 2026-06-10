@@ -27,6 +27,31 @@ def _subtype(retflag: int, bits: list[tuple[int, str]]) -> str:
     return 'Partial'
 
 
+def _solar_visible(jd_max: float, geopos: list[float]) -> bool:
+    """True if any phase of the solar eclipse peaking at jd_max is observable
+    from geopos. sol_eclipse_when_loc finds the next eclipse with any local
+    visibility; if its local maximum belongs to this eclipse, it is visible."""
+    try:
+        _retflag, tret, _attr = swe.sol_eclipse_when_loc(jd_max - 2.0, geopos, swe.FLG_SWIEPH, False)
+    except Exception:
+        return False
+    return abs(tret[0] - jd_max) < 0.5
+
+
+def _lunar_visible(jd_start: float, jd_end: float, geopos: list[float]) -> bool:
+    """True if the moon is above the horizon at any point of the eclipse window.
+    Unlike a solar eclipse, a lunar eclipse looks the same from anywhere the
+    moon is up, so sampling the window for moonrise is sufficient."""
+    samples = 9
+    for i in range(samples + 1):
+        jd = jd_start + (jd_end - jd_start) * i / samples
+        xx, _ = swe.calc_ut(jd, swe.MOON, swe.FLG_SWIEPH)
+        _az, true_alt, _app = swe.azalt(jd, swe.ECL2HOR, geopos, 0.0, 0.0, xx[:3])
+        if true_alt > 0.0:
+            return True
+    return False
+
+
 def _solar_eclipse(jd_midnight: float, geopos: list[float]) -> dict | None:
     try:
         retflag, tret = swe.sol_eclipse_when_glob(jd_midnight, swe.FLG_SWIEPH, 0, False)
@@ -34,11 +59,10 @@ def _solar_eclipse(jd_midnight: float, geopos: list[float]) -> dict | None:
         return None
     if retflag == 0:
         return None
-    how_flag, _attr = swe.sol_eclipse_how(tret[0], geopos, swe.FLG_SWIEPH)
     return {
         'kind': 'Solar',
         'subtype': _subtype(retflag, _SOLAR_SUBTYPE_BITS),
-        'visible': how_flag != 0,
+        'visible': _solar_visible(tret[0], geopos),
         'jd_max': tret[0],
         'jd_start': tret[2],
         'jd_end': tret[3],
@@ -52,12 +76,11 @@ def _lunar_eclipse(jd_midnight: float, geopos: list[float]) -> dict | None:
         return None
     if retflag == 0:
         return None
-    _how_flag, attr = swe.lun_eclipse_how(tret[0], geopos, swe.FLG_SWIEPH)
     jd_start, jd_end = (tret[2], tret[3]) if tret[2] else (tret[6], tret[7])
     return {
         'kind': 'Lunar',
         'subtype': _subtype(retflag, _LUNAR_SUBTYPE_BITS),
-        'visible': attr[6] > 0,
+        'visible': _lunar_visible(jd_start, jd_end, geopos),
         'jd_max': tret[0],
         'jd_start': jd_start,
         'jd_end': jd_end,
@@ -122,14 +145,10 @@ def get_eclipse_from_precomputed(
     for result in precomputed:
         if not (jd_midnight <= result['jd_max'] < jd_next_midnight):
             continue
-        # Visibility is sampled at the eclipse maximum only; a location where
-        # just the partial phases are above the horizon reports "not visible".
         if result['kind'] == 'Solar':
-            how_flag, _attr = swe.sol_eclipse_how(result['jd_max'], geopos, swe.FLG_SWIEPH)
-            visible = how_flag != 0
+            visible = _solar_visible(result['jd_max'], geopos)
         else:
-            _how_flag, attr = swe.lun_eclipse_how(result['jd_max'], geopos, swe.FLG_SWIEPH)
-            visible = attr[6] > 0
+            visible = _lunar_visible(result['jd_start'], result['jd_end'], geopos)
 
         if visible:
             sutak_hours = _SUTAK_HOURS[result['kind']]

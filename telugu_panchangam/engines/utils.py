@@ -92,6 +92,11 @@ def previous_new_moon(elongation_func, jd: float) -> float:
     return jd_nm
 
 
+def next_new_moon(elongation_func, jd: float) -> float:
+    """JD of the first new moon strictly after jd."""
+    return previous_new_moon(elongation_func, previous_new_moon(elongation_func, jd) + 35.0)
+
+
 def get_sunrise(jd_start: float, geopos: list[float]) -> float:
     """JD of next sunrise after jd_start for geopos=[lon, lat, alt_m]."""
     ret, tret = swe.rise_trans(
