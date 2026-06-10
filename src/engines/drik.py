@@ -125,6 +125,80 @@ class DrikGanitaEngine(PanchangamEngine):
             end=jd_to_utc(jd_yoga_end),
         )
 
+    def _day_part_window(self, part: int, jd_sunrise: float,
+                          jd_sunset: float, name: str) -> Window:
+        """Return Window for the Nth 1-indexed equal part of the day (8 parts)."""
+        day_duration = jd_sunset - jd_sunrise
+        part_size = day_duration / 8.0
+        start = jd_sunrise + (part - 1) * part_size
+        end = start + part_size
+        return Window(name=name, start=jd_to_utc(start), end=jd_to_utc(end))
+
+    def _rahu_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
+        return self._day_part_window(_RAHU_PART[weekday], jd_sr, jd_ss, 'Rahu Kalam')
+
+    def _gulika_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
+        return self._day_part_window(_GULIKA_PART[weekday], jd_sr, jd_ss, 'Gulika Kalam')
+
+    def _yamagandam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
+        return self._day_part_window(_YAMAG_PART[weekday], jd_sr, jd_ss, 'Yamagandam')
+
+    def _brahma_muhurta(self, jd_sunrise: float) -> Window:
+        # 2 muhurtas (96 min) before sunrise; 1 muhurta = 48 min = 1/30 day
+        muhurta = 1.0 / 30.0
+        start = jd_sunrise - 2 * muhurta
+        end = jd_sunrise - muhurta
+        return Window(name='Brahma Muhurta', start=jd_to_utc(start), end=jd_to_utc(end))
+
+    def _abhijit_muhurta(self, jd_sunrise: float, jd_sunset: float,
+                          weekday: int) -> Window | None:
+        if weekday == 3:  # Wednesday — no Abhijit
+            return None
+        midday = (jd_sunrise + jd_sunset) / 2.0
+        half_muhurta = (jd_sunset - jd_sunrise) / 60.0
+        return Window(name='Abhijit Muhurta',
+                      start=jd_to_utc(midday - half_muhurta),
+                      end=jd_to_utc(midday + half_muhurta))
+
+    def _choghadiya(self, weekday: int, jd_sr: float, jd_ss: float) -> list[Window]:
+        names = _DAY_CHOGHADIYA[weekday]
+        block = (jd_ss - jd_sr) / 8.0
+        return [
+            Window(name=names[i],
+                   start=jd_to_utc(jd_sr + i * block),
+                   end=jd_to_utc(jd_sr + (i + 1) * block))
+            for i in range(8)
+        ]
+
+    def _durmuhurtham(self, weekday: int, jd_sr: float, jd_ss: float) -> list[Window]:
+        muhurta = (jd_ss - jd_sr) / 30.0
+        parts = _DURMUHURTHA_PARTS[weekday]
+        results = []
+        for p in parts:
+            start = jd_sr + (p - 1) * muhurta
+            results.append(Window(name='Durmuhurtham',
+                                  start=jd_to_utc(start),
+                                  end=jd_to_utc(start + muhurta)))
+        return results
+
+    def _amrita_kalam(self, jd_sunrise: float, nak_span: Span) -> list[Window]:
+        nak_idx = NAKSHATRA_NAMES.index(nak_span.name)
+        offset_ghatikas = _AMRITA_OFFSET_GHATIKAS[nak_idx]
+        offset_jd = offset_ghatikas * (24.0 / 60.0) / 24.0  # ghatikas to days
+        nak_start_jd = datetime_to_jd(nak_span.start)
+        start_jd = nak_start_jd + offset_jd
+        end_jd = start_jd + (4.0 / 60.0) / 24.0  # 4 ghatikas duration
+        return [Window(name='Amrita Kalam', start=jd_to_utc(start_jd), end=jd_to_utc(end_jd))]
+
+    def _varjyam(self, nak_span: Span) -> list[Window]:
+        nak_idx = NAKSHATRA_NAMES.index(nak_span.name)
+        offset_ghatikas = _VARJYAM_OFFSET_GHATIKAS[nak_idx]
+        offset_jd = offset_ghatikas * (24.0 / 60.0) / 24.0
+        nak_start_jd = datetime_to_jd(nak_span.start)
+        start_jd = nak_start_jd + offset_jd
+        end_jd = start_jd + (4.0 / 60.0) / 24.0
+        return [Window(name='Varjyam', start=jd_to_utc(start_jd), end=jd_to_utc(end_jd))]
+
     def _karana_spans(self, jd_sunrise: float, jd_sunset: float) -> list[Span]:
         """Karanas active between sunrise and sunset."""
         elong_at_sunrise = moon_sun_elongation(jd_sunrise)
@@ -190,6 +264,7 @@ class DrikGanitaEngine(PanchangamEngine):
 
         # weekday: 0=Sunday ... 6=Saturday
         weekday = int((jd_sunrise + 1.5)) % 7
+        vaaram = VAARAM_NAMES[weekday]
 
         # --- Pancha Anga ---
         tithi_span = self._tithi_span(jd_sunrise)
@@ -199,10 +274,6 @@ class DrikGanitaEngine(PanchangamEngine):
         nakshatra_span = self._nakshatra_span(jd_sunrise)
         yoga_span = self._yoga_span(jd_sunrise)
         karana_spans = self._karana_spans(jd_sunrise, jd_sunset)
-
-        # Stubs for fields implemented in Tasks 8-9
-        _stub_span = Span('', sunrise, sunrise)
-        _stub_window = Window('', sunrise, sunrise)
 
         return PanchangamDay(
             date=d,
@@ -214,7 +285,7 @@ class DrikGanitaEngine(PanchangamEngine):
             maasam='',
             paksham=paksham,
             tithi=tithi_span,
-            vaaram='',
+            vaaram=vaaram,
             nakshatra=nakshatra_span,
             yoga=yoga_span,
             karana=karana_spans,
@@ -224,15 +295,15 @@ class DrikGanitaEngine(PanchangamEngine):
             moonset=moonset,
             solar_sign=solar_sign,
             lunar_sign=lunar_sign,
-            brahma_muhurta=_stub_window,
-            abhijit_muhurta=None,
-            amrita_kalam=[],
-            rahu_kalam=_stub_window,
-            gulika_kalam=_stub_window,
-            yamagandam=_stub_window,
-            varjyam=[],
-            durmuhurtham=[],
-            choghadiya=[],
+            brahma_muhurta=self._brahma_muhurta(jd_sunrise),
+            abhijit_muhurta=self._abhijit_muhurta(jd_sunrise, jd_sunset, weekday),
+            amrita_kalam=self._amrita_kalam(jd_sunrise, nakshatra_span),
+            rahu_kalam=self._rahu_kalam(weekday, jd_sunrise, jd_sunset),
+            gulika_kalam=self._gulika_kalam(weekday, jd_sunrise, jd_sunset),
+            yamagandam=self._yamagandam(weekday, jd_sunrise, jd_sunset),
+            varjyam=self._varjyam(nakshatra_span),
+            durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset),
+            choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
             is_ekadashi=False,
             is_amavasya=False,
             is_pournami=False,

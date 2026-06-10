@@ -73,3 +73,29 @@ def test_karana_count_is_one_or_two():
 def test_paksham_is_shukla_on_ref_date():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.paksham == 'Shukla'
+
+def test_rahu_kalam_is_window():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.rahu_kalam.start < result.rahu_kalam.end
+
+def test_rahu_kalam_within_day():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.sunrise <= result.rahu_kalam.start
+    assert result.rahu_kalam.end <= result.sunset
+
+def test_brahma_muhurta_before_sunrise():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.brahma_muhurta.end <= result.sunrise
+
+def test_choghadiya_count_is_eight():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert len(result.choghadiya) == 8
+
+def test_vaaram_is_valid():
+    from src.engines.base import VAARAM_NAMES
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.vaaram in VAARAM_NAMES
+
+def test_durmuhurtham_count_is_two():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert len(result.durmuhurtham) == 2
