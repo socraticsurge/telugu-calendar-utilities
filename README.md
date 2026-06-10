@@ -35,6 +35,40 @@ Visit the landing page to pick your city and calculation system and copy your `w
 | **Surya Siddhanta** | Mean-motion algorithms from classical SS text | Temple rituals, TTD-style timing |
 | **Vakya** | Surya Siddhanta + published correction tables | Traditional Telugu/Tamil printed Panchangams |
 
+## MCP Server
+
+`mcp-server-panchangam` is available on PyPI. Add it to any MCP-compatible AI assistant in one step.
+
+**Claude Desktop** — add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "panchangam": {
+      "command": "uvx",
+      "args": ["mcp-server-panchangam"]
+    }
+  }
+}
+```
+
+**Claude Code** — run once:
+
+```bash
+claude mcp add panchangam -- uvx mcp-server-panchangam
+```
+
+### Available tools
+
+| Tool | Description |
+|------|-------------|
+| `list_supported_cities` | 22 pre-configured cities with lat/lon/timezone |
+| `get_panchangam` | Full Panchangam for any date and city |
+| `get_muhurta` | Auspicious/inauspicious windows only |
+| `get_special_days` | Ekadashi, Amavasya, Pournami, Pradosham, Sankranti for a month |
+
+All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
+
 ## How it works
 
 Feeds are generated on the 1st of every month via GitHub Actions, covering 18 months ahead. They are served as static `.ics` files from GitHub Pages — zero hosting cost.
