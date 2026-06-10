@@ -49,3 +49,15 @@ def test_hyderabad_surya_siddhanta_feed():
     assert len(events) == 3
     for e in events:
         assert 'Rahu Kalam' in str(e.get('description'))
+
+def test_hyderabad_vakya_feed():
+    from src.engines.vakya import VakyaEngine
+    engine = VakyaEngine()
+    loc = next(c for c in CITIES if c.name == 'Hyderabad')
+    days = [engine.calculate(START + timedelta(days=i), loc) for i in range(3)]
+    raw = GEN.generate(days, 'vakya')
+    cal = Calendar.from_ical(raw)
+    events = [c for c in cal.walk() if c.name == 'VEVENT']
+    assert len(events) == 3
+    for e in events:
+        assert 'Rahu Kalam' in str(e.get('description'))
