@@ -158,7 +158,8 @@ def test_get_panchangam_range_basic():
     assert len(result['days']) == 3
     day = result['days'][0]
     for key in ('date', 'vaaram', 'tithi', 'nakshatra', 'sunrise', 'sunset',
-                'auspicious', 'inauspicious', 'special_days', 'special_yogas'):
+                'auspicious', 'inauspicious', 'special_days', 'special_yogas',
+                'yoga', 'eclipse', 'is_special'):
         assert key in day, f"Missing key in range day: {key}"
 
 
