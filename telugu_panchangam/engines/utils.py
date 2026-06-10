@@ -75,6 +75,23 @@ def find_crossing(
     return (jd_start + jd_end) / 2.0
 
 
+def previous_new_moon(elongation_func, jd: float) -> float:
+    """JD of the most recent new moon (elongation 0 crossing) at or before jd.
+
+    find_crossing cannot be used directly with a month-wide window: its signed
+    difference wraps at target+180° (the full moon), so bisection can converge
+    there instead. This iterates with the mean elongation rate, which always
+    lands on the nearest crossing behind jd.
+    """
+    jd_nm = jd - (elongation_func(jd) % 360.0) / 12.19
+    for _ in range(10):
+        offset = (elongation_func(jd_nm) + 180.0) % 360.0 - 180.0
+        jd_nm -= offset / 12.19
+    if jd_nm > jd:
+        jd_nm -= 29.530589
+    return jd_nm
+
+
 def get_sunrise(jd_start: float, geopos: list[float]) -> float:
     """JD of next sunrise after jd_start for geopos=[lon, lat, alt_m]."""
     ret, tret = swe.rise_trans(

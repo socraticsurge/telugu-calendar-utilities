@@ -39,7 +39,8 @@ class ICSGenerator:
         event.add('dtstart', day.date)
         event.add('dtend', day.date + timedelta(days=1))
         event.add('description', vText(self._description(day, tz)))
-        event.add('uid', f'{day.date.isoformat()}-{day.location.name.lower()}-{day.system}@telugu-panchangam')
+        city = day.location.name.lower().replace(' ', '-').replace(',', '')
+        event.add('uid', f'{day.date.isoformat()}-{city}-{day.system}@telugu-panchangam')
 
         return event
 

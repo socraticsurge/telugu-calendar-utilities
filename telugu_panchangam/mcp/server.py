@@ -26,7 +26,7 @@ def get_panchangam(
     longitude: float | None = None,
     timezone: str | None = None,
 ) -> str:
-    """Returns full Panchangam JSON for a date and city: Pancha Anga (Tithi, Nakshatra, Yoga, Karana), sky events (Sunrise, Sunset, Moonrise, Moonset), auspicious windows (Brahma Muhurta, Abhijit, Amrita Kalam), inauspicious windows (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), Choghadiya, and special day flags. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude+timezone for a custom location), system=drik|surya_siddhanta|vakya (default: drik)."""
+    """Returns full Panchangam JSON for a date and city: Pancha Anga (Tithi, Nakshatra, Yoga, Karana), sky events (Sunrise, Sunset, Moonrise, Moonset), auspicious windows (Brahma Muhurta, Abhijit, Amrita Kalam), inauspicious windows (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), Choghadiya, and special day flags. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude for a custom location; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
     return tool_get_panchangam(date, city, system, latitude, longitude, timezone)
 
 
@@ -39,7 +39,7 @@ def get_muhurta(
     longitude: float | None = None,
     timezone: str | None = None,
 ) -> str:
-    """Returns auspicious and inauspicious time windows for a date and city as JSON. Lighter than get_panchangam — use for quick 'is this a good time?' queries. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude+timezone), system=drik|surya_siddhanta|vakya (default: drik)."""
+    """Returns auspicious and inauspicious time windows for a date and city as JSON. Lighter than get_panchangam — use for quick 'is this a good time?' queries. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
     return tool_get_muhurta(date, city, system, latitude, longitude, timezone)
 
 
@@ -53,7 +53,7 @@ def get_special_days(
     longitude: float | None = None,
     timezone: str | None = None,
 ) -> str:
-    """Returns a JSON list of special days in a given month: Ekadashi (fasting days), Amavasya (new moon), Pournami (full moon), Pradosham, and Sankranti. Args: year=e.g. 2026, month=1-12, city=city name (or pass latitude+longitude+timezone), system=drik|surya_siddhanta|vakya (default: drik)."""
+    """Returns a JSON list of special days in a given month: Ekadashi (fasting days), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, and Eclipses. Args: year=e.g. 2026, month=1-12, city=city name (or pass latitude+longitude; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
     return tool_get_special_days(year, month, city, system, latitude, longitude, timezone)
 
 

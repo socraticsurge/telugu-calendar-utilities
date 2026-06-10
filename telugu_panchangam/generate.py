@@ -63,15 +63,18 @@ def generate_feeds(
                 f.write(raw)
 
 
-if __name__ == '__main__':
-    today = date.today()
-    start = date(today.year, today.month, 1)
-    end_year = today.year + (today.month + 17) // 12
-    end_month = (today.month + 17) % 12 or 12
+def default_feed_window(today: date) -> tuple[date, date]:
+    """Feed window: 1st of the current month through the last day of month +17."""
     import calendar
-    end_day = calendar.monthrange(end_year, end_month)[1]
-    end = date(end_year, end_month, end_day)
+    start = date(today.year, today.month, 1)
+    months_from_epoch = today.year * 12 + (today.month - 1) + 17
+    end_year, end_month = months_from_epoch // 12, months_from_epoch % 12 + 1
+    end = date(end_year, end_month, calendar.monthrange(end_year, end_month)[1])
+    return start, end
 
+
+if __name__ == '__main__':
+    start, end = default_feed_window(date.today())
     print(f'Generating feeds: {start} → {end}')
     generate_feeds(output_dir='feeds', start=start, end=end)
     print('Done.')

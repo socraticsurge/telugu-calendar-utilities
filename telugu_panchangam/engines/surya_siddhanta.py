@@ -7,12 +7,12 @@ import pytz
 from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, RITUVU_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
-    VAARAM_NAMES, MAASAM_NAMES, SAMVATSARA_NAMES,
-    KARANA_REPEATING, KARANA_FIXED,
+    VAARAM_NAMES, MAASAM_NAMES,
+    KARANA_REPEATING, KARANA_FIXED, samvatsara_name,
 )
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
-    get_sunrise, get_sunset, get_moonrise, get_moonset,
+    get_sunrise, get_sunset, get_moonrise, get_moonset, previous_new_moon,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 from telugu_panchangam.eclipses import get_eclipse_for_date
@@ -116,8 +116,8 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         yoga_span    = self._yoga_span(jd_sunrise)
         karana_spans = self._karana_spans(jd_sunrise, jd_sunset)
 
-        samvatsara = self._samvatsara(jd_sunrise)
         maasam     = self._maasam(jd_sunrise)
+        samvatsara = self._samvatsara(jd_sunrise, maasam)
         special    = self._special_flags(tithi_idx, weekday, jd_sunrise, jd_sunset)
 
         eclipse    = get_eclipse_for_date(d, location) if include_eclipse else None
@@ -194,12 +194,11 @@ class SuryaSiddhantaEngine(PanchangamEngine):
                 break
         return karanas
 
-    def _samvatsara(self, jd_sunrise: float) -> str:
-        ka = jd_sunrise - _KALI_EPOCH_JD
-        return SAMVATSARA_NAMES[int(ka / 361.02) % 60]
+    def _samvatsara(self, jd_sunrise: float, maasam: str) -> str:
+        return samvatsara_name(jd_sunrise, maasam)
 
     def _maasam(self, jd_sunrise: float) -> str:
-        jd_amavasya = find_crossing(ss_elongation, 0.0, jd_sunrise - 30.0, jd_sunrise)
+        jd_amavasya = previous_new_moon(ss_elongation, jd_sunrise)
         sun_lon = ss_sun_longitude(jd_amavasya)
         idx = (int(sun_lon / 30.0) % 12 - 11) % 12
         return MAASAM_NAMES[idx]

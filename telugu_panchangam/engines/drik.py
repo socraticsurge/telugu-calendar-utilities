@@ -6,12 +6,12 @@ import pytz
 from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, RITUVU_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
-    VAARAM_NAMES, MAASAM_NAMES, SAMVATSARA_NAMES,
-    KARANA_REPEATING, KARANA_FIXED,
+    VAARAM_NAMES, MAASAM_NAMES,
+    KARANA_REPEATING, KARANA_FIXED, samvatsara_name,
 )
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
-    sun_longitude, moon_longitude, moon_sun_elongation,
+    sun_longitude, moon_longitude, moon_sun_elongation, previous_new_moon,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
@@ -201,17 +201,13 @@ class DrikGanitaEngine(PanchangamEngine):
         end_jd = start_jd + (4.0 / 60.0) / 24.0
         return [Window(name='Varjyam', start=jd_to_utc(start_jd), end=jd_to_utc(end_jd))]
 
-    def _samvatsara(self, jd_sunrise: float) -> str:
-        """60-year Samvatsara cycle based on Kali Ahargana."""
-        jd_kali_epoch = 588465.5
-        ahargana = jd_sunrise - jd_kali_epoch
-        idx = int(ahargana / 361.02) % 60
-        return SAMVATSARA_NAMES[idx]
+    def _samvatsara(self, jd_sunrise: float, maasam: str) -> str:
+        """60-year Samvatsara cycle (Telugu solar reckoning, flips at Ugadi)."""
+        return samvatsara_name(jd_sunrise, maasam)
 
     def _maasam(self, jd_sunrise: float) -> str:
         """Lunar month name based on Sun's sign at the most recent Amavasya."""
-        jd_amavasya = find_crossing(moon_sun_elongation, 0.0,
-                                     jd_sunrise - 30.0, jd_sunrise)
+        jd_amavasya = previous_new_moon(moon_sun_elongation, jd_sunrise)
         sun_lon_at_nm = sun_longitude(jd_amavasya)
         solar_sign_idx = int(sun_lon_at_nm / 30.0) % 12
         maasam_idx = (solar_sign_idx - 11) % 12
@@ -319,8 +315,8 @@ class DrikGanitaEngine(PanchangamEngine):
 
         # --- Metadata & Special Flags ---
         special = self._special_flags(tithi_idx, weekday, jd_sunrise, jd_sunset)
-        samvatsara = self._samvatsara(jd_sunrise)
         maasam = self._maasam(jd_sunrise)
+        samvatsara = self._samvatsara(jd_sunrise, maasam)
 
         eclipse = get_eclipse_for_date(d, location) if include_eclipse else None
         special_yogas = get_special_yogas(vaaram, tithi_span.name, nakshatra_span.name)

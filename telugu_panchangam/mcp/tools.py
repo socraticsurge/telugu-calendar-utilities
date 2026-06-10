@@ -10,7 +10,7 @@ from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
-from telugu_panchangam.mcp.location import resolve_location
+from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
 
 _ENGINES = {
     'drik': DrikGanitaEngine(),
@@ -49,7 +49,9 @@ def _resolve_city(
     longitude: Optional[float],
     timezone: Optional[str],
 ) -> Location:
-    if latitude is not None and longitude is not None and timezone is not None:
+    if latitude is not None and longitude is not None:
+        if timezone is None:
+            timezone = timezone_for_coordinates(float(latitude), float(longitude))
         return Location(name=city or 'Custom', lat=float(latitude), lon=float(longitude), timezone=timezone)
     lat, lon, tz = resolve_location(city)
     return Location(name=city, lat=lat, lon=lon, timezone=tz)

@@ -122,6 +122,8 @@ def get_eclipse_from_precomputed(
     for result in precomputed:
         if not (jd_midnight <= result['jd_max'] < jd_next_midnight):
             continue
+        # Visibility is sampled at the eclipse maximum only; a location where
+        # just the partial phases are above the horizon reports "not visible".
         if result['kind'] == 'Solar':
             how_flag, _attr = swe.sol_eclipse_how(result['jd_max'], geopos, swe.FLG_SWIEPH)
             visible = how_flag != 0

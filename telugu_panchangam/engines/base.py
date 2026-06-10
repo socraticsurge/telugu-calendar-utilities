@@ -53,7 +53,7 @@ SAMVATSARA_NAMES: list[str] = [
     'Hevilambi', 'Vilambi', 'Vikari', 'Sharvari', 'Plava',
     'Shubhakrit', 'Shobhakrit', 'Krodhi', 'Vishvavasu', 'Parabhava',
     'Plavanga', 'Kilaka', 'Saumya', 'Sadharana', 'Virodhikrit',
-    'Paridhavi', 'Pramadi', 'Ananda', 'Rakshasa', 'Nala',
+    'Paridhavi', 'Pramadicha', 'Ananda', 'Rakshasa', 'Nala',
     'Pingala', 'Kalayukti', 'Siddharthi', 'Raudra', 'Durmati',
     'Dundubhi', 'Rudhirodgari', 'Raktakshi', 'Krodhana', 'Kshaya',
 ]
@@ -81,6 +81,24 @@ KARANA_FIXED: dict[int, str] = {
     58: 'Chatushpada',
     59: 'Naga',
 }
+
+
+_KALI_EPOCH_JD = 588465.5
+_SIDEREAL_YEAR_DAYS = 365.25636
+
+
+def samvatsara_name(jd: float, maasam: str) -> str:
+    """Telugu (southern, Chaitradi) 60-year Samvatsara name at instant `jd`.
+
+    Counts solar years elapsed since the Kali epoch. The ahargana is shifted
+    by the current lunar month so the year flips at Chaitra (Ugadi) rather
+    than at the mean solar boundary. Offset +12 anchors the cycle so that
+    Kali 5128 (2026-27 CE) is Parabhava.
+    """
+    maasa_num = MAASAM_NAMES.index(maasam) + 1
+    ahargana = jd - _KALI_EPOCH_JD
+    kali_elapsed = int((ahargana + (4 - maasa_num) * 30) / _SIDEREAL_YEAR_DAYS)
+    return SAMVATSARA_NAMES[(kali_elapsed + 12) % 60]
 
 
 class PanchangamEngine(ABC):

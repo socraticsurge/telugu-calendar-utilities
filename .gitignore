@@ -4,6 +4,9 @@ __pycache__/
 .coverage
 .venv/
 .worktrees
+dist/
+*.egg-info/
+docs/superpowers/
 
 # Harness / Claude Code internals
 .claude/
