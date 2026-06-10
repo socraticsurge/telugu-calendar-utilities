@@ -108,3 +108,44 @@ def test_get_special_days_invalid_month():
     result = json.loads(tool_get_special_days(2026, 13, 'Hyderabad', 'drik'))
     assert 'error' in result
     assert 'Invalid month' in result['error']
+
+
+def test_get_panchangam_has_eclipse_and_special_yogas_keys():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam
+    result = json.loads(tool_get_panchangam('2026-06-10', 'Hyderabad', 'drik'))
+    assert 'eclipse' in result
+    assert 'special_yogas' in result
+    assert isinstance(result['special_yogas'], list)
+
+
+def test_get_panchangam_eclipse_populated_on_eclipse_date():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam
+    result = json.loads(tool_get_panchangam('2025-09-07', 'Hyderabad', 'drik'))
+    assert result['eclipse'] is not None
+    assert result['eclipse']['kind'] == 'Lunar'
+    assert result['eclipse']['subtype'] == 'Total'
+    assert result['eclipse']['visible'] is True
+    assert result['eclipse']['sutak'] is not None
+    assert 'start' in result['eclipse']['sutak']
+
+
+def test_get_panchangam_eclipse_none_on_non_eclipse_date():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam
+    result = json.loads(tool_get_panchangam('2026-06-10', 'Hyderabad', 'drik'))
+    assert result['eclipse'] is None
+
+
+def test_get_special_days_eclipse_event_listed():
+    from telugu_panchangam.mcp.tools import tool_get_special_days
+    result = json.loads(tool_get_special_days(2025, 9, 'Hyderabad', 'drik'))
+    sep7 = next(d for d in result['special_days'] if d['date'] == '2025-09-07')
+    assert any('Eclipse' in e for e in sep7['events'])
+
+
+def test_get_special_days_special_yogas_key_present():
+    from telugu_panchangam.mcp.tools import tool_get_special_days
+    result = json.loads(tool_get_special_days(2026, 6, 'Hyderabad', 'drik'))
+    assert len(result['special_days']) > 0
+    for day in result['special_days']:
+        assert 'special_yogas' in day
+        assert isinstance(day['special_yogas'], list)

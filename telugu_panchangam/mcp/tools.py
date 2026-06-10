@@ -74,6 +74,22 @@ def _window_to_dict(window, tz: str) -> dict:
     }
 
 
+def _eclipse_to_dict(eclipse, tz: str) -> Optional[dict]:
+    if eclipse is None:
+        return None
+    return {
+        'kind': eclipse.kind,
+        'subtype': eclipse.subtype,
+        'visible': eclipse.visible,
+        'start': _fmt_time(eclipse.start, tz),
+        'end': _fmt_time(eclipse.end, tz),
+        'sutak': {
+            'start': _fmt_time(eclipse.sutak_start, tz),
+            'end': _fmt_time(eclipse.sutak_end, tz),
+        } if eclipse.sutak_start is not None else None,
+    }
+
+
 def _special_events(day: PanchangamDay) -> list[str]:
     events = []
     if day.is_ekadashi:         events.append('Ekadashi — fasting day')
@@ -83,6 +99,7 @@ def _special_events(day: PanchangamDay) -> list[str]:
     elif day.is_soma_pradosham: events.append('Soma Pradosham')
     elif day.is_pradosham:      events.append('Pradosham')
     if day.is_sankranti:        events.append('Sankranti')
+    if day.eclipse:             events.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
     return events
 
 
@@ -156,6 +173,8 @@ def tool_get_panchangam(
                 {'name': w.name, 'start': _fmt_time(w.start, tz)}
                 for w in day.choghadiya
             ],
+            'eclipse': _eclipse_to_dict(day.eclipse, tz),
+            'special_yogas': day.special_yogas,
             'special_days': specials,
             'is_special': bool(specials),
         })
@@ -222,12 +241,17 @@ def tool_get_special_days(
         for day_num in range(1, days_in_month + 1):
             d = date(year, month, day_num)
             day = engine.calculate(d, loc)
-            if day.is_ekadashi or day.is_amavasya or day.is_pournami or day.is_pradosham or day.is_sankranti:
+            is_notable = (
+                day.is_ekadashi or day.is_amavasya or day.is_pournami
+                or day.is_pradosham or day.is_sankranti or day.eclipse is not None
+            )
+            if is_notable:
                 events = _special_events(day)
                 special_days.append({
                     'date': d.isoformat(),
                     'tithi': day.tithi.name,
                     'events': events,
+                    'special_yogas': day.special_yogas,
                 })
         return json.dumps({
             'year': year,
