@@ -1,0 +1,30 @@
+name: Deploy Landing Page
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'docs/index.html'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stage landing page
+        run: mkdir -p public && cp docs/index.html public/index.html
+
+      # keep_files preserves the feeds/ already on gh-pages — only
+      # index.html is replaced. Full regeneration stays with generate.yml.
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: true
