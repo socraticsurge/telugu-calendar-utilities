@@ -2,4 +2,4 @@
 
 | Spec | Status |
 |---|---|
-| _none yet_ | - |
+| [2026-06-10-panchangam-design.md](2026-06-10-panchangam-design.md) | active |
