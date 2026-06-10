@@ -598,7 +598,8 @@
 
   document.getElementById('tp-city').addEventListener('change', loadPreview);
   document.getElementById('tp-system').addEventListener('change', loadPreview);
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const _d = new Date();
+  const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   document.getElementById('tp-date').value = todayISO;
   document.getElementById('tp-date').addEventListener('change', loadPreview);
   document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
