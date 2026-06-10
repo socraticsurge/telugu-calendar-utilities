@@ -1,93 +1,63 @@
-# Spec-Driven Development Harness
+# Telugu Panchangam Calendar Feeds
 
-A reusable Claude Code template for **greenfield** projects. It forces a
-roles → user stories → guidelines → spec → plan sequence before any source
-code is written, then keeps human-readable trackers in sync while
-implementation proceeds largely hands-free.
+Subscribable Telugu Panchangam feeds for 22 cities — delivered as `.ics` files you can add to Google Calendar, Apple Calendar, or Outlook.
 
-Full design rationale: see
-[`docs/specs/`](docs/specs/) once a project's spec has been written from this
-template (the design doc for the harness itself lives in the project that
-built it, not here — this repo is the *output* template).
+Every day appears as an all-day event (no calendar blocking) with full Panchangam details in the description. Special days — Ekadashi, Amavasya, Pournami, Pradosham, Sankranti — are marked with ⚡ in the title so they stand out at a glance.
 
-## What's in here
+## Subscribe
+
+Visit the landing page to pick your city and calculation system and copy your `webcal://` URL:
+
+**[socraticsurge.github.io/telugu-calendar-utilities](https://socraticsurge.github.io/telugu-calendar-utilities)**
+
+## What's in each day's event
+
+- **Metadata** — Samvatsara, Maasam, Paksham, Vaaram, solar and lunar signs
+- **Pancha Anga** — Tithi, Nakshatra, Yoga, Karana with start/end times
+- **Sky markers** — Sunrise, Sunset, Moonrise, Moonset
+- **Auspicious windows** — Brahma Muhurta, Abhijit Muhurta, Amrita Kalam
+- **Inauspicious windows** — Rahu Kalam, Gulika Kalam, Yamagandam, Varjyam, Durmuhurtham
+- **Choghadiya** — 8 day blocks with names
+
+## Cities
+
+**Telugu Heartland** — Hyderabad, Vijayawada, Visakhapatnam, Tirupati, Warangal, Guntur, Nizamabad, Rajahmundry, Kurnool, Nellore
+
+**Major Indian Metros** — Bengaluru, Chennai, Mumbai, Delhi
+
+**International Diaspora** — Dallas, San Jose, San Francisco, Edison (NJ), New York, London, Sydney, Dubai
+
+## Calculation Systems
+
+| System | Basis | Best for |
+|--------|-------|----------|
+| **Drik Ganita** | Swiss Ephemeris (pyswisseph) + Lahiri ayanamsa | Modern apps, accurate sky events |
+| **Surya Siddhanta** | Mean-motion algorithms from classical SS text | Temple rituals, TTD-style timing |
+| **Vakya** | Surya Siddhanta + published correction tables | Traditional Telugu/Tamil printed Panchangams |
+
+## How it works
+
+Feeds are generated on the 1st of every month via GitHub Actions, covering 18 months ahead. They are served as static `.ics` files from GitHub Pages — zero hosting cost.
 
 ```
-docs/
-  GUIDELINES.md            # stack & conventions (filled in during Phase 2)
-  NOW.md                    # single "front door" status file
-  specs/INDEX.md            # which spec is "active"
-  specs/                    # living specs (Phase 3)
-  plans/                    # narrative plans + HANDOFF.md / AWAITING_REVIEW.md
-  tracking/
-    STORIES.csv             # id, role, user_story, status, spec_ref, notes
-    TASKS.csv               # task_id, story_id, phase, description, status, estimate, depends_on, notes
-    SESSION_LOG.md          # append-only checkpoint log
-    DECISIONS.md            # append-only deviations/decisions log
-    .checkpoint-snapshot/   # internal, used by the checkpoint hook
-.claude/
-  settings.json             # hook registrations + pre-approved permissions
-  HARNESS_VERSION           # version string this project was scaffolded from
-  hooks/                    # Python hooks (see below)
-new-project.sh              # one-command scaffolding script
+GitHub Actions (monthly cron)
+  → python -m src.generate   (22 cities × 3 systems = 66 feeds)
+  → feeds/*.ics
+  → GitHub Pages (webcal:// subscriptions)
 ```
 
-## The workflow
-
-1. **Phase 1 — Roles & User Stories.** Conversational; every role/actor is
-   captured as `As a [role], I want [goal], so that [benefit]` rows in
-   `docs/tracking/STORIES.csv`.
-2. **Phase 2 — Tech Stack & Guidelines.** Captured in `docs/GUIDELINES.md`
-   (stack, architecture conventions, testing approach, hard rules, venv setup).
-3. **Phase 3 — Spec.** `docs/specs/<topic>-design.md`, referencing story IDs.
-4. **Phase 4 — Plan.** `docs/plans/<topic>-plan.md` plus a granular
-   `docs/tracking/TASKS.csv` (~5 minutes per task, with `depends_on`).
-5. **Phase 5 — Autonomous Implementation.** Subagent-driven, hooks active:
-   - A **gate hook** blocks source edits until a spec + stories exist (and
-     pauses the next phase while a phase is awaiting review).
-   - A **sync hook** rolls up `TASKS.csv` → `STORIES.csv` status as work
-     completes, and writes `docs/plans/AWAITING_REVIEW.md` when a phase finishes.
-   - A **checkpoint hook** (on context compaction or session end) refreshes
-     `docs/NOW.md` and `docs/plans/HANDOFF.md`, appends `SESSION_LOG.md`, and
-     commits trackers — so context survives compaction and session restarts.
-   - A **session-start hook** re-injects `HANDOFF.md` / `NOW.md` / the latest
-     `SESSION_LOG.md` entry at the start of every session.
-
-`docs/NOW.md` is the single file to check: it always answers "where are we
-and what do you need from me?"
-
-## Hooks (`.claude/hooks/`)
-
-| Hook | Event | Purpose |
-|---|---|---|
-| `gate_spec_required.py` | PreToolUse (Edit/Write) | Blocks source edits without spec + stories; respects `AWAITING_REVIEW.md` and `.claude/harness-override` |
-| `sync_tracker_on_task.py` | PostToolUse (TaskUpdate completed) | Updates `TASKS.csv`/`STORIES.csv` under a file lock, writes `AWAITING_REVIEW.md` on phase completion |
-| `session_start_context.py` | SessionStart | Injects `HANDOFF.md` + `NOW.md` + latest session log entry |
-| `checkpoint.py` | PreCompact, Stop | Diffs trackers, appends `SESSION_LOG.md`, refreshes `HANDOFF.md`/`NOW.md`, commits |
-
-All hooks are pure-stdlib Python (`csv`, `json`, `pathlib`, `subprocess`,
-`re`, `os`, `time`) so CSV trackers stay Excel-compatible. Tests live in
-`tests/` (run with `python3 -m pytest tests/`).
-
-## Starting a new project from this template
+## Development
 
 ```bash
-./new-project.sh "/path/to/new-project"
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+pytest tests/ -v
+python -m src.generate   # writes to feeds/
 ```
 
-This copies the template (including `.claude/`), re-initializes git, creates
-a `.venv`, and makes the first commit. Then `cd` into the new project, open
-Claude Code, and describe what you're building — Phase 1 (roles & user
-stories) starts automatically.
+## Roadmap
 
-## Versioning
-
-Each scaffolded project gets its own copy of `.claude/` + `docs/`, recorded
-via `.claude/HARNESS_VERSION`. There is no live sync back to existing
-projects — backporting harness improvements is a manual, deliberate copy.
-
-## Out of scope
-
-- Existing/legacy codebase support (a separate harness, future work).
-- Multi-machine/distributed agent coordination (single-machine file locking only).
-- Automatic harness updates across projects.
+- **Plan A** ✅ — Drik Ganita engine + ICS pipeline + landing page
+- **Plan B** — Surya Siddhanta engine
+- **Plan C** — Vakya engine
+- **Phase 2** — MCP server (`get_panchangam(date, location, system)` for AI assistants), Tarabalam personalization, Chrome extension
