@@ -68,6 +68,7 @@ class ICSGenerator:
         fmtw = self._fmt_window
         lines = [
             f'{day.samvatsara}  ·  {day.maasam} Maasam  ·  {day.paksham} Paksham  ·  {day.vaaram}',
+            f'Ayanam: {day.ayanam}  ·  Rituvu: {day.rituvu}',
             f'Sunrise {fmt(day.sunrise, tz)}  ·  Sunset {fmt(day.sunset, tz)}  ·  '
             f'Moonrise {fmt(day.moonrise, tz)}  ·  Moonset {fmt(day.moonset, tz)}',
             f'Solar sign: {day.solar_sign}  ·  Lunar sign: {day.lunar_sign}',

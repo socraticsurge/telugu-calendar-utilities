@@ -114,6 +114,13 @@
         <label for="tp-system">System</label>
         <select id="tp-system"></select>
       </div>
+      <div class="selector">
+        <label for="tp-date">Date</label>
+        <input type="date" id="tp-date"
+               style="font-size:0.85rem;padding:0.4rem 0.6rem;border-radius:8px;
+                      border:1px solid var(--indigo-border);background:var(--indigo-bg);
+                      color:var(--indigo);font-weight:600;min-width:140px;font-family:inherit;">
+      </div>
     </div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.</p>
@@ -136,6 +143,10 @@
     <div class="url-box" id="sub-url">—</div>
     <button class="btn" onclick="copyUrl()">Copy URL</button>
     <span class="copy-confirm" id="copy-confirm">Copied!</span>
+    <a id="sub-https-link" href="#" target="_blank" rel="noopener"
+       style="margin-left:0.75rem;font-size:0.8rem;color:var(--indigo);font-weight:600;">
+      Open feed in browser ↗
+    </a>
 
     <h3 class="sub" style="margin-top:1.25rem;">2 · Add it to your calendar</h3>
     <div class="app-tabs">
@@ -338,6 +349,8 @@
     const system = document.getElementById('sub-system').value;
     const url = `webcal://${FEED_BASE_URL.replace('https://', '')}${feedFilename(city, system)}`;
     document.getElementById('sub-url').textContent = url;
+    const httpsUrl = `${FEED_BASE_URL}${feedFilename(city, system)}`;
+    document.getElementById('sub-https-link').href = httpsUrl;
   }
 
   function copyUrl() {
@@ -376,6 +389,8 @@
   }
 
   function todayStamp() {
+    const val = document.getElementById('tp-date')?.value;
+    if (val) return val.replace(/-/g, '');
     const d = new Date();
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -416,7 +431,7 @@
       meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
       sunrise: null, sunset: null, moonrise: null, moonset: null,
       auspicious: [], inauspicious: [], choghadiya: [],
-      eclipse: null, yogas: [],
+      eclipse: null, yogas: [], ayanam: null, rituvu: null,
     };
     let section = null;
     for (const raw of description.split('\n')) {
@@ -432,6 +447,12 @@
       // Sky: "Sunrise HH:MM  ·  Sunset HH:MM  ·  Moonrise HH:MM  ·  Moonset HH:MM"
       if ((m = line.match(/^Sunrise (\d{2}:\d{2})\s+·\s+Sunset (\d{2}:\d{2})\s+·\s+Moonrise (\d{2}:\d{2})\s+·\s+Moonset (\d{2}:\d{2})$/))) {
         [, data.sunrise, data.sunset, data.moonrise, data.moonset] = m;
+        continue;
+      }
+      // Ayanam / Rituvu: "Ayanam: X  ·  Rituvu: Y"
+      if ((m = line.match(/^Ayanam:\s+(.+?)\s+·\s+Rituvu:\s+(.+)$/))) {
+        data.ayanam = m[1].trim();
+        data.rituvu = m[2].trim();
         continue;
       }
       // Pancha anga rows
@@ -488,7 +509,9 @@
   }
 
   function formatToday() {
-    return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const val = document.getElementById('tp-date')?.value;
+    const d = val ? new Date(val + 'T00:00:00') : new Date();
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   function renderPreview(container, event) {
@@ -504,6 +527,7 @@
     if (data.yoga) rows += row('Yoga', span(data.yoga));
     if (data.karana) rows += row('Karana', data.karana);
 
+    if (data.ayanam) rows += row('Ayanam / Rituvu', `${data.ayanam} · ${data.rituvu}`);
     rows += groupHead('Sky');
     rows += row('Sunrise / Sunset', `${data.sunrise} / ${data.sunset}`);
     rows += row('Moonrise / Moonset', `${data.moonrise} / ${data.moonset}`);
@@ -574,6 +598,10 @@
 
   document.getElementById('tp-city').addEventListener('change', loadPreview);
   document.getElementById('tp-system').addEventListener('change', loadPreview);
+  const _d = new Date();
+  const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
+  document.getElementById('tp-date').value = todayISO;
+  document.getElementById('tp-date').addEventListener('change', loadPreview);
   document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
   document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
 
