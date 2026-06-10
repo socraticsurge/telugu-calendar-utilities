@@ -49,7 +49,7 @@ class ICSGenerator:
 
     def _is_special(self, day: PanchangamDay) -> bool:
         return any([day.is_ekadashi, day.is_amavasya, day.is_pournami,
-                    day.is_pradosham, day.is_sankranti])
+                    day.is_pradosham, day.is_sankranti, day.eclipse is not None])
 
     def _fmt_time(self, dt, tz) -> str:
         local = dt.astimezone(tz)
@@ -57,6 +57,11 @@ class ICSGenerator:
 
     def _fmt_window(self, w: Window, tz) -> str:
         return f'{self._fmt_time(w.start, tz)} – {self._fmt_time(w.end, tz)}'
+
+    def _fmt_eclipse_time(self, dt, tz, day_date) -> str:
+        local = dt.astimezone(tz)
+        prefix = 'Previous day ' if local.date() < day_date else ''
+        return f'{prefix}{local.strftime("%H:%M")}'
 
     def _description(self, day: PanchangamDay, tz) -> str:
         fmt = self._fmt_time
@@ -99,6 +104,23 @@ class ICSGenerator:
             lines.append('')
             lines.append('Choghadiya: ' + ' | '.join(
                 f'{w.name} {fmt(w.start, tz)}' for w in day.choghadiya))
+        if day.eclipse:
+            e = day.eclipse
+            emoji = '🌒' if e.kind == 'Solar' else '🌕'
+            visibility = 'visible from this location' if e.visible else 'not visible from this location'
+            lines += [
+                '',
+                f'{emoji} {e.kind} Eclipse ({e.subtype}) — {visibility}',
+                f'  Eclipse:  {fmt(e.start, tz)} – {fmt(e.end, tz)}',
+            ]
+            if e.visible:
+                lines.append(
+                    f'  Sutak:    {self._fmt_eclipse_time(e.sutak_start, tz, day.date)} – {fmt(e.sutak_end, tz)}'
+                )
+
+        if day.special_yogas:
+            lines += ['', 'Yogas: ' + ', '.join(day.special_yogas)]
+
         specials = []
         if day.is_ekadashi:        specials.append('Ekadashi — fasting day')
         if day.is_amavasya:        specials.append('Amavasya')
@@ -107,6 +129,8 @@ class ICSGenerator:
         elif day.is_soma_pradosham: specials.append('Soma Pradosham')
         elif day.is_pradosham:     specials.append('Pradosham')
         if day.is_sankranti:       specials.append('Sankranti')
+        if day.eclipse:
+            specials.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
         if specials:
             lines += ['', '⚡ ' + ' | '.join(specials)]
         return '\n'.join(lines)
