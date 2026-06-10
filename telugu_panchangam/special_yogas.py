@@ -39,7 +39,7 @@ _PUSHKARA_VARAS: set[str] = {'Adivaram', 'Mangalavaram', 'Shanivaram'}
 _DVIPUSHKARA_TITHIS: set[int] = {2, 7, 12}
 _DVIPUSHKARA_NAKSHATRAS: set[str] = {'Mrigashira', 'Chitra', 'Dhanishtha'}
 
-_TRIPUSHKARA_TITHIS: set[int] = {3, 8, 13}
+_TRIPUSHKARA_TITHIS: set[int] = {2, 7, 12}
 _TRIPUSHKARA_NAKSHATRAS: set[str] = {
     'Krittika', 'Punarvasu', 'Uttara Phalguni',
     'Vishakha', 'Uttara Ashadha', 'Purva Bhadrapada',
