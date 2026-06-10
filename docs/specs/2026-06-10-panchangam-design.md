@@ -26,8 +26,24 @@ hosted on GitHub Pages at zero cost.
 
 - Tarabalam (personalized by birth Nakshatra) — deferred to Phase 2
 - Chrome extension — deferred to Phase 2
+- MCP server — deferred to Phase 2 (see below)
 - Real-time / on-demand feed generation (static monthly generation is sufficient)
+- Automatic alerts or timed calendar blocks — users set their own reminders
 - User accounts or personalization beyond city + system selection
+
+## Phase 2 Roadmap
+
+**MCP Server:** Expose the Panchangam engine as an MCP (Model Context Protocol) tool so AI
+assistants (Claude, etc.) can query it directly. A tool like `get_panchangam(date, location, system)`
+returns structured PanchangamDay data. This enables conversational, personalized use — "remind me
+of all Ekadashis this year", "is tomorrow auspicious for a new venture?", "what is Rahu Kalam
+in Hyderabad today?" — far more flexible than any static feed.
+
+**Tarabalam:** Personalized feed variant where users provide their Janma Nakshatra and the feed
+highlights auspicious/inauspicious days specific to them.
+
+**Chrome Extension:** Quick-access Panchangam for the current day/location without opening a
+calendar app.
 
 ---
 
@@ -175,40 +191,42 @@ All datetimes stored in UTC; converted to local timezone only at ICS generation.
 
 ## ICS Generation
 
-### Event types per day
+### One event per day — all-day summary
 
-**1. All-day event** — day identity label:
+Each day produces a single all-day VEVENT. No timed blocks, no automatic reminders (VALARM).
+Users read the details on demand and set their own reminders if they choose.
+
 ```
-Title: Shukla Ekadashi · Hasta · Shobhana Yoga
-Description: Samvatsara: Sharvari | Chaitra Maasam | Shukla Paksham
-             Sunrise: 05:48 | Sunset: 18:42 | Moonrise: 16:12
+Title:       Shukla Ekadashi · Hasta Nakshatra · Shobhana Yoga
+Description:
+  Samvatsara: Sharvari | Chaitra Maasam | Shukla Paksham | Mangalavaaram
+  Sunrise: 05:48 | Sunset: 18:42 | Moonrise: 16:12 | Moonset: 04:30
+  Solar sign: Mesha | Lunar sign: Tula
+
+  Tithi:     Shukla Ekadashi  05:20 – next day 03:45
+  Nakshatra: Hasta             06:10 – next day 04:55
+  Yoga:      Shobhana          all day
+  Karana:    Vanija / Vishti
+
+  Auspicious:
+    Brahma Muhurta   05:12 – 05:58
+    Abhijit Muhurta  11:46 – 12:32
+    Amrita Kalam     07:15 – 08:00
+
+  Inauspicious:
+    Rahu Kalam       09:00 – 10:30
+    Gulika Kalam     07:30 – 09:00
+    Yamagandam       12:00 – 13:30
+    Varjyam          14:00 – 14:48
+    Durmuhurtham     08:30 – 09:18, 15:30 – 16:18
+
+  Choghadiya: Udveg 06:00 | Char 07:30 | Labh 09:00 | Amrit 10:30 ...
+
+  ⚡ Ekadashi — fasting day
 ```
 
-**2. Timed block events** — one VEVENT per window:
-```
-🟢 Brahma Muhurta        05:12 – 05:58
-🟢 Abhijit Muhurta       11:46 – 12:32
-🟢 Amrita Kalam          07:15 – 08:45
-🔴 Rahu Kalam            09:00 – 10:30
-🔴 Gulika Kalam          07:30 – 09:00
-🔴 Yamagandam            12:00 – 13:30
-🔴 Varjyam               14:00 – 15:15
-🔴 Durmuhurtham          08:30 – 09:18, 15:30 – 16:18
-🟡 Choghadiya: Amrit     06:00 – 07:30  (etc.)
-```
-
-**3. Alert events** — special day reminders at 7pm the previous evening:
-```
-Tomorrow: Ekadashi — prepare for fast
-Tomorrow: Shani Pradosham
-Tomorrow: Soma Pradosham
-Tomorrow: Amavasya
-Tomorrow: Pournami
-```
-
-### VALARM timings
-- Special day alerts → 7pm the previous evening
-- Inauspicious windows (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham) → 15 min before
+Special days (Ekadashi, Amavasya, Pournami, Pradosham, Sankranti) are highlighted with a
+prefix symbol in the title: `⚡ Shukla Ekadashi · Hasta · ...`
 
 ### Feed naming convention
 `{city-slug}-{system}.ics`
