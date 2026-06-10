@@ -99,3 +99,27 @@ def test_vaaram_is_valid():
 def test_durmuhurtham_count_is_two():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert len(result.durmuhurtham) == 2
+
+def test_samvatsara_is_string():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert isinstance(result.samvatsara, str) and result.samvatsara != ''
+
+def test_maasam_is_valid():
+    from src.engines.base import MAASAM_NAMES
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.maasam in MAASAM_NAMES
+
+def test_is_pournami_on_ref_date():
+    result = ENGINE.calculate(REF_DATE, HYD)
+    assert result.is_pournami is True
+
+EKADASHI_DATE = date(2024, 3, 20)  # Shukla Ekadashi before Holi
+
+def test_is_ekadashi():
+    result = ENGINE.calculate(EKADASHI_DATE, HYD)
+    assert result.is_ekadashi is True
+
+def test_sankranti_on_mesha_sankranti():
+    # Mesha Sankranti 2024: ~April 14
+    result = ENGINE.calculate(date(2024, 4, 14), HYD)
+    assert result.is_sankranti is True

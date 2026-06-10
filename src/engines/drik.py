@@ -199,6 +199,46 @@ class DrikGanitaEngine(PanchangamEngine):
         end_jd = start_jd + (4.0 / 60.0) / 24.0
         return [Window(name='Varjyam', start=jd_to_utc(start_jd), end=jd_to_utc(end_jd))]
 
+    def _samvatsara(self, jd_sunrise: float) -> str:
+        """60-year Samvatsara cycle based on Kali Ahargana."""
+        jd_kali_epoch = 588465.5
+        ahargana = jd_sunrise - jd_kali_epoch
+        idx = int(ahargana / 361.02) % 60
+        return SAMVATSARA_NAMES[idx]
+
+    def _maasam(self, jd_sunrise: float) -> str:
+        """Lunar month name based on Sun's sign at the most recent Amavasya."""
+        jd_amavasya = find_crossing(moon_sun_elongation, 0.0,
+                                     jd_sunrise - 30.0, jd_sunrise)
+        sun_lon_at_nm = sun_longitude(jd_amavasya)
+        solar_sign_idx = int(sun_lon_at_nm / 30.0) % 12
+        maasam_idx = (solar_sign_idx - 11) % 12
+        return MAASAM_NAMES[maasam_idx]
+
+    def _special_flags(self, tithi_idx: int, weekday: int,
+                        jd_sunrise: float, jd_sunset: float) -> dict:
+        is_ekadashi = tithi_idx in (10, 25)
+        is_amavasya = tithi_idx == 29
+        is_pournami = tithi_idx == 14
+        tithi_at_sunset = int(moon_sun_elongation(jd_sunset) / 12.0) % 30
+        is_pradosham = tithi_idx in (12, 27) or tithi_at_sunset in (12, 27)
+        is_shani = is_pradosham and weekday == 6
+        is_soma = is_pradosham and weekday == 1
+        sun_sign_sr = int(sun_longitude(jd_sunrise) / 30.0) % 12
+        # Check if a sign change occurred in the 24h window: prev midnight to next sunrise
+        sun_sign_prev_sr = int(sun_longitude(jd_sunrise - 1.0) / 30.0) % 12
+        sun_sign_next_sr = int(sun_longitude(jd_sunrise + 1.0) / 30.0) % 12
+        is_sankranti = (sun_sign_sr != sun_sign_next_sr) or (sun_sign_prev_sr != sun_sign_sr)
+        return {
+            'is_ekadashi': is_ekadashi,
+            'is_amavasya': is_amavasya,
+            'is_pournami': is_pournami,
+            'is_pradosham': is_pradosham,
+            'is_shani_pradosham': is_shani,
+            'is_soma_pradosham': is_soma,
+            'is_sankranti': is_sankranti,
+        }
+
     def _karana_spans(self, jd_sunrise: float, jd_sunset: float) -> list[Span]:
         """Karanas active between sunrise and sunset."""
         elong_at_sunrise = moon_sun_elongation(jd_sunrise)
@@ -275,14 +315,19 @@ class DrikGanitaEngine(PanchangamEngine):
         yoga_span = self._yoga_span(jd_sunrise)
         karana_spans = self._karana_spans(jd_sunrise, jd_sunset)
 
+        # --- Metadata & Special Flags ---
+        special = self._special_flags(tithi_idx, weekday, jd_sunrise, jd_sunset)
+        samvatsara = self._samvatsara(jd_sunrise)
+        maasam = self._maasam(jd_sunrise)
+
         return PanchangamDay(
             date=d,
             location=location,
             system='drik',
-            samvatsara='',
+            samvatsara=samvatsara,
             ayanam=ayanam,
             rituvu=rituvu,
-            maasam='',
+            maasam=maasam,
             paksham=paksham,
             tithi=tithi_span,
             vaaram=vaaram,
@@ -304,11 +349,11 @@ class DrikGanitaEngine(PanchangamEngine):
             varjyam=self._varjyam(nakshatra_span),
             durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset),
             choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
-            is_ekadashi=False,
-            is_amavasya=False,
-            is_pournami=False,
-            is_pradosham=False,
-            is_shani_pradosham=False,
-            is_soma_pradosham=False,
-            is_sankranti=False,
+            is_ekadashi=special['is_ekadashi'],
+            is_amavasya=special['is_amavasya'],
+            is_pournami=special['is_pournami'],
+            is_pradosham=special['is_pradosham'],
+            is_shani_pradosham=special['is_shani_pradosham'],
+            is_soma_pradosham=special['is_soma_pradosham'],
+            is_sankranti=special['is_sankranti'],
         )
