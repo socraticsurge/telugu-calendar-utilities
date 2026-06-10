@@ -16,3 +16,18 @@ def test_panchangam_day_requires_fields():
     import pytest
     with pytest.raises(TypeError):
         PanchangamDay()
+
+def test_eclipse_info_fields():
+    from telugu_panchangam.models.panchangam_day import EclipseInfo
+    start = datetime(2025, 9, 7, 16, 27, tzinfo=timezone.utc)
+    end = datetime(2025, 9, 7, 19, 56, tzinfo=timezone.utc)
+    eclipse = EclipseInfo(
+        kind='Lunar', subtype='Total', visible=True,
+        start=start, end=end,
+        sutak_start=start, sutak_end=end,
+    )
+    assert eclipse.kind == 'Lunar'
+    assert eclipse.subtype == 'Total'
+    assert eclipse.visible is True
+    assert eclipse.start == start
+    assert eclipse.sutak_end == end

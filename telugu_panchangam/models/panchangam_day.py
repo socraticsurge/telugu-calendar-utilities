@@ -26,6 +26,17 @@ class Window:
 
 
 @dataclass
+class EclipseInfo:
+    kind: str        # 'Solar' | 'Lunar'
+    subtype: str     # 'Total' | 'Partial' | 'Annular' | 'Penumbral'
+    visible: bool    # visible from this location
+    start: datetime
+    end: datetime
+    sutak_start: datetime | None  # None if not visible (no Sutak observed)
+    sutak_end: datetime | None
+
+
+@dataclass
 class PanchangamDay:
     # Identity
     date: date
@@ -78,3 +89,5 @@ class PanchangamDay:
     is_soma_pradosham: bool
     is_sankranti: bool
     special_notes: list[str] = field(default_factory=list)
+    eclipse: EclipseInfo | None = None
+    special_yogas: list[str] = field(default_factory=list)
