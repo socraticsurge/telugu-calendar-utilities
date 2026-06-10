@@ -106,3 +106,14 @@ def test_no_yogas_section_when_empty():
     events = [c for c in cal.walk() if c.name == 'VEVENT']
     description = str(events[0].get('description'))
     assert 'Yogas:' not in description
+
+
+def test_ayanam_and_rituvu_in_description():
+    days = _make_days(1)
+    gen = ICSGenerator()
+    raw = gen.generate(days, 'drik')
+    cal = Calendar.from_ical(raw)
+    events = [c for c in cal.walk() if c.name == 'VEVENT']
+    description = str(events[0].get('description'))
+    assert 'Ayanam:' in description
+    assert 'Rituvu:' in description

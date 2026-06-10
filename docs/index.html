@@ -416,7 +416,7 @@
       meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
       sunrise: null, sunset: null, moonrise: null, moonset: null,
       auspicious: [], inauspicious: [], choghadiya: [],
-      eclipse: null, yogas: [],
+      eclipse: null, yogas: [], ayanam: null, rituvu: null,
     };
     let section = null;
     for (const raw of description.split('\n')) {
@@ -432,6 +432,12 @@
       // Sky: "Sunrise HH:MM  ·  Sunset HH:MM  ·  Moonrise HH:MM  ·  Moonset HH:MM"
       if ((m = line.match(/^Sunrise (\d{2}:\d{2})\s+·\s+Sunset (\d{2}:\d{2})\s+·\s+Moonrise (\d{2}:\d{2})\s+·\s+Moonset (\d{2}:\d{2})$/))) {
         [, data.sunrise, data.sunset, data.moonrise, data.moonset] = m;
+        continue;
+      }
+      // Ayanam / Rituvu: "Ayanam: X  ·  Rituvu: Y"
+      if ((m = line.match(/^Ayanam:\s+(.+?)\s+·\s+Rituvu:\s+(.+)$/))) {
+        data.ayanam = m[1].trim();
+        data.rituvu = m[2].trim();
         continue;
       }
       // Pancha anga rows
@@ -504,6 +510,7 @@
     if (data.yoga) rows += row('Yoga', span(data.yoga));
     if (data.karana) rows += row('Karana', data.karana);
 
+    if (data.ayanam) rows += row('Ayanam / Rituvu', `${data.ayanam} · ${data.rituvu}`);
     rows += groupHead('Sky');
     rows += row('Sunrise / Sunset', `${data.sunrise} / ${data.sunset}`);
     rows += row('Moonrise / Moonset', `${data.moonrise} / ${data.moonset}`);
