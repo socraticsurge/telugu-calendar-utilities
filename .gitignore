@@ -4,3 +4,4 @@ __pycache__/
 .coverage
 .venv/
 docs/tracking/.lockdir
+.worktrees

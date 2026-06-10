@@ -1,0 +1,4 @@
+pyswisseph>=2.10.3
+icalendar>=5.0.0
+pytz>=2024.1
+pytest>=8.0.0
