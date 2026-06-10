@@ -85,6 +85,6 @@ KARANA_FIXED: dict[int, str] = {
 
 class PanchangamEngine(ABC):
     @abstractmethod
-    def calculate(self, d: date, location: Location) -> PanchangamDay:
+    def calculate(self, d: date, location: Location, include_eclipse: bool = True) -> PanchangamDay:
         """Calculate full Panchangam for a single date and location."""
         ...

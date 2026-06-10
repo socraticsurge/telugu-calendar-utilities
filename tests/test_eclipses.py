@@ -71,3 +71,7 @@ def test_get_eclipse_from_precomputed_matches_get_eclipse_for_date():
     assert direct.kind == from_cache.kind
     assert direct.subtype == from_cache.subtype
     assert direct.visible == from_cache.visible
+    assert direct.start == from_cache.start
+    assert direct.end == from_cache.end
+    assert direct.sutak_start == from_cache.sutak_start
+    assert direct.sutak_end == from_cache.sutak_end

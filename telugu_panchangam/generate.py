@@ -35,8 +35,8 @@ def generate_feeds(
     locations = [c for c in CITIES if city_names is None or c.name in city_names]
     generator = ICSGenerator()
 
-    jd_start = local_midnight_jd(start, 'UTC')
-    jd_end = local_midnight_jd(end + timedelta(days=1), 'UTC')
+    jd_start = local_midnight_jd(start - timedelta(days=1), 'Asia/Kolkata')
+    jd_end = local_midnight_jd(end + timedelta(days=2), 'UTC')
     print('  Pre-computing eclipses for the generation window...')
     precomputed_eclipses = list_eclipses_in_range(jd_start, jd_end)
     print(f'  Found {len(precomputed_eclipses)} eclipse(s).')
