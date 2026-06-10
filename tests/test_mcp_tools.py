@@ -169,6 +169,19 @@ def test_get_panchangam_range_exceeds_limit():
     assert 'error' in result
 
 
+def test_get_panchangam_range_exactly_31_days_allowed():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam_range
+    result = json.loads(tool_get_panchangam_range('2026-06-01', '2026-07-01', 'Hyderabad'))
+    assert 'days' in result
+    assert len(result['days']) == 31
+
+
+def test_get_panchangam_range_32_days_rejected():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam_range
+    result = json.loads(tool_get_panchangam_range('2026-06-01', '2026-07-02', 'Hyderabad'))
+    assert 'error' in result
+
+
 def test_get_panchangam_range_invalid_dates():
     from telugu_panchangam.mcp.tools import tool_get_panchangam_range
     result = json.loads(tool_get_panchangam_range('2026-06-12', '2026-06-10', 'Hyderabad'))
@@ -183,12 +196,14 @@ def test_get_panchangam_range_auspicious_keys():
     assert 'rahu_kalam' in day['inauspicious']
 
 
-def test_choghadiya_has_end_time():
+@pytest.mark.parametrize('system', ['drik', 'surya_siddhanta', 'vakya'])
+def test_choghadiya_has_end_time(system):
     from telugu_panchangam.mcp.tools import tool_get_panchangam
-    result = json.loads(tool_get_panchangam('2026-06-10', 'Hyderabad', 'drik'))
+    result = json.loads(tool_get_panchangam('2026-06-10', 'Hyderabad', system))
+    assert 'choghadiya' in result
     chog = result['choghadiya']
     assert len(chog) == 8
     for entry in chog:
-        assert 'end' in entry, "Choghadiya entry missing 'end'"
+        assert 'end' in entry
         assert len(entry['end']) == 5
         assert entry['end'][2] == ':'
