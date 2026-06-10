@@ -37,7 +37,7 @@ Visit the landing page to pick your city and calculation system and copy your `w
 
 ## MCP Server
 
-`mcp-server-panchangam` is available on PyPI. Add it to any MCP-compatible AI assistant in one step.
+`mcp-server-panchangam` is available on PyPI. It's a standard MCP stdio server (`uvx mcp-server-panchangam`), so it works with any MCP-compatible client or agent — Claude Desktop, Claude Code, Cursor, Windsurf, and custom agents built on the MCP SDK. Below are examples for a couple of common clients; for others, point your client's MCP config at the same `uvx mcp-server-panchangam` command.
 
 **Claude Desktop** — add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
