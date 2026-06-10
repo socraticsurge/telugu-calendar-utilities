@@ -175,6 +175,41 @@ fields are computed in `calculate()`, and assigns the result to `day.special_yog
 
 ---
 
+## MCP Server Changes (`telugu_panchangam/mcp/tools.py`)
+
+The MCP tools wrap the same `PanchangamDay` objects, so they need to expose the new fields too:
+
+- `_special_events(day)`: extend to also append an eclipse entry when `day.eclipse` is set, e.g.
+  `'Solar Eclipse (Partial)'` / `'Lunar Eclipse (Total)'` — same strings used in the ICS
+  `specials` list, keeping the two surfaces consistent.
+- `tool_get_panchangam`: add a top-level `'eclipse'` key — `None` if `day.eclipse is None`,
+  otherwise:
+  ```python
+  {
+      'kind': day.eclipse.kind,
+      'subtype': day.eclipse.subtype,
+      'visible': day.eclipse.visible,
+      'start': _fmt_time(day.eclipse.start, tz),
+      'end': _fmt_time(day.eclipse.end, tz),
+      'sutak': {
+          'start': _fmt_time(day.eclipse.sutak_start, tz),
+          'end': _fmt_time(day.eclipse.sutak_end, tz),
+      } if day.eclipse.sutak_start else None,
+  }
+  ```
+  Also add a top-level `'special_yogas': day.special_yogas` (list of strings, possibly empty).
+  `'special_days'`/`'is_special'` continue to come from `_special_events`/`bool(specials)`, now
+  including the eclipse entry per above.
+- `tool_get_muhurta`: no changes — eclipses and special yogas aren't muhurta data.
+- `tool_get_special_days`: extend the inclusion condition to also include days where
+  `day.eclipse is not None`, and include `'special_yogas'` in each returned day's dict (so a day
+  that's *only* notable for a special yoga, e.g. Sarvartha Siddhi with no other special flag, is
+  *not* added to this list — `special_yogas` are informational annotations on existing entries,
+  not a reason by themselves to appear in `special_days`. This matches the ICS decision that
+  special yogas get no `SUMMARY`/specials-list marker of their own).
+
+---
+
 ## Error Handling
 
 - `eclipses.get_eclipse_for_date`: catch `swisseph` exceptions raised when no eclipse is found in
@@ -202,3 +237,7 @@ fields are computed in `calculate()`, and assigns the result to `day.special_yog
   due to the eclipse.
 - Run `python -m telugu_panchangam.generate` for a short date range covering a known eclipse date
   to manually spot-check the generated `.ics` output.
+- `tests/test_mcp_tools.py` (or equivalent): extend `tool_get_panchangam` tests to assert the new
+  `'eclipse'` and `'special_yogas'` keys (both the populated and `None`/`[]` cases), and extend
+  `tool_get_special_days` tests to confirm an eclipse-only day is included while a
+  special-yoga-only day is not.
