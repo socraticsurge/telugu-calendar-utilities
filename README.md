@@ -75,7 +75,7 @@ Feeds are generated on the 1st of every month via GitHub Actions, covering 18 mo
 
 ```
 GitHub Actions (monthly cron)
-  → python -m src.generate   (22 cities × 3 systems = 66 feeds)
+  → python -m telugu_panchangam.generate   (22 cities × 3 systems = 66 feeds)
   → feeds/*.ics
   → GitHub Pages (webcal:// subscriptions)
 ```
@@ -86,7 +86,7 @@ GitHub Actions (monthly cron)
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 pytest tests/ -v
-python -m src.generate   # writes to feeds/
+python -m telugu_panchangam.generate   # writes to feeds/
 ```
 
 ## Roadmap
