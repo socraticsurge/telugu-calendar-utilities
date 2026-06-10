@@ -78,8 +78,7 @@ def find_crossing(
 def get_sunrise(jd_start: float, geopos: list[float]) -> float:
     """JD of next sunrise after jd_start for geopos=[lon, lat, alt_m]."""
     ret, tret = swe.rise_trans(
-        jd_start, swe.SUN, '', swe.FLG_SWIEPH,
-        swe.CALC_RISE, geopos, 1013.25, 15.0,
+        jd_start, swe.SUN, swe.CALC_RISE, geopos, 1013.25, 15.0,
     )
     return tret[0]
 
@@ -87,8 +86,7 @@ def get_sunrise(jd_start: float, geopos: list[float]) -> float:
 def get_sunset(jd_start: float, geopos: list[float]) -> float:
     """JD of next sunset after jd_start."""
     ret, tret = swe.rise_trans(
-        jd_start, swe.SUN, '', swe.FLG_SWIEPH,
-        swe.CALC_SET, geopos, 1013.25, 15.0,
+        jd_start, swe.SUN, swe.CALC_SET, geopos, 1013.25, 15.0,
     )
     return tret[0]
 
@@ -96,8 +94,7 @@ def get_sunset(jd_start: float, geopos: list[float]) -> float:
 def get_moonrise(jd_start: float, geopos: list[float]) -> float:
     """JD of next moonrise after jd_start."""
     ret, tret = swe.rise_trans(
-        jd_start, swe.MOON, '', swe.FLG_SWIEPH,
-        swe.CALC_RISE, geopos, 1013.25, 15.0,
+        jd_start, swe.MOON, swe.CALC_RISE, geopos, 1013.25, 15.0,
     )
     return tret[0]
 
@@ -105,7 +102,6 @@ def get_moonrise(jd_start: float, geopos: list[float]) -> float:
 def get_moonset(jd_start: float, geopos: list[float]) -> float:
     """JD of next moonset after jd_start."""
     ret, tret = swe.rise_trans(
-        jd_start, swe.MOON, '', swe.FLG_SWIEPH,
-        swe.CALC_SET, geopos, 1013.25, 15.0,
+        jd_start, swe.MOON, swe.CALC_SET, geopos, 1013.25, 15.0,
     )
     return tret[0]
