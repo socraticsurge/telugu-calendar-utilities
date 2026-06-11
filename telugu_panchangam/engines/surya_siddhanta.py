@@ -9,6 +9,10 @@ from telugu_panchangam.engines.base import (
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
     VAARAM_NAMES, MAASAM_NAMES,
     KARANA_REPEATING, KARANA_FIXED, samvatsara_name, maasam_name,
+    RAHU_PART, GULIKA_PART, YAMAG_PART,
+    DURMUHURTA_DAY_MUHURTAS, DURMUHURTA_NIGHT_MUHURTAS,
+    VARJYAM_GHATIS, AMRITA_GHATIS,
+    nakshatra_day_windows, next_nakshatra_span,
 )
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
@@ -27,13 +31,6 @@ _SUN_APOGEE_DEG   = 77.333
 _SUN_MANDA_R      = 13.5
 _MOON_MANDA_R     = 31.5
 
-_RAHU_PART   = {0: 8, 1: 2, 2: 7, 3: 5, 4: 6, 5: 3, 6: 4}
-_GULIKA_PART = {0: 7, 1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1}
-_YAMAG_PART  = {0: 4, 1: 3, 2: 2, 3: 1, 4: 7, 5: 6, 6: 5}
-_DURMUHURTHA_PARTS = {
-    0: (5, 12), 1: (7, 15), 2: (5, 9),
-    3: (2, 8),  4: (10, 16), 5: (4, 11), 6: (6, 14),
-}
 _DAY_CHOGHADIYA = {
     0: ['Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg'],
     1: ['Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit'],
@@ -43,16 +40,6 @@ _DAY_CHOGHADIYA = {
     5: ['Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char'],
     6: ['Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal'],
 }
-_AMRITA_OFFSET_GHATIKAS = [
-    55, 4, 26, 22, 49, 17, 45, 13, 37, 55,
-    4, 12, 41, 16, 45, 17, 35, 10, 20, 52,
-    30, 35, 54, 22, 4, 36, 14,
-]
-_VARJYAM_OFFSET_GHATIKAS = [
-    30, 12, 50, 47, 24, 43, 21, 56, 12, 30,
-    38, 47, 16, 50, 20, 52, 10, 44, 55, 27,
-    5, 10, 28, 57, 38, 11, 48,
-]
 
 
 def _mean_longitude(ka: float, revs: int) -> float:
@@ -88,6 +75,7 @@ class SuryaSiddhantaEngine(PanchangamEngine):
 
         jd_sunrise  = get_sunrise(jd_midnight, geopos)
         jd_sunset   = get_sunset(jd_sunrise, geopos)
+        jd_next_sunrise = get_sunrise(jd_midnight + 1.0, geopos)
         jd_moonrise = get_moonrise(jd_midnight, geopos)
         jd_moonset  = get_moonset(jd_midnight, geopos)
 
@@ -123,6 +111,12 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         eclipse    = get_eclipse_for_date(d, location) if include_eclipse else None
         special_yogas = get_special_yogas(vaaram, tithi_span.name, nak_span.name)
 
+        # Varjyam / Amrita Kalam: windows of the sunrise nakshatra and the one
+        # following it that begin within this panchangam day.
+        nak_spans = [nak_span, next_nakshatra_span(nak_span, self._moon_longitude_func())]
+        day_start = jd_to_utc(jd_sunrise)
+        day_end   = jd_to_utc(jd_next_sunrise)
+
         return PanchangamDay(
             date=d, location=location, system='surya_siddhanta',
             samvatsara=samvatsara, ayanam=ayanam, rituvu=rituvu,
@@ -133,12 +127,12 @@ class SuryaSiddhantaEngine(PanchangamEngine):
             solar_sign=solar_sign, lunar_sign=lunar_sign,
             brahma_muhurta=self._brahma_muhurta(jd_sunrise),
             abhijit_muhurta=self._abhijit_muhurta(jd_sunrise, jd_sunset, weekday),
-            amrita_kalam=self._amrita_kalam(jd_sunrise, nak_span),
+            amrita_kalam=nakshatra_day_windows(nak_spans, AMRITA_GHATIS, 'Amrita Kalam', day_start, day_end),
             rahu_kalam=self._rahu_kalam(weekday, jd_sunrise, jd_sunset),
             gulika_kalam=self._gulika_kalam(weekday, jd_sunrise, jd_sunset),
             yamagandam=self._yamagandam(weekday, jd_sunrise, jd_sunset),
-            varjyam=self._varjyam(nak_span),
-            durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset),
+            varjyam=nakshatra_day_windows(nak_spans, VARJYAM_GHATIS, 'Varjyam', day_start, day_end),
+            durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset, jd_next_sunrise),
             choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
             eclipse=eclipse,
             special_yogas=special_yogas,
@@ -224,13 +218,13 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         return Window(name=name, start=jd_to_utc(s), end=jd_to_utc(s + sz))
 
     def _rahu_kalam(self, wd, jd_sr, jd_ss):
-        return self._day_part_window(_RAHU_PART[wd], jd_sr, jd_ss, 'Rahu Kalam')
+        return self._day_part_window(RAHU_PART[wd], jd_sr, jd_ss, 'Rahu Kalam')
 
     def _gulika_kalam(self, wd, jd_sr, jd_ss):
-        return self._day_part_window(_GULIKA_PART[wd], jd_sr, jd_ss, 'Gulika Kalam')
+        return self._day_part_window(GULIKA_PART[wd], jd_sr, jd_ss, 'Gulika Kalam')
 
     def _yamagandam(self, wd, jd_sr, jd_ss):
-        return self._day_part_window(_YAMAG_PART[wd], jd_sr, jd_ss, 'Yamagandam')
+        return self._day_part_window(YAMAG_PART[wd], jd_sr, jd_ss, 'Yamagandam')
 
     def _brahma_muhurta(self, jd_sunrise):
         m = 1.0 / 30.0
@@ -240,7 +234,7 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         if wd == 3:
             return None
         mid = (jd_sr + jd_ss) / 2.0
-        hm  = (jd_ss - jd_sr) / 60.0
+        hm  = (jd_ss - jd_sr) / 30.0  # half of a day/15 muhurta
         return Window('Abhijit Muhurta', start=jd_to_utc(mid - hm), end=jd_to_utc(mid + hm))
 
     def _choghadiya(self, wd, jd_sr, jd_ss):
@@ -248,19 +242,16 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         blk   = (jd_ss - jd_sr) / 8.0
         return [Window(names[i], jd_to_utc(jd_sr + i*blk), jd_to_utc(jd_sr + (i+1)*blk)) for i in range(8)]
 
-    def _durmuhurtham(self, wd, jd_sr, jd_ss):
-        m = (jd_ss - jd_sr) / 30.0
-        return [Window('Durmuhurtham', jd_to_utc(jd_sr + (p-1)*m), jd_to_utc(jd_sr + p*m))
-                for p in _DURMUHURTHA_PARTS[wd]]
+    def _durmuhurtham(self, wd, jd_sr, jd_ss, jd_next_sr):
+        out = []
+        m = (jd_ss - jd_sr) / 15.0
+        out += [Window('Durmuhurtham', jd_to_utc(jd_sr + (p-1)*m), jd_to_utc(jd_sr + p*m))
+                for p in DURMUHURTA_DAY_MUHURTAS[wd]]
+        nm = (jd_next_sr - jd_ss) / 15.0
+        out += [Window('Durmuhurtham', jd_to_utc(jd_ss + (p-1)*nm), jd_to_utc(jd_ss + p*nm))
+                for p in DURMUHURTA_NIGHT_MUHURTAS.get(wd, ())]
+        return out
 
-    def _amrita_kalam(self, jd_sunrise, nak_span):
-        idx    = NAKSHATRA_NAMES.index(nak_span.name)
-        offset = _AMRITA_OFFSET_GHATIKAS[idx] * (24.0 / 60.0) / 24.0
-        s      = datetime_to_jd(nak_span.start) + offset
-        return [Window('Amrita Kalam', jd_to_utc(s), jd_to_utc(s + (4.0/60.0)/24.0))]
-
-    def _varjyam(self, nak_span):
-        idx    = NAKSHATRA_NAMES.index(nak_span.name)
-        offset = _VARJYAM_OFFSET_GHATIKAS[idx] * (24.0 / 60.0) / 24.0
-        s      = datetime_to_jd(nak_span.start) + offset
-        return [Window('Varjyam', jd_to_utc(s), jd_to_utc(s + (4.0/60.0)/24.0))]
+    def _moon_longitude_func(self):
+        """Moon-longitude model used for nakshatra boundaries (vakya overrides)."""
+        return ss_moon_longitude

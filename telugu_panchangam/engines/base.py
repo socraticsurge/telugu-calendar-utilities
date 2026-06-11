@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, PanchangamDay, Span, Window
 
 TITHI_NAMES: list[str] = [
     # Shukla Paksha (0-14)
@@ -142,6 +142,68 @@ EKADASHI_NAMES: dict[str, dict[str, str]] = {
     'Magha':      {'Shukla': 'Jaya',        'Krishna': 'Vijaya'},
     'Phalguna':   {'Shukla': 'Amalaki',     'Krishna': 'Papamochani'},
 }
+
+
+# ---------------------------------------------------------------------------
+# Muhurta window tables — verified against Drik Panchang (Hyderabad, Jun–Aug
+# 2026 day panchang pages). Weekday convention throughout: 0=Sunday.
+# ---------------------------------------------------------------------------
+
+# Rahu Kalam / Gulika Kalam / Yamagandam: 1-indexed part of the 8-part day.
+RAHU_PART   = {0: 8, 1: 2, 2: 7, 3: 5, 4: 6, 5: 4, 6: 3}
+GULIKA_PART = {0: 7, 1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1}
+YAMAG_PART  = {0: 5, 1: 4, 2: 3, 3: 2, 4: 1, 5: 7, 6: 6}
+
+# Durmuhurtham: 1-indexed muhurtas of the 15-muhurta day; Tuesday has a
+# second window at night (1-indexed muhurta of the 15-muhurta night).
+DURMUHURTA_DAY_MUHURTAS = {0: (14,), 1: (9, 12), 2: (4,), 3: (8,), 4: (6, 12), 5: (4, 9), 6: (1, 2)}
+DURMUHURTA_NIGHT_MUHURTAS = {2: (7,)}
+
+# Varjyam (Tyajya) and Amrita Kalam: classical start ghatis per nakshatra on
+# the 60-ghati scale of the nakshatra's actual span; both last 4 such ghatis.
+# Order matches NAKSHATRA_NAMES (Ashvini … Revati).
+VARJYAM_GHATIS: list[int] = [
+    50, 24, 30, 40, 14, 21, 30, 20, 32,
+    30, 20, 18, 21, 20, 14, 14, 10, 14,
+    56, 24, 20, 10, 10, 18, 16, 24, 30,
+]
+AMRITA_GHATIS: list[int] = [
+    42, 48, 54, 52, 38, 35, 54, 44, 56,
+    54, 44, 42, 45, 44, 38, 38, 34, 38,
+    44, 48, 44, 34, 34, 42, 40, 48, 54,
+]
+
+
+def nakshatra_ghati_window(span: Span, ghatis: list[int], label: str) -> Window:
+    """The window starting `ghatis[nak]`/60 into the span, lasting 4/60 of it."""
+    idx = NAKSHATRA_NAMES.index(span.name)
+    dur = span.end - span.start
+    start = span.start + dur * (ghatis[idx] / 60.0)
+    return Window(name=label, start=start, end=start + dur * (4.0 / 60.0))
+
+
+def nakshatra_day_windows(spans: list[Span], ghatis: list[int], label: str,
+                          day_start, day_end) -> list[Window]:
+    """Windows from `spans` that begin within the panchangam day
+    [day_start, day_end) — the convention printed panchangams follow."""
+    out = []
+    for span in spans:
+        w = nakshatra_ghati_window(span, ghatis, label)
+        if day_start <= w.start < day_end:
+            out.append(w)
+    return out
+
+
+def next_nakshatra_span(span: Span, moon_longitude_func) -> Span:
+    """The nakshatra span immediately following `span`, using the engine's
+    own moon-longitude model."""
+    from telugu_panchangam.engines.utils import datetime_to_jd, jd_to_utc, find_crossing
+    idx = (NAKSHATRA_NAMES.index(span.name) + 1) % 27
+    nak_size = 360.0 / 27.0
+    jd_start = datetime_to_jd(span.end)
+    jd_end = find_crossing(moon_longitude_func, (idx + 1) * nak_size,
+                           jd_start, jd_start + 2.0)
+    return Span(name=NAKSHATRA_NAMES[idx], start=span.end, end=jd_to_utc(jd_end))
 
 
 def ekadashi_name(maasam: str, paksham: str, solar_sign: str) -> str | None:

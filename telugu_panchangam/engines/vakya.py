@@ -16,6 +16,7 @@ from telugu_panchangam.engines.base import (
     RASHI_NAMES, RITUVU_NAMES, VAARAM_NAMES, MAASAM_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, KARANA_REPEATING, KARANA_FIXED,
     maasam_name,
+    VARJYAM_GHATIS, AMRITA_GHATIS, nakshatra_day_windows, next_nakshatra_span,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 from telugu_panchangam.eclipses import get_eclipse_for_date
@@ -51,6 +52,7 @@ class VakyaEngine(SuryaSiddhantaEngine):
 
         jd_sunrise  = get_sunrise(jd_midnight, geopos)
         jd_sunset   = get_sunset(jd_sunrise, geopos)
+        jd_next_sunrise = get_sunrise(jd_midnight + 1.0, geopos)
         jd_moonrise = get_moonrise(jd_midnight, geopos)
         jd_moonset  = get_moonset(jd_midnight, geopos)
 
@@ -85,6 +87,12 @@ class VakyaEngine(SuryaSiddhantaEngine):
         eclipse    = get_eclipse_for_date(d, location) if include_eclipse else None
         special_yogas = get_special_yogas(vaaram, tithi_span.name, nak_span.name)
 
+        # Varjyam / Amrita Kalam: windows of the sunrise nakshatra and the one
+        # following it that begin within this panchangam day.
+        nak_spans = [nak_span, next_nakshatra_span(nak_span, self._moon_longitude_func())]
+        day_start = jd_to_utc(jd_sunrise)
+        day_end   = jd_to_utc(jd_next_sunrise)
+
         return PanchangamDay(
             date=d, location=location, system='vakya',
             samvatsara=samvatsara, ayanam=ayanam, rituvu=rituvu,
@@ -95,12 +103,12 @@ class VakyaEngine(SuryaSiddhantaEngine):
             solar_sign=solar_sign, lunar_sign=lunar_sign,
             brahma_muhurta=self._brahma_muhurta(jd_sunrise),
             abhijit_muhurta=self._abhijit_muhurta(jd_sunrise, jd_sunset, weekday),
-            amrita_kalam=self._amrita_kalam(jd_sunrise, nak_span),
+            amrita_kalam=nakshatra_day_windows(nak_spans, AMRITA_GHATIS, 'Amrita Kalam', day_start, day_end),
             rahu_kalam=self._rahu_kalam(weekday, jd_sunrise, jd_sunset),
             gulika_kalam=self._gulika_kalam(weekday, jd_sunrise, jd_sunset),
             yamagandam=self._yamagandam(weekday, jd_sunrise, jd_sunset),
-            varjyam=self._varjyam(nak_span),
-            durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset),
+            varjyam=nakshatra_day_windows(nak_spans, VARJYAM_GHATIS, 'Varjyam', day_start, day_end),
+            durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset, jd_next_sunrise),
             choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
             eclipse=eclipse,
             special_yogas=special_yogas,
@@ -108,6 +116,9 @@ class VakyaEngine(SuryaSiddhantaEngine):
         )
 
     # Override Moon-dependent helpers to use vakya functions
+
+    def _moon_longitude_func(self):
+        return vakya_moon_longitude
 
     def _tithi_index_at(self, jd: float) -> int:
         return int(vakya_elongation(jd) / 12.0) % 30

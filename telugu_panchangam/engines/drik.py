@@ -8,6 +8,10 @@ from telugu_panchangam.engines.base import (
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
     VAARAM_NAMES, MAASAM_NAMES,
     KARANA_REPEATING, KARANA_FIXED, samvatsara_name, maasam_name,
+    RAHU_PART, GULIKA_PART, YAMAG_PART,
+    DURMUHURTA_DAY_MUHURTAS, DURMUHURTA_NIGHT_MUHURTAS,
+    VARJYAM_GHATIS, AMRITA_GHATIS,
+    nakshatra_day_windows, next_nakshatra_span,
 )
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
@@ -17,23 +21,6 @@ from telugu_panchangam.engines.utils import (
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 from telugu_panchangam.eclipses import get_eclipse_for_date
 from telugu_panchangam.special_yogas import get_special_yogas
-
-# Rahu Kalam, Gulika, Yamagandam: 1-indexed part of day (1=first, 8=last)
-# Weekday: 0=Sunday, 1=Monday, ..., 6=Saturday
-_RAHU_PART   = {0: 8, 1: 2, 2: 7, 3: 5, 4: 6, 5: 3, 6: 4}
-_GULIKA_PART = {0: 7, 1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1}
-_YAMAG_PART  = {0: 4, 1: 3, 2: 2, 3: 1, 4: 7, 5: 6, 6: 5}
-
-# Durmuhurtham: 2 muhurta indices (1-indexed out of 30 solar muhurtas per day) per weekday
-_DURMUHURTHA_PARTS = {
-    0: (5, 12),   # Sunday
-    1: (7, 15),   # Monday
-    2: (5, 9),    # Tuesday
-    3: (2, 8),    # Wednesday
-    4: (10, 16),  # Thursday
-    5: (4, 11),   # Friday
-    6: (6, 14),   # Saturday
-}
 
 # Day Choghadiya sequence (8 per day from sunrise), weekday 0=Sunday
 _DAY_CHOGHADIYA = {
@@ -45,21 +32,6 @@ _DAY_CHOGHADIYA = {
     5: ['Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char'],
     6: ['Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal'],
 }
-
-# Amrita Kalam offset from Nakshatra start, in ghatikas (1 ghatika = 24 min)
-_AMRITA_OFFSET_GHATIKAS = [
-    55, 4, 26, 22, 49, 17, 45, 13, 37, 55,
-    4, 12, 41, 16, 45, 17, 35, 10, 20, 52,
-    30, 35, 54, 22, 4, 36, 14,
-]
-
-# Varjyam offset from Nakshatra start, in ghatikas
-_VARJYAM_OFFSET_GHATIKAS = [
-    30, 12, 50, 47, 24, 43, 21, 56, 12, 30,
-    38, 47, 16, 50, 20, 52, 10, 44, 55, 27,
-    5, 10, 28, 57, 38, 11, 48,
-]
-
 
 class DrikGanitaEngine(PanchangamEngine):
 
@@ -137,13 +109,13 @@ class DrikGanitaEngine(PanchangamEngine):
         return Window(name=name, start=jd_to_utc(start), end=jd_to_utc(end))
 
     def _rahu_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
-        return self._day_part_window(_RAHU_PART[weekday], jd_sr, jd_ss, 'Rahu Kalam')
+        return self._day_part_window(RAHU_PART[weekday], jd_sr, jd_ss, 'Rahu Kalam')
 
     def _gulika_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
-        return self._day_part_window(_GULIKA_PART[weekday], jd_sr, jd_ss, 'Gulika Kalam')
+        return self._day_part_window(GULIKA_PART[weekday], jd_sr, jd_ss, 'Gulika Kalam')
 
     def _yamagandam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
-        return self._day_part_window(_YAMAG_PART[weekday], jd_sr, jd_ss, 'Yamagandam')
+        return self._day_part_window(YAMAG_PART[weekday], jd_sr, jd_ss, 'Yamagandam')
 
     def _brahma_muhurta(self, jd_sunrise: float) -> Window:
         # 2 muhurtas (96 min) before sunrise; 1 muhurta = 48 min = 1/30 day
@@ -157,7 +129,7 @@ class DrikGanitaEngine(PanchangamEngine):
         if weekday == 3:  # Wednesday — no Abhijit
             return None
         midday = (jd_sunrise + jd_sunset) / 2.0
-        half_muhurta = (jd_sunset - jd_sunrise) / 60.0
+        half_muhurta = (jd_sunset - jd_sunrise) / 30.0  # half of a day/15 muhurta
         return Window(name='Abhijit Muhurta',
                       start=jd_to_utc(midday - half_muhurta),
                       end=jd_to_utc(midday + half_muhurta))
@@ -172,34 +144,22 @@ class DrikGanitaEngine(PanchangamEngine):
             for i in range(8)
         ]
 
-    def _durmuhurtham(self, weekday: int, jd_sr: float, jd_ss: float) -> list[Window]:
-        muhurta = (jd_ss - jd_sr) / 30.0
-        parts = _DURMUHURTHA_PARTS[weekday]
+    def _durmuhurtham(self, weekday: int, jd_sr: float, jd_ss: float,
+                       jd_next_sr: float) -> list[Window]:
         results = []
-        for p in parts:
-            start = jd_sr + (p - 1) * muhurta
+        day_muhurta = (jd_ss - jd_sr) / 15.0
+        for p in DURMUHURTA_DAY_MUHURTAS[weekday]:
+            start = jd_sr + (p - 1) * day_muhurta
             results.append(Window(name='Durmuhurtham',
                                   start=jd_to_utc(start),
-                                  end=jd_to_utc(start + muhurta)))
+                                  end=jd_to_utc(start + day_muhurta)))
+        night_muhurta = (jd_next_sr - jd_ss) / 15.0
+        for p in DURMUHURTA_NIGHT_MUHURTAS.get(weekday, ()):
+            start = jd_ss + (p - 1) * night_muhurta
+            results.append(Window(name='Durmuhurtham',
+                                  start=jd_to_utc(start),
+                                  end=jd_to_utc(start + night_muhurta)))
         return results
-
-    def _amrita_kalam(self, jd_sunrise: float, nak_span: Span) -> list[Window]:
-        nak_idx = NAKSHATRA_NAMES.index(nak_span.name)
-        offset_ghatikas = _AMRITA_OFFSET_GHATIKAS[nak_idx]
-        offset_jd = offset_ghatikas * (24.0 / 60.0) / 24.0  # ghatikas to days
-        nak_start_jd = datetime_to_jd(nak_span.start)
-        start_jd = nak_start_jd + offset_jd
-        end_jd = start_jd + (4.0 / 60.0) / 24.0  # 4 ghatikas duration
-        return [Window(name='Amrita Kalam', start=jd_to_utc(start_jd), end=jd_to_utc(end_jd))]
-
-    def _varjyam(self, nak_span: Span) -> list[Window]:
-        nak_idx = NAKSHATRA_NAMES.index(nak_span.name)
-        offset_ghatikas = _VARJYAM_OFFSET_GHATIKAS[nak_idx]
-        offset_jd = offset_ghatikas * (24.0 / 60.0) / 24.0
-        nak_start_jd = datetime_to_jd(nak_span.start)
-        start_jd = nak_start_jd + offset_jd
-        end_jd = start_jd + (4.0 / 60.0) / 24.0
-        return [Window(name='Varjyam', start=jd_to_utc(start_jd), end=jd_to_utc(end_jd))]
 
     def _samvatsara(self, jd_sunrise: float, maasam: str) -> str:
         """60-year Samvatsara cycle (Telugu solar reckoning, flips at Ugadi)."""
@@ -274,6 +234,7 @@ class DrikGanitaEngine(PanchangamEngine):
         # --- Solar & lunar rise/set ---
         jd_sunrise = get_sunrise(jd_midnight, geopos)
         jd_sunset = get_sunset(jd_sunrise, geopos)
+        jd_next_sunrise = get_sunrise(jd_midnight + 1.0, geopos)
         jd_moonrise = get_moonrise(jd_midnight, geopos)
         jd_moonset = get_moonset(jd_midnight, geopos)
 
@@ -317,6 +278,12 @@ class DrikGanitaEngine(PanchangamEngine):
         eclipse = get_eclipse_for_date(d, location) if include_eclipse else None
         special_yogas = get_special_yogas(vaaram, tithi_span.name, nakshatra_span.name)
 
+        # Varjyam / Amrita Kalam: windows of the sunrise nakshatra and the one
+        # following it that begin within this panchangam day.
+        nak_spans = [nakshatra_span, next_nakshatra_span(nakshatra_span, moon_longitude)]
+        day_start = jd_to_utc(jd_sunrise)
+        day_end = jd_to_utc(jd_next_sunrise)
+
         return PanchangamDay(
             date=d,
             location=location,
@@ -339,12 +306,12 @@ class DrikGanitaEngine(PanchangamEngine):
             lunar_sign=lunar_sign,
             brahma_muhurta=self._brahma_muhurta(jd_sunrise),
             abhijit_muhurta=self._abhijit_muhurta(jd_sunrise, jd_sunset, weekday),
-            amrita_kalam=self._amrita_kalam(jd_sunrise, nakshatra_span),
+            amrita_kalam=nakshatra_day_windows(nak_spans, AMRITA_GHATIS, 'Amrita Kalam', day_start, day_end),
             rahu_kalam=self._rahu_kalam(weekday, jd_sunrise, jd_sunset),
             gulika_kalam=self._gulika_kalam(weekday, jd_sunrise, jd_sunset),
             yamagandam=self._yamagandam(weekday, jd_sunrise, jd_sunset),
-            varjyam=self._varjyam(nakshatra_span),
-            durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset),
+            varjyam=nakshatra_day_windows(nak_spans, VARJYAM_GHATIS, 'Varjyam', day_start, day_end),
+            durmuhurtham=self._durmuhurtham(weekday, jd_sunrise, jd_sunset, jd_next_sunrise),
             choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
             is_ekadashi=special['is_ekadashi'],
             is_amavasya=special['is_amavasya'],
