@@ -6,6 +6,7 @@ from telugu_panchangam.mcp.tools import (
     tool_get_muhurta,
     tool_get_special_days,
     tool_get_panchangam_range,
+    tool_find_tarabalam_days,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -73,3 +74,18 @@ def get_panchangam_range(
 
 def main() -> None:
     mcp.run()
+
+
+@mcp.tool()
+def find_tarabalam_days(
+    janma_nakshatras: list[str],
+    start_date: str,
+    days: int = 14,
+    city: str = 'Hyderabad',
+    system: str = 'drik',
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Find which upcoming days are auspicious for one or more people based on their janma (birth) nakshatras — Tarabalam. Returns per-day taras (Janma/Sampat/Vipat/Kshema/Pratyak/Sadhana/Naidhana/Mitra/Parama Mitra) for each person plus good_for_all_dates listing days auspicious for everyone. Args: janma_nakshatras=1-4 birth stars (canonical spellings, e.g. 'Ashvini', 'Uttara Bhadrapada'), start_date=YYYY-MM-DD, days=1-60 (default 14), city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya."""
+    return tool_find_tarabalam_days(janma_nakshatras, start_date, days, city, system, latitude, longitude, timezone)
