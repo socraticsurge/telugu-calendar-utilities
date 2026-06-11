@@ -250,9 +250,8 @@
   <div class="card">
     <div class="tool-tabs" role="tablist">
       <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">🔆 Today's Panchangam</button>
-      <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">✦ Tarabalam · Chandrabalam</button>
-      <button id="tab-gochara" class="tool-tab" role="tab" onclick="switchTool('gochara')">🪐 Gochara</button>
-      <button id="tab-muhurta" class="tool-tab" role="tab" onclick="switchTool('muhurta')">⏱ Muhurta</button>
+      <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">✦ Tarabalam · Muhurtam</button>
+      <button id="tab-gochara" class="tool-tab" role="tab" onclick="switchTool('gochara')">🪐 Gochara · Phalalu</button>
     </div>
     <div class="selector-row">
       <div class="selector">
@@ -342,6 +341,33 @@
       </div><!-- /tb-controls -->
       <div id="tb-summary"></div>
       <div id="tb-result"></div>
+
+      <div class="tb-controls" style="margin-top:1rem;">
+        <div class="tb-controls-title">Find a time slot (Muhurtam)</div>
+        <div class="selector-row" style="margin:0;">
+          <div class="selector">
+            <label for="mu-activity">Activity</label>
+            <select id="mu-activity" class="tb-date">
+              <option value="any">Anything auspicious</option>
+              <option value="travel">Travel / journey</option>
+              <option value="purchase">Purchase</option>
+              <option value="ceremony">Ceremony / puja</option>
+              <option value="beginning">New beginning</option>
+            </select>
+          </div>
+          <div class="selector"><label>&nbsp;</label>
+            <button class="btn" onclick="findMuhurta()">Find slots</button>
+          </div>
+        </div>
+        <p class="preview-note" style="margin-top:0.4rem;" id="mu-context"></p>
+      </div>
+      <div id="mu-result"></div>
+      <p class="preview-note">Slots are good choghadiya blocks (Amrit · Shubh · Labh · Char) with Rahu Kalam,
+      Gulika, Yamagandam, Varjyam and Durmuhurtham cut out; Abhijit Muhurta / Amrita Kalam overlap and
+      special-yoga days raise the score. Travel additionally avoids Vishti karana; ceremonies skip Visha/Dagdha
+      days. Days are screened by the people above (classic tarabalam standard). For weddings and major
+      samskaras, consult your purohit.</p>
+
       <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
       <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
       Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
@@ -399,51 +425,6 @@
       <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
       day's panchangam above and consult your purohit or astrologer.</p>
     </div><!-- /panel-gochara -->
-
-    <div id="panel-muhurta" role="tabpanel" style="display:none;">
-      <p class="tb-intro">When should you do it? Ranked time slots from the panchangam itself —
-      good choghadiya blocks with every inauspicious window removed, scored and explained.</p>
-      <div class="tb-controls">
-        <div class="tb-controls-title">What &amp; when</div>
-        <div class="selector-row" style="margin:0;">
-          <div class="selector">
-            <label for="mu-activity">Activity</label>
-            <select id="mu-activity" class="tb-date">
-              <option value="any">Anything auspicious</option>
-              <option value="travel">Travel / journey</option>
-              <option value="purchase">Purchase</option>
-              <option value="ceremony">Ceremony / puja</option>
-              <option value="beginning">New beginning</option>
-            </select>
-          </div>
-          <div class="selector">
-            <label for="mu-from">From</label>
-            <input type="date" id="mu-from" class="tb-date">
-          </div>
-          <div class="selector">
-            <label for="mu-days">Days</label>
-            <select id="mu-days" class="tb-date">
-              <option value="3">3</option><option value="7" selected>7</option><option value="14">14</option>
-            </select>
-          </div>
-          <div class="selector"><label>&nbsp;</label>
-            <label class="tb-filter" style="margin:0;"><input type="checkbox" id="mu-people" checked>
-              screen by my saved people's stars</label>
-          </div>
-          <div class="selector"><label>&nbsp;</label>
-            <button class="btn" onclick="findMuhurta()">Find slots</button>
-          </div>
-        </div>
-      </div>
-      <div id="mu-result"></div>
-      <p class="preview-note">Slots are good choghadiya blocks (Amrit · Shubh · Labh · Char) with Rahu Kalam,
-      Gulika, Yamagandam, Varjyam and Durmuhurtham cut out; overlap with Abhijit Muhurta or Amrita Kalam and
-      special-yoga days raise the score. Travel additionally avoids Vishti karana; ceremonies skip Visha/Dagdha
-      days; star screening uses the classic tarabalam standard.</p>
-      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
-      <strong>Please note:</strong> this is a guide for everyday timing. Weddings, gruhapravesham and major
-      samskaras need a properly fixed muhurtam — consult your purohit or astrologer.</p>
-    </div><!-- /panel-muhurta -->
   </div>
 
   <div class="card">
@@ -1564,7 +1545,7 @@
   }
 
   function switchTool(which) {
-    for (const t of ['today', 'tarabalam', 'gochara', 'muhurta']) {
+    for (const t of ['today', 'tarabalam', 'gochara']) {
       document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
       document.getElementById('tab-' + t).classList.toggle('active', t === which);
     }
@@ -1827,22 +1808,13 @@
     const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+    const ph = buildPhalalu(jr, row, view, idx);
     const lines = [];
     const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
-    lines.push(`🪐 *Gochara — ${fmtD(shown)}* (${view.label})`);
+    lines.push(`📜 *Rasi Phalalu — ${fmtD(shown)}*`);
+    lines.push(`${view.label} · ${ph.quality} day`);
     lines.push('');
-    const conds = document.getElementById('go-conditions').innerText.trim();
-    if (conds) lines.push(conds.replace(/\s*⚠️\s*/g, '⚠️ ') , '');
-    GO_DATA.grahas.forEach((g, gi) => {
-      const pos = ((row[gi] - jr + 12) % 12) + 1;
-      const chip = [...document.querySelectorAll('.go-g')].find(c => c.textContent.replace('℞','') === g);
-      const verdict = chip && chip.classList.contains('good') ? '✅' : (chip && chip.classList.contains('blocked') ? '⚠️' : '🔻');
-      lines.push(`${verdict} ${g}${retro[gi] ? ' (R)' : ''} — ${GO_DATA.rasis[row[gi]]}, ${ord(pos)} house`);
-    });
-    const ph = buildPhalalu(jr, row, view, idx);
-    lines.push('');
-    lines.push(`📜 ${ph.lines[0]}`);
-    lines.push(ph.lines[ph.lines.length - 1]);
+    ph.lines.forEach(l => lines.push('• ' + l));
     lines.push('');
     lines.push('Check your rashi:');
     lines.push('https://panchangam.astrochaganti.com/#gochara');
@@ -1879,10 +1851,13 @@
     const box = document.getElementById('mu-result');
     box.innerHTML = '<p class="preview-error">Searching…</p>';
     const activity = document.getElementById('mu-activity').value;
-    const nDays = Number(document.getElementById('mu-days').value);
-    const from = new Date(document.getElementById('mu-from').value + 'T00:00:00');
-    const usePeople = document.getElementById('mu-people').checked;
-    const people = usePeople ? tbProfiles() : [];
+    const from = new Date(document.getElementById('tb-from').value + 'T00:00:00');
+    const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
+    const nDays = Math.min(60, Math.max(1, Math.round((to - from) / 86400000) + 1));
+    const people = tbProfiles();
+    document.getElementById('mu-context').innerHTML = people.length
+      ? `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => p.name).join(', ')}</strong> (set above).`
+      : `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong> — no people set above, so no star screening.`;
     try {
       const city = document.getElementById('tp-city').value;
       const system = document.getElementById('tp-system').value;
@@ -1976,10 +1951,9 @@
   document.getElementById('tb-from').value = todayISO;
   const _t2 = new Date(); _t2.setDate(_t2.getDate() + 13);
   document.getElementById('tb-to').value = `${_t2.getFullYear()}-${String(_t2.getMonth()+1).padStart(2,'0')}-${String(_t2.getDate()).padStart(2,'0')}`;
-  document.getElementById('mu-from').value = todayISO;
   if (location.hash === '#tarabalam') switchTool('tarabalam');
   if (location.hash === '#gochara') switchTool('gochara');
-  if (location.hash === '#muhurta') switchTool('muhurta');
+  if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
   updateSubscribeUrl();
   loadPreview();
 </script>
