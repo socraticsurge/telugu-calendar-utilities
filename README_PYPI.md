@@ -66,6 +66,10 @@ Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's ho
 
 Daily Rasi Phalalu: a deterministic daily reading. The Moon's chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati / Ashtama Shani are stated when running, and an optional birth star adds the tarabalam line. Every line maps to a calculation — nothing is invented.
 
+### `find_muhurta(start_date, days=7, activity="any", city="Hyderabad", system="drik", janma_nakshatras=None, ...)`
+
+Ranked auspicious time slots: good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted, scored with Abhijit/Amrita overlap and special-yoga bonuses. `activity` tunes the rules (travel avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit); optional birth stars keep only days whose tarabalam favours everyone. Each slot carries its reasons.
+
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
 Lists special days in a given month: named festivals, Ekadashi (fasting), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, Ganda Moola, and Solar/Lunar Eclipses. Each entry includes a `special_yogas` list for that day.

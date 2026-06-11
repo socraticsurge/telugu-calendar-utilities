@@ -15,6 +15,7 @@ from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_ve
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.phalalu import rasi_phalalu
+from telugu_panchangam.personal.muhurta import day_slots, ACTIVITIES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -522,6 +523,56 @@ def tool_get_rasi_phalalu(
                           'This is a daily reading, not a horoscope consultation or a muhurta.',
         })
         return json.dumps(out)
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_find_muhurta(
+    start_date: str,
+    days: int = 7,
+    activity: str = 'any',
+    city: str = 'Hyderabad',
+    system: str = 'drik',
+    janma_nakshatras: Optional[list] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        if not 1 <= days <= 14:
+            raise ValueError('days must be between 1 and 14.')
+        if activity not in ACTIVITIES:
+            raise ValueError(f'activity must be one of {ACTIVITIES}.')
+        if janma_nakshatras:
+            if len(janma_nakshatras) > 4:
+                raise ValueError('Provide at most 4 janma nakshatras.')
+            for nak in janma_nakshatras:
+                _nak_index(nak)
+        start = _parse_date(start_date)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        engine = _ENGINES[system]
+        tz = loc.timezone
+
+        slots = []
+        for i in range(days):
+            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=False)
+            for s in day_slots(day, activity=activity, janma_nakshatras=janma_nakshatras):
+                slots.append({**s, 'start': _fmt_time(s['start'], tz),
+                              'end': _fmt_time(s['end'], tz)})
+        slots.sort(key=lambda x: (-x['score'], x['date'], x['start']))
+        return json.dumps({
+            'start_date': start_date, 'days': days, 'activity': activity,
+            'city': city, 'system': system,
+            'slots': slots[:12],
+            'disclaimer': 'Slots intersect good choghadiya blocks with every inauspicious '
+                          'window removed (Rahu Kalam, Gulika, Yamagandam, Varjyam, '
+                          'Durmuhurtham), with Abhijit/Amrita and special-yoga bonuses and '
+                          'optional tarabalam screening. A guide for everyday timing — for '
+                          'weddings and major samskaras, consult your purohit.',
+        })
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception as e:
