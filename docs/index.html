@@ -703,6 +703,7 @@
   }
 
   function copyUrl() {
+    if (typeof gcEvent === 'function') gcEvent('subscribe-copy');
     const url = document.getElementById('sub-url').textContent;
     navigator.clipboard.writeText(url).then(() => {
       const el = document.getElementById('copy-confirm');
@@ -1236,7 +1237,8 @@
     }
     lines.push('');
     lines.push('📅 Full panchangam & free calendar feeds:');
-    lines.push('https://panchangam.astrochaganti.com');
+    lines.push('https://panchangam.astrochaganti.com/?src=share-today');
+    gcEvent('share-today');
     return lines.join('\n');
   }
 
@@ -1576,7 +1578,8 @@
     goodDays.forEach(r => lines.push(`✅ ${fmtD(r.date)} — ${r.nak} · ${r.tithi}`));
     lines.push('');
     lines.push('Check your own birth star:');
-    lines.push('https://panchangam.astrochaganti.com/#tarabalam');
+    lines.push('https://panchangam.astrochaganti.com/?src=share-tarabalam#tarabalam');
+    gcEvent('share-tarabalam');
     window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
@@ -1588,6 +1591,7 @@
     }
     document.getElementById('tp-date-wrap').style.display = which === 'today' ? '' : 'none';
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
+    if (typeof gcEvent === 'function') gcEvent('tab-' + which);
     if (which === 'gochara') loadGochara();
   }
 
@@ -1858,7 +1862,8 @@
     ph.lines.forEach(l => lines.push('• ' + l));
     lines.push('');
     lines.push('Check your rashi:');
-    lines.push('https://panchangam.astrochaganti.com/#gochara');
+    lines.push('https://panchangam.astrochaganti.com/?src=share-phalalu#gochara');
+    gcEvent('share-phalalu');
     window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
@@ -2010,7 +2015,8 @@
     });
     lines.push('');
     lines.push('Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.');
-    lines.push('Find your own: https://panchangam.astrochaganti.com/#tarabalam');
+    lines.push('Find your own: https://panchangam.astrochaganti.com/?src=share-slots#tarabalam');
+    gcEvent('share-slots');
     window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
@@ -2041,6 +2047,22 @@
   if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
   updateSubscribeUrl();
   loadPreview();
+</script>
+<script data-goatcounter="https://panchangam.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+<script>
+  // lightweight event tracking; no-ops if the counter is blocked or offline
+  function gcEvent(name) {
+    if (window.goatcounter && window.goatcounter.count) {
+      window.goatcounter.count({ path: name, title: name, event: true });
+    }
+  }
+  document.addEventListener('click', function (e) {
+    const a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+    if (a.href.includes('astrochaganti.com') && !a.href.includes('panchangam.')) gcEvent('consult-click');
+    if (a.href.includes('pypi.org')) gcEvent('pypi-click');
+  });
 </script>
 </body>
 </html>
