@@ -72,6 +72,7 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 | `get_graha_positions` | All nine grahas at sunrise — rasi, nakshatra, retrograde, next-rasi ingress dates |
 | `get_gochara` | Gochara verdicts from a janma rashi — Brihat Samhita houses, vedha, Sade Sati / Ashtama Shani |
 | `get_rasi_phalalu` | Daily Rasi Phalalu — deterministic daily reading rendered from computed facts |
+| `find_muhurta` | Ranked auspicious time slots — activity-aware, every slot with its reasons |
 
 All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
 
