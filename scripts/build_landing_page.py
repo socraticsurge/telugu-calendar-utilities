@@ -9,5 +9,6 @@ for f in os.listdir('feeds'):
         shutil.copy(os.path.join('feeds', f), os.path.join('public/feeds', f))
 
 shutil.copy('docs/index.html', 'public/index.html')
+shutil.copy('docs/og-image.png', 'public/og-image.png')
 
 print(f"Published {len(os.listdir('public/feeds'))} feeds.")

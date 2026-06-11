@@ -117,3 +117,57 @@ def test_ayanam_and_rituvu_in_description():
     description = str(events[0].get('description'))
     assert 'Ayanam:' in description
     assert 'Rituvu:' in description
+
+
+# --- Named Ekadashi, night Choghadiya, and (+1) next-day markers ---
+
+def test_named_ekadashi_in_summary_and_specials():
+    # 2026-06-11 (Hyderabad) is Krishna Ekadashi of Adhika Jyeshtha → Parama
+    day = ENGINE.calculate(date(2026, 6, 11), HYD)
+    gen = ICSGenerator()
+    raw = gen.generate([day], 'drik')
+    cal = Calendar.from_ical(raw)
+    event = [c for c in cal.walk() if c.name == 'VEVENT'][0]
+    summary = str(event.get('summary'))
+    description = str(event.get('description'))
+    assert 'Parama Ekadashi' in summary
+    assert 'Parama Ekadashi — fasting day' in description
+    assert 'Tithi:     Parama Ekadashi' in description
+
+
+def test_night_choghadiya_section_present_with_next_day():
+    days = [ENGINE.calculate(date(2026, 6, 11) + timedelta(days=i), HYD)
+            for i in range(2)]
+    gen = ICSGenerator()
+    raw = gen.generate(days, 'drik')
+    cal = Calendar.from_ical(raw)
+    events = [c for c in cal.walk() if c.name == 'VEVENT']
+    first = str(events[0].get('description'))
+    last = str(events[1].get('description'))
+    assert '─ Night Choghadiya ─' in first
+    night = first.split('─ Night Choghadiya ─')[1].split('\n\n')[0]
+    blocks = [l for l in night.strip().split('\n') if l.strip()]
+    assert len(blocks) == 8
+    # 2026-06-11 is a Thursday: night runs Amrit ... Amrit (verified vs Drik Panchang)
+    assert blocks[0].endswith('Amrit')
+    assert blocks[-1].endswith('Amrit')
+    # last day in the feed has no next sunrise — no night section
+    assert '─ Night Choghadiya ─' not in last
+
+
+def test_relative_day_markers_on_anga_times():
+    # 2026-06-11 Hyderabad: Nakshatra Revati started the previous day 09:21
+    # and ends today 08:16; Yoga Shobhana ends 01:00 the next day;
+    # Tithi starts and ends within the day.
+    day = ENGINE.calculate(date(2026, 6, 11), HYD)
+    gen = ICSGenerator()
+    raw = gen.generate([day], 'drik')
+    cal = Calendar.from_ical(raw)
+    event = [c for c in cal.walk() if c.name == 'VEVENT'][0]
+    description = str(event.get('description'))
+    nakshatra_line = next(l for l in description.split('\n') if l.startswith('Nakshatra:'))
+    yoga_line = next(l for l in description.split('\n') if l.startswith('Yoga:'))
+    tithi_line = next(l for l in description.split('\n') if l.startswith('Tithi:'))
+    assert '(-1)' in nakshatra_line and '(+1)' not in nakshatra_line
+    assert '(+1)' in yoga_line
+    assert '(+1)' not in tithi_line and '(-1)' not in tithi_line

@@ -126,6 +126,38 @@ def maasam_name(elongation_func, sun_longitude_func, jd_sunrise: float) -> str:
     return name
 
 
+# Traditional Ekadashi names by Amanta maasam and paksham. Both Ekadashis of
+# an Adhika maasam have their own names (Padmini/Parama) regardless of month.
+EKADASHI_NAMES: dict[str, dict[str, str]] = {
+    'Chaitra':    {'Shukla': 'Kamada',      'Krishna': 'Varuthini'},
+    'Vaishakha':  {'Shukla': 'Mohini',      'Krishna': 'Apara'},
+    'Jyeshtha':   {'Shukla': 'Nirjala',     'Krishna': 'Yogini'},
+    'Ashadha':    {'Shukla': 'Shayani',     'Krishna': 'Kamika'},
+    'Shravana':   {'Shukla': 'Putrada',     'Krishna': 'Aja'},
+    'Bhadrapada': {'Shukla': 'Parivartini', 'Krishna': 'Indira'},
+    'Ashvina':    {'Shukla': 'Papankusha',  'Krishna': 'Rama'},
+    'Kartika':    {'Shukla': 'Prabodhini',  'Krishna': 'Utpanna'},
+    'Margashira': {'Shukla': 'Mokshada',    'Krishna': 'Saphala'},
+    'Pushya':     {'Shukla': 'Putrada',     'Krishna': 'Shattila'},
+    'Magha':      {'Shukla': 'Jaya',        'Krishna': 'Vijaya'},
+    'Phalguna':   {'Shukla': 'Amalaki',     'Krishna': 'Papamochani'},
+}
+
+
+def ekadashi_name(maasam: str, paksham: str, solar_sign: str) -> str | None:
+    """Traditional name of the Ekadashi falling in `maasam`/`paksham`.
+
+    Vaikunta (Mukkoti) Ekadashi is tied to Dhanurmasa — the Shukla Ekadashi
+    while the sun is in Dhanu — not to a fixed lunar month.
+    """
+    if maasam.startswith('Adhika'):
+        return 'Padmini' if paksham == 'Shukla' else 'Parama'
+    name = EKADASHI_NAMES.get(maasam.removeprefix('Nija '), {}).get(paksham)
+    if name and paksham == 'Shukla' and solar_sign == 'Dhanu':
+        return f'{name} (Vaikunta)'
+    return name
+
+
 class PanchangamEngine(ABC):
     @abstractmethod
     def calculate(self, d: date, location: Location, include_eclipse: bool = True) -> PanchangamDay:

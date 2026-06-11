@@ -176,7 +176,8 @@
     </div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
-    Times marked <sup class="plus1" style="color:#d97706;">+1</sup> end after midnight, on the next day.</p>
+    Times marked <sup class="plus1" style="color:#d97706;">+1</sup> fall after midnight on the next day;
+    <sup class="plus1" style="color:#d97706;">−1</sup> means it began the previous day.</p>
   </div>
 
   <div class="card">
@@ -486,15 +487,23 @@
 
   function fmtT(t) {
     if (TIME_FMT === '24') return t;
-    const [h, m] = t.split(':').map(Number);
-    return `${h % 12 || 12}:${String(m).padStart(2, '0')}${h < 12 ? 'am' : 'pm'}`;
+    const m = t.match(/^(\d{2}):(\d{2})$/);
+    if (!m) return t;
+    const h = Number(m[1]);
+    return `${h % 12 || 12}:${m[2]}${h < 12 ? 'am' : 'pm'}`;
   }
 
-  // The panchangam day's end times that read "earlier" than the start fall
-  // after midnight — mark them so nobody plans for the wrong morning.
-  const PLUS1 = '<sup class="plus1" title="ends after midnight, on the next day">+1</sup>';
-  function fmtRange(start, end, sep) {
-    return `${fmtT(start)}${sep || ' – '}${fmtT(end)}${end <= start ? PLUS1 : ''}`;
+  // The feed marks times falling outside the event's date with (+1)/(-1);
+  // render those as superscripts. Old feeds without markers fall back to the
+  // end-reads-earlier-than-start heuristic for the +1 case.
+  function dayMark(flag) {
+    if (!flag) return '';
+    const title = flag === '+1' ? 'after midnight, on the next day' : 'on the previous day';
+    return `<sup class="plus1" title="${title}">${flag === '+1' ? '+1' : '−1'}</sup>`;
+  }
+  function fmtRange(start, end, sep, sflag, eflag) {
+    if (!sflag && !eflag && end <= start) eflag = '+1';
+    return `${fmtT(start)}${dayMark(sflag)}${sep || ' – '}${fmtT(end)}${dayMark(eflag)}`;
   }
 
   function setTimeFmt(f) {
@@ -562,11 +571,17 @@
     return blocks;
   }
 
+  // A time plus optional (+1)/(-1) relative-day marker, as emitted by the feed.
+  const TIME_PART = '(\\d{2}:\\d{2})(?:\\s*\\(([+-]1)\\))?';
+  const ANGA_RE = new RegExp(`^(Tithi|Nakshatra|Yoga):\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`);
+  const WINDOW_RE = new RegExp(`^\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s*$`);
+  const CHOG_RE = new RegExp(`^\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s+(.+)$`);
+
   function parseDescription(description) {
     const data = {
       meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
       sunrise: null, sunset: null, moonrise: null, moonset: null,
-      auspicious: [], inauspicious: [], choghadiya: [],
+      auspicious: [], inauspicious: [], choghadiya: [], nightChoghadiya: [],
       eclipse: null, yogas: [], ayanam: null, rituvu: null, special: [],
     };
     let section = null;
@@ -602,8 +617,8 @@
         continue;
       }
       // Pancha anga rows
-      if ((m = line.match(/^(Tithi|Nakshatra|Yoga):\s+(.+?)\s{2,}(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})$/))) {
-        data[m[1].toLowerCase()] = { name: m[2].trim(), start: m[3], end: m[4] };
+      if ((m = line.match(ANGA_RE))) {
+        data[m[1].toLowerCase()] = { name: m[2].trim(), start: m[3], sflag: m[4] || null, end: m[5], eflag: m[6] || null };
         continue;
       }
       if ((m = line.match(/^Karana:\s+(.+)$/))) {
@@ -614,17 +629,17 @@
       if (line === '─ Auspicious ─') { section = 'auspicious'; continue; }
       if (line === '─ Inauspicious ─') { section = 'inauspicious'; continue; }
       if (line === '─ Choghadiya ─') { section = 'choghadiya'; continue; }
+      if (line === '─ Night Choghadiya ─') { section = 'nightChoghadiya'; continue; }
       if (line === '─ Eclipse ─') { section = 'eclipse'; continue; }
       if (line === '─ Special Yogas ─') { section = 'specialyogas'; continue; }
-      // Auspicious / inauspicious entries: "  Name           HH:MM – HH:MM"
-      if ((section === 'auspicious' || section === 'inauspicious') &&
-          (m = line.match(/^\s+(.+?)\s{2,}(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s*$/))) {
-        data[section].push({ name: m[1].trim(), start: m[2], end: m[3] });
+      // Auspicious / inauspicious entries: "  Name           HH:MM – HH:MM (+1)"
+      if ((section === 'auspicious' || section === 'inauspicious') && (m = line.match(WINDOW_RE))) {
+        data[section].push({ name: m[1].trim(), start: m[2], sflag: m[3] || null, end: m[4], eflag: m[5] || null });
         continue;
       }
       // Choghadiya entries: "  HH:MM – HH:MM  Name"
-      if (section === 'choghadiya' && (m = line.match(/^\s+(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s+(.+)$/))) {
-        data.choghadiya.push({ start: m[1], end: m[2], name: m[3].trim() });
+      if ((section === 'choghadiya' || section === 'nightChoghadiya') && (m = line.match(CHOG_RE))) {
+        data[section].push({ start: m[1], end: m[3], name: m[5].trim() });
         continue;
       }
       // Eclipse detail line: "  🌒 Solar Eclipse (Total) — visible/not visible..."
@@ -694,13 +709,20 @@
 
     // 2 · What the day is — Pancha Anga as hero tiles, sky as a slim strip.
     const angaTile = (label, entry) => entry
-      ? `<div class="anga-cell"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${fmtRange(entry.start, entry.end)}</div></div>`
+      ? `<div class="anga-cell"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${fmtRange(entry.start, entry.end, undefined, entry.sflag, entry.eflag)}</div></div>`
       : '';
-    let anga = angaTile('Tithi', data.tithi) + angaTile('Nakshatra', data.nakshatra) + angaTile('Nitya Yoga', data.yoga);
+    // Older feeds carry the bare paksham tithi ("Krishna Ekadashi") — name it
+    // here; regenerated feeds arrive already named ("Parama Ekadashi").
+    let tithiEntry = data.tithi;
+    if (tithiEntry && /^(Shukla|Krishna) Ekadashi$/.test(tithiEntry.name)) {
+      const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
+      if (name) tithiEntry = { ...tithiEntry, name: `${name} Ekadashi` };
+    }
+    let anga = angaTile('Tithi', tithiEntry) + angaTile('Nakshatra', data.nakshatra) + angaTile('Nitya Yoga', data.yoga);
     if (data.karana) {
       const karanas = data.karana.split(/\s+\/\s+/).map(k => {
-        const m = k.match(/^(.*?)\s+(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})$/);
-        return m ? `<div class="anga-time"><b>${m[1]}</b> ${fmtRange(m[2], m[3], '–')}</div>` : `<div class="anga-time">${k}</div>`;
+        const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
+        return m ? `<div class="anga-time"><b>${m[1]}</b> ${fmtRange(m[2], m[4], '–', m[3], m[5])}</div>` : `<div class="anga-time">${k}</div>`;
       }).join('');
       anga += `<div class="anga-cell"><div class="anga-label">Karana</div>${karanas}</div>`;
     }
@@ -721,7 +743,7 @@
       const byName = new Map();
       [...list].sort((a, b) => a.start.localeCompare(b.start)).forEach(e => {
         if (!byName.has(e.name)) { byName.set(e.name, []); order.push(e.name); }
-        byName.get(e.name).push(fmtRange(e.start, e.end, '–'));
+        byName.get(e.name).push(fmtRange(e.start, e.end, '–', e.sflag, e.eflag));
       });
       return order.map(name => ({ name, times: byName.get(name) }));
     };
@@ -744,15 +766,17 @@
     if (data.choghadiya.length) {
       chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — day in 8 blocks</div><div class="chog-grid">${data.choghadiya.map(chogCell).join('')}</div></div>`;
     }
-    if (data.sunset && events) {
+    // Prefer the feed's night section; compute it locally only for older feeds.
+    let night = data.nightChoghadiya;
+    if (!night.length && data.sunset && events) {
       const tomorrow = new Date(selectedDate());
       tomorrow.setDate(tomorrow.getDate() + 1);
       const next = events.get(stampOf(tomorrow));
       const m = next && next.description.match(/Sunrise (\d{2}:\d{2})/);
-      if (m) {
-        const night = nightChoghadiya(selectedDate().getDay(), data.sunset, m[1]);
-        chog += `<div class="tile-strip"><div class="strip-title">🌙 Choghadiya — night in 8 blocks</div><div class="chog-grid">${night.map(chogCell).join('')}</div></div>`;
-      }
+      if (m) night = nightChoghadiya(selectedDate().getDay(), data.sunset, m[1]);
+    }
+    if (night.length) {
+      chog += `<div class="tile-strip"><div class="strip-title">🌙 Choghadiya — night in 8 blocks</div><div class="chog-grid">${night.map(chogCell).join('')}</div></div>`;
     }
 
     container.innerHTML = `

@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'docs/index.html'
+      - 'docs/og-image.png'
   workflow_dispatch:
 
 permissions:
@@ -17,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Stage landing page
-        run: mkdir -p public && cp docs/index.html public/index.html
+        run: mkdir -p public && cp docs/index.html docs/og-image.png public/
 
       # keep_files preserves the feeds/ already on gh-pages — only
       # index.html is replaced. Full regeneration stays with generate.yml.
