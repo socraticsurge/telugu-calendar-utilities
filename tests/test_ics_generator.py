@@ -211,3 +211,8 @@ def test_feed_declares_refresh_interval():
     raw = ICSGenerator().generate(_make_days(1), 'drik').decode()
     assert 'REFRESH-INTERVAL;VALUE=DURATION:PT12H' in raw
     assert 'X-PUBLISHED-TTL:PT12H' in raw
+
+
+def test_feed_name_uses_astrochaganti_branding():
+    raw = ICSGenerator().generate(_make_days(1), 'drik').decode()
+    assert "AstroChaganti's Panchangam — Hyderabad (Drik Ganita)" in raw.replace('\r\n ', '')

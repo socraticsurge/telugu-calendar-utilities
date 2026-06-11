@@ -33,7 +33,7 @@ class ICSGenerator:
         cal.add('prodid', '-//Telugu Panchangam//EN')
         cal.add('version', '2.0')
         cal.add('x-wr-calname',
-                f'Telugu Panchangam — {days[0].location.name} ({SYSTEM_LABELS[system]})')
+                f"AstroChaganti's Panchangam — {days[0].location.name} ({SYSTEM_LABELS[system]})")
         cal.add('x-wr-timezone', days[0].location.timezone)
         cal.add('x-wr-caldesc',
                 'Telugu Panchangam: Tithi, Nakshatra, Yoga, Muhurtas, and special days')
