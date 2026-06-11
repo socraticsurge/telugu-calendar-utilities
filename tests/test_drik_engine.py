@@ -149,3 +149,12 @@ def test_eclipse_populated_on_known_eclipse_date():
 def test_special_yogas_field_is_list():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert isinstance(result.special_yogas, list)
+
+def test_sankramanam_named_once_on_entry_day():
+    # Sun enters Mithuna between sunrise Jun 15 and sunrise Jun 16, 2026
+    assert ENGINE.calculate(date(2026, 6, 15), HYD).sankramanam == 'Mithuna'
+    assert ENGINE.calculate(date(2026, 6, 16), HYD).sankramanam is None
+    assert ENGINE.calculate(date(2026, 6, 14), HYD).sankramanam is None
+
+def test_sankramanam_makara_2026():
+    assert ENGINE.calculate(date(2026, 1, 14), HYD).sankramanam == 'Makara'

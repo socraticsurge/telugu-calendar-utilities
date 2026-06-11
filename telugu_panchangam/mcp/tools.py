@@ -103,7 +103,9 @@ def _special_events(day: PanchangamDay) -> list[str]:
     if day.is_shani_pradosham:  events.append('Shani Pradosham')
     elif day.is_soma_pradosham: events.append('Soma Pradosham')
     elif day.is_pradosham:      events.append('Pradosham')
-    if day.is_sankranti:        events.append('Sankranti')
+    if day.sankramanam and not (day.sankramanam == 'Makara'
+                                and 'Makara Sankranti' in day.festivals):
+        events.append(f'{day.sankramanam} Sankramanam')
     if day.eclipse:             events.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
     return events
 

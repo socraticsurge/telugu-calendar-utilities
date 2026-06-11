@@ -216,3 +216,18 @@ def test_feed_declares_refresh_interval():
 def test_feed_name_uses_astrochaganti_branding():
     raw = ICSGenerator().generate(_make_days(1), 'drik').decode()
     assert "AstroChaganti's Panchangam — Hyderabad (Drik Ganita)" in raw.replace('\r\n ', '')
+
+
+def test_monthly_sankramanam_named_not_bare_sankranti():
+    days = [ENGINE.calculate(date(2026, 6, 15), HYD, include_eclipse=False)]
+    ev = _event_for(days, date(2026, 6, 15))
+    desc = str(ev['description'])
+    assert 'Mithuna Sankramanam' in desc
+    assert '⚡ Sankranti' not in desc
+
+def test_monthly_sankramanam_is_not_a_special_day_title():
+    # 2026-07-17: Karka sankramanam (entry after sunset Jul 16), nothing else
+    days = [ENGINE.calculate(date(2026, 7, 17), HYD, include_eclipse=False)]
+    ev = _event_for(days, date(2026, 7, 17))
+    assert '⚡' not in str(ev['summary'])
+    assert 'Karka Sankramanam' in str(ev['description'])

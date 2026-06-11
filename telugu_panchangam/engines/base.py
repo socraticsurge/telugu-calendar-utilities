@@ -313,6 +313,19 @@ class PanchangamEngine(ABC):
             return True   # entry after yesterday's sunset
         return False
 
+    def _sankramanam_name(self, jd_sr: float, jd_ss: float) -> str | None:
+        """Name of the rashi the sun enters this day, or None. Uses the same
+        convention as Makara Sankranti: entry after sunset belongs to the
+        next day."""
+        sr, ss = self._sun_sign_idx_at(jd_sr), self._sun_sign_idx_at(jd_ss)
+        if sr != ss:
+            return RASHI_NAMES[ss]
+        prev_sr = self._sun_sign_idx_at(jd_sr - 1.0)
+        prev_ss = self._sun_sign_idx_at(jd_ss - 1.0)
+        if sr != prev_ss and prev_ss == prev_sr:
+            return RASHI_NAMES[sr]
+        return None
+
     def _festivals(self, maasam: str, weekday: int,
                    jd_sr: float, jd_ss: float, jd_next_sr: float,
                    jd_moonrise: float) -> list[str]:

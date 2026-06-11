@@ -214,3 +214,10 @@ def test_get_panchangam_includes_festivals():
     result = json.loads(tool_get_panchangam('2026-11-08', 'Hyderabad', 'drik'))
     assert 'Deepavali' in result['special_days']
     assert 'Naraka Chaturdashi' in result['special_days']
+
+
+def test_special_days_use_named_sankramanam():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam
+    result = json.loads(tool_get_panchangam('2026-06-15', 'Hyderabad', 'drik'))
+    assert 'Mithuna Sankramanam' in result['special_days']
+    assert 'Sankranti' not in result['special_days']

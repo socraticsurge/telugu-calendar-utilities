@@ -76,8 +76,10 @@ class ICSGenerator:
         return f'{prefix}{base}'
 
     def _is_special(self, day: PanchangamDay) -> bool:
+        # Monthly sign transitions are informational, not special days —
+        # Makara Sankranti is already a named festival.
         return any([day.is_ekadashi, day.is_amavasya, day.is_pournami,
-                    day.is_pradosham, day.is_sankranti, day.eclipse is not None])
+                    day.is_pradosham, day.eclipse is not None])
 
     def _fmt_time(self, dt, tz) -> str:
         local = dt.astimezone(tz)
@@ -187,7 +189,9 @@ class ICSGenerator:
         if day.is_shani_pradosham: specials.append('Shani Pradosham')
         elif day.is_soma_pradosham: specials.append('Soma Pradosham')
         elif day.is_pradosham:     specials.append('Pradosham')
-        if day.is_sankranti:       specials.append('Sankranti')
+        if day.sankramanam and not (day.sankramanam == 'Makara'
+                                    and 'Makara Sankranti' in day.festivals):
+            specials.append(f'{day.sankramanam} Sankramanam')
         if day.eclipse:
             specials.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
         if specials:

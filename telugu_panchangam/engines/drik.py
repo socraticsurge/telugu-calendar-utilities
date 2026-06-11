@@ -323,6 +323,7 @@ class DrikGanitaEngine(PanchangamEngine):
             special_yogas=special_yogas,
             festivals=self._festivals(maasam, weekday, jd_sunrise, jd_sunset,
                                       jd_next_sunrise, jd_moonrise),
+            sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
         )
 
     def _sun_sign_idx_at(self, jd: float) -> int:

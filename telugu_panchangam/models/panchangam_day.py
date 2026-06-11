@@ -92,3 +92,6 @@ class PanchangamDay:
     eclipse: EclipseInfo | None = None
     special_yogas: list[str] = field(default_factory=list)
     festivals: list[str] = field(default_factory=list)
+    # Rashi the sun enters this day (entry-after-sunset counts as next day),
+    # e.g. 'Mithuna' — None on ordinary days.
+    sankramanam: str | None = None
