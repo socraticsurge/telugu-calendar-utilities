@@ -48,7 +48,7 @@ Full Panchangam for a date and city:
 
 ### `get_muhurta(date, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
-Auspicious and inauspicious time windows only — a lighter call for quick "is this a good time?" queries.
+Auspicious and inauspicious time windows only — a lighter call for quick "is this a good time?" queries. To search and rank slots across several days, use `find_muhurta`.
 
 ### `find_tarabalam_days(janma_nakshatras, start_date, days=14, city="Hyderabad", system="drik", ...)`
 
