@@ -362,6 +362,9 @@
       </div><!-- /tb-controls -->
       <div id="tb-summary"></div>
       <div id="tb-result"></div>
+      <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
+      <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
+      Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
 
       <div class="tb-controls" style="margin-top:1rem;">
         <div class="tb-controls-title">Find a time slot (Muhurtam)</div>
@@ -383,14 +386,12 @@
         <p class="preview-note" style="margin-top:0.4rem;" id="mu-context"></p>
       </div>
       <div id="mu-result"></div>
-      <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
-      <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
-      Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
       <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
       <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
       finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
-      For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit or astrologer.</p>
+      For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit —
+      or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
@@ -447,7 +448,7 @@
       <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
       <strong>Please note:</strong> Gochara is a background influence read from the Moon sign alone — it is
       <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
-      day's panchangam above and consult your purohit or astrologer.</p>
+      day's panchangam above and consult your purohit — or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
     </div><!-- /panel-gochara -->
   </div>
 
@@ -522,10 +523,13 @@
   <div class="card">
     <h2>🧭 Choosing a calculation system</h2>
     <p style="font-size:0.85rem;color:#475569;">
-      Panchangams aren't one-size-fits-all. Different traditions calculate Tithi, Nakshatra, and muhurtam
-      timings slightly differently — sometimes by minutes, sometimes by a full day for festivals like
-      Ekadashi. Here's what each system means, who uses it, and how to pick.
+      <strong>Drik Ganita</strong>, the default, uses modern astronomy and matches drikpanchang.com.
+      <strong>Surya Siddhanta</strong> and <strong>Vakya</strong> are classical methods that intentionally
+      differ — by minutes for muhurtams, occasionally by a day for festivals. If your family follows a
+      printed panchangam, compare a few days in the preview above and pick what matches.
     </p>
+    <button class="read-more" style="color: var(--indigo);" data-more="Compare the three systems in detail ▾" data-less="Hide comparison ▴" onclick="toggleReadMore('systems-more', this)">Compare the three systems in detail ▾</button>
+    <div class="expanded" id="systems-more">
 
     <div class="sys-card drik">
       <h3>☀️ Drik Ganita — Modern Observational Astronomy</h3>
@@ -576,9 +580,9 @@
       </div>
     </div>
 
-    <p class="tip">Not sure? Drik Ganita is a safe modern default. If your family or temple follows a
-    specific printed panchangam, use the preview above to compare a few days against it and pick the
-    system that matches most closely — no two traditional panchangams agree to the minute, and that's normal.</p>
+    <p class="tip">Not sure? Drik Ganita is a safe modern default — no two traditional panchangams agree
+    to the minute, and that's normal.</p>
+    </div><!-- /systems-more -->
   </div>
 
   <div class="card">
@@ -594,7 +598,7 @@
 
     <div class="mcp-tools">
       <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
-      <div class="mcp-tool"><code>get_muhurta</code><span>One day's auspicious &amp; inauspicious windows — "is right now good?" (use <code>find_muhurta</code> to search across days)</span></div>
+      <div class="mcp-tool"><code>get_muhurta</code><span>One day's auspicious &amp; inauspicious windows — "is right now good?" (use <em>find_muhurta</em> to search across days)</span></div>
       <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
       <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
       <div class="mcp-tool"><code>get_graha_positions</code><span>All nine grahas at sunrise — rasi, nakshatra, retrograde, and when each enters its next rasi</span></div>
@@ -636,8 +640,9 @@
   </div>
 
   <footer>
-    AstroChaganti's Panchangam is open source. Feeds are regenerated on the 1st of each month covering 18 months ahead.
-    <a href="https://github.com/socraticsurge/telugu-calendar-utilities">GitHub</a>
+    A free service from AstroChaganti — open source, feeds regenerated monthly, 18 months ahead.
+    For professional consultations: <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>
+    &nbsp;·&nbsp; <a href="https://github.com/socraticsurge/telugu-calendar-utilities">GitHub</a>
   </footer>
 </div>
 
@@ -791,6 +796,7 @@
     renderAll();
     if (typeof TB_DAYS !== 'undefined' && TB_DAYS) renderTarabalam();
     if (typeof GO_DATA !== 'undefined' && GO_DATA) renderGochara();
+    if (typeof MU_LAST !== 'undefined' && MU_LAST) renderMuhurta();
   }
 
   // --- Ekadashi naming (Amanta maasam + paksham) ---
@@ -1595,19 +1601,15 @@
   let GO_DATA = null;
 
   async function loadGochara() {
-    if (!GO_DATA) {
+    const firstLoad = !GO_DATA;
+    if (firstLoad) {
       try {
         const r = await fetch('gochara.json', { cache: 'no-cache' });
         GO_DATA = await r.json();
       } catch (e) {
-        document.getElementById('go-sky').innerHTML =
+        document.getElementById('go-chart').innerHTML =
           '<p class="preview-error">Sky data unavailable — try again later.</p>';
         return;
-      }
-      goBuildViewSelect();
-      const savedView = localStorage.getItem('tc-go-view');
-      if (savedView && [...document.getElementById('go-view').options].some(o => o.value === savedView)) {
-        document.getElementById('go-view').value = savedView;
       }
       const di = document.getElementById('go-date');
       di.min = GO_DATA.start;
@@ -1616,6 +1618,11 @@
       di.max = `${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`;
       di.value = todayISO;
     }
+    // people may have changed in the Tarabalam tab — rebuild, keep selection
+    const sel = document.getElementById('go-view');
+    const keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
+    goBuildViewSelect();
+    if (keep && [...sel.options].some(o => o.value === keep)) sel.value = keep;
     renderGochara();
   }
 
@@ -1718,7 +1725,9 @@
         : sp === 4 ? ['Ardhastama Shani'] : [];
     }
     condBox.innerHTML = conds.length
-      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}</div>` : '';
+      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}
+         <div class="tb-sub" style="margin-top:0.25rem;">Running ${conds[0].split(' (')[0]}? Personalised guidance:
+         <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a></div></div>` : '';
 
     // chart
     const byRasi = {};
@@ -1942,23 +1951,63 @@
         }
       }
       slots.sort((a, b) => b.score - a.score || a.d - b.d || a.s0 - b.s0);
-      const toT = mm => { const m = ((mm % 1440) + 1440) % 1440;
-        return fmtT(`${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`); };
-      const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-      const top = slots.slice(0, 10);
-      box.innerHTML = top.length
-        ? top.map((s, i) => `<div class="mu-slot ${i === 0 ? 'top' : ''}">
-            <span class="mu-when">${fmtD(s.d)} · ${toT(s.s0)} – ${toT(s.e0)}</span>
-            <span class="mu-score">score ${s.score}</span>
-            <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
-          + `<p class="preview-note" style="margin-top:0.5rem;">The score is simply the sum of the (+n) reasons on each slot:
-             choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
-             days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
-             requirement, not a bonus.</p>`
-        : `<p class="preview-error">No clear slots found${screenedDays ? ` — ${screenedDays} day(s) were screened out by tarabalam` : ''}. Try more days or untick star screening.</p>`;
+      MU_LAST = { top: slots.slice(0, 10), screenedDays, activity, people };
+      renderMuhurta();
     } catch (e) {
       box.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
     }
+  }
+
+  let MU_LAST = null;
+  const MU_ACT_LABEL = { any: 'anything auspicious', travel: 'travel', purchase: 'a purchase',
+                         ceremony: 'a ceremony', beginning: 'a new beginning' };
+
+  function muToT(mm) {
+    const m = ((mm % 1440) + 1440) % 1440;
+    return fmtT(`${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`);
+  }
+
+  function renderMuhurta() {
+    if (!MU_LAST) return;
+    const box = document.getElementById('mu-result');
+    const { top, screenedDays } = MU_LAST;
+    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    if (!top.length) {
+      box.innerHTML = `<p class="preview-error">No clear slots found${screenedDays ? ` — ${screenedDays} day(s) were screened out by tarabalam` : ''}. Try more days, or clear the people above.</p>`;
+      return;
+    }
+    const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
+    box.innerHTML =
+      `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found — best first${share}</div>`
+      + top.map((s, i) => `<div class="mu-slot ${i === 0 ? 'top' : ''}">
+          <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
+          <span class="mu-score">score ${s.score}</span>
+          <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
+      + `<p class="preview-note" style="margin-top:0.5rem;">The score is simply the sum of the (+n) reasons on each slot:
+         choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
+         days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
+         requirement, not a bonus.</p>`;
+  }
+
+  function shareMuhurtaOnWhatsApp() {
+    if (!MU_LAST || !MU_LAST.top.length) return;
+    const { top, activity, people } = MU_LAST;
+    const citySel = document.getElementById('tp-city');
+    const cityLabel = citySel.options[citySel.selectedIndex].textContent;
+    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const lines = [];
+    lines.push(`⏱ *Good time slots — ${MU_ACT_LABEL[activity]}*`);
+    lines.push(`📍 ${cityLabel} · ${document.getElementById('tb-from').value} to ${document.getElementById('tb-to').value}`);
+    if (people.length) lines.push(`Screened for: ${people.map(p => `${p.name} (${p.nak})`).join(' · ')}`);
+    lines.push('');
+    top.slice(0, 5).forEach(s => {
+      lines.push(`✅ ${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}`);
+      lines.push(`   ${s.reasons.filter(r => r !== 'clear of all inauspicious windows').slice(0, 3).join(' · ')}`);
+    });
+    lines.push('');
+    lines.push('Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.');
+    lines.push('Find your own: https://panchangam.astrochaganti.com/#tarabalam');
+    window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
   // --- Init ---
