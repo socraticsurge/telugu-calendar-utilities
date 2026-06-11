@@ -48,7 +48,7 @@ Full Panchangam for a date and city:
 
 ### `get_muhurta(date, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
-Auspicious and inauspicious time windows only — a lighter call for quick "is this a good time?" queries.
+Auspicious and inauspicious time windows only — a lighter call for quick "is this a good time?" queries. To search and rank slots across several days, use `find_muhurta`.
 
 ### `find_tarabalam_days(janma_nakshatras, start_date, days=14, city="Hyderabad", system="drik", ...)`
 
@@ -61,6 +61,14 @@ Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, naks
 ### `get_gochara(date, janma_rasi, city="Hyderabad", ...)`
 
 Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse — per the classical Brihat Samhita tables, plus named conditions: Sade Sati (with phase), Ashtama Shani, Ardhastama Shani.
+
+### `get_rasi_phalalu(date, janma_rasi, city="Hyderabad", janma_nakshatra=None, ...)`
+
+Daily Rasi Phalalu: a deterministic daily reading. The Moon's chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati / Ashtama Shani are stated when running, and an optional birth star adds the tarabalam line. Every line maps to a calculation — nothing is invented.
+
+### `find_muhurta(start_date, days=7, activity="any", city="Hyderabad", system="drik", janma_nakshatras=None, ...)`
+
+Ranked auspicious time slots: good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted, scored with Abhijit/Amrita overlap and special-yoga bonuses. `activity` tunes the rules (travel avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit); optional birth stars keep only days whose tarabalam favours everyone. Each slot carries its reasons.
 
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
