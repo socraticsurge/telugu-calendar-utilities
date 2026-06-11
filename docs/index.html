@@ -271,6 +271,13 @@
         <label for="tp-system">System</label>
         <select id="tp-system"></select>
       </div>
+      <div class="selector" id="tp-date-wrap">
+        <label for="tp-date">Date</label>
+        <input type="date" id="tp-date"
+               style="font-size:0.85rem;padding:0.4rem 0.6rem;border-radius:8px;
+                      border:1px solid var(--indigo-border);background:var(--indigo-bg);
+                      color:var(--indigo);font-weight:600;min-width:140px;font-family:inherit;">
+      </div>
       <div class="selector">
         <label id="fmt-label">Time format</label>
         <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
@@ -280,15 +287,6 @@
       </div>
     </div>
     <div id="panel-today" role="tabpanel">
-    <div class="selector-row">
-      <div class="selector">
-        <label for="tp-date">Date</label>
-        <input type="date" id="tp-date"
-               style="font-size:0.85rem;padding:0.4rem 0.6rem;border-radius:8px;
-                      border:1px solid var(--indigo-border);background:var(--indigo-bg);
-                      color:var(--indigo);font-weight:600;min-width:140px;font-family:inherit;">
-      </div>
-    </div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
     Times marked <sup class="plus1" style="color:#d97706;">+1</sup> fall after midnight on the next day;
@@ -396,6 +394,9 @@
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
+      <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
+      <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
+      coloured by its gochara verdict for them.</p>
       <button class="read-more" style="color: var(--indigo);" data-more="New to Gochara &amp; Rasi Phalalu? How to read this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('go-help', this)">New to Gochara &amp; Rasi Phalalu? How to read this ▾</button>
       <div class="expanded" id="go-help">
         <strong>The chart.</strong> This is the fixed South Indian layout: Meena sits top-left, Mesha beside it,
@@ -412,9 +413,6 @@
         verdicts — the Moon's position sets the day's tone, each graha contributes one sentence, and nothing is
         invented. Share it with the green button; it sends the full reading.
       </div>
-      <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
-      <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
-      coloured by its gochara verdict for them.</p>
       <div class="tb-controls">
         <div class="selector-row" style="margin:0;">
           <div class="selector">
@@ -590,13 +588,13 @@
       is a standard <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
       server that gives AI assistants direct access to Panchangam calculations — ask Claude or any
       MCP-compatible agent for today's Tithi, a muhurta for next Tuesday, special days in the coming month,
-      a day-by-day comparison across a date range, or which days suit your family's birth stars —
-      and it calls the engine directly rather than guessing.
+      a ranked time slot for a journey, which days suit your family's birth stars, or today's
+      Rasi Phalalu for Mesha — and it calls the engine directly rather than guessing.
     </p>
 
     <div class="mcp-tools">
       <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
-      <div class="mcp-tool"><code>get_muhurta</code><span>Auspicious &amp; inauspicious windows only — faster for "is this a good time?" queries</span></div>
+      <div class="mcp-tool"><code>get_muhurta</code><span>One day's auspicious &amp; inauspicious windows — "is right now good?" (use <code>find_muhurta</code> to search across days)</span></div>
       <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
       <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
       <div class="mcp-tool"><code>get_graha_positions</code><span>All nine grahas at sunrise — rasi, nakshatra, retrograde, and when each enters its next rasi</span></div>
@@ -1578,6 +1576,7 @@
       document.getElementById('tab-' + t).classList.toggle('active', t === which);
       document.getElementById('tab-' + t).setAttribute('aria-selected', t === which ? 'true' : 'false');
     }
+    document.getElementById('tp-date-wrap').style.display = which === 'today' ? '' : 'none';
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
     if (which === 'gochara') loadGochara();
   }
