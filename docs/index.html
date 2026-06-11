@@ -541,6 +541,17 @@
     return name;
   }
 
+  function festivalNames(summary) {
+    const m = summary.match(/^🪔 (.+?) — /);
+    return m ? m[1].split(' · ') : [];
+  }
+
+  function chipEmoji(s, summary) {
+    if (festivalNames(summary).some(f => s.startsWith(f))) return '🪔';
+    if (s.startsWith('Ganda Moola')) return '⚠️';
+    return '⚡';
+  }
+
   function specialLabel(s, data) {
     if (/^Ekadashi/.test(s)) {
       const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
@@ -697,12 +708,14 @@
 
   function renderPreview(container, event, events) {
     const data = parseDescription(event.description);
-    const special = event.summary.includes('⚡') ? '<span class="badge">Special day</span>' : '';
+    const special = event.summary.includes('🪔')
+      ? '<span class="badge">Festival</span>'
+      : (event.summary.includes('⚡') ? '<span class="badge">Special day</span>' : '');
     // 1 · Why today is special — flags right under the header, with the reason.
     let flags = '';
     data.special
       .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-      .forEach(s => { flags += `<span class="special-chip">⚡ ${specialLabel(s, data)}</span>`; });
+      .forEach(s => { flags += `<span class="special-chip">${chipEmoji(s, event.summary)} ${specialLabel(s, data)}</span>`; });
     if (data.eclipse) flags += eclipseChip(data.eclipse);
     data.yogas.forEach(y => { flags += `<span class="yoga-chip">✨ ${y}</span>`; });
     const flagStrip = flags ? `<div class="flag-strip">${flags}</div>` : '';
@@ -804,12 +817,12 @@
       const d = new Date(today);
       d.setDate(d.getDate() + i);
       const ev = events.get(stampOf(d));
-      if (!ev || !ev.summary.includes('⚡')) continue;
+      if (!ev || !(ev.summary.includes('⚡') || ev.summary.includes('🪔'))) continue;
       const data = parseDescription(ev.description);
       let chips = '';
       data.special
         .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-        .forEach(s => { chips += `<span class="special-chip">⚡ ${specialLabel(s, data)}</span>`; });
+        .forEach(s => { chips += `<span class="special-chip">${chipEmoji(s, ev.summary)} ${specialLabel(s, data)}</span>`; });
       if (data.eclipse) chips += eclipseChip(data.eclipse);
       if (!chips) continue;
       const dow = d.toLocaleDateString('en-US', { weekday: 'short' });

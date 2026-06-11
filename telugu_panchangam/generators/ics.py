@@ -4,7 +4,7 @@ import pytz
 from icalendar import Calendar, Event, vText
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
-from telugu_panchangam.engines.base import ekadashi_name
+from telugu_panchangam.engines.base import ekadashi_name, GANDA_MOOLA_NAKSHATRAS
 
 
 SYSTEM_LABELS = {
@@ -66,8 +66,11 @@ class ICSGenerator:
         return day.tithi.name
 
     def _title(self, day: PanchangamDay) -> str:
+        base = f'{self._tithi_display(day)} · {day.nakshatra.name} · {day.yoga.name}'
+        if day.festivals:
+            return f'🪔 {" · ".join(day.festivals[:2])} — {base}'
         prefix = '⚡ ' if self._is_special(day) else ''
-        return f'{prefix}{self._tithi_display(day)} · {day.nakshatra.name} · {day.yoga.name}'
+        return f'{prefix}{base}'
 
     def _is_special(self, day: PanchangamDay) -> bool:
         return any([day.is_ekadashi, day.is_amavasya, day.is_pournami,
@@ -172,7 +175,9 @@ class ICSGenerator:
             for yoga in day.special_yogas:
                 lines.append(f'  {yoga}')
 
-        specials = []
+        specials = list(day.festivals)
+        if day.nakshatra.name in GANDA_MOOLA_NAKSHATRAS:
+            specials.append(f'Ganda Moola ({day.nakshatra.name})')
         if day.is_ekadashi:        specials.append(f'{self._tithi_display(day)} — fasting day')
         if day.is_amavasya:        specials.append('Amavasya')
         if day.is_pournami:        specials.append('Pournami')

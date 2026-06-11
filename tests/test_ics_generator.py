@@ -43,7 +43,8 @@ def test_special_day_has_bolt_prefix():
     cal = Calendar.from_ical(raw)
     events = [c for c in cal.walk() if c.name == 'VEVENT']
     summaries = [str(e.get('summary')) for e in events]
-    assert any('⚡' in s for s in summaries)
+    # 2024-03-25 is Pournami — and Holika Dahan, so the festival marker wins
+    assert any('⚡' in s or '🪔' in s for s in summaries)
 
 
 def test_eclipse_marker_and_description():
@@ -171,3 +172,36 @@ def test_relative_day_markers_on_anga_times():
     assert '(-1)' in nakshatra_line and '(+1)' not in nakshatra_line
     assert '(+1)' in yoga_line
     assert '(+1)' not in tithi_line and '(-1)' not in tithi_line
+
+
+# --- Festivals in the feed ---
+
+def _event_for(days, d):
+    gen = ICSGenerator()
+    cal = Calendar.from_ical(gen.generate(days, 'drik'))
+    for ev in cal.walk():
+        if ev.name == 'VEVENT' and ev['dtstart'].dt == d:
+            return ev
+    raise AssertionError(f'no event for {d}')
+
+
+def test_festival_in_summary_with_diya_prefix():
+    # 2026-11-08: Naraka Chaturdashi + Deepavali
+    days = [ENGINE.calculate(date(2026, 11, 8), HYD, include_eclipse=False)]
+    ev = _event_for(days, date(2026, 11, 8))
+    summary = str(ev['summary'])
+    assert summary.startswith('🪔')
+    assert 'Deepavali' in summary
+
+
+def test_festival_in_description_specials():
+    days = [ENGINE.calculate(date(2026, 10, 20), HYD, include_eclipse=False)]
+    ev = _event_for(days, date(2026, 10, 20))
+    assert 'Vijayadashami (Dasara)' in str(ev['description'])
+
+
+def test_ganda_moola_noted_in_description():
+    # 2026-06-11: Revati nakshatra at sunrise (Ganda Moola)
+    days = [ENGINE.calculate(date(2026, 6, 11), HYD, include_eclipse=False)]
+    ev = _event_for(days, date(2026, 6, 11))
+    assert 'Ganda Moola' in str(ev['description'])

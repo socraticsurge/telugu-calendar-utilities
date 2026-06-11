@@ -139,8 +139,13 @@ class SuryaSiddhantaEngine(PanchangamEngine):
             choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
             eclipse=eclipse,
             special_yogas=special_yogas,
+            festivals=self._festivals(maasam, weekday, jd_sunrise, jd_sunset,
+                                      jd_next_sunrise, jd_moonrise),
             **special,
         )
+
+    def _sun_sign_idx_at(self, jd: float) -> int:
+        return int(ss_sun_longitude(jd) / 30.0) % 12
 
     def _tithi_index_at(self, jd: float) -> int:
         return int(ss_elongation(jd) / 12.0) % 30

@@ -91,3 +91,4 @@ class PanchangamDay:
     special_notes: list[str] = field(default_factory=list)
     eclipse: EclipseInfo | None = None
     special_yogas: list[str] = field(default_factory=list)
+    festivals: list[str] = field(default_factory=list)

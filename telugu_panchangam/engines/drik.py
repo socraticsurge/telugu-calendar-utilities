@@ -321,4 +321,9 @@ class DrikGanitaEngine(PanchangamEngine):
             is_sankranti=special['is_sankranti'],
             eclipse=eclipse,
             special_yogas=special_yogas,
+            festivals=self._festivals(maasam, weekday, jd_sunrise, jd_sunset,
+                                      jd_next_sunrise, jd_moonrise),
         )
+
+    def _sun_sign_idx_at(self, jd: float) -> int:
+        return int(sun_longitude(jd) / 30.0) % 12

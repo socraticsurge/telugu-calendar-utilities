@@ -112,6 +112,8 @@ class VakyaEngine(SuryaSiddhantaEngine):
             choghadiya=self._choghadiya(weekday, jd_sunrise, jd_sunset),
             eclipse=eclipse,
             special_yogas=special_yogas,
+            festivals=self._festivals(maasam, weekday, jd_sunrise, jd_sunset,
+                                      jd_next_sunrise, jd_moonrise),
             **special,
         )
 
