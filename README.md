@@ -8,7 +8,7 @@ Every day appears as an all-day event (no calendar blocking) with full Panchanga
 
 Visit the landing page to pick your city and calculation system and copy your `webcal://` URL:
 
-**[socraticsurge.github.io/telugu-calendar-utilities](https://socraticsurge.github.io/telugu-calendar-utilities)**
+**[panchangam.astrochaganti.com](https://panchangam.astrochaganti.com)**
 
 ## What's in each day's event
 
