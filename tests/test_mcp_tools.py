@@ -207,3 +207,10 @@ def test_choghadiya_has_end_time(system):
         assert 'end' in entry
         assert len(entry['end']) == 5
         assert entry['end'][2] == ':'
+
+
+def test_get_panchangam_includes_festivals():
+    from telugu_panchangam.mcp.tools import tool_get_panchangam
+    result = json.loads(tool_get_panchangam('2026-11-08', 'Hyderabad', 'drik'))
+    assert 'Deepavali' in result['special_days']
+    assert 'Naraka Chaturdashi' in result['special_days']

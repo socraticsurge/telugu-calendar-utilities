@@ -9,6 +9,7 @@ from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
+from telugu_panchangam.engines.base import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
 
@@ -93,7 +94,9 @@ def _eclipse_to_dict(eclipse, tz: str) -> Optional[dict]:
 
 
 def _special_events(day: PanchangamDay) -> list[str]:
-    events = []
+    events = list(day.festivals)
+    if day.nakshatra.name in GANDA_MOOLA_NAKSHATRAS:
+        events.append(f'Ganda Moola ({day.nakshatra.name})')
     if day.is_ekadashi:         events.append('Ekadashi — fasting day')
     if day.is_amavasya:         events.append('Amavasya')
     if day.is_pournami:         events.append('Pournami')

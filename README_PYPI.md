@@ -41,7 +41,8 @@ Full Panchangam for a date and city:
 - **Auspicious windows** — Brahma Muhurta, Abhijit Muhurta, Amrita Kalam
 - **Inauspicious windows** — Rahu Kalam, Gulika Kalam, Yamagandam, Varjyam, Durmuhurtham
 - **Choghadiya** — 8 day blocks with names
-- **Special day flags** — Ekadashi, Amavasya, Pournami, Pradosham, Sankranti
+- **Festivals** — 30+ named Telugu festivals (Ugadi, Vinayaka Chavithi, Deepavali, Maha Shivaratri, Makara Sankranti cluster, Navaratri days, Varalakshmi Vratam, …) plus monthly Sankashti Chaturthi and Masa Shivaratri, with traditional deciding moments (madhyahna/aparahna/pradosha/nishita)
+- **Special day flags** — Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Ganda Moola
 - **Eclipse** — Solar/lunar eclipse with type (Total/Partial/Annular/Penumbral), visibility from your location, eclipse window, and Sutak period (or `null` if not visible)
 - **Special Yogas** — Sarvartha Siddhi, Amrita Siddhi, Visha, and Dagdha yogas
 
@@ -51,7 +52,7 @@ Auspicious and inauspicious time windows only — a lighter call for quick "is t
 
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
-Lists special days in a given month: Ekadashi (fasting), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, and Solar/Lunar Eclipses. Each entry includes a `special_yogas` list for that day.
+Lists special days in a given month: named festivals, Ekadashi (fasting), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, Ganda Moola, and Solar/Lunar Eclipses. Each entry includes a `special_yogas` list for that day.
 
 ## Cities and locations
 
