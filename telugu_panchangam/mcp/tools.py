@@ -13,6 +13,7 @@ from telugu_panchangam.engines.base import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
 from telugu_panchangam.gochara.positions import graha_positions
+from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -448,6 +449,42 @@ def tool_get_graha_positions(
             'sunrise': _fmt_time(jd_to_utc(jd_sunrise), loc.timezone),
             'ayanamsa': 'Lahiri (sidereal)',
             'grahas': graha_positions(jd_sunrise),
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_get_gochara(
+    date_str: str,
+    janma_rasi: str,
+    city: str = 'Hyderabad',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        _rasi_index(janma_rasi)
+        d = _parse_date(date_str)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0])
+        positions = graha_positions(jd_sunrise)
+        sky = {p['graha']: p['rasi'] for p in positions}
+        verdicts = {v['graha']: v for v in gochara_for(janma_rasi, sky)}
+        merged = []
+        for p in positions:
+            v = verdicts[p['graha']]
+            merged.append({**p, 'position_from_janma_rasi': v['position'],
+                           'verdict': v['verdict'], 'vedha_by': v['vedha_by']})
+        return json.dumps({
+            'date': date_str, 'city': city, 'janma_rasi': janma_rasi,
+            'convention': 'Brihat Samhita gochara from the natal Moon sign: favourable '
+                          'houses per graha with vedha obstruction (Surya-Shani and '
+                          'Chandra-Budha exempt; nodes neither cause nor receive vedha). '
+                          'Positions at sunrise. Gochara is one factor — not a muhurta.',
+            'conditions': named_conditions(janma_rasi, sky),
+            'gochara': merged,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})

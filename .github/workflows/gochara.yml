@@ -1,0 +1,40 @@
+name: Generate Gochara Data
+
+on:
+  schedule:
+    - cron: '30 2 1 * *'   # 1st of every month, after feed generation
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gochara:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+
+      - name: Build gochara.json
+        run: python scripts/build_gochara_json.py
+
+      # keep_files preserves feeds/ and index.html on gh-pages — only
+      # gochara.json is added/replaced. Fully independent of generate.yml.
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: true
+          cname: panchangam.astrochaganti.com
