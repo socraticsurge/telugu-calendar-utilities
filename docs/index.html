@@ -584,7 +584,8 @@
 
   // A time plus optional (+1)/(-1) relative-day marker, as emitted by the feed.
   const TIME_PART = '(\\d{2}:\\d{2})(?:\\s*\\(([+-]1)\\))?';
-  const ANGA_RE = new RegExp(`^(Tithi|Nakshatra|Yoga):\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`);
+  // \s+ not \s{2,}: long names (Krishna Chaturdashi, named Ekadashis) overflow the column padding
+  const ANGA_RE = new RegExp(`^(Tithi|Nakshatra|Yoga):\\s+(.+?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`);
   const WINDOW_RE = new RegExp(`^\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s*$`);
   const CHOG_RE = new RegExp(`^\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s+(.+)$`);
 
