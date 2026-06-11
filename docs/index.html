@@ -160,6 +160,16 @@
     .go-retro { font-size: 0.6rem; vertical-align: super; }
     .go-moves { margin-top: 0.6rem; font-size: 0.76rem; color: #475569; }
     .go-moves b { color: #1e1b4b; }
+    .go-phalalu { margin-top: 0.8rem; background: #fffdf7; border: 1px solid var(--amber-border);
+                  border-radius: 10px; padding: 0.75rem 0.95rem; }
+    .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
+                     text-transform: uppercase; letter-spacing: 0.05em; }
+    .go-phalalu p { margin: 0.3rem 0; font-size: 0.84rem; color: #44403c; line-height: 1.55; }
+    .go-quality { display: inline-block; border-radius: 6px; padding: 0.1rem 0.55rem;
+                  font-size: 0.75rem; font-weight: 700; margin-left: 0.4rem; vertical-align: middle; }
+    .go-quality.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .go-quality.mixed { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .go-quality.difficult { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
     .go-cond { margin-top: 0.7rem; }
     .go-cond .chip { display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 0.15rem 0.6rem; font-weight: 700; font-size: 0.8rem; margin-right: 0.35rem; }
     .go-pick { background: #fff; border: 1px solid var(--indigo-border); color: var(--indigo); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin: 0 0.25rem 0.25rem 0; font-family: inherit; }
@@ -364,6 +374,7 @@
       <div id="go-chart" class="go-chart"><p class="preview-error">Loading…</p></div>
       <div id="go-note"></div>
       <div id="go-moves"></div>
+      <div id="go-phalalu"></div>
       <div id="go-legend"></div>
       <p class="preview-note">Positions are the sky <strong>at sunrise</strong> on the chosen date — the chart's
       snapshot convention, like the rest of this site. The Moon changes rashi every 2–2½ days, so by evening it
@@ -529,6 +540,7 @@
       <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
       <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
       <div class="mcp-tool"><code>get_graha_positions</code><span>All nine grahas at sunrise — rasi, nakshatra, retrograde, and when each enters its next rasi</span></div>
+      <div class="mcp-tool"><code>get_rasi_phalalu</code><span>Daily reading for a rashi — every sentence rendered from computed gochara/chandrabalam/tarabalam facts</span></div>
       <div class="mcp-tool"><code>get_gochara</code><span>Transit verdicts from a janma rashi — favourable/blocked/adverse per graha with vedha, Sade Sati &amp; Ashtama Shani flags</span></div>
       <div class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
       <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
@@ -1681,6 +1693,17 @@
       ? `<div class="go-moves"><b>Coming up:</b> ` + moves.map(m =>
           `${m.g} → ${m.t.next} <b>${m.t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</b>`).join(' &nbsp;·&nbsp; ') + `</div>` : '';
 
+    // rasi phalalu (daily reading from the same computed verdicts)
+    const phBox = document.getElementById('go-phalalu');
+    if (jr === null) { phBox.innerHTML = ''; }
+    else {
+      const ph = buildPhalalu(jr, row, view, idx);
+      phBox.innerHTML = `<div class="go-phalalu"><h4>Rasi Phalalu — ${view.label}
+        <span class="go-quality ${ph.quality}">${ph.quality} day</span></h4>` +
+        ph.lines.map(l => `<p>${l}</p>`).join('') +
+        `<p style="font-size:0.72rem;color:#94a3b8;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
+    }
+
     // legend
     document.getElementById('go-legend').innerHTML = jr === null ? '' :
       `<div class="tb-legend" style="margin-top:0.5rem;">
@@ -1689,6 +1712,56 @@
         <span class="tb-legend-item"><span class="go-g bad">adverse</span></span>
         <span class="tb-legend-item"><span class="go-g">℞ retrograde</span></span>
         <span class="tb-legend-item">(hover a graha for detail)</span></div>`;
+  }
+
+  const HOUSE_MEANINGS = { 1:'self and health', 2:'wealth and family', 3:'courage and effort',
+    4:'home and comfort', 5:'children and learning', 6:'health and rivals', 7:'partnerships',
+    8:'obstacles', 9:'fortune and dharma', 10:'career and standing', 11:'gains and income', 12:'expenses and rest' };
+  const PHALALU_OPENERS = {
+    good: 'The Moon stands well for your rashi today — a day that supports initiative.',
+    puja: "The Moon's position asks for a small remedial prayer; proceed gently after it.",
+    bad: 'The Moon sits heavily for your rashi today — keep the day light and routine.' };
+  const PHALALU_ORDER = ['Shani','Guru','Rahu','Ketu','Kuja','Surya','Shukra','Budha'];
+  const ordinal = n => n + (['st','nd','rd'][n-1] || 'th');
+
+  function buildPhalalu(jr, row, view, idx) {
+    const houseOf = gi => ((row[gi] - jr + 12) % 12) + 1;
+    const occupants = {};
+    GO_DATA.grahas.forEach((g, gi) => { (occupants[houseOf(gi)] = occupants[houseOf(gi)] || []).push(g); });
+    const verdictFor = gi => {
+      const g = GO_DATA.grahas[gi], pos = houseOf(gi);
+      if (!GO_FAV[g].includes(pos)) return { v: 'adverse' };
+      if (!GO_NODES.has(g)) {
+        const vh = GO_VEDHA[g][pos];
+        for (const other of (occupants[vh] || [])) {
+          if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return { v: 'blocked', by: other };
+        }
+      }
+      return { v: 'favourable' };
+    };
+    const moonPos = houseOf(GO_DATA.grahas.indexOf('Chandra'));
+    const mv = CHANDRA_GOOD.has(moonPos) ? 'good' : (CHANDRA_PUJA.has(moonPos) ? 'puja' : 'bad');
+    let fav = 0, blocked = 0;
+    const detail = {};
+    GO_DATA.grahas.forEach((g, gi) => { const r = verdictFor(gi); detail[g] = { ...r, pos: houseOf(gi) };
+      if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++; });
+    const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
+    const lines = [PHALALU_OPENERS[mv]];
+    const shaniPos = detail['Shani'].pos;
+    const cond = shaniPos === 12 ? 'Sade Sati (rising phase)' : shaniPos === 1 ? 'Sade Sati (peak phase)'
+      : shaniPos === 2 ? 'Sade Sati (setting phase)' : shaniPos === 8 ? 'Ashtama Shani'
+      : shaniPos === 4 ? 'Ardhastama Shani' : null;
+    if (cond) lines.push(cond.startsWith('Sade Sati')
+      ? `${cond} is running — Shani asks for patience, discipline and steady work.`
+      : `${cond} is running — avoid risks and keep commitments minimal.`);
+    for (const g of PHALALU_ORDER) {
+      const d = detail[g], m = HOUSE_MEANINGS[d.pos];
+      lines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.pos)} house favours ${m}.`
+        : d.v === 'blocked' ? `${g}'s good ${ordinal(d.pos)}-house transit is under vedha by ${d.by} — gains in ${m} may arrive with friction.`
+        : `${g} in the ${ordinal(d.pos)} house tests ${m}; avoid forcing matters there.`);
+    }
+    lines.push(`${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''}.`);
+    return { quality, lines };
   }
 
   function shareGocharaOnWhatsApp() {
@@ -1712,6 +1785,10 @@
       const verdict = chip && chip.classList.contains('good') ? '✅' : (chip && chip.classList.contains('blocked') ? '⚠️' : '🔻');
       lines.push(`${verdict} ${g}${retro[gi] ? ' (R)' : ''} — ${GO_DATA.rasis[row[gi]]}, ${ord(pos)} house`);
     });
+    const ph = buildPhalalu(jr, row, view, idx);
+    lines.push('');
+    lines.push(`📜 ${ph.lines[0]}`);
+    lines.push(ph.lines[ph.lines.length - 1]);
     lines.push('');
     lines.push('Check your rashi:');
     lines.push('https://panchangam.astrochaganti.com/#gochara');
