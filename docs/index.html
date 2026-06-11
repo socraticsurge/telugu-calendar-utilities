@@ -96,6 +96,11 @@
                 background: none; border: none; cursor: pointer; padding: 0.4rem 0.65rem 0.55rem;
                 border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
+    @media (max-width: 620px) {
+      .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .tool-tabs::-webkit-scrollbar { display: none; }
+      .tool-tab { font-size: 0.8rem; padding: 0.35rem 0.45rem 0.5rem; white-space: nowrap; flex: none; }
+    }
     .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid var(--indigo-border); background: var(--indigo-bg);
                color: var(--indigo); font-weight: 600; font-family: inherit; }
@@ -144,7 +149,8 @@
     .go-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(86px, auto));
                 gap: 2px; background: #c7d2fe; border: 2px solid #c7d2fe; border-radius: 10px; overflow: hidden; margin-top: 0.8rem; }
     .go-box { background: #fff; padding: 0.3rem 0.35rem; position: relative; min-height: 86px; }
-    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;
+                     display: inline-block; padding-right: 1.1rem; }
     .go-box .house { position: absolute; top: 0.25rem; right: 0.35rem; font-size: 0.62rem; font-weight: 700; color: #c7d2fe; }
     .go-box.janma { outline: 2px solid var(--indigo); outline-offset: -2px; }
     .go-box.janma .rname { color: var(--indigo); }
@@ -290,7 +296,7 @@
       <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
       Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
       <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
-      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam &amp; Chandrabalam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam &amp; Chandrabalam? How to use this ▾</button>
+      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾</button>
       <div class="expanded" id="tb-help">
         <strong>Tarabalam — strength from your star.</strong> Each day the Moon occupies one of the 27 nakshatras.
         Counting from your <strong>janma nakshatra</strong> (birth star) to the day's nakshatra gives one of nine
@@ -311,6 +317,20 @@
         Create your birth chart at <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a> —
         it lists your janma nakshatra, padam and rashi. These are daily favourability checks, one factor among
         several; for major events check the day's muhurtas and consult your purohit.
+        <br/><br/>
+        <strong>Chandrabalam — the Moon check.</strong> Once the rashi is known, the Moon's position from it is
+        checked automatically: positions 1 · 3 · 6 · 7 · 10 · 11 are good, 2 · 5 · 9 are workable after a small
+        remedial puja (marked °), and 4 · 8 · 12 are avoided (marked ☾). The <strong>✦ standard</strong> selector
+        sets how this affects good days: <em>Stars only</em> matches classic tarabalam tables (the Moon still
+        annotates each chip), <em>puja ok</em> drops Moon-avoid days, and <em>strict</em> demands a clean Moon —
+        some star combinations have no strict days at all, so relax the standard if the list comes up empty.
+        <br/><br/>
+        <strong>Muhurtam — finding the time slot.</strong> With your people and date range set, the
+        <em>Find a time slot</em> section searches the same days for ranked slots: good choghadiya blocks
+        (Amrit · Shubh · Labh · Char) with Rahu Kalam, Gulika, Yamagandam, Varjyam and Durmuhurtham cut out,
+        scored higher when they overlap Abhijit Muhurta or Amrita Kalam or fall on Sarvartha/Amrita Siddhi
+        days. The activity tunes the rules — travel avoids Vishti karana, ceremonies skip Visha and Dagdha
+        days, purchases favour Labh, beginnings favour Amrit. Every slot lists its reasons.
       </div>
       <div class="tb-controls">
       <div class="tb-controls-title">Who is this for?
@@ -362,25 +382,12 @@
         <p class="preview-note" style="margin-top:0.4rem;" id="mu-context"></p>
       </div>
       <div id="mu-result"></div>
-      <p class="preview-note">Slots are good choghadiya blocks (Amrit · Shubh · Labh · Char) with Rahu Kalam,
-      Gulika, Yamagandam, Varjyam and Durmuhurtham cut out; Abhijit Muhurta / Amrita Kalam overlap and
-      special-yoga days raise the score. Travel additionally avoids Vishti karana; ceremonies skip Visha/Dagdha
-      days. Days are screened by the people above (classic tarabalam standard). For weddings and major
-      samskaras, consult your purohit.</p>
-
       <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
       <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
       Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
       <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
-      <strong>Chandrabalam</strong> is checked automatically once the rashi is known (from your star, plus
-      padam for the nine straddling stars): Moon positions 1 · 3 · 6 · 7 · 10 · 11 from the rashi are good,
-      2 · 5 · 9 are workable after a small remedial puja (marked °), and 4 · 8 · 12 are avoided (marked ☾ when
-      the Moon alone spoils an otherwise good star day). The <strong>✦ standard</strong> selector chooses how the Moon affects good days:
-      <em>Stars only</em> matches classic tarabalam tables (the Moon still annotates every chip),
-      <em>puja ok</em> additionally drops Moon-avoid days, and <em>strict</em> demands a clean Moon too.
-      Some star combinations have no strict days at all — relax the standard if the list comes up empty.</p>
-      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
-      <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks — they are <strong>not</strong> how muhurtams are fixed.
+      <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
+      finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit or astrologer.</p>
     </div><!-- /panel-tarabalam -->
