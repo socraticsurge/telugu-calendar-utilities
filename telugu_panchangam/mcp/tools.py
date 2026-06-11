@@ -10,6 +10,7 @@ from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.engines.base import GANDA_MOOLA_NAKSHATRAS
+from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
 
@@ -333,6 +334,62 @@ def tool_get_special_days(
             'city': city,
             'system': system,
             'special_days': special_days,
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_find_tarabalam_days(
+    janma_nakshatras: list,
+    start_date: str,
+    days: int = 14,
+    city: str = 'Hyderabad',
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        if not 1 <= len(janma_nakshatras) <= 4:
+            raise ValueError('Provide 1 to 4 janma nakshatras.')
+        if not 1 <= days <= 60:
+            raise ValueError('days must be between 1 and 60.')
+        for nak in janma_nakshatras:
+            _nak_index(nak)  # raises with the canonical list on a misspelling
+        start = _parse_date(start_date)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        engine = _ENGINES[system]
+
+        out_days = []
+        good_dates = []
+        for i in range(days):
+            d = start + timedelta(days=i)
+            day = engine.calculate(d, loc, include_eclipse=False)
+            nak = day.nakshatra.name
+            taras = taras_for_day(nak, janma_nakshatras)
+            all_good = all(t['auspicious'] for t in taras)
+            if all_good:
+                good_dates.append(d.isoformat())
+            out_days.append({
+                'date': d.isoformat(),
+                'vaaram': day.vaaram,
+                'nakshatra': nak,
+                'nakshatra_until': _fmt_time(day.nakshatra.end, loc.timezone),
+                'tithi': day.tithi.name,
+                'taras': taras,
+                'good_for_all': all_good,
+            })
+        return json.dumps({
+            'janma_nakshatras': list(janma_nakshatras),
+            'city': city, 'system': system,
+            'tara_convention': 'auspicious: 2 Sampat, 4 Kshema, 6 Sadhana, 8 Mitra, 9 Parama Mitra; '
+                               'avoid: 1 Janma, 3 Vipat, 5 Pratyak, 7 Naidhana. '
+                               'Day labelled by the sunrise nakshatra; it changes at nakshatra_until.',
+            'days': out_days,
+            'good_for_all_dates': good_dates,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
