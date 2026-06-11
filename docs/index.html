@@ -138,6 +138,24 @@
                   padding: 0.5rem 0.75rem; margin-top: 0.75rem; font-size: 0.83rem; color: #78350f; }
     .tb-summary .count { font-weight: 800; }
     .tb-toggle { margin-left: auto; font-size: 0.78rem; color: #92400e; display: inline-flex; gap: 0.35rem; align-items: center; cursor: pointer; }
+    .go-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 0.4rem; margin-top: 0.4rem; }
+    .go-cell { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px; padding: 0.45rem 0.5rem; text-align: center; }
+    .go-cell .g { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; }
+    .go-cell .r { font-size: 0.92rem; font-weight: 700; color: #1e1b4b; margin-top: 0.05rem; }
+    .go-cell .till { font-size: 0.7rem; color: #64748b; margin-top: 0.05rem; }
+    .go-retro { display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 5px; font-size: 0.62rem; font-weight: 800; padding: 0 0.3rem; margin-left: 0.25rem; vertical-align: middle; }
+    .go-verdict-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.4rem; margin-top: 0.6rem; }
+    .go-v { border-radius: 8px; padding: 0.45rem 0.5rem; text-align: center; border: 1px solid; }
+    .go-v.good { background: var(--green-bg); border-color: var(--green-border); }
+    .go-v.bad { background: #fef2f2; border-color: #fecaca; }
+    .go-v.blocked { background: var(--amber-bg); border-color: var(--amber-border); }
+    .go-v .g { font-weight: 700; font-size: 0.85rem; }
+    .go-v.good .g { color: var(--green); } .go-v.bad .g { color: #b91c1c; } .go-v.blocked .g { color: var(--amber); }
+    .go-v .d { font-size: 0.72rem; color: #475569; margin-top: 0.05rem; }
+    .go-cond { margin-top: 0.7rem; }
+    .go-cond .chip { display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 0.15rem 0.6rem; font-weight: 700; font-size: 0.8rem; margin-right: 0.35rem; }
+    .go-pick { background: #fff; border: 1px solid var(--indigo-border); color: var(--indigo); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin: 0 0.25rem 0.25rem 0; font-family: inherit; }
+    .go-pick:hover { background: var(--indigo-bg); }
     .tb-readme { margin-top: 0.7rem; padding: 0.6rem 0.75rem; background: #fbfcfe; border: 1px solid #eef2f7;
                  border-radius: 8px; font-size: 0.76rem; color: #475569; display: flex; flex-direction: column; gap: 0.3rem; }
     .tb-readme-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
@@ -208,6 +226,7 @@
     <div class="tool-tabs" role="tablist">
       <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">🔆 Today's Panchangam</button>
       <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">✦ Tarabalam · Chandrabalam</button>
+      <button id="tab-gochara" class="tool-tab" role="tab" onclick="switchTool('gochara')">🪐 Gochara</button>
     </div>
     <div class="selector-row">
       <div class="selector">
@@ -312,6 +331,38 @@
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit or astrologer.</p>
     </div><!-- /panel-tarabalam -->
+
+    <div id="panel-gochara" role="tabpanel" style="display:none;">
+      <p class="tb-intro">Where are the nine grahas today — and what does their movement (gochara) mean from your rashi?</p>
+      <div class="tb-readme-title" style="margin-top:0.4rem;">Today's sky</div>
+      <div id="go-sky" class="go-grid"><p class="preview-error">Loading…</p></div>
+      <div class="tb-controls" style="margin-top:1rem;">
+        <div class="tb-controls-title">Gochara from your rashi</div>
+        <div class="selector-row" style="margin:0;">
+          <div class="selector">
+            <label for="go-rasi">Janma rashi</label>
+            <select id="go-rasi" class="tb-date" onchange="renderGochara()"></select>
+          </div>
+          <div class="selector" id="go-people-wrap" style="display:none;">
+            <label>From your saved people</label>
+            <div id="go-people"></div>
+          </div>
+          <div class="selector" id="go-share-wrap" style="display:none;"><label>&nbsp;</label>
+            <button class="wa-share-mini" style="position:static;width:30px;height:30px;" title="Share today's gochara on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div id="go-conditions"></div>
+      <div id="go-result"></div>
+      <p class="preview-note">Verdicts follow the classical Brihat Samhita gochara tables — favourable houses per
+      graha counted from the natal Moon sign (janma rashi), with <strong>vedha</strong> (obstruction) checked:
+      a favourable transit is blocked when another graha occupies its vedha point (Surya–Shani and Chandra–Budha
+      never obstruct each other; Rahu and Ketu neither cause nor receive vedha).</p>
+      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
+      <strong>Please note:</strong> Gochara is a background influence read from the Moon sign alone — it is
+      <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
+      day's panchangam above and consult your purohit or astrologer.</p>
+    </div><!-- /panel-gochara -->
   </div>
 
   <div class="card">
@@ -461,6 +512,7 @@
       <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
       <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
       <div class="mcp-tool"><code>get_graha_positions</code><span>All nine grahas at sunrise — rasi, nakshatra, retrograde, and when each enters its next rasi</span></div>
+      <div class="mcp-tool"><code>get_gochara</code><span>Transit verdicts from a janma rashi — favourable/blocked/adverse per graha with vedha, Sade Sati &amp; Ashtama Shani flags</span></div>
       <div class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
       <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
     </div>
@@ -1416,11 +1468,155 @@
   }
 
   function switchTool(which) {
-    document.getElementById('panel-today').style.display = which === 'today' ? '' : 'none';
-    document.getElementById('panel-tarabalam').style.display = which === 'tarabalam' ? '' : 'none';
-    document.getElementById('tab-today').classList.toggle('active', which === 'today');
-    document.getElementById('tab-tarabalam').classList.toggle('active', which === 'tarabalam');
-    if (history.replaceState) history.replaceState(null, '', which === 'tarabalam' ? '#tarabalam' : '#');
+    for (const t of ['today', 'tarabalam', 'gochara']) {
+      document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
+      document.getElementById('tab-' + t).classList.toggle('active', t === which);
+    }
+    if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
+    if (which === 'gochara') loadGochara();
+  }
+
+  // --- Gochara tool ---
+
+  const GO_FAV = { Surya:[3,6,10,11], Chandra:[1,3,6,7,10,11], Kuja:[3,6,11],
+    Budha:[2,4,6,8,10,11], Guru:[2,5,7,9,11], Shukra:[1,2,3,4,5,8,9,11,12],
+    Shani:[3,6,11], Rahu:[3,6,11], Ketu:[3,6,11] };
+  const GO_VEDHA = { Surya:{3:9,6:12,10:4,11:5}, Chandra:{1:5,3:9,6:12,7:2,10:4,11:8},
+    Kuja:{3:12,6:9,11:5}, Budha:{2:5,4:3,6:9,8:1,10:8,11:12},
+    Guru:{2:12,5:4,7:3,9:10,11:8}, Shukra:{1:8,2:7,3:1,4:10,5:9,8:5,9:11,11:6,12:3},
+    Shani:{3:12,6:9,11:5} };
+  const GO_EXEMPT = new Set(['Surya|Shani','Shani|Surya','Chandra|Budha','Budha|Chandra']);
+  const GO_NODES = new Set(['Rahu','Ketu']);
+  let GO_DATA = null;
+
+  async function loadGochara() {
+    if (!GO_DATA) {
+      try {
+        const r = await fetch('gochara.json', { cache: 'no-cache' });
+        GO_DATA = await r.json();
+      } catch (e) {
+        document.getElementById('go-sky').innerHTML =
+          '<p class="preview-error">Sky data unavailable — try again later.</p>';
+        return;
+      }
+      const sel = document.getElementById('go-rasi');
+      sel.innerHTML = '<option value="">— pick your rashi —</option>' +
+        GO_DATA.rasis.map((r, i) => `<option value="${i}">${r}</option>`).join('');
+      // quick-pick buttons from saved Tarabalam people whose rashi is known
+      const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
+      const known = saved.map((v, i) => {
+        if (!v || !v.nak) return null;
+        const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
+        return rasi ? { name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)), rasi } : null;
+      }).filter(Boolean);
+      if (known.length) {
+        document.getElementById('go-people-wrap').style.display = '';
+        document.getElementById('go-people').innerHTML = known.map(k =>
+          `<button class="go-pick" onclick="document.getElementById('go-rasi').value='${TB_RASIS.indexOf(k.rasi)}'; renderGochara();">${k.name} · ${k.rasi}</button>`).join('');
+      }
+      const savedRasi = localStorage.getItem('tc-go-rasi');
+      if (savedRasi) sel.value = savedRasi;
+    }
+    renderGochara();
+  }
+
+  function goTodayIndex() {
+    const start = new Date(GO_DATA.start + 'T00:00:00');
+    const i = Math.round((new Date().setHours(0,0,0,0) - start) / 86400000);
+    return Math.max(0, Math.min(i, GO_DATA.days.length - 1));
+  }
+
+  function goTill(idx, gi) {
+    const cur = GO_DATA.days[idx][gi];
+    for (let j = idx + 1; j < GO_DATA.days.length; j++) {
+      if (GO_DATA.days[j][gi] !== cur) {
+        const d = new Date(GO_DATA.start + 'T00:00:00');
+        d.setDate(d.getDate() + j);
+        return { date: d, next: GO_DATA.rasis[GO_DATA.days[j][gi]] };
+      }
+    }
+    return null;
+  }
+
+  function renderGochara() {
+    if (!GO_DATA) return;
+    const idx = goTodayIndex();
+    const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
+    const fmtD = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+    document.getElementById('go-sky').innerHTML = GO_DATA.grahas.map((g, gi) => {
+      const t = goTill(idx, gi);
+      return `<div class="go-cell"><div class="g">${g}${retro[gi] ? '<span class="go-retro" title="retrograde">R</span>' : ''}</div>
+        <div class="r">${GO_DATA.rasis[row[gi]]}</div>
+        <div class="till">${t ? 'till ' + fmtD(t.date) : 'beyond ' + fmtD(new Date(new Date(GO_DATA.start+'T00:00:00').getTime() + (GO_DATA.days.length-1)*86400000))}</div></div>`;
+    }).join('');
+
+    const rasiVal = document.getElementById('go-rasi').value;
+    const condBox = document.getElementById('go-conditions');
+    const resBox = document.getElementById('go-result');
+    document.getElementById('go-share-wrap').style.display = rasiVal === '' ? 'none' : '';
+    if (rasiVal === '') { condBox.innerHTML = ''; resBox.innerHTML = ''; return; }
+    localStorage.setItem('tc-go-rasi', rasiVal);
+    const jr = Number(rasiVal);
+
+    const houseOf = gi => ((row[gi] - jr + 12) % 12) + 1;
+    const occupants = {};
+    GO_DATA.grahas.forEach((g, gi) => { (occupants[houseOf(gi)] = occupants[houseOf(gi)] || []).push(g); });
+
+    const verdicts = GO_DATA.grahas.map((g, gi) => {
+      const pos = houseOf(gi);
+      let verdict = 'adverse', vedhaBy = null;
+      if (GO_FAV[g].includes(pos)) {
+        verdict = 'favourable';
+        if (!GO_NODES.has(g)) {
+          const vh = GO_VEDHA[g][pos];
+          for (const other of (occupants[vh] || [])) {
+            if (other === g || GO_NODES.has(other) || GO_EXEMPT.has(g + '|' + other)) continue;
+            verdict = 'blocked'; vedhaBy = other; break;
+          }
+        }
+      }
+      return { g, pos, verdict, vedhaBy };
+    });
+
+    const shaniPos = verdicts.find(v => v.g === 'Shani').pos;
+    const conds = shaniPos === 12 ? ['Sade Sati (rising phase)'] : shaniPos === 1 ? ['Sade Sati (peak phase)']
+      : shaniPos === 2 ? ['Sade Sati (setting phase)'] : shaniPos === 8 ? ['Ashtama Shani']
+      : shaniPos === 4 ? ['Ardhastama Shani'] : [];
+    condBox.innerHTML = conds.length
+      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}</div>` : '';
+
+    const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+    resBox.innerHTML = `<div class="go-verdict-grid">` + verdicts.map(v => {
+      const cls = v.verdict === 'favourable' ? 'good' : (v.verdict === 'blocked' ? 'blocked' : 'bad');
+      const label = v.verdict === 'favourable' ? 'favourable' : (v.verdict === 'blocked' ? `vedha by ${v.vedhaBy}` : 'adverse');
+      return `<div class="go-v ${cls}"><div class="g">${v.g}</div><div class="d">${ord(v.pos)} house — ${label}</div></div>`;
+    }).join('') + `</div>`;
+  }
+
+  function shareGocharaOnWhatsApp() {
+    if (!GO_DATA) return;
+    const rasiVal = document.getElementById('go-rasi').value;
+    if (rasiVal === '') return;
+    const idx = goTodayIndex();
+    const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
+    const jr = Number(rasiVal);
+    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+    const lines = [];
+    lines.push(`🪐 *Gochara — ${fmtD(new Date())}* (${GO_DATA.rasis[jr]} rashi)`);
+    lines.push('');
+    const conds = document.getElementById('go-conditions').innerText.trim();
+    if (conds) lines.push(conds.replace(/\s*⚠️\s*/g, '⚠️ ') , '');
+    GO_DATA.grahas.forEach((g, gi) => {
+      const pos = ((row[gi] - jr + 12) % 12) + 1;
+      const v = document.querySelectorAll('.go-v')[gi];
+      const verdict = v.classList.contains('good') ? '✅' : (v.classList.contains('blocked') ? '⚠️' : '🔻');
+      lines.push(`${verdict} ${g}${retro[gi] ? ' (R)' : ''} — ${GO_DATA.rasis[row[gi]]}, ${ord(pos)} house`);
+    });
+    lines.push('');
+    lines.push('Check your rashi:');
+    lines.push('https://panchangam.astrochaganti.com/#gochara');
+    window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
   // --- Init ---
@@ -1446,6 +1642,7 @@
   const _t2 = new Date(); _t2.setDate(_t2.getDate() + 13);
   document.getElementById('tb-to').value = `${_t2.getFullYear()}-${String(_t2.getMonth()+1).padStart(2,'0')}-${String(_t2.getDate()).padStart(2,'0')}`;
   if (location.hash === '#tarabalam') switchTool('tarabalam');
+  if (location.hash === '#gochara') switchTool('gochara');
   updateSubscribeUrl();
   loadPreview();
 </script>
