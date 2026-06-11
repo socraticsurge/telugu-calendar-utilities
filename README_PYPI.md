@@ -52,7 +52,7 @@ Auspicious and inauspicious time windows only — a lighter call for quick "is t
 
 ### `find_tarabalam_days(janma_nakshatras, start_date, days=14, city="Hyderabad", system="drik", ...)`
 
-Tarabalam: pass 1-4 birth stars (e.g. `["Uttara Bhadrapada", "Purva Ashadha"]`) and get each day's tara per person (Janma/Sampat/Vipat/Kshema/Pratyak/Sadhana/Naidhana/Mitra/Parama Mitra) plus `good_for_all_dates` — days auspicious for everyone at once. Up to 60 days per call.
+Tarabalam & Chandrabalam: pass 1-4 birth stars (e.g. `["Uttara Bhadrapada", "Purva Ashadha"]`) and get each day's tara per person (Janma/Sampat/Vipat/Kshema/Pratyak/Sadhana/Naidhana/Mitra/Parama Mitra) plus `good_for_all_dates` — days auspicious for everyone at once. Optionally pass `janma_rasis` (aligned, null entries allowed) to also check Chandrabalam — each person then gets the Moon's position from their rashi with a verdict (good / needs remedial puja / avoid), and `chandra_mode` selects how it affects `good_for_all`: `stars` (annotate only — default, matches classic tarabalam tables), `puja_ok`, or `strict`. Up to 60 days per call.
 
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
