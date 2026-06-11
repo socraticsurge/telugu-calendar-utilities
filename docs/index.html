@@ -96,13 +96,13 @@
                 background: none; border: none; cursor: pointer; padding: 0.4rem 0.65rem 0.55rem;
                 border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
-    .tool-tab { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; text-align: left; }
+    .tool-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; flex: 1 1 0; }
     .tool-tab .ts { font-size: 0.68rem; font-weight: 500; color: #94a3b8; }
     .tool-tab.active .ts { color: #818cf8; }
     @media (max-width: 620px) {
       .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
       .tool-tabs::-webkit-scrollbar { display: none; }
-      .tool-tab { font-size: 0.8rem; padding: 0.35rem 0.45rem 0.5rem; white-space: nowrap; flex: none; }
+      .tool-tab { font-size: 0.8rem; padding: 0.35rem 0.45rem 0.5rem; white-space: nowrap; flex: none; align-items: flex-start; }
       .tool-tab .ts { display: none; }
     }
     .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
