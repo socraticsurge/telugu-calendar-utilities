@@ -95,3 +95,7 @@ Lists special days in a given month: named festivals, Ekadashi (fasting), Amavas
 ## Source
 
 Source code, tests, and the related Panchangam calendar feed project: https://github.com/socraticsurge/telugu-calendar-utilities
+
+---
+
+mcp-name: io.github.socraticsurge/panchangam
