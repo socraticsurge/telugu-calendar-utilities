@@ -9,6 +9,8 @@ from telugu_panchangam.mcp.tools import (
     tool_find_tarabalam_days,
     tool_get_graha_positions,
     tool_get_gochara,
+    tool_get_rasi_phalalu,
+    tool_find_muhurta,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -118,3 +120,33 @@ def get_gochara(
 ) -> str:
     """Gochara (transit) verdicts for a janma rasi (natal Moon sign): each of the nine grahas with its house position counted from the janma rasi, a verdict (favourable | blocked by vedha | adverse) per the classical Brihat Samhita tables, plus named conditions — Sade Sati with phase, Ashtama Shani, Ardhastama Shani. Positions at sunrise of the date. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha' (canonical rashi spellings), city=city name (or latitude+longitude)."""
     return tool_get_gochara(date, janma_rasi, city, latitude, longitude, timezone)
+
+
+@mcp.tool()
+def get_rasi_phalalu(
+    date: str,
+    janma_rasi: str,
+    city: str = 'Hyderabad',
+    janma_nakshatra: str | None = None,
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Daily Rasi Phalalu — a deterministic daily reading for a janma rasi, rendered entirely from computed facts: the Moon's chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati/Ashtama Shani are stated when running, and passing janma_nakshatra adds the day's tarabalam line. Not fiction: every line maps to a calculation. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha', janma_nakshatra=optional birth star for the tara line, city=city name (or latitude+longitude)."""
+    return tool_get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra, latitude, longitude, timezone)
+
+
+@mcp.tool()
+def find_muhurta(
+    start_date: str,
+    days: int = 7,
+    activity: str = 'any',
+    city: str = 'Hyderabad',
+    system: str = 'drik',
+    janma_nakshatras: list[str] | None = None,
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Find ranked auspicious time slots over the coming days. Slots are good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), scored with Abhijit Muhurta / Amrita Kalam overlap and special-yoga bonuses. activity tunes the rules: travel additionally avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit. Pass janma_nakshatras (1-4 birth stars) to keep only days whose tarabalam favours everyone. Args: start_date=YYYY-MM-DD, days=1-14, activity=any|travel|purchase|ceremony|beginning, city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya."""
+    return tool_find_muhurta(start_date, days, activity, city, system, janma_nakshatras, latitude, longitude, timezone)

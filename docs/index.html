@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AstroChaganti's Panchangam — Calendar Feeds</title>
-  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities, plus a Tarabalam & Chandrabalam good-day finder. Drik Ganita, Surya Siddhanta and Vakya systems. Free, no account needed.">
+  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities — plus Tarabalam & Muhurtam good-day and time-slot finders, and the Gochara chart with daily Rasi Phalalu. Free, no account needed.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌅</text></svg>">
   <meta property="og:title" content="AstroChaganti's Panchangam">
-  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days, plus a Tarabalam & Chandrabalam good-day finder. Subscribe once, updated automatically.">
+  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days — plus Tarabalam, Muhurtam, Gochara and Rasi Phalalu tools. Subscribe once, updated automatically.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://panchangam.astrochaganti.com/">
   <meta property="og:image" content="https://panchangam.astrochaganti.com/og-image.png">
@@ -96,6 +96,11 @@
                 background: none; border: none; cursor: pointer; padding: 0.4rem 0.65rem 0.55rem;
                 border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
+    @media (max-width: 620px) {
+      .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .tool-tabs::-webkit-scrollbar { display: none; }
+      .tool-tab { font-size: 0.8rem; padding: 0.35rem 0.45rem 0.5rem; white-space: nowrap; flex: none; }
+    }
     .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid var(--indigo-border); background: var(--indigo-bg);
                color: var(--indigo); font-weight: 600; font-family: inherit; }
@@ -127,6 +132,7 @@
     .tara-chip { display: inline-block; border-radius: 6px; padding: 0.08rem 0.5rem; font-weight: 700; font-size: 0.78rem; white-space: nowrap; }
     .tara-chip.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
     .tara-chip.bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
     .tara-chip.puja { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
     .tb-star { color: #b45309; font-size: 1rem; }
     .tb-intro { font-size: 0.85rem; color: #475569; margin: 0.2rem 0 0.6rem; }
@@ -144,7 +150,8 @@
     .go-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(86px, auto));
                 gap: 2px; background: #c7d2fe; border: 2px solid #c7d2fe; border-radius: 10px; overflow: hidden; margin-top: 0.8rem; }
     .go-box { background: #fff; padding: 0.3rem 0.35rem; position: relative; min-height: 86px; }
-    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;
+                     display: inline-block; padding-right: 1.1rem; }
     .go-box .house { position: absolute; top: 0.25rem; right: 0.35rem; font-size: 0.62rem; font-weight: 700; color: #c7d2fe; }
     .go-box.janma { outline: 2px solid var(--indigo); outline-offset: -2px; }
     .go-box.janma .rname { color: var(--indigo); }
@@ -157,9 +164,27 @@
     .go-g.good { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
     .go-g.blocked { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
     .go-g.bad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .go-g.bad::after { content: ' ✗'; font-size: 0.85em; }
     .go-retro { font-size: 0.6rem; vertical-align: super; }
     .go-moves { margin-top: 0.6rem; font-size: 0.76rem; color: #475569; }
     .go-moves b { color: #1e1b4b; }
+    .mu-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.8rem;
+               border: 1px solid #eef2f7; border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: #fcfdfe; }
+    .mu-slot.top { background: var(--green-bg); border-color: var(--green-border); }
+    .mu-when { font-weight: 700; color: #1e1b4b; white-space: nowrap; }
+    .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
+                background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
+    .mu-reasons { font-size: 0.74rem; color: #64748b; width: 100%; }
+    .go-phalalu { margin-top: 0.8rem; background: #fffdf7; border: 1px solid var(--amber-border);
+                  border-radius: 10px; padding: 0.75rem 0.95rem; }
+    .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
+                     text-transform: uppercase; letter-spacing: 0.05em; }
+    .go-phalalu p { margin: 0.3rem 0; font-size: 0.84rem; color: #44403c; line-height: 1.55; }
+    .go-quality { display: inline-block; border-radius: 6px; padding: 0.1rem 0.55rem;
+                  font-size: 0.75rem; font-weight: 700; margin-left: 0.4rem; vertical-align: middle; }
+    .go-quality.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .go-quality.mixed { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .go-quality.difficult { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
     .go-cond { margin-top: 0.7rem; }
     .go-cond .chip { display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 0.15rem 0.6rem; font-weight: 700; font-size: 0.8rem; margin-right: 0.35rem; }
     .go-pick { background: #fff; border: 1px solid var(--indigo-border); color: var(--indigo); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin: 0 0.25rem 0.25rem 0; font-family: inherit; }
@@ -225,16 +250,17 @@
   <div class="hero">
     <div><span class="sunmoon">🌅</span></div>
     <h1>AstroChaganti's Panchangam</h1>
-    <div class="tagline">The full Telugu panchangam — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days —
-    delivered into the calendar app you already use. Free, no account, updated automatically.</div>
+    <div class="tagline">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
+    and festival days — plus daily tools: Tarabalam &amp; Muhurtam for your family's good days and time slots,
+    and the Gochara chart with Rasi Phalalu. Free, no account, updated automatically.</div>
     <a class="btn hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
   </div>
 
   <div class="card">
     <div class="tool-tabs" role="tablist">
       <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">🔆 Today's Panchangam</button>
-      <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">✦ Tarabalam · Chandrabalam</button>
-      <button id="tab-gochara" class="tool-tab" role="tab" onclick="switchTool('gochara')">🪐 Gochara</button>
+      <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">✦ Tarabalam · Muhurtam</button>
+      <button id="tab-gochara" class="tool-tab" role="tab" onclick="switchTool('gochara')">🪐 Gochara · Rasi Phalalu</button>
     </div>
     <div class="selector-row">
       <div class="selector">
@@ -245,10 +271,7 @@
         <label for="tp-system">System</label>
         <select id="tp-system"></select>
       </div>
-    </div>
-    <div id="panel-today" role="tabpanel">
-    <div class="selector-row">
-      <div class="selector">
+      <div class="selector" id="tp-date-wrap">
         <label for="tp-date">Date</label>
         <input type="date" id="tp-date"
                style="font-size:0.85rem;padding:0.4rem 0.6rem;border-radius:8px;
@@ -263,6 +286,7 @@
         </div>
       </div>
     </div>
+    <div id="panel-today" role="tabpanel">
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
     Times marked <sup class="plus1" style="color:#d97706;">+1</sup> fall after midnight on the next day;
@@ -273,7 +297,7 @@
       <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
       Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
       <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
-      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam &amp; Chandrabalam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam &amp; Chandrabalam? How to use this ▾</button>
+      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾</button>
       <div class="expanded" id="tb-help">
         <strong>Tarabalam — strength from your star.</strong> Each day the Moon occupies one of the 27 nakshatras.
         Counting from your <strong>janma nakshatra</strong> (birth star) to the day's nakshatra gives one of nine
@@ -294,6 +318,20 @@
         Create your birth chart at <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a> —
         it lists your janma nakshatra, padam and rashi. These are daily favourability checks, one factor among
         several; for major events check the day's muhurtas and consult your purohit.
+        <br/><br/>
+        <strong>Chandrabalam — the Moon check.</strong> Once the rashi is known, the Moon's position from it is
+        checked automatically: positions 1 · 3 · 6 · 7 · 10 · 11 are good, 2 · 5 · 9 are workable after a small
+        remedial puja (marked °), and 4 · 8 · 12 are avoided (marked ☾). The <strong>✦ standard</strong> selector
+        sets how this affects good days: <em>Stars only</em> matches classic tarabalam tables (the Moon still
+        annotates each chip), <em>puja ok</em> drops Moon-avoid days, and <em>strict</em> demands a clean Moon —
+        some star combinations have no strict days at all, so relax the standard if the list comes up empty.
+        <br/><br/>
+        <strong>Muhurtam — finding the time slot.</strong> With your people and date range set, the
+        <em>Find a time slot</em> section searches the same days for ranked slots: good choghadiya blocks
+        (Amrit · Shubh · Labh · Char) with Rahu Kalam, Gulika, Yamagandam, Varjyam and Durmuhurtham cut out,
+        scored higher when they overlap Abhijit Muhurta or Amrita Kalam or fall on Sarvartha/Amrita Siddhi
+        days. The activity tunes the rules — travel avoids Vishti karana, ceremonies skip Visha and Dagdha
+        days, purchases favour Labh, beginnings favour Amrit. Every slot lists its reasons.
       </div>
       <div class="tb-controls">
       <div class="tb-controls-title">Who is this for?
@@ -327,24 +365,55 @@
       <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
       <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
       Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
+
+      <div class="tb-controls" style="margin-top:1rem;">
+        <div class="tb-controls-title">Find a time slot (Muhurtam)</div>
+        <div class="selector-row" style="margin:0;">
+          <div class="selector">
+            <label for="mu-activity">Activity</label>
+            <select id="mu-activity" class="tb-date">
+              <option value="any">Anything auspicious</option>
+              <option value="travel">Travel / journey</option>
+              <option value="purchase">Purchase</option>
+              <option value="ceremony">Ceremony / puja</option>
+              <option value="beginning">New beginning</option>
+            </select>
+          </div>
+          <div class="selector"><label>&nbsp;</label>
+            <button class="btn" onclick="findMuhurta()">Find slots</button>
+          </div>
+        </div>
+        <p class="preview-note" style="margin-top:0.4rem;" id="mu-context"></p>
+      </div>
+      <div id="mu-result"></div>
       <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
-      <strong>Chandrabalam</strong> is checked automatically once the rashi is known (from your star, plus
-      padam for the nine straddling stars): Moon positions 1 · 3 · 6 · 7 · 10 · 11 from the rashi are good,
-      2 · 5 · 9 are workable after a small remedial puja (marked °), and 4 · 8 · 12 are avoided (marked ☾ when
-      the Moon alone spoils an otherwise good star day). The <strong>✦ standard</strong> selector chooses how the Moon affects good days:
-      <em>Stars only</em> matches classic tarabalam tables (the Moon still annotates every chip),
-      <em>puja ok</em> additionally drops Moon-avoid days, and <em>strict</em> demands a clean Moon too.
-      Some star combinations have no strict days at all — relax the standard if the list comes up empty.</p>
-      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
-      <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks — they are <strong>not</strong> how muhurtams are fixed.
+      <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
+      finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
-      For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit or astrologer.</p>
+      For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit —
+      or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
       <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
       <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
       coloured by its gochara verdict for them.</p>
+      <button class="read-more" style="color: var(--indigo);" data-more="New to Gochara &amp; Rasi Phalalu? How to read this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('go-help', this)">New to Gochara &amp; Rasi Phalalu? How to read this ▾</button>
+      <div class="expanded" id="go-help">
+        <strong>The chart.</strong> This is the fixed South Indian layout: Meena sits top-left, Mesha beside it,
+        and the rashis run clockwise around the centre. Each graha appears in the rashi it currently occupies;
+        ℞ marks a retrograde. The "Coming up" line lists when each graha next changes rashi.
+        <br/><br/>
+        <strong>Gochara.</strong> Pick a person or rashi under <em>Viewing</em> and every graha is judged from
+        that janma rashi by the classical Brihat Samhita rules: each graha gives good results only in certain
+        houses counted from your Moon sign, and a favourable transit can be <em>blocked</em> when another graha
+        sits at its vedha (obstruction) point. Sade Sati, Ashtama Shani and Ardhastama Shani are flagged when
+        they apply to you. Box corners show the house number counted from your rashi.
+        <br/><br/>
+        <strong>Rasi Phalalu.</strong> The reading below the chart is composed line-by-line from these computed
+        verdicts — the Moon's position sets the day's tone, each graha contributes one sentence, and nothing is
+        invented. Share it with the green button; it sends the full reading.
+      </div>
       <div class="tb-controls">
         <div class="selector-row" style="margin:0;">
           <div class="selector">
@@ -364,6 +433,7 @@
       <div id="go-chart" class="go-chart"><p class="preview-error">Loading…</p></div>
       <div id="go-note"></div>
       <div id="go-moves"></div>
+      <div id="go-phalalu"></div>
       <div id="go-legend"></div>
       <p class="preview-note">Positions are the sky <strong>at sunrise</strong> on the chosen date — the chart's
       snapshot convention, like the rest of this site. The Moon changes rashi every 2–2½ days, so by evening it
@@ -378,7 +448,7 @@
       <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
       <strong>Please note:</strong> Gochara is a background influence read from the Moon sign alone — it is
       <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
-      day's panchangam above and consult your purohit or astrologer.</p>
+      day's panchangam above and consult your purohit — or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
     </div><!-- /panel-gochara -->
   </div>
 
@@ -453,10 +523,13 @@
   <div class="card">
     <h2>🧭 Choosing a calculation system</h2>
     <p style="font-size:0.85rem;color:#475569;">
-      Panchangams aren't one-size-fits-all. Different traditions calculate Tithi, Nakshatra, and muhurtam
-      timings slightly differently — sometimes by minutes, sometimes by a full day for festivals like
-      Ekadashi. Here's what each system means, who uses it, and how to pick.
+      <strong>Drik Ganita</strong>, the default, uses modern astronomy and matches drikpanchang.com.
+      <strong>Surya Siddhanta</strong> and <strong>Vakya</strong> are classical methods that intentionally
+      differ — by minutes for muhurtams, occasionally by a day for festivals. If your family follows a
+      printed panchangam, compare a few days in the preview above and pick what matches.
     </p>
+    <button class="read-more" style="color: var(--indigo);" data-more="Compare the three systems in detail ▾" data-less="Hide comparison ▴" onclick="toggleReadMore('systems-more', this)">Compare the three systems in detail ▾</button>
+    <div class="expanded" id="systems-more">
 
     <div class="sys-card drik">
       <h3>☀️ Drik Ganita — Modern Observational Astronomy</h3>
@@ -507,9 +580,9 @@
       </div>
     </div>
 
-    <p class="tip">Not sure? Drik Ganita is a safe modern default. If your family or temple follows a
-    specific printed panchangam, use the preview above to compare a few days against it and pick the
-    system that matches most closely — no two traditional panchangams agree to the minute, and that's normal.</p>
+    <p class="tip">Not sure? Drik Ganita is a safe modern default — no two traditional panchangams agree
+    to the minute, and that's normal.</p>
+    </div><!-- /systems-more -->
   </div>
 
   <div class="card">
@@ -519,17 +592,19 @@
       is a standard <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
       server that gives AI assistants direct access to Panchangam calculations — ask Claude or any
       MCP-compatible agent for today's Tithi, a muhurta for next Tuesday, special days in the coming month,
-      a day-by-day comparison across a date range, or which days suit your family's birth stars —
-      and it calls the engine directly rather than guessing.
+      a ranked time slot for a journey, which days suit your family's birth stars, or today's
+      Rasi Phalalu for Mesha — and it calls the engine directly rather than guessing.
     </p>
 
     <div class="mcp-tools">
       <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
-      <div class="mcp-tool"><code>get_muhurta</code><span>Auspicious &amp; inauspicious windows only — faster for "is this a good time?" queries</span></div>
+      <div class="mcp-tool"><code>get_muhurta</code><span>One day's auspicious &amp; inauspicious windows — "is right now good?" (use <em>find_muhurta</em> to search across days)</span></div>
       <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
       <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
       <div class="mcp-tool"><code>get_graha_positions</code><span>All nine grahas at sunrise — rasi, nakshatra, retrograde, and when each enters its next rasi</span></div>
+      <div class="mcp-tool"><code>get_rasi_phalalu</code><span>Daily reading for a rashi — every sentence rendered from computed gochara/chandrabalam/tarabalam facts</span></div>
       <div class="mcp-tool"><code>get_gochara</code><span>Transit verdicts from a janma rashi — favourable/blocked/adverse per graha with vedha, Sade Sati &amp; Ashtama Shani flags</span></div>
+      <div class="mcp-tool"><code>find_muhurta</code><span>Ranked auspicious slots over coming days — good choghadiya minus all bad windows, activity-aware, with reasons</span></div>
       <div class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
       <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
     </div>
@@ -565,8 +640,9 @@
   </div>
 
   <footer>
-    AstroChaganti's Panchangam is open source. Feeds are regenerated on the 1st of each month covering 18 months ahead.
-    <a href="https://github.com/socraticsurge/telugu-calendar-utilities">GitHub</a>
+    A free service from AstroChaganti — open source, feeds regenerated monthly, 18 months ahead.
+    For professional consultations: <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>
+    &nbsp;·&nbsp; <a href="https://github.com/socraticsurge/telugu-calendar-utilities">GitHub</a>
   </footer>
 </div>
 
@@ -718,6 +794,9 @@
     document.getElementById('fmt-12').classList.toggle('active', f === '12');
     document.getElementById('fmt-24').classList.toggle('active', f === '24');
     renderAll();
+    if (typeof TB_DAYS !== 'undefined' && TB_DAYS) renderTarabalam();
+    if (typeof GO_DATA !== 'undefined' && GO_DATA) renderGochara();
+    if (typeof MU_LAST !== 'undefined' && MU_LAST) renderMuhurta();
   }
 
   // --- Ekadashi naming (Amanta maasam + paksham) ---
@@ -1501,7 +1580,9 @@
     for (const t of ['today', 'tarabalam', 'gochara']) {
       document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
       document.getElementById('tab-' + t).classList.toggle('active', t === which);
+      document.getElementById('tab-' + t).setAttribute('aria-selected', t === which ? 'true' : 'false');
     }
+    document.getElementById('tp-date-wrap').style.display = which === 'today' ? '' : 'none';
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
     if (which === 'gochara') loadGochara();
   }
@@ -1520,19 +1601,15 @@
   let GO_DATA = null;
 
   async function loadGochara() {
-    if (!GO_DATA) {
+    const firstLoad = !GO_DATA;
+    if (firstLoad) {
       try {
         const r = await fetch('gochara.json', { cache: 'no-cache' });
         GO_DATA = await r.json();
       } catch (e) {
-        document.getElementById('go-sky').innerHTML =
+        document.getElementById('go-chart').innerHTML =
           '<p class="preview-error">Sky data unavailable — try again later.</p>';
         return;
-      }
-      goBuildViewSelect();
-      const savedView = localStorage.getItem('tc-go-view');
-      if (savedView && [...document.getElementById('go-view').options].some(o => o.value === savedView)) {
-        document.getElementById('go-view').value = savedView;
       }
       const di = document.getElementById('go-date');
       di.min = GO_DATA.start;
@@ -1541,6 +1618,11 @@
       di.max = `${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`;
       di.value = todayISO;
     }
+    // people may have changed in the Tarabalam tab — rebuild, keep selection
+    const sel = document.getElementById('go-view');
+    const keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
+    goBuildViewSelect();
+    if (keep && [...sel.options].some(o => o.value === keep)) sel.value = keep;
     renderGochara();
   }
 
@@ -1643,7 +1725,9 @@
         : sp === 4 ? ['Ardhastama Shani'] : [];
     }
     condBox.innerHTML = conds.length
-      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}</div>` : '';
+      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}
+         <div class="tb-sub" style="margin-top:0.25rem;">Running ${conds[0].split(' (')[0]}? Personalised guidance:
+         <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a></div></div>` : '';
 
     // chart
     const byRasi = {};
@@ -1681,6 +1765,17 @@
       ? `<div class="go-moves"><b>Coming up:</b> ` + moves.map(m =>
           `${m.g} → ${m.t.next} <b>${m.t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</b>`).join(' &nbsp;·&nbsp; ') + `</div>` : '';
 
+    // rasi phalalu (daily reading from the same computed verdicts)
+    const phBox = document.getElementById('go-phalalu');
+    if (jr === null) { phBox.innerHTML = ''; }
+    else {
+      const ph = buildPhalalu(jr, row, view, idx);
+      phBox.innerHTML = `<div class="go-phalalu"><h4>Rasi Phalalu — ${view.label}
+        <span class="go-quality ${ph.quality}">${ph.quality} day</span></h4>` +
+        ph.lines.map(l => `<p>${l}</p>`).join('') +
+        `<p style="font-size:0.72rem;color:#94a3b8;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
+    }
+
     // legend
     document.getElementById('go-legend').innerHTML = jr === null ? '' :
       `<div class="tb-legend" style="margin-top:0.5rem;">
@@ -1689,6 +1784,56 @@
         <span class="tb-legend-item"><span class="go-g bad">adverse</span></span>
         <span class="tb-legend-item"><span class="go-g">℞ retrograde</span></span>
         <span class="tb-legend-item">(hover a graha for detail)</span></div>`;
+  }
+
+  const HOUSE_MEANINGS = { 1:'self and health', 2:'wealth and family', 3:'courage and effort',
+    4:'home and comfort', 5:'children and learning', 6:'health and rivals', 7:'partnerships',
+    8:'obstacles', 9:'fortune and dharma', 10:'career and standing', 11:'gains and income', 12:'expenses and rest' };
+  const PHALALU_OPENERS = {
+    good: 'The Moon stands well for your rashi today — a day that supports initiative.',
+    puja: "The Moon's position asks for a small remedial prayer; proceed gently after it.",
+    bad: 'The Moon sits heavily for your rashi today — keep the day light and routine.' };
+  const PHALALU_ORDER = ['Shani','Guru','Rahu','Ketu','Kuja','Surya','Shukra','Budha'];
+  const ordinal = n => n + (['st','nd','rd'][n-1] || 'th');
+
+  function buildPhalalu(jr, row, view, idx) {
+    const houseOf = gi => ((row[gi] - jr + 12) % 12) + 1;
+    const occupants = {};
+    GO_DATA.grahas.forEach((g, gi) => { (occupants[houseOf(gi)] = occupants[houseOf(gi)] || []).push(g); });
+    const verdictFor = gi => {
+      const g = GO_DATA.grahas[gi], pos = houseOf(gi);
+      if (!GO_FAV[g].includes(pos)) return { v: 'adverse' };
+      if (!GO_NODES.has(g)) {
+        const vh = GO_VEDHA[g][pos];
+        for (const other of (occupants[vh] || [])) {
+          if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return { v: 'blocked', by: other };
+        }
+      }
+      return { v: 'favourable' };
+    };
+    const moonPos = houseOf(GO_DATA.grahas.indexOf('Chandra'));
+    const mv = CHANDRA_GOOD.has(moonPos) ? 'good' : (CHANDRA_PUJA.has(moonPos) ? 'puja' : 'bad');
+    let fav = 0, blocked = 0;
+    const detail = {};
+    GO_DATA.grahas.forEach((g, gi) => { const r = verdictFor(gi); detail[g] = { ...r, pos: houseOf(gi) };
+      if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++; });
+    const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
+    const lines = [PHALALU_OPENERS[mv]];
+    const shaniPos = detail['Shani'].pos;
+    const cond = shaniPos === 12 ? 'Sade Sati (rising phase)' : shaniPos === 1 ? 'Sade Sati (peak phase)'
+      : shaniPos === 2 ? 'Sade Sati (setting phase)' : shaniPos === 8 ? 'Ashtama Shani'
+      : shaniPos === 4 ? 'Ardhastama Shani' : null;
+    if (cond) lines.push(cond.startsWith('Sade Sati')
+      ? `${cond} is running — Shani asks for patience, discipline and steady work.`
+      : `${cond} is running — avoid risks and keep commitments minimal.`);
+    for (const g of PHALALU_ORDER) {
+      const d = detail[g], m = HOUSE_MEANINGS[d.pos];
+      lines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.pos)} house favours ${m}.`
+        : d.v === 'blocked' ? `${g}'s good ${ordinal(d.pos)}-house transit is under vedha by ${d.by} — gains in ${m} may arrive with friction.`
+        : `${g} in the ${ordinal(d.pos)} house tests ${m}; avoid forcing matters there.`);
+    }
+    lines.push(`${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''}.`);
+    return { quality, lines };
   }
 
   function shareGocharaOnWhatsApp() {
@@ -1700,21 +1845,168 @@
     const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+    const ph = buildPhalalu(jr, row, view, idx);
     const lines = [];
     const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
-    lines.push(`🪐 *Gochara — ${fmtD(shown)}* (${view.label})`);
+    lines.push(`📜 *Rasi Phalalu — ${fmtD(shown)}*`);
+    lines.push(`${view.label} · ${ph.quality} day`);
     lines.push('');
-    const conds = document.getElementById('go-conditions').innerText.trim();
-    if (conds) lines.push(conds.replace(/\s*⚠️\s*/g, '⚠️ ') , '');
-    GO_DATA.grahas.forEach((g, gi) => {
-      const pos = ((row[gi] - jr + 12) % 12) + 1;
-      const chip = [...document.querySelectorAll('.go-g')].find(c => c.textContent.replace('℞','') === g);
-      const verdict = chip && chip.classList.contains('good') ? '✅' : (chip && chip.classList.contains('blocked') ? '⚠️' : '🔻');
-      lines.push(`${verdict} ${g}${retro[gi] ? ' (R)' : ''} — ${GO_DATA.rasis[row[gi]]}, ${ord(pos)} house`);
-    });
+    ph.lines.forEach(l => lines.push('• ' + l));
     lines.push('');
     lines.push('Check your rashi:');
     lines.push('https://panchangam.astrochaganti.com/#gochara');
+    window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+  }
+
+  // --- Muhurta finder (client-side, from the already-loaded feed) ---
+
+  const MU_GOOD_CHOG = { Amrit: 3, Shubh: 2, Labh: 2, Char: 1 };
+  const MU_YOGA_BONUS = { 'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,
+                          'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1 };
+  const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
+
+  function muMin(t, flag) {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m + (flag === '+1' ? 1440 : flag === '-1' ? -1440 : 0);
+  }
+
+  function muSubtract(s, e, blocks) {
+    let pieces = [[s, e]];
+    for (const [b0, b1] of blocks) {
+      const nxt = [];
+      for (const [p0, p1] of pieces) {
+        if (b1 <= p0 || b0 >= p1) { nxt.push([p0, p1]); continue; }
+        if (p0 < b0) nxt.push([p0, b0]);
+        if (b1 < p1) nxt.push([b1, p1]);
+      }
+      pieces = nxt;
+    }
+    return pieces;
+  }
+
+  async function findMuhurta() {
+    const box = document.getElementById('mu-result');
+    box.innerHTML = '<p class="preview-error">Searching…</p>';
+    const activity = document.getElementById('mu-activity').value;
+    const from = new Date(document.getElementById('tb-from').value + 'T00:00:00');
+    const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
+    const nDays = Math.min(60, Math.max(1, Math.round((to - from) / 86400000) + 1));
+    const people = tbProfiles();
+    document.getElementById('mu-context').innerHTML = people.length
+      ? `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => p.name).join(', ')}</strong> (set above).`
+      : `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong> — no people set above, so no star screening.`;
+    try {
+      const city = document.getElementById('tp-city').value;
+      const system = document.getElementById('tp-system').value;
+      const events = LAST_EVENTS || await loadFeed(city, system);
+      const slots = [];
+      let screenedDays = 0;
+      for (let i = 0; i < nDays; i++) {
+        const d = new Date(from); d.setDate(d.getDate() + i);
+        const ev = events.get(stampOf(d));
+        if (!ev) continue;
+        const data = parseDescription(ev.description);
+        let dayBonus = 0; const dayReasons = [];
+        if (people.length && data.nakshatra) {
+          const ok = people.every(pr => TARA_GOOD.has(taraOf(pr.nak, data.nakshatra.name)));
+          if (!ok) { screenedDays++; continue; }
+          dayBonus += 2; dayReasons.push('tarabalam favourable for everyone (+2)');
+        }
+        let skipDay = false;
+        for (const y of data.yogas) {
+          if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
+          if (MU_YOGA_PENALTY[y] !== undefined) {
+            if (activity === 'ceremony') { skipDay = true; break; }
+            dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
+          }
+        }
+        if (skipDay) continue;
+        const bad = data.inauspicious.map(w => [muMin(w.start, w.sflag), muMin(w.end, w.eflag)]);
+        if (activity === 'travel' && data.karana) {
+          for (const k of data.karana.split(/\s+\/\s+/)) {
+            const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
+            if (m && m[1].trim() === 'Vishti') bad.push([muMin(m[2], m[3]), muMin(m[4], m[5])]);
+          }
+        }
+        const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
+        const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
+        for (const c of data.choghadiya) {
+          const base = MU_GOOD_CHOG[c.name];
+          if (base === undefined) continue;
+          for (const [s0, e0] of muSubtract(muMin(c.start), muMin(c.end), bad)) {
+            if (e0 - s0 < 24) continue;
+            let score = base + dayBonus;
+            const reasons = [`${c.name} choghadiya (+${base})`, 'clear of all inauspicious windows', ...dayReasons];
+            if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
+              score += 2; reasons.push('overlaps Abhijit Muhurta (+2)');
+            }
+            if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
+              score += 2; reasons.push('overlaps Amrita Kalam (+2)');
+            }
+            if (activity === 'purchase' && c.name === 'Labh') { score += 1; reasons.push('Labh favoured for purchases (+1)'); }
+            if (activity === 'beginning' && c.name === 'Amrit') { score += 1; reasons.push('Amrit favoured for beginnings (+1)'); }
+            if (activity === 'travel') reasons.push('Vishti karana avoided');
+            slots.push({ d: new Date(d), s0, e0, score, reasons });
+          }
+        }
+      }
+      slots.sort((a, b) => b.score - a.score || a.d - b.d || a.s0 - b.s0);
+      MU_LAST = { top: slots.slice(0, 10), screenedDays, activity, people };
+      renderMuhurta();
+    } catch (e) {
+      box.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
+    }
+  }
+
+  let MU_LAST = null;
+  const MU_ACT_LABEL = { any: 'anything auspicious', travel: 'travel', purchase: 'a purchase',
+                         ceremony: 'a ceremony', beginning: 'a new beginning' };
+
+  function muToT(mm) {
+    const m = ((mm % 1440) + 1440) % 1440;
+    return fmtT(`${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`);
+  }
+
+  function renderMuhurta() {
+    if (!MU_LAST) return;
+    const box = document.getElementById('mu-result');
+    const { top, screenedDays } = MU_LAST;
+    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    if (!top.length) {
+      box.innerHTML = `<p class="preview-error">No clear slots found${screenedDays ? ` — ${screenedDays} day(s) were screened out by tarabalam` : ''}. Try more days, or clear the people above.</p>`;
+      return;
+    }
+    const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
+    box.innerHTML =
+      `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found — best first${share}</div>`
+      + top.map((s, i) => `<div class="mu-slot ${i === 0 ? 'top' : ''}">
+          <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
+          <span class="mu-score">score ${s.score}</span>
+          <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
+      + `<p class="preview-note" style="margin-top:0.5rem;">The score is simply the sum of the (+n) reasons on each slot:
+         choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
+         days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
+         requirement, not a bonus.</p>`;
+  }
+
+  function shareMuhurtaOnWhatsApp() {
+    if (!MU_LAST || !MU_LAST.top.length) return;
+    const { top, activity, people } = MU_LAST;
+    const citySel = document.getElementById('tp-city');
+    const cityLabel = citySel.options[citySel.selectedIndex].textContent;
+    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const lines = [];
+    lines.push(`⏱ *Good time slots — ${MU_ACT_LABEL[activity]}*`);
+    lines.push(`📍 ${cityLabel} · ${document.getElementById('tb-from').value} to ${document.getElementById('tb-to').value}`);
+    if (people.length) lines.push(`Screened for: ${people.map(p => `${p.name} (${p.nak})`).join(' · ')}`);
+    lines.push('');
+    top.slice(0, 5).forEach(s => {
+      lines.push(`✅ ${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}`);
+      lines.push(`   ${s.reasons.filter(r => r !== 'clear of all inauspicious windows').slice(0, 3).join(' · ')}`);
+    });
+    lines.push('');
+    lines.push('Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.');
+    lines.push('Find your own: https://panchangam.astrochaganti.com/#tarabalam');
     window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
@@ -1742,6 +2034,7 @@
   document.getElementById('tb-to').value = `${_t2.getFullYear()}-${String(_t2.getMonth()+1).padStart(2,'0')}-${String(_t2.getDate()).padStart(2,'0')}`;
   if (location.hash === '#tarabalam') switchTool('tarabalam');
   if (location.hash === '#gochara') switchTool('gochara');
+  if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
   updateSubscribeUrl();
   loadPreview();
 </script>

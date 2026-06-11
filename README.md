@@ -10,6 +10,11 @@ Visit the landing page to pick your city and calculation system and copy your `w
 
 **[panchangam.astrochaganti.com](https://panchangam.astrochaganti.com)**
 
+The site is also a daily toolkit: **Today's Panchangam** (any date, any city), **Tarabalam · Muhurtam**
+(good days and ranked time slots for up to four people by birth star, with Chandrabalam), and the
+**Gochara chart with Rasi Phalalu** (South Indian chart, transit verdicts and a computed daily reading).
+Everything is shareable to WhatsApp.
+
 ## What's in each day's event
 
 - **Metadata** — Samvatsara, Maasam, Paksham, Vaaram, solar and lunar signs
@@ -66,11 +71,13 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 |------|-------------|
 | `list_supported_cities` | 22 pre-configured cities with lat/lon/timezone |
 | `get_panchangam` | Full Panchangam for any date and city |
-| `get_muhurta` | Auspicious/inauspicious windows only |
+| `get_muhurta` | One day's auspicious/inauspicious windows (see `find_muhurta` to search across days) |
 | `get_special_days` | Named festivals, Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Ganda Moola, and Eclipses for a month |
 | `find_tarabalam_days` | Tarabalam & Chandrabalam — days favourable for 1–4 people by birth star (and rashi), with selectable strictness |
 | `get_graha_positions` | All nine grahas at sunrise — rasi, nakshatra, retrograde, next-rasi ingress dates |
 | `get_gochara` | Gochara verdicts from a janma rashi — Brihat Samhita houses, vedha, Sade Sati / Ashtama Shani |
+| `get_rasi_phalalu` | Daily Rasi Phalalu — deterministic daily reading rendered from computed facts |
+| `find_muhurta` | Ranked auspicious time slots — activity-aware, every slot with its reasons |
 
 All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
 
