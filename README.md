@@ -2,7 +2,7 @@
 
 Subscribable Telugu Panchangam feeds for 22 cities — delivered as `.ics` files you can add to Google Calendar, Apple Calendar, or Outlook.
 
-Every day appears as an all-day event (no calendar blocking) with full Panchangam details in the description. Special days — Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, and Eclipses — are marked with ⚡ in the title so they stand out at a glance.
+Every day appears as an all-day event (no calendar blocking) with full Panchangam details in the description. Festival days — Ugadi, Vinayaka Chavithi, Deepavali, Maha Shivaratri, the Sankranti cluster, and 30+ more — are marked with 🪔 in the title; other special days (Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Eclipses) with ⚡.
 
 ## Subscribe
 
@@ -67,7 +67,7 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 | `list_supported_cities` | 22 pre-configured cities with lat/lon/timezone |
 | `get_panchangam` | Full Panchangam for any date and city |
 | `get_muhurta` | Auspicious/inauspicious windows only |
-| `get_special_days` | Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, and Eclipses for a month |
+| `get_special_days` | Named festivals, Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Ganda Moola, and Eclipses for a month |
 
 All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
 
