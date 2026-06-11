@@ -86,6 +86,8 @@ def find_tarabalam_days(
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
+    janma_rasis: list[str | None] | None = None,
+    chandra_mode: str = 'stars',
 ) -> str:
-    """Find which upcoming days are auspicious for one or more people based on their janma (birth) nakshatras — Tarabalam. Returns per-day taras (Janma/Sampat/Vipat/Kshema/Pratyak/Sadhana/Naidhana/Mitra/Parama Mitra) for each person plus good_for_all_dates listing days auspicious for everyone. Args: janma_nakshatras=1-4 birth stars (canonical spellings, e.g. 'Ashvini', 'Uttara Bhadrapada'), start_date=YYYY-MM-DD, days=1-60 (default 14), city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya."""
-    return tool_find_tarabalam_days(janma_nakshatras, start_date, days, city, system, latitude, longitude, timezone)
+    """Find which upcoming days are auspicious for one or more people based on their janma (birth) nakshatras — Tarabalam, optionally combined with Chandrabalam. Returns per-day taras (Janma/Sampat/Vipat/Kshema/Pratyak/Sadhana/Naidhana/Mitra/Parama Mitra) for each person plus good_for_all_dates listing days auspicious for everyone. Pass janma_rasis (aligned with janma_nakshatras, null entries allowed) to also check Chandrabalam — each person then gets a chandra position/verdict (good | puja | bad) and good_for_all requires both checks to pass. Args: janma_nakshatras=1-4 birth stars (canonical spellings, e.g. 'Ashvini', 'Uttara Bhadrapada'), start_date=YYYY-MM-DD, days=1-60 (default 14), city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya, janma_rasis=optional birth rashis (e.g. 'Meena'), chandra_mode=how the Moon affects good_for_all: 'stars' (annotate only, matches classic tarabalam tables — default), 'puja_ok' (drop Moon-avoid days), 'strict' (Moon must be good)."""
+    return tool_find_tarabalam_days(janma_nakshatras, start_date, days, city, system, latitude, longitude, timezone, janma_rasis, chandra_mode)

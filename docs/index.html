@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AstroChaganti's Panchangam — Calendar Feeds</title>
-  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities. Drik Ganita, Surya Siddhanta and Vakya systems. Free, no account needed.">
+  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities, plus a Tarabalam & Chandrabalam good-day finder. Drik Ganita, Surya Siddhanta and Vakya systems. Free, no account needed.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌅</text></svg>">
   <meta property="og:title" content="AstroChaganti's Panchangam">
-  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days. Subscribe once, updated automatically.">
+  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days, plus a Tarabalam & Chandrabalam good-day finder. Subscribe once, updated automatically.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://panchangam.astrochaganti.com/">
   <meta property="og:image" content="https://panchangam.astrochaganti.com/og-image.png">
@@ -99,6 +99,13 @@
     .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid var(--indigo-border); background: var(--indigo-bg);
                color: var(--indigo); font-weight: 600; font-family: inherit; }
+    .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 10px;
+                   padding: 0.75rem 0.9rem 0.85rem; margin-top: 0.85rem; }
+    .tb-controls-title { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase;
+                         letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .tb-controls .tb-profile-row select, .tb-controls .tb-date { background: #fff; }
+    .tb-controls .tb-add { background: #fff; }
+    .tb-controls .tb-add:hover { background: #f1f5f9; }
     .tb-profile-row { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap; align-items: center; }
     .tb-profile-row input[type=text] { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid #e2e8f0; font-family: inherit; width: 170px; }
@@ -117,6 +124,7 @@
     .tara-chip { display: inline-block; border-radius: 6px; padding: 0.08rem 0.5rem; font-weight: 700; font-size: 0.78rem; white-space: nowrap; }
     .tara-chip.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
     .tara-chip.bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .tara-chip.puja { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
     .tb-star { color: #b45309; font-size: 1rem; }
     .tb-intro { font-size: 0.85rem; color: #475569; margin: 0.2rem 0 0.6rem; }
     .tb-add { background: none; border: 1px dashed var(--indigo-border); color: var(--indigo);
@@ -130,7 +138,10 @@
                   padding: 0.5rem 0.75rem; margin-top: 0.75rem; font-size: 0.83rem; color: #78350f; }
     .tb-summary .count { font-weight: 800; }
     .tb-toggle { margin-left: auto; font-size: 0.78rem; color: #92400e; display: inline-flex; gap: 0.35rem; align-items: center; cursor: pointer; }
-    .tb-legend { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-top: 0.6rem; font-size: 0.72rem; color: #94a3b8; }
+    .tb-readme { margin-top: 0.7rem; padding: 0.6rem 0.75rem; background: #fbfcfe; border: 1px solid #eef2f7;
+                 border-radius: 8px; font-size: 0.76rem; color: #475569; display: flex; flex-direction: column; gap: 0.3rem; }
+    .tb-readme-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+    .tb-readme .tara-chip { margin-right: 0.25rem; }
     .wa-share-mini { position: absolute; top: 0.6rem; right: 0.7rem; width: 32px; height: 32px;
                      border-radius: 50%; background: #25d366; color: #fff; border: none; cursor: pointer;
                      display: flex; align-items: center; justify-content: center;
@@ -196,7 +207,7 @@
   <div class="card">
     <div class="tool-tabs" role="tablist">
       <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">🔆 Today's Panchangam</button>
-      <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">✦ Tarabalam</button>
+      <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">✦ Tarabalam · Chandrabalam</button>
     </div>
     <div class="selector-row">
       <div class="selector">
@@ -233,23 +244,35 @@
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
       <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
-      Each day gets a verdict per person; <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
-      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam? How to use this ▾</button>
+      Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
+      <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
+      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam &amp; Chandrabalam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam &amp; Chandrabalam? How to use this ▾</button>
       <div class="expanded" id="tb-help">
-        Each day the Moon occupies one of the 27 nakshatras. Counting from your <strong>janma nakshatra</strong>
-        (the star you were born under — it's on your birth chart, or any elder will know) to the day's nakshatra
-        gives one of nine repeating <strong>taras</strong>. Five are favourable — Sampat (wealth), Kshema (well-being),
-        Sadhana (accomplishment), Mitra and Parama Mitra (friendly) — and four are avoided: Janma, Vipat, Pratyak, Naidhana.
+        <strong>Tarabalam — strength from your star.</strong> Each day the Moon occupies one of the 27 nakshatras.
+        Counting from your <strong>janma nakshatra</strong> (birth star) to the day's nakshatra gives one of nine
+        repeating <strong>taras</strong>: five favourable — Sampat (wealth), Kshema (well-being), Sadhana
+        (accomplishment), Mitra and Parama Mitra (friendly) — and four avoided: Janma, Vipat, Pratyak, Naidhana.
         <br/><br/>
-        Traditional panchangams print this as a grid you decode by hand. Here, set your star once
-        (it's remembered on this device, and never leaves it) and read the verdict directly:
-        <strong>green days favour that person</strong>; for anything done together — travel, purchases,
-        ceremonies, new beginnings — prefer the <span class="tb-star">✦</span> days good for the whole group.
-        Tarabalam is one factor among several; for major events check the day's muhurtas above and consult your purohit.
+        <strong>Chandrabalam — strength from your rashi.</strong> The Moon also moves through the 12 rashis.
+        Its position counted from your <strong>janma rashi</strong> is good at 1 · 3 · 6 · 7 · 10 · 11, workable
+        after a small remedial puja at 2 · 5 · 9, and avoided at 4 · 8 · 12 (the 8th is Ashtama Chandra).
+        Your rashi is worked out automatically from your star — add your <strong>padam</strong> (quarter) only if
+        asked; it's needed for the nine stars that span two rashis.
+        <br/><br/>
+        <strong>How to use this tool.</strong> Add up to four people (stars are remembered on this device, and
+        never leave it), pick a date range, and choose your <strong>✦ standard</strong>: <em>Stars only</em>
+        matches classic tarabalam tables, with the Moon shown as ° and ☾ marks; the stricter standards also
+        require the Moon's support. Green days favour that person; for anything done together — travel,
+        purchases, ceremonies — prefer the <span class="tb-star">✦</span> days. Don't know your star or padam?
+        Create your birth chart at <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a> —
+        it lists your janma nakshatra, padam and rashi. These are daily favourability checks, one factor among
+        several; for major events check the day's muhurtas and consult your purohit.
       </div>
-      <div id="tb-profiles" style="margin-top:0.85rem;"></div>
+      <div class="tb-controls">
+      <div class="tb-controls-title">Who is this for?</div>
+      <div id="tb-profiles"></div>
       <button class="tb-add" id="tb-add-btn" onclick="tbAddRow()">+ Add a family member</button>
-      <div class="selector-row" style="margin-top:0.6rem;">
+      <div class="selector-row" style="margin-top:0.7rem;">
         <div class="selector">
           <label for="tb-from">From</label>
           <input type="date" id="tb-from" class="tb-date">
@@ -258,17 +281,34 @@
           <label for="tb-to">To</label>
           <input type="date" id="tb-to" class="tb-date">
         </div>
+        <div class="selector">
+          <label for="tb-mode" title="How strictly the Moon (Chandrabalam) is applied when deciding good days">✦ standard</label>
+          <select id="tb-mode" class="tb-date" onchange="tbSetMode(this.value)">
+            <option value="stars">Stars only (classic)</option>
+            <option value="puja_ok">Stars + Moon, puja ok</option>
+            <option value="strict">Stars + Moon, strict</option>
+          </select>
+        </div>
         <div class="selector"><label>&nbsp;</label>
           <button class="btn" onclick="calcTarabalam()">Find good days</button>
         </div>
       </div>
+      </div><!-- /tb-controls -->
       <div id="tb-summary"></div>
       <div id="tb-result"></div>
       <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
       <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
       Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
       <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
-      <strong>Please note:</strong> Tarabalam is a daily favourability check — it is <strong>not</strong> how muhurtams are fixed.
+      <strong>Chandrabalam</strong> is checked automatically once the rashi is known (from your star, plus
+      padam for the nine straddling stars): Moon positions 1 · 3 · 6 · 7 · 10 · 11 from the rashi are good,
+      2 · 5 · 9 are workable after a small remedial puja (marked °), and 4 · 8 · 12 are avoided (marked ☾ when
+      the Moon alone spoils an otherwise good star day). The <strong>✦ standard</strong> selector chooses how the Moon affects good days:
+      <em>Stars only</em> matches classic tarabalam tables (the Moon still annotates every chip),
+      <em>puja ok</em> additionally drops Moon-avoid days, and <em>strict</em> demands a clean Moon too.
+      Some star combinations have no strict days at all — relax the standard if the list comes up empty.</p>
+      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
+      <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks — they are <strong>not</strong> how muhurtams are fixed.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit or astrologer.</p>
     </div><!-- /panel-tarabalam -->
@@ -420,7 +460,7 @@
       <div class="mcp-tool"><code>get_muhurta</code><span>Auspicious &amp; inauspicious windows only — faster for "is this a good time?" queries</span></div>
       <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
       <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
-      <div class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam — pass 1–4 birth stars, get each day's tara and the days favourable for everyone</span></div>
+      <div class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
       <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
     </div>
 
@@ -1058,6 +1098,9 @@
   const TB_NAKSHATRAS = ['Ashvini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
   const TARA_NAMES = ['Janma','Sampat','Vipat','Kshema','Pratyak','Sadhana','Naidhana','Mitra','Parama Mitra'];
   const TARA_GOOD = new Set([2,4,6,8,9]);
+  const TB_RASIS = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
+  const CHANDRA_GOOD = new Set([1,3,6,7,10,11]);
+  const CHANDRA_PUJA = new Set([2,5,9]);
   let TB_DAYS = null;    // last computed result rows
   let TB_EVENTS = null;  // feed events used for the last calculation
 
@@ -1067,13 +1110,29 @@
     return ((d - j + 27) % 27) % 9 + 1;
   }
 
+  function rasiFromStar(nakName, pada) {
+    const k = TB_NAKSHATRAS.indexOf(nakName);
+    if (k < 0) return null;
+    if (pada) return TB_RASIS[Math.floor((k * 4 + pada - 1) / 9)];
+    const first = Math.floor((k * 4) / 9), last = Math.floor((k * 4 + 3) / 9);
+    return first === last ? TB_RASIS[first] : null;  // straddler needs padam
+  }
+
+  function chandraOf(janmaRasi, dayRasi) {
+    const j = TB_RASIS.indexOf(janmaRasi), d = TB_RASIS.indexOf(dayRasi);
+    if (j < 0 || d < 0) return null;
+    const pos = ((d - j + 12) % 12) + 1;
+    return { pos, verdict: CHANDRA_GOOD.has(pos) ? 'good' : (CHANDRA_PUJA.has(pos) ? 'puja' : 'bad') };
+  }
+
   function tbProfiles() {
     const out = [];
     for (let i = 0; i < TB_ROWS; i++) {
       const nak = document.getElementById(`tb-nak-${i}`).value;
       if (!nak) continue;
       const name = document.getElementById(`tb-name-${i}`).value.trim() || (i === 0 ? 'You' : `Person ${i+1}`);
-      out.push({ name, nak });
+      const pada = Number(document.getElementById(`tb-pada-${i}`).value) || null;
+      out.push({ name, nak, pada, rasi: rasiFromStar(nak, pada) });
     }
     return out;
   }
@@ -1082,7 +1141,8 @@
     const raw = [];
     for (let i = 0; i < TB_ROWS; i++) {
       raw.push({ name: document.getElementById(`tb-name-${i}`).value,
-                 nak: document.getElementById(`tb-nak-${i}`).value });
+                 nak: document.getElementById(`tb-nak-${i}`).value,
+                 pada: document.getElementById(`tb-pada-${i}`).value });
     }
     localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
   }
@@ -1095,12 +1155,20 @@
     const wrap = document.getElementById('tb-profiles');
     let html = '';
     for (let i = 0; i < TB_ROWS; i++) {
-      const v = saved[i] || { name: '', nak: '' };
+      const v = saved[i] || { name: '', nak: '', pada: '' };
       const opts = ['<option value="">— birth star —</option>']
         .concat(TB_NAKSHATRAS.map(n => `<option value="${n}" ${n === v.nak ? 'selected' : ''}>${n}</option>`)).join('');
+      const padaOpts = ['<option value="">padam?</option>']
+        .concat([1,2,3,4].map(q => `<option value="${q}" ${String(q) === String(v.pada) ? 'selected' : ''}>${q}</option>`)).join('');
+      const rasi = v.nak ? rasiFromStar(v.nak, Number(v.pada) || null) : null;
+      const rasiNote = !v.nak ? '' : rasi
+        ? `<span class="tb-you">Rashi: ${rasi}</span>`
+        : '<span class="tb-you" style="color:#b45309;">add padam for rashi</span>';
       html += `<div class="tb-profile-row">
         <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
-        <select id="tb-nak-${i}" onchange="tbSaveProfiles()">${opts}</select>
+        <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
+        <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star — needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
+        ${rasiNote}
         ${i === 0 ? '<span class="tb-you">(you)</span>'
                   : `<button class="tb-remove" title="Remove" onclick="tbRemoveRow(${i})">✕</button>`}
       </div>`;
@@ -1153,11 +1221,12 @@
         if (!nak) continue;
         const taras = profiles.map(pr => {
           const t = taraOf(pr.nak, nak);
-          return { who: pr.name, tara: t, label: TARA_NAMES[t-1], good: TARA_GOOD.has(t) };
+          const entry = { who: pr.name, tara: t, label: TARA_NAMES[t-1], good: TARA_GOOD.has(t) };
+          if (pr.rasi && data.lunarSign) entry.chandra = chandraOf(pr.rasi, data.lunarSign);
+          return entry;
         });
         TB_DAYS.push({ date: new Date(d), nak, nakUntil: data.nakshatra.end, nakEflag: data.nakshatra.eflag,
-                       tithi: data.tithi ? data.tithi.name : '', taras,
-                       allGood: taras.every(t => t.good) });
+                       moonRasi: data.lunarSign || '', tithi: data.tithi ? data.tithi.name : '', taras });
       }
       renderTarabalam(profiles);
     } catch (e) {
@@ -1166,6 +1235,21 @@
   }
 
   let TB_SHOW_ALL = false;  // default: only favourable days
+  let TB_MODE = localStorage.getItem('tc-tb-mode') || 'stars';
+
+  function tbSetMode(m) {
+    TB_MODE = m;
+    localStorage.setItem('tc-tb-mode', m);
+    if (TB_DAYS) renderTarabalam();
+  }
+
+  function tbPersonGood(t) {
+    if (!t.good) return false;
+    if (!t.chandra) return true;
+    if (TB_MODE === 'strict') return t.chandra.verdict === 'good';
+    if (TB_MODE === 'puja_ok') return t.chandra.verdict !== 'bad';
+    return true;  // stars: chandra annotates, never blocks
+  }
 
   function tbToggleShowAll() {
     TB_SHOW_ALL = document.getElementById('tb-show-all').checked;
@@ -1173,10 +1257,23 @@
   }
 
   function tbCycleHasGoodDay(profiles) {
-    // Tarabalam repeats every 27 nakshatras — if no candidate day-star works,
-    // no calendar day ever will.
+    // Tarabalam repeats every 27 nakshatras. When rashis are also set the
+    // real cycle is nakshatra x rashi, so only declare impossibility on the
+    // star check alone — the look-ahead handles the rest.
     return TB_NAKSHATRAS.some(n =>
       profiles.every(pr => TARA_GOOD.has(taraOf(pr.nak, n))));
+  }
+
+  function tbDayGoodForAll(profiles, nak, moonRasi) {
+    return profiles.every(pr => {
+      if (!TARA_GOOD.has(taraOf(pr.nak, nak))) return false;
+      if (TB_MODE !== 'stars' && pr.rasi && moonRasi) {
+        const c = chandraOf(pr.rasi, moonRasi);
+        if (c && c.verdict === 'bad') return false;
+        if (c && TB_MODE === 'strict' && c.verdict !== 'good') return false;
+      }
+      return true;
+    });
   }
 
   function tbNextGoodBeyondRange(profiles) {
@@ -1188,7 +1285,7 @@
       if (!ev) return null;  // feed horizon reached
       const data = parseDescription(ev.description);
       const nak = data.nakshatra && data.nakshatra.name;
-      if (nak && profiles.every(pr => TARA_GOOD.has(taraOf(pr.nak, nak)))) return d;
+      if (nak && tbDayGoodForAll(profiles, nak, data.lunarSign)) return d;
     }
     return null;
   }
@@ -1202,6 +1299,8 @@
     if (!TB_DAYS) return;
     profiles = profiles || tbProfiles();
     const group = profiles.length > 1;
+    TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
+    document.getElementById('tb-mode').value = TB_MODE;
     const goodDays = TB_DAYS.filter(r => r.allGood);
     const next = goodDays[0];
     const who = group ? 'everyone' : (profiles[0] ? profiles[0].name : 'you');
@@ -1214,11 +1313,7 @@
       : '';
     const toggle = `<label class="tb-toggle"><input type="checkbox" id="tb-show-all" ${TB_SHOW_ALL ? 'checked' : ''} onchange="tbToggleShowAll()"> show all days</label>${share}`;
     document.getElementById('tb-summary').innerHTML =
-      `<div class="tb-summary">${group ? '<span class="tb-star">✦</span>' : '🟢'} ${summary}${toggle}</div>
-       <div class="tb-legend">In the table below:
-         <span class="tara-chip good">green = favourable</span>
-         <span class="tara-chip bad">red = avoid</span>
-         ${group ? '<span class="tb-star">✦</span> = favourable for everyone selected' : ''}</div>`;
+      `<div class="tb-summary">${group ? '<span class="tb-star">✦</span>' : '🟢'} ${summary}${toggle}</div>`;
     const rows = TB_DAYS.filter(r => TB_SHOW_ALL || r.allGood);
     if (!rows.length) {
       if (!tbCycleHasGoodDay(profiles)) {
@@ -1248,31 +1343,69 @@
       `<th>${p.name}<div class="tb-sub">${p.nak}</div></th>`).join('')}${profiles.length > 1 ? '<th title="Auspicious for everyone selected">All ✦</th>' : ''}</tr>`;
     const body = rows.map(r => {
       const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-      const chips = r.taras.map(t =>
-        `<td><span class="tara-chip ${t.good ? 'good' : 'bad'}">${t.tara} ${t.label}</span></td>`).join('');
+      const chips = r.taras.map(t => {
+        // chip colour = verdict under the chosen ✦ standard; the Moon is a
+        // marked caveat (° puja, ☾ moon-avoid), never a silent veto
+        const passes = tbPersonGood(t);
+        const caveat = t.chandra && t.chandra.verdict !== 'good' ? t.chandra.verdict : null;
+        const mark = caveat === 'puja' ? ' °' : (caveat === 'bad' ? ' ☾' : '');
+        // colour follows the chosen standard: under 'Stars only' the chips are
+        // pure star verdicts; amber only when the standard admits a day on the
+        // condition of a remedial puja
+        const cls = !passes ? 'bad'
+          : (TB_MODE === 'puja_ok' && caveat === 'puja' ? 'puja' : 'good');
+        const detail = `Tara: ${t.tara} ${t.label} (${t.good ? 'good' : 'avoid'})` +
+          (t.chandra ? ` · Chandra: ${t.chandra.pos}${['st','nd','rd'][t.chandra.pos-1] || 'th'} from rashi (${t.chandra.verdict === 'puja' ? 'needs puja' : t.chandra.verdict})` : '') +
+          (r.moonRasi ? ` · Moon in ${r.moonRasi}` : '');
+        return `<td><span class="tara-chip ${cls}" title="${detail}">${t.tara} ${t.label}${mark}</span></td>`;
+      }).join('');
       const all = profiles.length > 1 ? `<td>${r.allGood ? '<span class="tb-star">✦</span>' : ''}</td>` : '';
       return `<tr class="${r.allGood && profiles.length > 1 ? 'tb-all' : ''}">
         <td class="tb-date-cell">${dlabel}</td>
         <td>${r.nak}<div class="tb-sub">till ${fmtT(r.nakUntil)}${r.nakEflag === '+1' ? ' +1' : ''}</div></td>
         <td>${r.tithi}</td>${chips}${all}</tr>`;
     }).join('');
+    const shown = TB_DAYS.filter(r => TB_SHOW_ALL || r.allGood);
+    const hasPuja = shown.some(r => r.taras.some(t => t.chandra && t.chandra.verdict === 'puja'));
+    const hasMoonBad = shown.some(r => r.taras.some(t => t.chandra && t.chandra.verdict === 'bad'));
+    const modeLabel = { stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE];
+    let legend = `<div class="tb-readme"><div class="tb-readme-title">How to read this table</div>
+      <div><span class="tara-chip good">green</span> a good day for that person, under your standard (<em>${modeLabel}</em>).</div>
+      <div><span class="tara-chip bad">red</span> not suitable for that person.</div>`;
+    if (TB_MODE === 'puja_ok' && hasPuja) {
+      legend += `<div><span class="tara-chip puja">amber</span> good — a small remedial puja is advised (°).</div>`;
+    } else if (hasPuja) {
+      legend += `<div><strong>°</strong> a small remedial puja is advised for the Moon's position.</div>`;
+    }
+    if (hasMoonBad) {
+      legend += `<div><strong>☾</strong> the Moon's position is unfavourable that day.</div>`;
+    }
+    if (group) {
+      legend += `<div><span class="tb-star">✦</span> the day is favourable for <strong>everyone</strong>, under your standard.</div>`;
+    }
+    legend += `<div class="tb-sub" style="margin-top:0.3rem;">Hover or tap any chip for the full star + Moon detail.</div></div>`;
     document.getElementById('tb-result').innerHTML =
-      `<div style="overflow-x:auto;"><table class="tb-table">${head}${body}</table></div>`;
+      `<div style="overflow-x:auto;"><table class="tb-table">${head}${body}</table></div>${legend}`;
   }
 
   function shareTarabalamOnWhatsApp() {
     if (!TB_DAYS) return;
     const profiles = tbProfiles();
     const group = profiles.length > 1;
+    TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
+    document.getElementById('tb-mode').value = TB_MODE;
+    TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
     const goodDays = TB_DAYS.filter(r => r.allGood);
     if (!goodDays.length) return;
     const citySel = document.getElementById('tp-city');
     const cityLabel = citySel.options[citySel.selectedIndex].textContent;
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const lines = [];
-    lines.push(`✦ *Good days ${group ? 'for all of us' : 'for me'} (Tarabalam)*`);
+    const anyRasi = profiles.some(pr => pr.rasi);
+    lines.push(`✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`);
     lines.push(`📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} – ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`);
     lines.push(profiles.map(pr => `${pr.name}: ${pr.nak}`).join(' · '));
+    lines.push(`Standard: ${{ stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE]}`);
     lines.push('');
     goodDays.forEach(r => lines.push(`✅ ${fmtD(r.date)} — ${r.nak} · ${r.tithi}`));
     lines.push('');
