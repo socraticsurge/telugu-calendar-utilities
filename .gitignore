@@ -28,3 +28,6 @@ tests/test_sync_tracker_on_task.py
 .DS_Store
 **/.DS_Store
 .superpowers/
+
+.playwright-mcp/
+/*.png
