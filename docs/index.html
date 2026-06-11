@@ -1656,8 +1656,12 @@
       boxes += `<div class="go-box ${jr === r ? 'janma' : ''}" style="grid-row:${gr};grid-column:${gc};">
         <span class="rname">${GO_DATA.rasis[r]}${jr === r ? ' · janma' : ''}</span>${house}<br>${grahas}</div>`;
     }
+    const typed = document.getElementById('go-date').value;
+    const shownISO = `${dateShown.getFullYear()}-${String(dateShown.getMonth()+1).padStart(2,'0')}-${String(dateShown.getDate()).padStart(2,'0')}`;
+    const clampNote = typed && typed !== shownISO
+      ? `<div class="d2" style="color:#b45309;">chart data covers ${GO_DATA.start} to ${document.getElementById('go-date').max} — showing the nearest day</div>` : '';
     const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
-      <div class="d2">${fmtD(dateShown)}</div>
+      <div class="d2">${fmtD(dateShown)}</div>${clampNote}
       <div class="d2">${jr !== null ? 'from ' + view.label : 'transits — choose a person or rashi above to personalise'}</div></div>`;
     document.getElementById('go-chart').innerHTML = boxes + center;
 
