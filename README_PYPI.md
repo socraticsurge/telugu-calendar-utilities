@@ -50,6 +50,10 @@ Full Panchangam for a date and city:
 
 Auspicious and inauspicious time windows only — a lighter call for quick "is this a good time?" queries.
 
+### `find_tarabalam_days(janma_nakshatras, start_date, days=14, city="Hyderabad", system="drik", ...)`
+
+Tarabalam: pass 1-4 birth stars (e.g. `["Uttara Bhadrapada", "Purva Ashadha"]`) and get each day's tara per person (Janma/Sampat/Vipat/Kshema/Pratyak/Sadhana/Naidhana/Mitra/Parama Mitra) plus `good_for_all_dates` — days auspicious for everyone at once. Up to 60 days per call.
+
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
 Lists special days in a given month: named festivals, Ekadashi (fasting), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, Ganda Moola, and Solar/Lunar Eclipses. Each entry includes a `special_yogas` list for that day.
