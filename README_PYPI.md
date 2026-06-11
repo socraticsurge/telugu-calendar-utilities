@@ -58,6 +58,10 @@ Tarabalam & Chandrabalam: pass 1-4 birth stars (e.g. `["Uttara Bhadrapada", "Pur
 
 Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, nakshatra, pada, retrograde flag, plus `rasi_until` and `next_rasi` — the date each graha changes sign, retrograde-aware.
 
+### `get_gochara(date, janma_rasi, city="Hyderabad", ...)`
+
+Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse — per the classical Brihat Samhita tables, plus named conditions: Sade Sati (with phase), Ashtama Shani, Ardhastama Shani.
+
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
 Lists special days in a given month: named festivals, Ekadashi (fasting), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, Ganda Moola, and Solar/Lunar Eclipses. Each entry includes a `special_yogas` list for that day.

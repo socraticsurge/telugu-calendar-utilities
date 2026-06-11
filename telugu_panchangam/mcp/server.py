@@ -8,6 +8,7 @@ from telugu_panchangam.mcp.tools import (
     tool_get_panchangam_range,
     tool_find_tarabalam_days,
     tool_get_graha_positions,
+    tool_get_gochara,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -104,3 +105,16 @@ def get_graha_positions(
 ) -> str:
     """Sidereal (Lahiri) positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until + next_rasi; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted)."""
     return tool_get_graha_positions(date, city, latitude, longitude, timezone)
+
+
+@mcp.tool()
+def get_gochara(
+    date: str,
+    janma_rasi: str,
+    city: str = 'Hyderabad',
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Gochara (transit) verdicts for a janma rasi (natal Moon sign): each of the nine grahas with its house position counted from the janma rasi, a verdict (favourable | blocked by vedha | adverse) per the classical Brihat Samhita tables, plus named conditions — Sade Sati with phase, Ashtama Shani, Ardhastama Shani. Positions at sunrise of the date. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha' (canonical rashi spellings), city=city name (or latitude+longitude)."""
+    return tool_get_gochara(date, janma_rasi, city, latitude, longitude, timezone)
