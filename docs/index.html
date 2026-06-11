@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AstroChaganti's Panchangam — Calendar Feeds</title>
+  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities. Drik Ganita, Surya Siddhanta and Vakya systems. Free, no account needed.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌅</text></svg>">
+  <meta property="og:title" content="AstroChaganti's Panchangam">
+  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days. Subscribe once, updated automatically.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://socraticsurge.github.io/telugu-calendar-utilities/">
+  <meta property="og:image" content="https://socraticsurge.github.io/telugu-calendar-utilities/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   <style>
     :root {
       --indigo: #4338ca; --indigo-bg: #eef2ff; --indigo-border: #c7d2fe;
@@ -14,9 +25,12 @@
     body { font-family: system-ui, sans-serif; color: #1e1b4b; background: #f8fafc; margin: 0; padding: 0 1rem 2rem; line-height: 1.6; }
     .page { max-width: 760px; margin: 0 auto; }
 
-    .hero { text-align: center; padding: 1.5rem 0 1rem; }
-    .hero h1 { font-size: 2rem; margin: 0; }
-    .hero .tagline { color: var(--indigo); font-size: 0.95rem; margin-top: 0.25rem; }
+    html { scroll-behavior: smooth; }
+    .hero { text-align: center; padding: 1.75rem 0 1.25rem; }
+    .hero h1 { font-family: 'Fraunces', Georgia, serif; font-size: 2.3rem; margin: 0; letter-spacing: -0.01em; }
+    .hero .tagline { color: #475569; font-size: 0.95rem; margin: 0.5rem auto 0; max-width: 540px; }
+    .hero .hero-cta { display: inline-block; margin-top: 1rem; text-decoration: none; padding: 0.6rem 1.3rem; font-size: 0.9rem; }
+    #subscribe { scroll-margin-top: 1rem; }
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
     @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
@@ -44,24 +58,26 @@
 
     .preview-card { border: 1px solid #dbe2ea; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
     .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; }
-    .preview-head .date { font-weight: 700; font-size: 0.9rem; }
-    .preview-head .meta { font-size: 0.72rem; opacity: 0.85; margin-top: 0.1rem; }
-    .preview-head .badge { display: inline-block; background: #fbbf24; color: #78350f; font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
+    .preview-head .date { font-weight: 700; font-size: 0.95rem; }
+    .preview-head .meta { font-size: 0.78rem; opacity: 0.85; margin-top: 0.1rem; }
+    .preview-head .badge { display: inline-block; background: #fbbf24; color: #78350f; font-size: 0.75rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
 
     .flag-strip { background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); padding: 0.45rem 0.9rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
-    .special-chip { display: inline-block; background: #fff; color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.75rem; font-weight: 700; }
-    .yoga-chip { display: inline-block; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.75rem; font-weight: 600; }
+    .special-chip { display: inline-block; background: #fff; color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700; }
+    .yoga-chip { display: inline-block; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 600; }
 
     .anga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; padding: 0.7rem 0.9rem 0.25rem; }
     @media (max-width: 620px) { .anga-grid { grid-template-columns: repeat(2, 1fr); } }
     .anga-cell { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px; padding: 0.45rem 0.4rem; text-align: center; }
-    .anga-label { font-size: 0.62rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; }
-    .anga-name { font-size: 0.84rem; font-weight: 700; color: #1e1b4b; margin-top: 0.1rem; }
-    .anga-time { font-size: 0.66rem; color: #64748b; margin-top: 0.05rem; white-space: nowrap; }
+    .anga-label { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; }
+    .anga-name { font-size: 0.88rem; font-weight: 700; color: #1e1b4b; margin-top: 0.1rem; }
+    .anga-time { font-size: 0.75rem; color: #475569; margin-top: 0.05rem; white-space: nowrap; }
+    sup.plus1 { font-size: 0.62em; font-weight: 700; color: #d97706; cursor: help; }
+    .preview-head sup.plus1 { color: #fbbf24; }
     .preview-head .meta.sky { margin-top: 0.25rem; opacity: 1; font-size: 0.78rem; }
 
     .tile-strip { border-top: 1px solid #f1f5f9; padding: 0.6rem 0.9rem 0.75rem; }
-    .strip-title { font-size: 0.7rem; font-weight: 700; color: var(--indigo); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem; }
+    .strip-title { font-size: 0.75rem; font-weight: 700; color: var(--indigo); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem; }
     .strip-title.good-t { color: #16a34a; }
     .strip-title.bad-t { color: #dc2626; }
     .win-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.3rem; }
@@ -70,12 +86,22 @@
     .chog-cell { border-radius: 6px; padding: 0.3rem 0.15rem; text-align: center; }
     .chog-cell.good { background: var(--green-bg); border: 1px solid var(--green-border); }
     .chog-cell.bad { background: #fef2f2; border: 1px solid #fecaca; }
-    .chog-name { font-size: 0.72rem; font-weight: 700; }
+    .chog-name { font-size: 0.78rem; font-weight: 700; }
     .chog-cell.good .chog-name { color: var(--green); }
     .chog-cell.bad .chog-name { color: #b91c1c; }
-    .chog-time { font-size: 0.6rem; color: #64748b; white-space: nowrap; }
+    .chog-time { font-size: 0.72rem; color: #475569; }
     .preview-note { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0 0; }
     .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
+
+    .fmt-toggle { display: inline-flex; border: 1px solid var(--indigo-border); border-radius: 8px; overflow: hidden; }
+    .fmt-toggle button { border: none; background: #fff; color: #64748b; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
+    .fmt-toggle button.active { background: var(--indigo-bg); color: var(--indigo); }
+
+    .upcoming-list { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.75rem; }
+    .upcoming-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.45rem 0.6rem; border: 1px solid #eef2f7; border-radius: 8px; background: #fcfdfe; flex-wrap: wrap; }
+    .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1e1b4b; min-width: 7.5rem; white-space: nowrap; }
+    .upcoming-date .dow { color: #94a3b8; font-weight: 600; }
+    .upcoming-in { font-size: 0.72rem; color: #94a3b8; margin-left: auto; white-space: nowrap; }
 
     .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
     .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
@@ -117,7 +143,9 @@
   <div class="hero">
     <div><span class="sunmoon">🌅</span></div>
     <h1>AstroChaganti's Panchangam</h1>
-    <div class="tagline">Subscribe to Tithi, Nakshatra, Muhurtams, Eclipses &amp; more — right in your calendar</div>
+    <div class="tagline">The full Telugu panchangam — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days —
+    delivered into the calendar app you already use. Free, no account, updated automatically.</div>
+    <a class="btn hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
   </div>
 
   <div class="card">
@@ -138,12 +166,26 @@
                       border:1px solid var(--indigo-border);background:var(--indigo-bg);
                       color:var(--indigo);font-weight:600;min-width:140px;font-family:inherit;">
       </div>
+      <div class="selector">
+        <label id="fmt-label">Time format</label>
+        <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
+          <button id="fmt-12" onclick="setTimeFmt('12')">12h</button>
+          <button id="fmt-24" onclick="setTimeFmt('24')">24h</button>
+        </div>
+      </div>
     </div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
-    <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.</p>
+    <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
+    Times marked <sup class="plus1" style="color:#d97706;">+1</sup> end after midnight, on the next day.</p>
   </div>
 
   <div class="card">
+    <h2>⚡ Special days — next 30 days</h2>
+    <div id="upcoming-result"><p class="preview-error">Loading…</p></div>
+    <p class="preview-note">Follows the city and system selected above. Subscribe below to get every special day in your calendar with a reminder.</p>
+  </div>
+
+  <div class="card" id="subscribe">
     <h2>📅 Subscribe to your calendar</h2>
     <div class="selector-row">
       <div class="selector">
@@ -408,42 +450,116 @@
     }, []);
   }
 
-  function todayStamp() {
-    const val = document.getElementById('tp-date')?.value;
-    if (val) return val.replace(/-/g, '');
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}${mm}${dd}`;
-  }
-
-  function findTodayEvent(text) {
+  // Parse every VEVENT into a Map keyed by YYYYMMDD — the preview, night
+  // choghadiya (needs tomorrow's sunrise) and upcoming list all read from it.
+  function parseEvents(text) {
     const lines = unfoldICS(text);
-    const target = todayStamp();
-    let block = null;
+    const events = new Map();
     let current = null;
     for (const line of lines) {
       if (line === 'BEGIN:VEVENT') { current = []; continue; }
       if (line === 'END:VEVENT') {
         if (current) {
           const dtstart = current.find(l => l.startsWith('DTSTART;VALUE=DATE:'));
-          if (dtstart && dtstart.endsWith(target)) block = current;
+          if (dtstart) {
+            const summary = (current.find(l => l.startsWith('SUMMARY:')) || '').slice('SUMMARY:'.length);
+            const descLine = current.find(l => l.startsWith('DESCRIPTION:')) || '';
+            const description = descLine.slice('DESCRIPTION:'.length)
+              .replace(/\\n/g, '\n')
+              .replace(/\\,/g, ',')
+              .replace(/\\;/g, ';')
+              .replace(/\\\\/g, '\\');
+            events.set(dtstart.slice('DTSTART;VALUE=DATE:'.length), { summary, description });
+          }
         }
         current = null;
         continue;
       }
       if (current) current.push(line);
     }
-    if (!block) return null;
-    const summary = (block.find(l => l.startsWith('SUMMARY:')) || '').slice('SUMMARY:'.length);
-    const descLine = block.find(l => l.startsWith('DESCRIPTION:')) || '';
-    const description = descLine.slice('DESCRIPTION:'.length)
-      .replace(/\\n/g, '\n')
-      .replace(/\\,/g, ',')
-      .replace(/\\;/g, ';')
-      .replace(/\\\\/g, '\\');
-    return { summary, description };
+    return events;
+  }
+
+  // --- Time formatting (12h/24h toggle) ---
+
+  let TIME_FMT = localStorage.getItem('tc-time-fmt') || '12';
+
+  function fmtT(t) {
+    if (TIME_FMT === '24') return t;
+    const [h, m] = t.split(':').map(Number);
+    return `${h % 12 || 12}:${String(m).padStart(2, '0')}${h < 12 ? 'am' : 'pm'}`;
+  }
+
+  // The panchangam day's end times that read "earlier" than the start fall
+  // after midnight — mark them so nobody plans for the wrong morning.
+  const PLUS1 = '<sup class="plus1" title="ends after midnight, on the next day">+1</sup>';
+  function fmtRange(start, end, sep) {
+    return `${fmtT(start)}${sep || ' – '}${fmtT(end)}${end <= start ? PLUS1 : ''}`;
+  }
+
+  function setTimeFmt(f) {
+    TIME_FMT = f;
+    localStorage.setItem('tc-time-fmt', f);
+    document.getElementById('fmt-12').classList.toggle('active', f === '12');
+    document.getElementById('fmt-24').classList.toggle('active', f === '24');
+    renderAll();
+  }
+
+  // --- Ekadashi naming (Amanta maasam + paksham) ---
+
+  const EKADASHI_NAMES = {
+    Chaitra:    { Shukla: 'Kamada',      Krishna: 'Varuthini' },
+    Vaishakha:  { Shukla: 'Mohini',      Krishna: 'Apara' },
+    Jyeshtha:   { Shukla: 'Nirjala',     Krishna: 'Yogini' },
+    Ashadha:    { Shukla: 'Shayani',     Krishna: 'Kamika' },
+    Shravana:   { Shukla: 'Putrada',     Krishna: 'Aja' },
+    Bhadrapada: { Shukla: 'Parivartini', Krishna: 'Indira' },
+    Ashvina:    { Shukla: 'Papankusha',  Krishna: 'Rama' },
+    Kartika:    { Shukla: 'Prabodhini',  Krishna: 'Utpanna' },
+    Margashira: { Shukla: 'Mokshada',    Krishna: 'Saphala' },
+    Pushya:     { Shukla: 'Putrada',     Krishna: 'Shattila' },
+    Magha:      { Shukla: 'Jaya',        Krishna: 'Vijaya' },
+    Phalguna:   { Shukla: 'Amalaki',     Krishna: 'Papamochani' },
+  };
+
+  function ekadashiName(maasam, paksham, solarSign) {
+    if (!maasam || !paksham) return null;
+    if (maasam.startsWith('Adhika')) return paksham === 'Shukla' ? 'Padmini' : 'Parama';
+    const name = (EKADASHI_NAMES[maasam.replace(/^Nija /, '')] || {})[paksham];
+    if (!name) return null;
+    // Vaikunta (Mukkoti) Ekadashi is the Shukla Ekadashi of Dhanurmasa.
+    if (paksham === 'Shukla' && solarSign === 'Dhanu') return `${name} (Vaikunta)`;
+    return name;
+  }
+
+  function specialLabel(s, data) {
+    if (/^Ekadashi/.test(s)) {
+      const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
+      if (name) return s.replace(/^Ekadashi/, `${name} Ekadashi`);
+    }
+    return s;
+  }
+
+  // --- Choghadiya tables (standard weekday sequences, Sun..Sat) ---
+
+  const CHOG_NIGHT_START = ['Shubh', 'Char', 'Kaal', 'Udveg', 'Amrit', 'Rog', 'Labh'];
+  const CHOG_NIGHT_SEQ = ['Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh'];
+
+  function nightChoghadiya(weekday, sunset, nextSunrise) {
+    const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    const toT = mm => { const m = Math.round(mm) % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+    const s = toMin(sunset);
+    const e = toMin(nextSunrise) + 1440;
+    const idx = CHOG_NIGHT_SEQ.indexOf(CHOG_NIGHT_START[weekday]);
+    const blocks = [];
+    for (let i = 0; i < 8; i++) {
+      blocks.push({
+        name: CHOG_NIGHT_SEQ[(idx + i) % 7],
+        start: toT(s + (e - s) * i / 8),
+        end: toT(s + (e - s) * (i + 1) / 8),
+      });
+    }
+    return blocks;
   }
 
   function parseDescription(description) {
@@ -477,6 +593,12 @@
       if ((m = line.match(/^Ayanam:\s+(.+?)\s+·\s+Rituvu:\s+(.+)$/))) {
         data.ayanam = m[1].trim();
         data.rituvu = m[2].trim();
+        continue;
+      }
+      // Signs: "Solar sign: X  ·  Lunar sign: Y" (solar sign drives Vaikunta Ekadashi naming)
+      if ((m = line.match(/^Solar sign:\s+(.+?)\s+·\s+Lunar sign:\s+(.+)$/))) {
+        data.solarSign = m[1].trim();
+        data.lunarSign = m[2].trim();
         continue;
       }
       // Pancha anga rows
@@ -537,40 +659,48 @@
     return data;
   }
 
-  function formatToday() {
+  function selectedDate() {
     const val = document.getElementById('tp-date')?.value;
-    const d = val ? new Date(val + 'T00:00:00') : new Date();
-    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    return val ? new Date(val + 'T00:00:00') : new Date();
   }
 
-  function renderPreview(container, event) {
+  function formatToday() {
+    return selectedDate().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function stampOf(d) {
+    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function eclipseChip(e) {
+    const emoji = e.kind === 'Solar' ? '🌒' : '🌕';
+    let txt = `${emoji} ${e.kind} Eclipse (${e.subtype}) — ${e.visible ? 'visible here' : 'not visible here'}`;
+    if (e.visible && e.window) txt += ` · ${fmtRange(e.window.start, e.window.end)}`;
+    if (e.visible && e.sutak) txt += ` · Sutak ${fmtRange(e.sutak.start, e.sutak.end)}`;
+    return `<span class="special-chip">${txt}</span>`;
+  }
+
+  function renderPreview(container, event, events) {
     const data = parseDescription(event.description);
     const special = event.summary.includes('⚡') ? '<span class="badge">Special day</span>' : '';
     // 1 · Why today is special — flags right under the header, with the reason.
     let flags = '';
     data.special
       .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-      .forEach(s => { flags += `<span class="special-chip">⚡ ${s}</span>`; });
-    if (data.eclipse) {
-      const e = data.eclipse;
-      const emoji = e.kind === 'Solar' ? '🌒' : '🌕';
-      let txt = `${emoji} ${e.kind} Eclipse (${e.subtype}) — ${e.visible ? 'visible here' : 'not visible here'}`;
-      if (e.visible && e.window) txt += ` · ${e.window.start} – ${e.window.end}`;
-      if (e.visible && e.sutak) txt += ` · Sutak ${e.sutak.start} – ${e.sutak.end}`;
-      flags += `<span class="special-chip">${txt}</span>`;
-    }
+      .forEach(s => { flags += `<span class="special-chip">⚡ ${specialLabel(s, data)}</span>`; });
+    if (data.eclipse) flags += eclipseChip(data.eclipse);
     data.yogas.forEach(y => { flags += `<span class="yoga-chip">✨ ${y}</span>`; });
     const flagStrip = flags ? `<div class="flag-strip">${flags}</div>` : '';
 
     // 2 · What the day is — Pancha Anga as hero tiles, sky as a slim strip.
     const angaTile = (label, entry) => entry
-      ? `<div class="anga-cell"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${entry.start} – ${entry.end}</div></div>`
+      ? `<div class="anga-cell"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${fmtRange(entry.start, entry.end)}</div></div>`
       : '';
     let anga = angaTile('Tithi', data.tithi) + angaTile('Nakshatra', data.nakshatra) + angaTile('Nitya Yoga', data.yoga);
     if (data.karana) {
       const karanas = data.karana.split(/\s+\/\s+/).map(k => {
-        const m = k.match(/^(.*?)\s+(\d{2}:\d{2}\s*[–-]\s*\d{2}:\d{2})$/);
-        return m ? `<div class="anga-time"><b>${m[1]}</b> ${m[2]}</div>` : `<div class="anga-time">${k}</div>`;
+        const m = k.match(/^(.*?)\s+(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})$/);
+        return m ? `<div class="anga-time"><b>${m[1]}</b> ${fmtRange(m[2], m[3], '–')}</div>` : `<div class="anga-time">${k}</div>`;
       }).join('');
       anga += `<div class="anga-cell"><div class="anga-label">Karana</div>${karanas}</div>`;
     }
@@ -580,17 +710,18 @@
     const metaLines = data.samvatsara
       ? `<div class="meta">${data.samvatsara} Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
          <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>
-         <div class="meta sky">🌅 ${data.sunrise} – ${data.sunset} &nbsp;·&nbsp; 🌙 ${data.moonrise} – ${data.moonset}</div>`
+         <div class="meta sky">🌅 ${fmtT(data.sunrise)} – ${fmtT(data.sunset)} &nbsp;·&nbsp; 🌙 ${fmtT(data.moonrise)} – ${fmtT(data.moonset)}</div>`
       : `<div class="meta">${data.meta}</div>`;
 
-    // 3 · When to act or avoid — tile strips in the same language as Choghadiya.
+    // 3 · When to act or avoid — tile strips in the same language as Choghadiya,
+    // in clock order so the day scans morning → evening.
     // An observance occurring twice (e.g. Durmuhurtham) is one tile, two windows.
     const groupWins = list => {
       const order = [];
       const byName = new Map();
-      list.forEach(e => {
+      [...list].sort((a, b) => a.start.localeCompare(b.start)).forEach(e => {
         if (!byName.has(e.name)) { byName.set(e.name, []); order.push(e.name); }
-        byName.get(e.name).push(`${e.start}–${e.end}`);
+        byName.get(e.name).push(fmtRange(e.start, e.end, '–'));
       });
       return order.map(name => ({ name, times: byName.get(name) }));
     };
@@ -604,14 +735,24 @@
       windows += `<div class="tile-strip"><div class="strip-title bad-t">🔴 Avoid</div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
     }
 
-    // 4 · The day's timeline — Choghadiya as a full-width colour-coded strip.
+    // 4 · The day's timeline — Choghadiya as full-width colour-coded strips,
+    // day from the feed, night computed from sunset → tomorrow's sunrise.
     const CHOG_GOOD = new Set(['Amrit', 'Shubh', 'Labh', 'Char']);
+    const chogCell = c =>
+      `<div class="chog-cell ${CHOG_GOOD.has(c.name) ? 'good' : 'bad'}"><div class="chog-name">${c.name}</div><div class="chog-time">${fmtRange(c.start, c.end, '–<wbr>')}</div></div>`;
     let chog = '';
     if (data.choghadiya.length) {
-      chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — the day in 8 blocks</div><div class="chog-grid">` +
-        data.choghadiya.map(c =>
-          `<div class="chog-cell ${CHOG_GOOD.has(c.name) ? 'good' : 'bad'}"><div class="chog-name">${c.name}</div><div class="chog-time">${c.start}–${c.end}</div></div>`
-        ).join('') + `</div></div>`;
+      chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — day in 8 blocks</div><div class="chog-grid">${data.choghadiya.map(chogCell).join('')}</div></div>`;
+    }
+    if (data.sunset && events) {
+      const tomorrow = new Date(selectedDate());
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const next = events.get(stampOf(tomorrow));
+      const m = next && next.description.match(/Sunrise (\d{2}:\d{2})/);
+      if (m) {
+        const night = nightChoghadiya(selectedDate().getDay(), data.sunset, m[1]);
+        chog += `<div class="tile-strip"><div class="strip-title">🌙 Choghadiya — night in 8 blocks</div><div class="chog-grid">${night.map(chogCell).join('')}</div></div>`;
+      }
     }
 
     container.innerHTML = `
@@ -628,26 +769,77 @@
     `;
   }
 
+  // --- Upcoming special days (next 30 days, same city/system as preview) ---
+
+  function renderUpcoming(events) {
+    const container = document.getElementById('upcoming-result');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const rows = [];
+    for (let i = 1; i <= 30; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      const ev = events.get(stampOf(d));
+      if (!ev || !ev.summary.includes('⚡')) continue;
+      const data = parseDescription(ev.description);
+      let chips = '';
+      data.special
+        .filter(s => !(data.eclipse && /Eclipse/.test(s)))
+        .forEach(s => { chips += `<span class="special-chip">⚡ ${specialLabel(s, data)}</span>`; });
+      if (data.eclipse) chips += eclipseChip(data.eclipse);
+      if (!chips) continue;
+      const dow = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const md = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      rows.push(`<div class="upcoming-row">
+        <span class="upcoming-date"><span class="dow">${dow}</span> ${md}</span>
+        ${chips}
+        <span class="upcoming-in">in ${i} day${i > 1 ? 's' : ''}</span>
+      </div>`);
+    }
+    container.innerHTML = rows.length
+      ? `<div class="upcoming-list">${rows.join('')}</div>`
+      : '<p class="preview-note">No special days in the next 30 days.</p>';
+  }
+
+  const FEED_CACHE = new Map();
+  let LAST_EVENTS = null;
+
+  async function loadFeed(city, system) {
+    const key = `${city}|${system}`;
+    if (FEED_CACHE.has(key)) return FEED_CACHE.get(key);
+    // Relative path on the deployed site; fall back to the live feed URL
+    // so the page also works when previewed locally without a feeds/ dir.
+    let res = await fetch(`feeds/${feedFilename(city, system)}`).catch(() => null);
+    if (!res || !res.ok) res = await fetch(`${FEED_BASE_URL}${feedFilename(city, system)}`);
+    if (!res.ok) throw new Error('fetch failed');
+    const events = parseEvents(await res.text());
+    FEED_CACHE.set(key, events);
+    return events;
+  }
+
+  function renderAll() {
+    if (!LAST_EVENTS) return;
+    const container = document.getElementById('tp-result');
+    const event = LAST_EVENTS.get(stampOf(selectedDate()));
+    if (event) {
+      renderPreview(container, event, LAST_EVENTS);
+    } else {
+      container.innerHTML = '<p class="preview-error">Preview unavailable for this date — try the subscription link below.</p>';
+    }
+    renderUpcoming(LAST_EVENTS);
+  }
+
   async function loadPreview() {
     const city = document.getElementById('tp-city').value;
     const system = document.getElementById('tp-system').value;
-    const container = document.getElementById('tp-result');
-    container.innerHTML = '<p class="preview-error">Loading…</p>';
+    document.getElementById('tp-result').innerHTML = '<p class="preview-error">Loading…</p>';
     try {
-      // Relative path on the deployed site; fall back to the live feed URL
-      // so the page also works when previewed locally without a feeds/ dir.
-      let res = await fetch(`feeds/${feedFilename(city, system)}`).catch(() => null);
-      if (!res || !res.ok) res = await fetch(`${FEED_BASE_URL}${feedFilename(city, system)}`);
-      if (!res.ok) throw new Error('fetch failed');
-      const text = await res.text();
-      const event = findTodayEvent(text);
-      if (!event) {
-        container.innerHTML = '<p class="preview-error">Preview unavailable for today — try the subscription link below.</p>';
-        return;
-      }
-      renderPreview(container, event);
+      LAST_EVENTS = await loadFeed(city, system);
+      renderAll();
     } catch (e) {
-      container.innerHTML = '<p class="preview-error">Preview unavailable — try the subscription link below.</p>';
+      LAST_EVENTS = null;
+      document.getElementById('tp-result').innerHTML = '<p class="preview-error">Preview unavailable — try the subscription link below.</p>';
+      document.getElementById('upcoming-result').innerHTML = '<p class="preview-error">Unavailable — try the subscription link below.</p>';
     }
   }
 
@@ -667,6 +859,7 @@
   document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
   document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
 
+  setTimeFmt(TIME_FMT);
   updateSubscribeUrl();
   loadPreview();
 </script>
