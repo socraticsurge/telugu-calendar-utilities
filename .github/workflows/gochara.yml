@@ -26,7 +26,7 @@ jobs:
         run: python -m pytest tests/ -v
 
       - name: Build gochara.json
-        run: python scripts/build_gochara_json.py
+        run: python -m scripts.build_gochara_json
 
       # keep_files preserves feeds/ and index.html on gh-pages — only
       # gochara.json is added/replaced. Fully independent of generate.yml.
