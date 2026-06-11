@@ -362,8 +362,12 @@
       </div>
       <div id="go-conditions"></div>
       <div id="go-chart" class="go-chart"><p class="preview-error">Loading…</p></div>
+      <div id="go-note"></div>
       <div id="go-moves"></div>
       <div id="go-legend"></div>
+      <p class="preview-note">Chart data covers about 18 months ahead and is refreshed monthly. The
+      <code>get_graha_positions</code> and <code>get_gochara</code> MCP tools (below) compute live for
+      <strong>any date</strong>, past or future.</p>
       <p class="preview-note">Verdicts follow the classical Brihat Samhita gochara tables — favourable houses per
       graha counted from the natal Moon sign (janma rashi), with <strong>vedha</strong> (obstruction) checked:
       a favourable transit is blocked when another graha occupies its vedha point (Surya–Shani and Chandra–Budha
@@ -1658,10 +1662,12 @@
     }
     const typed = document.getElementById('go-date').value;
     const shownISO = `${dateShown.getFullYear()}-${String(dateShown.getMonth()+1).padStart(2,'0')}-${String(dateShown.getDate()).padStart(2,'0')}`;
-    const clampNote = typed && typed !== shownISO
-      ? `<div class="d2" style="color:#b45309;">chart data covers ${GO_DATA.start} to ${document.getElementById('go-date').max} — showing the nearest day</div>` : '';
+    document.getElementById('go-note').innerHTML = typed && typed !== shownISO
+      ? `<p class="preview-note" style="color:#b45309;">That date is outside this chart's data window
+         (${GO_DATA.start} to ${document.getElementById('go-date').max}) — showing the nearest covered day,
+         ${fmtD(dateShown)}. For any date, past or future, ask via the MCP server below.</p>` : '';
     const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
-      <div class="d2">${fmtD(dateShown)}</div>${clampNote}
+      <div class="d2">${fmtD(dateShown)}</div>
       <div class="d2">${jr !== null ? 'from ' + view.label : 'transits — choose a person or rashi above to personalise'}</div></div>`;
     document.getElementById('go-chart').innerHTML = boxes + center;
 
