@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AstroChaganti's Panchangam — Calendar Feeds</title>
-  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities, plus a Tarabalam & Chandrabalam good-day finder. Drik Ganita, Surya Siddhanta and Vakya systems. Free, no account needed.">
+  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities — plus Tarabalam & Muhurtam good-day and time-slot finders, and the Gochara chart with daily Rasi Phalalu. Free, no account needed.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌅</text></svg>">
   <meta property="og:title" content="AstroChaganti's Panchangam">
-  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days, plus a Tarabalam & Chandrabalam good-day finder. Subscribe once, updated automatically.">
+  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days — plus Tarabalam, Muhurtam, Gochara and Rasi Phalalu tools. Subscribe once, updated automatically.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://panchangam.astrochaganti.com/">
   <meta property="og:image" content="https://panchangam.astrochaganti.com/og-image.png">
@@ -132,6 +132,7 @@
     .tara-chip { display: inline-block; border-radius: 6px; padding: 0.08rem 0.5rem; font-weight: 700; font-size: 0.78rem; white-space: nowrap; }
     .tara-chip.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
     .tara-chip.bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
     .tara-chip.puja { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
     .tb-star { color: #b45309; font-size: 1rem; }
     .tb-intro { font-size: 0.85rem; color: #475569; margin: 0.2rem 0 0.6rem; }
@@ -163,6 +164,7 @@
     .go-g.good { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
     .go-g.blocked { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
     .go-g.bad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .go-g.bad::after { content: ' ✗'; font-size: 0.85em; }
     .go-retro { font-size: 0.6rem; vertical-align: super; }
     .go-moves { margin-top: 0.6rem; font-size: 0.76rem; color: #475569; }
     .go-moves b { color: #1e1b4b; }
@@ -248,8 +250,9 @@
   <div class="hero">
     <div><span class="sunmoon">🌅</span></div>
     <h1>AstroChaganti's Panchangam</h1>
-    <div class="tagline">The full Telugu panchangam — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days —
-    delivered into the calendar app you already use. Free, no account, updated automatically.</div>
+    <div class="tagline">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
+    and festival days — plus daily tools: Tarabalam &amp; Muhurtam for your family's good days and time slots,
+    and the Gochara chart with Rasi Phalalu. Free, no account, updated automatically.</div>
     <a class="btn hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
   </div>
 
@@ -268,6 +271,13 @@
         <label for="tp-system">System</label>
         <select id="tp-system"></select>
       </div>
+      <div class="selector">
+        <label id="fmt-label">Time format</label>
+        <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
+          <button id="fmt-12" onclick="setTimeFmt('12')">12h</button>
+          <button id="fmt-24" onclick="setTimeFmt('24')">24h</button>
+        </div>
+      </div>
     </div>
     <div id="panel-today" role="tabpanel">
     <div class="selector-row">
@@ -277,13 +287,6 @@
                style="font-size:0.85rem;padding:0.4rem 0.6rem;border-radius:8px;
                       border:1px solid var(--indigo-border);background:var(--indigo-bg);
                       color:var(--indigo);font-weight:600;min-width:140px;font-family:inherit;">
-      </div>
-      <div class="selector">
-        <label id="fmt-label">Time format</label>
-        <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
-          <button id="fmt-12" onclick="setTimeFmt('12')">12h</button>
-          <button id="fmt-24" onclick="setTimeFmt('24')">24h</button>
-        </div>
       </div>
     </div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
@@ -393,6 +396,22 @@
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
+      <button class="read-more" style="color: var(--indigo);" data-more="New to Gochara &amp; Rasi Phalalu? How to read this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('go-help', this)">New to Gochara &amp; Rasi Phalalu? How to read this ▾</button>
+      <div class="expanded" id="go-help">
+        <strong>The chart.</strong> This is the fixed South Indian layout: Meena sits top-left, Mesha beside it,
+        and the rashis run clockwise around the centre. Each graha appears in the rashi it currently occupies;
+        ℞ marks a retrograde. The "Coming up" line lists when each graha next changes rashi.
+        <br/><br/>
+        <strong>Gochara.</strong> Pick a person or rashi under <em>Viewing</em> and every graha is judged from
+        that janma rashi by the classical Brihat Samhita rules: each graha gives good results only in certain
+        houses counted from your Moon sign, and a favourable transit can be <em>blocked</em> when another graha
+        sits at its vedha (obstruction) point. Sade Sati, Ashtama Shani and Ardhastama Shani are flagged when
+        they apply to you. Box corners show the house number counted from your rashi.
+        <br/><br/>
+        <strong>Rasi Phalalu.</strong> The reading below the chart is composed line-by-line from these computed
+        verdicts — the Moon's position sets the day's tone, each graha contributes one sentence, and nothing is
+        invented. Share it with the green button; it sends the full reading.
+      </div>
       <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
       <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
       coloured by its gochara verdict for them.</p>
@@ -772,6 +791,8 @@
     document.getElementById('fmt-12').classList.toggle('active', f === '12');
     document.getElementById('fmt-24').classList.toggle('active', f === '24');
     renderAll();
+    if (typeof TB_DAYS !== 'undefined' && TB_DAYS) renderTarabalam();
+    if (typeof GO_DATA !== 'undefined' && GO_DATA) renderGochara();
   }
 
   // --- Ekadashi naming (Amanta maasam + paksham) ---
@@ -1555,6 +1576,7 @@
     for (const t of ['today', 'tarabalam', 'gochara']) {
       document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
       document.getElementById('tab-' + t).classList.toggle('active', t === which);
+      document.getElementById('tab-' + t).setAttribute('aria-selected', t === which ? 'true' : 'false');
     }
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
     if (which === 'gochara') loadGochara();
