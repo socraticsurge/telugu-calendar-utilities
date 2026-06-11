@@ -102,7 +102,10 @@
     .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 10px;
                    padding: 0.75rem 0.9rem 0.85rem; margin-top: 0.85rem; }
     .tb-controls-title { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase;
-                         letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+                         letter-spacing: 0.05em; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .tb-reset { background: none; border: none; color: #94a3b8; font-size: 0.68rem; font-weight: 600;
+                cursor: pointer; text-transform: none; letter-spacing: 0; font-family: inherit; text-decoration: underline; }
+    .tb-reset:hover { color: #b91c1c; }
     .tb-controls .tb-profile-row select, .tb-controls .tb-date { background: #fff; }
     .tb-controls .tb-add { background: #fff; }
     .tb-controls .tb-add:hover { background: #f1f5f9; }
@@ -293,7 +296,8 @@
         several; for major events check the day's muhurtas and consult your purohit.
       </div>
       <div class="tb-controls">
-      <div class="tb-controls-title">Who is this for?</div>
+      <div class="tb-controls-title">Who is this for?
+        <button class="tb-reset" onclick="tbResetProfiles()" title="Forget all saved people on this device">clear all</button></div>
       <div id="tb-profiles"></div>
       <button class="tb-add" id="tb-add-btn" onclick="tbAddRow()">+ Add a family member</button>
       <div class="selector-row" style="margin-top:0.7rem;">
@@ -338,8 +342,9 @@
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
-      <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. Pick your janma rashi
-      and every graha is coloured by its gochara verdict for you.</p>
+      <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
+      <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
+      coloured by its gochara verdict for them.</p>
       <div class="tb-controls">
         <div class="selector-row" style="margin:0;">
           <div class="selector">
@@ -347,12 +352,8 @@
             <input type="date" id="go-date" class="tb-date" onchange="renderGochara()">
           </div>
           <div class="selector">
-            <label for="go-rasi">Janma rashi</label>
-            <select id="go-rasi" class="tb-date" onchange="renderGochara()"></select>
-          </div>
-          <div class="selector" id="go-people-wrap" style="display:none;">
-            <label>From your saved people</label>
-            <div id="go-people"></div>
+            <label for="go-view">Viewing</label>
+            <select id="go-view" class="tb-date" onchange="renderGochara()"></select>
           </div>
           <div class="selector" id="go-share-wrap" style="display:none;"><label>&nbsp;</label>
             <button class="wa-share-mini" style="position:static;width:30px;height:30px;" title="Share today's gochara on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>
@@ -1239,6 +1240,19 @@
     document.getElementById('tb-add-btn').style.display = TB_ROWS < 4 ? '' : 'none';
   }
 
+  function tbResetProfiles() {
+    if (!confirm('Forget all saved people and choices on this device?')) return;
+    localStorage.removeItem('tc-tb-profiles');
+    localStorage.removeItem('tc-go-view');
+    localStorage.removeItem('tc-go-rasi');
+    TB_ROWS = 1;
+    TB_DAYS = null;
+    tbRenderProfileInputs();
+    document.getElementById('tb-summary').innerHTML = '';
+    document.getElementById('tb-result').innerHTML = '';
+    if (GO_DATA) { goBuildViewSelect(); renderGochara(); }
+  }
+
   function tbAddRow() {
     tbSaveProfiles();
     TB_ROWS = Math.min(4, TB_ROWS + 1);
@@ -1508,23 +1522,11 @@
           '<p class="preview-error">Sky data unavailable — try again later.</p>';
         return;
       }
-      const sel = document.getElementById('go-rasi');
-      sel.innerHTML = '<option value="">— pick your rashi —</option>' +
-        GO_DATA.rasis.map((r, i) => `<option value="${i}">${r}</option>`).join('');
-      // quick-pick buttons from saved Tarabalam people whose rashi is known
-      const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
-      const known = saved.map((v, i) => {
-        if (!v || !v.nak) return null;
-        const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
-        return rasi ? { name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)), rasi } : null;
-      }).filter(Boolean);
-      if (known.length) {
-        document.getElementById('go-people-wrap').style.display = '';
-        document.getElementById('go-people').innerHTML = known.map(k =>
-          `<button class="go-pick" onclick="document.getElementById('go-rasi').value='${TB_RASIS.indexOf(k.rasi)}'; renderGochara();">${k.name} · ${k.rasi}</button>`).join('');
+      goBuildViewSelect();
+      const savedView = localStorage.getItem('tc-go-view');
+      if (savedView && [...document.getElementById('go-view').options].some(o => o.value === savedView)) {
+        document.getElementById('go-view').value = savedView;
       }
-      const savedRasi = localStorage.getItem('tc-go-rasi');
-      if (savedRasi) sel.value = savedRasi;
       const di = document.getElementById('go-date');
       di.min = GO_DATA.start;
       const last = new Date(GO_DATA.start + 'T00:00:00');
@@ -1555,6 +1557,39 @@
     return null;
   }
 
+  function goSavedPeople() {
+    const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
+    return saved.map((v, i) => {
+      if (!v || !v.nak) return null;
+      const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
+      return rasi ? { name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)), rasi } : null;
+    }).filter(Boolean);
+  }
+
+  function goBuildViewSelect() {
+    const sel = document.getElementById('go-view');
+    const people = goSavedPeople();
+    let html = '<option value="">Transits only — whole sky</option>';
+    if (people.length) {
+      html += '<optgroup label="Your saved people">' + people.map((k, i) =>
+        `<option value="p${i}">${k.name} · ${k.rasi}</option>`).join('') + '</optgroup>';
+    }
+    html += '<optgroup label="Any rashi">' +
+      GO_DATA.rasis.map((r, i) => `<option value="${i}">${r}</option>`).join('') + '</optgroup>';
+    sel.innerHTML = html;
+  }
+
+  function goCurrentView() {
+    const val = document.getElementById('go-view').value;
+    if (val === '') return { jr: null, label: null };
+    if (val.startsWith('p')) {
+      const k = goSavedPeople()[Number(val.slice(1))];
+      if (!k) return { jr: null, label: null };
+      return { jr: TB_RASIS.indexOf(k.rasi), label: `${k.rasi} rashi (${k.name})` };
+    }
+    return { jr: Number(val), label: GO_DATA.rasis[Number(val)] + ' rashi' };
+  }
+
   // South Indian chart: fixed rasi positions on a 4x4 grid (row, col)
   const GO_LAYOUT = { 11:[1,1], 0:[1,2], 1:[1,3], 2:[1,4], 3:[2,4], 4:[3,4],
                       5:[4,4], 6:[4,3], 7:[4,2], 8:[4,1], 9:[3,1], 10:[2,1] };
@@ -1563,9 +1598,9 @@
     if (!GO_DATA) return;
     const idx = goDateIndex();
     const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
-    const rasiVal = document.getElementById('go-rasi').value;
-    const jr = rasiVal === '' ? null : Number(rasiVal);
-    if (jr !== null) localStorage.setItem('tc-go-rasi', rasiVal);
+    const view = goCurrentView();
+    const jr = view.jr;
+    localStorage.setItem('tc-go-view', document.getElementById('go-view').value);
     document.getElementById('go-share-wrap').style.display = jr === null ? 'none' : '';
 
     const dateShown = new Date(GO_DATA.start + 'T00:00:00');
@@ -1623,7 +1658,7 @@
     }
     const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
       <div class="d2">${fmtD(dateShown)}</div>
-      <div class="d2">${jr !== null ? 'from ' + GO_DATA.rasis[jr] + ' rashi' : 'pick your rashi to colour the grahas'}</div></div>`;
+      <div class="d2">${jr !== null ? 'from ' + view.label : 'transits — choose a person or rashi above to personalise'}</div></div>`;
     document.getElementById('go-chart').innerHTML = boxes + center;
 
     // upcoming moves, soonest first
@@ -1645,16 +1680,16 @@
 
   function shareGocharaOnWhatsApp() {
     if (!GO_DATA) return;
-    const rasiVal = document.getElementById('go-rasi').value;
-    if (rasiVal === '') return;
+    const view = goCurrentView();
+    if (view.jr === null) return;
+    const jr = view.jr;
     const idx = goDateIndex();
     const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
-    const jr = Number(rasiVal);
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const ord = n => n + (['st','nd','rd'][n-1] || 'th');
     const lines = [];
     const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
-    lines.push(`🪐 *Gochara — ${fmtD(shown)}* (${GO_DATA.rasis[jr]} rashi)`);
+    lines.push(`🪐 *Gochara — ${fmtD(shown)}* (${view.label})`);
     lines.push('');
     const conds = document.getElementById('go-conditions').innerText.trim();
     if (conds) lines.push(conds.replace(/\s*⚠️\s*/g, '⚠️ ') , '');
