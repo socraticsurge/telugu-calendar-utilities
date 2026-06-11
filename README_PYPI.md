@@ -62,6 +62,10 @@ Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, naks
 
 Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse — per the classical Brihat Samhita tables, plus named conditions: Sade Sati (with phase), Ashtama Shani, Ardhastama Shani.
 
+### `get_rasi_phalalu(date, janma_rasi, city="Hyderabad", janma_nakshatra=None, ...)`
+
+Daily Rasi Phalalu: a deterministic daily reading. The Moon's chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati / Ashtama Shani are stated when running, and an optional birth star adds the tarabalam line. Every line maps to a calculation — nothing is invented.
+
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
 Lists special days in a given month: named festivals, Ekadashi (fasting), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, Ganda Moola, and Solar/Lunar Eclipses. Each entry includes a `special_yogas` list for that day.

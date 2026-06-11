@@ -14,6 +14,7 @@ from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
+from telugu_panchangam.personal.phalalu import rasi_phalalu
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -486,6 +487,41 @@ def tool_get_gochara(
             'conditions': named_conditions(janma_rasi, sky),
             'gochara': merged,
         })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_get_rasi_phalalu(
+    date_str: str,
+    janma_rasi: str,
+    city: str = 'Hyderabad',
+    janma_nakshatra: Optional[str] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        _rasi_index(janma_rasi)
+        if janma_nakshatra:
+            _nak_index(janma_nakshatra)
+        d = _parse_date(date_str)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0])
+        positions = graha_positions(jd_sunrise)
+        sky = {p['graha']: p['rasi'] for p in positions}
+        day_nak = next(p['nakshatra'] for p in positions if p['graha'] == 'Chandra')
+        out = rasi_phalalu(janma_rasi, sky,
+                           janma_nakshatra=janma_nakshatra,
+                           day_nakshatra=day_nak if janma_nakshatra else None)
+        out.update({
+            'date': date_str, 'city': city, 'day_nakshatra': day_nak,
+            'disclaimer': 'Every line is rendered from computed gochara/chandrabalam/'
+                          'tarabalam facts (Brihat Samhita conventions, sunrise positions). '
+                          'This is a daily reading, not a horoscope consultation or a muhurta.',
+        })
+        return json.dumps(out)
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception as e:
