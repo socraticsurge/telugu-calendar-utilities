@@ -54,17 +54,17 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         if not all(is_auspicious_tara(t) for t in taras):
             return []
         day_bonus += 2
-        day_reasons.append('tarabalam favourable for everyone')
+        day_reasons.append('tarabalam favourable for everyone (+2)')
 
     for y in day.special_yogas:
         if y in _YOGA_BONUS:
             day_bonus += _YOGA_BONUS[y]
-            day_reasons.append(f'{y} day')
+            day_reasons.append(f'{y} day (+{_YOGA_BONUS[y]})')
         if y in _YOGA_PENALTY:
             if activity == 'ceremony':
                 return []          # ceremonies avoid Visha/Dagdha days outright
             day_bonus += _YOGA_PENALTY[y]
-            day_reasons.append(f'{y} day — downweighted')
+            day_reasons.append(f'{y} day ({_YOGA_PENALTY[y]})')
 
     bad = [(w.start, w.end) for w in
            [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
@@ -85,19 +85,19 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
             if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
                 continue
             score = base + day_bonus
-            reasons = [f'{block.name} choghadiya', 'clear of all inauspicious windows'] + day_reasons
+            reasons = [f'{block.name} choghadiya (+{base})', 'clear of all inauspicious windows'] + day_reasons
             if abhijit and _overlaps(s, e, abhijit.start, abhijit.end):
                 score += 2
-                reasons.append('overlaps Abhijit Muhurta')
+                reasons.append('overlaps Abhijit Muhurta (+2)')
             if any(_overlaps(s, e, a.start, a.end) for a in amrita):
                 score += 2
-                reasons.append('overlaps Amrita Kalam')
+                reasons.append('overlaps Amrita Kalam (+2)')
             if activity == 'purchase' and block.name == 'Labh':
                 score += 1
-                reasons.append('Labh favoured for purchases')
+                reasons.append('Labh favoured for purchases (+1)')
             if activity == 'beginning' and block.name == 'Amrit':
                 score += 1
-                reasons.append('Amrit favoured for beginnings')
+                reasons.append('Amrit favoured for beginnings (+1)')
             if activity == 'travel':
                 reasons.append('Vishti karana avoided')
             slots.append({'date': day.date.isoformat(), 'vaaram': day.vaaram,

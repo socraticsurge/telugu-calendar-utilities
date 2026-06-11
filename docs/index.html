@@ -1902,14 +1902,14 @@
         if (people.length && data.nakshatra) {
           const ok = people.every(pr => TARA_GOOD.has(taraOf(pr.nak, data.nakshatra.name)));
           if (!ok) { screenedDays++; continue; }
-          dayBonus += 2; dayReasons.push('tarabalam favourable for everyone');
+          dayBonus += 2; dayReasons.push('tarabalam favourable for everyone (+2)');
         }
         let skipDay = false;
         for (const y of data.yogas) {
-          if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(y + ' day'); }
+          if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
           if (MU_YOGA_PENALTY[y] !== undefined) {
             if (activity === 'ceremony') { skipDay = true; break; }
-            dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(y + ' day — downweighted');
+            dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
           }
         }
         if (skipDay) continue;
@@ -1928,15 +1928,15 @@
           for (const [s0, e0] of muSubtract(muMin(c.start), muMin(c.end), bad)) {
             if (e0 - s0 < 24) continue;
             let score = base + dayBonus;
-            const reasons = [c.name + ' choghadiya', 'clear of all inauspicious windows', ...dayReasons];
+            const reasons = [`${c.name} choghadiya (+${base})`, 'clear of all inauspicious windows', ...dayReasons];
             if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
-              score += 2; reasons.push('overlaps Abhijit Muhurta');
+              score += 2; reasons.push('overlaps Abhijit Muhurta (+2)');
             }
             if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
-              score += 2; reasons.push('overlaps Amrita Kalam');
+              score += 2; reasons.push('overlaps Amrita Kalam (+2)');
             }
-            if (activity === 'purchase' && c.name === 'Labh') { score += 1; reasons.push('Labh favoured for purchases'); }
-            if (activity === 'beginning' && c.name === 'Amrit') { score += 1; reasons.push('Amrit favoured for beginnings'); }
+            if (activity === 'purchase' && c.name === 'Labh') { score += 1; reasons.push('Labh favoured for purchases (+1)'); }
+            if (activity === 'beginning' && c.name === 'Amrit') { score += 1; reasons.push('Amrit favoured for beginnings (+1)'); }
             if (activity === 'travel') reasons.push('Vishti karana avoided');
             slots.push({ d: new Date(d), s0, e0, score, reasons });
           }
@@ -1952,6 +1952,10 @@
             <span class="mu-when">${fmtD(s.d)} · ${toT(s.s0)} – ${toT(s.e0)}</span>
             <span class="mu-score">score ${s.score}</span>
             <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
+          + `<p class="preview-note" style="margin-top:0.5rem;">The score is simply the sum of the (+n) reasons on each slot:
+             choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
+             days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
+             requirement, not a bonus.</p>`
         : `<p class="preview-error">No clear slots found${screenedDays ? ` — ${screenedDays} day(s) were screened out by tarabalam` : ''}. Try more days or untick star screening.</p>`;
     } catch (e) {
       box.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
