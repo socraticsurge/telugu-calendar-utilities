@@ -5,7 +5,7 @@ from datetime import date
 import pytz
 
 from telugu_panchangam.engines.base import (
-    PanchangamEngine, RASHI_NAMES, RITUVU_NAMES,
+    PanchangamEngine, RASHI_NAMES, rituvu_name, ayanam_name,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
     VAARAM_NAMES, MAASAM_NAMES,
     KARANA_REPEATING, KARANA_FIXED, samvatsara_name, maasam_name,
@@ -22,12 +22,16 @@ from telugu_panchangam.models.panchangam_day import Location, Span, Window, Panc
 from telugu_panchangam.eclipses import get_eclipse_for_date
 from telugu_panchangam.special_yogas import get_special_yogas
 
-_KALI_EPOCH_JD    = 588465.5
+# Kali epoch: midnight of Feb 17/18, 3102 BCE at Ujjain (75.7683 E local time).
+_KALI_EPOCH_JD    = 588465.5 - 75.7683 / 360.0
 _CIVIL_DAYS       = 1_577_917_828
 _SUN_REVS         = 4_320_000
 _MOON_REVS        = 57_753_336
 _MOON_APOGEE_REVS = 488_219
+_MOON_APOGEE_AT_EPOCH = 90.0   # SS places the moon's mandocca at 90 deg at Kali epoch
 _SUN_APOGEE_DEG   = 77.333
+# Manda epicycle circumferences in degrees; the equation-of-centre amplitude
+# is circumference / 2*pi, subtracted when the anomaly (from apogee) is 0-180.
 _SUN_MANDA_R      = 13.5
 _MOON_MANDA_R     = 31.5
 
@@ -50,17 +54,17 @@ def ss_sun_longitude(jd: float) -> float:
     ka = jd - _KALI_EPOCH_JD
     mean_sun = _mean_longitude(ka, _SUN_REVS)
     anomaly = (mean_sun - _SUN_APOGEE_DEG) % 360.0
-    correction = _SUN_MANDA_R * math.sin(math.radians(anomaly))
-    return (mean_sun + correction) % 360.0
+    correction = _SUN_MANDA_R / (2.0 * math.pi) * math.sin(math.radians(anomaly))
+    return (mean_sun - correction) % 360.0
 
 
 def ss_moon_longitude(jd: float) -> float:
     ka = jd - _KALI_EPOCH_JD
     mean_moon = _mean_longitude(ka, _MOON_REVS)
-    moon_apogee = _mean_longitude(ka, _MOON_APOGEE_REVS)
+    moon_apogee = (_mean_longitude(ka, _MOON_APOGEE_REVS) + _MOON_APOGEE_AT_EPOCH) % 360.0
     anomaly = (mean_moon - moon_apogee) % 360.0
-    correction = _MOON_MANDA_R * math.sin(math.radians(anomaly))
-    return (mean_moon + correction) % 360.0
+    correction = _MOON_MANDA_R / (2.0 * math.pi) * math.sin(math.radians(anomaly))
+    return (mean_moon - correction) % 360.0
 
 
 def ss_elongation(jd: float) -> float:
@@ -90,9 +94,8 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         solar_sign   = RASHI_NAMES[int(sun_lon / 30) % 12]
         lunar_sign   = RASHI_NAMES[int(moon_lon / 30) % 12]
         sun_sign_idx = int(sun_lon / 30) % 12
-        uttarayanam_signs = {9, 10, 11, 0, 1, 2, 3, 4, 5}
-        ayanam = 'Uttarayanam' if sun_sign_idx in uttarayanam_signs else 'Dakshinayanam'
-        rituvu = RITUVU_NAMES[sun_sign_idx]
+        ayanam = ayanam_name(sun_sign_idx)
+        rituvu = rituvu_name(jd_sunrise)
 
         weekday = int((jd_sunrise + 1.5)) % 7
         vaaram  = VAARAM_NAMES[weekday]

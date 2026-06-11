@@ -43,6 +43,12 @@ def moon_longitude(jd: float) -> float:
     return sidereal_longitude(jd, swe.MOON)
 
 
+def tropical_sun_longitude(jd: float) -> float:
+    """Tropical (sayana) sun longitude — used for season (rituvu) reckoning."""
+    result, _ = swe.calc_ut(jd, swe.SUN, swe.FLG_SWIEPH)
+    return result[0] % 360.0
+
+
 def moon_sun_elongation(jd: float) -> float:
     """Moon - Sun longitude in [0, 360)."""
     return (moon_longitude(jd) - sun_longitude(jd)) % 360.0

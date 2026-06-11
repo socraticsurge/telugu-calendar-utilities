@@ -105,11 +105,10 @@ def test_maasam_valid():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.maasam in MAASAM_NAMES
 
-def test_is_pournami_on_ss_pournami_date():
-    # SS elongation puts Pournami on 2024-03-22 (tithi_idx=14, elong ~178°)
-    # Drik puts it on 2024-03-25 — demonstrating SS vs Drik difference
-    ss_pournami_date = date(2024, 3, 22)
-    result = ENGINE.calculate(ss_pournami_date, HYD)
+def test_is_pournami_on_holi_2024():
+    # With the corrected manda equation SS agrees with Drik that
+    # 2024-03-25 (Holi) is Pournami.
+    result = ENGINE.calculate(date(2024, 3, 25), HYD)
     assert result.is_pournami is True
 
 def test_ss_tithi_start_end_valid():
@@ -120,3 +119,34 @@ def test_eclipse_and_special_yogas_fields_present():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.eclipse is None or hasattr(result.eclipse, 'kind')
     assert isinstance(result.special_yogas, list)
+
+
+# --- Accuracy of the SS longitude model against modern sidereal positions ---
+# Pure Surya Siddhanta (no bija): sun stays within ~1 deg of the modern
+# sidereal sun; moon within ~5.5 deg (evection/variation are unmodelled).
+
+def _sample_jds():
+    from datetime import date
+    from telugu_panchangam.engines.utils import local_midnight_jd
+    jd0 = local_midnight_jd(date(2026, 1, 1), 'Asia/Kolkata')
+    return [jd0 + i * 7.3 for i in range(60)]
+
+
+def test_ss_sun_within_one_degree_of_drik():
+    from telugu_panchangam.engines.utils import sun_longitude
+    for jd in _sample_jds():
+        diff = abs((ss_sun_longitude(jd) - sun_longitude(jd) + 180.0) % 360.0 - 180.0)
+        assert diff < 1.0, f'sun off by {diff:.2f} deg at jd={jd}'
+
+
+def test_ss_moon_within_five_and_half_degrees_of_drik():
+    from telugu_panchangam.engines.utils import moon_longitude
+    for jd in _sample_jds():
+        diff = abs((ss_moon_longitude(jd) - moon_longitude(jd) + 180.0) % 360.0 - 180.0)
+        assert diff < 5.5, f'moon off by {diff:.2f} deg at jd={jd}'
+
+
+def test_rituvu_june_2026_is_grishma():
+    from datetime import date
+    result = ENGINE.calculate(date(2026, 6, 11), HYD)
+    assert result.rituvu == 'Grishma'

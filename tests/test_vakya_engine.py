@@ -39,10 +39,10 @@ def test_karana_count():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert 1 <= len(result.karana) <= 2
 
-def test_paksham_krishna_on_ref():
-    # Vakya engine places REF_DATE in Krishna paksha (elongation ~222°, tithi 18)
+def test_paksham_shukla_on_ref():
+    # REF_DATE (Holi 2024) is Pournami day — Shukla paksha at sunrise.
     result = ENGINE.calculate(REF_DATE, HYD)
-    assert result.paksham == 'Krishna'
+    assert result.paksham == 'Shukla'
 
 def test_rahu_kalam_within_day():
     result = ENGINE.calculate(REF_DATE, HYD)
@@ -92,3 +92,9 @@ def test_eclipse_and_special_yogas_fields_present():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.eclipse is None or hasattr(result.eclipse, 'kind')
     assert isinstance(result.special_yogas, list)
+
+
+def test_rituvu_june_2026_is_grishma():
+    from datetime import date
+    result = ENGINE.calculate(date(2026, 6, 11), HYD)
+    assert result.rituvu == 'Grishma'

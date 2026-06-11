@@ -46,3 +46,44 @@ def test_ekadashi_name_vaikunta_in_dhanurmasa():
     from telugu_panchangam.engines.base import ekadashi_name
     assert ekadashi_name('Margashira', 'Shukla', 'Dhanu') == 'Mokshada (Vaikunta)'
     assert ekadashi_name('Margashira', 'Krishna', 'Dhanu') == 'Saphala'
+
+
+# --- Rituvu (Drik ritu: tropical, solstice-anchored) ---
+# Reference values verified against drikpanchang.com day pages (Hyderabad):
+# 19/04/2026 Vasanta, 21/04/2026 Grishma, 11/06/2026 Grishma, 22/12/2026 Shishira
+
+def _noon_jd(y, m, d):
+    from datetime import date
+    from telugu_panchangam.engines.utils import local_midnight_jd
+    return local_midnight_jd(date(y, m, d), 'Asia/Kolkata') + 0.5
+
+
+def test_rituvu_april_19_is_vasanta():
+    from telugu_panchangam.engines.base import rituvu_name
+    assert rituvu_name(_noon_jd(2026, 4, 19)) == 'Vasanta'
+
+
+def test_rituvu_april_21_is_grishma():
+    from telugu_panchangam.engines.base import rituvu_name
+    assert rituvu_name(_noon_jd(2026, 4, 21)) == 'Grishma'
+
+
+def test_rituvu_june_11_is_grishma():
+    from telugu_panchangam.engines.base import rituvu_name
+    assert rituvu_name(_noon_jd(2026, 6, 11)) == 'Grishma'
+
+
+def test_rituvu_december_22_is_shishira():
+    from telugu_panchangam.engines.base import rituvu_name
+    assert rituvu_name(_noon_jd(2026, 12, 22)) == 'Shishira'
+
+
+# --- Ayanam (sidereal: Uttarayanam = Makara through Mithuna) ---
+
+def test_ayanam_uttarayanam_signs():
+    from telugu_panchangam.engines.base import ayanam_name
+    assert ayanam_name(9) == 'Uttarayanam'   # Makara
+    assert ayanam_name(2) == 'Uttarayanam'   # Mithuna
+    assert ayanam_name(3) == 'Dakshinayanam' # Karkataka
+    assert ayanam_name(4) == 'Dakshinayanam' # Simha
+    assert ayanam_name(8) == 'Dakshinayanam' # Dhanu

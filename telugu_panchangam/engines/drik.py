@@ -4,7 +4,7 @@ import swisseph as swe
 import pytz
 
 from telugu_panchangam.engines.base import (
-    PanchangamEngine, RASHI_NAMES, RITUVU_NAMES,
+    PanchangamEngine, RASHI_NAMES, rituvu_name, ayanam_name,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
     VAARAM_NAMES, MAASAM_NAMES,
     KARANA_REPEATING, KARANA_FIXED, samvatsara_name, maasam_name,
@@ -251,11 +251,10 @@ class DrikGanitaEngine(PanchangamEngine):
 
         # --- Ayanam ---
         sun_sign_idx = int(sun_lon_sr / 30) % 12
-        uttarayanam_signs = {9, 10, 11, 0, 1, 2, 3, 4, 5}
-        ayanam = 'Uttarayanam' if sun_sign_idx in uttarayanam_signs else 'Dakshinayanam'
+        ayanam = ayanam_name(sun_sign_idx)
 
         # --- Rituvu ---
-        rituvu = RITUVU_NAMES[sun_sign_idx]
+        rituvu = rituvu_name(jd_sunrise)
 
         # weekday: 0=Sunday ... 6=Saturday
         weekday = int((jd_sunrise + 1.5)) % 7

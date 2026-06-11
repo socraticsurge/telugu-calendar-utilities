@@ -58,14 +58,35 @@ SAMVATSARA_NAMES: list[str] = [
     'Dundubhi', 'Rudhirodgari', 'Raktakshi', 'Krodhana', 'Kshaya',
 ]
 
+# Drik ritu: seasons are tropical (sayana), anchored to the solstices —
+# Shishira starts at Uttarayana (winter solstice), each ritu spans two
+# tropical signs. Indexed by tropical sun sign (0 = Aries .. 11 = Pisces).
+# Verified against drikpanchang.com "Drik Ritu" (e.g. Grishma 2026 runs
+# Apr 20 - Jun 21, the tropical Taurus + Gemini stretch).
 RITUVU_NAMES: list[str] = [
-    'Vasanta', 'Vasanta',      # Mesha, Vrishabha
-    'Grishma', 'Grishma',      # Mithuna, Karka
-    'Varsha', 'Varsha',        # Simha, Kanya
-    'Sharad', 'Sharad',        # Tula, Vrischika
-    'Hemanta', 'Hemanta',      # Dhanu, Makara
-    'Shishira', 'Shishira',    # Kumbha, Meena
+    'Vasanta',                 # Aries
+    'Grishma', 'Grishma',      # Taurus, Gemini
+    'Varsha', 'Varsha',        # Cancer, Leo
+    'Sharad', 'Sharad',        # Virgo, Libra
+    'Hemanta', 'Hemanta',      # Scorpio, Sagittarius
+    'Shishira', 'Shishira',    # Capricorn, Aquarius
+    'Vasanta',                 # Pisces
 ]
+
+
+def rituvu_name(jd: float) -> str:
+    """Drik ritu at instant `jd`, from the tropical sun sign."""
+    from telugu_panchangam.engines.utils import tropical_sun_longitude
+    return RITUVU_NAMES[int(tropical_sun_longitude(jd) / 30.0) % 12]
+
+
+# Uttarayanam runs Makara through Mithuna (sidereal signs 9..2),
+# Dakshinayanam Karkataka through Dhanu (3..8).
+_UTTARAYANAM_SIGNS = frozenset({9, 10, 11, 0, 1, 2})
+
+
+def ayanam_name(sun_sign_idx: int) -> str:
+    return 'Uttarayanam' if sun_sign_idx in _UTTARAYANAM_SIGNS else 'Dakshinayanam'
 
 VAARAM_NAMES: list[str] = [
     'Adivaram', 'Somavaram', 'Mangalavaram', 'Budhavaram',

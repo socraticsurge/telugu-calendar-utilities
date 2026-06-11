@@ -38,9 +38,21 @@ def test_ayanam_march_is_uttarayanam():
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.ayanam == 'Uttarayanam'
 
-def test_rituvu_meena_is_shishira():
+def test_rituvu_late_march_is_vasanta():
+    # Drik ritu is tropical (solstice-anchored): Vasanta runs ~Feb 18 - Apr 20,
+    # so late March is Vasanta even though the sidereal sun is still in Meena.
     result = ENGINE.calculate(REF_DATE, HYD)
-    assert result.rituvu == 'Shishira'
+    assert result.rituvu == 'Vasanta'
+
+def test_rituvu_june_2026_is_grishma():
+    # DP 11/06/2026 Hyderabad: Drik Ritu Grishma
+    result = ENGINE.calculate(date(2026, 6, 11), HYD)
+    assert result.rituvu == 'Grishma'
+
+def test_ayanam_august_is_dakshinayanam():
+    # Sidereal sun in Simha in late August -> Dakshinayanam
+    result = ENGINE.calculate(date(2026, 8, 20), HYD)
+    assert result.ayanam == 'Dakshinayanam'
 
 def test_tithi_name_is_valid():
     from telugu_panchangam.engines.base import TITHI_NAMES
