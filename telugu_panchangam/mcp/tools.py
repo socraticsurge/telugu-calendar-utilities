@@ -12,6 +12,8 @@ from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.engines.base import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
+from telugu_panchangam.gochara.positions import graha_positions
+from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
 
@@ -420,6 +422,32 @@ def tool_find_tarabalam_days(
                                   'puja_ok=moon-avoid days dropped, strict=moon must be good.',
             'days': out_days,
             'good_for_all_dates': good_dates,
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception as e:
+        return json.dumps({'error': f'Calculation failed: {e}'})
+
+
+def tool_get_graha_positions(
+    date_str: str,
+    city: str = 'Hyderabad',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        d = _parse_date(date_str)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        geopos = [loc.lon, loc.lat, 0.0]
+        jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), geopos)
+        return json.dumps({
+            'date': date_str,
+            'city': city,
+            'at': 'sunrise',
+            'sunrise': _fmt_time(jd_to_utc(jd_sunrise), loc.timezone),
+            'ayanamsa': 'Lahiri (sidereal)',
+            'grahas': graha_positions(jd_sunrise),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})

@@ -7,6 +7,7 @@ from telugu_panchangam.mcp.tools import (
     tool_get_special_days,
     tool_get_panchangam_range,
     tool_find_tarabalam_days,
+    tool_get_graha_positions,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -91,3 +92,15 @@ def find_tarabalam_days(
 ) -> str:
     """Find which upcoming days are auspicious for one or more people based on their janma (birth) nakshatras — Tarabalam, optionally combined with Chandrabalam. Returns per-day taras (Janma/Sampat/Vipat/Kshema/Pratyak/Sadhana/Naidhana/Mitra/Parama Mitra) for each person plus good_for_all_dates listing days auspicious for everyone. Pass janma_rasis (aligned with janma_nakshatras, null entries allowed) to also check Chandrabalam — each person then gets a chandra position/verdict (good | puja | bad) and good_for_all requires both checks to pass. Args: janma_nakshatras=1-4 birth stars (canonical spellings, e.g. 'Ashvini', 'Uttara Bhadrapada'), start_date=YYYY-MM-DD, days=1-60 (default 14), city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya, janma_rasis=optional birth rashis (e.g. 'Meena'), chandra_mode=how the Moon affects good_for_all: 'stars' (annotate only, matches classic tarabalam tables — default), 'puja_ok' (drop Moon-avoid days), 'strict' (Moon must be good)."""
     return tool_find_tarabalam_days(janma_nakshatras, start_date, days, city, system, latitude, longitude, timezone, janma_rasis, chandra_mode)
+
+
+@mcp.tool()
+def get_graha_positions(
+    date: str,
+    city: str = 'Hyderabad',
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Sidereal (Lahiri) positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until + next_rasi; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted)."""
+    return tool_get_graha_positions(date, city, latitude, longitude, timezone)
