@@ -205,3 +205,9 @@ def test_ganda_moola_noted_in_description():
     days = [ENGINE.calculate(date(2026, 6, 11), HYD, include_eclipse=False)]
     ev = _event_for(days, date(2026, 6, 11))
     assert 'Ganda Moola' in str(ev['description'])
+
+
+def test_feed_declares_refresh_interval():
+    raw = ICSGenerator().generate(_make_days(1), 'drik').decode()
+    assert 'REFRESH-INTERVAL;VALUE=DURATION:PT12H' in raw
+    assert 'X-PUBLISHED-TTL:PT12H' in raw

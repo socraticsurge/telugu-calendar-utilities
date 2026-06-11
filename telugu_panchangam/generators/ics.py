@@ -37,6 +37,9 @@ class ICSGenerator:
         cal.add('x-wr-timezone', days[0].location.timezone)
         cal.add('x-wr-caldesc',
                 'Telugu Panchangam: Tithi, Nakshatra, Yoga, Muhurtas, and special days')
+        # Hint clients to refetch twice a day so corrections propagate quickly
+        cal.add('refresh-interval;value=duration', 'PT12H')
+        cal.add('x-published-ttl', 'PT12H')
 
         for i, day in enumerate(days):
             next_day = days[i + 1] if i + 1 < len(days) else None
