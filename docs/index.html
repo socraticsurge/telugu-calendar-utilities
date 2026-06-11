@@ -244,7 +244,7 @@
     .mcp-clients { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
     .mcp-client { font-size: 0.75rem; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.2rem 0.6rem; font-weight: 600; }
 
-    footer { text-align: center; font-size: 0.8rem; color: #94a3b8; padding: 1.5rem 0; }
+    footer { text-align: center; font-size: 0.8rem; color: #94a3b8; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 0.3rem; }
     footer a { color: var(--indigo); }
   </style>
 </head>
@@ -595,13 +595,16 @@
   <div class="card">
     <h2>🤖 Use Panchangam in AI Assistants</h2>
     <p class="mcp-tagline">
-      <code style="background:var(--indigo-bg);color:var(--indigo);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.8rem;">mcp-server-panchangam</code>
-      is a standard <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
-      server that gives AI assistants direct access to Panchangam calculations — ask Claude or any
-      MCP-compatible agent for today's Tithi, a muhurta for next Tuesday, special days in the coming month,
-      a ranked time slot for a journey, which days suit your family's birth stars, or today's
-      Rasi Phalalu for Mesha — and it calls the engine directly rather than guessing.
+      Everything this site computes is also an <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
+      server — ask Claude or any MCP-compatible assistant for a muhurta, your family's good days, or today's
+      Rasi Phalalu, and it calls this engine directly rather than guessing.
     </p>
+    <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center; margin-bottom:0.5rem;">
+      <a class="btn" style="text-decoration:none;" href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener">📦 mcp-server-panchangam on PyPI</a>
+      <span style="font-size:0.78rem; color:#64748b;">No API key · works offline for pre-configured cities</span>
+    </div>
+    <button class="read-more" style="color: var(--indigo);" data-more="Tools &amp; setup for Claude, Cursor and other clients ▾" data-less="Hide tools &amp; setup ▴" onclick="toggleReadMore('mcp-more', this)">Tools &amp; setup for Claude, Cursor and other clients ▾</button>
+    <div class="expanded" id="mcp-more">
 
     <div class="mcp-tools">
       <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
@@ -643,13 +646,13 @@
       <pre>claude mcp add panchangam -- uvx mcp-server-panchangam</pre>
     </div>
 
-    <p class="tip">Available on <a href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">PyPI</a> · No API key required · Works offline for pre-configured cities</p>
+    </div><!-- /mcp-more -->
   </div>
 
   <footer>
-    A free service from AstroChaganti — open source, feeds regenerated monthly, 18 months ahead.
-    For professional consultations: <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>
-    &nbsp;·&nbsp; <a href="https://github.com/socraticsurge/telugu-calendar-utilities">GitHub</a>
+    <div>A free service from AstroChaganti — open source, feeds regenerated monthly, 18 months ahead.</div>
+    <div>For professional consultations: <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a></div>
+    <div><a href="https://github.com/socraticsurge/telugu-calendar-utilities">Source on GitHub</a></div>
   </footer>
 </div>
 
