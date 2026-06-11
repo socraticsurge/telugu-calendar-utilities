@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.socraticsurge/panchangam",
+  "description": "Telugu Panchangam calculations: tithi, nakshatra, muhurtas, festivals, tarabalam, gochara and daily rasi phalalu — verified against reference almanacs",
+  "repository": {
+    "url": "https://github.com/socraticsurge/telugu-calendar-utilities",
+    "source": "github"
+  },
+  "version": "1.6.1",
+  "websiteUrl": "https://panchangam.astrochaganti.com",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "mcp-server-panchangam",
+      "version": "1.6.1",
+      "transport": { "type": "stdio" },
+      "runtimeHint": "uvx"
+    }
+  ]
+}
