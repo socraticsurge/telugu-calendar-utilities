@@ -68,6 +68,7 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 | `get_panchangam` | Full Panchangam for any date and city |
 | `get_muhurta` | Auspicious/inauspicious windows only |
 | `get_special_days` | Named festivals, Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Ganda Moola, and Eclipses for a month |
+| `find_tarabalam_days` | Tarabalam & Chandrabalam — days favourable for 1–4 people by birth star (and rashi), with selectable strictness |
 
 All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
 

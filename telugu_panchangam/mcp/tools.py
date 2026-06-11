@@ -11,6 +11,7 @@ from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.engines.base import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
+from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
 
@@ -350,14 +351,25 @@ def tool_find_tarabalam_days(
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
+    janma_rasis: Optional[list] = None,
+    chandra_mode: str = 'stars',
 ) -> str:
     try:
+        if chandra_mode not in ('stars', 'puja_ok', 'strict'):
+            raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
         if not 1 <= len(janma_nakshatras) <= 4:
             raise ValueError('Provide 1 to 4 janma nakshatras.')
         if not 1 <= days <= 60:
             raise ValueError('days must be between 1 and 60.')
         for nak in janma_nakshatras:
             _nak_index(nak)  # raises with the canonical list on a misspelling
+        if janma_rasis is not None:
+            if len(janma_rasis) != len(janma_nakshatras):
+                raise ValueError('janma_rasis must align with janma_nakshatras '
+                                 '(use null for people whose rashi is unknown).')
+            for r in janma_rasis:
+                if r:
+                    _rasi_index(r)
         start = _parse_date(start_date)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
@@ -370,7 +382,21 @@ def tool_find_tarabalam_days(
             day = engine.calculate(d, loc, include_eclipse=False)
             nak = day.nakshatra.name
             taras = taras_for_day(nak, janma_nakshatras)
-            all_good = all(t['auspicious'] for t in taras)
+            if janma_rasis is not None:
+                for t, rasi in zip(taras, janma_rasis):
+                    if rasi:
+                        pos = chandra_position(rasi, day.lunar_sign)
+                        t['chandra'] = {'position': pos, 'verdict': chandra_verdict(pos)}
+            def _ok(t):
+                if not t['auspicious']:
+                    return False
+                v = t.get('chandra', {}).get('verdict')
+                if v is None or chandra_mode == 'stars':
+                    return True
+                if chandra_mode == 'puja_ok':
+                    return v != 'bad'
+                return v == 'good'
+            all_good = all(_ok(t) for t in taras)
             if all_good:
                 good_dates.append(d.isoformat())
             out_days.append({
@@ -388,6 +414,10 @@ def tool_find_tarabalam_days(
             'tara_convention': 'auspicious: 2 Sampat, 4 Kshema, 6 Sadhana, 8 Mitra, 9 Parama Mitra; '
                                'avoid: 1 Janma, 3 Vipat, 5 Pratyak, 7 Naidhana. '
                                'Day labelled by the sunrise nakshatra; it changes at nakshatra_until.',
+            'chandra_convention': 'when janma_rasis given: positions 1,3,6,7,10,11 good; '
+                                  '2,5,9 workable with remedial puja; 4,8,12 avoid (8 is Ashtama Chandra). '
+                                  f'chandra_mode={chandra_mode}: stars=chandra annotates only, '
+                                  'puja_ok=moon-avoid days dropped, strict=moon must be good.',
             'days': out_days,
             'good_for_all_dates': good_dates,
         })
