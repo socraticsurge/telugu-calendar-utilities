@@ -20,12 +20,80 @@ from telugu_panchangam.personal.chandrabalam import (
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MIN_SLOT_MINUTES = 24  # one ghati
 
-ACTIVITIES = ('any', 'travel', 'purchase', 'ceremony', 'beginning')
 CHANDRA_MODES = ('stars', 'puja_ok', 'strict')
 
 _YOGA_BONUS = {'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,
                'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1}
 _YOGA_PENALTY = {'Visha Yoga': -2, 'Dagdha Yoga': -2}
+
+_SAMSKARA_SKIP = ('Visha Yoga', 'Dagdha Yoga')
+
+# Activity rules — declarative, one row per activity. Fields:
+#   label              human-readable name (used in MCP errors, UI dropdown)
+#   skip_on_yoga       day is omitted if any of these yogas are active
+#                      (classical samskaras avoid Visha / Dagdha days)
+#   prefer_choghadiya  (block_name, bonus) — adds bonus when slot's block matches
+#   avoid_karana       slot pieces overlapping these karana windows are cut
+#   (Batch B will add: prefer_tithi_class, prefer_vara)
+ACTIVITY_RULES: dict[str, dict] = {
+    # — Generic (existing — backward-compatible MCP keys) —
+    'any':           {'label': 'Anything auspicious'},
+    'travel':        {'label': 'Travel / journey',
+                      'avoid_karana': ['Vishti']},
+    'purchase':      {'label': 'Purchase (general)',
+                      'prefer_choghadiya': ('Labh', 1)},
+    'ceremony':      {'label': 'Ceremony / puja (general)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'beginning':     {'label': 'New beginning (general)',
+                      'prefer_choghadiya': ('Amrit', 1)},
+    # — Samskaras —
+    'wedding':       {'label': 'Wedding (Vivaha)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'engagement':    {'label': 'Engagement (Nischayam)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'naming':        {'label': 'Naming (Namakaranam)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_choghadiya': ('Shubh', 1)},
+    'annaprasana':   {'label': 'Annaprasana (First feeding)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_choghadiya': ('Shubh', 1)},
+    'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'mundana':       {'label': 'Mundana / Chaula (First head-shave)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'upanayana':     {'label': 'Upanayana (Sacred thread)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'vidyarambha':   {'label': 'Education start (Vidyarambha)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_choghadiya': ('Amrit', 1)},
+    'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    # — Acquisitions —
+    'vehicle':       {'label': 'Vehicle purchase',
+                      'prefer_choghadiya': ('Labh', 1)},
+    'property':      {'label': 'Property / Land purchase',
+                      'prefer_choghadiya': ('Labh', 1)},
+    'gold':          {'label': 'Gold / Jewelry purchase',
+                      'prefer_choghadiya': ('Labh', 1)},
+    # — Construction & Ventures —
+    'bhumi_puja':    {'label': 'Bhumi Puja / Foundation laying',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'business':      {'label': 'Business launch',
+                      'prefer_choghadiya': ('Amrit', 1)},
+    'job':           {'label': 'Job start / Contract signing',
+                      'prefer_choghadiya': ('Amrit', 1)},
+    # — Spiritual —
+    'yajna':         {'label': 'Yajna / Homam',
+                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+    'pilgrimage':    {'label': 'Pilgrimage (Tirtha Yatra)',
+                      'avoid_karana': ['Vishti']},
+    # — Civil & Medical —
+    'court':         {'label': 'Court / legal matter'},
+    'surgery':       {'label': 'Surgery / medical procedure',
+                      'avoid_karana': ['Vishti']},
+}
+
+ACTIVITIES = tuple(ACTIVITY_RULES.keys())
 
 
 def _subtract(start: datetime, end: datetime, blocks: list[tuple[datetime, datetime]]):
@@ -144,13 +212,18 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         if chandra_mode == 'puja_ok' and avoid_names:
             return []
 
+    rules = ACTIVITY_RULES[activity]
+    skip_yogas = set(rules.get('skip_on_yoga', ()))
+    prefer_chog = rules.get('prefer_choghadiya')  # ('Block', bonus) or None
+    avoid_karana_names = set(rules.get('avoid_karana', ()))
+
     for y in day.special_yogas:
         if y in _YOGA_BONUS:
             day_bonus += _YOGA_BONUS[y]
             day_reasons.append(f'{y} day (+{_YOGA_BONUS[y]})')
         if y in _YOGA_PENALTY:
-            if activity == 'ceremony':
-                return []  # ceremonies avoid Visha/Dagdha days outright
+            if y in skip_yogas:
+                return []  # activity defers on this yoga (samskaras on Visha/Dagdha etc.)
             day_bonus += _YOGA_PENALTY[y]
             day_reasons.append(f'{y} day ({_YOGA_PENALTY[y]})')
 
@@ -158,12 +231,13 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
            [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
            + list(day.varjyam) + list(day.durmuhurtham)]
 
-    if activity == 'travel':
-        bad += [(k.start, k.end) for k in day.karana if k.name == 'Vishti']
+    if avoid_karana_names:
+        bad += [(k.start, k.end) for k in day.karana if k.name in avoid_karana_names]
 
     abhijit = day.abhijit_muhurta
     amrita = list(day.amrita_kalam)
 
+    label = rules['label']
     slots = []
     for block in day.choghadiya:
         base = GOOD_CHOGHADIYA.get(block.name)
@@ -180,14 +254,12 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
             if any(_overlaps(s, e, a.start, a.end) for a in amrita):
                 score += 2
                 reasons.append('overlaps Amrita Kalam (+2)')
-            if activity == 'purchase' and block.name == 'Labh':
-                score += 1
-                reasons.append('Labh favoured for purchases (+1)')
-            if activity == 'beginning' and block.name == 'Amrit':
-                score += 1
-                reasons.append('Amrit favoured for beginnings (+1)')
-            if activity == 'travel':
-                reasons.append('Vishti karana avoided')
+            if prefer_chog and block.name == prefer_chog[0]:
+                bonus = prefer_chog[1]
+                score += bonus
+                reasons.append(f'{block.name} favoured for {label} (+{bonus})')
+            for kname in avoid_karana_names:
+                reasons.append(f'{kname} karana avoided')
             slots.append({'date': day.date.isoformat(), 'vaaram': day.vaaram,
                           'start': s, 'end': e, 'score': score, 'reasons': reasons})
     slots.sort(key=lambda x: (-x['score'], x['start']))

@@ -377,10 +377,41 @@
             <label for="mu-activity">Activity</label>
             <select id="mu-activity" class="tb-date">
               <option value="any">Anything auspicious</option>
-              <option value="travel">Travel / journey</option>
-              <option value="purchase">Purchase</option>
-              <option value="ceremony">Ceremony / puja</option>
-              <option value="beginning">New beginning</option>
+              <optgroup label="Samskaras">
+                <option value="wedding">Wedding (Vivaha)</option>
+                <option value="engagement">Engagement (Nischayam)</option>
+                <option value="naming">Naming (Namakaranam)</option>
+                <option value="annaprasana">Annaprasana (First feeding)</option>
+                <option value="karnavedha">Karnavedha (Ear-piercing)</option>
+                <option value="mundana">Mundana / Chaula (First head-shave)</option>
+                <option value="upanayana">Upanayana (Sacred thread)</option>
+                <option value="vidyarambha">Education start (Vidyarambha)</option>
+                <option value="gruhapravesha">Gruhapravesha (Home entry)</option>
+              </optgroup>
+              <optgroup label="Acquisitions">
+                <option value="vehicle">Vehicle purchase</option>
+                <option value="property">Property / Land purchase</option>
+                <option value="gold">Gold / Jewelry purchase</option>
+                <option value="purchase">Purchase (general)</option>
+              </optgroup>
+              <optgroup label="Construction &amp; ventures">
+                <option value="bhumi_puja">Bhumi Puja / Foundation laying</option>
+                <option value="business">Business launch</option>
+                <option value="job">Job start / Contract signing</option>
+              </optgroup>
+              <optgroup label="Spiritual">
+                <option value="yajna">Yajna / Homam</option>
+                <option value="pilgrimage">Pilgrimage (Tirtha Yatra)</option>
+                <option value="ceremony">Ceremony / puja (general)</option>
+              </optgroup>
+              <optgroup label="Civil &amp; medical">
+                <option value="court">Court / legal matter</option>
+                <option value="surgery">Surgery / medical procedure</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="travel">Travel / journey</option>
+                <option value="beginning">New beginning (general)</option>
+              </optgroup>
             </select>
           </div>
           <div class="selector"><label>&nbsp;</label>
@@ -2027,8 +2058,22 @@
   }
 
   let MU_LAST = null;
-  const MU_ACT_LABEL = { any: 'anything auspicious', travel: 'travel', purchase: 'a purchase',
-                         ceremony: 'a ceremony', beginning: 'a new beginning' };
+  const MU_ACT_LABEL = {
+    any: 'anything auspicious',
+    travel: 'travel', purchase: 'a purchase',
+    ceremony: 'a ceremony', beginning: 'a new beginning',
+    wedding: 'a wedding (Vivaha)', engagement: 'an engagement',
+    naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
+    karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
+    upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',
+    gruhapravesha: 'gruhapravesha (home entry)',
+    vehicle: 'a vehicle purchase', property: 'a property purchase',
+    gold: 'a gold / jewelry purchase',
+    bhumi_puja: 'bhumi puja (foundation laying)',
+    business: 'a business launch', job: 'a job start / contract',
+    yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
+    court: 'a court / legal matter', surgery: 'a surgery / medical procedure',
+  };
 
   function muToT(mm) {
     const m = ((mm % 1440) + 1440) % 1440;
