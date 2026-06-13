@@ -297,7 +297,7 @@
     footer a { color: var(--indigo); }
 
     /* ---------- Mobile shell — only active under 620px via body[data-mode] ---------- */
-    #m-topbar, #m-bottomnav, .m-drawer, #m-drawer-scrim { display: none; }
+    #m-topbar, #m-bottomnav, .m-drawer, #m-drawer-scrim, #m-help-sheet { display: none; }
 
     body[data-mode="mobile"] {
       padding-top: 52px;
@@ -532,6 +532,65 @@
     body[data-mode="mobile"] #mu-section.expanded .tb-controls-title::after { transform: rotate(180deg); }
     body[data-mode="mobile"] #mu-section:not(.expanded) > *:not(.tb-controls-title) { display: none; }
     body[data-mode="mobile"] #mu-section:not(.expanded) ~ #mu-result { display: none; }
+
+    /* ---------- Mobile contextual help — ? icon + bottom sheet ---------- */
+    #m-topbar .m-help-btn { width: 36px; height: 36px; }
+    #m-topbar .m-help-icon {
+      display: inline-flex; width: 22px; height: 22px;
+      border: 1.5px solid #94a3b8; border-radius: 50%;
+      align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 800; color: #64748b; line-height: 1;
+    }
+    #m-topbar .m-help-btn:active .m-help-icon { background: #eef2f7; }
+
+    /* Hide the in-panel intros + read-more guides + their expanded panels on
+       mobile — the same content opens from the ? in the top bar instead. */
+    body[data-mode="mobile"] #panel-today > .preview-note,
+    body[data-mode="mobile"] #panel-gochara > .tb-intro,
+    body[data-mode="mobile"] #panel-gochara > .read-more,
+    body[data-mode="mobile"] #panel-gochara > #go-help,
+    body[data-mode="mobile"] #panel-gochara > .preview-note,
+    body[data-mode="mobile"] #panel-tarabalam > .tb-intro,
+    body[data-mode="mobile"] #panel-tarabalam > .read-more,
+    body[data-mode="mobile"] #panel-tarabalam > #tb-help,
+    body[data-mode="mobile"] #panel-tarabalam > .preview-note { display: none !important; }
+
+    body[data-mode="mobile"] #m-help-sheet {
+      display: flex; flex-direction: column;
+      position: fixed; left: 0; right: 0; bottom: 0;
+      max-height: 78vh; z-index: 80;
+      background: #fff; border-radius: 18px 18px 0 0;
+      box-shadow: 0 -10px 30px rgba(15,23,42,0.22);
+      transform: translateY(100%); transition: transform 0.24s ease;
+    }
+    body[data-mode="mobile"].m-help-open #m-help-sheet { transform: translateY(0); }
+    body[data-mode="mobile"].m-help-open #m-drawer-scrim { opacity: 1; pointer-events: auto; }
+
+    #m-help-sheet .m-sheet-handle {
+      width: 44px; height: 4px; background: #cbd5e1; border-radius: 999px;
+      margin: 0.5rem auto 0.2rem;
+    }
+    #m-help-sheet .m-sheet-head {
+      display: flex; align-items: center; padding: 0.5rem 1rem 0.6rem;
+      border-bottom: 1px solid #eef2f7;
+      font-family: 'Fraunces', Georgia, serif; font-size: 1.02rem; color: #1e1b4b;
+    }
+    #m-help-sheet .m-sheet-close {
+      margin-left: auto; width: 32px; height: 32px; border-radius: 8px;
+      border: 0; background: transparent; color: #64748b; cursor: pointer; font-size: 0.95rem;
+    }
+    #m-help-sheet .m-sheet-body {
+      padding: 0.9rem 1rem 1.5rem; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      font-size: 0.86rem; color: #475569; line-height: 1.55;
+    }
+    #m-help-sheet .m-sheet-body p { margin: 0.5rem 0; }
+    #m-help-sheet .m-sheet-body p:first-child { margin-top: 0; }
+    #m-help-sheet .m-sheet-body strong { color: #1e1b4b; }
+    #m-help-sheet .m-sheet-body em { color: #1e1b4b; font-style: normal; font-weight: 600; }
+    #m-help-sheet .m-sheet-body a { color: var(--indigo); font-weight: 600; }
+    .m-help-mention { white-space: nowrap; color: #1e1b4b; font-weight: 600;
+                      background: var(--indigo-bg); padding: 0.05rem 0.4rem; border-radius: 6px;
+                      border: 1px solid var(--indigo-border); font-size: 0.82rem; }
   </style>
 </head>
 <body>
@@ -543,6 +602,10 @@
     <span class="m-cog" aria-hidden="true">⚙</span>
   </button>
   <span class="m-brand"><span class="sm">🌅</span><span class="full">AstroChaganti's Panchangam</span><span class="short">Panchangam</span></span>
+  <button class="m-icon-btn m-help-btn" id="m-help-btn"
+          aria-label="How to read this" aria-controls="m-help-sheet" aria-expanded="false">
+    <span class="m-help-icon" aria-hidden="true">?</span>
+  </button>
   <button class="m-text-btn m-subscribe-btn" id="m-subscribe-btn"
           aria-controls="m-subscribe-drawer" aria-expanded="false">
     <span aria-hidden="true">📅</span><span class="m-text-btn-label">Subscribe</span>
@@ -580,6 +643,43 @@
     <!-- City, System (with explanation card), Time format relocate here -->
   </div>
 </aside>
+
+<!-- Bottom-sheet help: contextual to the active screen -->
+<aside id="m-help-sheet" aria-hidden="true" aria-label="Help">
+  <div class="m-sheet-handle" aria-hidden="true"></div>
+  <div class="m-sheet-head">
+    <span id="m-help-title">How to read this</span>
+    <button class="m-sheet-close" id="m-help-close" aria-label="Close">✕</button>
+  </div>
+  <div class="m-sheet-body" id="m-help-body"></div>
+</aside>
+
+<!-- Today guide content lives here (hidden); the help sheet pulls it in.
+     Gochara and Tarabalam guides reuse #go-help and #tb-help in-place. -->
+<div id="today-help-src" hidden>
+  <p><strong>The day at a glance.</strong> The four tiles below the header show the day's
+  <em>Tithi</em>, <em>Nakshatra</em>, <em>Nitya Yoga</em> and <em>Karana</em> — the panchanga,
+  the five anga that frame any traditional day. The line above them shows sunrise, sunset,
+  moonrise and moonset for your selected city.</p>
+
+  <p><strong>Auspicious &amp; Avoid.</strong> The green strip lists the day's favourable
+  windows — Abhijit Muhurta, Amrita Kalam, and (just before sunrise) Brahma Muhurta. The
+  red strip lists the windows traditionally avoided — Rahu Kalam, Gulika, Yamagandam,
+  Varjyam, Durmuhurtham. All times are local to your selected city.</p>
+
+  <p><strong>Choghadiya.</strong> The day and night are each split into eight blocks.
+  Green blocks — <em>Amrit, Shubh, Labh, Char</em> — are favourable. The others —
+  <em>Rog, Kaal, Udveg, Vish</em> — are not.</p>
+
+  <p><strong>Special days &amp; festivals.</strong> Chips at the top of the day card flag
+  observances like Ekadashi, Pradosham, Pournami, Amavasya, eclipses, and named festivals.
+  The card below lists every special day in the next 30 days.</p>
+
+  <p><strong>Switching cities or systems.</strong> Tap <span class="m-help-mention">⚙ Settings</span>
+  to change the city, the calculation system (Drik · Surya Siddhanta · Vakya), or the time
+  format. The choices stick and also drive the calendar feed you can subscribe to from
+  <span class="m-help-mention">📅 Subscribe</span>.</p>
+</div>
 
 <!-- Subscribe drawer (right): take the panchangam into other tools -->
 <aside id="m-subscribe-drawer" class="m-drawer m-drawer-right" aria-hidden="true" aria-label="Subscribe and connect">
@@ -1974,6 +2074,33 @@
     if (sec) sec.classList.toggle('expanded');
   }
 
+  // mobile: contextual help bottom-sheet. Pulls in the guide for the active
+  // tab — Today has its own hidden source; Gochara and Tarabalam reuse the
+  // existing #go-help and #tb-help guides verbatim.
+  const HELP_TITLES = {
+    today:     'How to read Today',
+    gochara:   'How to read Gochara · Rasi Phalalu',
+    tarabalam: 'How to use Tarabalam · Muhurtam',
+  };
+  function openHelpSheet() {
+    const active = document.querySelector('#m-bottomnav .m-tab.active');
+    const tab = active ? active.dataset.tab : 'today';
+    const src = tab === 'today'   ? document.getElementById('today-help-src')
+              : tab === 'gochara' ? document.getElementById('go-help')
+              :                     document.getElementById('tb-help');
+    document.getElementById('m-help-title').textContent = HELP_TITLES[tab];
+    document.getElementById('m-help-body').innerHTML = src ? src.innerHTML : '';
+    document.body.classList.add('m-help-open');
+    document.getElementById('m-help-sheet').setAttribute('aria-hidden', 'false');
+    document.getElementById('m-help-btn').setAttribute('aria-expanded', 'true');
+    if (typeof gcEvent === 'function') gcEvent('help-' + tab);
+  }
+  function closeHelpSheet() {
+    document.body.classList.remove('m-help-open');
+    document.getElementById('m-help-sheet').setAttribute('aria-hidden', 'true');
+    document.getElementById('m-help-btn').setAttribute('aria-expanded', 'false');
+  }
+
   function switchTool(which) {
     for (const t of ['today', 'tarabalam', 'gochara']) {
       document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
@@ -2525,16 +2652,27 @@
       else { restoreAll(); closeAllDrawers(); }
     }
 
-    SETTINGS.btnEl.addEventListener('click', () => openDrawer(SETTINGS));
-    SUBSCRIBE.btnEl.addEventListener('click', () => openDrawer(SUBSCRIBE));
+    SETTINGS.btnEl.addEventListener('click', () => { closeHelpSheet(); openDrawer(SETTINGS); });
+    SUBSCRIBE.btnEl.addEventListener('click', () => { closeHelpSheet(); openDrawer(SUBSCRIBE); });
     document.querySelectorAll('.m-drawer-close').forEach(btn => {
       btn.addEventListener('click', () => {
         const key = btn.dataset.close;
         closeDrawer(key === 'settings' ? SETTINGS : SUBSCRIBE);
       });
     });
-    document.getElementById('m-drawer-scrim').addEventListener('click', closeAllDrawers);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllDrawers(); });
+    document.getElementById('m-help-btn').addEventListener('click', () => {
+      closeAllDrawers();
+      // toggle: tapping again closes the sheet
+      if (document.body.classList.contains('m-help-open')) closeHelpSheet();
+      else openHelpSheet();
+    });
+    document.getElementById('m-help-close').addEventListener('click', closeHelpSheet);
+    document.getElementById('m-drawer-scrim').addEventListener('click', () => {
+      closeAllDrawers(); closeHelpSheet();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeAllDrawers(); closeHelpSheet(); }
+    });
 
     // --- bottom-nav tap ---
     document.querySelectorAll('#m-bottomnav .m-tab').forEach(b => {
