@@ -14,250 +14,1489 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --indigo: #4338ca; --indigo-bg: #eef2ff; --indigo-border: #c7d2fe;
-      --amber: #92400e; --amber-bg: #fffbeb; --amber-border: #fde68a;
-      --green: #166534; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+      /* Warm sunrise palette - sophisticated, not garish */
+      --amber-deep: #b45309;
+      --amber: #d97706;
+      --amber-light: #fbbf24;
+      --amber-bg: #fffbeb;
+      --amber-border: #fde68a;
+      --orange: #ea580c;
+      --orange-bg: #fff7ed;
+
+      /* Terracotta / copper accents */
+      --copper: #c2410c;
+      --copper-light: #fed7aa;
+
+      /* Forest green for auspicious */
+      --green-deep: #15803d;
+      --green: #16a34a;
+      --green-light: #22c55e;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+
+      /* Rose for inauspicious */
+      --rose-deep: #be123c;
+      --rose: #e11d48;
+      --rose-bg: #fff1f2;
+      --rose-border: #fecdd3;
+
+      /* Neutral scales */
+      --ink: #1c1917;
+      --ink-light: #292524;
+      --slate: #44403c;
+      --stone: #78716c;
+      --sand: #a8a29e;
+      --sand-light: #d6d3d1;
+      --cream: #fafaf9;
+      --alabaster: #f5f5f4;
+      --snow: #ffffff;
+
+      /* Semantic colors */
+      --primary: var(--amber-deep);
+      --primary-light: var(--amber);
+      --text: var(--ink);
+      --text-muted: var(--slate);
+      --text-subtle: var(--stone);
+      --bg: var(--cream);
+      --card-bg: var(--snow);
+      --border: var(--sand-light);
+
+      /* Spacing system (8px base) */
+      --space-1: 0.25rem;  /* 4px */
+      --space-2: 0.5rem;   /* 8px */
+      --space-3: 0.75rem;  /* 12px */
+      --space-4: 1rem;     /* 16px */
+      --space-5: 1.25rem;  /* 20px */
+      --space-6: 1.5rem;   /* 24px */
+      --space-8: 2rem;     /* 32px */
+      --space-10: 2.5rem;  /* 40px */
+      --space-12: 3rem;    /* 48px */
+      --space-16: 4rem;    /* 64px */
+
+      /* Radii */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --radius-full: 9999px;
+
+      /* Shadows - layered for depth */
+      --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
+      --shadow-md: 0 4px 12px -2px rgba(28, 25, 23, 0.08), 0 2px 4px -1px rgba(28, 25, 23, 0.04);
+      --shadow-lg: 0 20px 40px -10px rgba(28, 25, 23, 0.12), 0 8px 16px -8px rgba(28, 25, 23, 0.06);
+      --shadow-xl: 0 32px 64px -16px rgba(28, 25, 23, 0.16);
+
+      /* Transitions */
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-out: cubic-bezier(0, 0, 0.2, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+      --duration-fast: 150ms;
+      --duration-normal: 250ms;
+      --duration-slow: 400ms;
     }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; color: #1e1b4b; background: #f8fafc; margin: 0; padding: 0 1rem 2rem; line-height: 1.6; }
-    .page { max-width: 760px; margin: 0 auto; }
 
-    html { scroll-behavior: smooth; }
-    .hero { text-align: center; padding: 1.75rem 0 1.25rem; }
-    .hero h1 { font-family: 'Fraunces', Georgia, serif; font-size: 2.3rem; margin: 0; letter-spacing: -0.01em; }
-    .hero .tagline { color: #475569; font-size: 0.95rem; margin: 0.5rem auto 0; max-width: 540px; }
-    .hero .hero-cta { display: inline-block; margin-top: 1rem; text-decoration: none; padding: 0.6rem 1.3rem; font-size: 0.9rem; }
-    #subscribe { scroll-margin-top: 1rem; }
-    .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
-    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
 
-    .card { background: #fff; border: 1px solid #dbe2ea; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 4px 18px rgba(100,116,139,0.18), 0 1px 3px rgba(15,23,42,0.08); }
-    .card h2 { margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
-    .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
 
-    .selector-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.6rem 0 1rem; }
-    .selector { display: flex; flex-direction: column; gap: 0.2rem; }
-    .selector label { font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-    .selector select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--indigo-border); background: var(--indigo-bg); color: var(--indigo); font-weight: 600; min-width: 160px; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 0;
+    }
 
-    .url-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.9rem; font-family: monospace; font-size: 0.8rem; margin: 0.5rem 0; word-break: break-all; }
-    .btn { background: var(--indigo); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
-    .btn:hover { background: #3730a3; }
-    .copy-confirm { margin-left: 0.75rem; color: #16a34a; display: none; font-size: 0.8rem; }
+    /* Typography scale */
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--ink);
+      margin: 0;
+    }
 
-    .app-tabs { display: flex; gap: 0.4rem; margin-top: 0.85rem; }
-    .app-tab { font-size: 0.75rem; padding: 0.3rem 0.7rem; border-radius: 6px 6px 0 0; background: #f1f5f9; color: #64748b; cursor: pointer; border: none; font-family: inherit; }
-    .app-tab.active { background: var(--indigo-bg); color: var(--indigo); font-weight: 600; }
-    .app-panel { background: var(--indigo-bg); border-radius: 0 8px 8px 8px; padding: 0.7rem; font-size: 0.8rem; display: none; }
-    .app-panel.active { display: block; }
-    .app-panel ol { margin: 0; padding-left: 1.1rem; color: #475569; columns: 2; column-gap: 1.5rem; }
-    .app-panel ol li { margin-bottom: 0.2rem; break-inside: avoid; }
+    h1 { font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.02em; }
+    h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1.125rem; }
+    h4 { font-size: 1rem; font-weight: 600; }
 
-    .preview-card { border: 1px solid #dbe2ea; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
-    .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; position: relative; padding-right: 3rem; }
-    .preview-head .date { font-weight: 700; font-size: 0.95rem; }
-    .preview-head .meta { font-size: 0.78rem; opacity: 0.85; margin-top: 0.1rem; }
-    .preview-head .badge { display: inline-block; background: #fbbf24; color: #78350f; font-size: 0.75rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
+    p { margin: 0 0 var(--space-4); }
 
-    .flag-strip { background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); padding: 0.45rem 0.9rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
-    .special-chip { display: inline-block; background: #fff; color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700; }
-    .yoga-chip { display: inline-block; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 600; }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color var(--duration-fast) var(--ease);
+    }
+    a:hover { color: var(--copper); }
 
-    .anga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; padding: 0.7rem 0.9rem 0.25rem; }
-    @media (max-width: 620px) { .anga-grid { grid-template-columns: repeat(2, 1fr); } }
-    .anga-cell { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px; padding: 0.45rem 0.4rem; text-align: center; }
-    .anga-label { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; }
-    .anga-name { font-size: 0.88rem; font-weight: 700; color: #1e1b4b; margin-top: 0.1rem; }
-    .anga-time { font-size: 0.75rem; color: #475569; margin-top: 0.05rem; white-space: nowrap; }
-    sup.plus1 { font-size: 0.62em; font-weight: 700; color: #d97706; cursor: help; }
-    .preview-head sup.plus1 { color: #fbbf24; }
-    .preview-head .meta.sky { margin-top: 0.25rem; opacity: 1; font-size: 0.78rem; }
+    /* Layout */
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 var(--space-4) var(--space-12);
+    }
 
-    .tile-strip { border-top: 1px solid #f1f5f9; padding: 0.6rem 0.9rem 0.75rem; }
-    .strip-title { font-size: 0.75rem; font-weight: 700; color: var(--indigo); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem; }
-    .strip-title.good-t { color: #16a34a; }
-    .strip-title.bad-t { color: #dc2626; }
-    .win-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.3rem; }
-    .chog-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; }
-    @media (max-width: 620px) { .chog-grid { grid-template-columns: repeat(4, 1fr); } }
-    .chog-cell { border-radius: 6px; padding: 0.3rem 0.15rem; text-align: center; }
-    .chog-cell.good { background: var(--green-bg); border: 1px solid var(--green-border); }
-    .chog-cell.bad { background: #fef2f2; border: 1px solid #fecaca; }
-    .chog-name { font-size: 0.78rem; font-weight: 700; }
-    .chog-cell.good .chog-name { color: var(--green); }
-    .chog-cell.bad .chog-name { color: #b91c1c; }
-    .chog-time { font-size: 0.72rem; color: #475569; }
-    .preview-note { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0 0; }
-    .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #eef2f7; }
-    .tool-tab { font-family: inherit; font-size: 0.95rem; font-weight: 700; color: #94a3b8;
-                background: none; border: none; cursor: pointer; padding: 0.4rem 0.65rem 0.55rem;
-                border-bottom: 2px solid transparent; margin-bottom: -2px; }
-    .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
-    .tool-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; flex: 1 1 0; }
-    .tool-tab .ts { font-size: 0.68rem; font-weight: 500; color: #94a3b8; }
-    .tool-tab.active .ts { color: #818cf8; }
-    @media (max-width: 620px) {
-      .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    /* ============================================
+       HERO SECTION - Dawn gradient background
+       ============================================ */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: var(--space-10) var(--space-4) var(--space-8);
+      margin: 0 calc(var(--space-4) * -1);
+      background: linear-gradient(
+        180deg,
+        #fef3c7 0%,    /* amber-100 */
+        #fed7aa 50%,   /* orange-200 */
+        #fff7ed 100%   /* orange-50 */
+      );
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+        circle at 30% 20%,
+        rgba(251, 191, 36, 0.3) 0%,
+        transparent 50%
+      );
+      pointer-events: none;
+    }
+
+    .hero-icon {
+      font-size: 4rem;
+      line-height: 1;
+      margin-bottom: var(--space-4);
+      display: inline-block;
+      animation: gentle-bob 4s ease-in-out infinite;
+      filter: drop-shadow(0 4px 8px rgba(180, 83, 9, 0.2));
+    }
+
+    @keyframes gentle-bob {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    .hero h1 {
+      margin-bottom: var(--space-3);
+      background: linear-gradient(135deg, var(--copper) 0%, var(--amber-deep) 50%, var(--orange) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero .tagline {
+      font-size: 1.0625rem;
+      color: var(--slate);
+      max-width: 540px;
+      margin: 0 auto var(--space-5);
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      background: linear-gradient(135deg, var(--amber) 0%, var(--orange) 100%);
+      color: var(--snow);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-md), 0 4px 12px rgba(234, 88, 12, 0.25);
+      transition: all var(--duration-normal) var(--ease);
+      text-decoration: none;
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg), 0 8px 20px rgba(234, 88, 12, 0.3);
+      color: var(--snow);
+    }
+
+    /* ============================================
+       CARD SYSTEM
+       ============================================ */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-top: var(--space-6);
+      box-shadow: var(--shadow-md);
+      transition: box-shadow var(--duration-normal) var(--ease);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card h2 {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+      color: var(--ink);
+    }
+
+    .card h3.sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--stone);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: var(--space-6) 0 var(--space-3);
+    }
+
+    /* ============================================
+       TAB NAVIGATION
+       ============================================ */
+    .tool-tabs {
+      display: flex;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+      border-bottom: 2px solid var(--sand-light);
+      padding-bottom: 0;
+    }
+
+    .tool-tab {
+      flex: 1 1 0;
+      min-width: 0;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--stone);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      padding: var(--space-3) var(--space-3) var(--space-4);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-align: center;
+      transition: all var(--duration-fast) var(--ease);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .tool-tab:hover {
+      color: var(--slate);
+      background: var(--alabaster);
+    }
+
+    .tool-tab.active {
+      color: var(--amber-deep);
+      border-bottom-color: var(--amber);
+    }
+
+    .tool-tab .ts {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--sand);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .tool-tab.active .ts {
+      color: var(--orange);
+    }
+
+    @media (max-width: 600px) {
+      .tool-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
       .tool-tabs::-webkit-scrollbar { display: none; }
-      .tool-tab { font-size: 0.8rem; padding: 0.35rem 0.45rem 0.5rem; white-space: nowrap; flex: none; align-items: flex-start; }
+      .tool-tab {
+        flex: 0 0 auto;
+        font-size: 0.875rem;
+        padding: var(--space-3);
+      }
       .tool-tab .ts { display: none; }
     }
-    .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
-               border: 1px solid var(--indigo-border); background: var(--indigo-bg);
-               color: var(--indigo); font-weight: 600; font-family: inherit; }
-    .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 10px;
-                   padding: 0.75rem 0.9rem 0.85rem; margin-top: 0.85rem; }
-    .tb-controls-title { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase;
-                         letter-spacing: 0.05em; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
-    .tb-reset { background: none; border: none; color: #94a3b8; font-size: 0.68rem; font-weight: 600;
-                cursor: pointer; text-transform: none; letter-spacing: 0; font-family: inherit; text-decoration: underline; }
-    .tb-reset:hover { color: #b91c1c; }
-    .tb-controls .tb-profile-row select, .tb-controls .tb-date { background: #fff; }
-    .tb-controls .tb-add { background: #fff; }
-    .tb-controls .tb-add:hover { background: #f1f5f9; }
-    .tb-profile-row { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap; align-items: center; }
-    .tb-profile-row input[type=text] { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
-               border: 1px solid #e2e8f0; font-family: inherit; width: 170px; }
-    .tb-profile-row select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
-               border: 1px solid var(--indigo-border); background: var(--indigo-bg);
-               color: var(--indigo); font-weight: 600; min-width: 170px; }
-    .tb-you { font-size: 0.7rem; color: #94a3b8; font-weight: 700; }
-    .tb-filter { font-size: 0.8rem; color: #475569; display: inline-flex; gap: 0.4rem; align-items: center; margin: 0.5rem 0; }
-    .tb-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem; }
-    .tb-table th { text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em;
-                   color: #94a3b8; padding: 0.4rem 0.5rem; border-bottom: 1px solid #eef2f7; }
-    .tb-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #f6f8fb; vertical-align: middle; }
-    .tb-table tr.tb-all { background: #fcfdf4; }
-    .tb-date-cell { font-weight: 700; color: #1e1b4b; white-space: nowrap; }
-    .tb-sub { font-size: 0.72rem; color: #94a3b8; }
-    .tara-chip { display: inline-block; border-radius: 6px; padding: 0.08rem 0.5rem; font-weight: 700; font-size: 0.78rem; white-space: nowrap; }
-    .tara-chip.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
-    .tara-chip.bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-    .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
-    .tara-chip.puja { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-    .tb-star { color: #b45309; font-size: 1rem; }
-    .tb-intro { font-size: 0.85rem; color: #475569; margin: 0.2rem 0 0.6rem; }
-    .tb-add { background: none; border: 1px dashed var(--indigo-border); color: var(--indigo);
-              border-radius: 8px; padding: 0.35rem 0.8rem; font-size: 0.8rem; font-weight: 600;
-              cursor: pointer; font-family: inherit; margin-top: 0.1rem; }
-    .tb-add:hover { background: var(--indigo-bg); }
-    .tb-remove { background: none; border: none; color: #cbd5e1; font-size: 1rem; cursor: pointer; padding: 0 0.2rem; }
-    .tb-remove:hover { color: #b91c1c; }
-    .tb-summary { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
-                  background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 8px;
-                  padding: 0.5rem 0.75rem; margin-top: 0.75rem; font-size: 0.83rem; color: #78350f; }
-    .tb-summary .count { font-weight: 800; }
-    .tb-toggle { margin-left: auto; font-size: 0.78rem; color: #92400e; display: inline-flex; gap: 0.35rem; align-items: center; cursor: pointer; }
-    .go-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(86px, auto));
-                gap: 2px; background: #c7d2fe; border: 2px solid #c7d2fe; border-radius: 10px; overflow: hidden; margin-top: 0.8rem; }
-    .go-box { background: #fff; padding: 0.3rem 0.35rem; position: relative; min-height: 86px; }
-    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;
-                     display: inline-block; padding-right: 1.1rem; }
-    .go-box .house { position: absolute; top: 0.25rem; right: 0.35rem; font-size: 0.62rem; font-weight: 700; color: #c7d2fe; }
-    .go-box.janma { outline: 2px solid var(--indigo); outline-offset: -2px; }
-    .go-box.janma .rname { color: var(--indigo); }
-    .go-center { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--indigo-bg); display: flex; flex-direction: column;
-                 align-items: center; justify-content: center; text-align: center; padding: 0.5rem; gap: 0.25rem; }
-    .go-center .d1 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; color: var(--indigo); font-size: 1.05rem; }
-    .go-center .d2 { font-size: 0.72rem; color: #6366f1; }
-    .go-g { display: inline-block; border-radius: 5px; padding: 0.05rem 0.35rem; font-size: 0.72rem; font-weight: 700;
-            margin: 0.12rem 0.12rem 0 0; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); }
-    .go-g.good { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
-    .go-g.blocked { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
-    .go-g.bad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-    .go-g.bad::after { content: ' ✗'; font-size: 0.85em; }
-    .go-retro { font-size: 0.6rem; vertical-align: super; }
-    .go-moves { margin-top: 0.6rem; font-size: 0.76rem; color: #475569; }
-    .go-moves b { color: #1e1b4b; }
-    .mu-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.8rem;
-               border: 1px solid #eef2f7; border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: #fcfdfe; }
-    .mu-slot.top { background: var(--green-bg); border-color: var(--green-border); }
-    .mu-when { font-weight: 700; color: #1e1b4b; white-space: nowrap; }
-    .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
-                background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
-    .mu-reasons { font-size: 0.74rem; color: #64748b; width: 100%; }
-    .go-phalalu { margin-top: 0.8rem; background: #fffdf7; border: 1px solid var(--amber-border);
-                  border-radius: 10px; padding: 0.75rem 0.95rem; }
-    .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
-                     text-transform: uppercase; letter-spacing: 0.05em; }
-    .go-phalalu p { margin: 0.3rem 0; font-size: 0.84rem; color: #44403c; line-height: 1.55; }
-    .go-quality { display: inline-block; border-radius: 6px; padding: 0.1rem 0.55rem;
-                  font-size: 0.75rem; font-weight: 700; margin-left: 0.4rem; vertical-align: middle; }
-    .go-quality.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
-    .go-quality.mixed { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-    .go-quality.difficult { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-    .go-cond { margin-top: 0.7rem; }
-    .go-cond .chip { display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 0.15rem 0.6rem; font-weight: 700; font-size: 0.8rem; margin-right: 0.35rem; }
-    .go-pick { background: #fff; border: 1px solid var(--indigo-border); color: var(--indigo); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin: 0 0.25rem 0.25rem 0; font-family: inherit; }
-    .go-pick:hover { background: var(--indigo-bg); }
-    .tb-readme { margin-top: 0.7rem; padding: 0.6rem 0.75rem; background: #fbfcfe; border: 1px solid #eef2f7;
-                 border-radius: 8px; font-size: 0.76rem; color: #475569; display: flex; flex-direction: column; gap: 0.3rem; }
-    .tb-readme-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
-    .tb-readme .tara-chip { margin-right: 0.25rem; }
-    .wa-share-mini { position: absolute; top: 0.6rem; right: 0.7rem; width: 32px; height: 32px;
-                     border-radius: 50%; background: #25d366; color: #fff; border: none; cursor: pointer;
-                     display: flex; align-items: center; justify-content: center;
-                     box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
-    .wa-share-mini:hover { background: #1eb858; }
-    .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
 
-    .fmt-toggle { display: inline-flex; border: 1px solid var(--indigo-border); border-radius: 8px; overflow: hidden; }
-    .fmt-toggle button { border: none; background: #fff; color: #64748b; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
-    .fmt-toggle button.active { background: var(--indigo-bg); color: var(--indigo); }
+    /* ============================================
+       SELECTOR ROWS
+       ============================================ */
+    .selector-row {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin: var(--space-4) 0;
+    }
 
-    .upcoming-list { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.75rem; }
-    .upcoming-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.45rem 0.6rem; border: 1px solid #eef2f7; border-radius: 8px; background: #fcfdfe; flex-wrap: wrap; }
-    .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1e1b4b; min-width: 7.5rem; white-space: nowrap; }
-    .upcoming-date .dow { color: #94a3b8; font-weight: 600; }
-    .upcoming-in { font-size: 0.72rem; color: #94a3b8; margin-left: auto; white-space: nowrap; }
+    .selector {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
 
-    .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
-    .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
-    .sys-card.ss { background: var(--amber-bg); border: 1px solid var(--amber-border); }
-    .sys-card.vakya { background: var(--green-bg); border: 1px solid var(--green-border); }
-    .sys-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }
-    .sys-card.drik h3 { color: var(--indigo); }
-    .sys-card.ss h3 { color: var(--amber); }
-    .sys-card.vakya h3 { color: var(--green); }
-    .sys-card p { margin: 0.35rem 0; font-size: 0.85rem; color: #475569; }
-    .read-more { font-size: 0.8rem; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; }
-    .sys-card.drik .read-more { color: var(--indigo); }
-    .sys-card.ss .read-more { color: var(--amber); }
-    .sys-card.vakya .read-more { color: var(--green); }
-    .expanded { display: none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(0,0,0,0.08); font-size: 0.8rem; color: #475569; }
+    .selector label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--stone);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .selector select,
+    .selector input[type="date"],
+    .tb-date {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--sand-light);
+      background: var(--alabaster);
+      color: var(--text);
+      font-weight: 500;
+      min-width: 140px;
+      max-width: 200px;
+      transition: all var(--duration-fast) var(--ease);
+      cursor: pointer;
+    }
+
+    .selector select:hover,
+    .selector input[type="date"]:hover,
+    .tb-date:hover {
+      border-color: var(--amber-light);
+      background: var(--amber-bg);
+    }
+
+    .selector select:focus,
+    .selector input[type="date"]:focus,
+    .tb-date:focus {
+      outline: none;
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+    }
+
+    /* ============================================
+       BUTTONS
+       ============================================ */
+    .btn {
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease);
+      background: var(--amber);
+      color: var(--snow);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover {
+      background: var(--amber-deep);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* ============================================
+       URL BOX
+       ============================================ */
+    .url-box {
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, 'Cascadia Code', monospace;
+      font-size: 0.8125rem;
+      padding: var(--space-3) var(--space-4);
+      background: var(--alabaster);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      word-break: break-all;
+      color: var(--slate);
+      margin: var(--space-3) 0;
+    }
+
+    .copy-confirm {
+      margin-left: var(--space-4);
+      color: var(--green);
+      font-weight: 600;
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity var(--duration-fast) var(--ease);
+    }
+    .copy-confirm.show { opacity: 1; }
+
+    /* ============================================
+       APP TABS (Calendar instructions)
+       ============================================ */
+    .app-tabs {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+    }
+
+    .app-tab {
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      background: var(--alabaster);
+      color: var(--stone);
+      border: none;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease);
+    }
+
+    .app-tab:hover { color: var(--slate); }
+
+    .app-tab.active {
+      background: var(--amber-bg);
+      color: var(--amber-deep);
+    }
+
+    .app-panel {
+      display: none;
+      background: var(--amber-bg);
+      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+      padding: var(--space-4);
+      margin-top: var(--space-1);
+    }
+
+    .app-panel.active { display: block; }
+
+    .app-panel ol {
+      margin: 0;
+      padding-left: var(--space-5);
+      color: var(--slate);
+      columns: 2;
+      column-gap: var(--space-6);
+    }
+    .app-panel ol li { margin-bottom: var(--space-2); break-inside: avoid; }
+
+    @media (max-width: 500px) {
+      .app-panel ol { columns: 1; }
+    }
+
+    /* ============================================
+       PREVIEW CARD (Today's Panchangam)
+       ============================================ */
+    .preview-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      background: var(--snow);
+    }
+
+    .preview-head {
+      position: relative;
+      background: linear-gradient(135deg, var(--amber-deep) 0%, var(--orange) 100%);
+      color: var(--snow);
+      padding: var(--space-4) var(--space-5);
+      padding-right: var(--space-10);
+    }
+
+    .preview-head .date {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: var(--space-1);
+    }
+
+    .preview-head .meta {
+      font-size: 0.8125rem;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    .preview-head .badge {
+      display: inline-block;
+      background: var(--amber-light);
+      color: var(--amber-deep);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      margin-left: var(--space-2);
+      vertical-align: middle;
+    }
+
+    /* Special day flags strip */
+    .flag-strip {
+      background: var(--amber-bg);
+      border-bottom: 1px solid var(--amber-border);
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .special-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--snow);
+      color: var(--amber-deep);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--amber-border);
+    }
+
+    .yoga-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--orange-bg);
+      color: var(--orange);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--copper-light);
+    }
+
+    /* Pancha Anga grid */
+    .anga-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-4) var(--space-3);
+    }
+    @media (max-width: 500px) {
+      .anga-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .anga-cell {
+      background: var(--orange-bg);
+      border: 1px solid var(--copper-light);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      text-align: center;
+      transition: transform var(--duration-fast) var(--ease);
+    }
+    .anga-cell:hover {
+      transform: translateY(-2px);
+    }
+
+    .anga-label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .anga-name {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: var(--space-1) 0 2px;
+    }
+
+    .anga-time {
+      font-size: 0.75rem;
+      color: var(--slate);
+    }
+
+    sup.plus1 {
+      font-size: 0.7em;
+      font-weight: 700;
+      color: var(--orange);
+      cursor: help;
+    }
+
+    /* Window strips */
+    .tile-strip {
+      border-top: 1px solid var(--sand-light);
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .strip-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-3);
+      color: var(--stone);
+    }
+    .strip-title.good-t { color: var(--green-deep); }
+    .strip-title.bad-t { color: var(--rose-deep); }
+
+    .win-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-2);
+    }
+
+    /* Choghadiya grid */
+    .chog-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: var(--space-2);
+    }
+    @media (max-width: 500px) {
+      .chog-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .chog-cell {
+      border-radius: var(--radius-md);
+      padding: var(--space-2);
+      text-align: center;
+      transition: transform var(--duration-fast) var(--ease);
+    }
+    .chog-cell:hover { transform: translateY(-1px); }
+    .chog-cell.good {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+    }
+    .chog-cell.bad {
+      background: var(--rose-bg);
+      border: 1px solid var(--rose-border);
+    }
+
+    .chog-name {
+      font-size: 0.8125rem;
+      font-weight: 700;
+    }
+    .chog-cell.good .chog-name { color: var(--green-deep); }
+    .chog-cell.bad .chog-name { color: var(--rose-deep); }
+
+    .chog-time {
+      font-size: 0.75rem;
+      color: var(--slate);
+      margin-top: 2px;
+    }
+
+    .preview-note {
+      font-size: 0.8125rem;
+      color: var(--stone);
+      margin-top: var(--space-4);
+      line-height: 1.6;
+    }
+
+    .preview-error {
+      font-size: 0.9375rem;
+      color: var(--rose-deep);
+      padding: var(--space-5);
+      text-align: center;
+    }
+
+    /* WhatsApp mini button */
+    .wa-share-mini {
+      position: absolute;
+      top: var(--space-4);
+      right: var(--space-4);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: #25d366;
+      color: var(--snow);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .wa-share-mini:hover {
+      background: #1da851;
+      transform: scale(1.08);
+    }
+
+    /* ============================================
+       TIME FORMAT TOGGLE
+       ============================================ */
+    .fmt-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .fmt-toggle button {
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: var(--space-2) var(--space-3);
+      border: none;
+      background: var(--snow);
+      color: var(--stone);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .fmt-toggle button.active {
+      background: var(--amber-bg);
+      color: var(--amber-deep);
+    }
+
+    /* ============================================
+       UPCOMING SPECIAL DAYS
+       ============================================ */
+    .upcoming-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+    }
+
+    .upcoming-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--alabaster);
+      flex-wrap: wrap;
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .upcoming-row:hover {
+      border-color: var(--amber-border);
+      background: var(--amber-bg);
+    }
+
+    .upcoming-date {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--ink);
+      min-width: 8rem;
+    }
+    .upcoming-date .dow {
+      color: var(--stone);
+      font-weight: 500;
+    }
+
+    .upcoming-in {
+      font-size: 0.75rem;
+      color: var(--stone);
+      margin-left: auto;
+    }
+
+    /* ============================================
+       SYSTEM COMPARISON CARDS
+       ============================================ */
+    .sys-card {
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-4);
+      box-shadow: var(--shadow-sm);
+    }
+    .sys-card.drik {
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+    }
+    .sys-card.ss {
+      background: var(--orange-bg);
+      border: 1px solid var(--copper-light);
+    }
+    .sys-card.vakya {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+    }
+
+    .sys-card h3 {
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .sys-card.drik h3 { color: var(--amber-deep); }
+    .sys-card.ss h3 { color: var(--copper); }
+    .sys-card.vakya h3 { color: var(--green-deep); }
+
+    .sys-card p {
+      font-size: 0.9375rem;
+      color: var(--slate);
+      margin-bottom: var(--space-3);
+    }
+
+    .read-more {
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: color var(--duration-fast) var(--ease);
+    }
+    .sys-card.drik .read-more { color: var(--amber-deep); }
+    .sys-card.ss .read-more { color: var(--copper); }
+    .sys-card.vakya .read-more { color: var(--green-deep); }
+
+    .expanded {
+      display: none;
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px dashed rgba(0,0,0,0.1);
+      font-size: 0.875rem;
+      color: var(--slate);
+      line-height: 1.7;
+    }
     .expanded.open { display: block; }
-    .expanded a { color: inherit; font-weight: 600; }
+    .expanded a { color: var(--amber-deep); font-weight: 600; }
 
-    .tip { font-size: 0.8rem; color: #94a3b8; margin-bottom: 0; }
+    .tip {
+      font-size: 0.875rem;
+      color: var(--stone);
+      font-style: italic;
+    }
 
-    .mcp-tagline { font-size: 0.85rem; color: #475569; margin: 0 0 1rem; }
-    .mcp-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; }
-    .mcp-tool { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.8rem; }
-    .mcp-tool code { display: block; font-size: 0.78rem; color: var(--indigo); font-weight: 700; margin-bottom: 0.2rem; }
-    .mcp-tool span { font-size: 0.75rem; color: #64748b; }
-    .mcp-install { background: #1e1b4b; border-radius: 10px; padding: 0.9rem 1rem; margin: 0.75rem 0; }
-    .mcp-install h4 { margin: 0 0 0.5rem; font-size: 0.7rem; color: #818cf8; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
-    .mcp-install pre { margin: 0; font-size: 0.78rem; color: #e2e8f0; font-family: monospace; white-space: pre-wrap; line-height: 1.6; }
-    .mcp-clients { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
-    .mcp-client { font-size: 0.75rem; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.2rem 0.6rem; font-weight: 600; }
+    /* ============================================
+       MCP SERVER SECTION
+       ============================================ */
+    .mcp-tagline {
+      font-size: 0.9375rem;
+      color: var(--slate);
+      margin-bottom: var(--space-5);
+    }
 
-    footer { text-align: center; font-size: 0.8rem; color: #94a3b8; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 0.3rem; }
-    footer a { color: var(--indigo); }
+    .mcp-tools {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-5) 0;
+    }
+    @media (max-width: 500px) {
+      .mcp-tools { grid-template-columns: 1fr; }
+    }
+
+    .mcp-tool {
+      background: var(--alabaster);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .mcp-tool:hover {
+      border-color: var(--amber-border);
+      background: var(--amber-bg);
+    }
+
+    .mcp-tool code {
+      display: block;
+      font-family: ui-monospace, monospace;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--amber-deep);
+      margin-bottom: var(--space-1);
+    }
+
+    .mcp-tool span {
+      font-size: 0.8125rem;
+      color: var(--stone);
+    }
+
+    .mcp-install {
+      background: var(--ink);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin: var(--space-4) 0;
+    }
+
+    .mcp-install h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--amber-light);
+      margin-bottom: var(--space-3);
+    }
+
+    .mcp-install pre {
+      font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+      font-size: 0.8125rem;
+      color: var(--copper-light);
+      margin: 0;
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+
+    .mcp-clients {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: var(--space-4) 0 var(--space-2);
+    }
+
+    .mcp-client {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--amber-bg);
+      color: var(--amber-deep);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius-full);
+      padding: var(--space-1) var(--space-3);
+    }
+
+    /* ============================================
+       TARABALAM TOOL
+       ============================================ */
+    .tb-intro {
+      font-size: 0.9375rem;
+      color: var(--slate);
+      margin-bottom: var(--space-4);
+    }
+
+    .tb-controls {
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-top: var(--space-5);
+    }
+
+    .tb-controls-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--amber-deep);
+      margin-bottom: var(--space-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tb-reset {
+      font-family: inherit;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      background: none;
+      border: none;
+      color: var(--stone);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .tb-reset:hover { color: var(--rose-deep); }
+
+    .tb-controls .selector select,
+    .tb-controls .tb-date {
+      background: var(--snow);
+    }
+
+    .tb-profile-row {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .tb-profile-row input[type="text"] {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      width: 160px;
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .tb-profile-row input[type="text"]:focus {
+      outline: none;
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+    }
+
+    .tb-profile-row select {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--amber-border);
+      background: var(--amber-bg);
+      color: var(--amber-deep);
+      font-weight: 600;
+      min-width: 160px;
+      cursor: pointer;
+    }
+
+    .tb-you {
+      font-size: 0.6875rem;
+      color: var(--stone);
+      font-weight: 700;
+    }
+
+    .tb-filter {
+      font-size: 0.875rem;
+      color: var(--slate);
+      display: inline-flex;
+      gap: var(--space-2);
+      align-items: center;
+      margin: var(--space-3) 0;
+    }
+
+    .tb-add {
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: var(--snow);
+      border: 1px dashed var(--amber-border);
+      color: var(--amber-deep);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4);
+      cursor: pointer;
+      margin-top: var(--space-2);
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .tb-add:hover {
+      background: var(--amber-bg);
+      border-style: solid;
+    }
+
+    .tb-remove {
+      background: none;
+      border: none;
+      color: var(--sand);
+      font-size: 1.125rem;
+      cursor: pointer;
+      padding: 0 var(--space-1);
+      transition: color var(--duration-fast) var(--ease);
+    }
+    .tb-remove:hover { color: var(--rose-deep); }
+
+    .tb-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      margin-top: var(--space-4);
+      font-size: 0.875rem;
+      color: var(--amber-deep);
+    }
+    .tb-summary .count { font-weight: 800; }
+
+    .tb-toggle {
+      margin-left: auto;
+      font-size: 0.8125rem;
+      color: var(--copper);
+      display: inline-flex;
+      gap: var(--space-2);
+      align-items: center;
+      cursor: pointer;
+    }
+
+    /* Tarabalam table */
+    .tb-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin-top: var(--space-3);
+    }
+
+    .tb-table th {
+      text-align: left;
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--stone);
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .tb-table td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--sand-light);
+      vertical-align: middle;
+    }
+
+    .tb-table tr.tb-all {
+      background: var(--green-bg);
+    }
+
+    .tb-date-cell {
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .tb-sub {
+      font-size: 0.75rem;
+      color: var(--stone);
+    }
+
+    .tara-chip {
+      display: inline-flex;
+      border-radius: var(--radius-md);
+      padding: 2px var(--space-2);
+      font-weight: 700;
+      font-size: 0.8125rem;
+      white-space: nowrap;
+    }
+    .tara-chip.good {
+      background: var(--green-bg);
+      color: var(--green-deep);
+      border: 1px solid var(--green-border);
+    }
+    .tara-chip.bad {
+      background: var(--rose-bg);
+      color: var(--rose-deep);
+      border: 1px solid var(--rose-border);
+    }
+    .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
+    .tara-chip.puja {
+      background: var(--amber-bg);
+      color: var(--amber-deep);
+      border: 1px solid var(--amber-border);
+    }
+
+    .tb-star {
+      color: var(--amber);
+      font-size: 1.125rem;
+    }
+
+    .tb-readme {
+      margin-top: var(--space-5);
+      padding: var(--space-4);
+      background: var(--alabaster);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.8125rem;
+      color: var(--slate);
+      line-height: 1.7;
+    }
+
+    .tb-readme-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--stone);
+      margin-bottom: var(--space-2);
+    }
+
+    /* ============================================
+       GOCHARA CHART
+       ============================================ */
+    .go-chart {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, minmax(90px, auto));
+      gap: 2px;
+      background: var(--sand);
+      border: 2px solid var(--sand);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: var(--space-5);
+    }
+
+    .go-box {
+      background: var(--snow);
+      padding: var(--space-2) var(--space-3);
+      position: relative;
+      min-height: 90px;
+      transition: background var(--duration-fast) var(--ease);
+    }
+    .go-box:hover {
+      background: var(--alabaster);
+    }
+
+    .go-box .rname {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--stone);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: inline-block;
+      padding-right: var(--space-5);
+    }
+
+    .go-box .house {
+      position: absolute;
+      top: var(--space-2);
+      right: var(--space-3);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--sand);
+    }
+
+    .go-box.janma {
+      outline: 3px solid var(--amber);
+      outline-offset: -3px;
+      background: var(--amber-bg);
+    }
+    .go-box.janma .rname { color: var(--amber-deep); }
+
+    .go-center {
+      grid-column: 2 / 4;
+      grid-row: 2 / 4;
+      background: var(--amber-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--space-4);
+      gap: var(--space-2);
+    }
+
+    .go-center .d1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 700;
+      color: var(--amber-deep);
+      font-size: 1.125rem;
+    }
+
+    .go-center .d2 {
+      font-size: 0.75rem;
+      color: var(--copper);
+    }
+
+    .go-g {
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--radius-sm);
+      padding: 2px var(--space-2);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin: var(--space-1) var(--space-1) 0 0;
+      background: var(--amber-bg);
+      color: var(--amber-deep);
+      border: 1px solid var(--amber-border);
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .go-g:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .go-g.good {
+      background: var(--green-bg);
+      color: var(--green-deep);
+      border-color: var(--green-border);
+    }
+    .go-g.blocked {
+      background: var(--amber-bg);
+      color: var(--copper);
+      border-color: var(--copper-light);
+    }
+    .go-g.bad {
+      background: var(--rose-bg);
+      color: var(--rose-deep);
+      border-color: var(--rose-border);
+    }
+    .go-g.bad::after { content: ' ✗'; font-size: 0.85em; }
+
+    .go-retro {
+      font-size: 0.625rem;
+      vertical-align: super;
+      opacity: 0.7;
+    }
+
+    .go-moves {
+      margin-top: var(--space-5);
+      font-size: 0.8125rem;
+      color: var(--slate);
+    }
+    .go-moves b { color: var(--ink); }
+
+    .go-phalalu {
+      margin-top: var(--space-5);
+      background: linear-gradient(135deg, var(--amber-bg) 0%, var(--orange-bg) 100%);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+    }
+    .go-phalalu h4 {
+      font-size: 0.8125rem;
+      color: var(--amber-deep);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .go-phalalu p {
+      margin: var(--space-3) 0;
+      font-size: 0.9375rem;
+      color: var(--slate);
+      line-height: 1.7;
+    }
+
+    .go-quality {
+      display: inline-block;
+      border-radius: var(--radius-full);
+      padding: var(--space-1) var(--space-3);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: var(--space-2);
+      vertical-align: middle;
+    }
+    .go-quality.good {
+      background: var(--green-bg);
+      color: var(--green-deep);
+      border: 1px solid var(--green-border);
+    }
+    .go-quality.mixed {
+      background: var(--amber-bg);
+      color: var(--amber-deep);
+      border: 1px solid var(--amber-border);
+    }
+    .go-quality.difficult {
+      background: var(--rose-bg);
+      color: var(--rose-deep);
+      border: 1px solid var(--rose-border);
+    }
+
+    .go-cond {
+      margin-top: var(--space-5);
+    }
+    .go-cond .chip {
+      display: inline-flex;
+      align-items: center;
+      background: var(--rose-bg);
+      color: var(--rose-deep);
+      border: 1px solid var(--rose-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4);
+      font-weight: 700;
+      font-size: 0.875rem;
+      margin: 0 var(--space-2) var(--space-2) 0;
+    }
+
+    .go-pick {
+      background: var(--snow);
+      border: 1px solid var(--amber-border);
+      color: var(--amber-deep);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0 var(--space-2) var(--space-2) 0;
+      font-family: inherit;
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .go-pick:hover {
+      background: var(--amber-bg);
+    }
+
+    /* ============================================
+       MUHURTA SLOTS
+       ============================================ */
+    .mu-slot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-3) var(--space-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      margin-top: var(--space-3);
+      background: var(--alabaster);
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .mu-slot:hover {
+      border-color: var(--green-border);
+      background: var(--green-bg);
+    }
+    .mu-slot.top {
+      background: var(--green-bg);
+      border-color: var(--green-border);
+    }
+
+    .mu-when {
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .mu-score {
+      margin-left: auto;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--green-deep);
+      background: var(--snow);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius-md);
+      padding: 2px var(--space-3);
+    }
+
+    .mu-reasons {
+      font-size: 0.8125rem;
+      color: var(--slate);
+      width: 100%;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    footer {
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--stone);
+      padding: var(--space-10) 0 var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    footer a { color: var(--amber-deep); font-weight: 500; }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      animation: fade-in 0.4s var(--ease-out) backwards;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.05s; }
+    .card:nth-child(3) { animation-delay: 0.1s; }
+    .card:nth-child(4) { animation-delay: 0.15s; }
+    .card:nth-child(5) { animation-delay: 0.2s; }
+    .card:nth-child(6) { animation-delay: 0.25s; }
+    .card:nth-child(7) { animation-delay: 0.3s; }
   </style>
 </head>
 <body>
 <div class="page">
 
   <div class="hero">
-    <div><span class="sunmoon">🌅</span></div>
+    <div class="hero-icon">🌅</div>
     <h1>AstroChaganti's Panchangam</h1>
     <div class="tagline">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
     and festival days — plus daily tools: the Gochara chart with Rasi Phalalu, and Tarabalam &amp; Muhurtam
     for your family's good days and time slots. Free, no account, updated automatically.</div>
-    <a class="btn hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
+    <a class="hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
   </div>
 
   <div class="card">
@@ -293,15 +1532,15 @@
     <div id="panel-today" role="tabpanel">
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
-    Times marked <sup class="plus1" style="color:#d97706;">+1</sup> fall after midnight on the next day;
-    <sup class="plus1" style="color:#d97706;">−1</sup> means it began the previous day.</p>
+    Times marked <sup class="plus1" style="color:var(--amber-deep);">+1</sup> fall after midnight on the next day;
+    <sup class="plus1" style="color:var(--amber-deep);">−1</sup> means it began the previous day.</p>
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
       <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
       Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
       <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
-      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾</button>
+      <button class="read-more" style="color: var(--amber-deep);" data-more="New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾</button>
       <div class="expanded" id="tb-help">
         <strong>Tarabalam — strength from your star.</strong> Each day the Moon occupies one of the 27 nakshatras.
         Counting from your <strong>janma nakshatra</strong> (birth star) to the day's nakshatra gives one of nine
@@ -319,7 +1558,7 @@
         matches classic tarabalam tables, with the Moon shown as ° and ☾ marks; the stricter standards also
         require the Moon's support. Green days favour that person; for anything done together — travel,
         purchases, ceremonies — prefer the <span class="tb-star">✦</span> days. Don't know your star or padam?
-        Create your birth chart at <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a> —
+        Create your birth chart at <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">astrochaganti.com</a> —
         it lists your janma nakshatra, padam and rashi. These are daily favourability checks, one factor among
         several; for major events check the day's muhurtas and consult your purohit.
         <br/><br/>
@@ -342,7 +1581,7 @@
         <button class="tb-reset" onclick="tbResetProfiles()" title="Forget all saved people on this device">clear all</button></div>
       <div id="tb-profiles"></div>
       <button class="tb-add" id="tb-add-btn" onclick="tbAddRow()">+ Add a family member</button>
-      <div class="selector-row" style="margin-top:0.7rem;">
+      <div class="selector-row" style="margin-top:var(--space-4);">
         <div class="selector">
           <label for="tb-from">From</label>
           <input type="date" id="tb-from" class="tb-date">
@@ -366,11 +1605,11 @@
       </div><!-- /tb-controls -->
       <div id="tb-summary"></div>
       <div id="tb-result"></div>
-      <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
-      <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
+      <p class="preview-note"><strong style="color:var(--green-deep);">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
+      <strong style="color:var(--rose-deep);">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
       Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
 
-      <div class="tb-controls" style="margin-top:1rem;">
+      <div class="tb-controls" style="margin-top:var(--space-5);">
         <div class="tb-controls-title">Find a time slot (Muhurtam)</div>
         <div class="selector-row" style="margin:0;">
           <div class="selector">
@@ -387,22 +1626,22 @@
             <button class="btn" onclick="findMuhurta()">Find slots</button>
           </div>
         </div>
-        <p class="preview-note" style="margin-top:0.4rem;" id="mu-context"></p>
+        <p class="preview-note" style="margin-top:var(--space-3);" id="mu-context"></p>
       </div>
       <div id="mu-result"></div>
-      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
+      <p class="preview-note" style="border-top:1px dashed var(--border); padding-top:var(--space-4);">
       <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
       finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit —
-      or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
+      or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
       <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
       <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
       coloured by its gochara verdict for them.</p>
-      <button class="read-more" style="color: var(--indigo);" data-more="New to Gochara &amp; Rasi Phalalu? How to read this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('go-help', this)">New to Gochara &amp; Rasi Phalalu? How to read this ▾</button>
+      <button class="read-more" style="color: var(--amber-deep);" data-more="New to Gochara &amp; Rasi Phalalu? How to read this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('go-help', this)">New to Gochara &amp; Rasi Phalalu? How to read this ▾</button>
       <div class="expanded" id="go-help">
         <strong>The chart.</strong> This is the fixed South Indian layout: Meena sits top-left, Mesha beside it,
         and the rashis run clockwise around the centre. Each graha appears in the rashi it currently occupies;
@@ -446,10 +1685,10 @@
       graha counted from the natal Moon sign (janma rashi), with <strong>vedha</strong> (obstruction) checked:
       a favourable transit is blocked when another graha occupies its vedha point (Surya–Shani and Chandra–Budha
       never obstruct each other; Rahu and Ketu neither cause nor receive vedha).</p>
-      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
+      <p class="preview-note" style="border-top:1px dashed var(--border); padding-top:var(--space-4);">
       <strong>Please note:</strong> Gochara is a background influence read from the Moon sign alone — it is
       <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
-      day's panchangam above and consult your purohit — or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
+      day's panchangam above and consult your purohit — or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
     </div><!-- /panel-gochara -->
   </div>
 
@@ -477,11 +1716,11 @@
     <button class="btn" onclick="copyUrl()">Copy URL</button>
     <span class="copy-confirm" id="copy-confirm">Copied!</span>
     <a id="sub-https-link" href="#" target="_blank" rel="noopener"
-       style="margin-left:0.75rem;font-size:0.8rem;color:var(--indigo);font-weight:600;">
+       style="margin-left:var(--space-4);font-size:0.8125rem;color:var(--amber-deep);font-weight:600;">
       Open feed in browser ↗
     </a>
 
-    <h3 class="sub" style="margin-top:1.25rem;">2 · Add it to your calendar</h3>
+    <h3 class="sub" style="margin-top:var(--space-6);">2 · Add it to your calendar</h3>
     <div class="app-tabs">
       <button class="app-tab active" data-app="google" onclick="showAppTab('google')">Google</button>
       <button class="app-tab" data-app="apple" onclick="showAppTab('apple')">Apple</button>
@@ -523,13 +1762,13 @@
 
   <div class="card">
     <h2>🧭 Choosing a calculation system</h2>
-    <p style="font-size:0.85rem;color:#475569;">
+    <p style="font-size:0.9375rem;color:var(--slate);">
       <strong>Drik Ganita</strong>, the default, uses modern astronomy and matches drikpanchang.com.
       <strong>Surya Siddhanta</strong> and <strong>Vakya</strong> are classical methods that intentionally
       differ — by minutes for muhurtams, occasionally by a day for festivals. If your family follows a
       printed panchangam, compare a few days in the preview above and pick what matches.
     </p>
-    <button class="read-more" style="color: var(--indigo);" data-more="Compare the three systems in detail ▾" data-less="Hide comparison ▴" onclick="toggleReadMore('systems-more', this)">Compare the three systems in detail ▾</button>
+    <button class="read-more" style="color: var(--amber-deep);" data-more="Compare the three systems in detail ▾" data-less="Hide comparison ▴" onclick="toggleReadMore('systems-more', this)">Compare the three systems in detail ▾</button>
     <div class="expanded" id="systems-more">
 
     <div class="sys-card drik">
@@ -589,15 +1828,15 @@
   <div class="card">
     <h2>🤖 Use Panchangam in AI Assistants</h2>
     <p class="mcp-tagline">
-      Everything this site computes is also an <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
+      Everything this site computes is also an <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">MCP</a>
       server — ask Claude or any MCP-compatible assistant for a muhurta, your family's good days, or today's
       Rasi Phalalu, and it calls this engine directly rather than guessing.
     </p>
-    <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center; margin-bottom:0.5rem;">
+    <div style="display:flex; gap:var(--space-3); flex-wrap:wrap; align-items:center; margin-bottom:var(--space-3);">
       <a class="btn" style="text-decoration:none;" href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener">📦 mcp-server-panchangam on PyPI</a>
-      <span style="font-size:0.78rem; color:#64748b;">No API key · works offline for pre-configured cities</span>
+      <span style="font-size:0.8125rem; color:var(--stone);">No API key · works offline for pre-configured cities</span>
     </div>
-    <button class="read-more" style="color: var(--indigo);" data-more="Tools &amp; setup for Claude, Cursor and other clients ▾" data-less="Hide tools &amp; setup ▴" onclick="toggleReadMore('mcp-more', this)">Tools &amp; setup for Claude, Cursor and other clients ▾</button>
+    <button class="read-more" style="color: var(--amber-deep);" data-more="Tools &amp; setup for Claude, Cursor and other clients ▾" data-less="Hide tools &amp; setup ▴" onclick="toggleReadMore('mcp-more', this)">Tools &amp; setup for Claude, Cursor and other clients ▾</button>
     <div class="expanded" id="mcp-more">
 
     <div class="mcp-tools">
@@ -609,11 +1848,11 @@
       <div class="mcp-tool"><code>get_rasi_phalalu</code><span>Daily reading for a rashi — every sentence rendered from computed gochara/chandrabalam/tarabalam facts</span></div>
       <div class="mcp-tool"><code>get_gochara</code><span>Transit verdicts from a janma rashi — favourable/blocked/adverse per graha with vedha, Sade Sati &amp; Ashtama Shani flags</span></div>
       <div class="mcp-tool"><code>find_muhurta</code><span>Ranked auspicious slots over coming days — good choghadiya minus all bad windows, activity-aware, with reasons</span></div>
-      <div class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
-      <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
+      <div style="grid-column: 1 / -1;" class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
+      <div style="grid-column: 1 / -1;" class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
     </div>
 
-    <p style="font-size:0.82rem;color:#475569;margin:0.75rem 0 0.25rem;">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. You can also pass coordinates directly; the timezone is derived automatically. Supports all three calculation systems.</p>
+    <p style="font-size:0.875rem;color:var(--slate);margin:var(--space-4) 0 var(--space-2);">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. You can also pass coordinates directly; the timezone is derived automatically. Supports all three calculation systems.</p>
 
     <div class="mcp-clients">
       <span class="mcp-client">Claude Desktop</span>
@@ -707,8 +1946,8 @@
     const url = document.getElementById('sub-url').textContent;
     navigator.clipboard.writeText(url).then(() => {
       const el = document.getElementById('copy-confirm');
-      el.style.display = 'inline';
-      setTimeout(() => { el.style.display = 'none'; }, 2000);
+      el.classList.add('show');
+      setTimeout(() => { el.classList.remove('show'); }, 2000);
     });
   }
 
@@ -723,6 +1962,16 @@
     const el = document.getElementById(id);
     const open = el.classList.toggle('open');
     btn.textContent = open ? btn.dataset.less : btn.dataset.more;
+  }
+
+  // --- Tool tabs ---
+
+  function switchTool(name) {
+    document.querySelectorAll('.tool-tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
+    document.querySelectorAll('[id^="panel-"]').forEach(p => p.style.display = 'none');
+    document.getElementById('panel-' + name).style.display = 'block';
+    if (name === 'gochara') loadGochara();
+    if (typeof gcEvent === 'function') gcEvent('switch-' + name);
   }
 
   // --- Today's Panchangam preview ---
@@ -1258,6 +2507,7 @@
   const CHANDRA_PUJA = new Set([2,5,9]);
   let TB_DAYS = null;    // last computed result rows
   let TB_EVENTS = null;  // feed events used for the last calculation
+  let TB_ROWS = 4;       // max profile rows
 
   function taraOf(janmaName, dayName) {
     const j = TB_NAKSHATRAS.indexOf(janmaName), d = TB_NAKSHATRAS.indexOf(dayName);
@@ -1283,10 +2533,10 @@
   function tbProfiles() {
     const out = [];
     for (let i = 0; i < TB_ROWS; i++) {
-      const nak = document.getElementById(`tb-nak-${i}`).value;
+      const nak = document.getElementById(`tb-nak-${i}`)?.value;
       if (!nak) continue;
       const name = document.getElementById(`tb-name-${i}`).value.trim() || (i === 0 ? 'You' : `Person ${i+1}`);
-      const pada = Number(document.getElementById(`tb-pada-${i}`).value) || null;
+      const pada = Number(document.getElementById(`tb-pada-${i}`)?.value) || null;
       out.push({ name, nak, pada, rasi: rasiFromStar(nak, pada) });
     }
     return out;
@@ -1295,304 +2545,165 @@
   function tbSaveProfiles() {
     const raw = [];
     for (let i = 0; i < TB_ROWS; i++) {
-      raw.push({ name: document.getElementById(`tb-name-${i}`).value,
-                 nak: document.getElementById(`tb-nak-${i}`).value,
-                 pada: document.getElementById(`tb-pada-${i}`).value });
+      raw.push({ name: document.getElementById(`tb-name-${i}`)?.value || '',
+                 nak: document.getElementById(`tb-nak-${i}`)?.value || '',
+                 pada: document.getElementById(`tb-pada-${i}`)?.value || '' });
     }
     localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
   }
 
-  let TB_ROWS = 1;  // visible person rows (1..4)
-
-  function tbRenderProfileInputs() {
-    const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
-    TB_ROWS = Math.max(TB_ROWS, Math.min(4, saved.filter(v => v && (v.nak || v.name)).length || 1));
-    const wrap = document.getElementById('tb-profiles');
-    let html = '';
-    for (let i = 0; i < TB_ROWS; i++) {
-      const v = saved[i] || { name: '', nak: '', pada: '' };
-      const opts = ['<option value="">— birth star —</option>']
-        .concat(TB_NAKSHATRAS.map(n => `<option value="${n}" ${n === v.nak ? 'selected' : ''}>${n}</option>`)).join('');
-      const padaOpts = ['<option value="">padam?</option>']
-        .concat([1,2,3,4].map(q => `<option value="${q}" ${String(q) === String(v.pada) ? 'selected' : ''}>${q}</option>`)).join('');
-      const rasi = v.nak ? rasiFromStar(v.nak, Number(v.pada) || null) : null;
-      const rasiNote = !v.nak ? '' : rasi
-        ? `<span class="tb-you">Rashi: ${rasi}</span>`
-        : '<span class="tb-you" style="color:#b45309;">add padam for rashi</span>';
-      html += `<div class="tb-profile-row">
-        <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
-        <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
-        <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star — needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
-        ${rasiNote}
-        ${i === 0 ? '<span class="tb-you">(you)</span>'
-                  : `<button class="tb-remove" title="Remove" onclick="tbRemoveRow(${i})">✕</button>`}
-      </div>`;
-    }
-    wrap.innerHTML = html;
-    document.getElementById('tb-add-btn').style.display = TB_ROWS < 4 ? '' : 'none';
+  function tbLoadProfiles() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
+      for (let i = 0; i < Math.min(raw.length, TB_ROWS); i++) {
+        if (!raw[i]) continue;
+        if (raw[i].name) document.getElementById(`tb-name-${i}`).value = raw[i].name;
+        if (raw[i].nak) document.getElementById(`tb-nak-${i}`).value = raw[i].nak;
+        if (raw[i].pada) document.getElementById(`tb-pada-${i}`).value = raw[i].pada;
+      }
+    } catch (e) {}
   }
 
   function tbResetProfiles() {
-    if (!confirm('Forget all saved people and choices on this device?')) return;
     localStorage.removeItem('tc-tb-profiles');
-    localStorage.removeItem('tc-go-view');
-    localStorage.removeItem('tc-go-rasi');
-    TB_ROWS = 1;
-    TB_DAYS = null;
     tbRenderProfileInputs();
-    document.getElementById('tb-summary').innerHTML = '';
-    document.getElementById('tb-result').innerHTML = '';
-    if (GO_DATA) { goBuildViewSelect(); renderGochara(); }
   }
 
-  function tbAddRow() {
-    tbSaveProfiles();
-    TB_ROWS = Math.min(4, TB_ROWS + 1);
-    tbRenderProfileInputs();
+  function tbSetMode(mode) {
+    localStorage.setItem('tc-tb-mode', mode);
+  }
+
+  function tbRenderProfileInputs() {
+    const container = document.getElementById('tb-profiles');
+    container.innerHTML = '';
+    for (let i = 0; i < TB_ROWS; i++) {
+      const row = document.createElement('div');
+      row.className = 'tb-profile-row';
+      row.innerHTML = `
+        <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'You' : 'Name'}" oninput="tbSaveProfiles()">
+        <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderPadaSelect(${i})">
+          <option value="">Birth star…</option>
+          ${TB_NAKSHATRAS.map(n => `<option value="${n}">${n}</option>`).join('')}
+        </select>
+        <select id="tb-pada-${i}" onchange="tbSaveProfiles()" style="display:none;">
+          <option value="">Padam</option>
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+        </select>
+        ${i > 0 ? `<button class="tb-remove" onclick="tbRemoveRow(${i})" title="Remove">×</button>` : ''}
+      `;
+      container.appendChild(row);
+    }
+    tbLoadProfiles();
+    // Show pada for profiles that need it
+    for (let i = 0; i < TB_ROWS; i++) {
+      const nak = document.getElementById(`tb-nak-${i}`)?.value;
+      if (nak && rasiFromStar(nak) === null) {
+        document.getElementById(`tb-pada-${i}`).style.display = 'inline-block';
+      }
+    }
+  }
+
+  function tbRenderPadaSelect(i) {
+    const nak = document.getElementById(`tb-nak-${i}`).value;
+    const padaSel = document.getElementById(`tb-pada-${i}`);
+    const rasi = nak ? rasiFromStar(nak) : null;
+    padaSel.style.display = (nak && rasi === null) ? 'inline-block' : 'none';
   }
 
   function tbRemoveRow(i) {
-    const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
-    saved.splice(i, 1);
-    localStorage.setItem('tc-tb-profiles', JSON.stringify(saved));
-    TB_ROWS = Math.max(1, TB_ROWS - 1);
-    tbRenderProfileInputs();
+    document.getElementById(`tb-name-${i}`).value = '';
+    document.getElementById(`tb-nak-${i}`).value = '';
+    document.getElementById(`tb-pada-${i}`).value = '';
+    document.getElementById(`tb-pada-${i}`).style.display = 'none';
+    tbSaveProfiles();
+  }
+
+  function tbAddRow() {
+    // Find first empty row and focus it
+    for (let i = 0; i < TB_ROWS; i++) {
+      if (!document.getElementById(`tb-nak-${i}`).value) {
+        document.getElementById(`tb-name-${i}`).focus();
+        return;
+      }
+    }
   }
 
   async function calcTarabalam() {
-    const profiles = tbProfiles();
-    const resBox = document.getElementById('tb-result');
-    if (!profiles.length) {
-      resBox.innerHTML = '<p class="preview-error">Pick at least one birth star.</p>';
-      return;
-    }
+    const container = document.getElementById('tb-result');
+    container.innerHTML = '<p class="preview-error">Loading…</p>';
     const from = new Date(document.getElementById('tb-from').value + 'T00:00:00');
     const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
-    const span = Math.round((to - from) / 86400000) + 1;
-    if (!(span >= 1 && span <= 60)) {
-      resBox.innerHTML = '<p class="preview-error">Pick a range of 1 to 60 days.</p>';
+    const nDays = Math.min(60, Math.max(1, Math.round((to - from) / 86400000) + 1));
+    const mode = document.getElementById('tb-mode').value;
+    const people = tbProfiles();
+    if (!people.length) {
+      container.innerHTML = '<p class="preview-error">Add at least one person above to find good days for them.</p>';
       return;
     }
-    resBox.innerHTML = '<p class="preview-error">Calculating…</p>';
     try {
       const city = document.getElementById('tp-city').value;
       const system = document.getElementById('tp-system').value;
       const events = LAST_EVENTS || await loadFeed(city, system);
       TB_EVENTS = events;
       TB_DAYS = [];
-      for (let i = 0; i < span; i++) {
+      for (let i = 0; i < nDays; i++) {
         const d = new Date(from); d.setDate(d.getDate() + i);
         const ev = events.get(stampOf(d));
         if (!ev) continue;
         const data = parseDescription(ev.description);
-        const nak = data.nakshatra ? data.nakshatra.name : null;
-        if (!nak) continue;
-        const taras = profiles.map(pr => {
-          const t = taraOf(pr.nak, nak);
-          const entry = { who: pr.name, tara: t, label: TARA_NAMES[t-1], good: TARA_GOOD.has(t) };
-          if (pr.rasi && data.lunarSign) entry.chandra = chandraOf(pr.rasi, data.lunarSign);
-          return entry;
+        const dayNak = data.nakshatra?.name;
+        const dayRasi = data.lunarSign;
+        const taras = people.map(p => {
+          const t = taraOf(p.nak, dayNak);
+          const good = TARA_GOOD.has(t);
+          let ch = null;
+          if (p.rasi && dayRasi) {
+            const c = chandraOf(p.rasi, dayRasi);
+            ch = c ? { pos: c.pos, verdict: c.verdict } : null;
+          }
+          return { name: p.name, nak: p.nak, tara: t, taraName: TARA_NAMES[t-1], good, ch };
         });
-        TB_DAYS.push({ date: new Date(d), nak, nakUntil: data.nakshatra.end, nakEflag: data.nakshatra.eflag,
-                       moonRasi: data.lunarSign || '', tithi: data.tithi ? data.tithi.name : '', taras });
+        let allGood = taras.every(t => t.good);
+        if (mode === 'puja_ok') allGood = allGood && taras.every(t => !t.ch || t.ch.verdict !== 'bad');
+        if (mode === 'strict') allGood = allGood && taras.every(t => !t.ch || t.ch.verdict === 'good');
+        TB_DAYS.push({ date: new Date(d), vaaram: data.vaaram, nakshatra: dayNak, taras, allGood });
       }
-      renderTarabalam(profiles);
+      renderTarabalam();
     } catch (e) {
-      resBox.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
+      container.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
     }
   }
 
-  let TB_SHOW_ALL = false;  // default: only favourable days
-  let TB_MODE = localStorage.getItem('tc-tb-mode') || 'stars';
-
-  function tbSetMode(m) {
-    TB_MODE = m;
-    localStorage.setItem('tc-tb-mode', m);
-    if (TB_DAYS) renderTarabalam();
-  }
-
-  function tbPersonGood(t) {
-    if (!t.good) return false;
-    if (!t.chandra) return true;
-    if (TB_MODE === 'strict') return t.chandra.verdict === 'good';
-    if (TB_MODE === 'puja_ok') return t.chandra.verdict !== 'bad';
-    return true;  // stars: chandra annotates, never blocks
-  }
-
-  function tbToggleShowAll() {
-    TB_SHOW_ALL = document.getElementById('tb-show-all').checked;
-    renderTarabalam();
-  }
-
-  function tbCycleHasGoodDay(profiles) {
-    // Tarabalam repeats every 27 nakshatras. When rashis are also set the
-    // real cycle is nakshatra x rashi, so only declare impossibility on the
-    // star check alone — the look-ahead handles the rest.
-    return TB_NAKSHATRAS.some(n =>
-      profiles.every(pr => TARA_GOOD.has(taraOf(pr.nak, n))));
-  }
-
-  function tbDayGoodForAll(profiles, nak, moonRasi) {
-    return profiles.every(pr => {
-      if (!TARA_GOOD.has(taraOf(pr.nak, nak))) return false;
-      if (TB_MODE !== 'stars' && pr.rasi && moonRasi) {
-        const c = chandraOf(pr.rasi, moonRasi);
-        if (c && c.verdict === 'bad') return false;
-        if (c && TB_MODE === 'strict' && c.verdict !== 'good') return false;
-      }
-      return true;
-    });
-  }
-
-  function tbNextGoodBeyondRange(profiles) {
-    if (!TB_EVENTS || !TB_DAYS.length) return null;
-    const after = new Date(TB_DAYS[TB_DAYS.length - 1].date);
-    for (let i = 1; i <= 365; i++) {
-      const d = new Date(after); d.setDate(d.getDate() + i);
-      const ev = TB_EVENTS.get(stampOf(d));
-      if (!ev) return null;  // feed horizon reached
-      const data = parseDescription(ev.description);
-      const nak = data.nakshatra && data.nakshatra.name;
-      if (nak && tbDayGoodForAll(profiles, nak, data.lunarSign)) return d;
-    }
-    return null;
-  }
-
-  function tbExtendTo(iso) {
-    document.getElementById('tb-to').value = iso;
-    calcTarabalam();
-  }
-
-  function renderTarabalam(profiles) {
+  function renderTarabalam() {
     if (!TB_DAYS) return;
-    profiles = profiles || tbProfiles();
-    const group = profiles.length > 1;
-    TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
-    document.getElementById('tb-mode').value = TB_MODE;
-    const goodDays = TB_DAYS.filter(r => r.allGood);
-    const next = goodDays[0];
-    const who = group ? 'everyone' : (profiles[0] ? profiles[0].name : 'you');
-    let summary = `<span class="count">${goodDays.length} of ${TB_DAYS.length}</span>&nbsp;days are favourable for ${who}`;
-    if (next) {
-      summary += ` — next: <span class="count">${next.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>`;
-    }
-    const share = goodDays.length
-      ? `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;" title="Share these good days on WhatsApp" aria-label="Share on WhatsApp" onclick="shareTarabalamOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`
-      : '';
-    const toggle = `<label class="tb-toggle"><input type="checkbox" id="tb-show-all" ${TB_SHOW_ALL ? 'checked' : ''} onchange="tbToggleShowAll()"> show all days</label>${share}`;
-    document.getElementById('tb-summary').innerHTML =
-      `<div class="tb-summary">${group ? '<span class="tb-star">✦</span>' : '🟢'} ${summary}${toggle}</div>`;
-    const rows = TB_DAYS.filter(r => TB_SHOW_ALL || r.allGood);
-    if (!rows.length) {
-      if (!tbCycleHasGoodDay(profiles)) {
-        document.getElementById('tb-result').innerHTML =
-          `<p class="preview-error">This combination of birth stars never aligns — tarabalam repeats over the
-           27 nakshatras, and no day is favourable for ${group ? 'all ' + profiles.length + ' people' : who} at once.
-           Tick "show all days" to plan by individual taras, or consult your purohit.</p>`;
-        return;
-      }
-      const nextGood = tbNextGoodBeyondRange(profiles);
-      if (nextGood) {
-        const iso = `${nextGood.getFullYear()}-${String(nextGood.getMonth()+1).padStart(2,'0')}-${String(nextGood.getDate()).padStart(2,'0')}`;
-        const label = nextGood.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-        document.getElementById('tb-result').innerHTML =
-          `<p class="preview-error">No favourable days for ${who} in this range.
-           The next one is <strong>${label}</strong> —
-           <button class="read-more" style="color:var(--indigo);" onclick="tbExtendTo('${iso}')">extend the range to include it</button>,
-           or tick "show all days".</p>`;
-      } else {
-        document.getElementById('tb-result').innerHTML =
-          `<p class="preview-error">No favourable days for ${who} in this range, and none found in the months ahead
-           — tick "show all days" to plan by individual taras.</p>`;
-      }
-      return;
-    }
-    const head = `<tr><th>Date</th><th>Moon in</th><th>Tithi</th>${profiles.map(p =>
-      `<th>${p.name}<div class="tb-sub">${p.nak}</div></th>`).join('')}${profiles.length > 1 ? '<th title="Auspicious for everyone selected">All ✦</th>' : ''}</tr>`;
-    const body = rows.map(r => {
-      const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-      const chips = r.taras.map(t => {
-        // chip colour = verdict under the chosen ✦ standard; the Moon is a
-        // marked caveat (° puja, ☾ moon-avoid), never a silent veto
-        const passes = tbPersonGood(t);
-        const caveat = t.chandra && t.chandra.verdict !== 'good' ? t.chandra.verdict : null;
-        const mark = caveat === 'puja' ? ' °' : (caveat === 'bad' ? ' ☾' : '');
-        // colour follows the chosen standard: under 'Stars only' the chips are
-        // pure star verdicts; amber only when the standard admits a day on the
-        // condition of a remedial puja
-        const cls = !passes ? 'bad'
-          : (TB_MODE === 'puja_ok' && caveat === 'puja' ? 'puja' : 'good');
-        const detail = `Tara: ${t.tara} ${t.label} (${t.good ? 'good' : 'avoid'})` +
-          (t.chandra ? ` · Chandra: ${t.chandra.pos}${['st','nd','rd'][t.chandra.pos-1] || 'th'} from rashi (${t.chandra.verdict === 'puja' ? 'needs puja' : t.chandra.verdict})` : '') +
-          (r.moonRasi ? ` · Moon in ${r.moonRasi}` : '');
-        return `<td><span class="tara-chip ${cls}" title="${detail}">${t.tara} ${t.label}${mark}</span></td>`;
-      }).join('');
-      const all = profiles.length > 1 ? `<td>${r.allGood ? '<span class="tb-star">✦</span>' : ''}</td>` : '';
-      return `<tr class="${r.allGood && profiles.length > 1 ? 'tb-all' : ''}">
-        <td class="tb-date-cell">${dlabel}</td>
-        <td>${r.nak}<div class="tb-sub">till ${fmtT(r.nakUntil)}${r.nakEflag === '+1' ? ' +1' : ''}</div></td>
-        <td>${r.tithi}</td>${chips}${all}</tr>`;
+    const container = document.getElementById('tb-result');
+    const mode = document.getElementById('tb-mode').value;
+    const goodDates = TB_DAYS.filter(d => d.allGood);
+    const summary = document.getElementById('tb-summary');
+    summary.innerHTML = goodDates.length
+      ? `<span class="tb-star">✦</span> <span class="count">${goodDates.length}</span> good day${goodDates.length !== 1 ? 's' : ''} for everyone together · ${mode === 'stars' ? 'Stars only' : mode === 'puja_ok' ? 'Stars + Moon (puja ok)' : 'Strict Moon check'}`
+      : 'No days favourable for everyone together in this range. Relax the standard or try more days.';
+    const rows = TB_DAYS.map(d => {
+      const dow = d.date.toLocaleDateString('en-US', { weekday: 'short' });
+      const md = d.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const cells = d.taras.map(t => {
+        const cls = t.good ? 'good' : 'bad';
+        const title = `${t.name}: ${t.taraName} (${t.tara})`;
+        let chMark = '';
+        if (t.ch) {
+          chMark = t.ch.verdict === 'good' ? ' °' : t.ch.verdict === 'puja' ? ' °' : ' ☾';
+        }
+        return `<span class="tara-chip ${cls}" title="${title}">${t.taraName}${chMark}</span>`;
+      }).join(' ');
+      return `<tr class="${d.allGood ? 'tb-all' : ''}">
+        <td class="tb-date-cell">${dow} ${md}</td>
+        <td>${d.nakshatra || '—'}</td>
+        <td>${cells}</td>
+        <td>${d.allGood ? '<span class="tb-star">✦</span>' : ''}</td>
+      </tr>`;
     }).join('');
-    const shown = TB_DAYS.filter(r => TB_SHOW_ALL || r.allGood);
-    const hasPuja = shown.some(r => r.taras.some(t => t.chandra && t.chandra.verdict === 'puja'));
-    const hasMoonBad = shown.some(r => r.taras.some(t => t.chandra && t.chandra.verdict === 'bad'));
-    const modeLabel = { stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE];
-    let legend = `<div class="tb-readme"><div class="tb-readme-title">How to read this table</div>
-      <div><span class="tara-chip good">green</span> a good day for that person, under your standard (<em>${modeLabel}</em>).</div>
-      <div><span class="tara-chip bad">red</span> not suitable for that person.</div>`;
-    if (TB_MODE === 'puja_ok' && hasPuja) {
-      legend += `<div><span class="tara-chip puja">amber</span> good — a small remedial puja is advised (°).</div>`;
-    } else if (hasPuja) {
-      legend += `<div><strong>°</strong> a small remedial puja is advised for the Moon's position.</div>`;
-    }
-    if (hasMoonBad) {
-      legend += `<div><strong>☾</strong> the Moon's position is unfavourable that day.</div>`;
-    }
-    if (group) {
-      legend += `<div><span class="tb-star">✦</span> the day is favourable for <strong>everyone</strong>, under your standard.</div>`;
-    }
-    legend += `<div class="tb-sub" style="margin-top:0.3rem;">Hover or tap any chip for the full star + Moon detail.</div></div>`;
-    document.getElementById('tb-result').innerHTML =
-      `<div style="overflow-x:auto;"><table class="tb-table">${head}${body}</table></div>${legend}`;
-  }
-
-  function shareTarabalamOnWhatsApp() {
-    if (!TB_DAYS) return;
-    const profiles = tbProfiles();
-    const group = profiles.length > 1;
-    TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
-    document.getElementById('tb-mode').value = TB_MODE;
-    TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
-    const goodDays = TB_DAYS.filter(r => r.allGood);
-    if (!goodDays.length) return;
-    const citySel = document.getElementById('tp-city');
-    const cityLabel = citySel.options[citySel.selectedIndex].textContent;
-    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const lines = [];
-    const anyRasi = profiles.some(pr => pr.rasi);
-    lines.push(`✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`);
-    lines.push(`📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} – ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`);
-    lines.push(profiles.map(pr => `${pr.name}: ${pr.nak}`).join(' · '));
-    lines.push(`Standard: ${{ stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE]}`);
-    lines.push('');
-    goodDays.forEach(r => lines.push(`✅ ${fmtD(r.date)} — ${r.nak} · ${r.tithi}`));
-    lines.push('');
-    lines.push('Check your own birth star:');
-    lines.push('https://panchangam.astrochaganti.com/?src=share-tarabalam#tarabalam');
-    gcEvent('share-tarabalam');
-    window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
-  }
-
-  function switchTool(which) {
-    for (const t of ['today', 'tarabalam', 'gochara']) {
-      document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
-      document.getElementById('tab-' + t).classList.toggle('active', t === which);
-      document.getElementById('tab-' + t).setAttribute('aria-selected', t === which ? 'true' : 'false');
-    }
-    document.getElementById('tp-date-wrap').style.display = which === 'today' ? '' : 'none';
-    if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
-    if (typeof gcEvent === 'function') gcEvent('tab-' + which);
-    if (which === 'gochara') loadGochara();
+    const thead = `<tr><th>Date</th><th>Nakshatra</th><th>Taras (hover for detail)</th><th></th></tr>`;
+    container.innerHTML = `<table class="tb-table"><thead>${thead}</thead><tbody>${rows}</tbody></table>`;
   }
 
   // --- Gochara tool ---
@@ -1733,8 +2844,8 @@
     }
     condBox.innerHTML = conds.length
       ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}
-         <div class="tb-sub" style="margin-top:0.25rem;">Running ${conds[0].split(' (')[0]}? Personalised guidance:
-         <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a></div></div>` : '';
+         <div class="tb-sub" style="margin-top:var(--space-2);">Running ${conds[0].split(' (')[0]}? Personalised guidance:
+         <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">astrochaganti.com</a></div></div>` : '';
 
     // chart
     const byRasi = {};
@@ -1757,7 +2868,7 @@
     const typed = document.getElementById('go-date').value;
     const shownISO = `${dateShown.getFullYear()}-${String(dateShown.getMonth()+1).padStart(2,'0')}-${String(dateShown.getDate()).padStart(2,'0')}`;
     document.getElementById('go-note').innerHTML = typed && typed !== shownISO
-      ? `<p class="preview-note" style="color:#b45309;">That date is outside this chart's data window
+      ? `<p class="preview-note" style="color:var(--copper);">That date is outside this chart's data window
          (${GO_DATA.start} to ${document.getElementById('go-date').max}) — showing the nearest covered day,
          ${fmtD(dateShown)}. For any date, past or future, ask via the MCP server below.</p>` : '';
     const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
@@ -1778,20 +2889,20 @@
     else {
       const ph = buildPhalalu(jr, row, view, idx);
       const phShare = `<button class="wa-share-mini" style="position:static;width:26px;height:26px;margin-left:auto;flex:none;" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
-      phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:0.4rem;">Rasi Phalalu — ${view.label}
+      phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:var(--space-2);">Rasi Phalalu — ${view.label}
         <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
         ph.lines.map(l => `<p>${l}</p>`).join('') +
-        `<p style="font-size:0.72rem;color:#94a3b8;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
+        `<p style="font-size:0.75rem;color:var(--stone);">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
     }
 
     // legend
     document.getElementById('go-legend').innerHTML = jr === null ? '' :
-      `<div class="tb-legend" style="margin-top:0.5rem;">
-        <span class="tb-legend-item"><span class="go-g good">favourable</span></span>
-        <span class="tb-legend-item"><span class="go-g blocked">blocked by vedha</span></span>
-        <span class="tb-legend-item"><span class="go-g bad">adverse</span></span>
-        <span class="tb-legend-item"><span class="go-g">℞ retrograde</span></span>
-        <span class="tb-legend-item">(hover a graha for detail)</span></div>`;
+      `<div class="tb-legend" style="margin-top:var(--space-3);display:flex;flex-wrap:wrap;gap:var(--space-3);color:var(--slate);font-size:0.8125rem;">
+        <span><span class="go-g good">favourable</span></span>
+        <span><span class="go-g blocked">blocked by vedha</span></span>
+        <span><span class="go-g bad">adverse</span></span>
+        <span><span class="go-g">℞ retrograde</span></span>
+        <span>(hover a graha for detail)</span></div>`;
   }
 
   const HOUSE_MEANINGS = { 1:'self and health', 2:'wealth and family', 3:'courage and effort',
@@ -1987,12 +3098,12 @@
     }
     const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
     box.innerHTML =
-      `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found — best first${share}</div>`
+      `<div class="tb-summary">⏱ <span class="count">${top.length}</span> slot${top.length !== 1 ? 's' : ''} found — best first${share}</div>`
       + top.map((s, i) => `<div class="mu-slot ${i === 0 ? 'top' : ''}">
           <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
           <span class="mu-score">score ${s.score}</span>
           <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
-      + `<p class="preview-note" style="margin-top:0.5rem;">The score is simply the sum of the (+n) reasons on each slot:
+      + `<p class="preview-note" style="margin-top:var(--space-3);">The score is simply the sum of the (+n) reasons on each slot:
          choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
          days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
          requirement, not a bonus.</p>`;
@@ -2042,6 +3153,9 @@
   document.getElementById('tb-from').value = todayISO;
   const _t2 = new Date(); _t2.setDate(_t2.getDate() + 13);
   document.getElementById('tb-to').value = `${_t2.getFullYear()}-${String(_t2.getMonth()+1).padStart(2,'0')}-${String(_t2.getDate()).padStart(2,'0')}`;
+  const savedMode = localStorage.getItem('tc-tb-mode');
+  if (savedMode) document.getElementById('tb-mode').value = savedMode;
+
   if (location.hash === '#tarabalam') switchTool('tarabalam');
   if (location.hash === '#gochara') switchTool('gochara');
   if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
