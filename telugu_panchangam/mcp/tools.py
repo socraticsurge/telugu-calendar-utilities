@@ -558,6 +558,8 @@ def tool_find_muhurta(
     city: str = 'Hyderabad',
     system: str = 'drik',
     janma_nakshatras: Optional[list] = None,
+    janma_rasis: Optional[list] = None,
+    chandra_mode: str = 'stars',
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
@@ -567,6 +569,8 @@ def tool_find_muhurta(
             raise ValueError('days must be between 1 and 14.')
         if activity not in ACTIVITIES:
             raise ValueError(f'activity must be one of {ACTIVITIES}.')
+        if chandra_mode not in ('stars', 'puja_ok', 'strict'):
+            raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
         if janma_nakshatras:
             if len(janma_nakshatras) > 4:
                 raise ValueError('Provide at most 4 janma nakshatras.')
@@ -574,6 +578,15 @@ def tool_find_muhurta(
                 if not isinstance(nak, str) or len(nak) > _MAX_NAME:
                     raise ValueError('Invalid nakshatra name.')
                 _nak_index(nak)
+        if janma_rasis is not None:
+            if not janma_nakshatras or len(janma_rasis) != len(janma_nakshatras):
+                raise ValueError('janma_rasis must align with janma_nakshatras '
+                                 '(use null for people whose rashi is unknown).')
+            for r in janma_rasis:
+                if r is not None:
+                    if not isinstance(r, str) or len(r) > _MAX_NAME:
+                        raise ValueError('Invalid rashi name.')
+                    _rasi_index(r)
         start = _parse_date(start_date)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
@@ -582,20 +595,25 @@ def tool_find_muhurta(
 
         slots = []
         for i in range(days):
-            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=False)
-            for s in day_slots(day, activity=activity, janma_nakshatras=janma_nakshatras):
+            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
+            for s in day_slots(day, activity=activity,
+                               janma_nakshatras=janma_nakshatras,
+                               janma_rasis=janma_rasis,
+                               chandra_mode=chandra_mode):
                 slots.append({**s, 'start': _fmt_time(s['start'], tz),
                               'end': _fmt_time(s['end'], tz)})
         slots.sort(key=lambda x: (-x['score'], x['date'], x['start']))
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
-            'city': city, 'system': system,
+            'city': city, 'system': system, 'chandra_mode': chandra_mode,
             'slots': slots[:12],
             'disclaimer': 'Slots intersect good choghadiya blocks with every inauspicious '
                           'window removed (Rahu Kalam, Gulika, Yamagandam, Varjyam, '
-                          'Durmuhurtham), with Abhijit/Amrita and special-yoga bonuses and '
-                          'optional tarabalam screening. A guide for everyday timing — for '
-                          'weddings and major samskaras, consult your purohit.',
+                          'Durmuhurtham). Scoring: tarabalam +/-1 per person, chandrabalam '
+                          '+/-1 per person, special-yoga bonuses, Abhijit/Amrita +2, '
+                          'activity bias +1. Eclipse days are skipped outright. '
+                          'A guide for everyday timing — for weddings and major samskaras, '
+                          'consult your purohit.',
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
