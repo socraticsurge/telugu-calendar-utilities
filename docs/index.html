@@ -295,9 +295,141 @@
 
     footer { text-align: center; font-size: 0.8rem; color: #94a3b8; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 0.3rem; }
     footer a { color: var(--indigo); }
+
+    /* ---------- Mobile shell — only active under 620px via body[data-mode] ---------- */
+    #m-topbar, #m-bottomnav, #m-drawer, #m-drawer-scrim { display: none; }
+
+    body[data-mode="mobile"] {
+      padding-top: 52px;
+      padding-bottom: 76px;
+    }
+    body[data-mode="mobile"] .page { padding-top: 0; }
+    body[data-mode="mobile"] .hero,
+    body[data-mode="mobile"] > .page > .card .tool-tabs,
+    body[data-mode="mobile"] > .page > footer { display: none; }
+
+    body[data-mode="mobile"] #m-topbar {
+      display: flex; align-items: center; gap: 0.5rem;
+      position: fixed; top: 0; left: 0; right: 0; height: 52px;
+      padding: 0 0.85rem; background: rgba(255,255,255,0.94);
+      backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px);
+      border-bottom: 1px solid #eef2f7; z-index: 50;
+    }
+    #m-topbar .m-brand {
+      font-family: 'Fraunces', Georgia, serif; font-size: 1.05rem; font-weight: 600;
+      letter-spacing: -0.005em; color: #1e1b4b; flex: 1; text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #m-topbar .m-brand .sm { font-size: 1.1rem; margin-right: 0.3rem; }
+    #m-topbar .m-menu, #m-topbar .m-spacer {
+      width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent;
+      font-size: 1.25rem; color: #475569; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; font-family: inherit;
+    }
+    #m-topbar .m-menu:active { background: #eef2f7; }
+    #m-topbar .m-spacer { visibility: hidden; pointer-events: none; }
+
+    body[data-mode="mobile"] #m-bottomnav {
+      display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: 64px;
+      background: rgba(255,255,255,0.96); backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      border-top: 1px solid #eef2f7; z-index: 50;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    #m-bottomnav .m-tab {
+      flex: 1 1 0; min-width: 0; background: transparent; border: 0; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1px; padding: 0.3rem 0.2rem; color: #94a3b8; font-family: inherit;
+      font-size: 0.78rem; font-weight: 600;
+    }
+    #m-bottomnav .m-tab .m-tab-emoji { font-size: 1.15rem; line-height: 1; }
+    #m-bottomnav .m-tab .m-tab-sub { font-size: 0.62rem; font-weight: 500; color: #cbd5e1; line-height: 1.1; }
+    #m-bottomnav .m-tab.active { color: var(--indigo); }
+    #m-bottomnav .m-tab.active .m-tab-sub { color: #818cf8; }
+
+    body[data-mode="mobile"] #m-drawer-scrim {
+      display: block; position: fixed; inset: 0; background: rgba(15,23,42,0.4);
+      z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
+    }
+    body[data-mode="mobile"].m-drawer-open #m-drawer-scrim { opacity: 1; pointer-events: auto; }
+
+    body[data-mode="mobile"] #m-drawer {
+      display: block; position: fixed; top: 0; right: 0; bottom: 0;
+      width: min(86vw, 380px); background: #fff; z-index: 70;
+      box-shadow: -8px 0 24px rgba(15,23,42,0.18);
+      transform: translateX(100%); transition: transform 0.22s ease;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    body[data-mode="mobile"].m-drawer-open #m-drawer { transform: translateX(0); }
+    #m-drawer .m-drawer-head {
+      position: sticky; top: 0; display: flex; align-items: center;
+      padding: 0.85rem 1rem; border-bottom: 1px solid #eef2f7; background: #fff;
+      font-family: 'Fraunces', Georgia, serif; font-size: 1.05rem; color: #1e1b4b;
+    }
+    #m-drawer .m-drawer-head .m-drawer-close {
+      margin-left: auto; width: 36px; height: 36px; border-radius: 10px;
+      border: 0; background: transparent; font-size: 1rem; color: #64748b; cursor: pointer;
+    }
+    #m-drawer .m-drawer-body { padding: 0.5rem 0.85rem 2rem; }
+    #m-drawer .m-drawer-body .card { margin: 0.75rem 0; box-shadow: none; border: 1px solid #eef2f7; }
+    #m-drawer .m-about {
+      padding: 0.75rem; font-size: 0.85rem; color: #475569; line-height: 1.5;
+      border: 1px solid #eef2f7; border-radius: 12px; background: #fcfdfe; margin: 0.75rem 0;
+    }
+    #m-drawer .m-about strong { color: #1e1b4b; }
+    #m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
+    #m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #94a3b8; text-align: center; }
+    #m-drawer .m-source a { color: var(--indigo); }
   </style>
 </head>
 <body>
+
+<!-- Mobile shell — visible only when body[data-mode="mobile"] -->
+<header id="m-topbar" role="banner">
+  <button class="m-menu" id="m-menu" aria-label="Open settings" aria-controls="m-drawer" aria-expanded="false">☰</button>
+  <span class="m-brand"><span class="sm">🌅</span>AstroChaganti's Panchangam</span>
+  <span class="m-spacer" aria-hidden="true">☰</span>
+</header>
+
+<nav id="m-bottomnav" role="tablist" aria-label="Sections">
+  <button class="m-tab active" data-tab="today" role="tab" aria-selected="true">
+    <span class="m-tab-emoji">🔆</span>
+    <span class="m-tab-label">Today</span>
+    <span class="m-tab-sub">the day</span>
+  </button>
+  <button class="m-tab" data-tab="gochara" role="tab" aria-selected="false">
+    <span class="m-tab-emoji">🪐</span>
+    <span class="m-tab-label">Gochara</span>
+    <span class="m-tab-sub">rasi phalalu</span>
+  </button>
+  <button class="m-tab" data-tab="tarabalam" role="tab" aria-selected="false">
+    <span class="m-tab-emoji">✦</span>
+    <span class="m-tab-label">Tarabalam</span>
+    <span class="m-tab-sub">muhurtam</span>
+  </button>
+</nav>
+
+<div id="m-drawer-scrim" aria-hidden="true"></div>
+<aside id="m-drawer" aria-hidden="true" aria-label="Settings">
+  <div class="m-drawer-head">
+    Settings
+    <button class="m-drawer-close" id="m-drawer-close" aria-label="Close settings">✕</button>
+  </div>
+  <div class="m-drawer-body" id="m-drawer-body">
+    <div class="m-about" id="m-about">
+      <strong>AstroChaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
+      a daily glance, and a family timing tool. It's open source, runs without an account,
+      and updates automatically. For personal readings and consultations, visit
+      <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>.
+    </div>
+    <!-- Subscribe, System and MCP cards relocate here in mobile mode -->
+    <div class="m-source" id="m-source-line">
+      A free service from AstroChaganti — feeds regenerated monthly, 18 months ahead.
+      <br/><a href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
+    </div>
+  </div>
+</aside>
+
 <div class="page">
 
   <div class="hero">
@@ -571,7 +703,7 @@
     <p class="preview-note">Updated automatically on the 1st of every month, 18 months ahead. No account needed.</p>
   </div>
 
-  <div class="card">
+  <div class="card" id="card-system">
     <h2>🧭 Choosing a calculation system</h2>
     <p style="font-size:0.85rem;color:#475569;">
       <strong>Drik Ganita</strong>, the default, uses modern astronomy and matches drikpanchang.com.
@@ -636,7 +768,7 @@
     </div><!-- /systems-more -->
   </div>
 
-  <div class="card">
+  <div class="card" id="card-mcp">
     <h2>🤖 Use Panchangam in AI Assistants</h2>
     <p class="mcp-tagline">
       Everything this site computes is also an <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
@@ -1668,6 +1800,12 @@
       document.getElementById('tab-' + t).classList.toggle('active', t === which);
       document.getElementById('tab-' + t).setAttribute('aria-selected', t === which ? 'true' : 'false');
     }
+    // mobile bottom-nav stays in sync with the desktop tab state
+    document.querySelectorAll('#m-bottomnav .m-tab').forEach(b => {
+      const on = b.dataset.tab === which;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
     document.getElementById('tp-date-wrap').style.display = which === 'today' ? '' : 'none';
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
     if (typeof gcEvent === 'function') gcEvent('tab-' + which);
@@ -2126,6 +2264,109 @@
   if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
   updateSubscribeUrl();
   loadPreview();
+
+  // ---------- Mobile shell — matchMedia, drawer, swipe, card relocation ----------
+  (function mobileShell() {
+    const mq = window.matchMedia('(max-width: 620px)');
+    const drawerBody = document.getElementById('m-drawer-body');
+    const aboutEl = document.getElementById('m-about');
+    const sourceEl = document.getElementById('m-source-line');
+    // these cards relocate into the drawer in mobile mode; back to flow on desktop
+    const MOVE_IDS = ['subscribe', 'card-system', 'card-mcp'];
+    const placeholders = {};
+
+    function moveCardsToDrawer() {
+      for (const id of MOVE_IDS) {
+        const el = document.getElementById(id);
+        if (!el || el.parentNode === drawerBody) continue;
+        const ph = document.createComment('m-drawer-slot-' + id);
+        placeholders[id] = ph;
+        el.parentNode.insertBefore(ph, el);
+        // insert just before the source line so order stays: about → cards → source
+        drawerBody.insertBefore(el, sourceEl);
+      }
+    }
+    function restoreCards() {
+      for (const id of MOVE_IDS) {
+        const el = document.getElementById(id);
+        const ph = placeholders[id];
+        if (el && ph && ph.parentNode) {
+          ph.parentNode.insertBefore(el, ph);
+          ph.parentNode.removeChild(ph);
+          delete placeholders[id];
+        }
+      }
+    }
+
+    function applyMode() {
+      const mobile = mq.matches;
+      document.body.dataset.mode = mobile ? 'mobile' : 'desktop';
+      if (mobile) moveCardsToDrawer(); else { restoreCards(); closeDrawer(); }
+    }
+
+    // --- drawer open/close ---
+    const menuBtn = document.getElementById('m-menu');
+    const closeBtn = document.getElementById('m-drawer-close');
+    const scrim = document.getElementById('m-drawer-scrim');
+    function openDrawer() {
+      document.body.classList.add('m-drawer-open');
+      document.getElementById('m-drawer').setAttribute('aria-hidden', 'false');
+      menuBtn.setAttribute('aria-expanded', 'true');
+      if (typeof gcEvent === 'function') gcEvent('settings-open');
+    }
+    function closeDrawer() {
+      if (!document.body.classList.contains('m-drawer-open')) return;
+      document.body.classList.remove('m-drawer-open');
+      document.getElementById('m-drawer').setAttribute('aria-hidden', 'true');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      if (typeof gcEvent === 'function') gcEvent('settings-close');
+    }
+    menuBtn.addEventListener('click', openDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    scrim.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+    // --- bottom-nav tap ---
+    document.querySelectorAll('#m-bottomnav .m-tab').forEach(b => {
+      b.addEventListener('click', () => switchTool(b.dataset.tab));
+    });
+
+    // --- swipe between tabs ---
+    const ORDER = ['today', 'gochara', 'tarabalam'];
+    function currentTab() {
+      const active = document.querySelector('#m-bottomnav .m-tab.active');
+      return active ? active.dataset.tab : 'today';
+    }
+    let touchX = null, touchY = null, touchT = 0;
+    document.addEventListener('touchstart', e => {
+      if (!mq.matches) return;
+      if (document.body.classList.contains('m-drawer-open')) return;
+      const t = e.touches[0]; touchX = t.clientX; touchY = t.clientY; touchT = Date.now();
+    }, { passive: true });
+    document.addEventListener('touchend', e => {
+      if (!mq.matches || touchX === null) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchX, dy = t.clientY - touchY;
+      const ax = Math.abs(dx), ay = Math.abs(dy);
+      touchX = null; touchY = null;
+      if (Date.now() - touchT > 600) return;          // ignore slow drags
+      if (ax < 60 || ax < ay * 1.5) return;            // need clear horizontal intent
+      // ignore swipes that start inside horizontally scrollable things (eg date inputs)
+      const startTarget = e.target.closest && e.target.closest('input, select, textarea, .tb-table-wrap, .url-box');
+      if (startTarget) return;
+      const i = ORDER.indexOf(currentTab());
+      const next = dx < 0 ? Math.min(ORDER.length - 1, i + 1) : Math.max(0, i - 1);
+      if (next !== i) switchTool(ORDER[next]);
+    }, { passive: true });
+
+    // --- resize: debounced re-apply, don't thrash on edge widths ---
+    let rt;
+    (mq.addEventListener ? mq.addEventListener('change', schedule) : mq.addListener(schedule));
+    function schedule() { clearTimeout(rt); rt = setTimeout(applyMode, 120); }
+    window.addEventListener('resize', schedule);
+
+    applyMode();
+  })();
 </script>
 <script data-goatcounter="https://panchangam.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
