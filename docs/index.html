@@ -29,12 +29,39 @@
     .hero { text-align: center; padding: 1.75rem 0 1.25rem; }
     .hero h1 { font-family: 'Fraunces', Georgia, serif; font-size: 2.3rem; margin: 0; letter-spacing: -0.01em; }
     .hero .tagline { color: #475569; font-size: 0.95rem; margin: 0.5rem auto 0; max-width: 540px; }
+    .hero .tagline-short { display: none; }
     .hero .hero-cta { display: inline-block; margin-top: 1rem; text-decoration: none; padding: 0.6rem 1.3rem; font-size: 0.9rem; }
+    @media (max-width: 620px) {
+      .hero { padding: 0.9rem 0 0.75rem; }
+      .hero h1 { font-size: 1.6rem; line-height: 1.15; }
+      .hero .sunmoon { font-size: 1.3rem; }
+      .hero .tagline-full { display: none; }
+      .hero .tagline-short { display: block; font-size: 0.88rem; margin-top: 0.35rem; }
+      .hero .hero-cta { margin-top: 0.7rem; padding: 0.5rem 1rem; font-size: 0.85rem; }
+    }
     #subscribe { scroll-margin-top: 1rem; }
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
     @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
     .card { background: #fff; border: 1px solid #dbe2ea; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 4px 18px rgba(100,116,139,0.18), 0 1px 3px rgba(15,23,42,0.08); }
+    @media (max-width: 620px) {
+      .card { padding: 0.85rem; }
+      body { padding: 0 0.7rem 2rem; }
+      .selector-row .selector { flex: 1 1 100%; }
+      .selector select, .tb-date { width: 100%; min-width: 0; }
+      /* tap-target floor: 44px for primary controls */
+      .selector select, input.tb-date, input#tp-date, input#go-date, input#tb-from, input#tb-to,
+      .tb-controls select, #mu-activity, #tb-mode, #go-view, #go-rasi,
+      .tb-profile-row select, .tb-profile-row input[type=text],
+      .btn, .fmt-toggle button, .app-tab, .read-more, .tb-add, .tb-remove, .tb-reset,
+      .go-pick, .upcoming-row a, .wa-share-mini { min-height: 44px; }
+      .wa-share-mini { min-width: 44px; }
+      .fmt-toggle { display: inline-flex; }
+      .fmt-toggle button { padding: 0 1rem; }
+      .app-tab { padding: 0.55rem 0.85rem; font-size: 0.8rem; }
+      .tb-add { padding: 0.55rem 1rem; }
+      .tb-remove { padding: 0 0.6rem; }
+    }
     .card h2 { margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
     .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
 
@@ -97,13 +124,14 @@
                 border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
     .tool-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; flex: 1 1 0; }
-    .tool-tab .ts { font-size: 0.68rem; font-weight: 500; color: #94a3b8; }
+    .tool-tab .ts { font-size: 0.72rem; font-weight: 500; color: #94a3b8; }
     .tool-tab.active .ts { color: #818cf8; }
     @media (max-width: 620px) {
-      .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 0.15rem; }
       .tool-tabs::-webkit-scrollbar { display: none; }
-      .tool-tab { font-size: 0.8rem; padding: 0.35rem 0.45rem 0.5rem; white-space: nowrap; flex: none; align-items: flex-start; }
-      .tool-tab .ts { display: none; }
+      .tool-tab { padding: 0.3rem 0.5rem 0.5rem; flex: 1 1 0; min-width: 0; align-items: center; text-align: center; }
+      .tool-tab .tt { font-size: 0.72rem; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+      .tool-tab .ts { font-size: 0.7rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     }
     .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid var(--indigo-border); background: var(--indigo-bg);
@@ -134,6 +162,19 @@
     .tb-date-cell { font-weight: 700; color: #1e1b4b; white-space: nowrap; }
     .tb-sub { font-size: 0.72rem; color: #94a3b8; }
     .tara-chip { display: inline-block; border-radius: 6px; padding: 0.08rem 0.5rem; font-weight: 700; font-size: 0.78rem; white-space: nowrap; }
+    .tb-cards { display: none; }
+    @media (max-width: 620px) {
+      .tb-table-wrap { display: none; }
+      .tb-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.6rem; }
+      .tb-card { border: 1px solid #eef2f7; border-radius: 10px; padding: 0.55rem 0.7rem; background: #fcfdfe; }
+      .tb-card.tb-all { background: #fcfdf4; border-color: #d9f99d; }
+      .tb-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+      .tb-card-flag { font-size: 0.75rem; color: #b45309; font-weight: 700; }
+      .tb-card-sub { font-size: 0.74rem; color: #64748b; margin-top: 0.05rem; }
+      .tb-card-row { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.35rem; margin-top: 0.35rem; border-top: 1px solid #f1f5f9; }
+      .tb-card-row .tb-sub { flex: 1; min-width: 0; font-size: 0.78rem; color: #1e1b4b; font-weight: 600; }
+      .tb-card-row .tara-chip { white-space: nowrap; }
+    }
     .tara-chip.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
     .tara-chip.bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
     .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
@@ -212,7 +253,15 @@
     .upcoming-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.45rem 0.6rem; border: 1px solid #eef2f7; border-radius: 8px; background: #fcfdfe; flex-wrap: wrap; }
     .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1e1b4b; min-width: 7.5rem; white-space: nowrap; }
     .upcoming-date .dow { color: #94a3b8; font-weight: 600; }
+    .upcoming-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; flex: 1 1 auto; min-width: 0; }
     .upcoming-in { font-size: 0.72rem; color: #94a3b8; margin-left: auto; white-space: nowrap; }
+    @media (max-width: 620px) {
+      .upcoming-row { flex-direction: column; align-items: flex-start; gap: 0.3rem; padding: 0.5rem 0.65rem; }
+      .upcoming-date { display: flex; justify-content: space-between; width: 100%; min-width: 0; font-size: 0.78rem; }
+      .upcoming-date .dow { font-size: 0.7rem; }
+      .upcoming-chips { width: 100%; }
+      .upcoming-in { display: none; }
+    }
 
     .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
     .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
@@ -254,9 +303,10 @@
   <div class="hero">
     <div><span class="sunmoon">🌅</span></div>
     <h1>AstroChaganti's Panchangam</h1>
-    <div class="tagline">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
+    <div class="tagline tagline-full">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
     and festival days — plus daily tools: the Gochara chart with Rasi Phalalu, and Tarabalam &amp; Muhurtam
     for your family's good days and time slots. Free, no account, updated automatically.</div>
+    <div class="tagline tagline-short">Telugu panchangam in your calendar — plus daily tools.</div>
     <a class="btn hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
   </div>
 
@@ -1123,9 +1173,8 @@
       const dow = d.toLocaleDateString('en-US', { weekday: 'short' });
       const md = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       rows.push(`<div class="upcoming-row">
-        <span class="upcoming-date"><span class="dow">${dow}</span> ${md}</span>
-        ${chips}
-        <span class="upcoming-in">in ${i} day${i > 1 ? 's' : ''}</span>
+        <span class="upcoming-date"><span class="dow">${dow}</span> ${md}<span class="upcoming-in"> · in ${i} day${i > 1 ? 's' : ''}</span></span>
+        <span class="upcoming-chips">${chips}</span>
       </div>`);
     }
     container.innerHTML = rows.length
@@ -1516,7 +1565,11 @@
         // marked caveat (° puja, ☾ moon-avoid), never a silent veto
         const passes = tbPersonGood(t);
         const caveat = t.chandra && t.chandra.verdict !== 'good' ? t.chandra.verdict : null;
-        const mark = caveat === 'puja' ? ' °' : (caveat === 'bad' ? ' ☾' : '');
+        const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+        const chandraTag = t.chandra && t.chandra.verdict !== 'good'
+          ? (caveat === 'puja' ? ` · ° ${ord(t.chandra.pos)}` : ` · ☾ ${ord(t.chandra.pos)}`)
+          : '';
+        const mark = '';
         // colour follows the chosen standard: under 'Stars only' the chips are
         // pure star verdicts; amber only when the standard admits a day on the
         // condition of a remedial puja
@@ -1525,7 +1578,7 @@
         const detail = `Tara: ${t.tara} ${t.label} (${t.good ? 'good' : 'avoid'})` +
           (t.chandra ? ` · Chandra: ${t.chandra.pos}${['st','nd','rd'][t.chandra.pos-1] || 'th'} from rashi (${t.chandra.verdict === 'puja' ? 'needs puja' : t.chandra.verdict})` : '') +
           (r.moonRasi ? ` · Moon in ${r.moonRasi}` : '');
-        return `<td><span class="tara-chip ${cls}" title="${detail}">${t.tara} ${t.label}${mark}</span></td>`;
+        return `<td><span class="tara-chip ${cls}" title="${detail}">${t.tara} ${t.label}${chandraTag}</span></td>`;
       }).join('');
       const all = profiles.length > 1 ? `<td>${r.allGood ? '<span class="tb-star">✦</span>' : ''}</td>` : '';
       return `<tr class="${r.allGood && profiles.length > 1 ? 'tb-all' : ''}">
@@ -1551,9 +1604,35 @@
     if (group) {
       legend += `<div><span class="tb-star">✦</span> the day is favourable for <strong>everyone</strong>, under your standard.</div>`;
     }
-    legend += `<div class="tb-sub" style="margin-top:0.3rem;">Hover or tap any chip for the full star + Moon detail.</div></div>`;
+    legend += `</div>`;
+    // Mobile-only stacked cards: same data, no horizontal swipe
+    const cards = rows.map(r => {
+      const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const personRows = r.taras.map((t, i) => {
+        const passes = tbPersonGood(t);
+        const caveat = t.chandra && t.chandra.verdict !== 'good' ? t.chandra.verdict : null;
+        const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+        const chandraTag = t.chandra && t.chandra.verdict !== 'good'
+          ? (caveat === 'puja' ? ` · ° ${ord(t.chandra.pos)}` : ` · ☾ ${ord(t.chandra.pos)}`)
+          : '';
+        const cls = !passes ? 'bad'
+          : (TB_MODE === 'puja_ok' && caveat === 'puja' ? 'puja' : 'good');
+        const sub = profiles[i] ? `<span class="tb-sub">${profiles[i].name}<span style="color:#cbd5e1"> · ${profiles[i].nak}</span></span>` : '';
+        return `<div class="tb-card-row">${sub}<span class="tara-chip ${cls}">${t.tara} ${t.label}${chandraTag}</span></div>`;
+      }).join('');
+      const star = (r.allGood && profiles.length > 1) ? '<span class="tb-star">✦</span> good for everyone' : '&nbsp;';
+      return `<div class="tb-card ${r.allGood && profiles.length > 1 ? 'tb-all' : ''}">
+        <div class="tb-card-head">
+          <span class="tb-date-cell">${dlabel}</span>
+          <span class="tb-card-flag">${star}</span>
+        </div>
+        <div class="tb-card-sub">${r.nak} till ${fmtT(r.nakUntil)}${r.nakEflag === '+1' ? ' +1' : ''} · ${r.tithi}</div>
+        ${personRows}
+      </div>`;
+    }).join('');
     document.getElementById('tb-result').innerHTML =
-      `<div style="overflow-x:auto;"><table class="tb-table">${head}${body}</table></div>${legend}`;
+      `<div class="tb-table-wrap"><table class="tb-table">${head}${body}</table></div>` +
+      `<div class="tb-cards">${cards}</div>${legend}`;
   }
 
   function shareTarabalamOnWhatsApp() {
@@ -1791,7 +1870,7 @@
         <span class="tb-legend-item"><span class="go-g blocked">blocked by vedha</span></span>
         <span class="tb-legend-item"><span class="go-g bad">adverse</span></span>
         <span class="tb-legend-item"><span class="go-g">℞ retrograde</span></span>
-        <span class="tb-legend-item">(hover a graha for detail)</span></div>`;
+        </div>`;
   }
 
   const HOUSE_MEANINGS = { 1:'self and health', 2:'wealth and family', 3:'courage and effort',
