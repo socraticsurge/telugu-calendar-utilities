@@ -297,7 +297,7 @@
     footer a { color: var(--indigo); }
 
     /* ---------- Mobile shell — only active under 620px via body[data-mode] ---------- */
-    #m-topbar, #m-bottomnav, #m-drawer, #m-drawer-scrim { display: none; }
+    #m-topbar, #m-bottomnav, .m-drawer, #m-drawer-scrim { display: none; }
 
     body[data-mode="mobile"] {
       padding-top: 52px;
@@ -321,13 +321,25 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     #m-topbar .m-brand .sm { font-size: 1.1rem; margin-right: 0.3rem; }
-    #m-topbar .m-menu, #m-topbar .m-spacer {
+    #m-topbar .m-icon-btn {
       width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent;
       font-size: 1.25rem; color: #475569; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; font-family: inherit;
+      align-items: center; justify-content: center; font-family: inherit; flex: none;
     }
-    #m-topbar .m-menu:active { background: #eef2f7; }
-    #m-topbar .m-spacer { visibility: hidden; pointer-events: none; }
+    #m-topbar .m-icon-btn:active { background: #eef2f7; }
+    #m-topbar .m-cog { font-size: 1.3rem; line-height: 1; }
+    #m-topbar .m-text-btn {
+      flex: none; height: 36px; padding: 0 0.65rem; border-radius: 999px;
+      border: 1px solid var(--indigo-border); background: var(--indigo-bg);
+      color: var(--indigo); font-family: inherit; font-weight: 700; font-size: 0.82rem;
+      display: flex; align-items: center; gap: 0.35rem; cursor: pointer;
+      white-space: nowrap;
+    }
+    #m-topbar .m-text-btn:active { background: #c7d2fe; }
+    @media (max-width: 360px) {
+      #m-topbar .m-text-btn .m-text-btn-label { display: none; }
+      #m-topbar .m-text-btn { padding: 0 0.55rem; }
+    }
 
     body[data-mode="mobile"] #m-bottomnav {
       display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: 64px;
@@ -351,35 +363,52 @@
       display: block; position: fixed; inset: 0; background: rgba(15,23,42,0.4);
       z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
     }
-    body[data-mode="mobile"].m-drawer-open #m-drawer-scrim { opacity: 1; pointer-events: auto; }
+    body[data-mode="mobile"].m-settings-open #m-drawer-scrim,
+    body[data-mode="mobile"].m-subscribe-open #m-drawer-scrim {
+      opacity: 1; pointer-events: auto;
+    }
 
-    body[data-mode="mobile"] #m-drawer {
-      display: block; position: fixed; top: 0; right: 0; bottom: 0;
+    body[data-mode="mobile"] .m-drawer {
+      display: block; position: fixed; top: 0; bottom: 0;
       width: min(86vw, 380px); background: #fff; z-index: 70;
-      box-shadow: -8px 0 24px rgba(15,23,42,0.18);
-      transform: translateX(100%); transition: transform 0.22s ease;
+      transition: transform 0.22s ease;
       overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
-    body[data-mode="mobile"].m-drawer-open #m-drawer { transform: translateX(0); }
-    #m-drawer .m-drawer-head {
+    body[data-mode="mobile"] .m-drawer-left {
+      left: 0; box-shadow: 8px 0 24px rgba(15,23,42,0.18);
+      transform: translateX(-100%);
+    }
+    body[data-mode="mobile"] .m-drawer-right {
+      right: 0; box-shadow: -8px 0 24px rgba(15,23,42,0.18);
+      transform: translateX(100%);
+    }
+    body[data-mode="mobile"].m-settings-open  #m-settings-drawer  { transform: translateX(0); }
+    body[data-mode="mobile"].m-subscribe-open #m-subscribe-drawer { transform: translateX(0); }
+
+    .m-drawer .m-drawer-head {
       position: sticky; top: 0; display: flex; align-items: center;
       padding: 0.85rem 1rem; border-bottom: 1px solid #eef2f7; background: #fff;
       font-family: 'Fraunces', Georgia, serif; font-size: 1.05rem; color: #1e1b4b;
+      z-index: 1;
     }
-    #m-drawer .m-drawer-head .m-drawer-close {
+    .m-drawer .m-drawer-head .m-drawer-close {
       margin-left: auto; width: 36px; height: 36px; border-radius: 10px;
       border: 0; background: transparent; font-size: 1rem; color: #64748b; cursor: pointer;
     }
-    #m-drawer .m-drawer-body { padding: 0.5rem 0.85rem 2rem; }
-    #m-drawer .m-drawer-body .card { margin: 0.75rem 0; box-shadow: none; border: 1px solid #eef2f7; }
-    #m-drawer .m-about {
+    .m-drawer .m-drawer-body { padding: 0.5rem 0.85rem 2rem; }
+    .m-drawer .m-drawer-body .card { margin: 0.75rem 0; box-shadow: none; border: 1px solid #eef2f7; }
+    .m-drawer .m-drawer-hint {
+      font-size: 0.78rem; color: #64748b; line-height: 1.5;
+      margin: 0.5rem 0.1rem 0.6rem; padding: 0;
+    }
+    .m-drawer .m-about {
       padding: 0.75rem; font-size: 0.85rem; color: #475569; line-height: 1.5;
       border: 1px solid #eef2f7; border-radius: 12px; background: #fcfdfe; margin: 0.75rem 0;
     }
-    #m-drawer .m-about strong { color: #1e1b4b; }
-    #m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
-    #m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #94a3b8; text-align: center; }
-    #m-drawer .m-source a { color: var(--indigo); }
+    .m-drawer .m-about strong { color: #1e1b4b; }
+    .m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
+    .m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #94a3b8; text-align: center; }
+    .m-drawer .m-source a { color: var(--indigo); }
 
     /* Brand wordmark: drop the symmetric right-side spacer on phones and
        left-align next to the hamburger. Caps off at narrow widths so the
@@ -397,25 +426,25 @@
     }
     #m-topbar .m-brand .short { display: none; }
 
-    /* Mobile selector-row: keep City + Date inline, push System + Time format
-       into the drawer. The drawer holds the explanations next to the controls. */
+    /* Mobile selector-row: City + System + Time format all live in Settings now.
+       Only the Today-screen Date input remains inline, full-width, as a single
+       compact row above the day content. */
     body[data-mode="mobile"] #tp-selector-row {
       gap: 0.5rem;
       margin-bottom: 0.55rem;
     }
-    body[data-mode="mobile"] #tp-selector-row .selector { flex: 1 1 50%; }
-    body[data-mode="mobile"] #tp-selector-row #tp-date-wrap { flex: 1 1 50%; }
+    body[data-mode="mobile"] #tp-selector-row #tp-date-wrap { flex: 1 1 100%; }
     body[data-mode="mobile"] #tp-selector-row label { font-size: 0.7rem; }
 
     /* Drawer placement for relocated selectors — sit them as discrete rows */
-    #m-drawer .selector { display: flex; flex-direction: column; gap: 0.3rem;
+    .m-drawer .selector { display: flex; flex-direction: column; gap: 0.3rem;
                          padding: 0.6rem 0.75rem; border: 1px solid #eef2f7;
                          border-radius: 12px; background: #fcfdfe; margin: 0.5rem 0; }
-    #m-drawer .selector > label { font-size: 0.72rem; color: #64748b;
+    .m-drawer .selector > label { font-size: 0.72rem; color: #64748b;
                                   text-transform: uppercase; letter-spacing: 0.04em;
                                   font-weight: 700; }
-    #m-drawer .selector select { width: 100%; }
-    #m-drawer .selector .fmt-toggle { align-self: flex-start; }
+    .m-drawer .selector select { width: 100%; }
+    .m-drawer .selector .fmt-toggle { align-self: flex-start; }
 
     /* Special days row: weekday + date stay together (no space-between split),
        chips on a second line. The "in N days" hint folds into the same line as
@@ -509,9 +538,15 @@
 
 <!-- Mobile shell — visible only when body[data-mode="mobile"] -->
 <header id="m-topbar" role="banner">
-  <button class="m-menu" id="m-menu" aria-label="Open settings" aria-controls="m-drawer" aria-expanded="false">☰</button>
+  <button class="m-icon-btn m-settings-btn" id="m-settings-btn"
+          aria-label="Open settings" aria-controls="m-settings-drawer" aria-expanded="false">
+    <span class="m-cog" aria-hidden="true">⚙</span>
+  </button>
   <span class="m-brand"><span class="sm">🌅</span><span class="full">AstroChaganti's Panchangam</span><span class="short">Panchangam</span></span>
-  <span class="m-spacer" aria-hidden="true">☰</span>
+  <button class="m-text-btn m-subscribe-btn" id="m-subscribe-btn"
+          aria-controls="m-subscribe-drawer" aria-expanded="false">
+    <span aria-hidden="true">📅</span><span class="m-text-btn-label">Subscribe</span>
+  </button>
 </header>
 
 <nav id="m-bottomnav" role="tablist" aria-label="Sections">
@@ -533,19 +568,33 @@
 </nav>
 
 <div id="m-drawer-scrim" aria-hidden="true"></div>
-<aside id="m-drawer" aria-hidden="true" aria-label="Settings">
+
+<!-- Settings drawer (left): preferences the devotee sets once -->
+<aside id="m-settings-drawer" class="m-drawer m-drawer-left" aria-hidden="true" aria-label="Settings">
   <div class="m-drawer-head">
     Settings
-    <button class="m-drawer-close" id="m-drawer-close" aria-label="Close settings">✕</button>
+    <button class="m-drawer-close" data-close="settings" aria-label="Close settings">✕</button>
   </div>
-  <div class="m-drawer-body" id="m-drawer-body">
+  <div class="m-drawer-body" id="m-settings-body">
+    <p class="m-drawer-hint">These apply across all three screens. The city and system you pick here also drive the calendar feed you subscribe to.</p>
+    <!-- City, System (with explanation card), Time format relocate here -->
+  </div>
+</aside>
+
+<!-- Subscribe drawer (right): take the panchangam into other tools -->
+<aside id="m-subscribe-drawer" class="m-drawer m-drawer-right" aria-hidden="true" aria-label="Subscribe and connect">
+  <div class="m-drawer-head">
+    Subscribe &amp; connect
+    <button class="m-drawer-close" data-close="subscribe" aria-label="Close">✕</button>
+  </div>
+  <div class="m-drawer-body" id="m-subscribe-body">
+    <!-- Subscribe and MCP cards relocate here -->
     <div class="m-about" id="m-about">
       <strong>AstroChaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
       a daily glance, and a family timing tool. It's open source, runs without an account,
       and updates automatically. For personal readings and consultations, visit
       <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>.
     </div>
-    <!-- Subscribe, System and MCP cards relocate here in mobile mode -->
     <div class="m-source" id="m-source-line">
       A free service from AstroChaganti — feeds regenerated monthly, 18 months ahead.
       <br/><a href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
@@ -575,7 +624,7 @@
         <span class="tt">✦ Tarabalam · Muhurtam</span><span class="ts">When should we act?</span></button>
     </div>
     <div class="selector-row" id="tp-selector-row">
-      <div class="selector">
+      <div class="selector" id="sel-tp-city">
         <label for="tp-city">City</label>
         <select id="tp-city"></select>
       </div>
@@ -2397,71 +2446,95 @@
   updateSubscribeUrl();
   loadPreview();
 
-  // ---------- Mobile shell — matchMedia, drawer, swipe, card relocation ----------
+  // ---------- Mobile shell — matchMedia, two drawers, swipe, card relocation ----------
   (function mobileShell() {
     const mq = window.matchMedia('(max-width: 620px)');
-    const drawerBody = document.getElementById('m-drawer-body');
-    const aboutEl = document.getElementById('m-about');
-    const sourceEl = document.getElementById('m-source-line');
-    // these elements relocate into the drawer in mobile mode (and back on desktop):
-    // - subscribe card
-    // - calculation system selector + its explanation card
-    // - time format toggle
-    // - MCP card
-    // Order in the drawer is the array order below.
-    const MOVE_IDS = ['subscribe', 'sel-tp-system', 'card-system', 'sel-fmt-toggle', 'card-mcp'];
+
+    // Each drawer has its own body and its own list of elements to host.
+    // On mobile, those elements move into the drawer body in array order.
+    // On resize back to desktop, they return to their original DOM position.
+    const SETTINGS = {
+      bodyEl: document.getElementById('m-settings-body'),
+      drawerEl: document.getElementById('m-settings-drawer'),
+      btnEl: document.getElementById('m-settings-btn'),
+      anchorBefore: null,    // append at end of body (no source line)
+      moveIds: ['sel-tp-city', 'sel-tp-system', 'card-system', 'sel-fmt-toggle'],
+      openClass: 'm-settings-open',
+      openEvt: 'settings-open', closeEvt: 'settings-close',
+    };
+    const SUBSCRIBE = {
+      bodyEl: document.getElementById('m-subscribe-body'),
+      drawerEl: document.getElementById('m-subscribe-drawer'),
+      btnEl: document.getElementById('m-subscribe-btn'),
+      anchorBefore: document.getElementById('m-source-line'),  // insert before source link
+      moveIds: ['subscribe', 'card-mcp'],
+      openClass: 'm-subscribe-open',
+      openEvt: 'subscribe-open', closeEvt: 'subscribe-close',
+    };
+    const DRAWERS = [SETTINGS, SUBSCRIBE];
     const placeholders = {};
 
-    function moveCardsToDrawer() {
-      for (const id of MOVE_IDS) {
-        const el = document.getElementById(id);
-        if (!el || el.parentNode === drawerBody) continue;
-        const ph = document.createComment('m-drawer-slot-' + id);
-        placeholders[id] = ph;
-        el.parentNode.insertBefore(ph, el);
-        // insert just before the source line so order stays: about → MOVE_IDS → source
-        drawerBody.insertBefore(el, sourceEl);
+    function moveAllToDrawers() {
+      for (const d of DRAWERS) {
+        for (const id of d.moveIds) {
+          const el = document.getElementById(id);
+          if (!el || el.parentNode === d.bodyEl) continue;
+          const ph = document.createComment('m-drawer-slot-' + id);
+          placeholders[id] = ph;
+          el.parentNode.insertBefore(ph, el);
+          if (d.anchorBefore) d.bodyEl.insertBefore(el, d.anchorBefore);
+          else d.bodyEl.appendChild(el);
+        }
       }
     }
-    function restoreCards() {
-      for (const id of MOVE_IDS) {
-        const el = document.getElementById(id);
-        const ph = placeholders[id];
-        if (el && ph && ph.parentNode) {
-          ph.parentNode.insertBefore(el, ph);
-          ph.parentNode.removeChild(ph);
-          delete placeholders[id];
+    function restoreAll() {
+      for (const d of DRAWERS) {
+        for (const id of d.moveIds) {
+          const el = document.getElementById(id);
+          const ph = placeholders[id];
+          if (el && ph && ph.parentNode) {
+            ph.parentNode.insertBefore(el, ph);
+            ph.parentNode.removeChild(ph);
+            delete placeholders[id];
+          }
         }
       }
     }
 
+    function openDrawer(d) {
+      // exclusive: tapping one closes the other
+      DRAWERS.filter(x => x !== d).forEach(closeDrawer);
+      document.body.classList.add(d.openClass);
+      d.drawerEl.setAttribute('aria-hidden', 'false');
+      d.btnEl.setAttribute('aria-expanded', 'true');
+      if (typeof gcEvent === 'function') gcEvent(d.openEvt);
+    }
+    function closeDrawer(d) {
+      if (!document.body.classList.contains(d.openClass)) return;
+      document.body.classList.remove(d.openClass);
+      d.drawerEl.setAttribute('aria-hidden', 'true');
+      d.btnEl.setAttribute('aria-expanded', 'false');
+      if (typeof gcEvent === 'function') gcEvent(d.closeEvt);
+    }
+    function closeAllDrawers() { DRAWERS.forEach(closeDrawer); }
+
     function applyMode() {
       const mobile = mq.matches;
       document.body.dataset.mode = mobile ? 'mobile' : 'desktop';
-      if (mobile) moveCardsToDrawer(); else { restoreCards(); closeDrawer(); }
+      if (mobile) moveAllToDrawers();
+      else { restoreAll(); closeAllDrawers(); }
     }
 
-    // --- drawer open/close ---
-    const menuBtn = document.getElementById('m-menu');
-    const closeBtn = document.getElementById('m-drawer-close');
-    const scrim = document.getElementById('m-drawer-scrim');
-    function openDrawer() {
-      document.body.classList.add('m-drawer-open');
-      document.getElementById('m-drawer').setAttribute('aria-hidden', 'false');
-      menuBtn.setAttribute('aria-expanded', 'true');
-      if (typeof gcEvent === 'function') gcEvent('settings-open');
-    }
-    function closeDrawer() {
-      if (!document.body.classList.contains('m-drawer-open')) return;
-      document.body.classList.remove('m-drawer-open');
-      document.getElementById('m-drawer').setAttribute('aria-hidden', 'true');
-      menuBtn.setAttribute('aria-expanded', 'false');
-      if (typeof gcEvent === 'function') gcEvent('settings-close');
-    }
-    menuBtn.addEventListener('click', openDrawer);
-    closeBtn.addEventListener('click', closeDrawer);
-    scrim.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+    SETTINGS.btnEl.addEventListener('click', () => openDrawer(SETTINGS));
+    SUBSCRIBE.btnEl.addEventListener('click', () => openDrawer(SUBSCRIBE));
+    document.querySelectorAll('.m-drawer-close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.close;
+        closeDrawer(key === 'settings' ? SETTINGS : SUBSCRIBE);
+      });
+    });
+    document.getElementById('m-drawer-scrim').addEventListener('click', closeAllDrawers);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllDrawers(); });
 
     // --- bottom-nav tap ---
     document.querySelectorAll('#m-bottomnav .m-tab').forEach(b => {
@@ -2477,7 +2550,9 @@
     let touchX = null, touchY = null, touchT = 0;
     document.addEventListener('touchstart', e => {
       if (!mq.matches) return;
-      if (document.body.classList.contains('m-drawer-open')) return;
+      // suppress while either drawer is open
+      if (document.body.classList.contains('m-settings-open') ||
+          document.body.classList.contains('m-subscribe-open')) return;
       const t = e.touches[0]; touchX = t.clientX; touchY = t.clientY; touchT = Date.now();
     }, { passive: true });
     document.addEventListener('touchend', e => {
@@ -2486,9 +2561,8 @@
       const dx = t.clientX - touchX, dy = t.clientY - touchY;
       const ax = Math.abs(dx), ay = Math.abs(dy);
       touchX = null; touchY = null;
-      if (Date.now() - touchT > 600) return;          // ignore slow drags
-      if (ax < 60 || ax < ay * 1.5) return;            // need clear horizontal intent
-      // ignore swipes that start inside horizontally scrollable things (eg date inputs)
+      if (Date.now() - touchT > 600) return;
+      if (ax < 60 || ax < ay * 1.5) return;
       const startTarget = e.target.closest && e.target.closest('input, select, textarea, .tb-table-wrap, .url-box');
       if (startTarget) return;
       const i = ORDER.indexOf(currentTab());
