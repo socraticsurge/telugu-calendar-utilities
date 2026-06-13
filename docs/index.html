@@ -138,13 +138,28 @@
     .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid var(--indigo-border); background: var(--indigo-bg);
                color: var(--indigo); font-weight: 600; font-family: inherit; }
-    .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 10px;
-                   padding: 0.75rem 0.9rem 0.85rem; margin-top: 0.85rem; }
-    .tb-controls-title { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase;
-                         letter-spacing: 0.05em; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 12px;
+                   padding: 0.85rem; margin-top: 0.85rem; }
+    .tb-controls-title { font-size: 0.72rem; font-weight: 700; color: #6366f1; text-transform: uppercase;
+                         letter-spacing: 0.06em; margin-bottom: 0.7rem; display: flex; justify-content: space-between; align-items: center; }
     .tb-reset { background: none; border: none; color: #94a3b8; font-size: 0.68rem; font-weight: 600;
                 cursor: pointer; text-transform: none; letter-spacing: 0; font-family: inherit; text-decoration: underline; }
     .tb-reset:hover { color: #b91c1c; }
+
+    /* Sub-section cards inside .tb-controls — Tarabalam and Muhurtam forms
+       use these to give each input group its own contextual space. Applied
+       on both web and mobile. */
+    .tb-section { background: #fff; border: 1px solid #e8ecf3; border-radius: 10px;
+                  padding: 0.75rem 0.9rem 0.85rem; margin-bottom: 0.65rem; }
+    .tb-section:last-of-type { margin-bottom: 0; }
+    .tb-section-head { display: flex; align-items: center; justify-content: space-between;
+                       gap: 0.5rem; margin-bottom: 0.55rem; padding-bottom: 0.45rem;
+                       border-bottom: 1px solid #f1f5f9; }
+    .tb-section-label { font-size: 0.7rem; font-weight: 700; color: #6366f1;
+                        text-transform: uppercase; letter-spacing: 0.08em; }
+    .tb-section .selector-row { margin: 0; }
+    .tb-cta { width: 100%; padding: 0.78rem 1.25rem; margin-top: 0.6rem;
+              border-radius: 999px; font-size: 0.92rem; letter-spacing: 0.005em; }
     .tb-controls .tb-profile-row select, .tb-controls .tb-date { background: #fff; }
     .tb-controls .tb-add { background: #fff; }
     .tb-controls .tb-add:hover { background: #f1f5f9; }
@@ -642,6 +657,122 @@
     body[data-mode="mobile"] #card-mcp .read-more,
     body[data-mode="mobile"] #card-mcp #mcp-more { display: none !important; }
 
+    /* ---------- Mobile Stitch input language — Tarabalam screen ---------- */
+    /* Outer container becomes a clean white surface; the inner .tb-section
+       cards provide the contextual sub-spaces. */
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls {
+      background: #fff; border: 1px solid #e8ecf3; border-radius: 16px;
+      padding: 0.85rem; margin: 0 0 0.75rem;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-section {
+      background: #fafbfd; border-color: #eef2f7;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-section-label {
+      font-size: 0.68rem; color: #64748b; letter-spacing: 0.1em;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-reset {
+      color: #94a3b8; font-size: 0.72rem;
+    }
+
+    /* Soft gray field surface across selects, text inputs and date inputs */
+    body[data-mode="mobile"] #panel-tarabalam input[type=text],
+    body[data-mode="mobile"] #panel-tarabalam input[type=date],
+    body[data-mode="mobile"] #panel-tarabalam select {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 0.7rem 0.85rem;
+      font-size: 0.92rem; color: #1e1b4b; font-family: inherit;
+      width: 100%;
+      -webkit-appearance: none; appearance: none;
+    }
+    body[data-mode="mobile"] #panel-tarabalam input[type=text]::placeholder {
+      color: #94a3b8;
+    }
+    body[data-mode="mobile"] #panel-tarabalam select {
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%2364748b' stroke-width='1.6'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      background-size: 11px;
+      padding-right: 2.1rem;
+    }
+    body[data-mode="mobile"] #panel-tarabalam input:focus,
+    body[data-mode="mobile"] #panel-tarabalam select:focus {
+      outline: none; border-color: var(--indigo);
+      box-shadow: 0 0 0 3px rgba(67,56,202,0.12);
+    }
+
+    /* Profile row: name full-width, then birth-star + padam two-up */
+    body[data-mode="mobile"] #panel-tarabalam .tb-profile-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.5rem; margin-bottom: 0.5rem;
+      align-items: center; position: relative;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-profile-row input[type=text] {
+      grid-column: 1 / -1;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-profile-row .tb-toggle {
+      grid-column: 1 / -1; margin-left: 0;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-remove {
+      position: absolute; right: 0; top: 0;
+      color: #cbd5e1; font-size: 1.05rem;
+    }
+
+    /* + Add a family member: dashed accent button, full width */
+    body[data-mode="mobile"] #panel-tarabalam .tb-add {
+      width: 100%; padding: 0.7rem 1rem; margin-top: 0.2rem;
+      background: #fff; border: 1px dashed var(--indigo-border);
+      color: var(--indigo); font-weight: 700; font-size: 0.88rem;
+      border-radius: 10px; cursor: pointer;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-add:active { background: var(--indigo-bg); }
+
+    /* Date row: From + To two-up; Standard full-width on its own line */
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .tb-sel-mode {
+      grid-column: 1 / -1;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .selector {
+      flex: none; min-width: 0;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .selector label {
+      font-size: 0.66rem; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Activity row inside mu-section: just the select full width */
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-activity {
+      display: block;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-activity .selector {
+      flex: none; width: 100%;
+    }
+
+    /* Primary CTAs — large pill buttons (both .tb-cta and any .btn) */
+    body[data-mode="mobile"] #panel-tarabalam .tb-cta {
+      padding: 0.9rem 1.25rem; font-size: 0.95rem; font-weight: 700;
+      background: var(--indigo); color: #fff; border: 0; border-radius: 999px;
+      box-shadow: 0 6px 14px rgba(67,56,202,0.22); cursor: pointer;
+      font-family: inherit;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-cta:active {
+      background: #3730a3; box-shadow: 0 3px 8px rgba(67,56,202,0.22);
+    }
+
+    /* Muhurtam section header keeps the chevron, sits in the same card style.
+       The chevron rotates on .mu-open. */
+    body[data-mode="mobile"] #mu-section.tb-controls .tb-controls-title {
+      margin-bottom: 0; font-size: 0.74rem; color: #1e1b4b; letter-spacing: 0.08em;
+    }
+    body[data-mode="mobile"] #mu-section.mu-open .tb-controls-title {
+      margin-bottom: 0.75rem;
+    }
+
     /* Mobile-only: the standalone "Special days — next 30 days" card belongs
        to the Today tab. Hide it when Gochara or Tarabalam is the active screen. */
     body[data-mode="mobile"]:not([data-tool="today"]) #special-days-card { display: none; }
@@ -986,31 +1117,40 @@
         days, purchases favour Labh, beginnings favour Amrit. Every slot lists its reasons.
       </div>
       <div class="tb-controls">
-      <div class="tb-controls-title">Who is this for?
-        <button class="tb-reset" onclick="tbResetProfiles()" title="Forget all saved people on this device">clear all</button></div>
-      <div id="tb-profiles"></div>
-      <button class="tb-add" id="tb-add-btn" onclick="tbAddRow()">+ Add a family member</button>
-      <div class="selector-row" style="margin-top:0.7rem;">
-        <div class="selector">
-          <label for="tb-from">From</label>
-          <input type="date" id="tb-from" class="tb-date">
+        <div class="tb-section">
+          <div class="tb-section-head">
+            <span class="tb-section-label">Who is this for?</span>
+            <button class="tb-reset" onclick="tbResetProfiles()" title="Forget all saved people on this device">clear all</button>
+          </div>
+          <div id="tb-profiles"></div>
+          <button class="tb-add" id="tb-add-btn" onclick="tbAddRow()">+ Add a family member</button>
         </div>
-        <div class="selector">
-          <label for="tb-to">To</label>
-          <input type="date" id="tb-to" class="tb-date">
+
+        <div class="tb-section">
+          <div class="tb-section-head">
+            <span class="tb-section-label">Date range &amp; standard</span>
+          </div>
+          <div class="selector-row tb-row-dates">
+            <div class="selector">
+              <label for="tb-from">From</label>
+              <input type="date" id="tb-from" class="tb-date">
+            </div>
+            <div class="selector">
+              <label for="tb-to">To</label>
+              <input type="date" id="tb-to" class="tb-date">
+            </div>
+            <div class="selector tb-sel-mode">
+              <label for="tb-mode" title="How strictly the Moon (Chandrabalam) is applied when deciding good days">✦ Standard</label>
+              <select id="tb-mode" class="tb-date" onchange="tbSetMode(this.value)">
+                <option value="stars">Stars only (classic)</option>
+                <option value="puja_ok">Stars + Moon, puja ok</option>
+                <option value="strict">Stars + Moon, strict</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="selector">
-          <label for="tb-mode" title="How strictly the Moon (Chandrabalam) is applied when deciding good days">✦ standard</label>
-          <select id="tb-mode" class="tb-date" onchange="tbSetMode(this.value)">
-            <option value="stars">Stars only (classic)</option>
-            <option value="puja_ok">Stars + Moon, puja ok</option>
-            <option value="strict">Stars + Moon, strict</option>
-          </select>
-        </div>
-        <div class="selector"><label>&nbsp;</label>
-          <button class="btn" onclick="calcTarabalam()">Find good days</button>
-        </div>
-      </div>
+
+        <button class="btn tb-cta" onclick="calcTarabalam()">Find good days</button>
       </div><!-- /tb-controls -->
       <div id="tb-summary"></div>
       <div id="tb-result"></div>
@@ -1021,22 +1161,24 @@
       <div class="tb-controls" id="mu-section" style="margin-top:1rem;">
         <div class="tb-controls-title" onclick="muToggleMobile()" role="button" tabindex="0"
              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();muToggleMobile();}">Find a time slot (Muhurtam)</div>
-        <div class="selector-row" style="margin:0;">
-          <div class="selector">
-            <label for="mu-activity">Activity</label>
-            <select id="mu-activity" class="tb-date">
-              <option value="any">Anything auspicious</option>
-              <option value="travel">Travel / journey</option>
-              <option value="purchase">Purchase</option>
-              <option value="ceremony">Ceremony / puja</option>
-              <option value="beginning">New beginning</option>
-            </select>
+        <div class="tb-section">
+          <div class="tb-section-head">
+            <span class="tb-section-label">Activity</span>
           </div>
-          <div class="selector"><label>&nbsp;</label>
-            <button class="btn" onclick="findMuhurta()">Find slots</button>
+          <div class="selector-row tb-row-activity">
+            <div class="selector">
+              <select id="mu-activity" class="tb-date" aria-label="Activity">
+                <option value="any">Anything auspicious</option>
+                <option value="travel">Travel / journey</option>
+                <option value="purchase">Purchase</option>
+                <option value="ceremony">Ceremony / puja</option>
+                <option value="beginning">New beginning</option>
+              </select>
+            </div>
           </div>
         </div>
-        <p class="preview-note" style="margin-top:0.4rem;" id="mu-context"></p>
+        <button class="btn tb-cta" onclick="findMuhurta()">Find slots</button>
+        <p class="preview-note" style="margin-top:0.5rem;" id="mu-context"></p>
       </div>
       <div id="mu-result"></div>
       <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
