@@ -380,6 +380,49 @@
     #m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
     #m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #94a3b8; text-align: center; }
     #m-drawer .m-source a { color: var(--indigo); }
+
+    /* Brand wordmark: drop the symmetric right-side spacer on phones and
+       left-align next to the hamburger. Caps off at narrow widths so the
+       full wordmark never truncates on iPhone SE / 320px. */
+    body[data-mode="mobile"] #m-topbar { gap: 0.35rem; padding: 0 0.7rem; }
+    body[data-mode="mobile"] #m-topbar .m-spacer { display: none; }
+    body[data-mode="mobile"] #m-topbar .m-brand { text-align: left; }
+    @media (max-width: 400px) {
+      #m-topbar .m-brand { font-size: 0.98rem; }
+      #m-topbar .m-brand .sm { font-size: 1rem; margin-right: 0.25rem; }
+    }
+    @media (max-width: 340px) {
+      #m-topbar .m-brand .full { display: none; }
+      #m-topbar .m-brand .short { display: inline; }
+    }
+    #m-topbar .m-brand .short { display: none; }
+
+    /* Mobile selector-row: keep City + Date inline, push System + Time format
+       into the drawer. The drawer holds the explanations next to the controls. */
+    body[data-mode="mobile"] #tp-selector-row {
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+    }
+    body[data-mode="mobile"] #tp-selector-row .selector { flex: 1 1 50%; }
+    body[data-mode="mobile"] #tp-selector-row #tp-date-wrap { flex: 1 1 50%; }
+    body[data-mode="mobile"] #tp-selector-row label { font-size: 0.7rem; }
+
+    /* Drawer placement for relocated selectors — sit them as discrete rows */
+    #m-drawer .selector { display: flex; flex-direction: column; gap: 0.3rem;
+                         padding: 0.6rem 0.75rem; border: 1px solid #eef2f7;
+                         border-radius: 12px; background: #fcfdfe; margin: 0.5rem 0; }
+    #m-drawer .selector > label { font-size: 0.72rem; color: #64748b;
+                                  text-transform: uppercase; letter-spacing: 0.04em;
+                                  font-weight: 700; }
+    #m-drawer .selector select { width: 100%; }
+    #m-drawer .selector .fmt-toggle { align-self: flex-start; }
+
+    /* Special days row: weekday + date stay together (no space-between split),
+       chips on a second line. The "in N days" hint folds into the same line as
+       the date so the row reads as one sentence. */
+    body[data-mode="mobile"] .upcoming-date { justify-content: flex-start; }
+    body[data-mode="mobile"] .upcoming-date { gap: 0.35rem; align-items: baseline; }
+    body[data-mode="mobile"] .upcoming-in { display: inline; color: #cbd5e1; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -387,7 +430,7 @@
 <!-- Mobile shell — visible only when body[data-mode="mobile"] -->
 <header id="m-topbar" role="banner">
   <button class="m-menu" id="m-menu" aria-label="Open settings" aria-controls="m-drawer" aria-expanded="false">☰</button>
-  <span class="m-brand"><span class="sm">🌅</span>AstroChaganti's Panchangam</span>
+  <span class="m-brand"><span class="sm">🌅</span><span class="full">AstroChaganti's Panchangam</span><span class="short">Panchangam</span></span>
   <span class="m-spacer" aria-hidden="true">☰</span>
 </header>
 
@@ -451,12 +494,12 @@
       <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">
         <span class="tt">✦ Tarabalam · Muhurtam</span><span class="ts">When should we act?</span></button>
     </div>
-    <div class="selector-row">
+    <div class="selector-row" id="tp-selector-row">
       <div class="selector">
         <label for="tp-city">City</label>
         <select id="tp-city"></select>
       </div>
-      <div class="selector">
+      <div class="selector" id="sel-tp-system">
         <label for="tp-system">System</label>
         <select id="tp-system"></select>
       </div>
@@ -464,7 +507,7 @@
         <label for="tp-date">Date</label>
         <input type="date" id="tp-date" class="tb-date" style="min-width:140px;">
       </div>
-      <div class="selector">
+      <div class="selector" id="sel-fmt-toggle">
         <label id="fmt-label">Time format</label>
         <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
           <button id="fmt-12" onclick="setTimeFmt('12')">12h</button>
@@ -2271,8 +2314,13 @@
     const drawerBody = document.getElementById('m-drawer-body');
     const aboutEl = document.getElementById('m-about');
     const sourceEl = document.getElementById('m-source-line');
-    // these cards relocate into the drawer in mobile mode; back to flow on desktop
-    const MOVE_IDS = ['subscribe', 'card-system', 'card-mcp'];
+    // these elements relocate into the drawer in mobile mode (and back on desktop):
+    // - subscribe card
+    // - calculation system selector + its explanation card
+    // - time format toggle
+    // - MCP card
+    // Order in the drawer is the array order below.
+    const MOVE_IDS = ['subscribe', 'sel-tp-system', 'card-system', 'sel-fmt-toggle', 'card-mcp'];
     const placeholders = {};
 
     function moveCardsToDrawer() {
@@ -2282,7 +2330,7 @@
         const ph = document.createComment('m-drawer-slot-' + id);
         placeholders[id] = ph;
         el.parentNode.insertBefore(ph, el);
-        // insert just before the source line so order stays: about → cards → source
+        // insert just before the source line so order stays: about → MOVE_IDS → source
         drawerBody.insertBefore(el, sourceEl);
       }
     }
