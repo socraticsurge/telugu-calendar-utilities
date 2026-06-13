@@ -1,0 +1,11 @@
+{
+  "name": "panchangam-landing",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
