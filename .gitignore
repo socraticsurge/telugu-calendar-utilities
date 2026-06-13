@@ -33,4 +33,3 @@ tests/test_sync_tracker_on_task.py
 /*.png
 docs/gochara.json
 public/
-.env
