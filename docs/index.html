@@ -423,6 +423,86 @@
     body[data-mode="mobile"] .upcoming-date { justify-content: flex-start; }
     body[data-mode="mobile"] .upcoming-date { gap: 0.35rem; align-items: baseline; }
     body[data-mode="mobile"] .upcoming-in { display: inline; color: #cbd5e1; font-weight: 500; }
+
+    /* ---------- Mobile Gochara screen ---------- */
+    body[data-mode="mobile"] #panel-gochara > .tb-intro { display: none; }
+    body[data-mode="mobile"] #panel-gochara > .read-more {
+      display: inline-block; font-size: 0.78rem; padding: 0.2rem 0;
+      margin: 0 0 0.3rem; color: #94a3b8 !important;
+    }
+    /* hide explanatory footnotes on phone; keep the last "Please note" disclaimer */
+    body[data-mode="mobile"] #panel-gochara .preview-note { display: none; }
+    body[data-mode="mobile"] #panel-gochara .preview-note:last-of-type {
+      display: block; font-size: 0.74rem; margin-top: 0.5rem;
+    }
+    /* compact pill row above the chart: Date + Viewing share one line */
+    body[data-mode="mobile"] #panel-gochara .tb-controls { padding: 0.3rem 0 0.5rem; }
+    body[data-mode="mobile"] #panel-gochara .tb-controls .selector-row { gap: 0.4rem; }
+    body[data-mode="mobile"] #panel-gochara .tb-controls .selector { flex: 1 1 48%; }
+    body[data-mode="mobile"] #panel-gochara .tb-controls .selector label { font-size: 0.68rem; }
+    /* Sade Sati / Ashtama Shani banner prominent above the chart */
+    body[data-mode="mobile"] #go-conditions .go-cond {
+      background: linear-gradient(180deg, #fffbeb, #fef3c7);
+      border: 1px solid #fcd34d; border-radius: 12px; padding: 0.65rem 0.8rem; margin: 0.4rem 0 0.6rem;
+    }
+    body[data-mode="mobile"] #go-conditions .chip {
+      background: #f59e0b; color: #fff; border: 0; font-weight: 700;
+      padding: 0.3rem 0.65rem; border-radius: 999px;
+    }
+    /* Chart full-bleed: extend just past the card padding, tighten cells */
+    body[data-mode="mobile"] .go-chart {
+      margin-left: -0.6rem; margin-right: -0.6rem;
+      grid-template-rows: repeat(4, minmax(78px, auto));
+      border-radius: 8px;
+    }
+    body[data-mode="mobile"] .go-box { padding: 0.25rem 0.3rem; min-height: 78px; }
+    body[data-mode="mobile"] .go-box .rname { font-size: 0.58rem; padding-right: 0.9rem; }
+    body[data-mode="mobile"] .go-g { font-size: 0.66rem; padding: 0.04rem 0.28rem; margin: 0.08rem 0.08rem 0 0; }
+    /* Centre cell: drop the title and "from X" subtitle; show only the date in large type */
+    body[data-mode="mobile"] .go-center .d1 { display: none; }
+    body[data-mode="mobile"] .go-center .d2 ~ .d2 { display: none; }
+    body[data-mode="mobile"] .go-center .d2 { font-size: 0.82rem; font-weight: 700; color: var(--indigo); }
+    /* Coming up: vertical chip stack, one per line */
+    body[data-mode="mobile"] .go-moves {
+      display: flex; flex-direction: column; align-items: flex-start;
+      gap: 0.3rem; margin-top: 0.7rem;
+    }
+    body[data-mode="mobile"] .go-moves > b:first-child {
+      font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    body[data-mode="mobile"] .go-move {
+      display: block; padding: 0.3rem 0.55rem; background: #eef2ff; color: #1e1b4b;
+      border: 1px solid var(--indigo-border); border-radius: 999px;
+      font-size: 0.78rem; line-height: 1.2;
+    }
+    body[data-mode="mobile"] .go-move-sep { display: none; }
+
+    /* ---------- Mobile Tarabalam screen ---------- */
+    body[data-mode="mobile"] #panel-tarabalam > .tb-intro { display: none; }
+    body[data-mode="mobile"] #panel-tarabalam > .read-more {
+      display: inline-block; font-size: 0.78rem; padding: 0.2rem 0;
+      margin: 0 0 0.3rem; color: #94a3b8 !important;
+    }
+    /* tighter profile + date controls */
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls { padding: 0.5rem 0; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls-title { font-size: 0.85rem; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector { flex: 1 1 48%; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector:last-child { flex: 1 1 100%; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector label { font-size: 0.68rem; }
+    body[data-mode="mobile"] #panel-tarabalam > .preview-note { font-size: 0.74rem; }
+
+    /* Find a time slot: collapse on mobile, expand on tap. Always open on desktop. */
+    body[data-mode="mobile"] #mu-section .tb-controls-title {
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem; user-select: none;
+    }
+    body[data-mode="mobile"] #mu-section .tb-controls-title::after {
+      content: '▾'; color: #94a3b8; font-size: 0.8rem;
+      transition: transform 0.18s ease;
+    }
+    body[data-mode="mobile"] #mu-section.expanded .tb-controls-title::after { transform: rotate(180deg); }
+    body[data-mode="mobile"] #mu-section:not(.expanded) > *:not(.tb-controls-title) { display: none; }
+    body[data-mode="mobile"] #mu-section:not(.expanded) ~ #mu-result { display: none; }
   </style>
 </head>
 <body>
@@ -595,8 +675,9 @@
       <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
       Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
 
-      <div class="tb-controls" style="margin-top:1rem;">
-        <div class="tb-controls-title">Find a time slot (Muhurtam)</div>
+      <div class="tb-controls" id="mu-section" style="margin-top:1rem;">
+        <div class="tb-controls-title" onclick="muToggleMobile()" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();muToggleMobile();}">Find a time slot (Muhurtam)</div>
         <div class="selector-row" style="margin:0;">
           <div class="selector">
             <label for="mu-activity">Activity</label>
@@ -1837,6 +1918,13 @@
     window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
+  // mobile: expand / collapse the "Find a time slot" section. Desktop CSS
+  // ignores the .expanded toggle, so this is a no-op there.
+  function muToggleMobile() {
+    const sec = document.getElementById('mu-section');
+    if (sec) sec.classList.toggle('expanded');
+  }
+
   function switchTool(which) {
     for (const t of ['today', 'tarabalam', 'gochara']) {
       document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
@@ -2030,7 +2118,8 @@
       .filter(m => m.t).sort((a, b) => a.t.date - b.t.date).slice(0, 5);
     document.getElementById('go-moves').innerHTML = moves.length
       ? `<div class="go-moves"><b>Coming up:</b> ` + moves.map(m =>
-          `${m.g} → ${m.t.next} <b>${m.t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</b>`).join(' &nbsp;·&nbsp; ') + `</div>` : '';
+          `<span class="go-move">${m.g} → ${m.t.next} <b>${m.t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</b></span>`)
+          .join('<span class="go-move-sep"> &nbsp;·&nbsp; </span>') + `</div>` : '';
 
     // rasi phalalu (daily reading from the same computed verdicts)
     const phBox = document.getElementById('go-phalalu');
