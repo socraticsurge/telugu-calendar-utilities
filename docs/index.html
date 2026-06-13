@@ -2,3180 +2,1314 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AstroChaganti's Panchangam — Calendar Feeds</title>
-  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities — plus Tarabalam & Muhurtam good-day and time-slot finders, and the Gochara chart with daily Rasi Phalalu. Free, no account needed.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌅</text></svg>">
-  <meta property="og:title" content="AstroChaganti's Panchangam">
-  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days — plus Tarabalam, Muhurtam, Gochara and Rasi Phalalu tools. Subscribe once, updated automatically.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://panchangam.astrochaganti.com/">
-  <meta property="og:image" content="https://panchangam.astrochaganti.com/og-image.png">
-  <meta name="twitter:card" content="summary_large_image">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#b45309">
+  <title>Panchangam</title>
+  <meta name="description" content="Telugu panchangam — Tithi, Nakshatra, muhurtams, festivals, Tarabalam, Gochara, Rasi Phalalu. Free, no account needed.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌅</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Warm sunrise palette - sophisticated, not garish */
-      --amber-deep: #b45309;
-      --amber: #d97706;
-      --amber-light: #fbbf24;
-      --amber-bg: #fffbeb;
-      --amber-border: #fde68a;
-      --orange: #ea580c;
-      --orange-bg: #fff7ed;
+      /* App-style color palette */
+      --primary: #b45309;
+      --primary-light: #d97706;
+      --primary-bg: #fffbeb;
+      --accent: #ea580c;
+      --accent-bg: #fff7ed;
 
-      /* Terracotta / copper accents */
-      --copper: #c2410c;
-      --copper-light: #fed7aa;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
 
-      /* Forest green for auspicious */
-      --green-deep: #15803d;
-      --green: #16a34a;
-      --green-light: #22c55e;
-      --green-bg: #f0fdf4;
-      --green-border: #bbf7d0;
+      --bg: #fafaf9;
+      --card: #ffffff;
+      --surface: #f5f5f4;
+      --border: #e7e5e4;
+      --divider: #d6d3d1;
 
-      /* Rose for inauspicious */
-      --rose-deep: #be123c;
-      --rose: #e11d48;
-      --rose-bg: #fff1f2;
-      --rose-border: #fecdd3;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
 
-      /* Neutral scales */
-      --ink: #1c1917;
-      --ink-light: #292524;
-      --slate: #44403c;
-      --stone: #78716c;
-      --sand: #a8a29e;
-      --sand-light: #d6d3d1;
-      --cream: #fafaf9;
-      --alabaster: #f5f5f4;
-      --snow: #ffffff;
+      --nav-height: 56px;
+      --bottom-nav: 64px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-      /* Semantic colors */
-      --primary: var(--amber-deep);
-      --primary-light: var(--amber);
-      --text: var(--ink);
-      --text-muted: var(--slate);
-      --text-subtle: var(--stone);
-      --bg: var(--cream);
-      --card-bg: var(--snow);
-      --border: var(--sand-light);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
 
-      /* Spacing system (8px base) */
-      --space-1: 0.25rem;  /* 4px */
-      --space-2: 0.5rem;   /* 8px */
-      --space-3: 0.75rem;  /* 12px */
-      --space-4: 1rem;     /* 16px */
-      --space-5: 1.25rem;  /* 20px */
-      --space-6: 1.5rem;   /* 24px */
-      --space-8: 2rem;     /* 32px */
-      --space-10: 2.5rem;  /* 40px */
-      --space-12: 3rem;    /* 48px */
-      --space-16: 4rem;    /* 64px */
-
-      /* Radii */
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 20px;
-      --radius-full: 9999px;
-
-      /* Shadows - layered for depth */
-      --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
-      --shadow-md: 0 4px 12px -2px rgba(28, 25, 23, 0.08), 0 2px 4px -1px rgba(28, 25, 23, 0.04);
-      --shadow-lg: 0 20px 40px -10px rgba(28, 25, 23, 0.12), 0 8px 16px -8px rgba(28, 25, 23, 0.06);
-      --shadow-xl: 0 32px 64px -16px rgba(28, 25, 23, 0.16);
-
-      /* Transitions */
-      --ease: cubic-bezier(0.4, 0, 0.2, 1);
-      --ease-out: cubic-bezier(0, 0, 0.2, 1);
-      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-      --duration-fast: 150ms;
-      --duration-normal: 250ms;
-      --duration-slow: 400ms;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 28px rgba(0,0,0,0.12);
     }
 
-    /* Base reset */
-    *, *::before, *::after { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    html {
-      scroll-behavior: smooth;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-    }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    html, body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 16px;
-      line-height: 1.6;
-      color: var(--text);
-      background: var(--bg);
-      margin: 0;
-      padding: 0;
-    }
-
-    /* Typography scale */
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
-      font-weight: 700;
-      line-height: 1.2;
-      color: var(--ink);
-      margin: 0;
-    }
-
-    h1 { font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.02em; }
-    h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
-    h3 { font-size: 1.125rem; }
-    h4 { font-size: 1rem; font-weight: 600; }
-
-    p { margin: 0 0 var(--space-4); }
-
-    a {
-      color: var(--primary);
-      text-decoration: none;
-      transition: color var(--duration-fast) var(--ease);
-    }
-    a:hover { color: var(--copper); }
-
-    /* Layout */
-    .page {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 0 var(--space-4) var(--space-12);
-    }
-
-    /* ============================================
-       HERO SECTION - Dawn gradient background
-       ============================================ */
-    .hero {
-      position: relative;
-      text-align: center;
-      padding: var(--space-10) var(--space-4) var(--space-8);
-      margin: 0 calc(var(--space-4) * -1);
-      background: linear-gradient(
-        180deg,
-        #fef3c7 0%,    /* amber-100 */
-        #fed7aa 50%,   /* orange-200 */
-        #fff7ed 100%   /* orange-50 */
-      );
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(
-        circle at 30% 20%,
-        rgba(251, 191, 36, 0.3) 0%,
-        transparent 50%
-      );
-      pointer-events: none;
-    }
-
-    .hero-icon {
-      font-size: 4rem;
-      line-height: 1;
-      margin-bottom: var(--space-4);
-      display: inline-block;
-      animation: gentle-bob 4s ease-in-out infinite;
-      filter: drop-shadow(0 4px 8px rgba(180, 83, 9, 0.2));
-    }
-
-    @keyframes gentle-bob {
-      0%, 100% { transform: translateY(0) rotate(-2deg); }
-      50% { transform: translateY(-8px) rotate(2deg); }
-    }
-
-    .hero h1 {
-      margin-bottom: var(--space-3);
-      background: linear-gradient(135deg, var(--copper) 0%, var(--amber-deep) 50%, var(--orange) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero .tagline {
-      font-size: 1.0625rem;
-      color: var(--slate);
-      max-width: 540px;
-      margin: 0 auto var(--space-5);
-      line-height: 1.7;
-    }
-
-    .hero-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-3) var(--space-6);
-      background: linear-gradient(135deg, var(--amber) 0%, var(--orange) 100%);
-      color: var(--snow);
-      font-weight: 600;
-      font-size: 0.9375rem;
-      border-radius: var(--radius-full);
-      box-shadow: var(--shadow-md), 0 4px 12px rgba(234, 88, 12, 0.25);
-      transition: all var(--duration-normal) var(--ease);
-      text-decoration: none;
-    }
-
-    .hero-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg), 0 8px 20px rgba(234, 88, 12, 0.3);
-      color: var(--snow);
-    }
-
-    /* ============================================
-       CARD SYSTEM
-       ============================================ */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: var(--space-6);
-      margin-top: var(--space-6);
-      box-shadow: var(--shadow-md);
-      transition: box-shadow var(--duration-normal) var(--ease);
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-lg);
-    }
-
-    .card h2 {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      margin-bottom: var(--space-5);
-      color: var(--ink);
-    }
-
-    .card h3.sub {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--stone);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: var(--space-6) 0 var(--space-3);
-    }
-
-    /* ============================================
-       TAB NAVIGATION
-       ============================================ */
-    .tool-tabs {
-      display: flex;
-      gap: var(--space-2);
-      margin-bottom: var(--space-5);
-      border-bottom: 2px solid var(--sand-light);
-      padding-bottom: 0;
-    }
-
-    .tool-tab {
-      flex: 1 1 0;
-      min-width: 0;
-      font-family: inherit;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      color: var(--stone);
-      background: none;
-      border: none;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-      padding: var(--space-3) var(--space-3) var(--space-4);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      text-align: center;
-      transition: all var(--duration-fast) var(--ease);
-      border-radius: var(--radius-md) var(--radius-md) 0 0;
-    }
-
-    .tool-tab:hover {
-      color: var(--slate);
-      background: var(--alabaster);
-    }
-
-    .tool-tab.active {
-      color: var(--amber-deep);
-      border-bottom-color: var(--amber);
-    }
-
-    .tool-tab .ts {
-      font-size: 0.6875rem;
-      font-weight: 500;
-      color: var(--sand);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-
-    .tool-tab.active .ts {
-      color: var(--orange);
-    }
-
-    @media (max-width: 600px) {
-      .tool-tabs {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-      }
-      .tool-tabs::-webkit-scrollbar { display: none; }
-      .tool-tab {
-        flex: 0 0 auto;
-        font-size: 0.875rem;
-        padding: var(--space-3);
-      }
-      .tool-tab .ts { display: none; }
-    }
-
-    /* ============================================
-       SELECTOR ROWS
-       ============================================ */
-    .selector-row {
-      display: flex;
-      gap: var(--space-3);
-      flex-wrap: wrap;
-      align-items: flex-end;
-      margin: var(--space-4) 0;
-    }
-
-    .selector {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-1);
-    }
-
-    .selector label {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      color: var(--stone);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .selector select,
-    .selector input[type="date"],
-    .tb-date {
-      font-family: inherit;
-      font-size: 0.875rem;
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--sand-light);
-      background: var(--alabaster);
-      color: var(--text);
-      font-weight: 500;
-      min-width: 140px;
-      max-width: 200px;
-      transition: all var(--duration-fast) var(--ease);
-      cursor: pointer;
-    }
-
-    .selector select:hover,
-    .selector input[type="date"]:hover,
-    .tb-date:hover {
-      border-color: var(--amber-light);
-      background: var(--amber-bg);
-    }
-
-    .selector select:focus,
-    .selector input[type="date"]:focus,
-    .tb-date:focus {
-      outline: none;
-      border-color: var(--amber);
-      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
-    }
-
-    /* ============================================
-       BUTTONS
-       ============================================ */
-    .btn {
-      font-family: inherit;
-      font-size: 0.875rem;
-      font-weight: 600;
-      padding: var(--space-2) var(--space-5);
-      border-radius: var(--radius-md);
-      border: none;
-      cursor: pointer;
-      transition: all var(--duration-fast) var(--ease);
-      background: var(--amber);
-      color: var(--snow);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn:hover {
-      background: var(--amber-deep);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    /* ============================================
-       URL BOX
-       ============================================ */
-    .url-box {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, 'Cascadia Code', monospace;
-      font-size: 0.8125rem;
-      padding: var(--space-3) var(--space-4);
-      background: var(--alabaster);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      word-break: break-all;
-      color: var(--slate);
-      margin: var(--space-3) 0;
-    }
-
-    .copy-confirm {
-      margin-left: var(--space-4);
-      color: var(--green);
-      font-weight: 600;
-      font-size: 0.875rem;
-      opacity: 0;
-      transition: opacity var(--duration-fast) var(--ease);
-    }
-    .copy-confirm.show { opacity: 1; }
-
-    /* ============================================
-       APP TABS (Calendar instructions)
-       ============================================ */
-    .app-tabs {
-      display: flex;
-      gap: var(--space-2);
-      margin-top: var(--space-4);
-    }
-
-    .app-tab {
-      font-family: inherit;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      padding: var(--space-2) var(--space-4);
-      border-radius: var(--radius-md) var(--radius-md) 0 0;
-      background: var(--alabaster);
-      color: var(--stone);
-      border: none;
-      cursor: pointer;
-      transition: all var(--duration-fast) var(--ease);
-    }
-
-    .app-tab:hover { color: var(--slate); }
-
-    .app-tab.active {
-      background: var(--amber-bg);
-      color: var(--amber-deep);
-    }
-
-    .app-panel {
-      display: none;
-      background: var(--amber-bg);
-      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
-      padding: var(--space-4);
-      margin-top: var(--space-1);
-    }
-
-    .app-panel.active { display: block; }
-
-    .app-panel ol {
-      margin: 0;
-      padding-left: var(--space-5);
-      color: var(--slate);
-      columns: 2;
-      column-gap: var(--space-6);
-    }
-    .app-panel ol li { margin-bottom: var(--space-2); break-inside: avoid; }
-
-    @media (max-width: 500px) {
-      .app-panel ol { columns: 1; }
-    }
-
-    /* ============================================
-       PREVIEW CARD (Today's Panchangam)
-       ============================================ */
-    .preview-card {
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-      background: var(--snow);
-    }
-
-    .preview-head {
-      position: relative;
-      background: linear-gradient(135deg, var(--amber-deep) 0%, var(--orange) 100%);
-      color: var(--snow);
-      padding: var(--space-4) var(--space-5);
-      padding-right: var(--space-10);
-    }
-
-    .preview-head .date {
-      font-family: 'Fraunces', Georgia, serif;
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: var(--space-1);
-    }
-
-    .preview-head .meta {
-      font-size: 0.8125rem;
-      opacity: 0.9;
       line-height: 1.5;
+      color: var(--text-primary);
+      background: var(--bg);
+      overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .preview-head .badge {
-      display: inline-block;
-      background: var(--amber-light);
-      color: var(--amber-deep);
-      font-family: 'Inter', sans-serif;
-      font-size: 0.6875rem;
-      font-weight: 700;
-      padding: 2px var(--space-2);
-      border-radius: var(--radius-sm);
-      margin-left: var(--space-2);
-      vertical-align: middle;
-    }
+    /* Hide scrollbar but allow scrolling */
+    ::-webkit-scrollbar { display: none; }
+    body { scrollbar-width: none; }
 
-    /* Special day flags strip */
-    .flag-strip {
-      background: var(--amber-bg);
-      border-bottom: 1px solid var(--amber-border);
-      padding: var(--space-3) var(--space-4);
+    /* ===== APP SHELL ===== */
+    .app {
       display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      align-items: center;
-    }
-
-    .special-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--snow);
-      color: var(--amber-deep);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      padding: var(--space-1) var(--space-3);
-      border-radius: var(--radius-full);
-      border: 1px solid var(--amber-border);
-    }
-
-    .yoga-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--orange-bg);
-      color: var(--orange);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      padding: var(--space-1) var(--space-3);
-      border-radius: var(--radius-full);
-      border: 1px solid var(--copper-light);
-    }
-
-    /* Pancha Anga grid */
-    .anga-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--space-2);
-      padding: var(--space-4) var(--space-4) var(--space-3);
-    }
-    @media (max-width: 500px) {
-      .anga-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    .anga-cell {
-      background: var(--orange-bg);
-      border: 1px solid var(--copper-light);
-      border-radius: var(--radius-md);
-      padding: var(--space-3);
-      text-align: center;
-      transition: transform var(--duration-fast) var(--ease);
-    }
-    .anga-cell:hover {
-      transform: translateY(-2px);
-    }
-
-    .anga-label {
-      font-size: 0.625rem;
-      font-weight: 700;
-      color: var(--orange);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .anga-name {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      color: var(--ink);
-      margin: var(--space-1) 0 2px;
-    }
-
-    .anga-time {
-      font-size: 0.75rem;
-      color: var(--slate);
-    }
-
-    sup.plus1 {
-      font-size: 0.7em;
-      font-weight: 700;
-      color: var(--orange);
-      cursor: help;
-    }
-
-    /* Window strips */
-    .tile-strip {
-      border-top: 1px solid var(--sand-light);
-      padding: var(--space-3) var(--space-4);
-    }
-
-    .strip-title {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: var(--space-3);
-      color: var(--stone);
-    }
-    .strip-title.good-t { color: var(--green-deep); }
-    .strip-title.bad-t { color: var(--rose-deep); }
-
-    .win-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: var(--space-2);
-    }
-
-    /* Choghadiya grid */
-    .chog-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: var(--space-2);
-    }
-    @media (max-width: 500px) {
-      .chog-grid { grid-template-columns: repeat(4, 1fr); }
-    }
-
-    .chog-cell {
-      border-radius: var(--radius-md);
-      padding: var(--space-2);
-      text-align: center;
-      transition: transform var(--duration-fast) var(--ease);
-    }
-    .chog-cell:hover { transform: translateY(-1px); }
-    .chog-cell.good {
-      background: var(--green-bg);
-      border: 1px solid var(--green-border);
-    }
-    .chog-cell.bad {
-      background: var(--rose-bg);
-      border: 1px solid var(--rose-border);
-    }
-
-    .chog-name {
-      font-size: 0.8125rem;
-      font-weight: 700;
-    }
-    .chog-cell.good .chog-name { color: var(--green-deep); }
-    .chog-cell.bad .chog-name { color: var(--rose-deep); }
-
-    .chog-time {
-      font-size: 0.75rem;
-      color: var(--slate);
-      margin-top: 2px;
-    }
-
-    .preview-note {
-      font-size: 0.8125rem;
-      color: var(--stone);
-      margin-top: var(--space-4);
-      line-height: 1.6;
-    }
-
-    .preview-error {
-      font-size: 0.9375rem;
-      color: var(--rose-deep);
-      padding: var(--space-5);
-      text-align: center;
-    }
-
-    /* WhatsApp mini button */
-    .wa-share-mini {
-      position: absolute;
-      top: var(--space-4);
-      right: var(--space-4);
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-full);
-      background: #25d366;
-      color: var(--snow);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .wa-share-mini:hover {
-      background: #1da851;
-      transform: scale(1.08);
-    }
-
-    /* ============================================
-       TIME FORMAT TOGGLE
-       ============================================ */
-    .fmt-toggle {
-      display: inline-flex;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
     }
 
-    .fmt-toggle button {
-      font-family: inherit;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      padding: var(--space-2) var(--space-3);
-      border: none;
-      background: var(--snow);
-      color: var(--stone);
-      cursor: pointer;
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .fmt-toggle button.active {
-      background: var(--amber-bg);
-      color: var(--amber-deep);
-    }
-
-    /* ============================================
-       UPCOMING SPECIAL DAYS
-       ============================================ */
-    .upcoming-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-      margin-top: var(--space-4);
-    }
-
-    .upcoming-row {
-      display: flex;
-      align-items: baseline;
-      gap: var(--space-3);
-      padding: var(--space-3) var(--space-4);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      background: var(--alabaster);
-      flex-wrap: wrap;
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .upcoming-row:hover {
-      border-color: var(--amber-border);
-      background: var(--amber-bg);
-    }
-
-    .upcoming-date {
-      font-size: 0.875rem;
-      font-weight: 700;
-      color: var(--ink);
-      min-width: 8rem;
-    }
-    .upcoming-date .dow {
-      color: var(--stone);
-      font-weight: 500;
-    }
-
-    .upcoming-in {
-      font-size: 0.75rem;
-      color: var(--stone);
-      margin-left: auto;
-    }
-
-    /* ============================================
-       SYSTEM COMPARISON CARDS
-       ============================================ */
-    .sys-card {
-      border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      margin-bottom: var(--space-4);
-      box-shadow: var(--shadow-sm);
-    }
-    .sys-card.drik {
-      background: var(--amber-bg);
-      border: 1px solid var(--amber-border);
-    }
-    .sys-card.ss {
-      background: var(--orange-bg);
-      border: 1px solid var(--copper-light);
-    }
-    .sys-card.vakya {
-      background: var(--green-bg);
-      border: 1px solid var(--green-border);
-    }
-
-    .sys-card h3 {
-      margin-bottom: var(--space-2);
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-    }
-    .sys-card.drik h3 { color: var(--amber-deep); }
-    .sys-card.ss h3 { color: var(--copper); }
-    .sys-card.vakya h3 { color: var(--green-deep); }
-
-    .sys-card p {
-      font-size: 0.9375rem;
-      color: var(--slate);
-      margin-bottom: var(--space-3);
-    }
-
-    .read-more {
-      font-family: inherit;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      transition: color var(--duration-fast) var(--ease);
-    }
-    .sys-card.drik .read-more { color: var(--amber-deep); }
-    .sys-card.ss .read-more { color: var(--copper); }
-    .sys-card.vakya .read-more { color: var(--green-deep); }
-
-    .expanded {
-      display: none;
-      margin-top: var(--space-4);
-      padding-top: var(--space-4);
-      border-top: 1px dashed rgba(0,0,0,0.1);
-      font-size: 0.875rem;
-      color: var(--slate);
-      line-height: 1.7;
-    }
-    .expanded.open { display: block; }
-    .expanded a { color: var(--amber-deep); font-weight: 600; }
-
-    .tip {
-      font-size: 0.875rem;
-      color: var(--stone);
-      font-style: italic;
-    }
-
-    /* ============================================
-       MCP SERVER SECTION
-       ============================================ */
-    .mcp-tagline {
-      font-size: 0.9375rem;
-      color: var(--slate);
-      margin-bottom: var(--space-5);
-    }
-
-    .mcp-tools {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-3);
-      margin: var(--space-5) 0;
-    }
-    @media (max-width: 500px) {
-      .mcp-tools { grid-template-columns: 1fr; }
-    }
-
-    .mcp-tool {
-      background: var(--alabaster);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: var(--space-3) var(--space-4);
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .mcp-tool:hover {
-      border-color: var(--amber-border);
-      background: var(--amber-bg);
-    }
-
-    .mcp-tool code {
-      display: block;
-      font-family: ui-monospace, monospace;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      color: var(--amber-deep);
-      margin-bottom: var(--space-1);
-    }
-
-    .mcp-tool span {
-      font-size: 0.8125rem;
-      color: var(--stone);
-    }
-
-    .mcp-install {
-      background: var(--ink);
-      border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      margin: var(--space-4) 0;
-    }
-
-    .mcp-install h4 {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.6875rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--amber-light);
-      margin-bottom: var(--space-3);
-    }
-
-    .mcp-install pre {
-      font-family: ui-monospace, 'SF Mono', Consolas, monospace;
-      font-size: 0.8125rem;
-      color: var(--copper-light);
-      margin: 0;
-      white-space: pre-wrap;
-      line-height: 1.7;
-    }
-
-    .mcp-clients {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      margin: var(--space-4) 0 var(--space-2);
-    }
-
-    .mcp-client {
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: var(--amber-bg);
-      color: var(--amber-deep);
-      border: 1px solid var(--amber-border);
-      border-radius: var(--radius-full);
-      padding: var(--space-1) var(--space-3);
-    }
-
-    /* ============================================
-       TARABALAM TOOL
-       ============================================ */
-    .tb-intro {
-      font-size: 0.9375rem;
-      color: var(--slate);
-      margin-bottom: var(--space-4);
-    }
-
-    .tb-controls {
-      background: var(--amber-bg);
-      border: 1px solid var(--amber-border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      margin-top: var(--space-5);
-    }
-
-    .tb-controls-title {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--amber-deep);
-      margin-bottom: var(--space-4);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .tb-reset {
-      font-family: inherit;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      background: none;
-      border: none;
-      color: var(--stone);
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .tb-reset:hover { color: var(--rose-deep); }
-
-    .tb-controls .selector select,
-    .tb-controls .tb-date {
-      background: var(--snow);
-    }
-
-    .tb-profile-row {
-      display: flex;
-      gap: var(--space-3);
-      margin-bottom: var(--space-3);
-      flex-wrap: wrap;
-      align-items: flex-end;
-    }
-
-    .tb-profile-row input[type="text"] {
-      font-family: inherit;
-      font-size: 0.875rem;
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      width: 160px;
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .tb-profile-row input[type="text"]:focus {
-      outline: none;
-      border-color: var(--amber);
-      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
-    }
-
-    .tb-profile-row select {
-      font-family: inherit;
-      font-size: 0.875rem;
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--amber-border);
-      background: var(--amber-bg);
-      color: var(--amber-deep);
-      font-weight: 600;
-      min-width: 160px;
-      cursor: pointer;
-    }
-
-    .tb-you {
-      font-size: 0.6875rem;
-      color: var(--stone);
-      font-weight: 700;
-    }
-
-    .tb-filter {
-      font-size: 0.875rem;
-      color: var(--slate);
-      display: inline-flex;
-      gap: var(--space-2);
-      align-items: center;
-      margin: var(--space-3) 0;
-    }
-
-    .tb-add {
-      font-family: inherit;
-      font-size: 0.875rem;
-      font-weight: 600;
-      background: var(--snow);
-      border: 1px dashed var(--amber-border);
-      color: var(--amber-deep);
-      border-radius: var(--radius-md);
-      padding: var(--space-2) var(--space-4);
-      cursor: pointer;
-      margin-top: var(--space-2);
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .tb-add:hover {
-      background: var(--amber-bg);
-      border-style: solid;
-    }
-
-    .tb-remove {
-      background: none;
-      border: none;
-      color: var(--sand);
-      font-size: 1.125rem;
-      cursor: pointer;
-      padding: 0 var(--space-1);
-      transition: color var(--duration-fast) var(--ease);
-    }
-    .tb-remove:hover { color: var(--rose-deep); }
-
-    .tb-summary {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-      align-items: center;
-      background: var(--amber-bg);
-      border: 1px solid var(--amber-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-3) var(--space-4);
-      margin-top: var(--space-4);
-      font-size: 0.875rem;
-      color: var(--amber-deep);
-    }
-    .tb-summary .count { font-weight: 800; }
-
-    .tb-toggle {
-      margin-left: auto;
-      font-size: 0.8125rem;
-      color: var(--copper);
-      display: inline-flex;
-      gap: var(--space-2);
-      align-items: center;
-      cursor: pointer;
-    }
-
-    /* Tarabalam table */
-    .tb-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-      margin-top: var(--space-3);
-    }
-
-    .tb-table th {
-      text-align: left;
-      font-size: 0.6875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--stone);
-      padding: var(--space-2) var(--space-3);
+    /* ===== TOP BAR ===== */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--card);
       border-bottom: 1px solid var(--border);
-      font-weight: 700;
-    }
-
-    .tb-table td {
-      padding: var(--space-2) var(--space-3);
-      border-bottom: 1px solid var(--sand-light);
-      vertical-align: middle;
-    }
-
-    .tb-table tr.tb-all {
-      background: var(--green-bg);
-    }
-
-    .tb-date-cell {
-      font-weight: 700;
-      color: var(--ink);
-      white-space: nowrap;
-    }
-
-    .tb-sub {
-      font-size: 0.75rem;
-      color: var(--stone);
-    }
-
-    .tara-chip {
-      display: inline-flex;
-      border-radius: var(--radius-md);
-      padding: 2px var(--space-2);
-      font-weight: 700;
-      font-size: 0.8125rem;
-      white-space: nowrap;
-    }
-    .tara-chip.good {
-      background: var(--green-bg);
-      color: var(--green-deep);
-      border: 1px solid var(--green-border);
-    }
-    .tara-chip.bad {
-      background: var(--rose-bg);
-      color: var(--rose-deep);
-      border: 1px solid var(--rose-border);
-    }
-    .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
-    .tara-chip.puja {
-      background: var(--amber-bg);
-      color: var(--amber-deep);
-      border: 1px solid var(--amber-border);
-    }
-
-    .tb-star {
-      color: var(--amber);
-      font-size: 1.125rem;
-    }
-
-    .tb-readme {
-      margin-top: var(--space-5);
-      padding: var(--space-4);
-      background: var(--alabaster);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      font-size: 0.8125rem;
-      color: var(--slate);
-      line-height: 1.7;
-    }
-
-    .tb-readme-title {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--stone);
-      margin-bottom: var(--space-2);
-    }
-
-    /* ============================================
-       GOCHARA CHART
-       ============================================ */
-    .go-chart {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(4, minmax(90px, auto));
-      gap: 2px;
-      background: var(--sand);
-      border: 2px solid var(--sand);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-top: var(--space-5);
-    }
-
-    .go-box {
-      background: var(--snow);
-      padding: var(--space-2) var(--space-3);
-      position: relative;
-      min-height: 90px;
-      transition: background var(--duration-fast) var(--ease);
-    }
-    .go-box:hover {
-      background: var(--alabaster);
-    }
-
-    .go-box .rname {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      color: var(--stone);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      display: inline-block;
-      padding-right: var(--space-5);
-    }
-
-    .go-box .house {
-      position: absolute;
-      top: var(--space-2);
-      right: var(--space-3);
-      font-size: 0.6875rem;
-      font-weight: 700;
-      color: var(--sand);
-    }
-
-    .go-box.janma {
-      outline: 3px solid var(--amber);
-      outline-offset: -3px;
-      background: var(--amber-bg);
-    }
-    .go-box.janma .rname { color: var(--amber-deep); }
-
-    .go-center {
-      grid-column: 2 / 4;
-      grid-row: 2 / 4;
-      background: var(--amber-bg);
+      padding: 12px 16px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: var(--space-4);
-      gap: var(--space-2);
+      justify-content: space-between;
+      gap: 12px;
+      min-height: var(--nav-height);
     }
 
-    .go-center .d1 {
+    .top-bar-title {
       font-family: 'Fraunces', Georgia, serif;
       font-weight: 700;
-      color: var(--amber-deep);
-      font-size: 1.125rem;
-    }
-
-    .go-center .d2 {
-      font-size: 0.75rem;
-      color: var(--copper);
-    }
-
-    .go-g {
-      display: inline-flex;
-      align-items: center;
-      border-radius: var(--radius-sm);
-      padding: 2px var(--space-2);
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin: var(--space-1) var(--space-1) 0 0;
-      background: var(--amber-bg);
-      color: var(--amber-deep);
-      border: 1px solid var(--amber-border);
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .go-g:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .go-g.good {
-      background: var(--green-bg);
-      color: var(--green-deep);
-      border-color: var(--green-border);
-    }
-    .go-g.blocked {
-      background: var(--amber-bg);
-      color: var(--copper);
-      border-color: var(--copper-light);
-    }
-    .go-g.bad {
-      background: var(--rose-bg);
-      color: var(--rose-deep);
-      border-color: var(--rose-border);
-    }
-    .go-g.bad::after { content: ' ✗'; font-size: 0.85em; }
-
-    .go-retro {
-      font-size: 0.625rem;
-      vertical-align: super;
-      opacity: 0.7;
-    }
-
-    .go-moves {
-      margin-top: var(--space-5);
-      font-size: 0.8125rem;
-      color: var(--slate);
-    }
-    .go-moves b { color: var(--ink); }
-
-    .go-phalalu {
-      margin-top: var(--space-5);
-      background: linear-gradient(135deg, var(--amber-bg) 0%, var(--orange-bg) 100%);
-      border: 1px solid var(--amber-border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-5);
-    }
-    .go-phalalu h4 {
-      font-size: 0.8125rem;
-      color: var(--amber-deep);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: var(--space-3);
+      font-size: 1.25rem;
+      color: var(--primary);
       display: flex;
       align-items: center;
-      gap: var(--space-2);
+      gap: 8px;
     }
 
-    .go-phalalu p {
-      margin: var(--space-3) 0;
-      font-size: 0.9375rem;
-      color: var(--slate);
-      line-height: 1.7;
+    .top-bar-actions {
+      display: flex;
+      gap: 4px;
     }
 
-    .go-quality {
-      display: inline-block;
-      border-radius: var(--radius-full);
-      padding: var(--space-1) var(--space-3);
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-left: var(--space-2);
-      vertical-align: middle;
-    }
-    .go-quality.good {
-      background: var(--green-bg);
-      color: var(--green-deep);
-      border: 1px solid var(--green-border);
-    }
-    .go-quality.mixed {
-      background: var(--amber-bg);
-      color: var(--amber-deep);
-      border: 1px solid var(--amber-border);
-    }
-    .go-quality.difficult {
-      background: var(--rose-bg);
-      color: var(--rose-deep);
-      border: 1px solid var(--rose-border);
-    }
-
-    .go-cond {
-      margin-top: var(--space-5);
-    }
-    .go-cond .chip {
-      display: inline-flex;
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface);
+      color: var(--text-secondary);
+      display: flex;
       align-items: center;
-      background: var(--rose-bg);
-      color: var(--rose-deep);
-      border: 1px solid var(--rose-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-2) var(--space-4);
-      font-weight: 700;
-      font-size: 0.875rem;
-      margin: 0 var(--space-2) var(--space-2) 0;
-    }
-
-    .go-pick {
-      background: var(--snow);
-      border: 1px solid var(--amber-border);
-      color: var(--amber-deep);
-      border-radius: var(--radius-md);
-      padding: var(--space-2) var(--space-3);
-      font-size: 0.8125rem;
-      font-weight: 600;
+      justify-content: center;
+      font-size: 1.25rem;
       cursor: pointer;
-      margin: 0 var(--space-2) var(--space-2) 0;
-      font-family: inherit;
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .go-pick:hover {
-      background: var(--amber-bg);
+      transition: all 0.2s;
     }
 
-    /* ============================================
-       MUHURTA SLOTS
-       ============================================ */
-    .mu-slot {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: var(--space-3) var(--space-4);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: var(--space-4);
-      margin-top: var(--space-3);
-      background: var(--alabaster);
-      transition: all var(--duration-fast) var(--ease);
-    }
-    .mu-slot:hover {
-      border-color: var(--green-border);
-      background: var(--green-bg);
-    }
-    .mu-slot.top {
-      background: var(--green-bg);
-      border-color: var(--green-border);
+    .icon-btn:active { transform: scale(0.92); background: var(--border); }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(var(--bottom-nav) + var(--safe-bottom) + 16px);
     }
 
-    .mu-when {
-      font-weight: 700;
-      color: var(--ink);
-      white-space: nowrap;
+    .screen {
+      display: none;
+      padding: 16px;
+      animation: slideUp 0.3s ease;
     }
 
-    .mu-score {
-      margin-left: auto;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--green-deep);
-      background: var(--snow);
-      border: 1px solid var(--green-border);
-      border-radius: var(--radius-md);
-      padding: 2px var(--space-3);
-    }
+    .screen.active { display: block; }
 
-    .mu-reasons {
-      font-size: 0.8125rem;
-      color: var(--slate);
-      width: 100%;
-    }
-
-    /* ============================================
-       FOOTER
-       ============================================ */
-    footer {
-      text-align: center;
-      font-size: 0.875rem;
-      color: var(--stone);
-      padding: var(--space-10) 0 var(--space-5);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-    footer a { color: var(--amber-deep); font-weight: 500; }
-
-    /* ============================================
-       ANIMATIONS
-       ============================================ */
-    @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .card {
-      animation: fade-in 0.4s var(--ease-out) backwards;
+    /* ===== BOTTOM NAVIGATION ===== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding-bottom: var(--safe-bottom);
+      display: flex;
+      height: calc(var(--bottom-nav) + var(--safe-bottom));
     }
 
-    .card:nth-child(2) { animation-delay: 0.05s; }
-    .card:nth-child(3) { animation-delay: 0.1s; }
-    .card:nth-child(4) { animation-delay: 0.15s; }
-    .card:nth-child(5) { animation-delay: 0.2s; }
-    .card:nth-child(6) { animation-delay: 0.25s; }
-    .card:nth-child(7) { animation-delay: 0.3s; }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 4px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-item .icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active .icon {
+      transform: scale(1.1);
+    }
+
+    /* ===== TODAY SCREEN ===== */
+    .date-header {
+      text-align: center;
+      padding: 16px 0 20px;
+    }
+
+    .date-day {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .date-month-year {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .date-location {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    /* Pancha Anga Cards */
+    .anga-section {
+      margin-bottom: 20px;
+    }
+
+    .anga-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .anga-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .anga-card:active { transform: scale(0.98); }
+
+    .anga-card .label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .anga-card .value {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .anga-card .time {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
+    /* Special Day Badge */
+    .special-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary-bg) 0%, var(--accent-bg) 100%);
+      border: 1px solid var(--primary-light);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .special-badge .icon {
+      font-size: 1.5rem;
+    }
+
+    .special-badge .text {
+      flex: 1;
+    }
+
+    .special-badge .title {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 0.9375rem;
+    }
+
+    .special-badge .desc {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Time Windows */
+    .windows-section {
+      margin-top: 20px;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title.good { color: var(--success); }
+    .section-title.bad { color: var(--danger); }
+
+    .window-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .window-card {
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: center;
+    }
+
+    .window-card.good {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+    }
+
+    .window-card.bad {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+    }
+
+    .window-card .name {
+      font-weight: 700;
+      font-size: 0.9375rem;
+      margin-bottom: 4px;
+    }
+    .window-card.good .name { color: var(--success); }
+    .window-card.bad .name { color: var(--danger); }
+
+    .window-card .time {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Choghadiya */
+    .chog-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 12px;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+    }
+
+    .chog-item {
+      flex: 0 0 72px;
+      scroll-snap-align: start;
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      text-align: center;
+    }
+
+    .chog-item.good {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+    }
+
+    .chog-item.bad {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+    }
+
+    .chog-item .name {
+      font-weight: 700;
+      font-size: 0.8125rem;
+      margin-bottom: 4px;
+    }
+    .chog-item.good .name { color: var(--success); }
+    .chog-item.bad .name { color: var(--danger); }
+
+    .chog-item .time {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+    }
+
+    /* ===== GOCHARA SCREEN ===== */
+    .go-header {
+      background: linear-gradient(135deg, var(--primary-bg) 0%, var(--accent-bg) 100%);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .go-header .rashi {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .go-header .rashi-en {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Chart Grid */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, minmax(80px, auto));
+      gap: 2px;
+      background: var(--divider);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .chart-cell {
+      background: var(--card);
+      padding: 8px;
+      position: relative;
+      min-height: 80px;
+    }
+
+    .chart-cell .rashi-label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .chart-cell .house-num {
+      position: absolute;
+          right: 8px;
+      top: 8px;
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .chart-cell.janma {
+      outline: 2px solid var(--primary);
+      outline-offset: -2px;
+      background: var(--primary-bg);
+    }
+
+    .chart-cell.janma .rashi-label {
+      color: var(--primary);
+    }
+
+    .chart-center {
+      grid-column: 2 / 4;
+      grid-row: 2 / 4;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .chart-center .label {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+    }
+
+    .chart-center .value {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .graha-chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      margin: 2px 2px 0 0;
+    }
+
+    .graha-chip.neutral {
+      background: var(--surface);
+      color: var(--text-secondary);
+    }
+
+    .graha-chip.good {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .graha-chip.bad {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .graha-chip.blocked {
+      background: var(--accent-bg);
+      color: var(--accent);
+    }
+
+    /* Phalalu Card */
+    .phalalu-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .phalalu-card .quality-badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .phalalu-card .quality-badge.good {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .phalalu-card .quality-badge.mixed {
+      background: var(--primary-bg);
+      color: var(--primary);
+    }
+
+    .phalalu-card .quality-badge.difficult {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .phalalu-card .reading {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ===== TARABALAM SCREEN ===== */
+    .tb-header {
+      margin-bottom: 20px;
+    }
+
+    .people-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .person-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .person-card .name-input {
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .person-card .name-input:focus {
+      outline: none;
+    }
+
+    .person-card .name-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .person-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .person-select {
+      flex: 1;
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .person-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .add-person-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      border: 2px dashed var(--border);
+      background: transparent;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .add-person-btn:active {
+      background: var(--primary-bg);
+      border-style: solid;
+    }
+
+    /* Date Range */
+    .date-range {
+      background: var(--primary-bg);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .date-range .label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .date-inputs {
+      display: flex;
+      gap: 12px;
+    }
+
+    .date-input {
+      flex: 1;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--primary-light);
+      background: var(--card);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* Good Days List */
+    .good-days-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .good-day-item {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .good-day-item .date {
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .good-day-item .stars {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
+    .good-day-item.all-good {
+      background: linear-gradient(135deg, var(--success-bg) 0%, var(--primary-bg) 100%);
+      border-color: var(--success);
+    }
+
+    .star-badge {
+      display: inline-block;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    .star-badge.good {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .star-badge.bad {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    /* ===== CALENDAR SCREEN ===== */
+    .sub-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .sub-card .title {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .sub-url {
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 0.8125rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px;
+      word-break: break-all;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .copy-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:active { transform: scale(0.98); background: var(--primary-light); }
+
+    /* App Instructions */
+    .app-list {
+      margin-top: 20px;
+    }
+
+    .app-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .app-btn:active { background: var(--surface); }
+
+    .app-btn .icon {
+      font-size: 1.5rem;
+    }
+
+    .app-btn .name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .app-btn .arrow {
+      margin-left: auto;
+      color: var(--text-muted);
+    }
+
+    /* App Steps Modal */
+    .app-steps {
+      background: var(--primary-bg);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: none;
+      margin-top: 12px;
+    }
+
+    .app-steps.active { display: block; }
+
+    .app-steps ol {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .app-steps li {
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      font-size: 0.9375rem;
+    }
+
+    /* ===== SETTINGS/OVERFLOW ===== */
+    .settings-group {
+      margin-bottom: 24px;
+    }
+
+    .settings-group .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .settings-select {
+      width: 100%;
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-primary);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .settings-toggle .name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .toggle-switch {
+      width: 48px;
+      height: 28px;
+      border-radius: 14px;
+      background: var(--divider);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toggle-switch.active {
+      background: var(--success);
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+
+    /* ===== FLOATING ACTION BUTTONS ===== */
+    .fab {
+      position: fixed;
+      bottom: calc(var(--bottom-nav) + var(--safe-bottom) + 16px);
+      right: 16px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: var(--success);
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 150;
+      transition: all 0.2s;
+    }
+
+    .fab:active { transform: scale(0.92); }
+
+    .fab.secondary {
+      bottom: calc(var(--bottom-nav) + var(--safe-bottom) + 80px);
+      background: var(--primary);
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .empty-state .icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .empty-state .title {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .empty-state .desc {
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== LOADING STATE ===== */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .loading .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===== FOOTER ===== */
+    .app-footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .app-footer a {
+      color: var(--primary);
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
-<div class="page">
-
-  <div class="hero">
-    <div class="hero-icon">🌅</div>
-    <h1>AstroChaganti's Panchangam</h1>
-    <div class="tagline">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
-    and festival days — plus daily tools: the Gochara chart with Rasi Phalalu, and Tarabalam &amp; Muhurtam
-    for your family's good days and time slots. Free, no account, updated automatically.</div>
-    <a class="hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
+<div class="app">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-title">🌅 Panchangam</div>
+    <div class="top-bar-actions">
+      <button class="icon-btn" onclick="showSettings()">⚙️</button>
+      <button class="icon-btn" onclick="shareContent()">📤</button>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="tool-tabs" role="tablist">
-      <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">
-        <span class="tt">🔆 Today's Panchangam</span><span class="ts">What is the day?</span></button>
-      <button id="tab-gochara" class="tool-tab" role="tab" onclick="switchTool('gochara')">
-        <span class="tt">🪐 Gochara · Rasi Phalalu</span><span class="ts">What does it mean for me?</span></button>
-      <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">
-        <span class="tt">✦ Tarabalam · Muhurtam</span><span class="ts">When should we act?</span></button>
-    </div>
-    <div class="selector-row">
-      <div class="selector">
-        <label for="tp-city">City</label>
-        <select id="tp-city"></select>
+  <!-- Main Content -->
+  <div class="main">
+    <!-- TODAY SCREEN -->
+    <div class="screen active" id="screen-today">
+      <div class="date-header">
+        <div class="date-day" id="today-day">13</div>
+        <div class="date-month-year" id="today-month-year">June 2026</div>
+        <div class="date-location">📍 <span id="today-city">Hyderabad</span> · Drik Ganita</div>
       </div>
-      <div class="selector">
-        <label for="tp-system">System</label>
-        <select id="tp-system"></select>
-      </div>
-      <div class="selector" id="tp-date-wrap">
-        <label for="tp-date">Date</label>
-        <input type="date" id="tp-date" class="tb-date" style="min-width:140px;">
-      </div>
-      <div class="selector">
-        <label id="fmt-label">Time format</label>
-        <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
-          <button id="fmt-12" onclick="setTimeFmt('12')">12h</button>
-          <button id="fmt-24" onclick="setTimeFmt('24')">24h</button>
-        </div>
-      </div>
-    </div>
-    <div id="panel-today" role="tabpanel">
-    <div id="tp-result"><p class="preview-error">Loading…</p></div>
-    <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
-    Times marked <sup class="plus1" style="color:var(--amber-deep);">+1</sup> fall after midnight on the next day;
-    <sup class="plus1" style="color:var(--amber-deep);">−1</sup> means it began the previous day.</p>
-    </div><!-- /panel-today -->
 
-    <div id="panel-tarabalam" role="tabpanel" style="display:none;">
-      <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
-      Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
-      <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
-      <button class="read-more" style="color: var(--amber-deep);" data-more="New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾</button>
-      <div class="expanded" id="tb-help">
-        <strong>Tarabalam — strength from your star.</strong> Each day the Moon occupies one of the 27 nakshatras.
-        Counting from your <strong>janma nakshatra</strong> (birth star) to the day's nakshatra gives one of nine
-        repeating <strong>taras</strong>: five favourable — Sampat (wealth), Kshema (well-being), Sadhana
-        (accomplishment), Mitra and Parama Mitra (friendly) — and four avoided: Janma, Vipat, Pratyak, Naidhana.
-        <br/><br/>
-        <strong>Chandrabalam — strength from your rashi.</strong> The Moon also moves through the 12 rashis.
-        Its position counted from your <strong>janma rashi</strong> is good at 1 · 3 · 6 · 7 · 10 · 11, workable
-        after a small remedial puja at 2 · 5 · 9, and avoided at 4 · 8 · 12 (the 8th is Ashtama Chandra).
-        Your rashi is worked out automatically from your star — add your <strong>padam</strong> (quarter) only if
-        asked; it's needed for the nine stars that span two rashis.
-        <br/><br/>
-        <strong>How to use this tool.</strong> Add up to four people (stars are remembered on this device, and
-        never leave it), pick a date range, and choose your <strong>✦ standard</strong>: <em>Stars only</em>
-        matches classic tarabalam tables, with the Moon shown as ° and ☾ marks; the stricter standards also
-        require the Moon's support. Green days favour that person; for anything done together — travel,
-        purchases, ceremonies — prefer the <span class="tb-star">✦</span> days. Don't know your star or padam?
-        Create your birth chart at <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">astrochaganti.com</a> —
-        it lists your janma nakshatra, padam and rashi. These are daily favourability checks, one factor among
-        several; for major events check the day's muhurtas and consult your purohit.
-        <br/><br/>
-        <strong>Chandrabalam — the Moon check.</strong> Once the rashi is known, the Moon's position from it is
-        checked automatically: positions 1 · 3 · 6 · 7 · 10 · 11 are good, 2 · 5 · 9 are workable after a small
-        remedial puja (marked °), and 4 · 8 · 12 are avoided (marked ☾). The <strong>✦ standard</strong> selector
-        sets how this affects good days: <em>Stars only</em> matches classic tarabalam tables (the Moon still
-        annotates each chip), <em>puja ok</em> drops Moon-avoid days, and <em>strict</em> demands a clean Moon —
-        some star combinations have no strict days at all, so relax the standard if the list comes up empty.
-        <br/><br/>
-        <strong>Muhurtam — finding the time slot.</strong> With your people and date range set, the
-        <em>Find a time slot</em> section searches the same days for ranked slots: good choghadiya blocks
-        (Amrit · Shubh · Labh · Char) with Rahu Kalam, Gulika, Yamagandam, Varjyam and Durmuhurtham cut out,
-        scored higher when they overlap Abhijit Muhurta or Amrita Kalam or fall on Sarvartha/Amrita Siddhi
-        days. The activity tunes the rules — travel avoids Vishti karana, ceremonies skip Visha and Dagdha
-        days, purchases favour Labh, beginnings favour Amrit. Every slot lists its reasons.
-      </div>
-      <div class="tb-controls">
-      <div class="tb-controls-title">Who is this for?
-        <button class="tb-reset" onclick="tbResetProfiles()" title="Forget all saved people on this device">clear all</button></div>
-      <div id="tb-profiles"></div>
-      <button class="tb-add" id="tb-add-btn" onclick="tbAddRow()">+ Add a family member</button>
-      <div class="selector-row" style="margin-top:var(--space-4);">
-        <div class="selector">
-          <label for="tb-from">From</label>
-          <input type="date" id="tb-from" class="tb-date">
-        </div>
-        <div class="selector">
-          <label for="tb-to">To</label>
-          <input type="date" id="tb-to" class="tb-date">
-        </div>
-        <div class="selector">
-          <label for="tb-mode" title="How strictly the Moon (Chandrabalam) is applied when deciding good days">✦ standard</label>
-          <select id="tb-mode" class="tb-date" onchange="tbSetMode(this.value)">
-            <option value="stars">Stars only (classic)</option>
-            <option value="puja_ok">Stars + Moon, puja ok</option>
-            <option value="strict">Stars + Moon, strict</option>
-          </select>
-        </div>
-        <div class="selector"><label>&nbsp;</label>
-          <button class="btn" onclick="calcTarabalam()">Find good days</button>
-        </div>
-      </div>
-      </div><!-- /tb-controls -->
-      <div id="tb-summary"></div>
-      <div id="tb-result"></div>
-      <p class="preview-note"><strong style="color:var(--green-deep);">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
-      <strong style="color:var(--rose-deep);">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
-      Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
+      <div id="special-day-badge"></div>
 
-      <div class="tb-controls" style="margin-top:var(--space-5);">
-        <div class="tb-controls-title">Find a time slot (Muhurtam)</div>
-        <div class="selector-row" style="margin:0;">
-          <div class="selector">
-            <label for="mu-activity">Activity</label>
-            <select id="mu-activity" class="tb-date">
-              <option value="any">Anything auspicious</option>
-              <option value="travel">Travel / journey</option>
-              <option value="purchase">Purchase</option>
-              <option value="ceremony">Ceremony / puja</option>
-              <option value="beginning">New beginning</option>
+      <div class="anga-section">
+        <div class="anga-grid" id="anga-grid">
+          <div class="loading">
+            <div class="spinner"></div>
+            <div>Loading panchangam...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="windows-section">
+        <div class="section-title good">✓ Auspicious Times</div>
+        <div class="window-grid" id="good-windows">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <div class="windows-section">
+        <div class="section-title bad">✗ Inauspicious Times</div>
+        <div class="window-grid" id="bad-windows">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <div class="windows-section">
+        <div class="section-title">Choghadiya</div>
+        <div class="chog-scroll" id="chog-scroll">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <button class="fab secondary" onclick="switchScreen('gochara')">🪐</button>
+    </div>
+
+    <!-- GOCHARA SCREEN -->
+    <div class="screen" id="screen-gochara">
+      <div class="go-header">
+        <div class="rashi" id="go-rashi">Mesha</div>
+        <div class="rashi-en" id="go-rashi-en">Aries</div>
+      </div>
+
+      <div class="settings-group">
+        <div class="label">View for</div>
+        <select class="settings-select" id="go-view-select" onchange="changeGocharaView()">
+          <option value="auto">My Rashi (choose below)</option>
+          <option value="Mesha">Mesha</option>
+          <option value="Vrishabha">Vrishabha</option>
+          <option value="Mithuna">Mithuna</option>
+          <option value="Karkataka">Karkataka</option>
+          <option value="Simha">Simha</option>
+          <option value="Kanya">Kanya</option>
+          <option value="Tula">Tula</option>
+          <option value="Vrishchika">Vrishchika</option>
+          <option value="Dhanus">Dhanus</option>
+          <option value="Makara">Makara</option>
+          <option value="Kumbha">Kumbha</option>
+          <option value="Meena">Meena</option>
+        </select>
+      </div>
+
+      <div class="chart-grid" id="go-chart">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+
+      <div class="phalalu-card">
+        <div class="quality-badge good" id="go-quality">Good Day</div>
+        <div class="reading" id="go-reading">Loading reading...</div>
+      </div>
+
+      <button class="fab" onclick="shareGochara()">📤</button>
+    </div>
+
+    <!-- TARABALAM SCREEN -->
+    <div class="screen" id="screen-tarabalam">
+      <div class="tb-header">
+        <p style="font-size:0.9375rem;color:var(--text-secondary);margin-bottom:16px;">
+          Add family members by birth star to find days favourable for everyone.
+        </p>
+      </div>
+
+      <div class="people-list" id="people-list">
+        <div class="person-card">
+          <input type="text" class="name-input" placeholder="Your name" id="person-name-0">
+          <div class="person-row">
+            <select class="person-select" id="person-star-0">
+              <option value="">Choose birth star...</option>
             </select>
           </div>
-          <div class="selector"><label>&nbsp;</label>
-            <button class="btn" onclick="findMuhurta()">Find slots</button>
-          </div>
-        </div>
-        <p class="preview-note" style="margin-top:var(--space-3);" id="mu-context"></p>
-      </div>
-      <div id="mu-result"></div>
-      <p class="preview-note" style="border-top:1px dashed var(--border); padding-top:var(--space-4);">
-      <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
-      finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
-      Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
-      For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit —
-      or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
-    </div><!-- /panel-tarabalam -->
-
-    <div id="panel-gochara" role="tabpanel" style="display:none;">
-      <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
-      <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
-      coloured by its gochara verdict for them.</p>
-      <button class="read-more" style="color: var(--amber-deep);" data-more="New to Gochara &amp; Rasi Phalalu? How to read this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('go-help', this)">New to Gochara &amp; Rasi Phalalu? How to read this ▾</button>
-      <div class="expanded" id="go-help">
-        <strong>The chart.</strong> This is the fixed South Indian layout: Meena sits top-left, Mesha beside it,
-        and the rashis run clockwise around the centre. Each graha appears in the rashi it currently occupies;
-        ℞ marks a retrograde. The "Coming up" line lists when each graha next changes rashi.
-        <br/><br/>
-        <strong>Gochara.</strong> Pick a person or rashi under <em>Viewing</em> and every graha is judged from
-        that janma rashi by the classical Brihat Samhita rules: each graha gives good results only in certain
-        houses counted from your Moon sign, and a favourable transit can be <em>blocked</em> when another graha
-        sits at its vedha (obstruction) point. Sade Sati, Ashtama Shani and Ardhastama Shani are flagged when
-        they apply to you. Box corners show the house number counted from your rashi.
-        <br/><br/>
-        <strong>Rasi Phalalu.</strong> The reading below the chart is composed line-by-line from these computed
-        verdicts — the Moon's position sets the day's tone, each graha contributes one sentence, and nothing is
-        invented. Share it with the green button; it sends the full reading.
-      </div>
-      <div class="tb-controls">
-        <div class="selector-row" style="margin:0;">
-          <div class="selector">
-            <label for="go-date">Date</label>
-            <input type="date" id="go-date" class="tb-date" onchange="renderGochara()">
-          </div>
-          <div class="selector">
-            <label for="go-view">Viewing</label>
-            <select id="go-view" class="tb-date" onchange="renderGochara()"></select>
-          </div>
         </div>
       </div>
-      <div id="go-conditions"></div>
-      <div id="go-chart" class="go-chart"><p class="preview-error">Loading…</p></div>
-      <div id="go-note"></div>
-      <div id="go-moves"></div>
-      <div id="go-phalalu"></div>
-      <div id="go-legend"></div>
-      <p class="preview-note">Positions are the sky <strong>at sunrise</strong> on the chosen date — the chart's
-      snapshot convention, like the rest of this site. The Moon changes rashi every 2–2½ days, so by evening it
-      may already be in the next rashi (the "Coming up" line shows when); the slower grahas are unaffected.</p>
-      <p class="preview-note">Chart data covers about 18 months ahead and is refreshed monthly. The
-      <code>get_graha_positions</code> and <code>get_gochara</code> MCP tools (below) compute live for
-      <strong>any date</strong>, past or future.</p>
-      <p class="preview-note">Verdicts follow the classical Brihat Samhita gochara tables — favourable houses per
-      graha counted from the natal Moon sign (janma rashi), with <strong>vedha</strong> (obstruction) checked:
-      a favourable transit is blocked when another graha occupies its vedha point (Surya–Shani and Chandra–Budha
-      never obstruct each other; Rahu and Ketu neither cause nor receive vedha).</p>
-      <p class="preview-note" style="border-top:1px dashed var(--border); padding-top:var(--space-4);">
-      <strong>Please note:</strong> Gochara is a background influence read from the Moon sign alone — it is
-      <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
-      day's panchangam above and consult your purohit — or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
-    </div><!-- /panel-gochara -->
-  </div>
 
-  <div class="card">
-    <h2>⚡ Special days — next 30 days</h2>
-    <div id="upcoming-result"><p class="preview-error">Loading…</p></div>
-    <p class="preview-note">Follows the city and system selected above. Subscribe below to get every special day in your calendar with a reminder.</p>
-  </div>
+      <button class="add-person-btn" onclick="addPerson()">+ Add Family Member</button>
 
-  <div class="card" id="subscribe">
-    <h2>📅 Subscribe to your calendar</h2>
-    <div class="selector-row">
-      <div class="selector">
-        <label for="sub-city">City</label>
-        <select id="sub-city"></select>
+      <div class="date-range">
+        <div class="label">Date Range</div>
+        <div class="date-inputs">
+          <input type="date" class="date-input" id="tb-from">
+          <input type="date" class="date-input" id="tb-to">
+        </div>
       </div>
-      <div class="selector">
-        <label for="sub-system">System</label>
-        <select id="sub-system"></select>
+
+      <button class="copy-btn" onclick="findGoodDays()" style="margin-bottom:16px;">Find Good Days</button>
+
+      <div class="good-days-list" id="good-days-list"></div>
+
+      <div class="app-footer">
+        <p>Tarabalam and Chandrabalam are daily favourability checks.<br>
+        For major events, consult your purohit or <a href="https://astrochaganti.com" target="_blank">astrochaganti.com</a></p>
       </div>
     </div>
 
-    <h3 class="sub">1 · Your subscription URL</h3>
-    <div class="url-box" id="sub-url">—</div>
-    <button class="btn" onclick="copyUrl()">Copy URL</button>
-    <span class="copy-confirm" id="copy-confirm">Copied!</span>
-    <a id="sub-https-link" href="#" target="_blank" rel="noopener"
-       style="margin-left:var(--space-4);font-size:0.8125rem;color:var(--amber-deep);font-weight:600;">
-      Open feed in browser ↗
-    </a>
+    <!-- CALENDAR SCREEN -->
+    <div class="screen" id="screen-calendar">
+      <div class="sub-card">
+        <div class="title">Subscribe to Calendar Feed</div>
+        <select class="settings-select" id="sub-city-select" style="margin-bottom:12px;">
+          <option value="hyderabad">Hyderabad</option>
+        </select>
+        <select class="settings-select" id="sub-system-select" style="margin-bottom:16px;">
+          <option value="drik">Drik Ganita</option>
+          <option value="surya_siddhanta">Surya Siddhanta</option>
+          <option value="vakya">Vakya</option>
+        </select>
+        <div class="sub-url" id="sub-url">https://feeds.panchangam.astrochaganti.com/hyderabad-drik.ics</div>
+        <button class="copy-btn" onclick="copySubscriptionUrl()">Copy Subscription URL</button>
+      </div>
 
-    <h3 class="sub" style="margin-top:var(--space-6);">2 · Add it to your calendar</h3>
-    <div class="app-tabs">
-      <button class="app-tab active" data-app="google" onclick="showAppTab('google')">Google</button>
-      <button class="app-tab" data-app="apple" onclick="showAppTab('apple')">Apple</button>
-      <button class="app-tab" data-app="outlook" onclick="showAppTab('outlook')">Outlook</button>
-    </div>
-    <div class="app-panel active" data-app="google">
-      <ol>
-        <li>Open Google Calendar on the web</li>
-        <li>In the left sidebar, find "Other calendars"</li>
-        <li>Click the <strong>+</strong> next to it</li>
-        <li>Select <strong>From URL</strong></li>
-        <li>Paste the subscription URL above</li>
-        <li>Click <strong>Add calendar</strong></li>
-      </ol>
-    </div>
-    <div class="app-panel" data-app="apple">
-      <ol>
-        <li>Open the Calendar app on your Mac</li>
-        <li>Go to <strong>File → New Calendar Subscription</strong></li>
-        <li>Paste the subscription URL above</li>
-        <li>Click <strong>Subscribe</strong></li>
-        <li>Choose how often to refresh (Daily recommended)</li>
-        <li>Click <strong>OK</strong></li>
-      </ol>
-    </div>
-    <div class="app-panel" data-app="outlook">
-      <ol>
-        <li>Open Outlook on the web</li>
-        <li>Go to <strong>Add calendar → Subscribe from web</strong></li>
-        <li>Paste the subscription URL above</li>
-        <li>Give the calendar a name</li>
-        <li>Click <strong>Import</strong></li>
-        <li>It refreshes automatically every few hours</li>
-      </ol>
-    </div>
+      <div class="app-list">
+        <div class="section-title">Add to Calendar App</div>
+        <button class="app-btn" onclick="toggleAppSteps('google')">
+          <span class="icon">📅</span>
+          <span class="name">Google Calendar</span>
+          <span class="arrow">›</span>
+        </button>
+        <div class="app-steps" id="steps-google">
+          <ol>
+            <li>Open Google Calendar on the web</li>
+            <li>Click the <strong>+</strong> next to "Other calendars"</li>
+            <li>Select <strong>From URL</strong></li>
+            <li>Paste the subscription URL</li>
+            <li>Click <strong>Add calendar</strong></li>
+          </ol>
+        </div>
 
-    <p class="preview-note">Updated automatically on the 1st of every month, 18 months ahead. No account needed.</p>
-  </div>
+        <button class="app-btn" onclick="toggleAppSteps('apple')">
+          <span class="icon">🍎</span>
+          <span class="name">Apple Calendar</span>
+          <span class="arrow">›</span>
+        </button>
+        <div class="app-steps" id="steps-apple">
+          <ol>
+            <li>Open Calendar on your Mac</li>
+            <li>Go to <strong>File → New Calendar Subscription</strong></li>
+            <li>Paste the subscription URL</li>
+            <li>Click <strong>Subscribe</strong></li>
+          </ol>
+        </div>
 
-  <div class="card">
-    <h2>🧭 Choosing a calculation system</h2>
-    <p style="font-size:0.9375rem;color:var(--slate);">
-      <strong>Drik Ganita</strong>, the default, uses modern astronomy and matches drikpanchang.com.
-      <strong>Surya Siddhanta</strong> and <strong>Vakya</strong> are classical methods that intentionally
-      differ — by minutes for muhurtams, occasionally by a day for festivals. If your family follows a
-      printed panchangam, compare a few days in the preview above and pick what matches.
-    </p>
-    <button class="read-more" style="color: var(--amber-deep);" data-more="Compare the three systems in detail ▾" data-less="Hide comparison ▴" onclick="toggleReadMore('systems-more', this)">Compare the three systems in detail ▾</button>
-    <div class="expanded" id="systems-more">
+        <button class="app-btn" onclick="toggleAppSteps('outlook')">
+          <span class="icon">📧</span>
+          <span class="name">Outlook</span>
+          <span class="arrow">›</span>
+        </button>
+        <div class="app-steps" id="steps-outlook">
+          <ol>
+            <li>Open Outlook on the web</li>
+            <li>Go to <strong>Add calendar → Subscribe from web</strong></li>
+            <li>Paste the subscription URL</li>
+            <li>Click <strong>Import</strong></li>
+          </ol>
+        </div>
+      </div>
 
-    <div class="sys-card drik">
-      <h3>☀️ Drik Ganita — Modern Observational Astronomy</h3>
-      <p>Calculated directly from real planetary positions using the Swiss Ephemeris with the Lahiri
-      ayanamsa — the same kind of engine used by professional astronomy software. Because it tracks the
-      sky as it actually is, it's the most accurate system for sunrise, sunset, moonrise, and moonset, and
-      is the default in most modern digital panchangam apps.</p>
-      <button class="read-more" data-more="Read more about Drik Ganita ▾" data-less="Show less ▴" onclick="toggleReadMore('drik-more', this)">Read more about Drik Ganita ▾</button>
-      <div class="expanded" id="drik-more">
-        <strong>What it computes:</strong> True geocentric positions of the Sun and Moon using the Swiss Ephemeris — the same engine that powers professional astronomy software. It applies the Lahiri ayanamsa (also called Chitrapaksha), which is India's government-adopted standard since 1955 and is specified by the Indian Astronomical Ephemeris. Because calculations are grounded in actual sky positions, sunrise and sunset times will match your weather app, and Tithi/Nakshatra boundaries reflect exactly when the sky transitions occur at your location.
-        <br/><br/>
-        <strong>Who uses it:</strong> The default for most modern digital panchangam apps and websites. If you're comparing against Prokerala, AstroSeek, or any app that doesn't specify a system, it's almost certainly Drik Ganita.
-        <br/><br/>
-        <strong>Gotcha:</strong> A small number of traditional institutions still associate "Drik" specifically with the Krishnamurti (KP) ayanamsa variant. If you hear someone say Drik results differ from what you see here, ask which ayanamsa they're using — this implementation uses Lahiri.
+      <div class="app-footer">
+        <p>Updated automatically on the 1st of every month.<br>
+        18 months ahead, no account needed.</p>
       </div>
     </div>
-
-    <div class="sys-card ss">
-      <h3>🛕 Surya Siddhanta — The Classical Siddhantic Method</h3>
-      <p>Computes positions using the mean-motion formulas of the Surya Siddhanta, the most influential
-      classical Sanskrit astronomy treatise. Timings follow the traditional siddhantic framework rather
-      than the observed sky, so Tithi and Nakshatra boundaries can differ from Drik Ganita by anywhere
-      from minutes to an hour or more. Choose it if your tradition is rooted in classical siddhantic
-      calculation rather than modern ephemerides.</p>
-      <button class="read-more" data-more="Read more about Surya Siddhanta ▾" data-less="Show less ▴" onclick="toggleReadMore('ss-more', this)">Read more about Surya Siddhanta ▾</button>
-      <div class="expanded" id="ss-more">
-        <strong>What it computes:</strong> Planetary longitudes from the mean-motion model codified in the Surya Siddhanta (the received text dates to roughly 400–800 CE, building on older material). Instead of tracking the actual sky, it counts long-period average orbital revolutions from the Kali epoch and applies the classical manda (equation-of-centre) correction. The result diverges from true positions — about half a degree for the Sun, up to ~4° for the Moon, since the classical model omits the Moon's evection and variation terms — which typically moves a Tithi boundary by 2–6 hours versus Drik Ganita, often enough to land an observance on a different calendar day.
-        <br/><br/>
-        <strong>Who it's for:</strong> Communities and almanac lineages that compute from the siddhantic framework. Important honesty note: there is no single "the" Surya Siddhanta panchangam — every traditional lineage applies its own bija (correction) constants and conventions, so two siddhantic panchangams rarely agree to the minute, and this feed won't exactly match any particular institution's published calendar either. Treat it as a faithful rendering of the classical method, and use the preview above to compare against the panchangam your family or temple actually follows.
-        <br/><br/>
-        <strong>Gotcha:</strong> For Tithi-sensitive observances (Ekadashi, Amavasya, Pournami) the siddhantic and observational boundaries can fall on different dates — which is why two families can fast on different days without either being "wrong."
-      </div>
-    </div>
-
-    <div class="sys-card vakya">
-      <h3>📜 Vakya — Traditional Printed Panchangam</h3>
-      <p>Builds on Surya Siddhanta with "Vakyas" — pre-computed correction tables passed down through
-      generations of traditional almanac-makers. Many printed Telugu and Tamil panchangams sold each year
-      descend from this tradition, so it suits households following a long-standing family or regional
-      printed panchangam.</p>
-      <button class="read-more" data-more="Read more about Vakya ▾" data-less="Show less ▴" onclick="toggleReadMore('vakya-more', this)">Read more about Vakya ▾</button>
-      <div class="expanded" id="vakya-more">
-        <strong>What it computes:</strong> Builds on Surya Siddhanta mean motions but layers in vakyas — pre-computed correction sequences that account for the Moon's variable speed (faster near perigee, slower near apogee). The word "vakya" means "sentence": each correction value was traditionally encoded as a memorable Sanskrit syllable sequence, attributed to the Vararuci and later Madhava traditions of South India. It let an almanac-maker produce a full panchangam by lookup and arithmetic, with no ephemeris needed.
-        <br/><br/>
-        <strong>Who it's for:</strong> Households that follow a traditional printed almanac. Many printed Telugu and Tamil panchangams descend from the vakya tradition, but publishers differ in which tables and corrections they use — two printed panchangams for the same year routinely disagree by 5–15 minutes on Tithi end-times. This feed implements the vakya approach as a correction layer over Surya Siddhanta; it represents the tradition's method, not any single publisher's booklet. Compare a few days in the preview against your printed panchangam to see how closely they align.
-        <br/><br/>
-        <strong>Gotcha:</strong> Vakya's lunar corrections improve on plain Surya Siddhanta for Moon-dependent timings, but it remains less precise than Drik Ganita for observable events like sunrise and moonrise. If your rule is "we follow our printed panchangam," pick whichever of Vakya or Surya Siddhanta matches it more closely in the preview.
-      </div>
-    </div>
-
-    <p class="tip">Not sure? Drik Ganita is a safe modern default — no two traditional panchangams agree
-    to the minute, and that's normal.</p>
-    </div><!-- /systems-more -->
   </div>
 
-  <div class="card">
-    <h2>🤖 Use Panchangam in AI Assistants</h2>
-    <p class="mcp-tagline">
-      Everything this site computes is also an <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">MCP</a>
-      server — ask Claude or any MCP-compatible assistant for a muhurta, your family's good days, or today's
-      Rasi Phalalu, and it calls this engine directly rather than guessing.
-    </p>
-    <div style="display:flex; gap:var(--space-3); flex-wrap:wrap; align-items:center; margin-bottom:var(--space-3);">
-      <a class="btn" style="text-decoration:none;" href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener">📦 mcp-server-panchangam on PyPI</a>
-      <span style="font-size:0.8125rem; color:var(--stone);">No API key · works offline for pre-configured cities</span>
-    </div>
-    <button class="read-more" style="color: var(--amber-deep);" data-more="Tools &amp; setup for Claude, Cursor and other clients ▾" data-less="Hide tools &amp; setup ▴" onclick="toggleReadMore('mcp-more', this)">Tools &amp; setup for Claude, Cursor and other clients ▾</button>
-    <div class="expanded" id="mcp-more">
-
-    <div class="mcp-tools">
-      <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
-      <div class="mcp-tool"><code>get_muhurta</code><span>One day's auspicious &amp; inauspicious windows — "is right now good?" (use <em>find_muhurta</em> to search across days)</span></div>
-      <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
-      <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
-      <div class="mcp-tool"><code>get_graha_positions</code><span>All nine grahas at sunrise — rasi, nakshatra, retrograde, and when each enters its next rasi</span></div>
-      <div class="mcp-tool"><code>get_rasi_phalalu</code><span>Daily reading for a rashi — every sentence rendered from computed gochara/chandrabalam/tarabalam facts</span></div>
-      <div class="mcp-tool"><code>get_gochara</code><span>Transit verdicts from a janma rashi — favourable/blocked/adverse per graha with vedha, Sade Sati &amp; Ashtama Shani flags</span></div>
-      <div class="mcp-tool"><code>find_muhurta</code><span>Ranked auspicious slots over coming days — good choghadiya minus all bad windows, activity-aware, with reasons</span></div>
-      <div style="grid-column: 1 / -1;" class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
-      <div style="grid-column: 1 / -1;" class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
-    </div>
-
-    <p style="font-size:0.875rem;color:var(--slate);margin:var(--space-4) 0 var(--space-2);">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. You can also pass coordinates directly; the timezone is derived automatically. Supports all three calculation systems.</p>
-
-    <div class="mcp-clients">
-      <span class="mcp-client">Claude Desktop</span>
-      <span class="mcp-client">Claude Code</span>
-      <span class="mcp-client">Cursor</span>
-      <span class="mcp-client">Windsurf</span>
-      <span class="mcp-client">Any MCP client</span>
-    </div>
-
-    <div class="mcp-install">
-      <h4>Claude Desktop — add to claude_desktop_config.json</h4>
-      <pre>{
-  "mcpServers": {
-    "panchangam": {
-      "command": "uvx",
-      "args": ["mcp-server-panchangam"]
-    }
-  }
-}</pre>
-    </div>
-
-    <div class="mcp-install">
-      <h4>Claude Code — run once in terminal</h4>
-      <pre>claude mcp add panchangam -- uvx mcp-server-panchangam</pre>
-    </div>
-
-    </div><!-- /mcp-more -->
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchScreen('today')">
+      <span class="icon">🔆</span>
+      <span>Today</span>
+    </button>
+    <button class="nav-item" onclick="switchScreen('gochara')">
+      <span class="icon">🪐</span>
+      <span>Gochara</span>
+    </button>
+    <button class="nav-item" onclick="switchScreen('tarabalam')">
+      <span class="icon">✦</span>
+      <span>Tarabalam</span>
+    </button>
+    <button class="nav-item" onclick="switchScreen('calendar')">
+      <span class="icon">📅</span>
+      <span>Subscribe</span>
+    </button>
   </div>
-
-  <footer>
-    <div>A free service from AstroChaganti — open source, feeds regenerated monthly, 18 months ahead.</div>
-    <div>For professional consultations: <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a></div>
-    <div><a href="https://github.com/socraticsurge/telugu-calendar-utilities">Source on GitHub</a></div>
-  </footer>
 </div>
 
 <script>
-  const FEED_BASE_URL = 'https://panchangam.astrochaganti.com/feeds/';
+  // Screen Navigation
+  function switchScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-  const CITY_GROUPS = [
-    ['Telugu Heartland', ['Hyderabad', 'Vijayawada', 'Visakhapatnam', 'Tirupati', 'Warangal', 'Guntur', 'Nizamabad', 'Rajahmundry', 'Kurnool', 'Nellore']],
-    ['Major Indian Metros', ['Bengaluru', 'Chennai', 'Mumbai', 'Delhi']],
-    ['International', ['Dallas', 'San Jose', 'San Francisco', 'Edison', 'New York', 'London', 'Sydney', 'Dubai']],
-  ];
-  const SYSTEMS = [['drik', 'Drik Ganita'], ['surya-siddhanta', 'Surya Siddhanta'], ['vakya', 'Vakya']];
+    document.getElementById('screen-' + screenId).classList.add('active');
+    event.currentTarget?.classList?.add('active');
 
-  function slug(name) {
-    return name.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '');
-  }
-
-  function feedFilename(city, system) {
-    return `${slug(city)}-${system}.ics`;
-  }
-
-  function populateCitySelect(select) {
-    CITY_GROUPS.forEach(([label, cities]) => {
-      const og = document.createElement('optgroup');
-      og.label = label;
-      cities.forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        og.appendChild(opt);
-      });
-      select.appendChild(og);
+    // Find the correct nav item and mark active
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick')?.includes(screenId)) {
+        n.classList.add('active');
+      }
     });
   }
 
-  function populateSystemSelect(select) {
-    SYSTEMS.forEach(([value, label]) => {
-      const opt = document.createElement('option');
-      opt.value = value;
-      opt.textContent = label;
-      select.appendChild(opt);
-    });
+  // Toggle App Steps
+  function toggleAppSteps(app) {
+    document.querySelectorAll('.app-steps').forEach(s => s.classList.remove('active'));
+    document.getElementById('steps-' + app).classList.toggle('active');
   }
 
-  // --- Subscribe card ---
-
-  function updateSubscribeUrl() {
-    const city = document.getElementById('sub-city').value;
-    const system = document.getElementById('sub-system').value;
-    const url = `webcal://${FEED_BASE_URL.replace('https://', '')}${feedFilename(city, system)}`;
-    document.getElementById('sub-url').textContent = url;
-    const httpsUrl = `${FEED_BASE_URL}${feedFilename(city, system)}`;
-    document.getElementById('sub-https-link').href = httpsUrl;
-  }
-
-  function copyUrl() {
-    if (typeof gcEvent === 'function') gcEvent('subscribe-copy');
+  // Copy URL
+  function copySubscriptionUrl() {
     const url = document.getElementById('sub-url').textContent;
     navigator.clipboard.writeText(url).then(() => {
-      const el = document.getElementById('copy-confirm');
-      el.classList.add('show');
-      setTimeout(() => { el.classList.remove('show'); }, 2000);
+      alert('Copied to clipboard!');
     });
   }
 
-  function showAppTab(name) {
-    document.querySelectorAll('.app-tab').forEach(t => t.classList.toggle('active', t.dataset.app === name));
-    document.querySelectorAll('.app-panel').forEach(p => p.classList.toggle('active', p.dataset.app === name));
+  // Placeholder functions - would connect to actual API
+  function showSettings() {
+    alert('Settings coming soon');
   }
 
-  // --- Choosing a system card ---
-
-  function toggleReadMore(id, btn) {
-    const el = document.getElementById(id);
-    const open = el.classList.toggle('open');
-    btn.textContent = open ? btn.dataset.less : btn.dataset.more;
-  }
-
-  // --- Tool tabs ---
-
-  function switchTool(name) {
-    document.querySelectorAll('.tool-tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
-    document.querySelectorAll('[id^="panel-"]').forEach(p => p.style.display = 'none');
-    document.getElementById('panel-' + name).style.display = 'block';
-    if (name === 'gochara') loadGochara();
-    if (typeof gcEvent === 'function') gcEvent('switch-' + name);
-  }
-
-  // --- Today's Panchangam preview ---
-
-  function unfoldICS(text) {
-    return text.replace(/\r\n/g, '\n').split('\n').reduce((lines, line) => {
-      if (line.startsWith(' ') && lines.length) {
-        lines[lines.length - 1] += line.slice(1);
-      } else {
-        lines.push(line);
-      }
-      return lines;
-    }, []);
-  }
-
-  // Parse every VEVENT into a Map keyed by YYYYMMDD — the preview, night
-  // choghadiya (needs tomorrow's sunrise) and upcoming list all read from it.
-  function parseEvents(text) {
-    const lines = unfoldICS(text);
-    const events = new Map();
-    let current = null;
-    for (const line of lines) {
-      if (line === 'BEGIN:VEVENT') { current = []; continue; }
-      if (line === 'END:VEVENT') {
-        if (current) {
-          const dtstart = current.find(l => l.startsWith('DTSTART;VALUE=DATE:'));
-          if (dtstart) {
-            const summary = (current.find(l => l.startsWith('SUMMARY:')) || '').slice('SUMMARY:'.length);
-            const descLine = current.find(l => l.startsWith('DESCRIPTION:')) || '';
-            const description = descLine.slice('DESCRIPTION:'.length)
-              .replace(/\\n/g, '\n')
-              .replace(/\\,/g, ',')
-              .replace(/\\;/g, ';')
-              .replace(/\\\\/g, '\\');
-            events.set(dtstart.slice('DTSTART;VALUE=DATE:'.length), { summary, description });
-          }
-        }
-        current = null;
-        continue;
-      }
-      if (current) current.push(line);
-    }
-    return events;
-  }
-
-  // --- Time formatting (12h/24h toggle) ---
-
-  let TIME_FMT = localStorage.getItem('tc-time-fmt') || '12';
-
-  function fmtT(t) {
-    if (TIME_FMT === '24') return t;
-    const m = t.match(/^(\d{2}):(\d{2})$/);
-    if (!m) return t;
-    const h = Number(m[1]);
-    return `${h % 12 || 12}:${m[2]}${h < 12 ? 'am' : 'pm'}`;
-  }
-
-  // The feed marks times falling outside the event's date with (+1)/(-1);
-  // render those as superscripts. Old feeds without markers fall back to the
-  // end-reads-earlier-than-start heuristic for the +1 case.
-  function dayMark(flag) {
-    if (!flag) return '';
-    const title = flag === '+1' ? 'after midnight, on the next day' : 'on the previous day';
-    return `<sup class="plus1" title="${title}">${flag === '+1' ? '+1' : '−1'}</sup>`;
-  }
-  function fmtRange(start, end, sep, sflag, eflag) {
-    if (!sflag && !eflag && end <= start) eflag = '+1';
-    return `${fmtT(start)}${dayMark(sflag)}${sep || ' – '}${fmtT(end)}${dayMark(eflag)}`;
-  }
-
-  function setTimeFmt(f) {
-    TIME_FMT = f;
-    localStorage.setItem('tc-time-fmt', f);
-    document.getElementById('fmt-12').classList.toggle('active', f === '12');
-    document.getElementById('fmt-24').classList.toggle('active', f === '24');
-    renderAll();
-    if (typeof TB_DAYS !== 'undefined' && TB_DAYS) renderTarabalam();
-    if (typeof GO_DATA !== 'undefined' && GO_DATA) renderGochara();
-    if (typeof MU_LAST !== 'undefined' && MU_LAST) renderMuhurta();
-  }
-
-  // --- Ekadashi naming (Amanta maasam + paksham) ---
-
-  const EKADASHI_NAMES = {
-    Chaitra:    { Shukla: 'Kamada',      Krishna: 'Varuthini' },
-    Vaishakha:  { Shukla: 'Mohini',      Krishna: 'Apara' },
-    Jyeshtha:   { Shukla: 'Nirjala',     Krishna: 'Yogini' },
-    Ashadha:    { Shukla: 'Shayani',     Krishna: 'Kamika' },
-    Shravana:   { Shukla: 'Putrada',     Krishna: 'Aja' },
-    Bhadrapada: { Shukla: 'Parivartini', Krishna: 'Indira' },
-    Ashvina:    { Shukla: 'Papankusha',  Krishna: 'Rama' },
-    Kartika:    { Shukla: 'Prabodhini',  Krishna: 'Utpanna' },
-    Margashira: { Shukla: 'Mokshada',    Krishna: 'Saphala' },
-    Pushya:     { Shukla: 'Putrada',     Krishna: 'Shattila' },
-    Magha:      { Shukla: 'Jaya',        Krishna: 'Vijaya' },
-    Phalguna:   { Shukla: 'Amalaki',     Krishna: 'Papamochani' },
-  };
-
-  function ekadashiName(maasam, paksham, solarSign) {
-    if (!maasam || !paksham) return null;
-    if (maasam.startsWith('Adhika')) return paksham === 'Shukla' ? 'Padmini' : 'Parama';
-    const name = (EKADASHI_NAMES[maasam.replace(/^Nija /, '')] || {})[paksham];
-    if (!name) return null;
-    // Vaikunta (Mukkoti) Ekadashi is the Shukla Ekadashi of Dhanurmasa.
-    if (paksham === 'Shukla' && solarSign === 'Dhanu') return `${name} (Vaikunta)`;
-    return name;
-  }
-
-  function festivalNames(summary) {
-    const m = summary.match(/^🪔 (.+?) — /);
-    return m ? m[1].split(' · ') : [];
-  }
-
-  function chipEmoji(s, summary) {
-    if (festivalNames(summary).some(f => s.startsWith(f))) return '🪔';
-    if (s.startsWith('Ganda Moola')) return '⚠️';
-    return '⚡';
-  }
-
-  function specialLabel(s, data) {
-    if (/^Ekadashi/.test(s)) {
-      const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
-      if (name) return s.replace(/^Ekadashi/, `${name} Ekadashi`);
-    }
-    return s;
-  }
-
-  // --- Choghadiya tables (standard weekday sequences, Sun..Sat) ---
-
-  const CHOG_NIGHT_START = ['Shubh', 'Char', 'Kaal', 'Udveg', 'Amrit', 'Rog', 'Labh'];
-  const CHOG_NIGHT_SEQ = ['Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh'];
-
-  function nightChoghadiya(weekday, sunset, nextSunrise) {
-    const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-    const toT = mm => { const m = Math.round(mm) % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
-    const s = toMin(sunset);
-    const e = toMin(nextSunrise) + 1440;
-    const idx = CHOG_NIGHT_SEQ.indexOf(CHOG_NIGHT_START[weekday]);
-    const blocks = [];
-    for (let i = 0; i < 8; i++) {
-      blocks.push({
-        name: CHOG_NIGHT_SEQ[(idx + i) % 7],
-        start: toT(s + (e - s) * i / 8),
-        end: toT(s + (e - s) * (i + 1) / 8),
+  function shareContent() {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Panchangam',
+        text: 'Check out AstroChaganti Panchangam',
+        url: window.location.href
       });
     }
-    return blocks;
   }
 
-  // A time plus optional (+1)/(-1) relative-day marker, as emitted by the feed.
-  const TIME_PART = '(\\d{2}:\\d{2})(?:\\s*\\(([+-]1)\\))?';
-  // \s+ not \s{2,}: long names (Krishna Chaturdashi, named Ekadashis) overflow the column padding
-  const ANGA_RE = new RegExp(`^(Tithi|Nakshatra|Yoga):\\s+(.+?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`);
-  const WINDOW_RE = new RegExp(`^\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s*$`);
-  const CHOG_RE = new RegExp(`^\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s+(.+)$`);
-
-  function parseDescription(description) {
-    const data = {
-      meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
-      sunrise: null, sunset: null, moonrise: null, moonset: null,
-      auspicious: [], inauspicious: [], choghadiya: [], nightChoghadiya: [],
-      eclipse: null, yogas: [], ayanam: null, rituvu: null, special: [],
-    };
-    let section = null;
-    for (const raw of description.split('\n')) {
-      const line = raw.trimEnd();
-      if (!line.trim()) { section = null; continue; }
-
-      let m;
-      // Header: "Samvatsara  ·  Maasam  ·  Paksham  ·  Vaaram"
-      if ((m = line.match(/^(.+?)\s+·\s+(.+?) Maasam\s+·\s+(.+?) Paksham\s+·\s+(.+)$/))) {
-        data.samvatsara = m[1].trim();
-        data.maasam = m[2].trim();
-        data.paksham = m[3].trim();
-        data.vaaram = m[4].trim();
-        data.meta = `${m[1]} Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4].trim()}`;
-        continue;
-      }
-      // Sky: "Sunrise HH:MM  ·  Sunset HH:MM  ·  Moonrise HH:MM  ·  Moonset HH:MM"
-      if ((m = line.match(/^Sunrise (\d{2}:\d{2})\s+·\s+Sunset (\d{2}:\d{2})\s+·\s+Moonrise (\d{2}:\d{2})\s+·\s+Moonset (\d{2}:\d{2})$/))) {
-        [, data.sunrise, data.sunset, data.moonrise, data.moonset] = m;
-        continue;
-      }
-      // Ayanam / Rituvu: "Ayanam: X  ·  Rituvu: Y"
-      if ((m = line.match(/^Ayanam:\s+(.+?)\s+·\s+Rituvu:\s+(.+)$/))) {
-        data.ayanam = m[1].trim();
-        data.rituvu = m[2].trim();
-        continue;
-      }
-      // Signs: "Solar sign: X  ·  Lunar sign: Y" (solar sign drives Vaikunta Ekadashi naming)
-      if ((m = line.match(/^Solar sign:\s+(.+?)\s+·\s+Lunar sign:\s+(.+)$/))) {
-        data.solarSign = m[1].trim();
-        data.lunarSign = m[2].trim();
-        continue;
-      }
-      // Pancha anga rows
-      if ((m = line.match(ANGA_RE))) {
-        data[m[1].toLowerCase()] = { name: m[2].trim(), start: m[3], sflag: m[4] || null, end: m[5], eflag: m[6] || null };
-        continue;
-      }
-      if ((m = line.match(/^Karana:\s+(.+)$/))) {
-        data.karana = m[1].trim();
-        continue;
-      }
-      // Section headers
-      if (line === '─ Auspicious ─') { section = 'auspicious'; continue; }
-      if (line === '─ Inauspicious ─') { section = 'inauspicious'; continue; }
-      if (line === '─ Choghadiya ─') { section = 'choghadiya'; continue; }
-      if (line === '─ Night Choghadiya ─') { section = 'nightChoghadiya'; continue; }
-      if (line === '─ Eclipse ─') { section = 'eclipse'; continue; }
-      if (line === '─ Special Yogas ─') { section = 'specialyogas'; continue; }
-      // Auspicious / inauspicious entries: "  Name           HH:MM – HH:MM (+1)"
-      if ((section === 'auspicious' || section === 'inauspicious') && (m = line.match(WINDOW_RE))) {
-        data[section].push({ name: m[1].trim(), start: m[2], sflag: m[3] || null, end: m[4], eflag: m[5] || null });
-        continue;
-      }
-      // Choghadiya entries: "  HH:MM – HH:MM  Name"
-      if ((section === 'choghadiya' || section === 'nightChoghadiya') && (m = line.match(CHOG_RE))) {
-        data[section].push({ start: m[1], end: m[3], name: m[5].trim() });
-        continue;
-      }
-      // Eclipse detail line: "  🌒 Solar Eclipse (Total) — visible/not visible..."
-      if (section === 'eclipse' && (m = line.match(/^\s*\S+\s+(Solar|Lunar) Eclipse \((.+?)\)\s*[—-]\s*(.+)$/))) {
-        data.eclipse = { kind: m[1], subtype: m[2], visible: !m[3].includes('not visible'), window: null, sutak: null };
-        continue;
-      }
-      if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Window:\s+(.+?)\s*[–-]\s*(.+)$/))) {
-        data.eclipse.window = { start: m[1].trim(), end: m[2].trim() };
-        continue;
-      }
-      if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Sutak:\s+(.+?)\s*[–-]\s*(.+)$/))) {
-        data.eclipse.sutak = { start: m[1].trim(), end: m[2].trim() };
-        continue;
-      }
-      // Special yoga entries: "  Yoga Name" (new format)
-      if (section === 'specialyogas' && (m = line.match(/^\s+(.+)$/))) {
-        data.yogas.push(m[1].trim());
-        continue;
-      }
-      // Backward compat: old "Yogas: X, Y" single-line format
-      if ((m = line.match(/^Yogas:\s+(.+)$/))) {
-        data.yogas = m[1].trim().split(/,\s*/);
-        continue;
-      }
-      // Trailing special-day line: "⚡ Ekadashi — fasting day  ·  Pradosham"
-      if ((m = line.match(/^⚡\s*(.+)$/))) {
-        data.special = m[1].split(/\s+·\s+/).map(s => s.trim());
-        continue;
-      }
-    }
-    return data;
+  function shareGochara() {
+    shareContent();
   }
 
-  function selectedDate() {
-    const val = document.getElementById('tp-date')?.value;
-    return val ? new Date(val + 'T00:00:00') : new Date();
-  }
-
-  function formatToday() {
-    return selectedDate().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  }
-
-  function stampOf(d) {
-    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-  }
-
-  function eclipseChip(e) {
-    const emoji = e.kind === 'Solar' ? '🌒' : '🌕';
-    let txt = `${emoji} ${e.kind} Eclipse (${e.subtype}) — ${e.visible ? 'visible here' : 'not visible here'}`;
-    if (e.visible && e.window) txt += ` · ${fmtRange(e.window.start, e.window.end)}`;
-    if (e.visible && e.sutak) txt += ` · Sutak ${fmtRange(e.sutak.start, e.sutak.end)}`;
-    return `<span class="special-chip">${txt}</span>`;
-  }
-
-  function renderPreview(container, event, events) {
-    const data = parseDescription(event.description);
-    const special = event.summary.includes('🪔')
-      ? '<span class="badge">Festival</span>'
-      : (event.summary.includes('⚡') ? '<span class="badge">Special day</span>' : '');
-    // 1 · Why today is special — flags right under the header, with the reason.
-    let flags = '';
-    data.special
-      .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-      .forEach(s => { flags += `<span class="special-chip">${chipEmoji(s, event.summary)} ${specialLabel(s, data)}</span>`; });
-    if (data.eclipse) flags += eclipseChip(data.eclipse);
-    data.yogas.forEach(y => { flags += `<span class="yoga-chip">✨ ${y}</span>`; });
-    const flagStrip = flags ? `<div class="flag-strip">${flags}</div>` : '';
-
-    // 2 · What the day is — Pancha Anga as hero tiles, sky as a slim strip.
-    const angaTile = (label, entry) => entry
-      ? `<div class="anga-cell"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${fmtRange(entry.start, entry.end, undefined, entry.sflag, entry.eflag)}</div></div>`
-      : '';
-    // Older feeds carry the bare paksham tithi ("Krishna Ekadashi") — name it
-    // here; regenerated feeds arrive already named ("Parama Ekadashi").
-    let tithiEntry = data.tithi;
-    if (tithiEntry && /^(Shukla|Krishna) Ekadashi$/.test(tithiEntry.name)) {
-      const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
-      if (name) tithiEntry = { ...tithiEntry, name: `${name} Ekadashi` };
-    }
-    let anga = angaTile('Tithi', tithiEntry) + angaTile('Nakshatra', data.nakshatra) + angaTile('Nitya Yoga', data.yoga);
-    if (data.karana) {
-      const karanas = data.karana.split(/\s+\/\s+/).map(k => {
-        const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-        return m ? `<div class="anga-time"><b>${m[1]}</b> ${fmtRange(m[2], m[4], '–', m[3], m[5])}</div>` : `<div class="anga-time">${k}</div>`;
-      }).join('');
-      anga += `<div class="anga-cell"><div class="anga-label">Karana</div>${karanas}</div>`;
-    }
-    const angaGrid = anga ? `<div class="anga-grid">${anga}</div>` : '';
-
-    // Header context lines: year context · month context · today's sky frame.
-    const metaLines = data.samvatsara
-      ? `<div class="meta">${data.samvatsara} Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
-         <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>
-         <div class="meta sky">🌅 ${fmtT(data.sunrise)} – ${fmtT(data.sunset)} &nbsp;·&nbsp; 🌙 ${fmtT(data.moonrise)} – ${fmtT(data.moonset)}</div>`
-      : `<div class="meta">${data.meta}</div>`;
-
-    // 3 · When to act or avoid — tile strips in the same language as Choghadiya,
-    // in clock order so the day scans morning → evening.
-    // An observance occurring twice (e.g. Durmuhurtham) is one tile, two windows.
-    const groupWins = list => {
-      const order = [];
-      const byName = new Map();
-      [...list].sort((a, b) => a.start.localeCompare(b.start)).forEach(e => {
-        if (!byName.has(e.name)) { byName.set(e.name, []); order.push(e.name); }
-        byName.get(e.name).push(fmtRange(e.start, e.end, '–', e.sflag, e.eflag));
-      });
-      return order.map(name => ({ name, times: byName.get(name) }));
-    };
-    const winCell = (e, cls) =>
-      `<div class="chog-cell ${cls}"><div class="chog-name">${e.name}</div>${e.times.map(t => `<div class="chog-time">${t}</div>`).join('')}</div>`;
-    let windows = '';
-    if (data.auspicious.length) {
-      windows += `<div class="tile-strip"><div class="strip-title good-t">🟢 Auspicious</div><div class="win-grid">${groupWins(data.auspicious).map(e => winCell(e, 'good')).join('')}</div></div>`;
-    }
-    if (data.inauspicious.length) {
-      windows += `<div class="tile-strip"><div class="strip-title bad-t">🔴 Avoid</div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
+  function addPerson() {
+    const list = document.getElementById('people-list');
+    const count = list.children.length;
+    if (count >= 4) {
+      alert('Maximum 4 family members');
+      return;
     }
 
-    // 4 · The day's timeline — Choghadiya as full-width colour-coded strips,
-    // day from the feed, night computed from sunset → tomorrow's sunrise.
-    const CHOG_GOOD = new Set(['Amrit', 'Shubh', 'Labh', 'Char']);
-    const chogCell = c =>
-      `<div class="chog-cell ${CHOG_GOOD.has(c.name) ? 'good' : 'bad'}"><div class="chog-name">${c.name}</div><div class="chog-time">${fmtRange(c.start, c.end, '–<wbr>')}</div></div>`;
-    let chog = '';
-    if (data.choghadiya.length) {
-      chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — day in 8 blocks</div><div class="chog-grid">${data.choghadiya.map(chogCell).join('')}</div></div>`;
-    }
-    // Prefer the feed's night section; compute it locally only for older feeds.
-    let night = data.nightChoghadiya;
-    if (!night.length && data.sunset && events) {
-      const tomorrow = new Date(selectedDate());
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const next = events.get(stampOf(tomorrow));
-      const m = next && next.description.match(/Sunrise (\d{2}:\d{2})/);
-      if (m) night = nightChoghadiya(selectedDate().getDay(), data.sunset, m[1]);
-    }
-    if (night.length) {
-      chog += `<div class="tile-strip"><div class="strip-title">🌙 Choghadiya — night in 8 blocks</div><div class="chog-grid">${night.map(chogCell).join('')}</div></div>`;
-    }
-
-    container.innerHTML = `
-      <div class="preview-card">
-        <div class="preview-head">
-          <button class="wa-share-mini" onclick="shareTodayOnWhatsApp()"
-                  title="Share this day's panchangam on WhatsApp" aria-label="Share on WhatsApp">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
-          </button>
-          <div class="date">${formatToday()}${special}</div>
-          ${metaLines}
-        </div>
-        ${flagStrip}
-        ${angaGrid}
-        ${windows}
-        ${chog}
+    const html = `<div class="person-card">
+      <input type="text" class="name-input" placeholder="Name">
+      <div class="person-row">
+        <select class="person-select">
+          <option value="">Choose birth star...</option>
+        </select>
+        <button class="icon-btn" onclick="this.closest('.person-card').remove()">✕</button>
       </div>
-    `;
+    </div>`;
+    list.insertAdjacentHTML('beforeend', html);
   }
 
-  // --- Upcoming special days (next 30 days, same city/system as preview) ---
+  function findGoodDays() {
+    alert('Calculating good days...');
+  }
 
-  function renderUpcoming(events) {
-    const container = document.getElementById('upcoming-result');
+  function changeGocharaView() {
+    // Would update the gochara chart
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set dates
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const rows = [];
-    for (let i = 1; i <= 30; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() + i);
-      const ev = events.get(stampOf(d));
-      if (!ev || !(ev.summary.includes('⚡') || ev.summary.includes('🪔'))) continue;
-      const data = parseDescription(ev.description);
-      let chips = '';
-      data.special
-        .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-        .forEach(s => { chips += `<span class="special-chip">${chipEmoji(s, ev.summary)} ${specialLabel(s, data)}</span>`; });
-      if (data.eclipse) chips += eclipseChip(data.eclipse);
-      if (!chips) continue;
-      const dow = d.toLocaleDateString('en-US', { weekday: 'short' });
-      const md = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      rows.push(`<div class="upcoming-row">
-        <span class="upcoming-date"><span class="dow">${dow}</span> ${md}</span>
-        ${chips}
-        <span class="upcoming-in">in ${i} day${i > 1 ? 's' : ''}</span>
-      </div>`);
-    }
-    container.innerHTML = rows.length
-      ? `<div class="upcoming-list">${rows.join('')}</div>`
-      : '<p class="preview-note">No special days in the next 30 days.</p>';
-  }
+    document.getElementById('today-day').textContent = today.getDate();
+    document.getElementById('today-month-year').textContent =
+      today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  const FEED_CACHE = new Map();
-  let LAST_EVENTS = null;
+    // Set date inputs
+    const dateStr = today.toISOString().split('T')[0];
+    document.getElementById('tb-from').value = dateStr;
 
-  async function loadFeed(city, system) {
-    const key = `${city}|${system}`;
-    if (FEED_CACHE.has(key)) return FEED_CACHE.get(key);
-    // Relative path on the deployed site; fall back to the live feed URL
-    // so the page also works when previewed locally without a feeds/ dir.
-    let res = await fetch(`feeds/${feedFilename(city, system)}`).catch(() => null);
-    if (!res || !res.ok) res = await fetch(`${FEED_BASE_URL}${feedFilename(city, system)}`);
-    if (!res.ok) throw new Error('fetch failed');
-    const events = parseEvents(await res.text());
-    FEED_CACHE.set(key, events);
-    return events;
-  }
+    const nextMonth = new Date(today);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    document.getElementById('tb-to').value = nextMonth.toISOString().split('T')[0];
 
-  function renderAll() {
-    if (!LAST_EVENTS) return;
-    const container = document.getElementById('tp-result');
-    const event = LAST_EVENTS.get(stampOf(selectedDate()));
-    if (event) {
-      renderPreview(container, event, LAST_EVENTS);
-    } else {
-      container.innerHTML = '<p class="preview-error">Preview unavailable for this date — try the subscription link below.</p>';
-    }
-    renderUpcoming(LAST_EVENTS);
-  }
+    // Populate stars (placeholder)
+    const stars = ['Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra',
+                   'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni',
+                   'Uttara Phalguni', 'Hasta', 'Chitra', 'Swati', 'Vishakha',
+                   'Anuradha', 'Jyeshtha', 'Mula', 'Purva Ashadha', 'Uttara Ashadha',
+                   'Shravana', 'Dhanishtha', 'Shatabhisha', 'Purva Bhadrapada',
+                   'Uttara Bhadrapada', 'Revati'];
 
-  async function loadPreview() {
-    const city = document.getElementById('tp-city').value;
-    const system = document.getElementById('tp-system').value;
-    document.getElementById('tp-result').innerHTML = '<p class="preview-error">Loading…</p>';
-    try {
-      LAST_EVENTS = await loadFeed(city, system);
-      renderAll();
-    } catch (e) {
-      LAST_EVENTS = null;
-      document.getElementById('tp-result').innerHTML = '<p class="preview-error">Preview unavailable — try the subscription link below.</p>';
-      document.getElementById('upcoming-result').innerHTML = '<p class="preview-error">Unavailable — try the subscription link below.</p>';
-    }
-  }
-
-  // --- Share today's panchangam on WhatsApp (plain-text forward) ---
-
-  function fmtPlain(t, flag) {
-    return fmtT(t) + (flag === '+1' ? ' (next day)' : flag === '-1' ? ' (prev day)' : '');
-  }
-
-  function buildShareText(event) {
-    const data = parseDescription(event.description);
-    const d = selectedDate();
-    const dateLabel = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-    const citySel = document.getElementById('tp-city');
-    const sysSel = document.getElementById('tp-system');
-    const cityLabel = citySel.options[citySel.selectedIndex].textContent;
-    const sysLabel = sysSel.options[sysSel.selectedIndex].textContent;
-    const lines = [];
-    const fests = festivalNames(event.summary);
-    if (fests.length) lines.push(`🪔 *${fests.join(' · ')}*`);
-    lines.push(`*Panchangam — ${dateLabel}*`);
-    lines.push(`📍 ${cityLabel} · ${sysLabel}`);
-    lines.push('');
-    if (data.samvatsara) {
-      const yearBits = [data.samvatsara + ' Samvatsara', data.ayanam, data.rituvu ? data.rituvu + ' Rituvu' : null].filter(Boolean);
-      lines.push(yearBits.join(' · '));
-      lines.push(`${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}`);
-    }
-    const anga = (label, e) => e && lines.push(`*${label}:* ${e.name} — ${fmtPlain(e.start, e.sflag)} to ${fmtPlain(e.end, e.eflag)}`);
-    let tithi = data.tithi;
-    if (tithi && /^(Shukla|Krishna) Ekadashi$/.test(tithi.name)) {
-      const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
-      if (name) tithi = { ...tithi, name: `${name} Ekadashi` };
-    }
-    anga('Tithi', tithi);
-    anga('Nakshatra', data.nakshatra);
-    anga('Yoga', data.yoga);
-    if (data.karana) {
-      const karana = data.karana.split(/\s+\/\s+/).map(k => {
-        const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-        return m ? `${m[1]} ${fmtPlain(m[2], m[3])}–${fmtPlain(m[4], m[5])}` : k;
-      }).join(' / ');
-      lines.push(`*Karana:* ${karana}`);
-    }
-    if (data.sunrise) lines.push(`🌅 Sunrise ${fmtT(data.sunrise)} · Sunset ${fmtT(data.sunset)}`);
-    if (data.moonrise) lines.push(`🌙 Moonrise ${fmtT(data.moonrise)} · Moonset ${fmtT(data.moonset)}`);
-    const winList = (title, list) => {
-      if (!list.length) return;
-      lines.push('');
-      lines.push(title);
-      list.forEach(w => lines.push(`• ${w.name} ${fmtPlain(w.start, w.sflag)}–${fmtPlain(w.end, w.eflag)}`));
-    };
-    winList('⚠️ *Avoid:*', data.inauspicious);
-    winList('✅ *Good times:*', data.auspicious);
-    const extras = data.special.filter(sp => !fests.some(f => sp.startsWith(f)));
-    if (extras.length) {
-      lines.push('');
-      lines.push(`⚡ ${extras.map(sp => specialLabel(sp, data)).join(' · ')}`);
-    }
-    if (data.yogas.length) lines.push(`✨ ${data.yogas.join(' · ')}`);
-    if (data.eclipse) {
-      lines.push(`🌒 ${data.eclipse.kind} Eclipse (${data.eclipse.subtype}) — ${data.eclipse.visible ? 'visible here, Sutak applies' : 'not visible from this location'}`);
-    }
-    lines.push('');
-    lines.push('📅 Full panchangam & free calendar feeds:');
-    lines.push('https://panchangam.astrochaganti.com/?src=share-today');
-    gcEvent('share-today');
-    return lines.join('\n');
-  }
-
-  function shareTodayOnWhatsApp() {
-    const event = LAST_EVENTS && LAST_EVENTS.get(stampOf(selectedDate()));
-    if (!event) return;
-    window.open('https://wa.me/?text=' + encodeURIComponent(buildShareText(event)), '_blank');
-  }
-
-  // --- Tarabalam tool ---
-
-  const TB_NAKSHATRAS = ['Ashvini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
-  const TARA_NAMES = ['Janma','Sampat','Vipat','Kshema','Pratyak','Sadhana','Naidhana','Mitra','Parama Mitra'];
-  const TARA_GOOD = new Set([2,4,6,8,9]);
-  const TB_RASIS = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
-  const CHANDRA_GOOD = new Set([1,3,6,7,10,11]);
-  const CHANDRA_PUJA = new Set([2,5,9]);
-  let TB_DAYS = null;    // last computed result rows
-  let TB_EVENTS = null;  // feed events used for the last calculation
-  let TB_ROWS = 4;       // max profile rows
-
-  function taraOf(janmaName, dayName) {
-    const j = TB_NAKSHATRAS.indexOf(janmaName), d = TB_NAKSHATRAS.indexOf(dayName);
-    if (j < 0 || d < 0) return null;
-    return ((d - j + 27) % 27) % 9 + 1;
-  }
-
-  function rasiFromStar(nakName, pada) {
-    const k = TB_NAKSHATRAS.indexOf(nakName);
-    if (k < 0) return null;
-    if (pada) return TB_RASIS[Math.floor((k * 4 + pada - 1) / 9)];
-    const first = Math.floor((k * 4) / 9), last = Math.floor((k * 4 + 3) / 9);
-    return first === last ? TB_RASIS[first] : null;  // straddler needs padam
-  }
-
-  function chandraOf(janmaRasi, dayRasi) {
-    const j = TB_RASIS.indexOf(janmaRasi), d = TB_RASIS.indexOf(dayRasi);
-    if (j < 0 || d < 0) return null;
-    const pos = ((d - j + 12) % 12) + 1;
-    return { pos, verdict: CHANDRA_GOOD.has(pos) ? 'good' : (CHANDRA_PUJA.has(pos) ? 'puja' : 'bad') };
-  }
-
-  function tbProfiles() {
-    const out = [];
-    for (let i = 0; i < TB_ROWS; i++) {
-      const nak = document.getElementById(`tb-nak-${i}`)?.value;
-      if (!nak) continue;
-      const name = document.getElementById(`tb-name-${i}`).value.trim() || (i === 0 ? 'You' : `Person ${i+1}`);
-      const pada = Number(document.getElementById(`tb-pada-${i}`)?.value) || null;
-      out.push({ name, nak, pada, rasi: rasiFromStar(nak, pada) });
-    }
-    return out;
-  }
-
-  function tbSaveProfiles() {
-    const raw = [];
-    for (let i = 0; i < TB_ROWS; i++) {
-      raw.push({ name: document.getElementById(`tb-name-${i}`)?.value || '',
-                 nak: document.getElementById(`tb-nak-${i}`)?.value || '',
-                 pada: document.getElementById(`tb-pada-${i}`)?.value || '' });
-    }
-    localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
-  }
-
-  function tbLoadProfiles() {
-    try {
-      const raw = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
-      for (let i = 0; i < Math.min(raw.length, TB_ROWS); i++) {
-        if (!raw[i]) continue;
-        if (raw[i].name) document.getElementById(`tb-name-${i}`).value = raw[i].name;
-        if (raw[i].nak) document.getElementById(`tb-nak-${i}`).value = raw[i].nak;
-        if (raw[i].pada) document.getElementById(`tb-pada-${i}`).value = raw[i].pada;
-      }
-    } catch (e) {}
-  }
-
-  function tbResetProfiles() {
-    localStorage.removeItem('tc-tb-profiles');
-    tbRenderProfileInputs();
-  }
-
-  function tbSetMode(mode) {
-    localStorage.setItem('tc-tb-mode', mode);
-  }
-
-  function tbRenderProfileInputs() {
-    const container = document.getElementById('tb-profiles');
-    container.innerHTML = '';
-    for (let i = 0; i < TB_ROWS; i++) {
-      const row = document.createElement('div');
-      row.className = 'tb-profile-row';
-      row.innerHTML = `
-        <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'You' : 'Name'}" oninput="tbSaveProfiles()">
-        <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderPadaSelect(${i})">
-          <option value="">Birth star…</option>
-          ${TB_NAKSHATRAS.map(n => `<option value="${n}">${n}</option>`).join('')}
-        </select>
-        <select id="tb-pada-${i}" onchange="tbSaveProfiles()" style="display:none;">
-          <option value="">Padam</option>
-          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-        </select>
-        ${i > 0 ? `<button class="tb-remove" onclick="tbRemoveRow(${i})" title="Remove">×</button>` : ''}
-      `;
-      container.appendChild(row);
-    }
-    tbLoadProfiles();
-    // Show pada for profiles that need it
-    for (let i = 0; i < TB_ROWS; i++) {
-      const nak = document.getElementById(`tb-nak-${i}`)?.value;
-      if (nak && rasiFromStar(nak) === null) {
-        document.getElementById(`tb-pada-${i}`).style.display = 'inline-block';
-      }
-    }
-  }
-
-  function tbRenderPadaSelect(i) {
-    const nak = document.getElementById(`tb-nak-${i}`).value;
-    const padaSel = document.getElementById(`tb-pada-${i}`);
-    const rasi = nak ? rasiFromStar(nak) : null;
-    padaSel.style.display = (nak && rasi === null) ? 'inline-block' : 'none';
-  }
-
-  function tbRemoveRow(i) {
-    document.getElementById(`tb-name-${i}`).value = '';
-    document.getElementById(`tb-nak-${i}`).value = '';
-    document.getElementById(`tb-pada-${i}`).value = '';
-    document.getElementById(`tb-pada-${i}`).style.display = 'none';
-    tbSaveProfiles();
-  }
-
-  function tbAddRow() {
-    // Find first empty row and focus it
-    for (let i = 0; i < TB_ROWS; i++) {
-      if (!document.getElementById(`tb-nak-${i}`).value) {
-        document.getElementById(`tb-name-${i}`).focus();
-        return;
-      }
-    }
-  }
-
-  async function calcTarabalam() {
-    const container = document.getElementById('tb-result');
-    container.innerHTML = '<p class="preview-error">Loading…</p>';
-    const from = new Date(document.getElementById('tb-from').value + 'T00:00:00');
-    const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
-    const nDays = Math.min(60, Math.max(1, Math.round((to - from) / 86400000) + 1));
-    const mode = document.getElementById('tb-mode').value;
-    const people = tbProfiles();
-    if (!people.length) {
-      container.innerHTML = '<p class="preview-error">Add at least one person above to find good days for them.</p>';
-      return;
-    }
-    try {
-      const city = document.getElementById('tp-city').value;
-      const system = document.getElementById('tp-system').value;
-      const events = LAST_EVENTS || await loadFeed(city, system);
-      TB_EVENTS = events;
-      TB_DAYS = [];
-      for (let i = 0; i < nDays; i++) {
-        const d = new Date(from); d.setDate(d.getDate() + i);
-        const ev = events.get(stampOf(d));
-        if (!ev) continue;
-        const data = parseDescription(ev.description);
-        const dayNak = data.nakshatra?.name;
-        const dayRasi = data.lunarSign;
-        const taras = people.map(p => {
-          const t = taraOf(p.nak, dayNak);
-          const good = TARA_GOOD.has(t);
-          let ch = null;
-          if (p.rasi && dayRasi) {
-            const c = chandraOf(p.rasi, dayRasi);
-            ch = c ? { pos: c.pos, verdict: c.verdict } : null;
-          }
-          return { name: p.name, nak: p.nak, tara: t, taraName: TARA_NAMES[t-1], good, ch };
-        });
-        let allGood = taras.every(t => t.good);
-        if (mode === 'puja_ok') allGood = allGood && taras.every(t => !t.ch || t.ch.verdict !== 'bad');
-        if (mode === 'strict') allGood = allGood && taras.every(t => !t.ch || t.ch.verdict === 'good');
-        TB_DAYS.push({ date: new Date(d), vaaram: data.vaaram, nakshatra: dayNak, taras, allGood });
-      }
-      renderTarabalam();
-    } catch (e) {
-      container.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
-    }
-  }
-
-  function renderTarabalam() {
-    if (!TB_DAYS) return;
-    const container = document.getElementById('tb-result');
-    const mode = document.getElementById('tb-mode').value;
-    const goodDates = TB_DAYS.filter(d => d.allGood);
-    const summary = document.getElementById('tb-summary');
-    summary.innerHTML = goodDates.length
-      ? `<span class="tb-star">✦</span> <span class="count">${goodDates.length}</span> good day${goodDates.length !== 1 ? 's' : ''} for everyone together · ${mode === 'stars' ? 'Stars only' : mode === 'puja_ok' ? 'Stars + Moon (puja ok)' : 'Strict Moon check'}`
-      : 'No days favourable for everyone together in this range. Relax the standard or try more days.';
-    const rows = TB_DAYS.map(d => {
-      const dow = d.date.toLocaleDateString('en-US', { weekday: 'short' });
-      const md = d.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const cells = d.taras.map(t => {
-        const cls = t.good ? 'good' : 'bad';
-        const title = `${t.name}: ${t.taraName} (${t.tara})`;
-        let chMark = '';
-        if (t.ch) {
-          chMark = t.ch.verdict === 'good' ? ' °' : t.ch.verdict === 'puja' ? ' °' : ' ☾';
-        }
-        return `<span class="tara-chip ${cls}" title="${title}">${t.taraName}${chMark}</span>`;
-      }).join(' ');
-      return `<tr class="${d.allGood ? 'tb-all' : ''}">
-        <td class="tb-date-cell">${dow} ${md}</td>
-        <td>${d.nakshatra || '—'}</td>
-        <td>${cells}</td>
-        <td>${d.allGood ? '<span class="tb-star">✦</span>' : ''}</td>
-      </tr>`;
-    }).join('');
-    const thead = `<tr><th>Date</th><th>Nakshatra</th><th>Taras (hover for detail)</th><th></th></tr>`;
-    container.innerHTML = `<table class="tb-table"><thead>${thead}</thead><tbody>${rows}</tbody></table>`;
-  }
-
-  // --- Gochara tool ---
-
-  const GO_FAV = { Surya:[3,6,10,11], Chandra:[1,3,6,7,10,11], Kuja:[3,6,11],
-    Budha:[2,4,6,8,10,11], Guru:[2,5,7,9,11], Shukra:[1,2,3,4,5,8,9,11,12],
-    Shani:[3,6,11], Rahu:[3,6,11], Ketu:[3,6,11] };
-  const GO_VEDHA = { Surya:{3:9,6:12,10:4,11:5}, Chandra:{1:5,3:9,6:12,7:2,10:4,11:8},
-    Kuja:{3:12,6:9,11:5}, Budha:{2:5,4:3,6:9,8:1,10:8,11:12},
-    Guru:{2:12,5:4,7:3,9:10,11:8}, Shukra:{1:8,2:7,3:1,4:10,5:9,8:5,9:11,11:6,12:3},
-    Shani:{3:12,6:9,11:5} };
-  const GO_EXEMPT = new Set(['Surya|Shani','Shani|Surya','Chandra|Budha','Budha|Chandra']);
-  const GO_NODES = new Set(['Rahu','Ketu']);
-  let GO_DATA = null;
-
-  async function loadGochara() {
-    const firstLoad = !GO_DATA;
-    if (firstLoad) {
-      try {
-        const r = await fetch('gochara.json', { cache: 'no-cache' });
-        GO_DATA = await r.json();
-      } catch (e) {
-        document.getElementById('go-chart').innerHTML =
-          '<p class="preview-error">Sky data unavailable — try again later.</p>';
-        return;
-      }
-      const di = document.getElementById('go-date');
-      di.min = GO_DATA.start;
-      const last = new Date(GO_DATA.start + 'T00:00:00');
-      last.setDate(last.getDate() + GO_DATA.days.length - 1);
-      di.max = `${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`;
-      di.value = todayISO;
-    }
-    // people may have changed in the Tarabalam tab — rebuild, keep selection
-    const sel = document.getElementById('go-view');
-    const keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
-    goBuildViewSelect();
-    if (keep && [...sel.options].some(o => o.value === keep)) sel.value = keep;
-    renderGochara();
-  }
-
-  function goDateIndex() {
-    const start = new Date(GO_DATA.start + 'T00:00:00');
-    const val = document.getElementById('go-date').value;
-    const chosen = val ? new Date(val + 'T00:00:00') : new Date(new Date().setHours(0,0,0,0));
-    const i = Math.round((chosen - start) / 86400000);
-    return Math.max(0, Math.min(i, GO_DATA.days.length - 1));
-  }
-
-  function goTill(idx, gi) {
-    const cur = GO_DATA.days[idx][gi];
-    for (let j = idx + 1; j < GO_DATA.days.length; j++) {
-      if (GO_DATA.days[j][gi] !== cur) {
-        const d = new Date(GO_DATA.start + 'T00:00:00');
-        d.setDate(d.getDate() + j);
-        return { date: d, next: GO_DATA.rasis[GO_DATA.days[j][gi]] };
-      }
-    }
-    return null;
-  }
-
-  function goSavedPeople() {
-    const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
-    return saved.map((v, i) => {
-      if (!v || !v.nak) return null;
-      const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
-      return rasi ? { name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)), rasi } : null;
-    }).filter(Boolean);
-  }
-
-  function goBuildViewSelect() {
-    const sel = document.getElementById('go-view');
-    const people = goSavedPeople();
-    let html = '<option value="">Transits only — whole sky</option>';
-    if (people.length) {
-      html += '<optgroup label="Your saved people">' + people.map((k, i) =>
-        `<option value="p${i}">${k.name} · ${k.rasi}</option>`).join('') + '</optgroup>';
-    }
-    html += '<optgroup label="Any rashi">' +
-      GO_DATA.rasis.map((r, i) => `<option value="${i}">${r}</option>`).join('') + '</optgroup>';
-    sel.innerHTML = html;
-  }
-
-  function goCurrentView() {
-    const val = document.getElementById('go-view').value;
-    if (val === '') return { jr: null, label: null };
-    if (val.startsWith('p')) {
-      const k = goSavedPeople()[Number(val.slice(1))];
-      if (!k) return { jr: null, label: null };
-      return { jr: TB_RASIS.indexOf(k.rasi), label: `${k.rasi} rashi (${k.name})` };
-    }
-    return { jr: Number(val), label: GO_DATA.rasis[Number(val)] + ' rashi' };
-  }
-
-  // South Indian chart: fixed rasi positions on a 4x4 grid (row, col)
-  const GO_LAYOUT = { 11:[1,1], 0:[1,2], 1:[1,3], 2:[1,4], 3:[2,4], 4:[3,4],
-                      5:[4,4], 6:[4,3], 7:[4,2], 8:[4,1], 9:[3,1], 10:[2,1] };
-
-  function renderGochara() {
-    if (!GO_DATA) return;
-    const idx = goDateIndex();
-    const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
-    const view = goCurrentView();
-    const jr = view.jr;
-    localStorage.setItem('tc-go-view', document.getElementById('go-view').value);
-
-    const dateShown = new Date(GO_DATA.start + 'T00:00:00');
-    dateShown.setDate(dateShown.getDate() + idx);
-    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-
-    // per-graha verdicts when a janma rashi is chosen
-    const houseOf = gi => jr === null ? null : ((row[gi] - jr + 12) % 12) + 1;
-    const occupants = {};
-    if (jr !== null) GO_DATA.grahas.forEach((g, gi) => {
-      (occupants[houseOf(gi)] = occupants[houseOf(gi)] || []).push(g);
+    document.querySelectorAll('.person-select').forEach(sel => {
+      stars.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sel.appendChild(opt);
+      });
     });
-    const verdictOf = gi => {
-      if (jr === null) return null;
-      const g = GO_DATA.grahas[gi], pos = houseOf(gi);
-      if (!GO_FAV[g].includes(pos)) return 'bad';
-      if (!GO_NODES.has(g)) {
-        const vh = GO_VEDHA[g][pos];
-        for (const other of (occupants[vh] || [])) {
-          if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return 'blocked';
-        }
-      }
-      return 'good';
-    };
-
-    // conditions banner
-    const condBox = document.getElementById('go-conditions');
-    let conds = [];
-    if (jr !== null) {
-      const sp = houseOf(GO_DATA.grahas.indexOf('Shani'));
-      conds = sp === 12 ? ['Sade Sati (rising phase)'] : sp === 1 ? ['Sade Sati (peak phase)']
-        : sp === 2 ? ['Sade Sati (setting phase)'] : sp === 8 ? ['Ashtama Shani']
-        : sp === 4 ? ['Ardhastama Shani'] : [];
-    }
-    condBox.innerHTML = conds.length
-      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}
-         <div class="tb-sub" style="margin-top:var(--space-2);">Running ${conds[0].split(' (')[0]}? Personalised guidance:
-         <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--amber-deep);font-weight:600;">astrochaganti.com</a></div></div>` : '';
-
-    // chart
-    const byRasi = {};
-    GO_DATA.grahas.forEach((g, gi) => { (byRasi[row[gi]] = byRasi[row[gi]] || []).push(gi); });
-    let boxes = '';
-    for (let r = 0; r < 12; r++) {
-      const [gr, gc] = GO_LAYOUT[r];
-      const grahas = (byRasi[r] || []).map(gi => {
-        const v = verdictOf(gi);
-        const t = goTill(idx, gi);
-        const tip = `${GO_DATA.grahas[gi]} in ${GO_DATA.rasis[r]}` +
-          (jr !== null ? ` — ${houseOf(gi)}${['st','nd','rd'][houseOf(gi)-1]||'th'} house, ${v === 'good' ? 'favourable' : v === 'blocked' ? 'vedha' : 'adverse'}` : '') +
-          (t ? ` · till ${t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '');
-        return `<span class="go-g ${v || ''}" title="${tip}">${GO_DATA.grahas[gi]}${retro[gi] ? '<span class="go-retro">℞</span>' : ''}</span>`;
-      }).join('');
-      const house = jr !== null ? `<span class="house">${((r - jr + 12) % 12) + 1}</span>` : '';
-      boxes += `<div class="go-box ${jr === r ? 'janma' : ''}" style="grid-row:${gr};grid-column:${gc};">
-        <span class="rname">${GO_DATA.rasis[r]}${jr === r ? ' · janma' : ''}</span>${house}<br>${grahas}</div>`;
-    }
-    const typed = document.getElementById('go-date').value;
-    const shownISO = `${dateShown.getFullYear()}-${String(dateShown.getMonth()+1).padStart(2,'0')}-${String(dateShown.getDate()).padStart(2,'0')}`;
-    document.getElementById('go-note').innerHTML = typed && typed !== shownISO
-      ? `<p class="preview-note" style="color:var(--copper);">That date is outside this chart's data window
-         (${GO_DATA.start} to ${document.getElementById('go-date').max}) — showing the nearest covered day,
-         ${fmtD(dateShown)}. For any date, past or future, ask via the MCP server below.</p>` : '';
-    const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
-      <div class="d2">${fmtD(dateShown)}</div>
-      <div class="d2">${jr !== null ? 'from ' + view.label : 'transits — choose a person or rashi above to personalise'}</div></div>`;
-    document.getElementById('go-chart').innerHTML = boxes + center;
-
-    // upcoming moves, soonest first
-    const moves = GO_DATA.grahas.map((g, gi) => ({ g, t: goTill(idx, gi) }))
-      .filter(m => m.t).sort((a, b) => a.t.date - b.t.date).slice(0, 5);
-    document.getElementById('go-moves').innerHTML = moves.length
-      ? `<div class="go-moves"><b>Coming up:</b> ` + moves.map(m =>
-          `${m.g} → ${m.t.next} <b>${m.t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</b>`).join(' &nbsp;·&nbsp; ') + `</div>` : '';
-
-    // rasi phalalu (daily reading from the same computed verdicts)
-    const phBox = document.getElementById('go-phalalu');
-    if (jr === null) { phBox.innerHTML = ''; }
-    else {
-      const ph = buildPhalalu(jr, row, view, idx);
-      const phShare = `<button class="wa-share-mini" style="position:static;width:26px;height:26px;margin-left:auto;flex:none;" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
-      phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:var(--space-2);">Rasi Phalalu — ${view.label}
-        <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
-        ph.lines.map(l => `<p>${l}</p>`).join('') +
-        `<p style="font-size:0.75rem;color:var(--stone);">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
-    }
-
-    // legend
-    document.getElementById('go-legend').innerHTML = jr === null ? '' :
-      `<div class="tb-legend" style="margin-top:var(--space-3);display:flex;flex-wrap:wrap;gap:var(--space-3);color:var(--slate);font-size:0.8125rem;">
-        <span><span class="go-g good">favourable</span></span>
-        <span><span class="go-g blocked">blocked by vedha</span></span>
-        <span><span class="go-g bad">adverse</span></span>
-        <span><span class="go-g">℞ retrograde</span></span>
-        <span>(hover a graha for detail)</span></div>`;
-  }
-
-  const HOUSE_MEANINGS = { 1:'self and health', 2:'wealth and family', 3:'courage and effort',
-    4:'home and comfort', 5:'children and learning', 6:'health and rivals', 7:'partnerships',
-    8:'obstacles', 9:'fortune and dharma', 10:'career and standing', 11:'gains and income', 12:'expenses and rest' };
-  const PHALALU_OPENERS = {
-    good: 'The Moon stands well for your rashi today — a day that supports initiative.',
-    puja: "The Moon's position asks for a small remedial prayer; proceed gently after it.",
-    bad: 'The Moon sits heavily for your rashi today — keep the day light and routine.' };
-  const PHALALU_ORDER = ['Shani','Guru','Rahu','Ketu','Kuja','Surya','Shukra','Budha'];
-  const ordinal = n => n + (['st','nd','rd'][n-1] || 'th');
-
-  function buildPhalalu(jr, row, view, idx) {
-    const houseOf = gi => ((row[gi] - jr + 12) % 12) + 1;
-    const occupants = {};
-    GO_DATA.grahas.forEach((g, gi) => { (occupants[houseOf(gi)] = occupants[houseOf(gi)] || []).push(g); });
-    const verdictFor = gi => {
-      const g = GO_DATA.grahas[gi], pos = houseOf(gi);
-      if (!GO_FAV[g].includes(pos)) return { v: 'adverse' };
-      if (!GO_NODES.has(g)) {
-        const vh = GO_VEDHA[g][pos];
-        for (const other of (occupants[vh] || [])) {
-          if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return { v: 'blocked', by: other };
-        }
-      }
-      return { v: 'favourable' };
-    };
-    const moonPos = houseOf(GO_DATA.grahas.indexOf('Chandra'));
-    const mv = CHANDRA_GOOD.has(moonPos) ? 'good' : (CHANDRA_PUJA.has(moonPos) ? 'puja' : 'bad');
-    let fav = 0, blocked = 0;
-    const detail = {};
-    GO_DATA.grahas.forEach((g, gi) => { const r = verdictFor(gi); detail[g] = { ...r, pos: houseOf(gi) };
-      if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++; });
-    const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
-    const lines = [PHALALU_OPENERS[mv]];
-    const shaniPos = detail['Shani'].pos;
-    const cond = shaniPos === 12 ? 'Sade Sati (rising phase)' : shaniPos === 1 ? 'Sade Sati (peak phase)'
-      : shaniPos === 2 ? 'Sade Sati (setting phase)' : shaniPos === 8 ? 'Ashtama Shani'
-      : shaniPos === 4 ? 'Ardhastama Shani' : null;
-    if (cond) lines.push(cond.startsWith('Sade Sati')
-      ? `${cond} is running — Shani asks for patience, discipline and steady work.`
-      : `${cond} is running — avoid risks and keep commitments minimal.`);
-    for (const g of PHALALU_ORDER) {
-      const d = detail[g], m = HOUSE_MEANINGS[d.pos];
-      lines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.pos)} house favours ${m}.`
-        : d.v === 'blocked' ? `${g}'s good ${ordinal(d.pos)}-house transit is under vedha by ${d.by} — gains in ${m} may arrive with friction.`
-        : `${g} in the ${ordinal(d.pos)} house tests ${m}; avoid forcing matters there.`);
-    }
-    lines.push(`${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''}.`);
-    return { quality, lines };
-  }
-
-  function shareGocharaOnWhatsApp() {
-    if (!GO_DATA) return;
-    const view = goCurrentView();
-    if (view.jr === null) return;
-    const jr = view.jr;
-    const idx = goDateIndex();
-    const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
-    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const ord = n => n + (['st','nd','rd'][n-1] || 'th');
-    const ph = buildPhalalu(jr, row, view, idx);
-    const lines = [];
-    const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
-    lines.push(`📜 *Rasi Phalalu — ${fmtD(shown)}*`);
-    lines.push(`${view.label} · ${ph.quality} day`);
-    lines.push('');
-    ph.lines.forEach(l => lines.push('• ' + l));
-    lines.push('');
-    lines.push('Check your rashi:');
-    lines.push('https://panchangam.astrochaganti.com/?src=share-phalalu#gochara');
-    gcEvent('share-phalalu');
-    window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
-  }
-
-  // --- Muhurta finder (client-side, from the already-loaded feed) ---
-
-  const MU_GOOD_CHOG = { Amrit: 3, Shubh: 2, Labh: 2, Char: 1 };
-  const MU_YOGA_BONUS = { 'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,
-                          'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1 };
-  const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
-
-  function muMin(t, flag) {
-    const [h, m] = t.split(':').map(Number);
-    return h * 60 + m + (flag === '+1' ? 1440 : flag === '-1' ? -1440 : 0);
-  }
-
-  function muSubtract(s, e, blocks) {
-    let pieces = [[s, e]];
-    for (const [b0, b1] of blocks) {
-      const nxt = [];
-      for (const [p0, p1] of pieces) {
-        if (b1 <= p0 || b0 >= p1) { nxt.push([p0, p1]); continue; }
-        if (p0 < b0) nxt.push([p0, b0]);
-        if (b1 < p1) nxt.push([b1, p1]);
-      }
-      pieces = nxt;
-    }
-    return pieces;
-  }
-
-  async function findMuhurta() {
-    const box = document.getElementById('mu-result');
-    box.innerHTML = '<p class="preview-error">Searching…</p>';
-    const activity = document.getElementById('mu-activity').value;
-    const from = new Date(document.getElementById('tb-from').value + 'T00:00:00');
-    const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
-    const nDays = Math.min(60, Math.max(1, Math.round((to - from) / 86400000) + 1));
-    const people = tbProfiles();
-    document.getElementById('mu-context').innerHTML = people.length
-      ? `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => p.name).join(', ')}</strong> (set above).`
-      : `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong> — no people set above, so no star screening.`;
-    try {
-      const city = document.getElementById('tp-city').value;
-      const system = document.getElementById('tp-system').value;
-      const events = LAST_EVENTS || await loadFeed(city, system);
-      const slots = [];
-      let screenedDays = 0;
-      for (let i = 0; i < nDays; i++) {
-        const d = new Date(from); d.setDate(d.getDate() + i);
-        const ev = events.get(stampOf(d));
-        if (!ev) continue;
-        const data = parseDescription(ev.description);
-        let dayBonus = 0; const dayReasons = [];
-        if (people.length && data.nakshatra) {
-          const ok = people.every(pr => TARA_GOOD.has(taraOf(pr.nak, data.nakshatra.name)));
-          if (!ok) { screenedDays++; continue; }
-          dayBonus += 2; dayReasons.push('tarabalam favourable for everyone (+2)');
-        }
-        let skipDay = false;
-        for (const y of data.yogas) {
-          if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
-          if (MU_YOGA_PENALTY[y] !== undefined) {
-            if (activity === 'ceremony') { skipDay = true; break; }
-            dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
-          }
-        }
-        if (skipDay) continue;
-        const bad = data.inauspicious.map(w => [muMin(w.start, w.sflag), muMin(w.end, w.eflag)]);
-        if (activity === 'travel' && data.karana) {
-          for (const k of data.karana.split(/\s+\/\s+/)) {
-            const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-            if (m && m[1].trim() === 'Vishti') bad.push([muMin(m[2], m[3]), muMin(m[4], m[5])]);
-          }
-        }
-        const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
-        const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
-        for (const c of data.choghadiya) {
-          const base = MU_GOOD_CHOG[c.name];
-          if (base === undefined) continue;
-          for (const [s0, e0] of muSubtract(muMin(c.start), muMin(c.end), bad)) {
-            if (e0 - s0 < 24) continue;
-            let score = base + dayBonus;
-            const reasons = [`${c.name} choghadiya (+${base})`, 'clear of all inauspicious windows', ...dayReasons];
-            if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
-              score += 2; reasons.push('overlaps Abhijit Muhurta (+2)');
-            }
-            if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
-              score += 2; reasons.push('overlaps Amrita Kalam (+2)');
-            }
-            if (activity === 'purchase' && c.name === 'Labh') { score += 1; reasons.push('Labh favoured for purchases (+1)'); }
-            if (activity === 'beginning' && c.name === 'Amrit') { score += 1; reasons.push('Amrit favoured for beginnings (+1)'); }
-            if (activity === 'travel') reasons.push('Vishti karana avoided');
-            slots.push({ d: new Date(d), s0, e0, score, reasons });
-          }
-        }
-      }
-      slots.sort((a, b) => b.score - a.score || a.d - b.d || a.s0 - b.s0);
-      MU_LAST = { top: slots.slice(0, 10), screenedDays, activity, people };
-      renderMuhurta();
-    } catch (e) {
-      box.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
-    }
-  }
-
-  let MU_LAST = null;
-  const MU_ACT_LABEL = { any: 'anything auspicious', travel: 'travel', purchase: 'a purchase',
-                         ceremony: 'a ceremony', beginning: 'a new beginning' };
-
-  function muToT(mm) {
-    const m = ((mm % 1440) + 1440) % 1440;
-    return fmtT(`${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`);
-  }
-
-  function renderMuhurta() {
-    if (!MU_LAST) return;
-    const box = document.getElementById('mu-result');
-    const { top, screenedDays } = MU_LAST;
-    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    if (!top.length) {
-      box.innerHTML = `<p class="preview-error">No clear slots found${screenedDays ? ` — ${screenedDays} day(s) were screened out by tarabalam` : ''}. Try more days, or clear the people above.</p>`;
-      return;
-    }
-    const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
-    box.innerHTML =
-      `<div class="tb-summary">⏱ <span class="count">${top.length}</span> slot${top.length !== 1 ? 's' : ''} found — best first${share}</div>`
-      + top.map((s, i) => `<div class="mu-slot ${i === 0 ? 'top' : ''}">
-          <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
-          <span class="mu-score">score ${s.score}</span>
-          <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
-      + `<p class="preview-note" style="margin-top:var(--space-3);">The score is simply the sum of the (+n) reasons on each slot:
-         choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
-         days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
-         requirement, not a bonus.</p>`;
-  }
-
-  function shareMuhurtaOnWhatsApp() {
-    if (!MU_LAST || !MU_LAST.top.length) return;
-    const { top, activity, people } = MU_LAST;
-    const citySel = document.getElementById('tp-city');
-    const cityLabel = citySel.options[citySel.selectedIndex].textContent;
-    const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const lines = [];
-    lines.push(`⏱ *Good time slots — ${MU_ACT_LABEL[activity]}*`);
-    lines.push(`📍 ${cityLabel} · ${document.getElementById('tb-from').value} to ${document.getElementById('tb-to').value}`);
-    if (people.length) lines.push(`Screened for: ${people.map(p => `${p.name} (${p.nak})`).join(' · ')}`);
-    lines.push('');
-    top.slice(0, 5).forEach(s => {
-      lines.push(`✅ ${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}`);
-      lines.push(`   ${s.reasons.filter(r => r !== 'clear of all inauspicious windows').slice(0, 3).join(' · ')}`);
-    });
-    lines.push('');
-    lines.push('Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.');
-    lines.push('Find your own: https://panchangam.astrochaganti.com/?src=share-slots#tarabalam');
-    gcEvent('share-slots');
-    window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
-  }
-
-  // --- Init ---
-
-  populateCitySelect(document.getElementById('tp-city'));
-  populateSystemSelect(document.getElementById('tp-system'));
-  populateCitySelect(document.getElementById('sub-city'));
-  populateSystemSelect(document.getElementById('sub-system'));
-
-  document.getElementById('tp-city').addEventListener('change', loadPreview);
-  document.getElementById('tp-system').addEventListener('change', loadPreview);
-  const _d = new Date();
-  const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
-  document.getElementById('tp-date').value = todayISO;
-  document.getElementById('tp-date').addEventListener('change', loadPreview);
-  document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
-  document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
-
-  setTimeFmt(TIME_FMT);
-
-  tbRenderProfileInputs();
-  document.getElementById('tb-from').value = todayISO;
-  const _t2 = new Date(); _t2.setDate(_t2.getDate() + 13);
-  document.getElementById('tb-to').value = `${_t2.getFullYear()}-${String(_t2.getMonth()+1).padStart(2,'0')}-${String(_t2.getDate()).padStart(2,'0')}`;
-  const savedMode = localStorage.getItem('tc-tb-mode');
-  if (savedMode) document.getElementById('tb-mode').value = savedMode;
-
-  if (location.hash === '#tarabalam') switchTool('tarabalam');
-  if (location.hash === '#gochara') switchTool('gochara');
-  if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
-  updateSubscribeUrl();
-  loadPreview();
-</script>
-<script data-goatcounter="https://panchangam.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
-<script>
-  // lightweight event tracking; no-ops if the counter is blocked or offline
-  function gcEvent(name) {
-    if (window.goatcounter && window.goatcounter.count) {
-      window.goatcounter.count({ path: name, title: name, event: true });
-    }
-  }
-  document.addEventListener('click', function (e) {
-    const a = e.target.closest && e.target.closest('a');
-    if (!a) return;
-    if (a.href.includes('astrochaganti.com') && !a.href.includes('panchangam.')) gcEvent('consult-click');
-    if (a.href.includes('pypi.org')) gcEvent('pypi-click');
   });
 </script>
 </body>
