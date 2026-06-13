@@ -158,7 +158,88 @@ def test_eclipse_day_returns_no_slots():
 
 def test_invalid_activity_raises():
     with pytest.raises(ValueError):
-        day_slots(_day(2026, 6, 17), activity='wedding')
+        day_slots(_day(2026, 6, 17), activity='not-a-real-activity')
+
+
+# --- Activity taxonomy (Batch D) ---
+
+def test_all_24_activities_callable():
+    from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
+    assert len(ACTIVITIES) == 24
+    # backward-compat: every old key must still be accepted
+    for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
+        assert old in ACTIVITY_RULES
+    # spot check new keys
+    for new in ('wedding', 'gruhapravesha', 'naming', 'annaprasana',
+                'karnavedha', 'mundana', 'upanayana', 'vidyarambha',
+                'engagement', 'vehicle', 'property', 'gold', 'bhumi_puja',
+                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery'):
+        assert new in ACTIVITY_RULES
+    # every row has a label
+    for k, row in ACTIVITY_RULES.items():
+        assert row.get('label'), f'activity {k!r} missing label'
+
+
+def test_wedding_skips_dagdha_day():
+    # 2026-06-17 carries Dagdha Yoga — samskara activities are deferred.
+    day = _day(2026, 6, 17)
+    assert 'Dagdha Yoga' in day.special_yogas, 'fixture assumption'
+    assert day_slots(day, activity='wedding') == []
+    # And the other samskaras that ride the same rule:
+    for samskara in ('gruhapravesha', 'upanayana', 'naming',
+                     'annaprasana', 'karnavedha', 'mundana',
+                     'engagement', 'bhumi_puja', 'yajna', 'vidyarambha'):
+        assert day_slots(day, activity=samskara) == [], \
+            f'{samskara} should defer on Dagdha day'
+
+
+def test_vehicle_applies_labh_bonus():
+    day = _day(2026, 6, 17)
+    slots = day_slots(day, activity='vehicle')
+    labh_slots = [s for s in slots if s['reasons'][0].startswith('Labh ')]
+    assert labh_slots, 'expected at least one Labh-block slot'
+    assert any('Labh favoured for Vehicle purchase' in r for r in labh_slots[0]['reasons'])
+
+
+def test_surgery_avoids_vishti():
+    # 2026-06-10 has Vishti karana in the daytime window.
+    day = _day(2026, 6, 10)
+    vishti = [k for k in day.karana if k.name == 'Vishti']
+    assert vishti
+    for s in day_slots(day, activity='surgery'):
+        for k in vishti:
+            assert not (s['start'] < k.end and k.start < s['end'])
+
+
+def test_pilgrimage_avoids_vishti():
+    day = _day(2026, 6, 10)
+    vishti = [k for k in day.karana if k.name == 'Vishti']
+    assert vishti
+    for s in day_slots(day, activity='pilgrimage'):
+        for k in vishti:
+            assert not (s['start'] < k.end and k.start < s['end'])
+
+
+def test_naming_uses_shubh_bonus():
+    # Naming has prefer_choghadiya=('Shubh', 1) — verify the reason appears.
+    day = _day(2026, 6, 17)
+    slots = day_slots(day, activity='naming')
+    shubh = [s for s in slots if s['reasons'][0].startswith('Shubh ')]
+    if shubh:  # at least one Shubh block clear of bad windows
+        assert any('Shubh favoured for Naming' in r for r in shubh[0]['reasons'])
+
+
+def test_court_no_special_rules():
+    # 'court' has no skip_on_yoga, no prefer_choghadiya, no avoid_karana.
+    # It should still produce slots and not add an activity-specific reason.
+    day = _day(2026, 6, 17)
+    slots = day_slots(day, activity='court')
+    assert slots
+    # no 'favoured for Court' or 'Vishti karana avoided' lines
+    for s in slots:
+        for r in s['reasons']:
+            assert 'favoured for Court' not in r
+            assert 'Vishti' not in r
 
 
 def test_invalid_chandra_mode_raises():
@@ -206,7 +287,7 @@ def test_mcp_find_muhurta_validates():
     import json
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     assert 'error' in json.loads(tool_find_muhurta('2026-06-15', 20, 'any', 'Hyderabad'))
-    assert 'error' in json.loads(tool_find_muhurta('2026-06-15', 5, 'wedding', 'Hyderabad'))
+    assert 'error' in json.loads(tool_find_muhurta('2026-06-15', 5, 'not-a-real-activity', 'Hyderabad'))
     assert 'error' in json.loads(tool_find_muhurta(
         '2026-06-15', 5, 'any', 'Hyderabad', chandra_mode='bogus'))
     # rashis without aligned nakshatras
