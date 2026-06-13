@@ -1,9 +1,13 @@
 import json
 import calendar
+import logging
 from datetime import date, datetime, timedelta
 from typing import Optional
 
 import pytz
+
+_log = logging.getLogger(__name__)
+_MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
@@ -57,7 +61,13 @@ def _resolve_city(
     longitude: Optional[float],
     timezone: Optional[str],
 ) -> Location:
+    if isinstance(city, str) and len(city) > _MAX_NAME:
+        raise ValueError('City name too long.')
     if latitude is not None and longitude is not None:
+        if not (-90.0 <= float(latitude) <= 90.0):
+            raise ValueError('latitude must be between -90 and 90.')
+        if not (-180.0 <= float(longitude) <= 180.0):
+            raise ValueError('longitude must be between -180 and 180.')
         if timezone is None:
             timezone = timezone_for_coordinates(float(latitude), float(longitude))
         return Location(name=city or 'Custom', lat=float(latitude), lon=float(longitude), timezone=timezone)
@@ -194,8 +204,9 @@ def tool_get_panchangam(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_get_muhurta(
@@ -231,8 +242,9 @@ def tool_get_muhurta(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_get_panchangam_range(
@@ -298,8 +310,9 @@ def tool_get_panchangam_range(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_get_special_days(
@@ -343,8 +356,9 @@ def tool_get_special_days(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_find_tarabalam_days(
@@ -367,6 +381,8 @@ def tool_find_tarabalam_days(
         if not 1 <= days <= 60:
             raise ValueError('days must be between 1 and 60.')
         for nak in janma_nakshatras:
+            if not isinstance(nak, str) or len(nak) > _MAX_NAME:
+                raise ValueError('Invalid nakshatra name.')
             _nak_index(nak)  # raises with the canonical list on a misspelling
         if janma_rasis is not None:
             if len(janma_rasis) != len(janma_nakshatras):
@@ -374,6 +390,8 @@ def tool_find_tarabalam_days(
                                  '(use null for people whose rashi is unknown).')
             for r in janma_rasis:
                 if r:
+                    if not isinstance(r, str) or len(r) > _MAX_NAME:
+                        raise ValueError('Invalid rashi name.')
                     _rasi_index(r)
         start = _parse_date(start_date)
         _validate_system(system)
@@ -428,8 +446,9 @@ def tool_find_tarabalam_days(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_get_graha_positions(
@@ -454,8 +473,9 @@ def tool_get_graha_positions(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_get_gochara(
@@ -490,8 +510,9 @@ def tool_get_gochara(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_get_rasi_phalalu(
@@ -525,8 +546,9 @@ def tool_get_rasi_phalalu(
         return json.dumps(out)
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
 def tool_find_muhurta(
@@ -549,6 +571,8 @@ def tool_find_muhurta(
             if len(janma_nakshatras) > 4:
                 raise ValueError('Provide at most 4 janma nakshatras.')
             for nak in janma_nakshatras:
+                if not isinstance(nak, str) or len(nak) > _MAX_NAME:
+                    raise ValueError('Invalid nakshatra name.')
                 _nak_index(nak)
         start = _parse_date(start_date)
         _validate_system(system)
@@ -575,5 +599,6 @@ def tool_find_muhurta(
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
-    except Exception as e:
-        return json.dumps({'error': f'Calculation failed: {e}'})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
