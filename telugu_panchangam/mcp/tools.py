@@ -19,7 +19,7 @@ from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_ve
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.phalalu import rasi_phalalu
-from telugu_panchangam.personal.muhurta import day_slots, ACTIVITIES
+from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, ACTIVITIES, TIER_NAMES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -558,6 +558,8 @@ def tool_find_muhurta(
     city: str = 'Hyderabad',
     system: str = 'drik',
     janma_nakshatras: Optional[list] = None,
+    janma_rasis: Optional[list] = None,
+    chandra_mode: str = 'stars',
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
@@ -567,6 +569,8 @@ def tool_find_muhurta(
             raise ValueError('days must be between 1 and 14.')
         if activity not in ACTIVITIES:
             raise ValueError(f'activity must be one of {ACTIVITIES}.')
+        if chandra_mode not in ('stars', 'puja_ok', 'strict'):
+            raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
         if janma_nakshatras:
             if len(janma_nakshatras) > 4:
                 raise ValueError('Provide at most 4 janma nakshatras.')
@@ -574,6 +578,15 @@ def tool_find_muhurta(
                 if not isinstance(nak, str) or len(nak) > _MAX_NAME:
                     raise ValueError('Invalid nakshatra name.')
                 _nak_index(nak)
+        if janma_rasis is not None:
+            if not janma_nakshatras or len(janma_rasis) != len(janma_nakshatras):
+                raise ValueError('janma_rasis must align with janma_nakshatras '
+                                 '(use null for people whose rashi is unknown).')
+            for r in janma_rasis:
+                if r is not None:
+                    if not isinstance(r, str) or len(r) > _MAX_NAME:
+                        raise ValueError('Invalid rashi name.')
+                    _rasi_index(r)
         start = _parse_date(start_date)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
@@ -581,21 +594,51 @@ def tool_find_muhurta(
         tz = loc.timezone
 
         slots = []
+        dropped_days = []
         for i in range(days):
-            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=False)
-            for s in day_slots(day, activity=activity, janma_nakshatras=janma_nakshatras):
+            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
+            day_results = day_slots(day, activity=activity,
+                                    janma_nakshatras=janma_nakshatras,
+                                    janma_rasis=janma_rasis,
+                                    chandra_mode=chandra_mode,
+                                    engine=engine)
+            if not day_results:
+                reason = diagnose_day(day, activity=activity,
+                                      janma_nakshatras=janma_nakshatras,
+                                      janma_rasis=janma_rasis,
+                                      chandra_mode=chandra_mode)
+                if reason:
+                    dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
+            for s in day_results:
                 slots.append({**s, 'start': _fmt_time(s['start'], tz),
                               'end': _fmt_time(s['end'], tz)})
-        slots.sort(key=lambda x: (-x['score'], x['date'], x['start']))
+        slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
+                                  x['personal_dosha'] is not None,
+                                  x['date'], x['start']))
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
-            'city': city, 'system': system,
+            'city': city, 'system': system, 'chandra_mode': chandra_mode,
             'slots': slots[:12],
+            'dropped_days': dropped_days,
             'disclaimer': 'Slots intersect good choghadiya blocks with every inauspicious '
                           'window removed (Rahu Kalam, Gulika, Yamagandam, Varjyam, '
-                          'Durmuhurtham), with Abhijit/Amrita and special-yoga bonuses and '
-                          'optional tarabalam screening. A guide for everyday timing — for '
-                          'weddings and major samskaras, consult your purohit.',
+                          'Durmuhurtham). Scoring: tarabalam +/-1 per person, chandrabalam '
+                          '+/-1 per person, tithi class +1 / Rikta -2, vara match +1, '
+                          'special-yoga bonuses, Nitya yoga (auspicious +1, Vyatipata/'
+                          'Vaidhriti -2 + samskara skip, dosha-window -1), Abhijit/Amrita '
+                          '+2, activity bias +1. Eclipse days are skipped outright. '
+                          'Each slot carries a tier (Excellent/Good/Fair/Avoid), assigned '
+                          'relative to the best/worst score achievable for this many '
+                          'people on this day (so a larger group needs a higher score '
+                          'to reach "Excellent"), and a reason_groups breakdown '
+                          '(slot_quality, day_quality, group_fit, '
+                          'activity_match, notes) for transparent reasoning. '
+                          'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '
+                          'flags an unrectified personal Moon caution: such slots are capped '
+                          'below Excellent, and slots are ranked tier-first (Excellent > Good > '
+                          'Fair > Avoid), then by score, then preferring personally-clean slots. '
+                          'A guide for everyday timing — for weddings and major samskaras, '
+                          'consult your purohit.',
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})

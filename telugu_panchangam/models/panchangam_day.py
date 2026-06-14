@@ -37,6 +37,25 @@ class EclipseInfo:
 
 
 @dataclass
+class SlotFacts:
+    """Panchangam facts active at a specific instant — used by the muhurta
+    slot finder to score each candidate slot against its actual moment,
+    not against the day's sunrise snapshot.
+
+    `vaaram` is the weekday of the panchangam day this instant belongs to
+    (which is constant across the day, anchored at sunrise) — it does NOT
+    flip at civil midnight.
+    """
+    nakshatra: str
+    tithi: str
+    yoga: str           # Nitya yoga
+    karana: str
+    lunar_sign: str     # Moon's rashi
+    vaaram: str
+    special_yogas: list[str]
+
+
+@dataclass
 class PanchangamDay:
     # Identity
     date: date

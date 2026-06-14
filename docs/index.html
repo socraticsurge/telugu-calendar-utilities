@@ -248,11 +248,39 @@
     .go-moves b { color: #1F1A17; }
     .mu-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.8rem;
                border: 1px solid #E7DECC; border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: #FFFFFF; }
-    .mu-slot.top { background: var(--green-bg); border-color: var(--green-border); }
     .mu-when { font-weight: 700; color: #1F1A17; white-space: nowrap; }
     .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
                 background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
+    /* Tier chip — Batch C #15 */
+    .mu-tier { font-size: 0.66rem; font-weight: 800; padding: 0.06rem 0.5rem; border-radius: 999px;
+               letter-spacing: 0.05em; text-transform: uppercase; }
+    .mu-tier-excellent { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+    .mu-tier-good      { background: #ecfeff; color: #155e75; border: 1px solid #67e8f9; }
+    .mu-tier-fair      { background: #fef9c3; color: #713f12; border: 1px solid #fde047; }
+    .mu-tier-avoid     { background: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
+    /* Dropped-days disclosure — Batch C #17 */
+    .mu-dropped { margin-top: 0.7rem; padding: 0.6rem 0.8rem; background: #f8fafc;
+                  border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.78rem; color: #475569; }
+    .mu-dropped summary { cursor: pointer; font-weight: 600; color: #1e1b4b; }
+    .mu-dropped ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+    .mu-dropped li { margin: 0.2rem 0; }
+    .mu-dropped .dd-date { font-weight: 700; color: #1e1b4b; }
     .mu-reasons { font-size: 0.74rem; color: #8B8377; width: 100%; }
+    /* Grouped reason categories — Batch C #16 */
+    .mu-rgroups { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem; }
+    .mu-rg { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.74rem; line-height: 1.45; }
+    .mu-rg-label { flex: none; font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: 0.06em; color: #94a3b8; width: 6.2rem; padding-top: 0.05rem; }
+    .mu-rg-items { flex: 1 1 auto; list-style: none; margin: 0; padding: 0;
+                   display: flex; flex-direction: column; gap: 0.15rem; }
+    .mu-rg-items li { color: #475569; }
+    .mu-rg-items li.mu-pos { color: #166534; }
+    .mu-rg-items li.mu-neg { color: #b91c1c; }
+    .mu-rg-items li.mu-caution { color: #92400e; }
+    .mu-rg-notes { background: #fffaeb; border: 1px solid #fde68a; border-radius: 8px;
+                   padding: 0.4rem 0.6rem; }
+    .mu-rg-notes .mu-rg-label { color: var(--amber); }
+    .mu-rg-notes .mu-rg-items { color: #78350f; }
     .go-phalalu { margin-top: 0.8rem; background: #FBF6EB; border: 1px solid var(--amber-border);
                   border-radius: 8px; padding: 0.75rem 0.95rem; }
     .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
@@ -1202,10 +1230,41 @@
             <div class="selector">
               <select id="mu-activity" class="tb-date" aria-label="Activity">
                 <option value="any">Anything auspicious</option>
-                <option value="travel">Travel / journey</option>
-                <option value="purchase">Purchase</option>
-                <option value="ceremony">Ceremony / puja</option>
-                <option value="beginning">New beginning</option>
+                <optgroup label="Samskaras">
+                  <option value="wedding">Wedding (Vivaha)</option>
+                  <option value="engagement">Engagement (Nischayam)</option>
+                  <option value="naming">Naming (Namakaranam)</option>
+                  <option value="annaprasana">Annaprasana (First feeding)</option>
+                  <option value="karnavedha">Karnavedha (Ear-piercing)</option>
+                  <option value="mundana">Mundana / Chaula (First head-shave)</option>
+                  <option value="upanayana">Upanayana (Sacred thread)</option>
+                  <option value="vidyarambha">Education start (Vidyarambha)</option>
+                  <option value="gruhapravesha">Gruhapravesha (Home entry)</option>
+                </optgroup>
+                <optgroup label="Acquisitions">
+                  <option value="vehicle">Vehicle purchase</option>
+                  <option value="property">Property / Land purchase</option>
+                  <option value="gold">Gold / Jewelry purchase</option>
+                  <option value="purchase">Purchase (general)</option>
+                </optgroup>
+                <optgroup label="Construction &amp; ventures">
+                  <option value="bhumi_puja">Bhumi Puja / Foundation laying</option>
+                  <option value="business">Business launch</option>
+                  <option value="job">Job start / Contract signing</option>
+                </optgroup>
+                <optgroup label="Spiritual">
+                  <option value="yajna">Yajna / Homam</option>
+                  <option value="pilgrimage">Pilgrimage (Tirtha Yatra)</option>
+                  <option value="ceremony">Ceremony / puja (general)</option>
+                </optgroup>
+                <optgroup label="Civil &amp; medical">
+                  <option value="court">Court / legal matter</option>
+                  <option value="surgery">Surgery / medical procedure</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value="travel">Travel / journey</option>
+                  <option value="beginning">New beginning (general)</option>
+                </optgroup>
               </select>
             </div>
           </div>
@@ -1217,6 +1276,8 @@
       <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
       <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
       finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
+      Each slot's tier reflects its score plus any personal cautions noted below it, so two slots
+      with the same score can land in different tiers.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit —
       or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
@@ -2769,6 +2830,56 @@
                           'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1 };
   const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
 
+  // Tier mapping — mirror telugu_panchangam/personal/muhurta.score_tier
+  const MU_TIER_NAMES = ['Avoid', 'Fair', 'Good', 'Excellent'];
+  function muScoreTier(score) {
+    if (score >= 7) return 'Excellent';
+    if (score >= 4) return 'Good';
+    if (score >= 1) return 'Fair';
+    return 'Avoid';
+  }
+
+  // Relative tier — mirror telugu_panchangam/personal/muhurta
+  // _score_ceiling_floor / relative_tier. A larger group has a wider
+  // tara/chandra swing, so "Excellent" needs a higher score to mean the
+  // same thing (near the best achievable for THIS query).
+  function muScoreCeilingFloor(nPeople, preferChog, preferTithiClass, varaBonus, abhijit, amrita) {
+    const taraChandraSpan = 2 * nPeople;
+    const ceiling = 3 + varaBonus + taraChandraSpan
+      + (preferTithiClass ? 1 : 0)
+      + MU_NITYA_AUSPICIOUS_BONUS
+      + (abhijit ? 2 : 0)
+      + (amrita.length ? 2 : 0)
+      + (preferChog ? preferChog[1] : 0);
+    const floor = -taraChandraSpan - 2 + MU_NITYA_PARTIAL_PENALTY;
+    return [ceiling, floor];
+  }
+  function muRelativeTier(score, ceiling, floor) {
+    const spread = ceiling - floor;
+    if (spread <= 0) return muScoreTier(score);
+    const rel = (score - floor) / spread;
+    if (rel >= 0.75) return 'Excellent';
+    if (rel >= 0.5) return 'Good';
+    if (rel >= 0.25) return 'Fair';
+    return 'Avoid';
+  }
+
+  // Nitya Yoga scoring — mirror telugu_panchangam/personal/nitya_yoga.py
+  const MU_NITYA_HARD_AVOID = new Set(['Vyatipata', 'Vaidhriti']);
+  const MU_NITYA_HARD_PENALTY = -2;
+  const MU_NITYA_PARTIAL_WINDOW_MIN = {  // dosha-window minutes from yoga start
+    'Vishkambha': 3 * 24, 'Atiganda': 6 * 24, 'Shoola': 5 * 24,
+    'Ganda': 6 * 24, 'Vyaghata': 9 * 24, 'Parigha': 5 * 24,
+  };
+  const MU_NITYA_PARTIAL_PENALTY = -1;
+  const MU_NITYA_AUSPICIOUS = new Set([
+    'Preeti', 'Ayushman', 'Saubhagya', 'Shobhana',
+    'Sukarma', 'Dhriti', 'Vriddhi', 'Dhruva',
+    'Harshana', 'Siddhi', 'Shiva', 'Siddha',
+    'Sadhya', 'Shubha', 'Shukla', 'Brahma', 'Indra',
+  ]);
+  const MU_NITYA_AUSPICIOUS_BONUS = 1;
+
   function muMin(t, flag) {
     const [h, m] = t.split(':').map(Number);
     return h * 60 + m + (flag === '+1' ? 1440 : flag === '-1' ? -1440 : 0);
@@ -2788,6 +2899,280 @@
     return pieces;
   }
 
+  // ---------- Slot-time astronomy (Batch F2) ----------------------------
+  //
+  // Meeus low-precision Sun/Moon longitudes + Lahiri ayanamsa. Lets us
+  // recompute the panchangam anga (nakshatra, tithi, yoga, karana, moon
+  // rashi, special yogas) at any datetime — matching the Python engine's
+  // facts_at() so the in-page muhurta finder gets slot-time precision
+  // instead of just the sunrise snapshot from the feed.
+  //
+  // Accuracy: Sun ~0.01°, Moon ~0.1-0.3°. Nakshatra boundaries are
+  // 13.33° wide and tithi boundaries 12° wide, so this is comfortably
+  // sufficient for slot-time scoring.
+
+  const MU_NAKSHATRA_LIST = TB_NAKSHATRAS;     // already defined above
+
+  const MU_TITHI_LIST_FULL = (() => {
+    const last = ['Pratipat','Dwitiya','Tritiya','Chaturthi','Panchami',
+                  'Shashthi','Saptami','Ashtami','Navami','Dashami',
+                  'Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Pournami'];
+    const shukla = last.slice(0, 14).map(n => `Shukla ${n}`).concat(['Pournami']);
+    const krishna = last.slice(0, 14).map(n => `Krishna ${n}`).concat(['Amavasya']);
+    return shukla.concat(krishna);
+  })();
+
+  const MU_YOGA_NAMES_27 = [
+    'Vishkambha','Priti','Ayushman','Saubhagya','Shobhana','Atiganda',
+    'Sukarma','Dhriti','Shula','Ganda','Vriddhi','Dhruva','Vyaghata',
+    'Harshana','Vajra','Siddhi','Vyatipata','Variyana','Parigha','Shiva',
+    'Siddha','Sadhya','Shubha','Shukla','Brahma','Indra','Vaidhriti',
+  ];
+
+  const MU_KARANA_REPEATING = ['Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti'];
+  const MU_KARANA_FIXED = { 0: 'Kinstughna', 57: 'Shakuni', 58: 'Chatushpada', 59: 'Naga' };
+
+  // Special yogas — mirror telugu_panchangam/special_yogas.py
+  const MU_SARVARTHA = {
+    Adivaram:    new Set(['Hasta','Mula','Pushya','Ashvini','Punarvasu','Anuradha','Shravana','Revati']),
+    Somavaram:   new Set(['Shravana','Rohini','Mrigashira','Pushya','Anuradha']),
+    Mangalavaram:new Set(['Ashvini','Krittika','Ashlesha','Uttara Ashadha','Uttara Phalguni','Uttara Bhadrapada']),
+    Budhavaram:  new Set(['Krittika','Rohini','Hasta','Anuradha','Mrigashira']),
+    Guruvaram:   new Set(['Ashvini','Punarvasu','Anuradha','Revati','Pushya','Swati']),
+    Shukravaram: new Set(['Revati','Anuradha','Ashvini','Pushya','Shravana','Punarvasu']),
+    Shanivaram:  new Set(['Swati','Rohini','Shravana']),
+  };
+  const MU_AMRITA_SIDDHI = {
+    Adivaram:'Hasta', Somavaram:'Mrigashira', Mangalavaram:'Ashvini',
+    Budhavaram:'Anuradha', Guruvaram:'Pushya', Shukravaram:'Revati', Shanivaram:'Rohini',
+  };
+  const MU_VISHA_TITHI = { Adivaram:5, Somavaram:6, Mangalavaram:7, Budhavaram:8,
+                           Guruvaram:9, Shukravaram:10, Shanivaram:11 };
+  const MU_DAGDHA_TITHI = { Adivaram:new Set([12]), Somavaram:new Set([11]),
+                            Mangalavaram:new Set([5]), Budhavaram:new Set([2,3]),
+                            Guruvaram:new Set([6]), Shukravaram:new Set([8]), Shanivaram:new Set([9]) };
+  const MU_PUSHKARA_VARAS = new Set(['Adivaram','Mangalavaram','Shanivaram']);
+  const MU_DVI_TITHIS = new Set([2,7,12]);
+  const MU_DVI_NAKS   = new Set(['Mrigashira','Chitra','Dhanishtha']);
+  const MU_TRI_TITHIS = new Set([2,7,12]);
+  const MU_TRI_NAKS   = new Set(['Krittika','Punarvasu','Uttara Phalguni',
+                                  'Vishakha','Uttara Ashadha','Purva Bhadrapada']);
+
+  function muSpecialYogasAt(vaaram, tithiName, nakshatraName) {
+    const yogas = [];
+    if (MU_SARVARTHA[vaaram] && MU_SARVARTHA[vaaram].has(nakshatraName))
+      yogas.push('Sarvartha Siddhi Yoga');
+    if (MU_AMRITA_SIDDHI[vaaram] === nakshatraName)
+      yogas.push('Amrita Siddhi Yoga');
+    const tithiBase = MU_TITHI_LIST_FULL.indexOf(tithiName) % 15 + 1;
+    if (tithiBase === MU_VISHA_TITHI[vaaram]) yogas.push('Visha Yoga');
+    if (MU_DAGDHA_TITHI[vaaram] && MU_DAGDHA_TITHI[vaaram].has(tithiBase))
+      yogas.push('Dagdha Yoga');
+    if (MU_PUSHKARA_VARAS.has(vaaram)) {
+      if (MU_DVI_TITHIS.has(tithiBase) && MU_DVI_NAKS.has(nakshatraName))
+        yogas.push('Dvipushkara Yoga');
+      if (MU_TRI_TITHIS.has(tithiBase) && MU_TRI_NAKS.has(nakshatraName))
+        yogas.push('Tripushkara Yoga');
+    }
+    return yogas;
+  }
+
+  // Julian Day from a JS Date (UTC)
+  function muJD(dt) { return dt.getTime() / 86400000 + 2440587.5; }
+
+  // Lahiri ayanamsa (linear approximation; ~0.01° accuracy in the
+  // current era — good enough for nakshatra/tithi boundaries).
+  function muLahiri(jd) {
+    return 23.85 + ((jd - 2451545.0) / 365.25) * 0.01397;
+  }
+
+  // Sun apparent longitude, sidereal (Lahiri). Meeus low-precision.
+  function muSunLong(jd) {
+    const T = (jd - 2451545.0) / 36525;
+    const L = ((280.460 + 36000.770 * T) % 360 + 360) % 360;
+    const g = ((357.528 + 35999.050 * T) % 360 + 360) % 360;
+    const gr = g * Math.PI / 180;
+    const tropical = L + 1.915 * Math.sin(gr) + 0.020 * Math.sin(2 * gr);
+    return ((tropical - muLahiri(jd)) % 360 + 360) % 360;
+  }
+
+  // Moon apparent longitude, sidereal (Lahiri). Meeus 12 leading terms.
+  function muMoonLong(jd) {
+    const T = (jd - 2451545.0) / 36525;
+    const d2r = Math.PI / 180;
+    const Lp = ((218.3164477 + 481267.88123421 * T) % 360 + 360) % 360;
+    const D  = ((297.8501921 + 445267.1114034 * T) % 360 + 360) % 360;
+    const M  = ((357.5291092 + 35999.0502909 * T) % 360 + 360) % 360;
+    const Mp = ((134.9633964 + 477198.8675055 * T) % 360 + 360) % 360;
+    const F  = (( 93.2720950 + 483202.0175233 * T) % 360 + 360) % 360;
+    const s  = a => Math.sin(a * d2r);
+    const tropical = Lp
+      + 6.288774 * s(Mp)
+      + 1.274027 * s(2*D - Mp)
+      + 0.658314 * s(2*D)
+      + 0.213618 * s(2*Mp)
+      - 0.185116 * s(M)
+      - 0.114332 * s(2*F)
+      + 0.058793 * s(2*D - 2*Mp)
+      + 0.057066 * s(2*D - M - Mp)
+      + 0.053322 * s(2*D + Mp)
+      + 0.045758 * s(2*D - M)
+      - 0.040923 * s(M - Mp)
+      - 0.034720 * s(D);
+    return ((tropical - muLahiri(jd)) % 360 + 360) % 360;
+  }
+
+  // factsAt(dt, vaaram) — slot-time anga, mirroring Python engine.facts_at.
+  function muFactsAt(dt, vaaram) {
+    const jd = muJD(dt);
+    const sun = muSunLong(jd);
+    const moon = muMoonLong(jd);
+    const elong = ((moon - sun) % 360 + 360) % 360;
+    const nakSize = 360 / 27;
+    const nakIdx = Math.floor(moon / nakSize) % 27;
+    const nakshatra = MU_NAKSHATRA_LIST[nakIdx];
+    const tithiIdx = Math.floor(elong / 12) % 30;
+    const tithi = MU_TITHI_LIST_FULL[tithiIdx];
+    const yogaIdx = Math.floor(((sun + moon) % 360) / nakSize) % 27;
+    const yoga = MU_YOGA_NAMES_27[yogaIdx];
+    const htIdx = Math.floor(elong / 6) % 60;
+    const karana = MU_KARANA_FIXED[htIdx] !== undefined
+      ? MU_KARANA_FIXED[htIdx]
+      : MU_KARANA_REPEATING[(htIdx - 1 + 7) % 7];
+    const rashiIdx = Math.floor(moon / 30) % 12;
+    const lunarSign = TB_RASIS[rashiIdx];
+    const specialYogas = muSpecialYogasAt(vaaram, tithi, nakshatra);
+    return { nakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
+  }
+
+  // Chandrabalam sets — mirror telugu_panchangam/personal/chandrabalam.py
+  const MU_CHANDRA_GOOD = new Set([1, 3, 6, 7, 10, 11]);
+  const MU_CHANDRA_PUJA = new Set([2, 5, 9]);
+  // CHANDRA bad = {4, 8, 12} (everything else)
+
+  // Tithi family — mirror telugu_panchangam/personal/tithi_class.py
+  const TITHI_NAMES_ORDER = [
+    'Pratipat', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
+    'Shashthi', 'Saptami', 'Ashtami', 'Navami',    'Dashami',
+    'Ekadashi', 'Dwadashi','Trayodashi','Chaturdashi','Pournami',
+  ];
+  const TITHI_ALIASES = { Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15 };
+  const TITHI_NUMBER_FAMILY = {
+    1:'Nanda',  6:'Nanda',  11:'Nanda',
+    2:'Bhadra', 7:'Bhadra', 12:'Bhadra',
+    3:'Jaya',   8:'Jaya',   13:'Jaya',
+    4:'Rikta',  9:'Rikta',  14:'Rikta',
+    5:'Purna', 10:'Purna',  15:'Purna',
+  };
+  function tithiFamily(name) {
+    if (!name) return null;
+    const last = name.trim().split(/\s+/).pop();
+    if (TITHI_ALIASES[last]) return TITHI_NUMBER_FAMILY[TITHI_ALIASES[last]];
+    const idx = TITHI_NAMES_ORDER.indexOf(last);
+    return idx >= 0 ? TITHI_NUMBER_FAMILY[idx + 1] : null;
+  }
+
+  // Activity rules — mirror telugu_panchangam/personal/muhurta.py
+  // ACTIVITY_RULES. Only the fields the JS scorer consumes are duplicated
+  // here (label, prefer_tithi_class, prefer_vara). skip_on_yoga and
+  // avoid_karana are still enforced by the engine; the JS reads
+  // parsed-feed yogas and karanas to mirror behaviour for activities the
+  // user picks via the in-page dropdown.
+  const MU_ACTIVITY = {
+    any:           { label: 'Anything auspicious' },
+    travel:        { label: 'Travel / journey', avoid_karana: ['Vishti'] },
+    purchase:      { label: 'Purchase (general)', prefer_choghadiya: ['Labh', 1] },
+    ceremony:      { label: 'Ceremony / puja (general)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_vara: ['Somavaram','Guruvaram'] },
+    beginning:     { label: 'New beginning (general)',
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    wedding:       { label: 'Wedding (Vivaha)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Purna',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    engagement:    { label: 'Engagement (Nischayam)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Purna',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    naming:        { label: 'Naming (Namakaranam)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_choghadiya: ['Shubh', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    annaprasana:   { label: 'Annaprasana (First feeding)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_choghadiya: ['Shubh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Somavaram','Guruvaram'] },
+    karnavedha:    { label: 'Karnavedha (Ear-piercing)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Budhavaram','Shukravaram'] },
+    mundana:       { label: 'Mundana / Chaula (First head-shave)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    upanayana:     { label: 'Upanayana (Sacred thread)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    vidyarambha:   { label: 'Education start (Vidyarambha)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram'] },
+    gruhapravesha: { label: 'Gruhapravesha (Home entry)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    vehicle:       { label: 'Vehicle purchase',
+                     prefer_choghadiya: ['Labh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Shukravaram'] },
+    property:      { label: 'Property / Land purchase',
+                     prefer_choghadiya: ['Labh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Guruvaram','Shukravaram'] },
+    gold:          { label: 'Gold / Jewelry purchase',
+                     prefer_choghadiya: ['Labh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Shukravaram','Guruvaram'] },
+    bhumi_puja:    { label: 'Bhumi Puja / Foundation laying',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    business:      { label: 'Business launch',
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Guruvaram','Budhavaram'] },
+    job:           { label: 'Job start / Contract signing',
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Guruvaram','Budhavaram'] },
+    yajna:         { label: 'Yajna / Homam',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Purna',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    pilgrimage:    { label: 'Pilgrimage (Tirtha Yatra)', avoid_karana: ['Vishti'] },
+    court:         { label: 'Court / legal matter',
+                     prefer_tithi_class: 'Jaya',
+                     prefer_vara: ['Mangalavaram'] },
+    surgery:       { label: 'Surgery / medical procedure',
+                     avoid_karana: ['Vishti'],
+                     prefer_vara: ['Mangalavaram'] },
+  };
+
+  // HTML-escape user-typed values (profile names) before they enter the
+  // `reasons` strings that renderMuhurta concatenates via innerHTML.
+  function muEsc(s) {
+    return String(s).replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+  }
+
   async function findMuhurta() {
     const box = document.getElementById('mu-result');
     box.innerHTML = '<p class="preview-error">Searching…</p>';
@@ -2796,6 +3181,7 @@
     const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
     const nDays = Math.min(60, Math.max(1, Math.round((to - from) / 86400000) + 1));
     const people = tbProfiles();
+    const chandraMode = TB_MODE;  // 'stars' | 'puja_ok' | 'strict' — filters only, never scores
     document.getElementById('mu-context').innerHTML = people.length
       ? `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => p.name).join(', ')}</strong> (set above).`
       : `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong> — no people set above, so no star screening.`;
@@ -2804,67 +3190,286 @@
       const system = document.getElementById('tp-system').value;
       const events = LAST_EVENTS || await loadFeed(city, system);
       const slots = [];
-      let screenedDays = 0;
+      let droppedEclipseDays = 0;
+      let droppedModeDays = 0;
+      let droppedModeSlots = 0;
+      const droppedDays = [];
+      const slotsPerDay = new Map();   // YYYY-MM-DD → count
       for (let i = 0; i < nDays; i++) {
         const d = new Date(from); d.setDate(d.getDate() + i);
         const ev = events.get(stampOf(d));
         if (!ev) continue;
         const data = parseDescription(ev.description);
-        let dayBonus = 0; const dayReasons = [];
-        if (people.length && data.nakshatra) {
-          const ok = people.every(pr => TARA_GOOD.has(taraOf(pr.nak, data.nakshatra.name)));
-          if (!ok) { screenedDays++; continue; }
-          dayBonus += 2; dayReasons.push('tarabalam favourable for everyone (+2)');
+        const isoDate = stampOf(d).replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+
+        // Eclipse: auspicious activities are deferred outright.
+        if (data.eclipse) {
+          droppedEclipseDays++;
+          const kind = data.eclipse.kind || 'Eclipse';
+          droppedDays.push({ date: isoDate, reason: `${kind} — auspicious activities deferred` });
+          continue;
         }
-        let skipDay = false;
-        for (const y of data.yogas) {
-          if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
-          if (MU_YOGA_PENALTY[y] !== undefined) {
-            if (activity === 'ceremony') { skipDay = true; break; }
-            dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
-          }
-        }
-        if (skipDay) continue;
+
+        const rules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
+        const skipYogas = new Set(rules.skip_on_yoga || []);
+        const preferChog = rules.prefer_choghadiya || null;     // ['Block', bonus]
+        const avoidKaranaNames = new Set(rules.avoid_karana || []);
+        const preferTithiClass = rules.prefer_tithi_class || null;
+        const preferVaras = new Set(rules.prefer_vara || []);
+        const activityLabel = rules.label;
+
+        // Vara is sunrise-anchored — compute once per day.
+        const varaBonus = (data.vaaram && preferVaras.has(data.vaaram)) ? 1 : 0;
+        const varaReason = varaBonus
+          ? `${data.vaaram} favoured for ${activityLabel} (+1)` : null;
+
         const bad = data.inauspicious.map(w => [muMin(w.start, w.sflag), muMin(w.end, w.eflag)]);
-        if (activity === 'travel' && data.karana) {
+        if (avoidKaranaNames.size && data.karana) {
           for (const k of data.karana.split(/\s+\/\s+/)) {
             const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-            if (m && m[1].trim() === 'Vishti') bad.push([muMin(m[2], m[3]), muMin(m[4], m[5])]);
+            if (m && avoidKaranaNames.has(m[1].trim())) bad.push([muMin(m[2], m[3]), muMin(m[4], m[5])]);
           }
         }
         const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
         const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
+
+        const [muCeiling, muFloor] = muScoreCeilingFloor(
+          people.length, preferChog, preferTithiClass, varaBonus, abhijit, amrita);
+
         for (const c of data.choghadiya) {
           const base = MU_GOOD_CHOG[c.name];
           if (base === undefined) continue;
           for (const [s0, e0] of muSubtract(muMin(c.start), muMin(c.end), bad)) {
             if (e0 - s0 < 24) continue;
-            let score = base + dayBonus;
-            const reasons = [`${c.name} choghadiya (+${base})`, 'clear of all inauspicious windows', ...dayReasons];
+
+            // Compute slot-time facts via Meeus Sun/Moon longitudes.
+            // s0 is minutes from local midnight of `d`. Convert to a Date
+            // object in the same local timezone, then muFactsAt does the
+            // UTC → JD conversion internally.
+            const slotStart = new Date(d.getTime() + s0 * 60000);
+            const facts = muFactsAt(slotStart, data.vaaram);
+
+            // Build reason groups as we score — slot_quality, day_quality,
+            // group_fit, activity_match, notes — mirroring Python's
+            // day_slots() reason_groups field.
+            let score = base;
+            const slotQuality = [`${c.name} choghadiya (+${base})`,
+                                  'clear of all inauspicious windows'];
+            const dayQuality = [];
+            const groupFit = [];
+            const activityMatch = [];
+            const taraUnfavNames = [];
+            const chandraAvoidNames = [];
+            const chandraPujaNames = [];
+            let hasAshtama = false;
+
+            // Tarabalam — slot-time nakshatra (per-person)
+            if (people.length) {
+              const fav = [], unfav = [];
+              for (let pi = 0; pi < people.length; pi++) {
+                const pr = people[pi];
+                const t = taroOf_safe(pr.nak, facts.nakshatra);
+                const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
+                if (TARA_GOOD.has(t)) { fav.push(label); score += 1; }
+                else { unfav.push(`${label} ${TARA_NAMES[t - 1]}`); taraUnfavNames.push(label); score -= 1; }
+              }
+              if (fav.length) groupFit.push(`Tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
+              if (unfav.length) groupFit.push(`Tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
+            }
+
+            // Chandrabalam — slot-time moon rashi (per-person + mode filter)
+            let dropSlot = false;
+            if (people.length) {
+              const good = [], puja = [], avoid = [];
+              for (let pi = 0; pi < people.length; pi++) {
+                const pr = people[pi];
+                if (!pr.rasi) continue;
+                const c2 = chandraOf(pr.rasi, facts.lunarSign);
+                if (!c2) continue;
+                const pos = c2.pos;
+                const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
+                if (MU_CHANDRA_GOOD.has(pos)) { good.push(label); score += 1; }
+                else if (MU_CHANDRA_PUJA.has(pos)) { puja.push(`${label} Moon@${pos}`); chandraPujaNames.push(label); }
+                else {
+                  const ashtama = pos === 8 ? ' Ashtama' : '';
+                  if (pos === 8) hasAshtama = true;
+                  avoid.push(`${label}${ashtama} Moon@${pos}`); chandraAvoidNames.push(label); score -= 1;
+                }
+              }
+              if (good.length) groupFit.push(`Chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
+              if (puja.length) groupFit.push(`Chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
+              if (avoid.length) groupFit.push(`Chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
+
+              if (chandraMode === 'strict' && (puja.length || avoid.length)) dropSlot = true;
+              else if (chandraMode === 'puja_ok' && avoid.length) dropSlot = true;
+            }
+            if (dropSlot) { droppedModeSlots++; continue; }
+
+            // Tithi family — slot-time tithi (Rikta → day_quality penalty;
+            // activity class match → activity_match bonus)
+            const tFam = tithiFamily(facts.tithi);
+            if (tFam === 'Rikta') {
+              score -= 2;
+              dayQuality.push(`${facts.tithi} (Rikta tithi) (-2)`);
+            } else if (tFam && preferTithiClass && tFam === preferTithiClass) {
+              score += 1;
+              activityMatch.push(`${facts.tithi} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
+            }
+
+            // Special yogas — slot-time
+            let yogaSkip = false;
+            for (const y of facts.specialYogas) {
+              if (MU_YOGA_BONUS[y]) { score += MU_YOGA_BONUS[y]; dayQuality.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
+              if (MU_YOGA_PENALTY[y] !== undefined) {
+                if (skipYogas.has(y)) { yogaSkip = true; break; }
+                score += MU_YOGA_PENALTY[y]; dayQuality.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
+              }
+            }
+            if (yogaSkip) continue;
+
+            // Nitya yoga — slot-time (samskara skip on Vyatipata/Vaidhriti)
+            const ny = facts.yoga;
+            if (MU_NITYA_HARD_AVOID.has(ny)) {
+              if (skipYogas.size) { continue; }
+              score += MU_NITYA_HARD_PENALTY;
+              dayQuality.push(`${ny} yoga (${MU_NITYA_HARD_PENALTY})`);
+            } else if (MU_NITYA_PARTIAL_WINDOW_MIN[ny] !== undefined && data.yoga) {
+              const windowMin = MU_NITYA_PARTIAL_WINDOW_MIN[ny];
+              const yogaStartMin = (ny === data.yoga.name)
+                ? muMin(data.yoga.start, data.yoga.sflag)
+                : muMin(data.yoga.end, data.yoga.eflag);
+              if (s0 - yogaStartMin <= windowMin) {
+                score += MU_NITYA_PARTIAL_PENALTY;
+                dayQuality.push(`${ny} yoga dosha-window (${MU_NITYA_PARTIAL_PENALTY})`);
+              }
+            } else if (MU_NITYA_AUSPICIOUS.has(ny)) {
+              score += MU_NITYA_AUSPICIOUS_BONUS;
+              dayQuality.push(`${ny} yoga (+${MU_NITYA_AUSPICIOUS_BONUS})`);
+            }
+
+            // Vara — activity_match (day-level)
+            if (varaReason) { score += 1; activityMatch.push(varaReason); }
+
+            // Slot-overlap bonuses → slot_quality
             if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
-              score += 2; reasons.push('overlaps Abhijit Muhurta (+2)');
+              score += 2; slotQuality.push('overlaps Abhijit Muhurta (+2)');
             }
             if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
-              score += 2; reasons.push('overlaps Amrita Kalam (+2)');
+              score += 2; slotQuality.push('overlaps Amrita Kalam (+2)');
             }
-            if (activity === 'purchase' && c.name === 'Labh') { score += 1; reasons.push('Labh favoured for purchases (+1)'); }
-            if (activity === 'beginning' && c.name === 'Amrit') { score += 1; reasons.push('Amrit favoured for beginnings (+1)'); }
-            if (activity === 'travel') reasons.push('Vishti karana avoided');
-            slots.push({ d: new Date(d), s0, e0, score, reasons });
+            if (preferChog && c.name === preferChog[0]) {
+              score += preferChog[1];
+              activityMatch.push(`${c.name} favoured for ${activityLabel} (+${preferChog[1]})`);
+            }
+            for (const kn of avoidKaranaNames) activityMatch.push(`${kn} karana avoided`);
+
+            // Doctrinal notes — explanatory, no score effect
+            const notes = [];
+            const siddhiYogas = facts.specialYogas.filter(y =>
+              y === 'Sarvartha Siddhi Yoga' || y === 'Amrita Siddhi Yoga');
+            const hasPushkara = facts.specialYogas.some(y =>
+              y === 'Dvipushkara Yoga' || y === 'Tripushkara Yoga');
+            if (siddhiYogas.length && taraUnfavNames.length) {
+              notes.push(`${siddhiYogas.join(' + ')} traditionally rectifies tara dosha ` +
+                         `(Muhurta Chintamani) — ${taraUnfavNames.join(', ')} mitigated.`);
+            }
+            if (siddhiYogas.length && chandraAvoidNames.length) {
+              notes.push(`Chandra dosha is not rectified by Siddhi yogas — ` +
+                         `${chandraAvoidNames.join(', ')} remains a personal caution.`);
+            }
+            if (hasPushkara && tFam === 'Rikta') {
+              notes.push(`Pushkara amplifies the day's nature; combined with Rikta tithi, ` +
+                         `even small inauspicious factors magnify.`);
+            }
+
+            const reasonGroups = {
+              slot_quality: slotQuality, day_quality: dayQuality,
+              group_fit: groupFit, activity_match: activityMatch, notes,
+            };
+            const reasons = [...slotQuality, ...groupFit, ...dayQuality, ...activityMatch];
+
+            // Personal (chandra) dosha is never fully rectified by
+            // group-level yogas — cap the tier below Excellent and flag
+            // it so equally-scored clean slots sort first.
+            let personalDosha = null;
+            if (chandraAvoidNames.length) personalDosha = hasAshtama ? 'ashtama_chandra' : 'chandra_avoid';
+            else if (chandraPujaNames.length) personalDosha = 'chandra_remedial';
+            let tier = muRelativeTier(score, muCeiling, muFloor);
+            if (personalDosha && tier === 'Excellent') tier = 'Good';
+
+            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, tier, personalDosha });
+            slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
           }
         }
+        // Diagnose: if the day produced no slots and it wasn't an eclipse,
+        // record the most likely reason (samskara skip, mode filter, etc.).
+        if (!slotsPerDay.has(isoDate)) {
+          let reason = null;
+          // Samskara skip on Visha/Dagdha
+          for (const y of data.yogas) {
+            if (skipYogas.has(y)) {
+              reason = `${y} — ${activityLabel} traditionally avoids this day`;
+              break;
+            }
+          }
+          // Samskara skip on Vyatipata/Vaidhriti (Nitya yoga at sunrise)
+          if (!reason && skipYogas.size && data.yoga && MU_NITYA_HARD_AVOID.has(data.yoga.name)) {
+            reason = `${data.yoga.name} yoga — samskaras traditionally defer`;
+          }
+          // chandra_mode filter at the day level
+          if (!reason && people.length && chandraMode !== 'stars' && data.lunarSign) {
+            let hasAvoid = false, hasRemedial = false;
+            for (const pr of people) {
+              if (!pr.rasi) continue;
+              const c2 = chandraOf(pr.rasi, data.lunarSign);
+              if (!c2) continue;
+              if (!MU_CHANDRA_GOOD.has(c2.pos) && !MU_CHANDRA_PUJA.has(c2.pos)) hasAvoid = true;
+              else if (MU_CHANDRA_PUJA.has(c2.pos)) hasRemedial = true;
+            }
+            if (chandraMode === 'strict' && (hasAvoid || hasRemedial)) {
+              reason = 'chandra_mode=strict — Moon at sunrise fails for at least one person';
+            } else if (chandraMode === 'puja_ok' && hasAvoid) {
+              reason = 'chandra_mode=puja_ok — someone has Moon-avoid (4/8/12)';
+            }
+          }
+          if (reason) droppedDays.push({ date: isoDate, reason });
+        }
       }
-      slots.sort((a, b) => b.score - a.score || a.d - b.d || a.s0 - b.s0);
-      MU_LAST = { top: slots.slice(0, 10), screenedDays, activity, people };
+      droppedModeDays = droppedModeSlots;
+      slots.sort((a, b) => MU_TIER_NAMES.indexOf(b.tier) - MU_TIER_NAMES.indexOf(a.tier)
+        || b.score - a.score
+        || (!!a.personalDosha - !!b.personalDosha) || a.d - b.d || a.s0 - b.s0);
+      MU_LAST = { top: slots.slice(0, 10), droppedEclipseDays, droppedModeDays, droppedDays, activity, people, chandraMode };
       renderMuhurta();
     } catch (e) {
       box.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
     }
   }
 
+  // taroOf-safe: gracefully handle the case where parseDescription returns
+  // a nakshatra string that's not in our table (shouldn't happen on canonical
+  // feeds, but defensive — return Janma (1) so the day reads as avoid).
+  function taroOf_safe(janma, dayNak) {
+    try { return taraOf(janma, dayNak); } catch (e) { return 1; }
+  }
+
   let MU_LAST = null;
-  const MU_ACT_LABEL = { any: 'anything auspicious', travel: 'travel', purchase: 'a purchase',
-                         ceremony: 'a ceremony', beginning: 'a new beginning' };
+  const MU_ACT_LABEL = {
+    any: 'anything auspicious',
+    travel: 'travel', purchase: 'a purchase',
+    ceremony: 'a ceremony', beginning: 'a new beginning',
+    wedding: 'a wedding (Vivaha)', engagement: 'an engagement',
+    naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
+    karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
+    upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',
+    gruhapravesha: 'gruhapravesha (home entry)',
+    vehicle: 'a vehicle purchase', property: 'a property purchase',
+    gold: 'a gold / jewelry purchase',
+    bhumi_puja: 'bhumi puja (foundation laying)',
+    business: 'a business launch', job: 'a job start / contract',
+    yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
+    court: 'a court / legal matter', surgery: 'a surgery / medical procedure',
+  };
 
   function muToT(mm) {
     const m = ((mm % 1440) + 1440) % 1440;
@@ -2874,23 +3479,71 @@
   function renderMuhurta() {
     if (!MU_LAST) return;
     const box = document.getElementById('mu-result');
-    const { top, screenedDays } = MU_LAST;
+    const { top, droppedEclipseDays = 0, droppedModeDays = 0, droppedDays = [] } = MU_LAST;
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const fmtIso = iso => {
+      const [y, mo, da] = iso.split('-').map(Number);
+      return new Date(y, mo - 1, da).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    };
+    const droppedHtml = droppedDays.length
+      ? `<details class="mu-dropped"><summary>${droppedDays.length} day${droppedDays.length>1?'s':''} filtered — see why</summary>
+           <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> — ${muEsc(dd.reason)}</li>`).join('')}</ul>
+         </details>`
+      : '';
     if (!top.length) {
-      box.innerHTML = `<p class="preview-error">No clear slots found${screenedDays ? ` — ${screenedDays} day(s) were screened out by tarabalam` : ''}. Try more days, or clear the people above.</p>`;
+      const notes = [];
+      if (droppedEclipseDays) notes.push(`${droppedEclipseDays} eclipse day(s) deferred`);
+      if (droppedModeDays) notes.push(`${droppedModeDays} slot(s) filtered by chandra mode`);
+      const suffix = notes.length ? ` — ${notes.join(', ')}` : '';
+      box.innerHTML = `<p class="preview-error">No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.</p>${droppedHtml}`;
       return;
     }
     const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
+    const muLineClass = (item) => {
+      if (/\(\+\d+\)\s*$/.test(item)) return 'mu-pos';
+      if (/\(-\d+\)\s*$/.test(item)) return 'mu-neg';
+      if (/rectifies/i.test(item)) return 'mu-pos';
+      if (/not rectified|remains a personal caution|puja recommended/i.test(item)) return 'mu-caution';
+      return '';
+    };
+    const muCapitalize = (item) => item.charAt(0).toUpperCase() + item.slice(1);
+    const renderGroup = (label, items, extraClass = '') => {
+      if (!items || !items.length) return '';
+      const lis = items.map(it => `<li class="${muLineClass(it)}">${muCapitalize(it)}</li>`).join('');
+      return `<div class="mu-rg ${extraClass}">
+                <span class="mu-rg-label">${label}</span>
+                <ul class="mu-rg-items">${lis}</ul>
+              </div>`;
+    };
+    const renderSlot = (s, i) => {
+      const rg = s.reasonGroups;
+      const groupsHtml = rg
+        ? `<div class="mu-rgroups">
+             ${renderGroup('Slot quality', rg.slot_quality)}
+             ${renderGroup('Day quality', rg.day_quality)}
+             ${renderGroup('Group fit', rg.group_fit)}
+             ${renderGroup('Activity', rg.activity_match)}
+             ${renderGroup('Notes', rg.notes, 'mu-rg-notes')}
+           </div>`
+        : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
+      const tier = s.tier || muScoreTier(s.score);
+      const tierClass = `mu-tier-${tier.toLowerCase()}`;
+      return `<div class="mu-slot">
+                <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
+                <span class="mu-tier ${tierClass}">${tier}</span>
+                <span class="mu-score">score ${s.score}</span>
+                ${groupsHtml}
+              </div>`;
+    };
     box.innerHTML =
       `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found — best first${share}</div>`
-      + top.map((s, i) => `<div class="mu-slot ${i === 0 ? 'top' : ''}">
-          <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
-          <span class="mu-score">score ${s.score}</span>
-          <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
-      + `<p class="preview-note" style="margin-top:0.5rem;">The score is simply the sum of the (+n) reasons on each slot:
-         choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
-         days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
-         requirement, not a bonus.</p>`;
+      + top.map(renderSlot).join('')
+      + droppedHtml
+      + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across
+         Slot quality (choghadiya, Abhijit/Amrita overlap), Day quality (Siddhi yogas, Nitya yoga, Rikta tithi),
+         Group fit (per-person tarabalam and chandrabalam), and Activity match (preferred tithi class / vara).
+         Notes carry classical-doctrine context (e.g. Sarvartha Siddhi traditionally rectifies tara dosha)
+         without changing the score. Being clear of every inauspicious window is a requirement, not a bonus.</p>`;
   }
 
   function shareMuhurtaOnWhatsApp() {
