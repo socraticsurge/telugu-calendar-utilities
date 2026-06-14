@@ -264,3 +264,6 @@ class SuryaSiddhantaEngine(PanchangamEngine):
     def _moon_longitude_func(self):
         """Moon-longitude model used for nakshatra boundaries (vakya overrides)."""
         return ss_moon_longitude
+
+    def _sun_longitude_func(self):
+        return ss_sun_longitude

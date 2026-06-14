@@ -123,6 +123,9 @@ class VakyaEngine(SuryaSiddhantaEngine):
     def _moon_longitude_func(self):
         return vakya_moon_longitude
 
+    def _sun_longitude_func(self):
+        return ss_sun_longitude
+
     def _tithi_index_at(self, jd: float) -> int:
         return int(vakya_elongation(jd) / 12.0) % 30
 
