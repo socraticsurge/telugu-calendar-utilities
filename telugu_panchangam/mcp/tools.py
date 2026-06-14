@@ -19,7 +19,7 @@ from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_ve
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.phalalu import rasi_phalalu
-from telugu_panchangam.personal.muhurta import day_slots, ACTIVITIES
+from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, ACTIVITIES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -594,13 +594,22 @@ def tool_find_muhurta(
         tz = loc.timezone
 
         slots = []
+        dropped_days = []
         for i in range(days):
             day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
-            for s in day_slots(day, activity=activity,
-                               janma_nakshatras=janma_nakshatras,
-                               janma_rasis=janma_rasis,
-                               chandra_mode=chandra_mode,
-                               engine=engine):
+            day_results = day_slots(day, activity=activity,
+                                    janma_nakshatras=janma_nakshatras,
+                                    janma_rasis=janma_rasis,
+                                    chandra_mode=chandra_mode,
+                                    engine=engine)
+            if not day_results:
+                reason = diagnose_day(day, activity=activity,
+                                      janma_nakshatras=janma_nakshatras,
+                                      janma_rasis=janma_rasis,
+                                      chandra_mode=chandra_mode)
+                if reason:
+                    dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
+            for s in day_results:
                 slots.append({**s, 'start': _fmt_time(s['start'], tz),
                               'end': _fmt_time(s['end'], tz)})
         slots.sort(key=lambda x: (-x['score'], x['date'], x['start']))
@@ -608,11 +617,17 @@ def tool_find_muhurta(
             'start_date': start_date, 'days': days, 'activity': activity,
             'city': city, 'system': system, 'chandra_mode': chandra_mode,
             'slots': slots[:12],
+            'dropped_days': dropped_days,
             'disclaimer': 'Slots intersect good choghadiya blocks with every inauspicious '
                           'window removed (Rahu Kalam, Gulika, Yamagandam, Varjyam, '
                           'Durmuhurtham). Scoring: tarabalam +/-1 per person, chandrabalam '
-                          '+/-1 per person, special-yoga bonuses, Abhijit/Amrita +2, '
-                          'activity bias +1. Eclipse days are skipped outright. '
+                          '+/-1 per person, tithi class +1 / Rikta -2, vara match +1, '
+                          'special-yoga bonuses, Nitya yoga (auspicious +1, Vyatipata/'
+                          'Vaidhriti -2 + samskara skip, dosha-window -1), Abhijit/Amrita '
+                          '+2, activity bias +1. Eclipse days are skipped outright. '
+                          'Each slot carries a tier (Excellent/Good/Fair/Avoid) and a '
+                          'reason_groups breakdown (slot_quality, day_quality, group_fit, '
+                          'activity_match, notes) for transparent reasoning. '
                           'A guide for everyday timing — for weddings and major samskaras, '
                           'consult your purohit.',
         })

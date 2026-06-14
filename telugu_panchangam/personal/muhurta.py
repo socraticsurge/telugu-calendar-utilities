@@ -28,6 +28,25 @@ MIN_SLOT_MINUTES = 24  # one ghati
 
 CHANDRA_MODES = ('stars', 'puja_ok', 'strict')
 
+# Tier thresholds — score → human-anchor label.
+# Tuned for typical Drik scoring with a 1-4 person family:
+#   ≥ +7: Excellent — rare alignment, multiple positive signals
+#   +4..+6: Good — solid recommendation
+#   +1..+3: Fair — workable, often with compromises (notes explain)
+#   ≤ 0: Avoid — significant negatives outweigh the slot
+TIER_NAMES = ('Avoid', 'Fair', 'Good', 'Excellent')
+
+
+def score_tier(score: int) -> str:
+    """Map raw slot score to a tier label."""
+    if score >= 7:
+        return 'Excellent'
+    if score >= 4:
+        return 'Good'
+    if score >= 1:
+        return 'Fair'
+    return 'Avoid'
+
 _YOGA_BONUS = {'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,
                'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1}
 _YOGA_PENALTY = {'Visha Yoga': -2, 'Dagdha Yoga': -2}
@@ -348,6 +367,57 @@ def _score_nitya_yoga(yoga_name, slot_start, day, skip_on_hard_avoid):
     return 0, [], False
 
 
+def diagnose_day(day, activity='any', janma_nakshatras=None,
+                 janma_rasis=None, chandra_mode='stars'):
+    """If day_slots() would return [] for these inputs, explain why.
+
+    Returns a string (the reason) or None when the day is not filtered.
+    Used by MCP find_muhurta to populate dropped_days[] so devotees see
+    why days were excluded from the result set.
+
+    This is a lightweight pre-check — it does NOT run the full scoring
+    loop. It catches the day-level skip conditions:
+      - Eclipse
+      - Activity-skip yoga (samskara on Visha/Dagdha/Vyatipata/Vaidhriti)
+      - chandra_mode strict/puja_ok filtering out the day's sunrise rashi
+    """
+    if day.eclipse is not None:
+        kind = f'{day.eclipse.kind} eclipse'
+        return f'{kind} — auspicious activities deferred'
+
+    rules = ACTIVITY_RULES.get(activity, ACTIVITY_RULES['any'])
+    skip_yogas = set(rules.get('skip_on_yoga', ()))
+    if skip_yogas:
+        for y in day.special_yogas:
+            if y in skip_yogas:
+                return f'{y} — {rules["label"]} traditionally avoids this day'
+        # Vyatipata/Vaidhriti also defer samskaras even though they're
+        # Nitya yogas not in skip_on_yoga
+        if day.yoga.name in NITYA_HARD_AVOID:
+            return f'{day.yoga.name} yoga — samskaras traditionally defer'
+
+    # chandra_mode day-level filter (matches the sunrise rashi snapshot;
+    # for slot-time precision, individual slots may still pass, but if
+    # the sunrise reading already fails, the whole day usually fails)
+    if janma_rasis is not None and chandra_mode != 'stars':
+        has_avoid = False
+        has_remedial = False
+        for r in janma_rasis:
+            if r is None:
+                continue
+            pos = chandra_position(r, day.lunar_sign)
+            if pos not in CHANDRA_GOOD and pos not in CHANDRA_PUJA:
+                has_avoid = True
+            elif pos in CHANDRA_PUJA:
+                has_remedial = True
+        if chandra_mode == 'strict' and (has_avoid or has_remedial):
+            return f'chandra_mode=strict — Moon at sunrise fails for at least one person'
+        if chandra_mode == 'puja_ok' and has_avoid:
+            return f'chandra_mode=puja_ok — someone has Moon-avoid (4/8/12)'
+
+    return None
+
+
 def _day_snapshot_facts(day):
     """Fallback when no engine is provided — wrap the day's sunrise spans
     as a SlotFacts so the per-slot scoring path can use the same code."""
@@ -528,6 +598,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
 
             slots.append({'date': day.date.isoformat(), 'vaaram': day.vaaram,
                           'start': s, 'end': e, 'score': score,
+                          'tier': score_tier(score),
                           'reasons': reasons, 'reason_groups': reason_groups})
 
     slots.sort(key=lambda x: (-x['score'], x['start']))
