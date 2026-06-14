@@ -642,8 +642,12 @@ def tool_find_muhurta(
                           'day-level dosha: either keeps a slot capped below Excellent, and '
                           'slots are ranked tier-first (Excellent > Good > '
                           'Fair > Avoid), then by score, then preferring dosha-free slots. '
-                          'A guide for everyday timing — for weddings and major samskaras, '
-                          'consult your purohit.',
+                          'Tiers are relative to this search, not a universal standard — '
+                          '"Good"/"Fair" slots with personal_dosha and day_dosha both null are '
+                          'workable choices, not just runner-ups. When presenting results, '
+                          'surface personal_dosha/day_dosha and notes regardless of tier, and '
+                          'for weddings, major samskaras, or any caution the devotee is unsure '
+                          'about, recommend consulting their purohit.',
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
