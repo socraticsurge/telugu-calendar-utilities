@@ -358,32 +358,18 @@
       border-bottom: 1px solid #E7DECC; z-index: 50;
     }
     #m-topbar .m-brand {
-      font-family: var(--brand-display); font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 0.005em; color: #1F1A17; flex: 1; min-width: 0; text-align: left;
-      line-height: 1.15; display: flex; align-items: center; gap: 0.4rem;
+      font-family: var(--brand-display); font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 0.005em; color: #1F1A17; flex: 1; min-width: 0;
+      line-height: 1.15; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     }
     #m-topbar .m-brand .m-brand-mark {
-      flex: none; width: 24px; height: 24px; display: inline-block;
+      flex: none; width: 30px; height: 30px; display: inline-block;
     }
-    #m-topbar .m-brand .m-brand-word { display: inline; white-space: normal; }
-    #m-topbar .m-icon-btn {
-      width: 36px; height: 36px; border-radius: 8px; border: 0; background: transparent;
-      font-size: 1.15rem; color: #58504A; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; font-family: inherit; flex: none;
-    }
-    #m-topbar .m-icon-btn:active { background: #E7DECC; }
-    #m-topbar .m-cog { font-size: 1.25rem; line-height: 1; }
-    #m-topbar .m-text-btn {
-      flex: none; height: 34px; padding: 0 0.6rem; border-radius: 999px;
-      border: 1px solid var(--indigo-border); background: var(--indigo-bg);
-      color: var(--indigo); font-family: inherit; font-weight: 700; font-size: 0.78rem;
-      display: flex; align-items: center; gap: 0.3rem; cursor: pointer;
-      white-space: nowrap;
-    }
-    #m-topbar .m-text-btn:active { background: #DCC1B5; }
-    @media (max-width: 360px) {
-      #m-topbar .m-text-btn .m-text-btn-label { display: none; }
-      #m-topbar .m-text-btn { padding: 0 0.5rem; }
+    #m-topbar .m-brand .m-brand-word { display: inline; white-space: nowrap; }
+    #m-topbar .m-brand .m-brand-word em {
+      font-style: italic;
+      background: linear-gradient(90deg, var(--brand), #b83a2a);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
     }
 
     body[data-mode="mobile"] #m-bottomnav {
@@ -408,8 +394,7 @@
       display: block; position: fixed; inset: 0; background: rgba(31,26,23,0.4);
       z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
     }
-    body[data-mode="mobile"].m-settings-open #m-drawer-scrim,
-    body[data-mode="mobile"].m-subscribe-open #m-drawer-scrim {
+    body[data-mode="mobile"].m-more-open #m-drawer-scrim {
       opacity: 1; pointer-events: auto;
     }
 
@@ -427,8 +412,7 @@
       right: 0; box-shadow: -8px 0 24px rgba(31,26,23,0.18);
       transform: translateX(100%);
     }
-    body[data-mode="mobile"].m-settings-open  #m-settings-drawer  { transform: translateX(0); }
-    body[data-mode="mobile"].m-subscribe-open #m-subscribe-drawer { transform: translateX(0); }
+    body[data-mode="mobile"].m-more-open #m-more-drawer { transform: translateX(0); }
 
     .m-drawer .m-drawer-head {
       position: sticky; top: 0; display: flex; align-items: center;
@@ -455,14 +439,9 @@
     .m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #B5AC9C; text-align: center; }
     .m-drawer .m-source a { color: var(--indigo); }
 
-    /* Brand wordmark: drop the symmetric right-side spacer on phones and
-       left-align next to the hamburger. Brand uses two-line wordmark wrap so
-       the full title fits even on iPhone SE / 320px without ellipsis. */
-    body[data-mode="mobile"] #m-topbar { gap: 0.3rem; padding: 0 0.55rem; }
-    body[data-mode="mobile"] #m-topbar .m-spacer { display: none; }
     @media (max-width: 340px) {
-      #m-topbar .m-brand { font-size: 0.72rem; }
-      #m-topbar .m-brand .m-brand-mark { width: 22px; height: 22px; }
+      #m-topbar .m-brand { font-size: 0.92rem; }
+      #m-topbar .m-brand .m-brand-mark { width: 26px; height: 26px; }
     }
 
     /* Mobile selector-row: City + System + Time format all live in Settings now.
@@ -572,15 +551,23 @@
     body[data-mode="mobile"] #mu-section:not(.mu-open) > *:not(.tb-controls-title) { display: none; }
     body[data-mode="mobile"] #mu-section:not(.mu-open) ~ #mu-result { display: none; }
 
-    /* ---------- Mobile contextual help — ? icon + bottom sheet ---------- */
-    #m-topbar .m-help-btn { width: 36px; height: 36px; }
-    #m-topbar .m-help-icon {
-      display: inline-flex; width: 22px; height: 22px;
-      border: 1.5px solid #B5AC9C; border-radius: 50%;
-      align-items: center; justify-content: center;
-      font-size: 0.78rem; font-weight: 800; color: #8B8377; line-height: 1;
+    /* ---------- Mobile contextual help — inline per-panel link + bottom sheet ---------- */
+    .m-page-help { display: none; }
+    body[data-mode="mobile"] .m-page-help {
+      display: flex; justify-content: flex-end; margin: 0 0 0.4rem;
     }
-    #m-topbar .m-help-btn:active .m-help-icon { background: #E7DECC; }
+    .m-page-help-btn {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      border: 0; background: transparent; padding: 0.2rem 0;
+      font-family: inherit; font-size: 0.78rem; font-weight: 600;
+      color: var(--indigo); cursor: pointer;
+    }
+    .m-page-help-btn .m-help-icon {
+      display: inline-flex; width: 18px; height: 18px;
+      border: 1.5px solid var(--indigo-border); border-radius: 50%;
+      align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800; color: var(--indigo); line-height: 1;
+    }
 
     /* Hide the in-panel intros + read-more guides + their expanded panels on
        mobile — the same content opens from the ? in the top bar instead. */
@@ -884,10 +871,6 @@
 
 <!-- Mobile shell — visible only when body[data-mode="mobile"] -->
 <header id="m-topbar" role="banner">
-  <button class="m-icon-btn m-settings-btn" id="m-settings-btn"
-          aria-label="Open settings" aria-controls="m-settings-drawer" aria-expanded="false">
-    <span class="m-cog" aria-hidden="true">⚙</span>
-  </button>
   <span class="m-brand">
     <svg class="m-brand-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
       <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
@@ -896,16 +879,8 @@
       <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
       <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
     </svg>
-    <span class="m-brand-word">Astro Chaganti</span>
+    <span class="m-brand-word">Astro <em>Chaganti</em></span>
   </span>
-  <button class="m-icon-btn m-help-btn" id="m-help-btn"
-          aria-label="How to read this" aria-controls="m-help-sheet" aria-expanded="false">
-    <span class="m-help-icon" aria-hidden="true">?</span>
-  </button>
-  <button class="m-text-btn m-subscribe-btn" id="m-subscribe-btn"
-          aria-controls="m-subscribe-drawer" aria-expanded="false">
-    <span aria-hidden="true">📅</span><span class="m-text-btn-label">Subscribe</span>
-  </button>
 </header>
 
 <nav id="m-bottomnav" role="tablist" aria-label="Sections">
@@ -924,19 +899,35 @@
     <span class="m-tab-label">Tarabalam</span>
     <span class="m-tab-sub">muhurtam</span>
   </button>
+  <button class="m-tab" id="m-more-btn" aria-controls="m-more-drawer" aria-expanded="false">
+    <span class="m-tab-emoji">⋯</span>
+    <span class="m-tab-label">More</span>
+    <span class="m-tab-sub">settings &amp; info</span>
+  </button>
 </nav>
 
 <div id="m-drawer-scrim" aria-hidden="true"></div>
 
-<!-- Settings drawer (left): preferences the devotee sets once -->
-<aside id="m-settings-drawer" class="m-drawer m-drawer-left" aria-hidden="true" aria-label="Settings">
+<!-- "More" drawer: settings (city / system / time format), subscribe &
+     connect, MCP/AI assistants and about — everything secondary lives here. -->
+<aside id="m-more-drawer" class="m-drawer m-drawer-right" aria-hidden="true" aria-label="More">
   <div class="m-drawer-head">
-    Settings
-    <button class="m-drawer-close" data-close="settings" aria-label="Close settings">✕</button>
+    More
+    <button class="m-drawer-close" data-close="more" aria-label="Close">✕</button>
   </div>
-  <div class="m-drawer-body" id="m-settings-body">
-    <p class="m-drawer-hint">These apply across all three screens. The city and system you pick here also drive the calendar feed you subscribe to.</p>
-    <!-- City, System (with explanation card), Time format relocate here -->
+  <div class="m-drawer-body" id="m-more-body">
+    <p class="m-drawer-hint">City and calculation system apply across all three screens, and also drive the calendar feed below.</p>
+    <!-- City, System (with explanation card), Time format, Subscribe and MCP cards relocate here -->
+    <div class="m-about" id="m-about">
+      <strong>Astro Chaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
+      a daily glance, and a family timing tool. It's open source, runs without an account,
+      and updates automatically. For personal readings and consultations, visit
+      <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>.
+    </div>
+    <div class="m-source" id="m-source-line">
+      A free service from AstroChaganti — feeds regenerated monthly, 18 months ahead.
+      <br/><a href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
+    </div>
   </div>
 </aside>
 
@@ -1029,27 +1020,6 @@
   </p>
 </div>
 
-<!-- Subscribe drawer (right): take the panchangam into other tools -->
-<aside id="m-subscribe-drawer" class="m-drawer m-drawer-right" aria-hidden="true" aria-label="Subscribe and Connect">
-  <div class="m-drawer-head">
-    Subscribe and Connect
-    <button class="m-drawer-close" data-close="subscribe" aria-label="Close">✕</button>
-  </div>
-  <div class="m-drawer-body" id="m-subscribe-body">
-    <!-- Subscribe and MCP cards relocate here -->
-    <div class="m-about" id="m-about">
-      <strong>Astro Chaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
-      a daily glance, and a family timing tool. It's open source, runs without an account,
-      and updates automatically. For personal readings and consultations, visit
-      <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>.
-    </div>
-    <div class="m-source" id="m-source-line">
-      A free service from AstroChaganti — feeds regenerated monthly, 18 months ahead.
-      <br/><a href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
-    </div>
-  </div>
-</aside>
-
 <div class="page">
 
   <div class="hero">
@@ -1101,6 +1071,7 @@
       </div>
     </div>
     <div id="panel-today" role="tabpanel">
+    <div class="m-page-help"><button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false"><span class="m-help-icon">?</span> How to read this</button></div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
     Times marked <sup class="plus1" style="color:#A56B1E;">+1</sup> fall after midnight on the next day;
@@ -1108,6 +1079,7 @@
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
+      <div class="m-page-help"><button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false"><span class="m-help-icon">?</span> How to read this</button></div>
       <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
       Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
       <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
@@ -1221,6 +1193,7 @@
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
+      <div class="m-page-help"><button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false"><span class="m-help-icon">?</span> How to read this</button></div>
       <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
       <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
       coloured by its gochara verdict for them.</p>
@@ -2454,13 +2427,13 @@
     document.getElementById('m-help-body').innerHTML = src ? src.innerHTML : '';
     document.body.classList.add('m-help-open');
     document.getElementById('m-help-sheet').setAttribute('aria-hidden', 'false');
-    document.getElementById('m-help-btn').setAttribute('aria-expanded', 'true');
+    document.querySelectorAll('.m-page-help-btn').forEach(b => b.setAttribute('aria-expanded', 'true'));
     if (typeof gcEvent === 'function') gcEvent('help-' + tab);
   }
   function closeHelpSheet() {
     document.body.classList.remove('m-help-open');
     document.getElementById('m-help-sheet').setAttribute('aria-hidden', 'true');
-    document.getElementById('m-help-btn').setAttribute('aria-expanded', 'false');
+    document.querySelectorAll('.m-page-help-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
   }
 
   function switchTool(which) {
@@ -2944,25 +2917,16 @@
     // Each drawer has its own body and its own list of elements to host.
     // On mobile, those elements move into the drawer body in array order.
     // On resize back to desktop, they return to their original DOM position.
-    const SETTINGS = {
-      bodyEl: document.getElementById('m-settings-body'),
-      drawerEl: document.getElementById('m-settings-drawer'),
-      btnEl: document.getElementById('m-settings-btn'),
-      anchorBefore: null,    // append at end of body (no source line)
-      moveIds: ['sel-tp-city', 'sel-tp-system', 'sel-fmt-toggle', 'card-system'],
-      openClass: 'm-settings-open',
-      openEvt: 'settings-open', closeEvt: 'settings-close',
+    const MORE = {
+      bodyEl: document.getElementById('m-more-body'),
+      drawerEl: document.getElementById('m-more-drawer'),
+      btnEl: document.getElementById('m-more-btn'),
+      anchorBefore: document.getElementById('m-about'),  // insert before the about blurb
+      moveIds: ['sel-tp-city', 'sel-tp-system', 'sel-fmt-toggle', 'card-system', 'subscribe', 'card-mcp'],
+      openClass: 'm-more-open',
+      openEvt: 'more-open', closeEvt: 'more-close',
     };
-    const SUBSCRIBE = {
-      bodyEl: document.getElementById('m-subscribe-body'),
-      drawerEl: document.getElementById('m-subscribe-drawer'),
-      btnEl: document.getElementById('m-subscribe-btn'),
-      anchorBefore: document.getElementById('m-source-line'),  // insert before source link
-      moveIds: ['subscribe', 'card-mcp'],
-      openClass: 'm-subscribe-open',
-      openEvt: 'subscribe-open', closeEvt: 'subscribe-close',
-    };
-    const DRAWERS = [SETTINGS, SUBSCRIBE];
+    const DRAWERS = [MORE];
     const placeholders = {};
 
     function moveAllToDrawers() {
@@ -3016,19 +2980,17 @@
       else { restoreAll(); closeAllDrawers(); }
     }
 
-    SETTINGS.btnEl.addEventListener('click', () => { closeHelpSheet(); openDrawer(SETTINGS); });
-    SUBSCRIBE.btnEl.addEventListener('click', () => { closeHelpSheet(); openDrawer(SUBSCRIBE); });
+    MORE.btnEl.addEventListener('click', () => { closeHelpSheet(); openDrawer(MORE); });
     document.querySelectorAll('.m-drawer-close').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.close;
-        closeDrawer(key === 'settings' ? SETTINGS : SUBSCRIBE);
-      });
+      btn.addEventListener('click', () => closeDrawer(MORE));
     });
-    document.getElementById('m-help-btn').addEventListener('click', () => {
-      closeAllDrawers();
-      // toggle: tapping again closes the sheet
-      if (document.body.classList.contains('m-help-open')) closeHelpSheet();
-      else openHelpSheet();
+    document.querySelectorAll('.m-page-help-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        closeAllDrawers();
+        // toggle: tapping again closes the sheet
+        if (document.body.classList.contains('m-help-open')) closeHelpSheet();
+        else openHelpSheet();
+      });
     });
     document.getElementById('m-help-close').addEventListener('click', closeHelpSheet);
     document.getElementById('m-help-cta').addEventListener('click', closeHelpSheet);
@@ -3040,7 +3002,7 @@
     });
 
     // --- bottom-nav tap ---
-    document.querySelectorAll('#m-bottomnav .m-tab').forEach(b => {
+    document.querySelectorAll('#m-bottomnav .m-tab[data-tab]').forEach(b => {
       b.addEventListener('click', () => switchTool(b.dataset.tab));
     });
 
@@ -3053,9 +3015,9 @@
     let touchX = null, touchY = null, touchT = 0;
     document.addEventListener('touchstart', e => {
       if (!mq.matches) return;
-      // suppress while either drawer is open
-      if (document.body.classList.contains('m-settings-open') ||
-          document.body.classList.contains('m-subscribe-open')) return;
+      // suppress while a drawer or help sheet is open
+      if (document.body.classList.contains('m-more-open') ||
+          document.body.classList.contains('m-help-open')) return;
       const t = e.touches[0]; touchX = t.clientX; touchY = t.clientY; touchT = Date.now();
     }, { passive: true });
     document.addEventListener('touchend', e => {
