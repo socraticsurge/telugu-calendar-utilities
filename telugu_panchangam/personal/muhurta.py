@@ -38,12 +38,61 @@ TIER_NAMES = ('Avoid', 'Fair', 'Good', 'Excellent')
 
 
 def score_tier(score: int) -> str:
-    """Map raw slot score to a tier label."""
+    """Map raw slot score to a tier label using fixed absolute bands."""
     if score >= 7:
         return 'Excellent'
     if score >= 4:
         return 'Good'
     if score >= 1:
+        return 'Fair'
+    return 'Avoid'
+
+
+# Relative tier buckets — fraction of the way from this query's floor to
+# its ceiling. score_tier()'s fixed bands assume a 1-person, no-Abhijit,
+# no-Amrita baseline; a 4-person query has a per-person ±1 tara/chandra
+# swing that shifts both ends of the range, so a fixed band over- or
+# under-rates slots depending on group size and what bonuses are even
+# possible that day. Bucketing by position-in-range keeps "Excellent"
+# meaning "near the best achievable for this query", not "above a
+# constant that happens to suit one person".
+_RELATIVE_BANDS = (0.75, 0.5, 0.25)
+
+
+def _score_ceiling_floor(n_people: int, prefer_chog: tuple[str, int] | None,
+                          prefer_tithi_class: str | None, vara_bonus: int,
+                          abhijit, amrita: list) -> tuple[int, int]:
+    """Best/worst raw score realistically achievable for this query+day.
+
+    Mirrors the components summed in day_slots(): choghadiya base, vara,
+    per-person tarabalam + chandrabalam, tithi class, Nitya yoga,
+    Abhijit/Amrita overlap, and the activity's choghadiya preference.
+    Multi-yoga stacking (Sarvartha + Amrita Siddhi + Dvi/Tripushkara all
+    at once) is excluded from the ceiling — it's rare enough that
+    including it would push everything else down to "Fair".
+    """
+    tara_chandra_span = 2 * n_people
+    ceiling = (3 + vara_bonus + tara_chandra_span
+               + (1 if prefer_tithi_class else 0)
+               + NITYA_AUSPICIOUS_BONUS
+               + (2 if abhijit else 0)
+               + (2 if amrita else 0)
+               + (prefer_chog[1] if prefer_chog else 0))
+    floor = -tara_chandra_span - 2 + NITYA_PARTIAL_PENALTY  # -2: Rikta tithi
+    return ceiling, floor
+
+
+def relative_tier(score: int, ceiling: int, floor: int) -> str:
+    """Map raw score to a tier relative to this query's achievable range."""
+    spread = ceiling - floor
+    if spread <= 0:
+        return score_tier(score)
+    rel = (score - floor) / spread
+    if rel >= _RELATIVE_BANDS[0]:
+        return 'Excellent'
+    if rel >= _RELATIVE_BANDS[1]:
+        return 'Good'
+    if rel >= _RELATIVE_BANDS[2]:
         return 'Fair'
     return 'Avoid'
 
@@ -510,6 +559,10 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     abhijit = day.abhijit_muhurta
     amrita = list(day.amrita_kalam)
 
+    n_people = len(janma_nakshatras) if janma_nakshatras else 0
+    ceiling, floor = _score_ceiling_floor(
+        n_people, prefer_chog, prefer_tithi_class, vara_bonus, abhijit, amrita)
+
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.
     use_engine = engine is not None and hasattr(engine, 'facts_at')
@@ -614,7 +667,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 personal_dosha = None
             has_personal_dosha = personal_dosha is not None
 
-            tier = score_tier(score)
+            tier = relative_tier(score, ceiling, floor)
             if has_personal_dosha and tier == 'Excellent':
                 tier = 'Good'
 
