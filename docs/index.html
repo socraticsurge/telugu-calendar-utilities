@@ -812,6 +812,7 @@
     /* Mobile-only: the standalone "Special days — next 30 days" card belongs
        to the Today tab. Hide it when Gochara or Tarabalam is the active screen. */
     body[data-mode="mobile"]:not([data-tool="today"]) #special-days-card { display: none; }
+    body[data-mode="mobile"] #special-days-card .preview-note { display: none; }
 
     /* ---------- Mobile Stitch aesthetic — Today screen ---------- */
     /* "AT A GLANCE" section label above the anga grid */
@@ -840,6 +841,7 @@
     }
     body[data-mode="mobile"] .anga-time {
       font-size: 0.74rem; color: #8B8377; margin-top: 0.15rem;
+      white-space: normal;
     }
 
     /* "Crucial Timings" — Auspicious / Avoid as table-row cards */
