@@ -2,7 +2,14 @@
 import os
 import tempfile
 from datetime import date
-from telugu_panchangam.generate import generate_feeds
+from telugu_panchangam.generate import generate_feeds, city_slug
+
+def test_city_slug():
+    assert city_slug("Hyderabad") == "hyderabad"
+    assert city_slug("New Delhi") == "new-delhi"
+    assert city_slug("Washington, D.C.") == "washington-d.c."
+    assert city_slug("A, B C") == "a-b-c"
+    assert city_slug("") == ""
 
 def test_generate_creates_ics_files():
     with tempfile.TemporaryDirectory() as tmpdir:
