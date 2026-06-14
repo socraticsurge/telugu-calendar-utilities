@@ -371,6 +371,34 @@
       background: linear-gradient(90deg, var(--brand), #b83a2a);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
+    #m-topbar .m-spacer, #m-topbar .m-page-help-btn {
+      flex: none; width: 30px; height: 30px;
+    }
+    #m-topbar .m-page-help-btn {
+      border: 0; background: transparent; padding: 0; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #m-topbar .m-page-help-btn .m-help-icon {
+      display: inline-flex; width: 22px; height: 22px;
+      border: 1.5px solid #B5AC9C; border-radius: 50%;
+      align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 800; color: #8B8377; line-height: 1;
+    }
+    #m-topbar .m-page-help-btn:active .m-help-icon { background: #E7DECC; }
+
+    /* Per-screen title, just below the topbar */
+    body[data-mode="mobile"] .m-page-title {
+      display: flex; flex-direction: column; gap: 0.1rem;
+      padding: 0.9rem 0 0.5rem;
+    }
+    .m-page-title { display: none; }
+    .m-page-title-main {
+      font-family: var(--brand-display); font-size: 1.2rem; font-weight: 700;
+      color: #1F1A17; line-height: 1.2;
+    }
+    .m-page-title-sub {
+      font-family: var(--brand-sans); font-size: 0.78rem; color: #8B8377;
+    }
 
     body[data-mode="mobile"] #m-bottomnav {
       display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: 64px;
@@ -438,6 +466,17 @@
     .m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
     .m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #B5AC9C; text-align: center; }
     .m-drawer .m-source a { color: var(--indigo); }
+
+    /* Condense the More drawer: smaller headings, tighter spacing, trim
+       explanatory copy that's redundant once a choice has been made. */
+    .m-drawer .m-drawer-body h2 { font-size: 0.95rem; margin: 0 0 0.5rem; }
+    .m-drawer .m-drawer-body h3.sub { font-size: 0.8rem; margin: 0.85rem 0 0.4rem; }
+    .m-drawer .m-drawer-body .card > p,
+    .m-drawer .m-drawer-body .card .preview-note { font-size: 0.78rem; line-height: 1.45; }
+    .m-drawer #card-system > p,
+    .m-drawer #card-mcp .mcp-tagline,
+    .m-drawer #card-mcp > div > span { display: none; }
+    .m-drawer #card-mcp .btn { font-size: 0.82rem; }
 
     @media (max-width: 340px) {
       #m-topbar .m-brand { font-size: 0.92rem; }
@@ -551,23 +590,7 @@
     body[data-mode="mobile"] #mu-section:not(.mu-open) > *:not(.tb-controls-title) { display: none; }
     body[data-mode="mobile"] #mu-section:not(.mu-open) ~ #mu-result { display: none; }
 
-    /* ---------- Mobile contextual help — inline per-panel link + bottom sheet ---------- */
-    .m-page-help { display: none; }
-    body[data-mode="mobile"] .m-page-help {
-      display: flex; justify-content: flex-end; margin: 0 0 0.4rem;
-    }
-    .m-page-help-btn {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      border: 0; background: transparent; padding: 0.2rem 0;
-      font-family: inherit; font-size: 0.78rem; font-weight: 600;
-      color: var(--indigo); cursor: pointer;
-    }
-    .m-page-help-btn .m-help-icon {
-      display: inline-flex; width: 18px; height: 18px;
-      border: 1.5px solid var(--indigo-border); border-radius: 50%;
-      align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 800; color: var(--indigo); line-height: 1;
-    }
+    /* ---------- Mobile contextual help — topbar hint + bottom sheet ---------- */
 
     /* Hide the in-panel intros + read-more guides + their expanded panels on
        mobile — the same content opens from the ? in the top bar instead. */
@@ -871,6 +894,7 @@
 
 <!-- Mobile shell — visible only when body[data-mode="mobile"] -->
 <header id="m-topbar" role="banner">
+  <span class="m-spacer" aria-hidden="true"></span>
   <span class="m-brand">
     <svg class="m-brand-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
       <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
@@ -881,6 +905,9 @@
     </svg>
     <span class="m-brand-word">Astro <em>Chaganti</em></span>
   </span>
+  <button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false" aria-label="How to read this screen">
+    <span class="m-help-icon">?</span>
+  </button>
 </header>
 
 <nav id="m-bottomnav" role="tablist" aria-label="Sections">
@@ -916,7 +943,7 @@
     <button class="m-drawer-close" data-close="more" aria-label="Close">✕</button>
   </div>
   <div class="m-drawer-body" id="m-more-body">
-    <p class="m-drawer-hint">City and calculation system apply across all three screens, and also drive the calendar feed below.</p>
+    <p class="m-drawer-hint">City and system apply everywhere, including the calendar feed below.</p>
     <!-- City, System (with explanation card), Time format, Subscribe and MCP cards relocate here -->
     <div class="m-about" id="m-about">
       <strong>Astro Chaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
@@ -1049,6 +1076,7 @@
       <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">
         <span class="tt">✦ Tarabalam · Muhurtam</span><span class="ts">When should we act?</span></button>
     </div>
+    <div class="m-page-title" id="m-page-title"><span class="m-page-title-main" id="m-page-title-main">Today's Panchangam</span><span class="m-page-title-sub" id="m-page-title-sub">What is the day?</span></div>
     <div class="selector-row" id="tp-selector-row">
       <div class="selector" id="sel-tp-city">
         <label for="tp-city">City</label>
@@ -1071,7 +1099,6 @@
       </div>
     </div>
     <div id="panel-today" role="tabpanel">
-    <div class="m-page-help"><button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false"><span class="m-help-icon">?</span> How to read this</button></div>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
     Times marked <sup class="plus1" style="color:#A56B1E;">+1</sup> fall after midnight on the next day;
@@ -1079,7 +1106,6 @@
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
-      <div class="m-page-help"><button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false"><span class="m-help-icon">?</span> How to read this</button></div>
       <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
       Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
       <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
@@ -1193,7 +1219,6 @@
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
-      <div class="m-page-help"><button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false"><span class="m-help-icon">?</span> How to read this</button></div>
       <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
       <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
       coloured by its gochara verdict for them.</p>
@@ -2105,16 +2130,15 @@
       const padaOpts = ['<option value="">padam?</option>']
         .concat([1,2,3,4].map(q => `<option value="${q}" ${String(q) === String(v.pada) ? 'selected' : ''}>${q}</option>`)).join('');
       const rasi = v.nak ? rasiFromStar(v.nak, Number(v.pada) || null) : null;
-      const rasiNote = !v.nak ? '' : rasi
-        ? `<span class="tb-you">Rashi: ${rasi}</span>`
-        : '<span class="tb-you" style="color:#8A5518;">add padam for rashi</span>';
+      const rasiNote = (v.nak && !rasi)
+        ? '<span class="tb-you" style="color:#8A5518;">add padam for rashi</span>'
+        : '';
       html += `<div class="tb-profile-row">
         <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
         <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
         <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star — needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
         ${rasiNote}
-        ${i === 0 ? '<span class="tb-you">(you)</span>'
-                  : `<button class="tb-remove" title="Remove" onclick="tbRemoveRow(${i})">✕</button>`}
+        ${i === 0 ? '' : `<button class="tb-remove" title="Remove" onclick="tbRemoveRow(${i})">✕</button>`}
       </div>`;
     }
     wrap.innerHTML = html;
@@ -2417,6 +2441,11 @@
     gochara:   'How to read Gochara · Rasi Phalalu',
     tarabalam: 'How to use Tarabalam · Muhurtam',
   };
+  const PAGE_TITLES = {
+    today:     ["Today's Panchangam", 'What is the day?'],
+    gochara:   ['Gochara · Rasi Phalalu', 'What does it mean for me?'],
+    tarabalam: ['Tarabalam · Muhurtam', 'When should we act?'],
+  };
   function openHelpSheet() {
     const active = document.querySelector('#m-bottomnav .m-tab.active');
     const tab = active ? active.dataset.tab : 'today';
@@ -2450,6 +2479,8 @@
       b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
     document.getElementById('tp-date-wrap').style.display = which === 'today' ? '' : 'none';
+    document.getElementById('m-page-title-main').textContent = PAGE_TITLES[which][0];
+    document.getElementById('m-page-title-sub').textContent = PAGE_TITLES[which][1];
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
     if (typeof gcEvent === 'function') gcEvent('tab-' + which);
     if (which === 'gochara') loadGochara();
