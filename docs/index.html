@@ -124,15 +124,6 @@
     .strip-title.good-t { color: #15803d; }
     .strip-title.bad-t { color: #8E2A1F; }
     .avoid-strip > .win-grid { margin-top: 0.45rem; }
-    .avoid-count { font-style: normal; font-weight: 600; color: #B5AC9C; text-transform: none; letter-spacing: normal; }
-    /* Mobile: collapse the Avoid windows behind a tap-to-expand toggle */
-    body[data-mode="mobile"] .avoid-strip > .avoid-toggle { cursor: pointer; display: flex; align-items: center; }
-    body[data-mode="mobile"] .avoid-strip > .avoid-toggle::after { content: '▾'; margin-left: auto; font-style: normal; color: #B5AC9C; }
-    body[data-mode="mobile"] .avoid-strip.open > .avoid-toggle::after { content: '▴'; }
-    body[data-mode="mobile"] .avoid-strip > .win-grid { display: none; }
-    body[data-mode="mobile"] .avoid-strip.open > .win-grid { display: flex; }
-    /* Desktop: always show the Avoid windows, hide the toggle affordance */
-    body:not([data-mode="mobile"]) .avoid-count { display: none; }
     .win-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.3rem; }
     .chog-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; }
     @media (max-width: 620px) { .chog-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -1885,8 +1876,7 @@
       windows += `<div class="tile-strip"><div class="strip-title good-t">🟢 Auspicious</div><div class="win-grid">${groupWins(data.auspicious).map(e => winCell(e, 'good')).join('')}</div></div>`;
     }
     if (data.inauspicious.length) {
-      const avoidCount = groupWins(data.inauspicious).length;
-      windows += `<div class="tile-strip avoid-strip"><div class="strip-title bad-t avoid-toggle" onclick="this.closest('.avoid-strip').classList.toggle('open')">🔴 Avoid <span class="avoid-count">(${avoidCount} window${avoidCount === 1 ? '' : 's'})</span></div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
+      windows += `<div class="tile-strip avoid-strip"><div class="strip-title bad-t">🔴 Avoid</div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
     }
 
     // 4 · The day's timeline — Choghadiya as full-width colour-coded strips,
