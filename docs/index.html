@@ -2833,6 +2833,31 @@
     return 'Avoid';
   }
 
+  // Relative tier — mirror telugu_panchangam/personal/muhurta
+  // _score_ceiling_floor / relative_tier. A larger group has a wider
+  // tara/chandra swing, so "Excellent" needs a higher score to mean the
+  // same thing (near the best achievable for THIS query).
+  function muScoreCeilingFloor(nPeople, preferChog, preferTithiClass, varaBonus, abhijit, amrita) {
+    const taraChandraSpan = 2 * nPeople;
+    const ceiling = 3 + varaBonus + taraChandraSpan
+      + (preferTithiClass ? 1 : 0)
+      + MU_NITYA_AUSPICIOUS_BONUS
+      + (abhijit ? 2 : 0)
+      + (amrita.length ? 2 : 0)
+      + (preferChog ? preferChog[1] : 0);
+    const floor = -taraChandraSpan - 2 + MU_NITYA_PARTIAL_PENALTY;
+    return [ceiling, floor];
+  }
+  function muRelativeTier(score, ceiling, floor) {
+    const spread = ceiling - floor;
+    if (spread <= 0) return muScoreTier(score);
+    const rel = (score - floor) / spread;
+    if (rel >= 0.75) return 'Excellent';
+    if (rel >= 0.5) return 'Good';
+    if (rel >= 0.25) return 'Fair';
+    return 'Avoid';
+  }
+
   // Nitya Yoga scoring — mirror telugu_panchangam/personal/nitya_yoga.py
   const MU_NITYA_HARD_AVOID = new Set(['Vyatipata', 'Vaidhriti']);
   const MU_NITYA_HARD_PENALTY = -2;
@@ -3202,6 +3227,9 @@
         const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
         const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
+        const [muCeiling, muFloor] = muScoreCeilingFloor(
+          people.length, preferChog, preferTithiClass, varaBonus, abhijit, amrita);
+
         for (const c of data.choghadiya) {
           const base = MU_GOOD_CHOG[c.name];
           if (base === undefined) continue;
@@ -3360,7 +3388,7 @@
             let personalDosha = null;
             if (chandraAvoidNames.length) personalDosha = hasAshtama ? 'ashtama_chandra' : 'chandra_avoid';
             else if (chandraPujaNames.length) personalDosha = 'chandra_remedial';
-            let tier = muScoreTier(score);
+            let tier = muRelativeTier(score, muCeiling, muFloor);
             if (personalDosha && tier === 'Excellent') tier = 'Good';
 
             slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, tier, personalDosha });
