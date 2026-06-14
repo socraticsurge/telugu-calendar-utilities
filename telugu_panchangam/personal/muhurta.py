@@ -623,5 +623,10 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                           'tier': tier, 'personal_dosha': personal_dosha,
                           'reasons': reasons, 'reason_groups': reason_groups})
 
-    slots.sort(key=lambda x: (-x['score'], x['personal_dosha'] is not None, x['start']))
+    # Tier first (Excellent > Good > Fair > Avoid), then score, then the
+    # personal-dosha tiebreaker, then chronological. This keeps the visible
+    # tier pill consistent with rank order — a "Good" slot never sits
+    # above an "Excellent" one just because its raw score is higher.
+    slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
+                              x['personal_dosha'] is not None, x['start']))
     return slots
