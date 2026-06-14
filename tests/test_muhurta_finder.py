@@ -575,8 +575,62 @@ def test_each_slot_carries_a_tier():
     slots = day_slots(day)
     assert slots
     for s in slots:
-        assert s['tier'] == score_tier(s['score'])
+        if s['personal_dosha'] is None:
+            assert s['tier'] == score_tier(s['score'])
         assert s['tier'] in ('Excellent', 'Good', 'Fair', 'Avoid')
+
+
+# --- Personal (chandra) dosha: tier cap + sort tiebreaker ---
+
+def test_personal_dosha_none_when_chandra_clean():
+    # 2026-06-17: Mesha -> Moon@3 (good) — no personal caution.
+    day = _day(2026, 6, 17)
+    slots = day_slots(day, janma_nakshatras=['Krittika'], janma_rasis=['Mesha'])
+    assert slots
+    assert all(s['personal_dosha'] is None for s in slots)
+
+
+def test_personal_dosha_chandra_avoid_caps_tier():
+    # 2026-06-25: Pushya + Karka -> Moon@4 (avoid, non-Ashtama). The
+    # top slot scores 7 (Excellent by raw score) but the unrectified
+    # chandra dosha caps it at Good.
+    from telugu_panchangam.personal.muhurta import score_tier
+    day = _day(2026, 6, 25)
+    slots = day_slots(day, janma_nakshatras=['Pushya'], janma_rasis=['Karka'])
+    assert slots
+    top = slots[0]
+    assert top['score'] == 7
+    assert score_tier(top['score']) == 'Excellent'
+    assert top['personal_dosha'] == 'chandra_avoid'
+    assert top['tier'] == 'Good'
+
+
+def test_personal_dosha_chandra_remedial_caps_tier_when_excellent():
+    # 2026-06-17: Rohini + Vrishabha -> Moon@2 (remedial/puja position).
+    from telugu_panchangam.personal.muhurta import score_tier
+    day = _day(2026, 6, 17)
+    slots = day_slots(day, janma_nakshatras=['Rohini'], janma_rasis=['Vrishabha'])
+    assert slots
+    for s in slots:
+        assert s['personal_dosha'] == 'chandra_remedial'
+        if score_tier(s['score']) == 'Excellent':
+            assert s['tier'] == 'Good'
+        else:
+            assert s['tier'] == score_tier(s['score'])
+
+
+def test_sort_tiebreaker_prefers_personally_clean_slot():
+    """Among equal-score slots, the one without a personal dosha sorts first."""
+    day = _day(2026, 6, 25)
+    slots = day_slots(day, janma_nakshatras=['Pushya'], janma_rasis=['Karka'])
+    assert slots
+    # The sort key (-score, has_personal_dosha, start) must be honoured —
+    # for any pair of equal-score slots, a clean one (if present) cannot
+    # follow a dosha-bearing one.
+    for i in range(len(slots) - 1):
+        a, b = slots[i], slots[i + 1]
+        if a['score'] == b['score']:
+            assert (a['personal_dosha'] is not None) <= (b['personal_dosha'] is not None)
 
 
 # --- dropped_days transparency (Batch C #17) ---

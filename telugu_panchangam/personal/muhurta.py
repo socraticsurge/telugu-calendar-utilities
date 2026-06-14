@@ -215,14 +215,18 @@ def _score_tara(janma_nakshatras, day_nakshatra_name):
 def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
     """Per-person chandrabalam against a specific moon rashi.
 
-    Returns (bonus, reasons, dropped_by_mode, avoid_names). avoid_names
-    lists people whose Moon is at 4/8/12 (used by doctrinal-notes engine
-    to surface the 'chandra dosha is not rectified' caution).
+    Returns (bonus, reasons, dropped_by_mode, avoid_names, puja_names).
+    avoid_names lists people whose Moon is at 4/8/12 (used by
+    doctrinal-notes engine to surface the 'chandra dosha is not
+    rectified' caution). puja_names lists people whose Moon is in a
+    remedial (puja) position — both lists feed the personal-dosha flag
+    that caps a slot's tier (chandra dosha is never fully rectified by
+    group-level yogas).
     """
     if janma_rasis is None or not any(r is not None for r in janma_rasis):
-        return 0, [], False, []
+        return 0, [], False, [], []
     bonus = 0
-    good, puja, avoid, avoid_names = [], [], [], []
+    good, puja, avoid, avoid_names, puja_names = [], [], [], [], []
     for i, rasi in enumerate(janma_rasis):
         if rasi is None:
             continue
@@ -233,10 +237,11 @@ def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
             good.append(label); bonus += 1
         elif pos in CHANDRA_PUJA:
             puja.append(f'{label} Moon@{pos}')
+            puja_names.append(label)
         else:
             ashtama = ' Ashtama' if pos == 8 else ''
             avoid.append(f'{label}{ashtama} Moon@{pos}')
-            avoid_names.append(label)
+            avoid_names.append(f'{label}{ashtama}')
             bonus -= 1
     reasons = []
     if good:
@@ -247,7 +252,7 @@ def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
         reasons.append(f"chandrabalam avoid for {', '.join(avoid)} (-{len(avoid)})")
     dropped = (chandra_mode == 'strict' and (puja or avoid)) \
               or (chandra_mode == 'puja_ok' and avoid)
-    return bonus, reasons, bool(dropped), avoid_names
+    return bonus, reasons, bool(dropped), avoid_names, puja_names
 
 
 def _score_tithi_class(tithi_name, prefer_tithi_class, activity_label):
@@ -532,8 +537,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 janma_nakshatras, facts.nakshatra)
 
             # Chandrabalam (slot-time moon rashi + mode filter)
-            chandra_bonus, chandra_reasons, dropped, chandra_avoid_names = _score_chandra(
-                janma_nakshatras, janma_rasis, facts.lunar_sign, chandra_mode)
+            chandra_bonus, chandra_reasons, dropped, chandra_avoid_names, chandra_puja_names = \
+                _score_chandra(janma_nakshatras, janma_rasis, facts.lunar_sign, chandra_mode)
             if dropped:
                 continue
 
@@ -596,10 +601,27 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
             # Backward-compat flat list (existing callers / tests use this)
             reasons = slot_quality + group_fit + day_quality + activity_match
 
+            # Personal (chandra) dosha is never fully rectified by
+            # group-level yogas — flag it so a slot can't be "Excellent"
+            # while carrying an unresolved personal caution, and so
+            # equally-scored slots prefer the personally-clean one.
+            if chandra_avoid_names:
+                personal_dosha = 'ashtama_chandra' if any(
+                    'Ashtama' in n for n in chandra_avoid_names) else 'chandra_avoid'
+            elif chandra_puja_names:
+                personal_dosha = 'chandra_remedial'
+            else:
+                personal_dosha = None
+            has_personal_dosha = personal_dosha is not None
+
+            tier = score_tier(score)
+            if has_personal_dosha and tier == 'Excellent':
+                tier = 'Good'
+
             slots.append({'date': day.date.isoformat(), 'vaaram': day.vaaram,
                           'start': s, 'end': e, 'score': score,
-                          'tier': score_tier(score),
+                          'tier': tier, 'personal_dosha': personal_dosha,
                           'reasons': reasons, 'reason_groups': reason_groups})
 
-    slots.sort(key=lambda x: (-x['score'], x['start']))
+    slots.sort(key=lambda x: (-x['score'], x['personal_dosha'] is not None, x['start']))
     return slots
