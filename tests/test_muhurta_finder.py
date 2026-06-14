@@ -330,9 +330,12 @@ def test_bhadra_tithi_gruhapravesha_bonus():
 
 
 def test_vara_bonus_thursday_wedding():
-    # 2026-07-02 (Thu) = Krishna Dwitiya (Bhadra). Wedding prefers Purna
-    # tithi (not Bhadra) and Guruvaram vara — so only the vara bonus fires.
-    day = _day(2026, 7, 2)
+    # 2026-07-16 (Thu) = Shukla Dwitiya (Bhadra), Nitya yoga = Siddhi
+    # (auspicious), no Visha/Dagdha/Vyatipata/Vaidhriti. A clean Thursday
+    # for wedding scoring. Wedding prefers Purna tithi (not Bhadra) and
+    # Guruvaram vara — so only the vara bonus fires (Nitya yoga adds +1
+    # auspicious bonus separately).
+    day = _day(2026, 7, 16)
     slots = day_slots(day, activity='wedding')
     assert slots
     reasons = [r for s in slots for r in s['reasons']]
@@ -381,6 +384,69 @@ def test_no_vara_match_no_bonus():
         for r in s['reasons']:
             assert 'Mangalavaram favoured' not in r
             assert 'favoured for Anything auspicious' not in r
+
+
+# --- Nitya Yoga scoring (Batch B-2) ---
+
+def test_vaidhriti_defers_wedding():
+    """2026-07-02 (Thu) carries Vaidhriti yoga at sunrise. Vaidhriti is a
+    hard-avoid Nitya yoga — samskara activities (wedding, gruhapravesha,
+    etc.) defer outright."""
+    day = _day(2026, 7, 2)
+    assert day.yoga.name == 'Vaidhriti', 'fixture: 2026-07-02 should be Vaidhriti'
+    assert day_slots(day, activity='wedding') == []
+    assert day_slots(day, activity='gruhapravesha') == []
+    assert day_slots(day, activity='upanayana') == []
+
+
+def test_vaidhriti_penalises_non_samskara():
+    """For non-samskara activities, Vaidhriti is -2 day_bonus + reason
+    but does not defer the day."""
+    day = _day(2026, 7, 2)
+    # Slots before yoga ends are under Vaidhriti — they get -2
+    eng_slots = day_slots(day, activity='any', engine=ENGINE)
+    # Check at least one early slot carries the Vaidhriti penalty
+    early = [s for s in eng_slots if s['start'] <= day.yoga.end]
+    assert early
+    assert any('Vaidhriti yoga (-2)' in r for s in early for r in s['reasons'])
+
+
+def test_auspicious_nitya_yoga_bonus():
+    """2026-07-16 (Thu) = Siddhi yoga (auspicious). Slots under Siddhi
+    pick up the +1 bonus."""
+    day = _day(2026, 7, 16)
+    assert day.yoga.name == 'Siddhi'
+    eng_slots = day_slots(day, activity='any', engine=ENGINE)
+    assert eng_slots
+    early = [s for s in eng_slots if s['start'] <= day.yoga.end]
+    assert any('Siddhi yoga (+1)' in r for s in early for r in s['reasons'])
+
+
+def test_partial_avoid_nitya_dosha_window():
+    """2026-06-18 sunrise yoga = Vyaghata (partial-avoid). Slots inside
+    the 9-ghati dosha-window get -1; slots outside don't."""
+    from datetime import timedelta
+    day = _day(2026, 6, 18)
+    assert day.yoga.name == 'Vyaghata'
+    window_end = day.yoga.start + timedelta(minutes=9 * 24)  # 216 min
+    eng_slots = day_slots(day, activity='any', engine=ENGINE)
+    in_window = [s for s in eng_slots if s['start'] < window_end]
+    out_window = [s for s in eng_slots if s['start'] >= window_end
+                                       and s['start'] < day.yoga.end]
+    if in_window:
+        assert any('Vyaghata yoga dosha-window' in r
+                   for s in in_window for r in s['reasons'])
+    if out_window:
+        # Outside the dosha-window — no penalty reason
+        for s in out_window:
+            assert not any('Vyaghata yoga dosha-window' in r for r in s['reasons'])
+
+
+def test_neutral_nitya_yoga_no_score():
+    """Vajra and Variyan are explicitly neutral — no bonus, no penalty."""
+    from telugu_panchangam.personal.nitya_yoga import nitya_disposition
+    assert nitya_disposition('Vajra') == 'neutral'
+    assert nitya_disposition('Variyan') == 'neutral'
 
 
 def test_unknown_tithi_name_does_not_explode():
