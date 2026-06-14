@@ -179,6 +179,16 @@
     .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
                 background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
     .mu-reasons { font-size: 0.74rem; color: #64748b; width: 100%; }
+    /* Grouped reason categories — Batch C #16 */
+    .mu-rgroups { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem; }
+    .mu-rg { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.74rem; line-height: 1.45; }
+    .mu-rg-label { flex: none; font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: 0.06em; color: #94a3b8; min-width: 4.5rem; padding-top: 0.05rem; }
+    .mu-rg-items { color: #475569; flex: 1 1 auto; }
+    .mu-rg-notes { background: #fffaeb; border: 1px solid #fde68a; border-radius: 8px;
+                   padding: 0.4rem 0.6rem; }
+    .mu-rg-notes .mu-rg-label { color: var(--amber); }
+    .mu-rg-notes .mu-rg-items { color: #78350f; }
     .go-phalalu { margin-top: 0.8rem; background: #fffdf7; border: 1px solid var(--amber-border);
                   border-radius: 10px; padding: 0.75rem 0.95rem; }
     .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
@@ -2279,24 +2289,33 @@
             const slotStart = new Date(d.getTime() + s0 * 60000);
             const facts = muFactsAt(slotStart, data.vaaram);
 
-            let dayBonus = 0;
-            const dayReasons = [];
+            // Build reason groups as we score — slot_quality, day_quality,
+            // group_fit, activity_match, notes — mirroring Python's
+            // day_slots() reason_groups field.
+            let score = base;
+            const slotQuality = [`${c.name} choghadiya (+${base})`,
+                                  'clear of all inauspicious windows'];
+            const dayQuality = [];
+            const groupFit = [];
+            const activityMatch = [];
+            const taraUnfavNames = [];
+            const chandraAvoidNames = [];
 
-            // Tarabalam — slot-time nakshatra
+            // Tarabalam — slot-time nakshatra (per-person)
             if (people.length) {
               const fav = [], unfav = [];
               for (let pi = 0; pi < people.length; pi++) {
                 const pr = people[pi];
                 const t = taroOf_safe(pr.nak, facts.nakshatra);
                 const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
-                if (TARA_GOOD.has(t)) { fav.push(label); dayBonus += 1; }
-                else { unfav.push(`${label} ${TARA_NAMES[t - 1]}`); dayBonus -= 1; }
+                if (TARA_GOOD.has(t)) { fav.push(label); score += 1; }
+                else { unfav.push(`${label} ${TARA_NAMES[t - 1]}`); taraUnfavNames.push(label); score -= 1; }
               }
-              if (fav.length) dayReasons.push(`tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
-              if (unfav.length) dayReasons.push(`tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
+              if (fav.length) groupFit.push(`tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
+              if (unfav.length) groupFit.push(`tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
             }
 
-            // Chandrabalam — slot-time moon rashi
+            // Chandrabalam — slot-time moon rashi (per-person + mode filter)
             let dropSlot = false;
             if (people.length) {
               const good = [], puja = [], avoid = [];
@@ -2307,81 +2326,102 @@
                 if (!c2) continue;
                 const pos = c2.pos;
                 const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
-                if (MU_CHANDRA_GOOD.has(pos)) { good.push(label); dayBonus += 1; }
+                if (MU_CHANDRA_GOOD.has(pos)) { good.push(label); score += 1; }
                 else if (MU_CHANDRA_PUJA.has(pos)) { puja.push(`${label} Moon@${pos}`); }
-                else { const ashtama = pos === 8 ? ' Ashtama' : ''; avoid.push(`${label}${ashtama} Moon@${pos}`); dayBonus -= 1; }
+                else { const ashtama = pos === 8 ? ' Ashtama' : ''; avoid.push(`${label}${ashtama} Moon@${pos}`); chandraAvoidNames.push(label); score -= 1; }
               }
-              if (good.length) dayReasons.push(`chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
-              if (puja.length) dayReasons.push(`chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
-              if (avoid.length) dayReasons.push(`chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
+              if (good.length) groupFit.push(`chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
+              if (puja.length) groupFit.push(`chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
+              if (avoid.length) groupFit.push(`chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
 
               if (chandraMode === 'strict' && (puja.length || avoid.length)) dropSlot = true;
               else if (chandraMode === 'puja_ok' && avoid.length) dropSlot = true;
             }
             if (dropSlot) { droppedModeSlots++; continue; }
 
-            // Tithi family — slot-time tithi (universal Rikta -2; class +1)
+            // Tithi family — slot-time tithi (Rikta → day_quality penalty;
+            // activity class match → activity_match bonus)
             const tFam = tithiFamily(facts.tithi);
             if (tFam === 'Rikta') {
-              dayBonus -= 2;
-              dayReasons.push(`${facts.tithi} (Rikta tithi) (-2)`);
+              score -= 2;
+              dayQuality.push(`${facts.tithi} (Rikta tithi) (-2)`);
             } else if (tFam && preferTithiClass && tFam === preferTithiClass) {
-              dayBonus += 1;
-              dayReasons.push(`${facts.tithi} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
+              score += 1;
+              activityMatch.push(`${facts.tithi} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
             }
 
             // Special yogas — slot-time
             let yogaSkip = false;
             for (const y of facts.specialYogas) {
-              if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
+              if (MU_YOGA_BONUS[y]) { score += MU_YOGA_BONUS[y]; dayQuality.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
               if (MU_YOGA_PENALTY[y] !== undefined) {
                 if (skipYogas.has(y)) { yogaSkip = true; break; }
-                dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
+                score += MU_YOGA_PENALTY[y]; dayQuality.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
               }
             }
             if (yogaSkip) continue;
 
-            // Nitya yoga — slot-time. Samskara activities defer on
-            // Vyatipata/Vaidhriti the same way they defer on Visha/Dagdha.
+            // Nitya yoga — slot-time (samskara skip on Vyatipata/Vaidhriti)
             const ny = facts.yoga;
             if (MU_NITYA_HARD_AVOID.has(ny)) {
-              if (skipYogas.size) { continue; }  // samskara skip
-              dayBonus += MU_NITYA_HARD_PENALTY;
-              dayReasons.push(`${ny} yoga (${MU_NITYA_HARD_PENALTY})`);
+              if (skipYogas.size) { continue; }
+              score += MU_NITYA_HARD_PENALTY;
+              dayQuality.push(`${ny} yoga (${MU_NITYA_HARD_PENALTY})`);
             } else if (MU_NITYA_PARTIAL_WINDOW_MIN[ny] !== undefined && data.yoga) {
-              // Dosha-window from yoga start. If slot's yoga matches the
-              // sunrise yoga, use data.yoga.start; otherwise use
-              // data.yoga.end (the next yoga's start).
               const windowMin = MU_NITYA_PARTIAL_WINDOW_MIN[ny];
               const yogaStartMin = (ny === data.yoga.name)
                 ? muMin(data.yoga.start, data.yoga.sflag)
                 : muMin(data.yoga.end, data.yoga.eflag);
               if (s0 - yogaStartMin <= windowMin) {
-                dayBonus += MU_NITYA_PARTIAL_PENALTY;
-                dayReasons.push(`${ny} yoga dosha-window (${MU_NITYA_PARTIAL_PENALTY})`);
+                score += MU_NITYA_PARTIAL_PENALTY;
+                dayQuality.push(`${ny} yoga dosha-window (${MU_NITYA_PARTIAL_PENALTY})`);
               }
             } else if (MU_NITYA_AUSPICIOUS.has(ny)) {
-              dayBonus += MU_NITYA_AUSPICIOUS_BONUS;
-              dayReasons.push(`${ny} yoga (+${MU_NITYA_AUSPICIOUS_BONUS})`);
+              score += MU_NITYA_AUSPICIOUS_BONUS;
+              dayQuality.push(`${ny} yoga (+${MU_NITYA_AUSPICIOUS_BONUS})`);
             }
 
-            // Vara — day-level, append last so reason ordering reads slot-then-day
-            if (varaReason) { dayBonus += 1; dayReasons.push(varaReason); }
+            // Vara — activity_match (day-level)
+            if (varaReason) { score += 1; activityMatch.push(varaReason); }
 
-            let score = base + dayBonus;
-            const reasons = [`${c.name} choghadiya (+${base})`, 'clear of all inauspicious windows', ...dayReasons];
+            // Slot-overlap bonuses → slot_quality
             if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
-              score += 2; reasons.push('overlaps Abhijit Muhurta (+2)');
+              score += 2; slotQuality.push('overlaps Abhijit Muhurta (+2)');
             }
             if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
-              score += 2; reasons.push('overlaps Amrita Kalam (+2)');
+              score += 2; slotQuality.push('overlaps Amrita Kalam (+2)');
             }
             if (preferChog && c.name === preferChog[0]) {
               score += preferChog[1];
-              reasons.push(`${c.name} favoured for ${activityLabel} (+${preferChog[1]})`);
+              activityMatch.push(`${c.name} favoured for ${activityLabel} (+${preferChog[1]})`);
             }
-            for (const kn of avoidKaranaNames) reasons.push(`${kn} karana avoided`);
-            slots.push({ d: new Date(d), s0, e0, score, reasons });
+            for (const kn of avoidKaranaNames) activityMatch.push(`${kn} karana avoided`);
+
+            // Doctrinal notes — explanatory, no score effect
+            const notes = [];
+            const siddhiYogas = facts.specialYogas.filter(y =>
+              y === 'Sarvartha Siddhi Yoga' || y === 'Amrita Siddhi Yoga');
+            const hasPushkara = facts.specialYogas.some(y =>
+              y === 'Dvipushkara Yoga' || y === 'Tripushkara Yoga');
+            if (siddhiYogas.length && taraUnfavNames.length) {
+              notes.push(`${siddhiYogas.join(' + ')} traditionally rectifies tara dosha ` +
+                         `(Muhurta Chintamani) — ${taraUnfavNames.join(', ')} mitigated.`);
+            }
+            if (siddhiYogas.length && chandraAvoidNames.length) {
+              notes.push(`Chandra dosha is not rectified by Siddhi yogas — ` +
+                         `${chandraAvoidNames.join(', ')} remains a personal caution.`);
+            }
+            if (hasPushkara && tFam === 'Rikta') {
+              notes.push(`Pushkara amplifies the day's nature; combined with Rikta tithi, ` +
+                         `even small inauspicious factors magnify.`);
+            }
+
+            const reasonGroups = {
+              slot_quality: slotQuality, day_quality: dayQuality,
+              group_fit: groupFit, activity_match: activityMatch, notes,
+            };
+            const reasons = [...slotQuality, ...groupFit, ...dayQuality, ...activityMatch];
+            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups });
           }
         }
       }
@@ -2438,16 +2478,38 @@
       return;
     }
     const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
+    const renderGroup = (label, items, extraClass = '') => {
+      if (!items || !items.length) return '';
+      return `<div class="mu-rg ${extraClass}">
+                <span class="mu-rg-label">${label}</span>
+                <span class="mu-rg-items">${items.join(' · ')}</span>
+              </div>`;
+    };
+    const renderSlot = (s, i) => {
+      const rg = s.reasonGroups;
+      const groupsHtml = rg
+        ? `<div class="mu-rgroups">
+             ${renderGroup('Slot quality', rg.slot_quality)}
+             ${renderGroup('Day quality', rg.day_quality)}
+             ${renderGroup('Group fit', rg.group_fit)}
+             ${renderGroup('Activity', rg.activity_match)}
+             ${renderGroup('Notes', rg.notes, 'mu-rg-notes')}
+           </div>`
+        : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
+      return `<div class="mu-slot ${i === 0 ? 'top' : ''}">
+                <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
+                <span class="mu-score">score ${s.score}</span>
+                ${groupsHtml}
+              </div>`;
+    };
     box.innerHTML =
       `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found — best first${share}</div>`
-      + top.map((s, i) => `<div class="mu-slot ${i === 0 ? 'top' : ''}">
-          <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
-          <span class="mu-score">score ${s.score}</span>
-          <span class="mu-reasons">${s.reasons.join(' · ')}</span></div>`).join('')
-      + `<p class="preview-note" style="margin-top:0.5rem;">The score is simply the sum of the (+n) reasons on each slot:
-         choghadiya base (Amrit +3 · Shubh/Labh +2 · Char +1), then bonuses for Abhijit/Amrita overlap, Siddhi-yoga
-         days and group tarabalam; Visha/Dagdha days subtract. Being clear of every inauspicious window is a
-         requirement, not a bonus.</p>`;
+      + top.map(renderSlot).join('')
+      + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across
+         Slot quality (choghadiya, Abhijit/Amrita overlap), Day quality (Siddhi yogas, Nitya yoga, Rikta tithi),
+         Group fit (per-person tarabalam and chandrabalam), and Activity match (preferred tithi class / vara).
+         Notes carry classical-doctrine context (e.g. Sarvartha Siddhi traditionally rectifies tara dosha)
+         without changing the score. Being clear of every inauspicious window is a requirement, not a bonus.</p>`;
   }
 
   function shareMuhurtaOnWhatsApp() {
