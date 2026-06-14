@@ -1924,6 +1924,152 @@
     return pieces;
   }
 
+  // ---------- Slot-time astronomy (Batch F2) ----------------------------
+  //
+  // Meeus low-precision Sun/Moon longitudes + Lahiri ayanamsa. Lets us
+  // recompute the panchangam anga (nakshatra, tithi, yoga, karana, moon
+  // rashi, special yogas) at any datetime — matching the Python engine's
+  // facts_at() so the in-page muhurta finder gets slot-time precision
+  // instead of just the sunrise snapshot from the feed.
+  //
+  // Accuracy: Sun ~0.01°, Moon ~0.1-0.3°. Nakshatra boundaries are
+  // 13.33° wide and tithi boundaries 12° wide, so this is comfortably
+  // sufficient for slot-time scoring.
+
+  const MU_NAKSHATRA_LIST = TB_NAKSHATRAS;     // already defined above
+
+  const MU_TITHI_LIST_FULL = (() => {
+    const last = ['Pratipat','Dwitiya','Tritiya','Chaturthi','Panchami',
+                  'Shashthi','Saptami','Ashtami','Navami','Dashami',
+                  'Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Pournami'];
+    const shukla = last.slice(0, 14).map(n => `Shukla ${n}`).concat(['Pournami']);
+    const krishna = last.slice(0, 14).map(n => `Krishna ${n}`).concat(['Amavasya']);
+    return shukla.concat(krishna);
+  })();
+
+  const MU_YOGA_NAMES_27 = [
+    'Vishkambha','Priti','Ayushman','Saubhagya','Shobhana','Atiganda',
+    'Sukarma','Dhriti','Shula','Ganda','Vriddhi','Dhruva','Vyaghata',
+    'Harshana','Vajra','Siddhi','Vyatipata','Variyana','Parigha','Shiva',
+    'Siddha','Sadhya','Shubha','Shukla','Brahma','Indra','Vaidhriti',
+  ];
+
+  const MU_KARANA_REPEATING = ['Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti'];
+  const MU_KARANA_FIXED = { 0: 'Kinstughna', 57: 'Shakuni', 58: 'Chatushpada', 59: 'Naga' };
+
+  // Special yogas — mirror telugu_panchangam/special_yogas.py
+  const MU_SARVARTHA = {
+    Adivaram:    new Set(['Hasta','Mula','Pushya','Ashvini','Punarvasu','Anuradha','Shravana','Revati']),
+    Somavaram:   new Set(['Shravana','Rohini','Mrigashira','Pushya','Anuradha']),
+    Mangalavaram:new Set(['Ashvini','Krittika','Ashlesha','Uttara Ashadha','Uttara Phalguni','Uttara Bhadrapada']),
+    Budhavaram:  new Set(['Krittika','Rohini','Hasta','Anuradha','Mrigashira']),
+    Guruvaram:   new Set(['Ashvini','Punarvasu','Anuradha','Revati','Pushya','Swati']),
+    Shukravaram: new Set(['Revati','Anuradha','Ashvini','Pushya','Shravana','Punarvasu']),
+    Shanivaram:  new Set(['Swati','Rohini','Shravana']),
+  };
+  const MU_AMRITA_SIDDHI = {
+    Adivaram:'Hasta', Somavaram:'Mrigashira', Mangalavaram:'Ashvini',
+    Budhavaram:'Anuradha', Guruvaram:'Pushya', Shukravaram:'Revati', Shanivaram:'Rohini',
+  };
+  const MU_VISHA_TITHI = { Adivaram:5, Somavaram:6, Mangalavaram:7, Budhavaram:8,
+                           Guruvaram:9, Shukravaram:10, Shanivaram:11 };
+  const MU_DAGDHA_TITHI = { Adivaram:new Set([12]), Somavaram:new Set([11]),
+                            Mangalavaram:new Set([5]), Budhavaram:new Set([2,3]),
+                            Guruvaram:new Set([6]), Shukravaram:new Set([8]), Shanivaram:new Set([9]) };
+  const MU_PUSHKARA_VARAS = new Set(['Adivaram','Mangalavaram','Shanivaram']);
+  const MU_DVI_TITHIS = new Set([2,7,12]);
+  const MU_DVI_NAKS   = new Set(['Mrigashira','Chitra','Dhanishtha']);
+  const MU_TRI_TITHIS = new Set([2,7,12]);
+  const MU_TRI_NAKS   = new Set(['Krittika','Punarvasu','Uttara Phalguni',
+                                  'Vishakha','Uttara Ashadha','Purva Bhadrapada']);
+
+  function muSpecialYogasAt(vaaram, tithiName, nakshatraName) {
+    const yogas = [];
+    if (MU_SARVARTHA[vaaram] && MU_SARVARTHA[vaaram].has(nakshatraName))
+      yogas.push('Sarvartha Siddhi Yoga');
+    if (MU_AMRITA_SIDDHI[vaaram] === nakshatraName)
+      yogas.push('Amrita Siddhi Yoga');
+    const tithiBase = MU_TITHI_LIST_FULL.indexOf(tithiName) % 15 + 1;
+    if (tithiBase === MU_VISHA_TITHI[vaaram]) yogas.push('Visha Yoga');
+    if (MU_DAGDHA_TITHI[vaaram] && MU_DAGDHA_TITHI[vaaram].has(tithiBase))
+      yogas.push('Dagdha Yoga');
+    if (MU_PUSHKARA_VARAS.has(vaaram)) {
+      if (MU_DVI_TITHIS.has(tithiBase) && MU_DVI_NAKS.has(nakshatraName))
+        yogas.push('Dvipushkara Yoga');
+      if (MU_TRI_TITHIS.has(tithiBase) && MU_TRI_NAKS.has(nakshatraName))
+        yogas.push('Tripushkara Yoga');
+    }
+    return yogas;
+  }
+
+  // Julian Day from a JS Date (UTC)
+  function muJD(dt) { return dt.getTime() / 86400000 + 2440587.5; }
+
+  // Lahiri ayanamsa (linear approximation; ~0.01° accuracy in the
+  // current era — good enough for nakshatra/tithi boundaries).
+  function muLahiri(jd) {
+    return 23.85 + ((jd - 2451545.0) / 365.25) * 0.01397;
+  }
+
+  // Sun apparent longitude, sidereal (Lahiri). Meeus low-precision.
+  function muSunLong(jd) {
+    const T = (jd - 2451545.0) / 36525;
+    const L = ((280.460 + 36000.770 * T) % 360 + 360) % 360;
+    const g = ((357.528 + 35999.050 * T) % 360 + 360) % 360;
+    const gr = g * Math.PI / 180;
+    const tropical = L + 1.915 * Math.sin(gr) + 0.020 * Math.sin(2 * gr);
+    return ((tropical - muLahiri(jd)) % 360 + 360) % 360;
+  }
+
+  // Moon apparent longitude, sidereal (Lahiri). Meeus 12 leading terms.
+  function muMoonLong(jd) {
+    const T = (jd - 2451545.0) / 36525;
+    const d2r = Math.PI / 180;
+    const Lp = ((218.3164477 + 481267.88123421 * T) % 360 + 360) % 360;
+    const D  = ((297.8501921 + 445267.1114034 * T) % 360 + 360) % 360;
+    const M  = ((357.5291092 + 35999.0502909 * T) % 360 + 360) % 360;
+    const Mp = ((134.9633964 + 477198.8675055 * T) % 360 + 360) % 360;
+    const F  = (( 93.2720950 + 483202.0175233 * T) % 360 + 360) % 360;
+    const s  = a => Math.sin(a * d2r);
+    const tropical = Lp
+      + 6.288774 * s(Mp)
+      + 1.274027 * s(2*D - Mp)
+      + 0.658314 * s(2*D)
+      + 0.213618 * s(2*Mp)
+      - 0.185116 * s(M)
+      - 0.114332 * s(2*F)
+      + 0.058793 * s(2*D - 2*Mp)
+      + 0.057066 * s(2*D - M - Mp)
+      + 0.053322 * s(2*D + Mp)
+      + 0.045758 * s(2*D - M)
+      - 0.040923 * s(M - Mp)
+      - 0.034720 * s(D);
+    return ((tropical - muLahiri(jd)) % 360 + 360) % 360;
+  }
+
+  // factsAt(dt, vaaram) — slot-time anga, mirroring Python engine.facts_at.
+  function muFactsAt(dt, vaaram) {
+    const jd = muJD(dt);
+    const sun = muSunLong(jd);
+    const moon = muMoonLong(jd);
+    const elong = ((moon - sun) % 360 + 360) % 360;
+    const nakSize = 360 / 27;
+    const nakIdx = Math.floor(moon / nakSize) % 27;
+    const nakshatra = MU_NAKSHATRA_LIST[nakIdx];
+    const tithiIdx = Math.floor(elong / 12) % 30;
+    const tithi = MU_TITHI_LIST_FULL[tithiIdx];
+    const yogaIdx = Math.floor(((sun + moon) % 360) / nakSize) % 27;
+    const yoga = MU_YOGA_NAMES_27[yogaIdx];
+    const htIdx = Math.floor(elong / 6) % 60;
+    const karana = MU_KARANA_FIXED[htIdx] !== undefined
+      ? MU_KARANA_FIXED[htIdx]
+      : MU_KARANA_REPEATING[(htIdx - 1 + 7) % 7];
+    const rashiIdx = Math.floor(moon / 30) % 12;
+    const lunarSign = TB_RASIS[rashiIdx];
+    const specialYogas = muSpecialYogasAt(vaaram, tithi, nakshatra);
+    return { nakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
+  }
+
   // Chandrabalam sets — mirror telugu_panchangam/personal/chandrabalam.py
   const MU_CHANDRA_GOOD = new Set([1, 3, 6, 7, 10, 11]);
   const MU_CHANDRA_PUJA = new Set([2, 5, 9]);
@@ -2071,6 +2217,7 @@
       const slots = [];
       let droppedEclipseDays = 0;
       let droppedModeDays = 0;
+      let droppedModeSlots = 0;
       for (let i = 0; i < nDays; i++) {
         const d = new Date(from); d.setDate(d.getDate() + i);
         const ev = events.get(stampOf(d));
@@ -2080,45 +2227,6 @@
         // Eclipse: auspicious activities are deferred outright.
         if (data.eclipse) { droppedEclipseDays++; continue; }
 
-        let dayBonus = 0; const dayReasons = [];
-
-        // Tarabalam — per-person additive (graded).
-        if (people.length && data.nakshatra) {
-          const fav = [], unfav = [];
-          for (let pi = 0; pi < people.length; pi++) {
-            const pr = people[pi];
-            const t = taroOf_safe(pr.nak, data.nakshatra.name);
-            const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
-            if (TARA_GOOD.has(t)) { fav.push(label); dayBonus += 1; }
-            else { unfav.push(`${label} ${TARA_NAMES[t - 1]}`); dayBonus -= 1; }
-          }
-          if (fav.length) dayReasons.push(`tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
-          if (unfav.length) dayReasons.push(`tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
-        }
-
-        // Chandrabalam — per-person additive (graded). Mode filters AFTER scoring.
-        let chandraBad = false, chandraPuja = false;
-        if (people.length && data.lunarSign) {
-          const good = [], puja = [], avoid = [];
-          for (let pi = 0; pi < people.length; pi++) {
-            const pr = people[pi];
-            if (!pr.rasi) continue;
-            const c = chandraOf(pr.rasi, data.lunarSign);
-            if (!c) continue;
-            const pos = c.pos;
-            const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
-            if (MU_CHANDRA_GOOD.has(pos)) { good.push(label); dayBonus += 1; }
-            else if (MU_CHANDRA_PUJA.has(pos)) { puja.push(`${label} Moon@${pos}`); chandraPuja = true; }
-            else { const ashtama = pos === 8 ? ' Ashtama' : ''; avoid.push(`${label}${ashtama} Moon@${pos}`); chandraBad = true; dayBonus -= 1; }
-          }
-          if (good.length) dayReasons.push(`chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
-          if (puja.length) dayReasons.push(`chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
-          if (avoid.length) dayReasons.push(`chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
-
-          if (chandraMode === 'strict' && (chandraPuja || chandraBad)) { droppedModeDays++; continue; }
-          if (chandraMode === 'puja_ok' && chandraBad) { droppedModeDays++; continue; }
-        }
-
         const rules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
         const skipYogas = new Set(rules.skip_on_yoga || []);
         const preferChog = rules.prefer_choghadiya || null;     // ['Block', bonus]
@@ -2127,31 +2235,11 @@
         const preferVaras = new Set(rules.prefer_vara || []);
         const activityLabel = rules.label;
 
-        // Tithi family — universal Rikta penalty + activity-class bonus.
-        const tFam = tithiFamily(data.tithi && data.tithi.name);
-        if (tFam === 'Rikta') {
-          dayBonus -= 2;
-          dayReasons.push(`${data.tithi.name} (Rikta tithi) (-2)`);
-        } else if (tFam && preferTithiClass && tFam === preferTithiClass) {
-          dayBonus += 1;
-          dayReasons.push(`${data.tithi.name} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
-        }
+        // Vara is sunrise-anchored — compute once per day.
+        const varaBonus = (data.vaaram && preferVaras.has(data.vaaram)) ? 1 : 0;
+        const varaReason = varaBonus
+          ? `${data.vaaram} favoured for ${activityLabel} (+1)` : null;
 
-        // Vara — activity-preferred weekday (+1).
-        if (data.vaaram && preferVaras.has(data.vaaram)) {
-          dayBonus += 1;
-          dayReasons.push(`${data.vaaram} favoured for ${activityLabel} (+1)`);
-        }
-
-        let skipDay = false;
-        for (const y of data.yogas) {
-          if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
-          if (MU_YOGA_PENALTY[y] !== undefined) {
-            if (skipYogas.has(y)) { skipDay = true; break; }
-            dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
-          }
-        }
-        if (skipDay) continue;
         const bad = data.inauspicious.map(w => [muMin(w.start, w.sflag), muMin(w.end, w.eflag)]);
         if (avoidKaranaNames.size && data.karana) {
           for (const k of data.karana.split(/\s+\/\s+/)) {
@@ -2161,11 +2249,85 @@
         }
         const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
         const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
+
         for (const c of data.choghadiya) {
           const base = MU_GOOD_CHOG[c.name];
           if (base === undefined) continue;
           for (const [s0, e0] of muSubtract(muMin(c.start), muMin(c.end), bad)) {
             if (e0 - s0 < 24) continue;
+
+            // Compute slot-time facts via Meeus Sun/Moon longitudes.
+            // s0 is minutes from local midnight of `d`. Convert to a Date
+            // object in the same local timezone, then muFactsAt does the
+            // UTC → JD conversion internally.
+            const slotStart = new Date(d.getTime() + s0 * 60000);
+            const facts = muFactsAt(slotStart, data.vaaram);
+
+            let dayBonus = 0;
+            const dayReasons = [];
+
+            // Tarabalam — slot-time nakshatra
+            if (people.length) {
+              const fav = [], unfav = [];
+              for (let pi = 0; pi < people.length; pi++) {
+                const pr = people[pi];
+                const t = taroOf_safe(pr.nak, facts.nakshatra);
+                const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
+                if (TARA_GOOD.has(t)) { fav.push(label); dayBonus += 1; }
+                else { unfav.push(`${label} ${TARA_NAMES[t - 1]}`); dayBonus -= 1; }
+              }
+              if (fav.length) dayReasons.push(`tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
+              if (unfav.length) dayReasons.push(`tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
+            }
+
+            // Chandrabalam — slot-time moon rashi
+            let dropSlot = false;
+            if (people.length) {
+              const good = [], puja = [], avoid = [];
+              for (let pi = 0; pi < people.length; pi++) {
+                const pr = people[pi];
+                if (!pr.rasi) continue;
+                const c2 = chandraOf(pr.rasi, facts.lunarSign);
+                if (!c2) continue;
+                const pos = c2.pos;
+                const label = `#${pi + 1} (${muEsc(pr.name || pr.nak)})`;
+                if (MU_CHANDRA_GOOD.has(pos)) { good.push(label); dayBonus += 1; }
+                else if (MU_CHANDRA_PUJA.has(pos)) { puja.push(`${label} Moon@${pos}`); }
+                else { const ashtama = pos === 8 ? ' Ashtama' : ''; avoid.push(`${label}${ashtama} Moon@${pos}`); dayBonus -= 1; }
+              }
+              if (good.length) dayReasons.push(`chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
+              if (puja.length) dayReasons.push(`chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
+              if (avoid.length) dayReasons.push(`chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
+
+              if (chandraMode === 'strict' && (puja.length || avoid.length)) dropSlot = true;
+              else if (chandraMode === 'puja_ok' && avoid.length) dropSlot = true;
+            }
+            if (dropSlot) { droppedModeSlots++; continue; }
+
+            // Tithi family — slot-time tithi (universal Rikta -2; class +1)
+            const tFam = tithiFamily(facts.tithi);
+            if (tFam === 'Rikta') {
+              dayBonus -= 2;
+              dayReasons.push(`${facts.tithi} (Rikta tithi) (-2)`);
+            } else if (tFam && preferTithiClass && tFam === preferTithiClass) {
+              dayBonus += 1;
+              dayReasons.push(`${facts.tithi} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
+            }
+
+            // Special yogas — slot-time
+            let yogaSkip = false;
+            for (const y of facts.specialYogas) {
+              if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
+              if (MU_YOGA_PENALTY[y] !== undefined) {
+                if (skipYogas.has(y)) { yogaSkip = true; break; }
+                dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
+              }
+            }
+            if (yogaSkip) continue;
+
+            // Vara — day-level, append last so reason ordering reads slot-then-day
+            if (varaReason) { dayBonus += 1; dayReasons.push(varaReason); }
+
             let score = base + dayBonus;
             const reasons = [`${c.name} choghadiya (+${base})`, 'clear of all inauspicious windows', ...dayReasons];
             if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
@@ -2183,6 +2345,7 @@
           }
         }
       }
+      droppedModeDays = droppedModeSlots;
       slots.sort((a, b) => b.score - a.score || a.d - b.d || a.s0 - b.s0);
       MU_LAST = { top: slots.slice(0, 10), droppedEclipseDays, droppedModeDays, activity, people, chandraMode };
       renderMuhurta();
