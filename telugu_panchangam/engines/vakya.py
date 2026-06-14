@@ -6,7 +6,6 @@ from telugu_panchangam.engines.surya_siddhanta import (
     SuryaSiddhantaEngine,
     ss_sun_longitude, ss_moon_longitude,
     _KALI_EPOCH_JD, _CIVIL_DAYS, _MOON_REVS, _MOON_APOGEE_REVS,
-    _MOON_MANDA_R,
 )
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
