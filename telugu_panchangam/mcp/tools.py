@@ -19,7 +19,7 @@ from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_ve
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.phalalu import rasi_phalalu
-from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, ACTIVITIES, TIER_NAMES
+from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -612,6 +612,9 @@ def tool_find_muhurta(
             for s in day_results:
                 slots.append({**s, 'start': _fmt_time(s['start'], tz),
                               'end': _fmt_time(s['end'], tz)})
+        # Re-tier across the whole search, not just one day — "Excellent"
+        # means the best of what turned up over the full date range.
+        assign_tiers(slots)
         slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
                                   x['personal_dosha'] is not None,
                                   x['date'], x['start']))
@@ -628,9 +631,9 @@ def tool_find_muhurta(
                           'Vaidhriti -2 + samskara skip, dosha-window -1), Abhijit/Amrita '
                           '+2, activity bias +1. Eclipse days are skipped outright. '
                           'Each slot carries a tier (Excellent/Good/Fair/Avoid), assigned '
-                          'relative to the best/worst score achievable for this many '
-                          'people on this day (so a larger group needs a higher score '
-                          'to reach "Excellent"), and a reason_groups breakdown '
+                          'relative to the highest/lowest score found across this search '
+                          '(so "Excellent" means the best of what turned up, not a fixed '
+                          'absolute bar), and a reason_groups breakdown '
                           '(slot_quality, day_quality, group_fit, '
                           'activity_match, notes) for transparent reasoning. '
                           'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '

@@ -6,7 +6,7 @@ import pytest
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.personal.muhurta import (
-    day_slots, GOOD_CHOGHADIYA, ACTIVITY_RULES, _score_ceiling_floor, relative_tier,
+    day_slots, GOOD_CHOGHADIYA, relative_tier,
 )
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
@@ -17,14 +17,14 @@ def _day(y, m, d, include_eclipse=False):
     return ENGINE.calculate(date(y, m, d), HYD, include_eclipse=include_eclipse)
 
 
-def _expected_tier(day, score, n_people=0, activity='any'):
-    """Recompute the relative tier the same way day_slots() does."""
-    rules = ACTIVITY_RULES[activity]
-    vara_bonus = 1 if day.vaaram in set(rules.get('prefer_vara', ())) else 0
-    ceiling, floor = _score_ceiling_floor(
-        n_people, rules.get('prefer_choghadiya'), rules.get('prefer_tithi_class'),
-        vara_bonus, day.abhijit_muhurta, list(day.amrita_kalam))
-    return relative_tier(score, ceiling, floor)
+def _expected_tier(slots, score, personal_dosha):
+    """Recompute the relative tier the same way assign_tiers() does."""
+    all_scores = [s['score'] for s in slots]
+    ceiling, floor = max(all_scores), min(all_scores)
+    tier = relative_tier(score, ceiling, floor)
+    if personal_dosha is not None and tier == 'Excellent':
+        tier = 'Good'
+    return tier
 
 
 def test_slots_never_overlap_inauspicious_windows():
@@ -586,8 +586,7 @@ def test_each_slot_carries_a_tier():
     slots = day_slots(day)
     assert slots
     for s in slots:
-        if s['personal_dosha'] is None:
-            assert s['tier'] == _expected_tier(day, s['score'])
+        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'])
         assert s['tier'] in ('Excellent', 'Good', 'Fair', 'Avoid')
 
 
@@ -623,11 +622,7 @@ def test_personal_dosha_chandra_remedial_caps_tier_when_excellent():
     assert slots
     for s in slots:
         assert s['personal_dosha'] == 'chandra_remedial'
-        expected = _expected_tier(day, s['score'], n_people=1)
-        if expected == 'Excellent':
-            assert s['tier'] == 'Good'
-        else:
-            assert s['tier'] == expected
+        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'])
 
 
 def test_sort_tiebreaker_prefers_personally_clean_slot():

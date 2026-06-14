@@ -1276,8 +1276,9 @@
       <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
       <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
       finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
-      Each slot's tier reflects its score plus any personal cautions noted below it, so two slots
-      with the same score can land in different tiers.
+      Each slot's tier (Excellent/Good/Fair/Avoid) is relative to the best and worst scores found
+      in this search, plus any personal cautions noted below it — so two slots with the same score
+      can land in different tiers, and "Excellent" means the best of what turned up this time.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit —
       or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
@@ -2839,21 +2840,8 @@
     return 'Avoid';
   }
 
-  // Relative tier — mirror telugu_panchangam/personal/muhurta
-  // _score_ceiling_floor / relative_tier. A larger group has a wider
-  // tara/chandra swing, so "Excellent" needs a higher score to mean the
-  // same thing (near the best achievable for THIS query).
-  function muScoreCeilingFloor(nPeople, preferChog, preferTithiClass, varaBonus, abhijit, amrita) {
-    const taraChandraSpan = 2 * nPeople;
-    const ceiling = 3 + varaBonus + taraChandraSpan
-      + (preferTithiClass ? 1 : 0)
-      + MU_NITYA_AUSPICIOUS_BONUS
-      + (abhijit ? 2 : 0)
-      + (amrita.length ? 2 : 0)
-      + (preferChog ? preferChog[1] : 0);
-    const floor = -taraChandraSpan - 2 + MU_NITYA_PARTIAL_PENALTY;
-    return [ceiling, floor];
-  }
+  // Relative tier — mirror telugu_panchangam/personal/muhurta.relative_tier.
+  // Buckets a score by its position within [floor, ceiling].
   function muRelativeTier(score, ceiling, floor) {
     const spread = ceiling - floor;
     if (spread <= 0) return muScoreTier(score);
@@ -2862,6 +2850,22 @@
     if (rel >= 0.5) return 'Good';
     if (rel >= 0.25) return 'Fair';
     return 'Avoid';
+  }
+  // Tier each slot relative to the min/max score in this batch — mirror
+  // telugu_panchangam/personal/muhurta.assign_tiers. "Excellent" means
+  // the best of what turned up in this search, not a fixed bar.
+  function muAssignTiers(slots) {
+    if (!slots.length) return;
+    let ceiling = -Infinity, floor = Infinity;
+    for (const s of slots) {
+      if (s.score > ceiling) ceiling = s.score;
+      if (s.score < floor) floor = s.score;
+    }
+    for (const s of slots) {
+      let tier = muRelativeTier(s.score, ceiling, floor);
+      if (s.personalDosha && tier === 'Excellent') tier = 'Good';
+      s.tier = tier;
+    }
   }
 
   // Nitya Yoga scoring — mirror telugu_panchangam/personal/nitya_yoga.py
@@ -3233,9 +3237,6 @@
         const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
         const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
-        const [muCeiling, muFloor] = muScoreCeilingFloor(
-          people.length, preferChog, preferTithiClass, varaBonus, abhijit, amrita);
-
         for (const c of data.choghadiya) {
           const base = MU_GOOD_CHOG[c.name];
           if (base === undefined) continue;
@@ -3394,10 +3395,7 @@
             let personalDosha = null;
             if (chandraAvoidNames.length) personalDosha = hasAshtama ? 'ashtama_chandra' : 'chandra_avoid';
             else if (chandraPujaNames.length) personalDosha = 'chandra_remedial';
-            let tier = muRelativeTier(score, muCeiling, muFloor);
-            if (personalDosha && tier === 'Excellent') tier = 'Good';
-
-            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, tier, personalDosha });
+            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha });
             slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
           }
         }
@@ -3436,6 +3434,9 @@
         }
       }
       droppedModeDays = droppedModeSlots;
+      // Re-tier across the whole search — "Excellent" means the best of
+      // what turned up over the full date range, not a fixed bar.
+      muAssignTiers(slots);
       slots.sort((a, b) => MU_TIER_NAMES.indexOf(b.tier) - MU_TIER_NAMES.indexOf(a.tier)
         || b.score - a.score
         || (!!a.personalDosha - !!b.personalDosha) || a.d - b.d || a.s0 - b.s0);
