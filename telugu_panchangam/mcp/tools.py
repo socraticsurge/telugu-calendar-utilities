@@ -612,7 +612,8 @@ def tool_find_muhurta(
             for s in day_results:
                 slots.append({**s, 'start': _fmt_time(s['start'], tz),
                               'end': _fmt_time(s['end'], tz)})
-        slots.sort(key=lambda x: (-x['score'], x['date'], x['start']))
+        slots.sort(key=lambda x: (-x['score'], x['personal_dosha'] is not None,
+                                  x['date'], x['start']))
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
             'city': city, 'system': system, 'chandra_mode': chandra_mode,
@@ -628,6 +629,9 @@ def tool_find_muhurta(
                           'Each slot carries a tier (Excellent/Good/Fair/Avoid) and a '
                           'reason_groups breakdown (slot_quality, day_quality, group_fit, '
                           'activity_match, notes) for transparent reasoning. '
+                          'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '
+                          'flags an unrectified personal Moon caution: such slots are capped '
+                          'below Excellent and sort after equally-scored clean slots. '
                           'A guide for everyday timing — for weddings and major samskaras, '
                           'consult your purohit.',
         })
