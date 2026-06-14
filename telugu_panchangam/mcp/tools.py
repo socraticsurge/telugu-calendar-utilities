@@ -637,9 +637,11 @@ def tool_find_muhurta(
                           '(slot_quality, day_quality, group_fit, '
                           'activity_match, notes) for transparent reasoning. '
                           'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '
-                          'flags an unrectified personal Moon caution: such slots are capped '
-                          'below Excellent, and slots are ranked tier-first (Excellent > Good > '
-                          'Fair > Avoid), then by score, then preferring personally-clean slots. '
+                          'flags an unrectified personal Moon caution, and day_dosha '
+                          '(rikta_tithi/visha_dagdha_yoga/vyatipata_vaidhriti/null) flags a '
+                          'day-level dosha: either keeps a slot capped below Excellent, and '
+                          'slots are ranked tier-first (Excellent > Good > '
+                          'Fair > Avoid), then by score, then preferring dosha-free slots. '
                           'A guide for everyday timing — for weddings and major samskaras, '
                           'consult your purohit.',
         })

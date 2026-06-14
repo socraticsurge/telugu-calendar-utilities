@@ -1277,8 +1277,9 @@
       <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
       finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
       Each slot's tier (Excellent/Good/Fair/Avoid) is relative to the best and worst scores found
-      in this search, plus any personal cautions noted below it — so two slots with the same score
-      can land in different tiers, and "Excellent" means the best of what turned up this time.
+      in this search, plus any personal or day-level cautions noted below it — a slot carrying
+      a named dosha (e.g. Rikta tithi, Ashtama Chandra) is never shown as "Excellent" even if its
+      score is the highest found, so two slots with the same score can land in different tiers.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, please consult your purohit —
       or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
@@ -2863,7 +2864,7 @@
     }
     for (const s of slots) {
       let tier = muRelativeTier(s.score, ceiling, floor);
-      if (s.personalDosha && tier === 'Excellent') tier = 'Good';
+      if ((s.personalDosha || s.dayDosha) && tier === 'Excellent') tier = 'Good';
       s.tier = tier;
     }
   }
@@ -3395,7 +3396,16 @@
             let personalDosha = null;
             if (chandraAvoidNames.length) personalDosha = hasAshtama ? 'ashtama_chandra' : 'chandra_avoid';
             else if (chandraPujaNames.length) personalDosha = 'chandra_remedial';
-            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha });
+
+            // Day-level dosha (Rikta tithi, Visha/Dagdha yoga, Vyatipata/
+            // Vaidhriti) — same "can't be Excellent" treatment as a
+            // personal chandra dosha.
+            let dayDosha = null;
+            if (tFam === 'Rikta') dayDosha = 'rikta_tithi';
+            else if (facts.specialYogas.some(y => MU_YOGA_PENALTY[y] !== undefined)) dayDosha = 'visha_dagdha_yoga';
+            else if (MU_NITYA_HARD_AVOID.has(ny)) dayDosha = 'vyatipata_vaidhriti';
+
+            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha });
             slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
           }
         }

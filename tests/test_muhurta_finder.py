@@ -17,12 +17,12 @@ def _day(y, m, d, include_eclipse=False):
     return ENGINE.calculate(date(y, m, d), HYD, include_eclipse=include_eclipse)
 
 
-def _expected_tier(slots, score, personal_dosha):
+def _expected_tier(slots, score, personal_dosha, day_dosha):
     """Recompute the relative tier the same way assign_tiers() does."""
     all_scores = [s['score'] for s in slots]
     ceiling, floor = max(all_scores), min(all_scores)
     tier = relative_tier(score, ceiling, floor)
-    if personal_dosha is not None and tier == 'Excellent':
+    if tier == 'Excellent' and (personal_dosha is not None or day_dosha is not None):
         tier = 'Good'
     return tier
 
@@ -586,7 +586,7 @@ def test_each_slot_carries_a_tier():
     slots = day_slots(day)
     assert slots
     for s in slots:
-        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'])
+        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'], s['day_dosha'])
         assert s['tier'] in ('Excellent', 'Good', 'Fair', 'Avoid')
 
 
@@ -622,7 +622,7 @@ def test_personal_dosha_chandra_remedial_caps_tier_when_excellent():
     assert slots
     for s in slots:
         assert s['personal_dosha'] == 'chandra_remedial'
-        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'])
+        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'], s['day_dosha'])
 
 
 def test_sort_tiebreaker_prefers_personally_clean_slot():
@@ -637,6 +637,28 @@ def test_sort_tiebreaker_prefers_personally_clean_slot():
         a, b = slots[i], slots[i + 1]
         if a['score'] == b['score']:
             assert (a['personal_dosha'] is not None) <= (b['personal_dosha'] is not None)
+
+
+# --- Day-level dosha (Rikta tithi / Visha-Dagdha / Vyatipata-Vaidhriti): tier cap ---
+
+def test_day_dosha_rikta_tithi_caps_tier_when_excellent():
+    # 2026-06-14: Krishna Chaturdashi (Rikta tithi). A slot here should
+    # never show as "Excellent" even if its raw score is the batch ceiling.
+    day = _day(2026, 6, 14)
+    slots = day_slots(day)
+    assert slots
+    rikta_slots = [s for s in slots if s['day_dosha'] == 'rikta_tithi']
+    assert rikta_slots
+    for s in rikta_slots:
+        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'], s['day_dosha'])
+        assert s['tier'] != 'Excellent'
+
+
+def test_day_dosha_none_on_clean_day():
+    day = _day(2026, 6, 16)
+    slots = day_slots(day)
+    assert slots
+    assert all(s['day_dosha'] is None for s in slots)
 
 
 # --- dropped_days transparency (Batch C #17) ---
