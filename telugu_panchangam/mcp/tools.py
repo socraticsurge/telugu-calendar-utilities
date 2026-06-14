@@ -599,7 +599,8 @@ def tool_find_muhurta(
             for s in day_slots(day, activity=activity,
                                janma_nakshatras=janma_nakshatras,
                                janma_rasis=janma_rasis,
-                               chandra_mode=chandra_mode):
+                               chandra_mode=chandra_mode,
+                               engine=engine):
                 slots.append({**s, 'start': _fmt_time(s['start'], tz),
                               'end': _fmt_time(s['end'], tz)})
         slots.sort(key=lambda x: (-x['score'], x['date'], x['start']))

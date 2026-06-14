@@ -161,30 +161,141 @@ def _label(janma: str, idx: int) -> str:
     return f'#{idx + 1} ({janma})'
 
 
+def _score_tara(janma_nakshatras, day_nakshatra_name):
+    """Per-person tarabalam contribution against a specific nakshatra."""
+    if not janma_nakshatras:
+        return 0, []
+    bonus, fav, unfav = 0, [], []
+    for i, janma in enumerate(janma_nakshatras):
+        t = tara_number(janma, day_nakshatra_name)
+        label = _label(janma, i)
+        if t in AUSPICIOUS_TARAS:
+            fav.append(label); bonus += 1
+        else:
+            unfav.append(f'{label} {tara_name(t)}'); bonus -= 1
+    reasons = []
+    if fav:
+        reasons.append(f"tarabalam favourable for {', '.join(fav)} (+{len(fav)})")
+    if unfav:
+        reasons.append(f"tarabalam avoid for {', '.join(unfav)} (-{len(unfav)})")
+    return bonus, reasons
+
+
+def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
+    """Per-person chandrabalam against a specific moon rashi.
+
+    Returns (bonus, reasons, dropped_by_mode). When dropped_by_mode is True,
+    the caller should skip this slot/day under the active chandra_mode.
+    """
+    if janma_rasis is None or not any(r is not None for r in janma_rasis):
+        return 0, [], False
+    bonus = 0
+    good, puja, avoid = [], [], []
+    for i, rasi in enumerate(janma_rasis):
+        if rasi is None:
+            continue
+        janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
+        label = _label(janma_label, i)
+        pos = chandra_position(rasi, lunar_sign)
+        if pos in CHANDRA_GOOD:
+            good.append(label); bonus += 1
+        elif pos in CHANDRA_PUJA:
+            puja.append(f'{label} Moon@{pos}')
+        else:
+            ashtama = ' Ashtama' if pos == 8 else ''
+            avoid.append(f'{label}{ashtama} Moon@{pos}'); bonus -= 1
+    reasons = []
+    if good:
+        reasons.append(f"chandrabalam favourable for {', '.join(good)} (+{len(good)})")
+    if puja:
+        reasons.append(f"chandrabalam remedial for {', '.join(puja)} (puja recommended)")
+    if avoid:
+        reasons.append(f"chandrabalam avoid for {', '.join(avoid)} (-{len(avoid)})")
+    dropped = (chandra_mode == 'strict' and (puja or avoid)) \
+              or (chandra_mode == 'puja_ok' and avoid)
+    return bonus, reasons, bool(dropped)
+
+
+def _score_tithi_class(tithi_name, prefer_tithi_class, activity_label):
+    """Universal Rikta -2; activity-preferred class +1."""
+    try:
+        fam = tithi_family(tithi_name)
+    except ValueError:
+        return 0, []
+    if fam == 'Rikta':
+        return -2, [f'{tithi_name} (Rikta tithi) (-2)']
+    if prefer_tithi_class and fam == prefer_tithi_class:
+        return 1, [f'{tithi_name} ({prefer_tithi_class}) favoured for {activity_label} (+1)']
+    return 0, []
+
+
+def _score_special_yogas(special_yogas, skip_yogas):
+    """Yoga bonuses/penalties. Returns (bonus, reasons, defer_due_to_yoga)."""
+    bonus, reasons = 0, []
+    for y in special_yogas:
+        if y in _YOGA_BONUS:
+            bonus += _YOGA_BONUS[y]
+            reasons.append(f'{y} day (+{_YOGA_BONUS[y]})')
+        if y in _YOGA_PENALTY:
+            if y in skip_yogas:
+                return 0, [], True
+            bonus += _YOGA_PENALTY[y]
+            reasons.append(f'{y} day ({_YOGA_PENALTY[y]})')
+    return bonus, reasons, False
+
+
+def _day_snapshot_facts(day):
+    """Fallback when no engine is provided — wrap the day's sunrise spans
+    as a SlotFacts so the per-slot scoring path can use the same code."""
+    from telugu_panchangam.models.panchangam_day import SlotFacts
+    return SlotFacts(
+        nakshatra=day.nakshatra.name,
+        tithi=day.tithi.name,
+        yoga=day.yoga.name,
+        karana=day.karana[0].name if day.karana else '',
+        lunar_sign=day.lunar_sign,
+        vaaram=day.vaaram,
+        special_yogas=list(day.special_yogas),
+    )
+
+
 def day_slots(day: PanchangamDay, activity: str = 'any',
               janma_nakshatras: list[str] | None = None,
               janma_rasis: list[str | None] | None = None,
-              chandra_mode: str = 'stars') -> list[dict]:
+              chandra_mode: str = 'stars',
+              *, engine=None) -> list[dict]:
     """Ranked auspicious slots for one day (daytime, sunrise to sunset).
 
-    Scoring (always applied, regardless of chandra_mode):
-      - Tarabalam: per person, +1 if tara in {2,4,6,8,9}; -1 otherwise.
-        Reasons name each person; net contribution is the sum.
-      - Chandrabalam (when rashis given): per person, +1 for {1,3,6,7,10,11},
-        0 for {2,5,9} (annotation only), -1 for {4,8,12}.
-      - Yoga: Sarvartha Siddhi / Amrita Siddhi +2, Dvi/Tripushkara +1,
-        Visha / Dagdha -2 (ceremony skips Visha/Dagdha days outright).
-      - Choghadiya base 1-3, Abhijit/Amrita Kalam overlap +2 each,
-        activity bias +1 (purchase favours Labh, beginning favours Amrit).
+    When `engine` is supplied, every Moon-driven scoring component
+    (tarabalam, chandrabalam, tithi class, special yogas) is recomputed
+    at the slot's start time using `engine.facts_at(slot.start, day.location)`
+    — so late-day slots are scored against the panchangam facts active
+    THEN, not at sunrise. Vara remains day-level (sunrise-anchored by
+    classical convention).
 
-    Day-level hard skips (return []):
-      - Eclipse day (engine-provided): auspicious activities deferred.
-      - Ceremony activity on Visha/Dagdha day.
+    When `engine` is None (default), every component falls back to the
+    day's sunrise snapshot — the pre-B1-Heavy behaviour. This keeps
+    every existing caller working unchanged.
 
-    Mode filtering (only affects which days are in the output):
-      - 'stars': no chandrabalam filter.
-      - 'puja_ok': day omitted if any person hits {4,8,12}.
-      - 'strict': day omitted unless every person is in {1,3,6,7,10,11}.
+    Scoring components (all mode-independent):
+      Tarabalam      ±1 per person, slot-time nakshatra
+      Chandrabalam   +1/0/-1 per person, slot-time moon rashi
+      Tithi class    -2 universal for Rikta, +1 for activity match
+      Vara           +1 for activity-preferred weekday (day-level)
+      Special yogas  Sarvartha/Amrita +2, Dvi/Tripushkara +1,
+                     Visha/Dagdha -2 — recomputed at slot time when
+                     `engine` is given
+      Choghadiya     1..3 base, ±1 activity preference
+      Abhijit/Amrita +2 each on slot overlap
+
+    Hard skips (slot excluded):
+      Eclipse day            — entire day
+      Slot inside avoid_karana — slot only (Vishti for travel, etc.)
+      skip_on_yoga match     — slot only (when engine), day (when not)
+      chandra_mode filter    — slot or day depending on engine presence
+
+    Mode filtering ('chandra_mode') only changes which slots survive;
+    scoring itself is universal.
     """
     if activity not in ACTIVITIES:
         raise ValueError(f'activity must be one of {ACTIVITIES}')
@@ -199,104 +310,31 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     if day.eclipse is not None:
         return []
 
-    day_bonus = 0
-    day_reasons: list[str] = []
-
-    # Tarabalam — per-person additive (graded). +1 favourable, -1 otherwise.
-    if janma_nakshatras:
-        fav_names, unfav_names = [], []
-        for i, janma in enumerate(janma_nakshatras):
-            t = tara_number(janma, day.nakshatra.name)
-            label = _label(janma, i)
-            if t in AUSPICIOUS_TARAS:
-                fav_names.append(label)
-                day_bonus += 1
-            else:
-                unfav_names.append(f'{label} {tara_name(t)}')
-                day_bonus -= 1
-        if fav_names:
-            day_reasons.append(f"tarabalam favourable for {', '.join(fav_names)} (+{len(fav_names)})")
-        if unfav_names:
-            day_reasons.append(f"tarabalam avoid for {', '.join(unfav_names)} (-{len(unfav_names)})")
-
-    # Chandrabalam — per-person additive (graded), only when rashis are given.
-    if janma_rasis is not None and any(r is not None for r in janma_rasis):
-        good_names, puja_names, avoid_names = [], [], []
-        for i, rasi in enumerate(janma_rasis):
-            if rasi is None:
-                continue
-            janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
-            label = _label(janma_label, i)
-            pos = chandra_position(rasi, day.lunar_sign)
-            if pos in CHANDRA_GOOD:
-                good_names.append(label)
-                day_bonus += 1
-            elif pos in CHANDRA_PUJA:
-                puja_names.append(f'{label} Moon@{pos}')
-            else:  # in {4, 8, 12}
-                ashtama = ' Ashtama' if pos == 8 else ''
-                avoid_names.append(f'{label}{ashtama} Moon@{pos}')
-                day_bonus -= 1
-        if good_names:
-            day_reasons.append(f"chandrabalam favourable for {', '.join(good_names)} (+{len(good_names)})")
-        if puja_names:
-            day_reasons.append(f"chandrabalam remedial for {', '.join(puja_names)} (puja recommended)")
-        if avoid_names:
-            day_reasons.append(f"chandrabalam avoid for {', '.join(avoid_names)} (-{len(avoid_names)})")
-
-        # Mode filtering — applied AFTER scoring is fixed, so it only changes
-        # which days appear in the result, never the scores themselves.
-        if chandra_mode == 'strict' and (puja_names or avoid_names):
-            return []
-        if chandra_mode == 'puja_ok' and avoid_names:
-            return []
-
     rules = ACTIVITY_RULES[activity]
     skip_yogas = set(rules.get('skip_on_yoga', ()))
-    prefer_chog = rules.get('prefer_choghadiya')  # ('Block', bonus) or None
+    prefer_chog = rules.get('prefer_choghadiya')   # ('Block', bonus) or None
     avoid_karana_names = set(rules.get('avoid_karana', ()))
-    prefer_tithi_class = rules.get('prefer_tithi_class')  # 'Nanda'|... or None
+    prefer_tithi_class = rules.get('prefer_tithi_class')
     prefer_varas = set(rules.get('prefer_vara', ()))
     label = rules['label']
 
-    # Tithi family — universal Rikta penalty (-2) + activity-class bonus (+1).
-    # Tithi family is mode-independent like every other scoring component;
-    # it never filters days.
-    try:
-        tithi_fam = tithi_family(day.tithi.name)
-    except ValueError:
-        tithi_fam = None
-    if tithi_fam == 'Rikta':
-        day_bonus -= 2
-        day_reasons.append(f'{day.tithi.name} (Rikta tithi) (-2)')
-    elif tithi_fam is not None and prefer_tithi_class and tithi_fam == prefer_tithi_class:
-        day_bonus += 1
-        day_reasons.append(f'{day.tithi.name} ({prefer_tithi_class}) favoured for {label} (+1)')
-
-    # Vara — activity-preferred weekday (+1). No penalty on non-preferred.
-    if day.vaaram in prefer_varas:
-        day_bonus += 1
-        day_reasons.append(f'{day.vaaram} favoured for {label} (+1)')
-
-    for y in day.special_yogas:
-        if y in _YOGA_BONUS:
-            day_bonus += _YOGA_BONUS[y]
-            day_reasons.append(f'{y} day (+{_YOGA_BONUS[y]})')
-        if y in _YOGA_PENALTY:
-            if y in skip_yogas:
-                return []  # activity defers on this yoga (samskaras on Visha/Dagdha etc.)
-            day_bonus += _YOGA_PENALTY[y]
-            day_reasons.append(f'{y} day ({_YOGA_PENALTY[y]})')
+    # Vara is sunrise-anchored (one constant per panchangam day).
+    vara_bonus = 1 if day.vaaram in prefer_varas else 0
+    vara_reason = (f'{day.vaaram} favoured for {label} (+1)'
+                   if vara_bonus else None)
 
     bad = [(w.start, w.end) for w in
            [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
            + list(day.varjyam) + list(day.durmuhurtham)]
-
     if avoid_karana_names:
         bad += [(k.start, k.end) for k in day.karana if k.name in avoid_karana_names]
-
     abhijit = day.abhijit_muhurta
     amrita = list(day.amrita_kalam)
+
+    # Engine-precise mode: per-slot facts via engine.facts_at(start).
+    # Snapshot mode: every slot sees the day's sunrise facts.
+    use_engine = engine is not None and hasattr(engine, 'facts_at')
+    snapshot = _day_snapshot_facts(day) if not use_engine else None
 
     slots = []
     for block in day.choghadiya:
@@ -306,8 +344,36 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         for s, e in _subtract(block.start, block.end, bad):
             if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
                 continue
-            score = base + day_bonus
-            reasons = [f'{block.name} choghadiya (+{base})', 'clear of all inauspicious windows'] + day_reasons
+            facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                    if use_engine else snapshot
+
+            # Special yogas (slot-time when engine given)
+            yoga_bonus, yoga_reasons, defer = _score_special_yogas(
+                facts.special_yogas, skip_yogas)
+            if defer:
+                continue
+
+            # Tarabalam (slot-time nakshatra)
+            tara_bonus, tara_reasons = _score_tara(janma_nakshatras, facts.nakshatra)
+
+            # Chandrabalam (slot-time moon rashi + mode filter)
+            chandra_bonus, chandra_reasons, dropped = _score_chandra(
+                janma_nakshatras, janma_rasis, facts.lunar_sign, chandra_mode)
+            if dropped:
+                continue
+
+            # Tithi class (slot-time tithi)
+            tithi_bonus, tithi_reasons = _score_tithi_class(
+                facts.tithi, prefer_tithi_class, label)
+
+            score = base + vara_bonus + tara_bonus + chandra_bonus \
+                    + tithi_bonus + yoga_bonus
+            reasons = [f'{block.name} choghadiya (+{base})',
+                       'clear of all inauspicious windows']
+            reasons += tara_reasons + chandra_reasons + tithi_reasons + yoga_reasons
+            if vara_reason:
+                reasons.append(vara_reason)
+
             if abhijit and _overlaps(s, e, abhijit.start, abhijit.end):
                 score += 2
                 reasons.append('overlaps Abhijit Muhurta (+2)')
@@ -315,12 +381,13 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 score += 2
                 reasons.append('overlaps Amrita Kalam (+2)')
             if prefer_chog and block.name == prefer_chog[0]:
-                bonus = prefer_chog[1]
-                score += bonus
-                reasons.append(f'{block.name} favoured for {label} (+{bonus})')
+                score += prefer_chog[1]
+                reasons.append(f'{block.name} favoured for {label} (+{prefer_chog[1]})')
             for kname in avoid_karana_names:
                 reasons.append(f'{kname} karana avoided')
+
             slots.append({'date': day.date.isoformat(), 'vaaram': day.vaaram,
                           'start': s, 'end': e, 'score': score, 'reasons': reasons})
+
     slots.sort(key=lambda x: (-x['score'], x['start']))
     return slots

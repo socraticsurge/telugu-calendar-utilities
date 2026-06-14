@@ -391,6 +391,94 @@ def test_unknown_tithi_name_does_not_explode():
         tithi_family('Unknown Mystery Tithi')
 
 
+# --- B1-Heavy: per-slot precision via engine.facts_at() ---
+
+def test_engine_kwarg_changes_late_slot_nakshatra():
+    """On 2026-06-17 with engine passed, a slot starting after
+    day.nakshatra.end uses the new nakshatra for tarabalam — the score
+    can differ from the same slot computed in snapshot mode."""
+    day = _day(2026, 6, 17)
+    # Snapshot mode (no engine): all slots score using sunrise Punarvasu
+    snap = day_slots(day, janma_nakshatras=['Pushya'])
+    # Engine mode: slots after Punarvasu's end use the next nakshatra
+    eng_slots = day_slots(day, janma_nakshatras=['Pushya'], engine=ENGINE)
+    # Pushya's tara on Punarvasu (sunrise) = Parama Mitra (favourable, +1)
+    # Pushya's tara on Pushya (post-transition) = Janma (-1)
+    # So a late-day slot in engine mode should carry the avoid reason.
+    late_eng_reasons = [r for s in eng_slots
+                        if s['start'] >= day.nakshatra.end
+                        for r in s['reasons']]
+    if late_eng_reasons:
+        # We have at least one late slot — verify nakshatra-driven swing
+        assert any('tarabalam avoid' in r and 'Janma' in r for r in late_eng_reasons), \
+            f'late slot should show Janma when nakshatra transitions: {late_eng_reasons}'
+
+
+def test_engine_kwarg_preserves_early_slot_tara():
+    """An early slot (before nakshatra.end) scores identically with or
+    without engine — the slot-time nakshatra equals sunrise nakshatra."""
+    day = _day(2026, 6, 17)
+    snap = day_slots(day, janma_nakshatras=['Pushya'])
+    eng_slots = day_slots(day, janma_nakshatras=['Pushya'], engine=ENGINE)
+    if not snap or not eng_slots:
+        return
+    # Find the first slot whose end is before day.nakshatra.end
+    early_eng = next((s for s in eng_slots if s['end'] <= day.nakshatra.end), None)
+    early_snap = next((s for s in snap if s['end'] <= day.nakshatra.end and
+                       s['start'] == early_eng['start']), None) if early_eng else None
+    if early_eng and early_snap:
+        assert early_eng['score'] == early_snap['score'], \
+            f'early slot should score the same in both modes; ' \
+            f'eng={early_eng["score"]} snap={early_snap["score"]}'
+
+
+def test_sarvartha_lapses_for_late_slot():
+    """2026-06-25: Sarvartha Siddhi at sunrise via Swati. After Swati ends,
+    new nakshatra (Vishakha for Drik) is not in Guruvaram's Sarvartha set
+    — late slots in engine mode should NOT carry the Sarvartha bonus."""
+    day = _day(2026, 6, 25)
+    assert 'Sarvartha Siddhi Yoga' in day.special_yogas
+    eng_slots = day_slots(day, engine=ENGINE)
+    # Slots after Swati's end (Drik: 10:59 UTC) should not have Sarvartha
+    for s in eng_slots:
+        if s['start'] >= day.nakshatra.end:
+            for r in s['reasons']:
+                assert 'Sarvartha Siddhi Yoga' not in r, \
+                    f'late slot at {s["start"]} should not credit Sarvartha; got {r}'
+
+
+def test_sarvartha_active_for_early_slot():
+    """The same 2026-06-25 should still credit Sarvartha for slots ending
+    before Swati's end."""
+    day = _day(2026, 6, 25)
+    eng_slots = day_slots(day, engine=ENGINE)
+    early = [s for s in eng_slots if s['end'] <= day.nakshatra.end]
+    assert early, 'fixture: expected at least one slot before nakshatra transition'
+    assert any('Sarvartha Siddhi Yoga' in r for s in early for r in s['reasons'])
+
+
+def test_engine_kwarg_does_not_break_mcp_path():
+    """Through the MCP tool — verify it still produces results."""
+    import json
+    from telugu_panchangam.mcp.tools import tool_find_muhurta
+    result = json.loads(tool_find_muhurta('2026-06-15', 5, 'any', 'Hyderabad'))
+    assert result['slots']
+    # Score is the sum of its (+n)/(-n) reasons
+    for s in result['slots']:
+        bonuses = []
+        for r in s['reasons']:
+            # Match trailing (+N) or (-N)
+            import re
+            m = re.search(r'\(([+-]\d+)\)\s*$', r)
+            if m:
+                bonuses.append(int(m.group(1)))
+        # Reasons may include the constant 'clear of all inauspicious windows'
+        # and karana-avoided lines that don't have a number — those are fine.
+        # We just verify the sum matches the score.
+        assert sum(bonuses) == s['score'], \
+            f'reasons {bonuses} should sum to {s["score"]} but got {sum(bonuses)}'
+
+
 def test_invalid_chandra_mode_raises():
     with pytest.raises(ValueError):
         day_slots(_day(2026, 6, 17), chandra_mode='bogus')
