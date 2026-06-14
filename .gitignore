@@ -10,6 +10,7 @@ docs/superpowers/
 
 # Harness / Claude Code internals
 .claude/
+CLAUDE.md
 dashboard.html
 docs/tracking/
 docs/plans/
