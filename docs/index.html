@@ -178,6 +178,20 @@
     .mu-when { font-weight: 700; color: #1e1b4b; white-space: nowrap; }
     .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
                 background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
+    /* Tier chip — Batch C #15 */
+    .mu-tier { font-size: 0.66rem; font-weight: 800; padding: 0.06rem 0.5rem; border-radius: 999px;
+               letter-spacing: 0.05em; text-transform: uppercase; }
+    .mu-tier-excellent { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+    .mu-tier-good      { background: #ecfeff; color: #155e75; border: 1px solid #67e8f9; }
+    .mu-tier-fair      { background: #fef9c3; color: #713f12; border: 1px solid #fde047; }
+    .mu-tier-avoid     { background: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
+    /* Dropped-days disclosure — Batch C #17 */
+    .mu-dropped { margin-top: 0.7rem; padding: 0.6rem 0.8rem; background: #f8fafc;
+                  border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.78rem; color: #475569; }
+    .mu-dropped summary { cursor: pointer; font-weight: 600; color: #1e1b4b; }
+    .mu-dropped ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+    .mu-dropped li { margin: 0.2rem 0; }
+    .mu-dropped .dd-date { font-weight: 700; color: #1e1b4b; }
     .mu-reasons { font-size: 0.74rem; color: #64748b; width: 100%; }
     /* Grouped reason categories — Batch C #16 */
     .mu-rgroups { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem; }
@@ -1915,6 +1929,14 @@
                           'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1 };
   const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
 
+  // Tier mapping — mirror telugu_panchangam/personal/muhurta.score_tier
+  function muScoreTier(score) {
+    if (score >= 7) return 'Excellent';
+    if (score >= 4) return 'Good';
+    if (score >= 1) return 'Fair';
+    return 'Avoid';
+  }
+
   // Nitya Yoga scoring — mirror telugu_panchangam/personal/nitya_yoga.py
   const MU_NITYA_HARD_AVOID = new Set(['Vyatipata', 'Vaidhriti']);
   const MU_NITYA_HARD_PENALTY = -2;
@@ -2244,14 +2266,22 @@
       let droppedEclipseDays = 0;
       let droppedModeDays = 0;
       let droppedModeSlots = 0;
+      const droppedDays = [];
+      const slotsPerDay = new Map();   // YYYY-MM-DD → count
       for (let i = 0; i < nDays; i++) {
         const d = new Date(from); d.setDate(d.getDate() + i);
         const ev = events.get(stampOf(d));
         if (!ev) continue;
         const data = parseDescription(ev.description);
+        const isoDate = stampOf(d).replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
 
         // Eclipse: auspicious activities are deferred outright.
-        if (data.eclipse) { droppedEclipseDays++; continue; }
+        if (data.eclipse) {
+          droppedEclipseDays++;
+          const kind = data.eclipse.kind || 'Eclipse';
+          droppedDays.push({ date: isoDate, reason: `${kind} — auspicious activities deferred` });
+          continue;
+        }
 
         const rules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
         const skipYogas = new Set(rules.skip_on_yoga || []);
@@ -2421,13 +2451,47 @@
               group_fit: groupFit, activity_match: activityMatch, notes,
             };
             const reasons = [...slotQuality, ...groupFit, ...dayQuality, ...activityMatch];
-            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups });
+            slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, tier: muScoreTier(score) });
+            slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
           }
+        }
+        // Diagnose: if the day produced no slots and it wasn't an eclipse,
+        // record the most likely reason (samskara skip, mode filter, etc.).
+        if (!slotsPerDay.has(isoDate)) {
+          let reason = null;
+          // Samskara skip on Visha/Dagdha
+          for (const y of data.yogas) {
+            if (skipYogas.has(y)) {
+              reason = `${y} — ${activityLabel} traditionally avoids this day`;
+              break;
+            }
+          }
+          // Samskara skip on Vyatipata/Vaidhriti (Nitya yoga at sunrise)
+          if (!reason && skipYogas.size && data.yoga && MU_NITYA_HARD_AVOID.has(data.yoga.name)) {
+            reason = `${data.yoga.name} yoga — samskaras traditionally defer`;
+          }
+          // chandra_mode filter at the day level
+          if (!reason && people.length && chandraMode !== 'stars' && data.lunarSign) {
+            let hasAvoid = false, hasRemedial = false;
+            for (const pr of people) {
+              if (!pr.rasi) continue;
+              const c2 = chandraOf(pr.rasi, data.lunarSign);
+              if (!c2) continue;
+              if (!MU_CHANDRA_GOOD.has(c2.pos) && !MU_CHANDRA_PUJA.has(c2.pos)) hasAvoid = true;
+              else if (MU_CHANDRA_PUJA.has(c2.pos)) hasRemedial = true;
+            }
+            if (chandraMode === 'strict' && (hasAvoid || hasRemedial)) {
+              reason = 'chandra_mode=strict — Moon at sunrise fails for at least one person';
+            } else if (chandraMode === 'puja_ok' && hasAvoid) {
+              reason = 'chandra_mode=puja_ok — someone has Moon-avoid (4/8/12)';
+            }
+          }
+          if (reason) droppedDays.push({ date: isoDate, reason });
         }
       }
       droppedModeDays = droppedModeSlots;
       slots.sort((a, b) => b.score - a.score || a.d - b.d || a.s0 - b.s0);
-      MU_LAST = { top: slots.slice(0, 10), droppedEclipseDays, droppedModeDays, activity, people, chandraMode };
+      MU_LAST = { top: slots.slice(0, 10), droppedEclipseDays, droppedModeDays, droppedDays, activity, people, chandraMode };
       renderMuhurta();
     } catch (e) {
       box.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
@@ -2467,14 +2531,23 @@
   function renderMuhurta() {
     if (!MU_LAST) return;
     const box = document.getElementById('mu-result');
-    const { top, droppedEclipseDays = 0, droppedModeDays = 0 } = MU_LAST;
+    const { top, droppedEclipseDays = 0, droppedModeDays = 0, droppedDays = [] } = MU_LAST;
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const fmtIso = iso => {
+      const [y, mo, da] = iso.split('-').map(Number);
+      return new Date(y, mo - 1, da).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    };
+    const droppedHtml = droppedDays.length
+      ? `<details class="mu-dropped"><summary>${droppedDays.length} day${droppedDays.length>1?'s':''} filtered — see why</summary>
+           <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> — ${muEsc(dd.reason)}</li>`).join('')}</ul>
+         </details>`
+      : '';
     if (!top.length) {
       const notes = [];
       if (droppedEclipseDays) notes.push(`${droppedEclipseDays} eclipse day(s) deferred`);
-      if (droppedModeDays) notes.push(`${droppedModeDays} day(s) filtered by chandra mode`);
+      if (droppedModeDays) notes.push(`${droppedModeDays} slot(s) filtered by chandra mode`);
       const suffix = notes.length ? ` — ${notes.join(', ')}` : '';
-      box.innerHTML = `<p class="preview-error">No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.</p>`;
+      box.innerHTML = `<p class="preview-error">No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.</p>${droppedHtml}`;
       return;
     }
     const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
@@ -2496,8 +2569,11 @@
              ${renderGroup('Notes', rg.notes, 'mu-rg-notes')}
            </div>`
         : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
+      const tier = s.tier || muScoreTier(s.score);
+      const tierClass = `mu-tier-${tier.toLowerCase()}`;
       return `<div class="mu-slot ${i === 0 ? 'top' : ''}">
                 <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
+                <span class="mu-tier ${tierClass}">${tier}</span>
                 <span class="mu-score">score ${s.score}</span>
                 ${groupsHtml}
               </div>`;
@@ -2505,6 +2581,7 @@
     box.innerHTML =
       `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found — best first${share}</div>`
       + top.map(renderSlot).join('')
+      + droppedHtml
       + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across
          Slot quality (choghadiya, Abhijit/Amrita overlap), Day quality (Siddhi yogas, Nitya yoga, Rikta tithi),
          Group fit (per-person tarabalam and chandrabalam), and Activity match (preferred tithi class / vara).

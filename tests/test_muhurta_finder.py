@@ -550,6 +550,95 @@ def test_reason_groups_score_consistency():
             f'groups sum {total} != score {s["score"]} ({rg})'
 
 
+# --- Tier mapping (Batch C #15) ---
+
+def test_score_tier_thresholds():
+    from telugu_panchangam.personal.muhurta import score_tier
+    # Excellent: ≥ 7
+    assert score_tier(7) == 'Excellent'
+    assert score_tier(15) == 'Excellent'
+    # Good: 4..6
+    assert score_tier(6) == 'Good'
+    assert score_tier(4) == 'Good'
+    # Fair: 1..3
+    assert score_tier(3) == 'Fair'
+    assert score_tier(1) == 'Fair'
+    # Avoid: ≤ 0
+    assert score_tier(0) == 'Avoid'
+    assert score_tier(-5) == 'Avoid'
+
+
+def test_each_slot_carries_a_tier():
+    """Every slot has a `tier` field matching its score band."""
+    from telugu_panchangam.personal.muhurta import score_tier
+    day = _day(2026, 6, 17)
+    slots = day_slots(day)
+    assert slots
+    for s in slots:
+        assert s['tier'] == score_tier(s['score'])
+        assert s['tier'] in ('Excellent', 'Good', 'Fair', 'Avoid')
+
+
+# --- dropped_days transparency (Batch C #17) ---
+
+def test_diagnose_day_eclipse():
+    from telugu_panchangam.personal.muhurta import diagnose_day
+    # 2027-08-02: total solar eclipse, Hyderabad
+    day = _day(2027, 8, 2, include_eclipse=True)
+    reason = diagnose_day(day)
+    assert reason and 'eclipse' in reason.lower()
+
+
+def test_diagnose_day_samskara_skip_on_dagdha():
+    from telugu_panchangam.personal.muhurta import diagnose_day
+    # 2026-06-17 has Dagdha Yoga — wedding defers
+    day = _day(2026, 6, 17)
+    reason = diagnose_day(day, activity='wedding')
+    assert reason and 'Dagdha' in reason
+
+
+def test_diagnose_day_samskara_skip_on_vaidhriti():
+    from telugu_panchangam.personal.muhurta import diagnose_day
+    # 2026-07-02 has Vaidhriti at sunrise
+    day = _day(2026, 7, 2)
+    reason = diagnose_day(day, activity='wedding')
+    assert reason and 'Vaidhriti' in reason
+
+
+def test_diagnose_day_returns_none_when_clear():
+    from telugu_panchangam.personal.muhurta import diagnose_day
+    # 2026-06-16 — clean day (Bhadra tithi, no special yogas)
+    day = _day(2026, 6, 16)
+    assert diagnose_day(day, activity='any') is None
+
+
+def test_mcp_find_muhurta_emits_dropped_days():
+    import json
+    from telugu_panchangam.mcp.tools import tool_find_muhurta
+    # Wedding over 2026-06-16 to 2026-06-20 — should drop 06-17 (Dagdha)
+    # and 06-18 (Dagdha is gone, but Rikta + Sarvartha Siddhi might mix);
+    # let's just verify dropped_days exists and at least the Dagdha day
+    # appears for wedding activity.
+    result = json.loads(tool_find_muhurta('2026-06-16', 5, 'wedding', 'Hyderabad'))
+    assert 'dropped_days' in result
+    # The 17th has Dagdha Yoga — must show up in dropped_days for wedding
+    dropped_dates = {dd['date'] for dd in result['dropped_days']}
+    assert '2026-06-17' in dropped_dates, f'expected Dagdha day in dropped_days; got {result["dropped_days"]}'
+    # Each dropped entry has a date and a reason
+    for dd in result['dropped_days']:
+        assert 'date' in dd and 'reason' in dd
+        assert isinstance(dd['reason'], str) and dd['reason']
+
+
+def test_mcp_find_muhurta_emits_tier_on_each_slot():
+    import json
+    from telugu_panchangam.mcp.tools import tool_find_muhurta
+    result = json.loads(tool_find_muhurta('2026-06-15', 5, 'any', 'Hyderabad'))
+    assert result['slots']
+    for s in result['slots']:
+        assert s['tier'] in ('Excellent', 'Good', 'Fair', 'Avoid')
+
+
 def test_unknown_tithi_name_does_not_explode():
     # Robustness: tithi_family is wrapped in try/except inside day_slots,
     # so an unknown tithi name silently skips tithi-class scoring.
