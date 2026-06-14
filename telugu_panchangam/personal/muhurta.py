@@ -17,6 +17,11 @@ from telugu_panchangam.personal.chandrabalam import (
     CHANDRA_GOOD, CHANDRA_PUJA, chandra_position,
 )
 from telugu_panchangam.personal.tithi_class import tithi_family
+from telugu_panchangam.personal.nitya_yoga import (
+    NITYA_HARD_AVOID, NITYA_HARD_PENALTY,
+    NITYA_PARTIAL_DOSHA_WINDOW, NITYA_PARTIAL_PENALTY,
+    NITYA_AUSPICIOUS, NITYA_AUSPICIOUS_BONUS,
+)
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MIN_SLOT_MINUTES = 24  # one ghati
@@ -244,6 +249,45 @@ def _score_special_yogas(special_yogas, skip_yogas):
     return bonus, reasons, False
 
 
+def _score_nitya_yoga(yoga_name, slot_start, day, skip_on_hard_avoid):
+    """Score the slot's Nitya yoga (the 27 sun-moon longitudinal yogas).
+
+    Returns (bonus, reasons, defer_on_hard_avoid).
+
+    - Hard-avoid (Vyatipata, Vaidhriti): -2 day_bonus + reason. Also
+      defers the slot when `skip_on_hard_avoid` is True (samskaras).
+    - Partial-avoid (Vishkambha/Atiganda/Shoola/Ganda/Vyaghata/Parigha):
+      -1 only if the slot is inside the yoga's dosha-window measured
+      from when the yoga began. We use `day.yoga.start` when the slot's
+      yoga matches the sunrise yoga; otherwise we treat `day.yoga.end`
+      as the start of the new yoga (a 1-transition heuristic that
+      covers the common case).
+    - Auspicious yogas (Siddhi, Shubha, Brahma, etc): +1.
+    - Neutral yogas: 0.
+    """
+    if yoga_name in NITYA_HARD_AVOID:
+        if skip_on_hard_avoid:
+            return 0, [], True
+        return NITYA_HARD_PENALTY, [f'{yoga_name} yoga ({NITYA_HARD_PENALTY})'], False
+    if yoga_name in NITYA_PARTIAL_DOSHA_WINDOW:
+        window = NITYA_PARTIAL_DOSHA_WINDOW[yoga_name]
+        # Best-effort yoga-start: sunrise yoga if it matches, else the
+        # boundary at day.yoga.end (where the next yoga began).
+        if day.yoga.name == yoga_name:
+            yoga_start = day.yoga.start
+        else:
+            yoga_start = day.yoga.end
+        if slot_start - yoga_start <= window:
+            return NITYA_PARTIAL_PENALTY, \
+                [f'{yoga_name} yoga dosha-window ({NITYA_PARTIAL_PENALTY})'], False
+        # Outside the dosha-window — neutral
+        return 0, [], False
+    if yoga_name in NITYA_AUSPICIOUS:
+        return NITYA_AUSPICIOUS_BONUS, \
+               [f'{yoga_name} yoga (+{NITYA_AUSPICIOUS_BONUS})'], False
+    return 0, [], False
+
+
 def _day_snapshot_facts(day):
     """Fallback when no engine is provided — wrap the day's sunrise spans
     as a SlotFacts so the per-slot scoring path can use the same code."""
@@ -366,11 +410,19 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
             tithi_bonus, tithi_reasons = _score_tithi_class(
                 facts.tithi, prefer_tithi_class, label)
 
+            # Nitya yoga (slot-time yoga). Samskara activities defer on
+            # Vyatipata/Vaidhriti the same way they defer on Visha/Dagdha.
+            skip_on_nitya_hard = bool(skip_yogas)  # any activity with samskara skip
+            nitya_bonus, nitya_reasons, defer_nitya = _score_nitya_yoga(
+                facts.yoga, s, day, skip_on_nitya_hard)
+            if defer_nitya:
+                continue
+
             score = base + vara_bonus + tara_bonus + chandra_bonus \
-                    + tithi_bonus + yoga_bonus
+                    + tithi_bonus + yoga_bonus + nitya_bonus
             reasons = [f'{block.name} choghadiya (+{base})',
                        'clear of all inauspicious windows']
-            reasons += tara_reasons + chandra_reasons + tithi_reasons + yoga_reasons
+            reasons += tara_reasons + chandra_reasons + tithi_reasons + yoga_reasons + nitya_reasons
             if vara_reason:
                 reasons.append(vara_reason)
 
