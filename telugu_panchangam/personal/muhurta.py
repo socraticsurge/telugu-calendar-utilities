@@ -16,6 +16,7 @@ from telugu_panchangam.personal.tarabalam import (
 from telugu_panchangam.personal.chandrabalam import (
     CHANDRA_GOOD, CHANDRA_PUJA, chandra_position,
 )
+from telugu_panchangam.personal.tithi_class import tithi_family
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MIN_SLOT_MINUTES = 24  # one ghati
@@ -43,54 +44,92 @@ ACTIVITY_RULES: dict[str, dict] = {
     'purchase':      {'label': 'Purchase (general)',
                       'prefer_choghadiya': ('Labh', 1)},
     'ceremony':      {'label': 'Ceremony / puja (general)',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_vara': ['Somavaram', 'Guruvaram']},
     'beginning':     {'label': 'New beginning (general)',
-                      'prefer_choghadiya': ('Amrit', 1)},
+                      'prefer_choghadiya': ('Amrit', 1),
+                      'prefer_tithi_class': 'Nanda',
+                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
     # — Samskaras —
     'wedding':       {'label': 'Wedding (Vivaha)',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Purna',
+                      'prefer_vara': ['Guruvaram', 'Somavaram']},
     'engagement':    {'label': 'Engagement (Nischayam)',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Purna',
+                      'prefer_vara': ['Guruvaram', 'Somavaram']},
     'naming':        {'label': 'Naming (Namakaranam)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
-                      'prefer_choghadiya': ('Shubh', 1)},
+                      'prefer_choghadiya': ('Shubh', 1),
+                      'prefer_tithi_class': 'Nanda',
+                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
     'annaprasana':   {'label': 'Annaprasana (First feeding)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
-                      'prefer_choghadiya': ('Shubh', 1)},
+                      'prefer_choghadiya': ('Shubh', 1),
+                      'prefer_tithi_class': 'Bhadra',
+                      'prefer_vara': ['Somavaram', 'Guruvaram']},
     'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Bhadra',
+                      'prefer_vara': ['Budhavaram', 'Shukravaram']},
     'mundana':       {'label': 'Mundana / Chaula (First head-shave)',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Nanda',
+                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
     'upanayana':     {'label': 'Upanayana (Sacred thread)',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Nanda',
+                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
     'vidyarambha':   {'label': 'Education start (Vidyarambha)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
-                      'prefer_choghadiya': ('Amrit', 1)},
+                      'prefer_choghadiya': ('Amrit', 1),
+                      'prefer_tithi_class': 'Nanda',
+                      'prefer_vara': ['Budhavaram']},
     'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Bhadra',
+                      'prefer_vara': ['Guruvaram', 'Somavaram']},
     # — Acquisitions —
     'vehicle':       {'label': 'Vehicle purchase',
-                      'prefer_choghadiya': ('Labh', 1)},
+                      'prefer_choghadiya': ('Labh', 1),
+                      'prefer_tithi_class': 'Bhadra',
+                      'prefer_vara': ['Shukravaram']},
     'property':      {'label': 'Property / Land purchase',
-                      'prefer_choghadiya': ('Labh', 1)},
+                      'prefer_choghadiya': ('Labh', 1),
+                      'prefer_tithi_class': 'Bhadra',
+                      'prefer_vara': ['Guruvaram', 'Shukravaram']},
     'gold':          {'label': 'Gold / Jewelry purchase',
-                      'prefer_choghadiya': ('Labh', 1)},
+                      'prefer_choghadiya': ('Labh', 1),
+                      'prefer_tithi_class': 'Bhadra',
+                      'prefer_vara': ['Shukravaram', 'Guruvaram']},
     # — Construction & Ventures —
     'bhumi_puja':    {'label': 'Bhumi Puja / Foundation laying',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Bhadra',
+                      'prefer_vara': ['Guruvaram', 'Somavaram']},
     'business':      {'label': 'Business launch',
-                      'prefer_choghadiya': ('Amrit', 1)},
+                      'prefer_choghadiya': ('Amrit', 1),
+                      'prefer_tithi_class': 'Nanda',
+                      'prefer_vara': ['Guruvaram', 'Budhavaram']},
     'job':           {'label': 'Job start / Contract signing',
-                      'prefer_choghadiya': ('Amrit', 1)},
+                      'prefer_choghadiya': ('Amrit', 1),
+                      'prefer_tithi_class': 'Nanda',
+                      'prefer_vara': ['Guruvaram', 'Budhavaram']},
     # — Spiritual —
     'yajna':         {'label': 'Yajna / Homam',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP)},
+                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'prefer_tithi_class': 'Purna',
+                      'prefer_vara': ['Guruvaram', 'Somavaram']},
     'pilgrimage':    {'label': 'Pilgrimage (Tirtha Yatra)',
                       'avoid_karana': ['Vishti']},
     # — Civil & Medical —
-    'court':         {'label': 'Court / legal matter'},
+    'court':         {'label': 'Court / legal matter',
+                      'prefer_tithi_class': 'Jaya',
+                      'prefer_vara': ['Mangalavaram']},
     'surgery':       {'label': 'Surgery / medical procedure',
-                      'avoid_karana': ['Vishti']},
+                      'avoid_karana': ['Vishti'],
+                      'prefer_vara': ['Mangalavaram']},
 }
 
 ACTIVITIES = tuple(ACTIVITY_RULES.keys())
@@ -216,6 +255,28 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     prefer_chog = rules.get('prefer_choghadiya')  # ('Block', bonus) or None
     avoid_karana_names = set(rules.get('avoid_karana', ()))
+    prefer_tithi_class = rules.get('prefer_tithi_class')  # 'Nanda'|... or None
+    prefer_varas = set(rules.get('prefer_vara', ()))
+    label = rules['label']
+
+    # Tithi family — universal Rikta penalty (-2) + activity-class bonus (+1).
+    # Tithi family is mode-independent like every other scoring component;
+    # it never filters days.
+    try:
+        tithi_fam = tithi_family(day.tithi.name)
+    except ValueError:
+        tithi_fam = None
+    if tithi_fam == 'Rikta':
+        day_bonus -= 2
+        day_reasons.append(f'{day.tithi.name} (Rikta tithi) (-2)')
+    elif tithi_fam is not None and prefer_tithi_class and tithi_fam == prefer_tithi_class:
+        day_bonus += 1
+        day_reasons.append(f'{day.tithi.name} ({prefer_tithi_class}) favoured for {label} (+1)')
+
+    # Vara — activity-preferred weekday (+1). No penalty on non-preferred.
+    if day.vaaram in prefer_varas:
+        day_bonus += 1
+        day_reasons.append(f'{day.vaaram} favoured for {label} (+1)')
 
     for y in day.special_yogas:
         if y in _YOGA_BONUS:
@@ -237,7 +298,6 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     abhijit = day.abhijit_muhurta
     amrita = list(day.amrita_kalam)
 
-    label = rules['label']
     slots = []
     for block in day.choghadiya:
         base = GOOD_CHOGHADIYA.get(block.name)
