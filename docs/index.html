@@ -2825,6 +2825,7 @@
   const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
 
   // Tier mapping — mirror telugu_panchangam/personal/muhurta.score_tier
+  const MU_TIER_NAMES = ['Avoid', 'Fair', 'Good', 'Excellent'];
   function muScoreTier(score) {
     if (score >= 7) return 'Excellent';
     if (score >= 4) return 'Good';
@@ -3401,7 +3402,8 @@
         }
       }
       droppedModeDays = droppedModeSlots;
-      slots.sort((a, b) => b.score - a.score
+      slots.sort((a, b) => MU_TIER_NAMES.indexOf(b.tier) - MU_TIER_NAMES.indexOf(a.tier)
+        || b.score - a.score
         || (!!a.personalDosha - !!b.personalDosha) || a.d - b.d || a.s0 - b.s0);
       MU_LAST = { top: slots.slice(0, 10), droppedEclipseDays, droppedModeDays, droppedDays, activity, people, chandraMode };
       renderMuhurta();

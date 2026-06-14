@@ -19,7 +19,7 @@ from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_ve
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.phalalu import rasi_phalalu
-from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, ACTIVITIES
+from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, ACTIVITIES, TIER_NAMES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -612,7 +612,8 @@ def tool_find_muhurta(
             for s in day_results:
                 slots.append({**s, 'start': _fmt_time(s['start'], tz),
                               'end': _fmt_time(s['end'], tz)})
-        slots.sort(key=lambda x: (-x['score'], x['personal_dosha'] is not None,
+        slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
+                                  x['personal_dosha'] is not None,
                                   x['date'], x['start']))
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
@@ -631,7 +632,8 @@ def tool_find_muhurta(
                           'activity_match, notes) for transparent reasoning. '
                           'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '
                           'flags an unrectified personal Moon caution: such slots are capped '
-                          'below Excellent and sort after equally-scored clean slots. '
+                          'below Excellent, and slots are ranked tier-first (Excellent > Good > '
+                          'Fair > Avoid), then by score, then preferring personally-clean slots. '
                           'A guide for everyday timing — for weddings and major samskaras, '
                           'consult your purohit.',
         })
