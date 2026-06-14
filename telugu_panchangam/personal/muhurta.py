@@ -86,7 +86,8 @@ def assign_tiers(slots: list[dict]) -> None:
     ceiling, floor = max(scores), min(scores)
     for s in slots:
         tier = relative_tier(s['score'], ceiling, floor)
-        if s['personal_dosha'] is not None and tier == 'Excellent':
+        if tier == 'Excellent' and (s['personal_dosha'] is not None
+                                     or s['day_dosha'] is not None):
             tier = 'Good'
         s['tier'] = tier
 
@@ -655,9 +656,24 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 personal_dosha = 'chandra_remedial'
             else:
                 personal_dosha = None
+
+            # Day-level dosha (Rikta tithi, Visha/Dagdha yoga, Vyatipata/
+            # Vaidhriti) — same "can't be Excellent" treatment as a
+            # personal chandra dosha: these are traditionally avoided
+            # regardless of how high other yogas push the score.
+            if tithi_fam == 'Rikta':
+                day_dosha = 'rikta_tithi'
+            elif any(y in _YOGA_PENALTY for y in facts.special_yogas):
+                day_dosha = 'visha_dagdha_yoga'
+            elif facts.yoga in NITYA_HARD_AVOID:
+                day_dosha = 'vyatipata_vaidhriti'
+            else:
+                day_dosha = None
+
             slots.append({'date': day.date.isoformat(), 'vaaram': day.vaaram,
                           'start': s, 'end': e, 'score': score,
                           'personal_dosha': personal_dosha,
+                          'day_dosha': day_dosha,
                           'reasons': reasons, 'reason_groups': reason_groups})
 
     # Tier each slot relative to the scores found on this day, then sort
