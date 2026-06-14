@@ -14,29 +14,38 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --indigo: #4338ca; --indigo-bg: #eef2ff; --indigo-border: #c7d2fe;
-      --amber: #92400e; --amber-bg: #fffbeb; --amber-border: #fde68a;
-      --green: #166534; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+      --indigo: #8E2A1F; --indigo-bg: rgba(142,42,31,0.08); --indigo-border: rgba(142,42,31,0.22);
+      --amber: #A56B1E; --amber-bg: rgba(165,107,30,0.09); --amber-border: rgba(165,107,30,0.30);
+      --green: #4F6B2C; --green-bg: rgba(79,107,44,0.09); --green-border: rgba(79,107,44,0.30);
       --brand: #8E2A1F;
       --brand-display: 'Libre Baskerville', 'Fraunces', Georgia, serif;
+      --brand-sans: 'Inter', system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; color: #1e1b4b; background: #f8fafc; margin: 0; padding: 0 1rem 2rem; line-height: 1.6; }
+    body { font-family: var(--brand-sans); color: #1F1A17; background: #F2ECDF; margin: 0; padding: 0 1rem 2rem; line-height: 1.6; }
     .page { max-width: 760px; margin: 0 auto; }
 
     html { scroll-behavior: smooth; }
     .hero { text-align: center; padding: 1.75rem 0 1.25rem; }
-    .hero h1 { font-family: var(--brand-display); font-size: 2.1rem; margin: 0; letter-spacing: 0.005em; line-height: 1.2; }
-    .hero .tagline { color: #475569; font-size: 0.95rem; margin: 0.5rem auto 0; max-width: 540px; }
+    .hero .brand-row { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+    .hero .sunmoon { flex: none; animation: none; }
+    .hero h1 { font-family: var(--brand-display); font-size: 2.1rem; font-weight: 400; margin: 0; letter-spacing: 0.005em; line-height: 1.2; color: #1F1A17; }
+    .hero h1 em {
+      font-style: italic; font-weight: 400;
+      background: linear-gradient(135deg, #b83a2a 0%, #8E2A1F 50%, #6d1f16 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .hero .tagline { color: #58504A; font-size: 0.95rem; margin: 0.5rem auto 0; max-width: 540px; }
     .hero .tagline-short { display: none; }
     .hero .hero-cta { display: inline-block; margin-top: 1rem; text-decoration: none; padding: 0.6rem 1.3rem; font-size: 0.9rem; }
     @media (max-width: 620px) {
       .hero { padding: 0.9rem 0 0.75rem; }
-      .hero h1 { font-size: 1.6rem; line-height: 1.15; }
-      .hero .sunmoon { font-size: 1.3rem; }
+      .hero .brand-row { gap: 0.4rem; }
+      .hero h1 { font-size: 1.5rem; line-height: 1.15; }
+      .hero .sunmoon { width: 34px; height: 34px; }
       .hero .tagline-full { display: none; }
       .hero .tagline-short { display: block; font-size: 0.88rem; margin-top: 0.35rem; }
       .hero .hero-cta { margin-top: 0.7rem; padding: 0.5rem 1rem; font-size: 0.85rem; }
@@ -45,7 +54,7 @@
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
     @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-    .card { background: #fff; border: 1px solid #dbe2ea; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 4px 18px rgba(100,116,139,0.18), 0 1px 3px rgba(15,23,42,0.08); }
+    .card { background: #fff; border: 1px solid #DDD2BC; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 4px 18px rgba(139,131,119,0.18), 0 1px 3px rgba(31,26,23,0.08); }
     @media (max-width: 620px) {
       .card { padding: 0.85rem; }
       body { padding: 0 0.7rem 2rem; }
@@ -65,31 +74,31 @@
       .tb-remove { padding: 0 0.6rem; }
     }
     .card h2 { margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
-    .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+    .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #8B8377; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
 
     .selector-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.6rem 0 1rem; }
     .selector { display: flex; flex-direction: column; gap: 0.2rem; }
-    .selector label { font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .selector label { font-size: 0.7rem; color: #B5AC9C; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
     .selector select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--indigo-border); background: var(--indigo-bg); color: var(--indigo); font-weight: 600; min-width: 160px; }
 
-    .url-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.9rem; font-family: monospace; font-size: 0.8rem; margin: 0.5rem 0; word-break: break-all; }
+    .url-box { background: #F2ECDF; border: 1px solid #DDD2BC; border-radius: 8px; padding: 0.6rem 0.9rem; font-family: monospace; font-size: 0.8rem; margin: 0.5rem 0; word-break: break-all; }
     .btn { background: var(--indigo); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
-    .btn:hover { background: #3730a3; }
+    .btn:hover { background: #6d1f16; }
     .copy-confirm { margin-left: 0.75rem; color: #16a34a; display: none; font-size: 0.8rem; }
 
     .app-tabs { display: flex; gap: 0.4rem; margin-top: 0.85rem; }
-    .app-tab { font-size: 0.75rem; padding: 0.3rem 0.7rem; border-radius: 6px 6px 0 0; background: #f1f5f9; color: #64748b; cursor: pointer; border: none; font-family: inherit; }
+    .app-tab { font-size: 0.75rem; padding: 0.3rem 0.7rem; border-radius: 6px 6px 0 0; background: #FBF6EB; color: #8B8377; cursor: pointer; border: none; font-family: inherit; }
     .app-tab.active { background: var(--indigo-bg); color: var(--indigo); font-weight: 600; }
     .app-panel { background: var(--indigo-bg); border-radius: 0 8px 8px 8px; padding: 0.7rem; font-size: 0.8rem; display: none; }
     .app-panel.active { display: block; }
-    .app-panel ol { margin: 0; padding-left: 1.2rem; color: #475569; }
+    .app-panel ol { margin: 0; padding-left: 1.2rem; color: #58504A; }
     .app-panel ol li { margin-bottom: 0.3rem; }
 
-    .preview-card { border: 1px solid #dbe2ea; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
+    .preview-card { border: 1px solid #DDD2BC; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(139,131,119,0.12); }
     .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; position: relative; padding-right: 3rem; }
     .preview-head .date { font-weight: 700; font-size: 0.95rem; }
     .preview-head .meta { font-size: 0.78rem; opacity: 0.85; margin-top: 0.1rem; }
-    .preview-head .badge { display: inline-block; background: #fbbf24; color: #78350f; font-size: 0.75rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
+    .preview-head .badge { display: inline-block; background: #C98A3A; color: #5C3D10; font-size: 0.75rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
 
     .flag-strip { background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); padding: 0.45rem 0.9rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
     .special-chip { display: inline-block; background: #fff; color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700; }
@@ -98,14 +107,14 @@
     .anga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; padding: 0.7rem 0.9rem 0.25rem; }
     @media (max-width: 620px) { .anga-grid { grid-template-columns: repeat(2, 1fr); } }
     .anga-cell { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px; padding: 0.45rem 0.4rem; text-align: center; }
-    .anga-label { font-size: 0.7rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; }
-    .anga-name { font-size: 0.88rem; font-weight: 700; color: #1e1b4b; margin-top: 0.1rem; }
-    .anga-time { font-size: 0.75rem; color: #475569; margin-top: 0.05rem; white-space: nowrap; }
-    sup.plus1 { font-size: 0.62em; font-weight: 700; color: #d97706; cursor: help; }
-    .preview-head sup.plus1 { color: #fbbf24; }
+    .anga-label { font-size: 0.7rem; font-weight: 700; color: #8E2A1F; text-transform: uppercase; letter-spacing: 0.05em; }
+    .anga-name { font-size: 0.88rem; font-weight: 700; color: #1F1A17; margin-top: 0.1rem; }
+    .anga-time { font-size: 0.75rem; color: #58504A; margin-top: 0.05rem; white-space: nowrap; }
+    sup.plus1 { font-size: 0.62em; font-weight: 700; color: #A56B1E; cursor: help; }
+    .preview-head sup.plus1 { color: #C98A3A; }
     .preview-head .meta.sky { margin-top: 0.25rem; opacity: 1; font-size: 0.78rem; }
 
-    .tile-strip { border-top: 1px solid #f1f5f9; padding: 0.6rem 0.9rem 0.75rem; }
+    .tile-strip { border-top: 1px solid #FBF6EB; padding: 0.6rem 0.9rem 0.75rem; }
     .strip-title { font-size: 0.75rem; font-weight: 700; color: var(--indigo); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem; }
     .strip-title.good-t { color: #16a34a; }
     .strip-title.bad-t { color: #dc2626; }
@@ -118,16 +127,16 @@
     .chog-name { font-size: 0.78rem; font-weight: 700; }
     .chog-cell.good .chog-name { color: var(--green); }
     .chog-cell.bad .chog-name { color: #b91c1c; }
-    .chog-time { font-size: 0.72rem; color: #475569; }
-    .preview-note { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0 0; }
-    .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #eef2f7; }
-    .tool-tab { font-family: inherit; font-size: 0.95rem; font-weight: 700; color: #94a3b8;
+    .chog-time { font-size: 0.72rem; color: #58504A; }
+    .preview-note { font-size: 0.75rem; color: #B5AC9C; margin: 0.6rem 0 0; }
+    .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #E7DECC; }
+    .tool-tab { font-family: inherit; font-size: 0.95rem; font-weight: 700; color: #B5AC9C;
                 background: none; border: none; cursor: pointer; padding: 0.4rem 0.65rem 0.55rem;
                 border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
     .tool-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; flex: 1 1 0; }
-    .tool-tab .ts { font-size: 0.72rem; font-weight: 500; color: #94a3b8; }
-    .tool-tab.active .ts { color: #818cf8; }
+    .tool-tab .ts { font-size: 0.72rem; font-weight: 500; color: #B5AC9C; }
+    .tool-tab.active .ts { color: #b83a2a; }
     @media (max-width: 620px) {
       .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 0.15rem; }
       .tool-tabs::-webkit-scrollbar { display: none; }
@@ -140,87 +149,87 @@
                color: var(--indigo); font-weight: 600; font-family: inherit; }
     .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 12px;
                    padding: 0.85rem; margin-top: 0.85rem; }
-    .tb-controls-title { font-size: 0.72rem; font-weight: 700; color: #6366f1; text-transform: uppercase;
+    .tb-controls-title { font-size: 0.72rem; font-weight: 700; color: #8E2A1F; text-transform: uppercase;
                          letter-spacing: 0.06em; margin-bottom: 0.7rem; display: flex; justify-content: space-between; align-items: center; }
-    .tb-reset { background: none; border: none; color: #94a3b8; font-size: 0.68rem; font-weight: 600;
+    .tb-reset { background: none; border: none; color: #B5AC9C; font-size: 0.68rem; font-weight: 600;
                 cursor: pointer; text-transform: none; letter-spacing: 0; font-family: inherit; text-decoration: underline; }
     .tb-reset:hover { color: #b91c1c; }
 
     /* Sub-section cards inside .tb-controls — Tarabalam and Muhurtam forms
        use these to give each input group its own contextual space. Applied
        on both web and mobile. */
-    .tb-section { background: #fff; border: 1px solid #e8ecf3; border-radius: 10px;
+    .tb-section { background: #fff; border: 1px solid #DDD2BC; border-radius: 10px;
                   padding: 0.75rem 0.9rem 0.85rem; margin-bottom: 0.65rem; }
     .tb-section:last-of-type { margin-bottom: 0; }
     .tb-section-head { display: flex; align-items: center; justify-content: space-between;
                        gap: 0.5rem; margin-bottom: 0.55rem; padding-bottom: 0.45rem;
-                       border-bottom: 1px solid #f1f5f9; }
-    .tb-section-label { font-size: 0.7rem; font-weight: 700; color: #6366f1;
+                       border-bottom: 1px solid #FBF6EB; }
+    .tb-section-label { font-size: 0.7rem; font-weight: 700; color: #8E2A1F;
                         text-transform: uppercase; letter-spacing: 0.08em; }
     .tb-section .selector-row { margin: 0; }
     .tb-cta { width: 100%; padding: 0.78rem 1.25rem; margin-top: 0.6rem;
               border-radius: 999px; font-size: 0.92rem; letter-spacing: 0.005em; }
     .tb-controls .tb-profile-row select, .tb-controls .tb-date { background: #fff; }
     .tb-controls .tb-add { background: #fff; }
-    .tb-controls .tb-add:hover { background: #f1f5f9; }
+    .tb-controls .tb-add:hover { background: #FBF6EB; }
     .tb-profile-row { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap; align-items: center; }
     .tb-profile-row input[type=text] { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
-               border: 1px solid #e2e8f0; font-family: inherit; width: 170px; }
+               border: 1px solid #DDD2BC; font-family: inherit; width: 170px; }
     .tb-profile-row select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid var(--indigo-border); background: var(--indigo-bg);
                color: var(--indigo); font-weight: 600; min-width: 170px; }
-    .tb-you { font-size: 0.7rem; color: #94a3b8; font-weight: 700; }
-    .tb-filter { font-size: 0.8rem; color: #475569; display: inline-flex; gap: 0.4rem; align-items: center; margin: 0.5rem 0; }
+    .tb-you { font-size: 0.7rem; color: #B5AC9C; font-weight: 700; }
+    .tb-filter { font-size: 0.8rem; color: #58504A; display: inline-flex; gap: 0.4rem; align-items: center; margin: 0.5rem 0; }
     .tb-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem; }
     .tb-table th { text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em;
-                   color: #94a3b8; padding: 0.4rem 0.5rem; border-bottom: 1px solid #eef2f7; }
+                   color: #B5AC9C; padding: 0.4rem 0.5rem; border-bottom: 1px solid #E7DECC; }
     .tb-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #f6f8fb; vertical-align: middle; }
     .tb-table tr.tb-all { background: #fcfdf4; }
-    .tb-date-cell { font-weight: 700; color: #1e1b4b; white-space: nowrap; }
-    .tb-sub { font-size: 0.72rem; color: #94a3b8; }
+    .tb-date-cell { font-weight: 700; color: #1F1A17; white-space: nowrap; }
+    .tb-sub { font-size: 0.72rem; color: #B5AC9C; }
     .tara-chip { display: inline-block; border-radius: 6px; padding: 0.08rem 0.5rem; font-weight: 700; font-size: 0.78rem; white-space: nowrap; }
     .tb-cards { display: none; }
     @media (max-width: 620px) {
       .tb-table-wrap { display: none; }
       .tb-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.6rem; }
-      .tb-card { border: 1px solid #eef2f7; border-radius: 10px; padding: 0.55rem 0.7rem; background: #fcfdfe; }
+      .tb-card { border: 1px solid #E7DECC; border-radius: 10px; padding: 0.55rem 0.7rem; background: #FFFFFF; }
       .tb-card.tb-all { background: #fcfdf4; border-color: #d9f99d; }
       .tb-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
-      .tb-card-flag { font-size: 0.75rem; color: #b45309; font-weight: 700; }
-      .tb-card-sub { font-size: 0.74rem; color: #64748b; margin-top: 0.05rem; }
-      .tb-card-row { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.35rem; margin-top: 0.35rem; border-top: 1px solid #f1f5f9; }
-      .tb-card-row .tb-sub { flex: 1; min-width: 0; font-size: 0.78rem; color: #1e1b4b; font-weight: 600; }
+      .tb-card-flag { font-size: 0.75rem; color: #8A5518; font-weight: 700; }
+      .tb-card-sub { font-size: 0.74rem; color: #8B8377; margin-top: 0.05rem; }
+      .tb-card-row { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.35rem; margin-top: 0.35rem; border-top: 1px solid #FBF6EB; }
+      .tb-card-row .tb-sub { flex: 1; min-width: 0; font-size: 0.78rem; color: #1F1A17; font-weight: 600; }
       .tb-card-row .tara-chip { white-space: nowrap; }
     }
     .tara-chip.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
     .tara-chip.bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
     .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
     .tara-chip.puja { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-    .tb-star { color: #b45309; font-size: 1rem; }
-    .tb-intro { font-size: 0.85rem; color: #475569; margin: 0.2rem 0 0.6rem; }
+    .tb-star { color: #8A5518; font-size: 1rem; }
+    .tb-intro { font-size: 0.85rem; color: #58504A; margin: 0.2rem 0 0.6rem; }
     .tb-add { background: none; border: 1px dashed var(--indigo-border); color: var(--indigo);
               border-radius: 8px; padding: 0.35rem 0.8rem; font-size: 0.8rem; font-weight: 600;
               cursor: pointer; font-family: inherit; margin-top: 0.1rem; }
     .tb-add:hover { background: var(--indigo-bg); }
-    .tb-remove { background: none; border: none; color: #cbd5e1; font-size: 1rem; cursor: pointer; padding: 0 0.2rem; }
+    .tb-remove { background: none; border: none; color: #DDD2BC; font-size: 1rem; cursor: pointer; padding: 0 0.2rem; }
     .tb-remove:hover { color: #b91c1c; }
     .tb-summary { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
                   background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 8px;
-                  padding: 0.5rem 0.75rem; margin-top: 0.75rem; font-size: 0.83rem; color: #78350f; }
+                  padding: 0.5rem 0.75rem; margin-top: 0.75rem; font-size: 0.83rem; color: #5C3D10; }
     .tb-summary .count { font-weight: 800; }
     .tb-toggle { margin-left: auto; font-size: 0.78rem; color: #92400e; display: inline-flex; gap: 0.35rem; align-items: center; cursor: pointer; }
     .go-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(86px, auto));
-                gap: 2px; background: #c7d2fe; border: 2px solid #c7d2fe; border-radius: 10px; overflow: hidden; margin-top: 0.8rem; }
+                gap: 2px; background: #DCC1B5; border: 2px solid #DCC1B5; border-radius: 10px; overflow: hidden; margin-top: 0.8rem; }
     .go-box { background: #fff; padding: 0.3rem 0.35rem; position: relative; min-height: 86px; }
-    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;
+    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #B5AC9C; text-transform: uppercase; letter-spacing: 0.04em;
                      display: inline-block; padding-right: 1.1rem; }
-    .go-box .house { position: absolute; top: 0.25rem; right: 0.35rem; font-size: 0.62rem; font-weight: 700; color: #c7d2fe; }
+    .go-box .house { position: absolute; top: 0.25rem; right: 0.35rem; font-size: 0.62rem; font-weight: 700; color: #DCC1B5; }
     .go-box.janma { outline: 2px solid var(--indigo); outline-offset: -2px; }
     .go-box.janma .rname { color: var(--indigo); }
     .go-center { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--indigo-bg); display: flex; flex-direction: column;
                  align-items: center; justify-content: center; text-align: center; padding: 0.5rem; gap: 0.25rem; }
     .go-center .d1 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; color: var(--indigo); font-size: 1.05rem; }
-    .go-center .d2 { font-size: 0.72rem; color: #6366f1; }
+    .go-center .d2 { font-size: 0.72rem; color: #8E2A1F; }
     .go-g { display: inline-block; border-radius: 5px; padding: 0.05rem 0.35rem; font-size: 0.72rem; font-weight: 700;
             margin: 0.12rem 0.12rem 0 0; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); }
     .go-g.good { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
@@ -228,16 +237,16 @@
     .go-g.bad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
     .go-g.bad::after { content: ' ✗'; font-size: 0.85em; }
     .go-retro { font-size: 0.6rem; vertical-align: super; }
-    .go-moves { margin-top: 0.6rem; font-size: 0.76rem; color: #475569; }
-    .go-moves b { color: #1e1b4b; }
+    .go-moves { margin-top: 0.6rem; font-size: 0.76rem; color: #58504A; }
+    .go-moves b { color: #1F1A17; }
     .mu-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.8rem;
-               border: 1px solid #eef2f7; border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: #fcfdfe; }
+               border: 1px solid #E7DECC; border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: #FFFFFF; }
     .mu-slot.top { background: var(--green-bg); border-color: var(--green-border); }
-    .mu-when { font-weight: 700; color: #1e1b4b; white-space: nowrap; }
+    .mu-when { font-weight: 700; color: #1F1A17; white-space: nowrap; }
     .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
                 background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
-    .mu-reasons { font-size: 0.74rem; color: #64748b; width: 100%; }
-    .go-phalalu { margin-top: 0.8rem; background: #fffdf7; border: 1px solid var(--amber-border);
+    .mu-reasons { font-size: 0.74rem; color: #8B8377; width: 100%; }
+    .go-phalalu { margin-top: 0.8rem; background: #FBF6EB; border: 1px solid var(--amber-border);
                   border-radius: 10px; padding: 0.75rem 0.95rem; }
     .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
                      text-transform: uppercase; letter-spacing: 0.05em; }
@@ -251,9 +260,9 @@
     .go-cond .chip { display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 0.15rem 0.6rem; font-weight: 700; font-size: 0.8rem; margin-right: 0.35rem; }
     .go-pick { background: #fff; border: 1px solid var(--indigo-border); color: var(--indigo); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin: 0 0.25rem 0.25rem 0; font-family: inherit; }
     .go-pick:hover { background: var(--indigo-bg); }
-    .tb-readme { margin-top: 0.7rem; padding: 0.6rem 0.75rem; background: #fbfcfe; border: 1px solid #eef2f7;
-                 border-radius: 8px; font-size: 0.76rem; color: #475569; display: flex; flex-direction: column; gap: 0.3rem; }
-    .tb-readme-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+    .tb-readme { margin-top: 0.7rem; padding: 0.6rem 0.75rem; background: #FFFFFF; border: 1px solid #E7DECC;
+                 border-radius: 8px; font-size: 0.76rem; color: #58504A; display: flex; flex-direction: column; gap: 0.3rem; }
+    .tb-readme-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #B5AC9C; }
     .tb-readme .tara-chip { margin-right: 0.25rem; }
     .wa-share-mini { position: absolute; top: 0.6rem; right: 0.7rem; width: 32px; height: 32px;
                      border-radius: 50%; background: #25d366; color: #fff; border: none; cursor: pointer;
@@ -263,15 +272,15 @@
     .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
 
     .fmt-toggle { display: inline-flex; border: 1px solid var(--indigo-border); border-radius: 8px; overflow: hidden; }
-    .fmt-toggle button { border: none; background: #fff; color: #64748b; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
+    .fmt-toggle button { border: none; background: #fff; color: #8B8377; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
     .fmt-toggle button.active { background: var(--indigo-bg); color: var(--indigo); }
 
     .upcoming-list { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.75rem; }
-    .upcoming-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.45rem 0.6rem; border: 1px solid #eef2f7; border-radius: 8px; background: #fcfdfe; flex-wrap: wrap; }
-    .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1e1b4b; min-width: 7.5rem; white-space: nowrap; }
-    .upcoming-date .dow { color: #94a3b8; font-weight: 600; }
+    .upcoming-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.45rem 0.6rem; border: 1px solid #E7DECC; border-radius: 8px; background: #FFFFFF; flex-wrap: wrap; }
+    .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1F1A17; min-width: 7.5rem; white-space: nowrap; }
+    .upcoming-date .dow { color: #B5AC9C; font-weight: 600; }
     .upcoming-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; flex: 1 1 auto; min-width: 0; }
-    .upcoming-in { font-size: 0.72rem; color: #94a3b8; margin-left: auto; white-space: nowrap; }
+    .upcoming-in { font-size: 0.72rem; color: #B5AC9C; margin-left: auto; white-space: nowrap; }
     @media (max-width: 620px) {
       .upcoming-row { flex-direction: column; align-items: flex-start; gap: 0.3rem; padding: 0.5rem 0.65rem; }
       .upcoming-date { display: flex; justify-content: space-between; width: 100%; min-width: 0; font-size: 0.78rem; }
@@ -280,7 +289,7 @@
       .upcoming-in { display: none; }
     }
 
-    .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 0 2px 8px rgba(100,116,139,0.12); }
+    .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 0 2px 8px rgba(139,131,119,0.12); }
     .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
     .sys-card.ss { background: var(--amber-bg); border: 1px solid var(--amber-border); }
     .sys-card.vakya { background: var(--green-bg); border: 1px solid var(--green-border); }
@@ -288,29 +297,29 @@
     .sys-card.drik h3 { color: var(--indigo); }
     .sys-card.ss h3 { color: var(--amber); }
     .sys-card.vakya h3 { color: var(--green); }
-    .sys-card p { margin: 0.35rem 0; font-size: 0.85rem; color: #475569; }
+    .sys-card p { margin: 0.35rem 0; font-size: 0.85rem; color: #58504A; }
     .read-more { font-size: 0.8rem; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; }
     .sys-card.drik .read-more { color: var(--indigo); }
     .sys-card.ss .read-more { color: var(--amber); }
     .sys-card.vakya .read-more { color: var(--green); }
-    .expanded { display: none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(0,0,0,0.08); font-size: 0.8rem; color: #475569; }
+    .expanded { display: none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(0,0,0,0.08); font-size: 0.8rem; color: #58504A; }
     .expanded.open { display: block; }
     .expanded a { color: inherit; font-weight: 600; }
 
-    .tip { font-size: 0.8rem; color: #94a3b8; margin-bottom: 0; }
+    .tip { font-size: 0.8rem; color: #B5AC9C; margin-bottom: 0; }
 
-    .mcp-tagline { font-size: 0.85rem; color: #475569; margin: 0 0 1rem; }
+    .mcp-tagline { font-size: 0.85rem; color: #58504A; margin: 0 0 1rem; }
     .mcp-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; }
-    .mcp-tool { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.8rem; }
+    .mcp-tool { background: #F2ECDF; border: 1px solid #DDD2BC; border-radius: 8px; padding: 0.6rem 0.8rem; }
     .mcp-tool code { display: block; font-size: 0.78rem; color: var(--indigo); font-weight: 700; margin-bottom: 0.2rem; }
-    .mcp-tool span { font-size: 0.75rem; color: #64748b; }
-    .mcp-install { background: #1e1b4b; border-radius: 10px; padding: 0.9rem 1rem; margin: 0.75rem 0; }
-    .mcp-install h4 { margin: 0 0 0.5rem; font-size: 0.7rem; color: #818cf8; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
-    .mcp-install pre { margin: 0; font-size: 0.78rem; color: #e2e8f0; font-family: monospace; white-space: pre-wrap; line-height: 1.6; }
+    .mcp-tool span { font-size: 0.75rem; color: #8B8377; }
+    .mcp-install { background: #1F1A17; border-radius: 10px; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+    .mcp-install h4 { margin: 0 0 0.5rem; font-size: 0.7rem; color: #b83a2a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .mcp-install pre { margin: 0; font-size: 0.78rem; color: #DDD2BC; font-family: monospace; white-space: pre-wrap; line-height: 1.6; }
     .mcp-clients { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
     .mcp-client { font-size: 0.75rem; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.2rem 0.6rem; font-weight: 600; }
 
-    footer { text-align: center; font-size: 0.8rem; color: #94a3b8; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 0.3rem; }
+    footer { text-align: center; font-size: 0.8rem; color: #B5AC9C; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 0.3rem; }
     footer a { color: var(--indigo); }
 
     /* ---------- Mobile shell — only active under 620px via body[data-mode] ---------- */
@@ -330,11 +339,11 @@
       position: fixed; top: 0; left: 0; right: 0; height: 52px;
       padding: 0 0.85rem; background: rgba(255,255,255,0.94);
       backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px);
-      border-bottom: 1px solid #eef2f7; z-index: 50;
+      border-bottom: 1px solid #E7DECC; z-index: 50;
     }
     #m-topbar .m-brand {
       font-family: var(--brand-display); font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 0.005em; color: #1e1b4b; flex: 1; min-width: 0; text-align: left;
+      letter-spacing: 0.005em; color: #1F1A17; flex: 1; min-width: 0; text-align: left;
       line-height: 1.15; display: flex; align-items: center; gap: 0.4rem;
     }
     #m-topbar .m-brand .m-brand-mark {
@@ -343,10 +352,10 @@
     #m-topbar .m-brand .m-brand-word { display: inline; white-space: normal; }
     #m-topbar .m-icon-btn {
       width: 36px; height: 36px; border-radius: 10px; border: 0; background: transparent;
-      font-size: 1.15rem; color: #475569; cursor: pointer; display: flex;
+      font-size: 1.15rem; color: #58504A; cursor: pointer; display: flex;
       align-items: center; justify-content: center; font-family: inherit; flex: none;
     }
-    #m-topbar .m-icon-btn:active { background: #eef2f7; }
+    #m-topbar .m-icon-btn:active { background: #E7DECC; }
     #m-topbar .m-cog { font-size: 1.25rem; line-height: 1; }
     #m-topbar .m-text-btn {
       flex: none; height: 34px; padding: 0 0.6rem; border-radius: 999px;
@@ -355,7 +364,7 @@
       display: flex; align-items: center; gap: 0.3rem; cursor: pointer;
       white-space: nowrap;
     }
-    #m-topbar .m-text-btn:active { background: #c7d2fe; }
+    #m-topbar .m-text-btn:active { background: #DCC1B5; }
     @media (max-width: 360px) {
       #m-topbar .m-text-btn .m-text-btn-label { display: none; }
       #m-topbar .m-text-btn { padding: 0 0.5rem; }
@@ -365,22 +374,22 @@
       display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: 64px;
       background: rgba(255,255,255,0.96); backdrop-filter: saturate(180%) blur(10px);
       -webkit-backdrop-filter: saturate(180%) blur(10px);
-      border-top: 1px solid #eef2f7; z-index: 50;
+      border-top: 1px solid #E7DECC; z-index: 50;
       padding-bottom: env(safe-area-inset-bottom, 0);
     }
     #m-bottomnav .m-tab {
       flex: 1 1 0; min-width: 0; background: transparent; border: 0; cursor: pointer;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 1px; padding: 0.3rem 0.2rem; color: #94a3b8; font-family: inherit;
+      gap: 1px; padding: 0.3rem 0.2rem; color: #B5AC9C; font-family: inherit;
       font-size: 0.78rem; font-weight: 600;
     }
     #m-bottomnav .m-tab .m-tab-emoji { font-size: 1.15rem; line-height: 1; }
-    #m-bottomnav .m-tab .m-tab-sub { font-size: 0.62rem; font-weight: 500; color: #cbd5e1; line-height: 1.1; }
+    #m-bottomnav .m-tab .m-tab-sub { font-size: 0.62rem; font-weight: 500; color: #DDD2BC; line-height: 1.1; }
     #m-bottomnav .m-tab.active { color: var(--indigo); }
-    #m-bottomnav .m-tab.active .m-tab-sub { color: #818cf8; }
+    #m-bottomnav .m-tab.active .m-tab-sub { color: #b83a2a; }
 
     body[data-mode="mobile"] #m-drawer-scrim {
-      display: block; position: fixed; inset: 0; background: rgba(15,23,42,0.4);
+      display: block; position: fixed; inset: 0; background: rgba(31,26,23,0.4);
       z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
     }
     body[data-mode="mobile"].m-settings-open #m-drawer-scrim,
@@ -395,11 +404,11 @@
       overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
     body[data-mode="mobile"] .m-drawer-left {
-      left: 0; box-shadow: 8px 0 24px rgba(15,23,42,0.18);
+      left: 0; box-shadow: 8px 0 24px rgba(31,26,23,0.18);
       transform: translateX(-100%);
     }
     body[data-mode="mobile"] .m-drawer-right {
-      right: 0; box-shadow: -8px 0 24px rgba(15,23,42,0.18);
+      right: 0; box-shadow: -8px 0 24px rgba(31,26,23,0.18);
       transform: translateX(100%);
     }
     body[data-mode="mobile"].m-settings-open  #m-settings-drawer  { transform: translateX(0); }
@@ -407,27 +416,27 @@
 
     .m-drawer .m-drawer-head {
       position: sticky; top: 0; display: flex; align-items: center;
-      padding: 1rem 1rem 0.9rem; border-bottom: 1px solid #eef2f7; background: #fff;
+      padding: 1rem 1rem 0.9rem; border-bottom: 1px solid #E7DECC; background: #fff;
       font-family: var(--brand-display); font-size: 1.18rem; font-weight: 700;
-      color: #1e1b4b; z-index: 1; letter-spacing: 0.005em;
+      color: #1F1A17; z-index: 1; letter-spacing: 0.005em;
     }
     .m-drawer .m-drawer-head .m-drawer-close {
       margin-left: auto; width: 36px; height: 36px; border-radius: 10px;
-      border: 0; background: transparent; font-size: 1rem; color: #64748b; cursor: pointer;
+      border: 0; background: transparent; font-size: 1rem; color: #8B8377; cursor: pointer;
     }
     .m-drawer .m-drawer-body { padding: 0.5rem 0.85rem 2rem; }
-    .m-drawer .m-drawer-body .card { margin: 0.75rem 0; box-shadow: none; border: 1px solid #eef2f7; }
+    .m-drawer .m-drawer-body .card { margin: 0.75rem 0; box-shadow: none; border: 1px solid #E7DECC; }
     .m-drawer .m-drawer-hint {
-      font-size: 0.78rem; color: #64748b; line-height: 1.5;
+      font-size: 0.78rem; color: #8B8377; line-height: 1.5;
       margin: 0.5rem 0.1rem 0.6rem; padding: 0;
     }
     .m-drawer .m-about {
-      padding: 0.75rem; font-size: 0.85rem; color: #475569; line-height: 1.5;
-      border: 1px solid #eef2f7; border-radius: 12px; background: #fcfdfe; margin: 0.75rem 0;
+      padding: 0.75rem; font-size: 0.85rem; color: #58504A; line-height: 1.5;
+      border: 1px solid #E7DECC; border-radius: 12px; background: #FFFFFF; margin: 0.75rem 0;
     }
-    .m-drawer .m-about strong { color: #1e1b4b; }
+    .m-drawer .m-about strong { color: #1F1A17; }
     .m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
-    .m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #94a3b8; text-align: center; }
+    .m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #B5AC9C; text-align: center; }
     .m-drawer .m-source a { color: var(--indigo); }
 
     /* Brand wordmark: drop the symmetric right-side spacer on phones and
@@ -452,9 +461,9 @@
 
     /* Drawer placement for relocated selectors — sit them as discrete rows */
     .m-drawer .selector { display: flex; flex-direction: column; gap: 0.3rem;
-                         padding: 0.6rem 0.75rem; border: 1px solid #eef2f7;
-                         border-radius: 12px; background: #fcfdfe; margin: 0.5rem 0; }
-    .m-drawer .selector > label { font-size: 0.72rem; color: #64748b;
+                         padding: 0.6rem 0.75rem; border: 1px solid #E7DECC;
+                         border-radius: 12px; background: #FFFFFF; margin: 0.5rem 0; }
+    .m-drawer .selector > label { font-size: 0.72rem; color: #8B8377;
                                   text-transform: uppercase; letter-spacing: 0.04em;
                                   font-weight: 700; }
     .m-drawer .selector select { width: 100%; }
@@ -465,13 +474,13 @@
        the date so the row reads as one sentence. */
     body[data-mode="mobile"] .upcoming-date { justify-content: flex-start; }
     body[data-mode="mobile"] .upcoming-date { gap: 0.35rem; align-items: baseline; }
-    body[data-mode="mobile"] .upcoming-in { display: inline; color: #cbd5e1; font-weight: 500; }
+    body[data-mode="mobile"] .upcoming-in { display: inline; color: #DDD2BC; font-weight: 500; }
 
     /* ---------- Mobile Gochara screen ---------- */
     body[data-mode="mobile"] #panel-gochara > .tb-intro { display: none; }
     body[data-mode="mobile"] #panel-gochara > .read-more {
       display: inline-block; font-size: 0.78rem; padding: 0.2rem 0;
-      margin: 0 0 0.3rem; color: #94a3b8 !important;
+      margin: 0 0 0.3rem; color: #B5AC9C !important;
     }
     /* hide explanatory footnotes on phone; keep the last "Please note" disclaimer */
     body[data-mode="mobile"] #panel-gochara .preview-note { display: none; }
@@ -485,8 +494,8 @@
     body[data-mode="mobile"] #panel-gochara .tb-controls .selector label { font-size: 0.68rem; }
     /* Sade Sati / Ashtama Shani banner prominent above the chart */
     body[data-mode="mobile"] #go-conditions .go-cond {
-      background: linear-gradient(180deg, #fffbeb, #fef3c7);
-      border: 1px solid #fcd34d; border-radius: 12px; padding: 0.65rem 0.8rem; margin: 0.4rem 0 0.6rem;
+      background: linear-gradient(180deg, #FBF6EB, #F5E6D3);
+      border: 1px solid #D9A85C; border-radius: 12px; padding: 0.65rem 0.8rem; margin: 0.4rem 0 0.6rem;
     }
     body[data-mode="mobile"] #go-conditions .chip {
       background: #f59e0b; color: #fff; border: 0; font-weight: 700;
@@ -511,10 +520,10 @@
       gap: 0.3rem; margin-top: 0.7rem;
     }
     body[data-mode="mobile"] .go-moves > b:first-child {
-      font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;
+      font-size: 0.7rem; color: #B5AC9C; text-transform: uppercase; letter-spacing: 0.05em;
     }
     body[data-mode="mobile"] .go-move {
-      display: block; padding: 0.3rem 0.55rem; background: #eef2ff; color: #1e1b4b;
+      display: block; padding: 0.3rem 0.55rem; background: var(--indigo-bg); color: #1F1A17;
       border: 1px solid var(--indigo-border); border-radius: 999px;
       font-size: 0.78rem; line-height: 1.2;
     }
@@ -524,7 +533,7 @@
     body[data-mode="mobile"] #panel-tarabalam > .tb-intro { display: none; }
     body[data-mode="mobile"] #panel-tarabalam > .read-more {
       display: inline-block; font-size: 0.78rem; padding: 0.2rem 0;
-      margin: 0 0 0.3rem; color: #94a3b8 !important;
+      margin: 0 0 0.3rem; color: #B5AC9C !important;
     }
     /* tighter profile + date controls */
     body[data-mode="mobile"] #panel-tarabalam .tb-controls { padding: 0.5rem 0; }
@@ -540,7 +549,7 @@
       gap: 0.5rem; user-select: none;
     }
     body[data-mode="mobile"] #mu-section .tb-controls-title::after {
-      content: '▾'; color: #94a3b8; font-size: 0.8rem;
+      content: '▾'; color: #B5AC9C; font-size: 0.8rem;
       transition: transform 0.18s ease;
     }
     body[data-mode="mobile"] #mu-section.mu-open .tb-controls-title::after { transform: rotate(180deg); }
@@ -551,11 +560,11 @@
     #m-topbar .m-help-btn { width: 36px; height: 36px; }
     #m-topbar .m-help-icon {
       display: inline-flex; width: 22px; height: 22px;
-      border: 1.5px solid #94a3b8; border-radius: 50%;
+      border: 1.5px solid #B5AC9C; border-radius: 50%;
       align-items: center; justify-content: center;
-      font-size: 0.78rem; font-weight: 800; color: #64748b; line-height: 1;
+      font-size: 0.78rem; font-weight: 800; color: #8B8377; line-height: 1;
     }
-    #m-topbar .m-help-btn:active .m-help-icon { background: #eef2f7; }
+    #m-topbar .m-help-btn:active .m-help-icon { background: #E7DECC; }
 
     /* Hide the in-panel intros + read-more guides + their expanded panels on
        mobile — the same content opens from the ? in the top bar instead. */
@@ -574,50 +583,50 @@
       position: fixed; left: 0; right: 0; bottom: 0;
       max-height: 88vh; z-index: 80;
       background: #fff; border-radius: 20px 20px 0 0;
-      box-shadow: 0 -12px 36px rgba(15,23,42,0.22);
+      box-shadow: 0 -12px 36px rgba(31,26,23,0.22);
       transform: translateY(100%); transition: transform 0.24s ease;
     }
     body[data-mode="mobile"].m-help-open #m-help-sheet { transform: translateY(0); }
     body[data-mode="mobile"].m-help-open #m-drawer-scrim { opacity: 1; pointer-events: auto; }
 
     #m-help-sheet .m-sheet-handle {
-      width: 44px; height: 4px; background: #cbd5e1; border-radius: 999px;
+      width: 44px; height: 4px; background: #DDD2BC; border-radius: 999px;
       margin: 0.55rem auto 0.3rem;
     }
     #m-help-sheet .m-sheet-head {
       display: flex; align-items: center; padding: 0.75rem 1.1rem 0.85rem;
-      border-bottom: 1px solid #eef2f7;
+      border-bottom: 1px solid #E7DECC;
       font-family: var(--brand-display); font-size: 1.18rem; font-weight: 700;
-      color: #1e1b4b; letter-spacing: 0.005em;
+      color: #1F1A17; letter-spacing: 0.005em;
     }
     #m-help-sheet .m-sheet-close {
       margin-left: auto; width: 32px; height: 32px; border-radius: 8px;
-      border: 0; background: transparent; color: #64748b; cursor: pointer; font-size: 0.95rem;
+      border: 0; background: transparent; color: #8B8377; cursor: pointer; font-size: 0.95rem;
     }
     #m-help-sheet .m-sheet-body {
       padding: 1rem 1.1rem 1.1rem; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      font-size: 0.88rem; color: #475569; line-height: 1.55; flex: 1 1 auto; min-height: 0;
+      font-size: 0.88rem; color: #58504A; line-height: 1.55; flex: 1 1 auto; min-height: 0;
     }
     #m-help-sheet .m-sheet-body > p { margin: 0.6rem 0; }
     #m-help-sheet .m-sheet-body > p:first-child { margin-top: 0; }
-    #m-help-sheet .m-sheet-body strong { color: #1e1b4b; }
-    #m-help-sheet .m-sheet-body em { color: #1e1b4b; font-style: normal; font-weight: 600; }
+    #m-help-sheet .m-sheet-body strong { color: #1F1A17; }
+    #m-help-sheet .m-sheet-body em { color: #1F1A17; font-style: normal; font-weight: 600; }
     #m-help-sheet .m-sheet-body a { color: var(--indigo); font-weight: 600; }
-    .m-help-mention { white-space: nowrap; color: #1e1b4b; font-weight: 600;
+    .m-help-mention { white-space: nowrap; color: #1F1A17; font-weight: 600;
                       background: var(--indigo-bg); padding: 0.05rem 0.4rem; border-radius: 6px;
                       border: 1px solid var(--indigo-border); font-size: 0.82rem; }
 
     /* Help-sheet Stitch-pattern building blocks */
     #m-help-sheet .help-lead {
-      margin: 0 0 0.85rem; font-size: 0.9rem; color: #475569; line-height: 1.55;
+      margin: 0 0 0.85rem; font-size: 0.9rem; color: #58504A; line-height: 1.55;
     }
     #m-help-sheet .help-section-label {
       font-size: 0.7rem; font-weight: 700; color: var(--indigo);
       text-transform: uppercase; letter-spacing: 0.08em;
-      margin: 1rem 0 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid #eef2f7;
+      margin: 1rem 0 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid #E7DECC;
     }
     #m-help-sheet .help-card {
-      background: #fff; border: 1px solid #eef2f7; border-radius: 12px;
+      background: #fff; border: 1px solid #E7DECC; border-radius: 12px;
       padding: 0.75rem 0.85rem; margin: 0.5rem 0; display: flex; gap: 0.65rem;
       align-items: flex-start;
     }
@@ -632,16 +641,16 @@
     #m-help-sheet .help-card.help-card-bad  .help-card-icon { background: #fee2e2; color: #b91c1c; }
     #m-help-sheet .help-card-body { flex: 1 1 auto; min-width: 0; }
     #m-help-sheet .help-card-title {
-      font-size: 0.92rem; font-weight: 700; color: #1e1b4b; margin: 0 0 0.15rem;
+      font-size: 0.92rem; font-weight: 700; color: #1F1A17; margin: 0 0 0.15rem;
       line-height: 1.25;
     }
     #m-help-sheet .help-card-text {
-      font-size: 0.82rem; color: #475569; line-height: 1.5; margin: 0;
+      font-size: 0.82rem; color: #58504A; line-height: 1.5; margin: 0;
     }
 
     #m-help-sheet .m-sheet-foot {
       flex: none; padding: 0.7rem 1.1rem calc(0.8rem + env(safe-area-inset-bottom, 0));
-      border-top: 1px solid #eef2f7; background: #fff;
+      border-top: 1px solid #E7DECC; background: #fff;
     }
     #m-help-sheet .m-sheet-cta {
       width: 100%; border: 0; border-radius: 999px;
@@ -650,7 +659,7 @@
       letter-spacing: 0.06em; text-transform: uppercase;
       padding: 0.85rem 1rem; cursor: pointer;
     }
-    #m-help-sheet .m-sheet-cta:active { background: #3730a3; }
+    #m-help-sheet .m-sheet-cta:active { background: #6d1f16; }
 
     /* Mobile-only: hide the Tools & setup expansion in the Subscribe drawer
        (interested devotees can read this on PyPI). Desktop unchanged. */
@@ -661,32 +670,32 @@
     /* Outer container becomes a clean white surface; the inner .tb-section
        cards provide the contextual sub-spaces. */
     body[data-mode="mobile"] #panel-tarabalam .tb-controls {
-      background: #fff; border: 1px solid #e8ecf3; border-radius: 16px;
+      background: #fff; border: 1px solid #DDD2BC; border-radius: 16px;
       padding: 0.85rem; margin: 0 0 0.75rem;
-      box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+      box-shadow: 0 1px 3px rgba(31,26,23,0.04);
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-section {
-      background: #fafbfd; border-color: #eef2f7;
+      background: #FBF6EB; border-color: #E7DECC;
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-section-label {
-      font-size: 0.68rem; color: #64748b; letter-spacing: 0.1em;
+      font-size: 0.68rem; color: #8B8377; letter-spacing: 0.1em;
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-reset {
-      color: #94a3b8; font-size: 0.72rem;
+      color: #B5AC9C; font-size: 0.72rem;
     }
 
     /* Soft gray field surface across selects, text inputs and date inputs */
     body[data-mode="mobile"] #panel-tarabalam input[type=text],
     body[data-mode="mobile"] #panel-tarabalam input[type=date],
     body[data-mode="mobile"] #panel-tarabalam select {
-      background: #fff; border: 1px solid #e2e8f0;
+      background: #fff; border: 1px solid #DDD2BC;
       border-radius: 10px; padding: 0.7rem 0.85rem;
-      font-size: 0.92rem; color: #1e1b4b; font-family: inherit;
+      font-size: 0.92rem; color: #1F1A17; font-family: inherit;
       width: 100%;
       -webkit-appearance: none; appearance: none;
     }
     body[data-mode="mobile"] #panel-tarabalam input[type=text]::placeholder {
-      color: #94a3b8;
+      color: #B5AC9C;
     }
     body[data-mode="mobile"] #panel-tarabalam select {
       background-image:
@@ -699,7 +708,7 @@
     body[data-mode="mobile"] #panel-tarabalam input:focus,
     body[data-mode="mobile"] #panel-tarabalam select:focus {
       outline: none; border-color: var(--indigo);
-      box-shadow: 0 0 0 3px rgba(67,56,202,0.12);
+      box-shadow: 0 0 0 3px rgba(142,42,31,0.12);
     }
 
     /* Profile row: name full-width, then birth-star + padam two-up */
@@ -716,7 +725,7 @@
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-remove {
       position: absolute; right: 0; top: 0;
-      color: #cbd5e1; font-size: 1.05rem;
+      color: #DDD2BC; font-size: 1.05rem;
     }
 
     /* + Add a family member: dashed accent button, full width */
@@ -740,7 +749,7 @@
       flex: none; min-width: 0;
     }
     body[data-mode="mobile"] #panel-tarabalam .selector label {
-      font-size: 0.66rem; color: #64748b;
+      font-size: 0.66rem; color: #8B8377;
       text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
       margin-bottom: 0.25rem;
     }
@@ -757,17 +766,17 @@
     body[data-mode="mobile"] #panel-tarabalam .tb-cta {
       padding: 0.9rem 1.25rem; font-size: 0.95rem; font-weight: 700;
       background: var(--indigo); color: #fff; border: 0; border-radius: 999px;
-      box-shadow: 0 6px 14px rgba(67,56,202,0.22); cursor: pointer;
+      box-shadow: 0 6px 14px rgba(142,42,31,0.22); cursor: pointer;
       font-family: inherit;
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-cta:active {
-      background: #3730a3; box-shadow: 0 3px 8px rgba(67,56,202,0.22);
+      background: #6d1f16; box-shadow: 0 3px 8px rgba(142,42,31,0.22);
     }
 
     /* Muhurtam section header keeps the chevron, sits in the same card style.
        The chevron rotates on .mu-open. */
     body[data-mode="mobile"] #mu-section.tb-controls .tb-controls-title {
-      margin-bottom: 0; font-size: 0.74rem; color: #1e1b4b; letter-spacing: 0.08em;
+      margin-bottom: 0; font-size: 0.74rem; color: #1F1A17; letter-spacing: 0.08em;
     }
     body[data-mode="mobile"] #mu-section.mu-open .tb-controls-title {
       margin-bottom: 0.75rem;
@@ -784,32 +793,32 @@
     }
     body[data-mode="mobile"] .anga-grid::before {
       content: 'At a glance'; grid-column: 1 / -1;
-      font-size: 0.7rem; font-weight: 700; color: #64748b;
+      font-size: 0.7rem; font-weight: 700; color: #8B8377;
       text-transform: uppercase; letter-spacing: 0.08em;
       padding-bottom: 0.05rem;
     }
     /* White anga cards with color top-border per anga type */
     body[data-mode="mobile"] .anga-cell {
-      background: #fff; border: 1px solid #e8ecf3; border-top: 3px solid var(--indigo);
+      background: #fff; border: 1px solid #DDD2BC; border-top: 3px solid var(--indigo);
       border-radius: 12px; text-align: left; padding: 0.6rem 0.7rem 0.65rem;
       display: flex; flex-direction: column; gap: 0.1rem;
     }
     body[data-mode="mobile"] .anga-cell[data-kind="nakshatra"] { border-top-color: var(--green); }
-    body[data-mode="mobile"] .anga-cell[data-kind="yoga"]      { border-top-color: #d97706; }
+    body[data-mode="mobile"] .anga-cell[data-kind="yoga"]      { border-top-color: #A56B1E; }
     body[data-mode="mobile"] .anga-cell[data-kind="karana"]    { border-top-color: #b91c1c; }
     body[data-mode="mobile"] .anga-label {
-      font-size: 0.68rem; color: #64748b; letter-spacing: 0.06em;
+      font-size: 0.68rem; color: #8B8377; letter-spacing: 0.06em;
     }
     body[data-mode="mobile"] .anga-name {
-      font-size: 1rem; line-height: 1.2; color: #1e1b4b; margin-top: 0.15rem;
+      font-size: 1rem; line-height: 1.2; color: #1F1A17; margin-top: 0.15rem;
     }
     body[data-mode="mobile"] .anga-time {
-      font-size: 0.74rem; color: #64748b; margin-top: 0.15rem;
+      font-size: 0.74rem; color: #8B8377; margin-top: 0.15rem;
     }
 
     /* "Crucial Timings" — Auspicious / Avoid as table-row cards */
     body[data-mode="mobile"] .tile-strip {
-      padding: 0.85rem 0.85rem 0.55rem; border-top: 1px solid #f1f5f9;
+      padding: 0.85rem 0.85rem 0.55rem; border-top: 1px solid #FBF6EB;
     }
     body[data-mode="mobile"] .strip-title {
       font-size: 0.7rem; letter-spacing: 0.08em; margin-bottom: 0.55rem;
@@ -822,18 +831,18 @@
     body[data-mode="mobile"] .win-grid .chog-cell {
       display: grid; grid-template-columns: 1fr auto; align-items: center;
       gap: 0.5rem; padding: 0.55rem 0.75rem;
-      background: #fff; border: 1px solid #e8ecf3; border-radius: 10px;
+      background: #fff; border: 1px solid #DDD2BC; border-radius: 10px;
       text-align: left;
     }
     body[data-mode="mobile"] .win-grid .chog-cell.good { background: var(--green-bg); border-color: var(--green-border); }
     body[data-mode="mobile"] .win-grid .chog-cell.bad  { background: #fef2f2; border-color: #fecaca; }
     body[data-mode="mobile"] .win-grid .chog-cell .chog-name {
-      font-size: 0.88rem; font-weight: 700; color: #1e1b4b; text-align: left;
+      font-size: 0.88rem; font-weight: 700; color: #1F1A17; text-align: left;
     }
     body[data-mode="mobile"] .win-grid .chog-cell.good .chog-name { color: #14532d; }
     body[data-mode="mobile"] .win-grid .chog-cell.bad  .chog-name { color: #7f1d1d; }
     body[data-mode="mobile"] .win-grid .chog-cell .chog-time {
-      font-size: 0.78rem; color: #1e1b4b; white-space: nowrap; text-align: right;
+      font-size: 0.78rem; color: #1F1A17; white-space: nowrap; text-align: right;
       grid-column: 2; line-height: 1.25;
     }
     body[data-mode="mobile"] .win-grid .chog-cell .chog-time + .chog-time {
@@ -998,7 +1007,7 @@
     </div>
   </div>
 
-  <p style="font-size:0.82rem;color:#64748b;margin-top:1rem;">
+  <p style="font-size:0.82rem;color:#8B8377;margin-top:1rem;">
     Change city, system or time format from <span class="m-help-mention">⚙ Settings</span>.
     Subscribe to the calendar feed from <span class="m-help-mention">📅 Subscribe</span>.
   </p>
@@ -1028,7 +1037,7 @@
 <div class="page">
 
   <div class="hero">
-    <div>
+    <div class="brand-row">
       <svg class="sunmoon" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="width:48px;height:48px;">
         <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
         <ellipse cx="24" cy="24" rx="12" ry="19" transform="rotate(22 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.3" stroke-opacity="0.6"/>
@@ -1036,8 +1045,8 @@
         <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
         <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
       </svg>
+      <h1>Astro<em>Chaganti's Panchangam</em></h1>
     </div>
-    <h1>AstroChaganti's Panchangam</h1>
     <div class="tagline tagline-full">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
     and festival days — plus daily tools: the Gochara chart with Rasi Phalalu, and Tarabalam &amp; Muhurtam
     for your family's good days and time slots. Free, no account, updated automatically.</div>
@@ -1078,8 +1087,8 @@
     <div id="panel-today" role="tabpanel">
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
-    Times marked <sup class="plus1" style="color:#d97706;">+1</sup> fall after midnight on the next day;
-    <sup class="plus1" style="color:#d97706;">−1</sup> means it began the previous day.</p>
+    Times marked <sup class="plus1" style="color:#A56B1E;">+1</sup> fall after midnight on the next day;
+    <sup class="plus1" style="color:#A56B1E;">−1</sup> means it began the previous day.</p>
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
@@ -1187,7 +1196,7 @@
         <p class="preview-note" style="margin-top:0.5rem;" id="mu-context"></p>
       </div>
       <div id="mu-result"></div>
-      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
+      <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
       <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
       finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
@@ -1243,7 +1252,7 @@
       graha counted from the natal Moon sign (janma rashi), with <strong>vedha</strong> (obstruction) checked:
       a favourable transit is blocked when another graha occupies its vedha point (Surya–Shani and Chandra–Budha
       never obstruct each other; Rahu and Ketu neither cause nor receive vedha).</p>
-      <p class="preview-note" style="border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
+      <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
       <strong>Please note:</strong> Gochara is a background influence read from the Moon sign alone — it is
       <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
       day's panchangam above and consult your purohit — or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
@@ -1316,7 +1325,7 @@
 
   <div class="card" id="card-system">
     <h2>🧭 Calculation System</h2>
-    <p style="font-size:0.85rem;color:#475569;">
+    <p style="font-size:0.85rem;color:#58504A;">
       <strong>Drik Ganita</strong>, the default, uses modern astronomy and matches drikpanchang.com.
       <strong>Surya Siddhanta</strong> and <strong>Vakya</strong> are classical methods that intentionally
       differ — by minutes for muhurtams, occasionally by a day for festivals. If your family follows a
@@ -1388,7 +1397,7 @@
     </p>
     <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center; margin-bottom:0.5rem;">
       <a class="btn" style="text-decoration:none;" href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener">📦 mcp-server-panchangam on PyPI</a>
-      <span style="font-size:0.78rem; color:#64748b;">No API key · works offline for pre-configured cities</span>
+      <span style="font-size:0.78rem; color:#8B8377;">No API key · works offline for pre-configured cities</span>
     </div>
     <button class="read-more" style="color: var(--indigo);" data-more="Tools &amp; setup for Claude, Cursor and other clients ▾" data-less="Hide tools &amp; setup ▴" onclick="toggleReadMore('mcp-more', this)">Tools &amp; setup for Claude, Cursor and other clients ▾</button>
     <div class="expanded" id="mcp-more">
@@ -1406,7 +1415,7 @@
       <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
     </div>
 
-    <p style="font-size:0.82rem;color:#475569;margin:0.75rem 0 0.25rem;">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. You can also pass coordinates directly; the timezone is derived automatically. Supports all three calculation systems.</p>
+    <p style="font-size:0.82rem;color:#58504A;margin:0.75rem 0 0.25rem;">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. You can also pass coordinates directly; the timezone is derived automatically. Supports all three calculation systems.</p>
 
     <div class="mcp-clients">
       <span class="mcp-client">Claude Desktop</span>
@@ -2108,7 +2117,7 @@
       const rasi = v.nak ? rasiFromStar(v.nak, Number(v.pada) || null) : null;
       const rasiNote = !v.nak ? '' : rasi
         ? `<span class="tb-you">Rashi: ${rasi}</span>`
-        : '<span class="tb-you" style="color:#b45309;">add padam for rashi</span>';
+        : '<span class="tb-you" style="color:#8A5518;">add padam for rashi</span>';
       html += `<div class="tb-profile-row">
         <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
         <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
@@ -2358,7 +2367,7 @@
           : '';
         const cls = !passes ? 'bad'
           : (TB_MODE === 'puja_ok' && caveat === 'puja' ? 'puja' : 'good');
-        const sub = profiles[i] ? `<span class="tb-sub">${profiles[i].name}<span style="color:#cbd5e1"> · ${profiles[i].nak}</span></span>` : '';
+        const sub = profiles[i] ? `<span class="tb-sub">${profiles[i].name}<span style="color:#DDD2BC"> · ${profiles[i].nak}</span></span>` : '';
         return `<div class="tb-card-row">${sub}<span class="tara-chip ${cls}">${t.tara} ${t.label}${chandraTag}</span></div>`;
       }).join('');
       const star = (r.allGood && profiles.length > 1) ? '<span class="tb-star">✦</span> good for everyone' : '&nbsp;';
@@ -2618,7 +2627,7 @@
     const typed = document.getElementById('go-date').value;
     const shownISO = `${dateShown.getFullYear()}-${String(dateShown.getMonth()+1).padStart(2,'0')}-${String(dateShown.getDate()).padStart(2,'0')}`;
     document.getElementById('go-note').innerHTML = typed && typed !== shownISO
-      ? `<p class="preview-note" style="color:#b45309;">That date is outside this chart's data window
+      ? `<p class="preview-note" style="color:#8A5518;">That date is outside this chart's data window
          (${GO_DATA.start} to ${document.getElementById('go-date').max}) — showing the nearest covered day,
          ${fmtD(dateShown)}. For any date, past or future, ask via the MCP server below.</p>` : '';
     const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
@@ -2643,7 +2652,7 @@
       phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:0.4rem;">Rasi Phalalu — ${view.label}
         <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
         ph.lines.map(l => `<p>${l}</p>`).join('') +
-        `<p style="font-size:0.72rem;color:#94a3b8;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
+        `<p style="font-size:0.72rem;color:#B5AC9C;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
     }
 
     // legend
