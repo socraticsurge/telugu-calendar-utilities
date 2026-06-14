@@ -61,7 +61,7 @@
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
     @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-    .card { background: #fff; border: 1px solid #DDD2BC; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 4px 18px rgba(139,131,119,0.18), 0 1px 3px rgba(31,26,23,0.08); }
+    .card { background: #fff; border: 1px solid #DDD2BC; border-radius: 8px; padding: 1.25rem; margin: 1rem 0; box-shadow: 2px 2px 0 rgba(31,26,23,0.05); }
     @media (max-width: 620px) {
       .card { padding: 0.85rem; }
       body { padding: 0 0.7rem 2rem; }
@@ -101,7 +101,7 @@
     .app-panel ol { margin: 0; padding-left: 1.2rem; color: #58504A; }
     .app-panel ol li { margin-bottom: 0.3rem; }
 
-    .preview-card { border: 1px solid #DDD2BC; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(139,131,119,0.12); }
+    .preview-card { border: 1px solid #DDD2BC; border-radius: 8px; overflow: hidden; box-shadow: 2px 2px 0 rgba(31,26,23,0.05); }
     .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; position: relative; padding-right: 3rem; }
     .preview-head .date { font-weight: 700; font-size: 0.95rem; }
     .preview-head .meta { font-size: 0.78rem; opacity: 0.85; margin-top: 0.1rem; }
@@ -113,18 +113,29 @@
 
     .anga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; padding: 0.7rem 0.9rem 0.25rem; }
     @media (max-width: 620px) { .anga-grid { grid-template-columns: repeat(2, 1fr); } }
-    .anga-cell { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px; padding: 0.45rem 0.4rem; text-align: center; }
-    .anga-label { font-size: 0.7rem; font-weight: 700; color: #8E2A1F; text-transform: uppercase; letter-spacing: 0.05em; }
+    .anga-cell { background: #FBF6EB; border: 1px solid #E4DAC6; border-radius: 6px; padding: 0.45rem 0.4rem; text-align: center; }
+    .anga-label { font-size: 0.7rem; font-weight: 700; color: #8B8377; text-transform: uppercase; letter-spacing: 0.08em; font-style: italic; font-family: var(--brand-display), serif; }
     .anga-name { font-size: 0.88rem; font-weight: 700; color: #1F1A17; margin-top: 0.1rem; }
     .anga-time { font-size: 0.75rem; color: #58504A; margin-top: 0.05rem; white-space: nowrap; }
     sup.plus1 { font-size: 0.62em; font-weight: 700; color: #A56B1E; cursor: help; }
     .preview-head sup.plus1 { color: #C98A3A; }
     .preview-head .meta.sky { margin-top: 0.25rem; opacity: 1; font-size: 0.78rem; }
 
-    .tile-strip { border-top: 1px solid #FBF6EB; padding: 0.6rem 0.9rem 0.75rem; }
-    .strip-title { font-size: 0.75rem; font-weight: 700; color: var(--indigo); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem; }
-    .strip-title.good-t { color: #16a34a; }
-    .strip-title.bad-t { color: #dc2626; }
+    .tile-strip { border-top: 1px solid #E4DAC6; padding: 0.6rem 0.9rem 0.75rem; }
+    .strip-title { font-size: 0.75rem; font-weight: 700; color: #8B8377; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.45rem; font-style: italic; font-family: var(--brand-display), serif; }
+    .strip-title.good-t { color: #15803d; }
+    .strip-title.bad-t { color: #8E2A1F; }
+    .avoid-strip > summary.strip-title { cursor: pointer; list-style: none; display: flex; align-items: center; }
+    .avoid-strip > summary.strip-title::-webkit-details-marker { display: none; }
+    .avoid-strip > summary.strip-title::after { content: '▾'; margin-left: auto; font-style: normal; color: #B5AC9C; }
+    .avoid-strip[open] > summary.strip-title::after { content: '▴'; }
+    .avoid-strip > .win-grid { margin-top: 0.45rem; }
+    .avoid-count { font-style: normal; font-weight: 600; color: #B5AC9C; text-transform: none; letter-spacing: normal; }
+    /* Desktop: always show the Avoid windows, hide the toggle affordance */
+    body:not([data-mode="mobile"]) .avoid-strip > .win-grid { display: grid !important; }
+    body:not([data-mode="mobile"]) .avoid-strip > summary.strip-title { cursor: default; }
+    body:not([data-mode="mobile"]) .avoid-strip > summary.strip-title::after { content: ''; }
+    body:not([data-mode="mobile"]) .avoid-count { display: none; }
     .win-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.3rem; }
     .chog-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; }
     @media (max-width: 620px) { .chog-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -154,7 +165,7 @@
     .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
                border: 1px solid var(--indigo-border); background: var(--indigo-bg);
                color: var(--indigo); font-weight: 600; font-family: inherit; }
-    .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 12px;
+    .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px;
                    padding: 0.85rem; margin-top: 0.85rem; }
     .tb-controls-title { font-size: 0.72rem; font-weight: 700; color: #8E2A1F; text-transform: uppercase;
                          letter-spacing: 0.06em; margin-bottom: 0.7rem; display: flex; justify-content: space-between; align-items: center; }
@@ -165,14 +176,15 @@
     /* Sub-section cards inside .tb-controls — Tarabalam and Muhurtam forms
        use these to give each input group its own contextual space. Applied
        on both web and mobile. */
-    .tb-section { background: #fff; border: 1px solid #DDD2BC; border-radius: 10px;
+    .tb-section { background: #fff; border: 1px solid #DDD2BC; border-radius: 8px;
                   padding: 0.75rem 0.9rem 0.85rem; margin-bottom: 0.65rem; }
     .tb-section:last-of-type { margin-bottom: 0; }
     .tb-section-head { display: flex; align-items: center; justify-content: space-between;
                        gap: 0.5rem; margin-bottom: 0.55rem; padding-bottom: 0.45rem;
                        border-bottom: 1px solid #FBF6EB; }
-    .tb-section-label { font-size: 0.7rem; font-weight: 700; color: #8E2A1F;
-                        text-transform: uppercase; letter-spacing: 0.08em; }
+    .tb-section-label { font-size: 0.7rem; font-weight: 700; color: #8B8377;
+                        text-transform: uppercase; letter-spacing: 0.08em;
+                        font-style: italic; font-family: var(--brand-display), serif; }
     .tb-section .selector-row { margin: 0; }
     .tb-cta { width: 100%; padding: 0.78rem 1.25rem; margin-top: 0.6rem;
               border-radius: 999px; font-size: 0.92rem; letter-spacing: 0.005em; }
@@ -199,7 +211,7 @@
     @media (max-width: 620px) {
       .tb-table-wrap { display: none; }
       .tb-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.6rem; }
-      .tb-card { border: 1px solid #E7DECC; border-radius: 10px; padding: 0.55rem 0.7rem; background: #FFFFFF; }
+      .tb-card { border: 1px solid #E7DECC; border-radius: 8px; padding: 0.55rem 0.7rem; background: #FFFFFF; }
       .tb-card.tb-all { background: #fcfdf4; border-color: #d9f99d; }
       .tb-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
       .tb-card-flag { font-size: 0.75rem; color: #8A5518; font-weight: 700; }
@@ -226,7 +238,7 @@
     .tb-summary .count { font-weight: 800; }
     .tb-toggle { margin-left: auto; font-size: 0.78rem; color: #92400e; display: inline-flex; gap: 0.35rem; align-items: center; cursor: pointer; }
     .go-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(86px, auto));
-                gap: 2px; background: #DCC1B5; border: 2px solid #DCC1B5; border-radius: 10px; overflow: hidden; margin-top: 0.8rem; }
+                gap: 2px; background: #DCC1B5; border: 2px solid #DCC1B5; border-radius: 8px; overflow: hidden; margin-top: 0.8rem; }
     .go-box { background: #fff; padding: 0.3rem 0.35rem; position: relative; min-height: 86px; }
     .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #B5AC9C; text-transform: uppercase; letter-spacing: 0.04em;
                      display: inline-block; padding-right: 1.1rem; }
@@ -254,7 +266,7 @@
                 background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
     .mu-reasons { font-size: 0.74rem; color: #8B8377; width: 100%; }
     .go-phalalu { margin-top: 0.8rem; background: #FBF6EB; border: 1px solid var(--amber-border);
-                  border-radius: 10px; padding: 0.75rem 0.95rem; }
+                  border-radius: 8px; padding: 0.75rem 0.95rem; }
     .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
                      text-transform: uppercase; letter-spacing: 0.05em; }
     .go-phalalu p { margin: 0.3rem 0; font-size: 0.84rem; color: #44403c; line-height: 1.55; }
@@ -272,10 +284,10 @@
     .tb-readme-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #B5AC9C; }
     .tb-readme .tara-chip { margin-right: 0.25rem; }
     .wa-share-mini { position: absolute; top: 0.6rem; right: 0.7rem; width: 32px; height: 32px;
-                     border-radius: 50%; background: #25d366; color: #fff; border: none; cursor: pointer;
+                     border-radius: 50%; background: #fff; color: #15803d; border: 1px solid #DDD2BC; cursor: pointer;
                      display: flex; align-items: center; justify-content: center;
-                     box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
-    .wa-share-mini:hover { background: #1eb858; }
+                     box-shadow: 0 1px 3px rgba(31,26,23,0.04); }
+    .wa-share-mini:hover { background: #FBF6EB; border-color: #15803d; }
     .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
 
     .fmt-toggle { display: inline-flex; border: 1px solid var(--indigo-border); border-radius: 8px; overflow: hidden; }
@@ -296,7 +308,7 @@
       .upcoming-in { display: none; }
     }
 
-    .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 0 2px 8px rgba(139,131,119,0.12); }
+    .sys-card { border-radius: 8px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 2px 2px 0 rgba(31,26,23,0.05); }
     .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
     .sys-card.ss { background: var(--amber-bg); border: 1px solid var(--amber-border); }
     .sys-card.vakya { background: var(--green-bg); border: 1px solid var(--green-border); }
@@ -320,7 +332,7 @@
     .mcp-tool { background: #F2ECDF; border: 1px solid #DDD2BC; border-radius: 8px; padding: 0.6rem 0.8rem; }
     .mcp-tool code { display: block; font-size: 0.78rem; color: var(--indigo); font-weight: 700; margin-bottom: 0.2rem; }
     .mcp-tool span { font-size: 0.75rem; color: #8B8377; }
-    .mcp-install { background: #1F1A17; border-radius: 10px; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+    .mcp-install { background: #1F1A17; border-radius: 8px; padding: 0.9rem 1rem; margin: 0.75rem 0; }
     .mcp-install h4 { margin: 0 0 0.5rem; font-size: 0.7rem; color: #b83a2a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
     .mcp-install pre { margin: 0; font-size: 0.78rem; color: #DDD2BC; font-family: monospace; white-space: pre-wrap; line-height: 1.6; }
     .mcp-clients { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
@@ -358,7 +370,7 @@
     }
     #m-topbar .m-brand .m-brand-word { display: inline; white-space: normal; }
     #m-topbar .m-icon-btn {
-      width: 36px; height: 36px; border-radius: 10px; border: 0; background: transparent;
+      width: 36px; height: 36px; border-radius: 8px; border: 0; background: transparent;
       font-size: 1.15rem; color: #58504A; cursor: pointer; display: flex;
       align-items: center; justify-content: center; font-family: inherit; flex: none;
     }
@@ -428,7 +440,7 @@
       color: #1F1A17; z-index: 1; letter-spacing: 0.005em;
     }
     .m-drawer .m-drawer-head .m-drawer-close {
-      margin-left: auto; width: 36px; height: 36px; border-radius: 10px;
+      margin-left: auto; width: 36px; height: 36px; border-radius: 8px;
       border: 0; background: transparent; font-size: 1rem; color: #8B8377; cursor: pointer;
     }
     .m-drawer .m-drawer-body { padding: 0.5rem 0.85rem 2rem; }
@@ -439,7 +451,7 @@
     }
     .m-drawer .m-about {
       padding: 0.75rem; font-size: 0.85rem; color: #58504A; line-height: 1.5;
-      border: 1px solid #E7DECC; border-radius: 12px; background: #FFFFFF; margin: 0.75rem 0;
+      border: 1px solid #E7DECC; border-radius: 8px; background: #FFFFFF; margin: 0.75rem 0;
     }
     .m-drawer .m-about strong { color: #1F1A17; }
     .m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
@@ -469,7 +481,7 @@
     /* Drawer placement for relocated selectors — sit them as discrete rows */
     .m-drawer .selector { display: flex; flex-direction: column; gap: 0.3rem;
                          padding: 0.6rem 0.75rem; border: 1px solid #E7DECC;
-                         border-radius: 12px; background: #FFFFFF; margin: 0.5rem 0; }
+                         border-radius: 8px; background: #FFFFFF; margin: 0.5rem 0; }
     .m-drawer .selector > label { font-size: 0.72rem; color: #8B8377;
                                   text-transform: uppercase; letter-spacing: 0.04em;
                                   font-weight: 700; }
@@ -502,7 +514,7 @@
     /* Sade Sati / Ashtama Shani banner prominent above the chart */
     body[data-mode="mobile"] #go-conditions .go-cond {
       background: linear-gradient(180deg, #FBF6EB, #F5E6D3);
-      border: 1px solid #D9A85C; border-radius: 12px; padding: 0.65rem 0.8rem; margin: 0.4rem 0 0.6rem;
+      border: 1px solid #D9A85C; border-radius: 8px; padding: 0.65rem 0.8rem; margin: 0.4rem 0 0.6rem;
     }
     body[data-mode="mobile"] #go-conditions .chip {
       background: #f59e0b; color: #fff; border: 0; font-weight: 700;
@@ -589,7 +601,7 @@
       display: flex; flex-direction: column;
       position: fixed; left: 0; right: 0; bottom: 0;
       max-height: 88vh; z-index: 80;
-      background: #fff; border-radius: 20px 20px 0 0;
+      background: #fff; border-radius: 8px 8px 0 0;
       box-shadow: 0 -12px 36px rgba(31,26,23,0.22);
       transform: translateY(100%); transition: transform 0.24s ease;
     }
@@ -628,12 +640,13 @@
       margin: 0 0 0.85rem; font-size: 0.9rem; color: #58504A; line-height: 1.55;
     }
     #m-help-sheet .help-section-label {
-      font-size: 0.7rem; font-weight: 700; color: var(--indigo);
+      font-size: 0.7rem; font-weight: 700; color: #8B8377;
       text-transform: uppercase; letter-spacing: 0.08em;
+      font-style: italic; font-family: var(--brand-display), serif;
       margin: 1rem 0 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid #E7DECC;
     }
     #m-help-sheet .help-card {
-      background: #fff; border: 1px solid #E7DECC; border-radius: 12px;
+      background: #fff; border: 1px solid #E7DECC; border-radius: 8px;
       padding: 0.75rem 0.85rem; margin: 0.5rem 0; display: flex; gap: 0.65rem;
       align-items: flex-start;
     }
@@ -677,9 +690,9 @@
     /* Outer container becomes a clean white surface; the inner .tb-section
        cards provide the contextual sub-spaces. */
     body[data-mode="mobile"] #panel-tarabalam .tb-controls {
-      background: #fff; border: 1px solid #DDD2BC; border-radius: 16px;
+      background: #fff; border: 1px solid #DDD2BC; border-radius: 8px;
       padding: 0.85rem; margin: 0 0 0.75rem;
-      box-shadow: 0 1px 3px rgba(31,26,23,0.04);
+      box-shadow: 2px 2px 0 rgba(31,26,23,0.05);
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-section {
       background: #FBF6EB; border-color: #E7DECC;
@@ -696,7 +709,7 @@
     body[data-mode="mobile"] #panel-tarabalam input[type=date],
     body[data-mode="mobile"] #panel-tarabalam select {
       background: #fff; border: 1px solid #DDD2BC;
-      border-radius: 10px; padding: 0.7rem 0.85rem;
+      border-radius: 8px; padding: 0.7rem 0.85rem;
       font-size: 0.92rem; color: #1F1A17; font-family: inherit;
       width: 100%;
       -webkit-appearance: none; appearance: none;
@@ -740,7 +753,7 @@
       width: 100%; padding: 0.7rem 1rem; margin-top: 0.2rem;
       background: #fff; border: 1px dashed var(--indigo-border);
       color: var(--indigo); font-weight: 700; font-size: 0.88rem;
-      border-radius: 10px; cursor: pointer;
+      border-radius: 8px; cursor: pointer;
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-add:active { background: var(--indigo-bg); }
 
@@ -773,11 +786,11 @@
     body[data-mode="mobile"] #panel-tarabalam .tb-cta {
       padding: 0.9rem 1.25rem; font-size: 0.95rem; font-weight: 700;
       background: var(--indigo); color: #fff; border: 0; border-radius: 999px;
-      box-shadow: 0 6px 14px rgba(142,42,31,0.22); cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(31,26,23,0.08); cursor: pointer;
       font-family: inherit;
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-cta:active {
-      background: #6d1f16; box-shadow: 0 3px 8px rgba(142,42,31,0.22);
+      background: #6d1f16; box-shadow: none;
     }
 
     /* Muhurtam section header keeps the chevron, sits in the same card style.
@@ -803,18 +816,17 @@
       font-size: 0.7rem; font-weight: 700; color: #8B8377;
       text-transform: uppercase; letter-spacing: 0.08em;
       padding-bottom: 0.05rem;
+      font-style: italic; font-family: var(--brand-display), serif;
     }
-    /* White anga cards with color top-border per anga type */
+    /* White anga cards, neutral parchment surface */
     body[data-mode="mobile"] .anga-cell {
-      background: #fff; border: 1px solid #DDD2BC; border-top: 3px solid var(--indigo);
-      border-radius: 12px; text-align: left; padding: 0.6rem 0.7rem 0.65rem;
+      background: #FBF6EB; border: 1px solid #E4DAC6;
+      border-radius: 8px; text-align: left; padding: 0.6rem 0.7rem 0.65rem;
       display: flex; flex-direction: column; gap: 0.1rem;
     }
-    body[data-mode="mobile"] .anga-cell[data-kind="nakshatra"] { border-top-color: var(--green); }
-    body[data-mode="mobile"] .anga-cell[data-kind="yoga"]      { border-top-color: #A56B1E; }
-    body[data-mode="mobile"] .anga-cell[data-kind="karana"]    { border-top-color: #b91c1c; }
     body[data-mode="mobile"] .anga-label {
-      font-size: 0.68rem; color: #8B8377; letter-spacing: 0.06em;
+      font-size: 0.68rem; color: #8B8377; letter-spacing: 0.08em;
+      text-transform: uppercase; font-style: italic; font-family: var(--brand-display), serif;
     }
     body[data-mode="mobile"] .anga-name {
       font-size: 1rem; line-height: 1.2; color: #1F1A17; margin-top: 0.15rem;
@@ -838,7 +850,7 @@
     body[data-mode="mobile"] .win-grid .chog-cell {
       display: grid; grid-template-columns: 1fr auto; align-items: center;
       gap: 0.5rem; padding: 0.55rem 0.75rem;
-      background: #fff; border: 1px solid #DDD2BC; border-radius: 10px;
+      background: #fff; border: 1px solid #DDD2BC; border-radius: 8px;
       text-align: left;
     }
     body[data-mode="mobile"] .win-grid .chog-cell.good { background: var(--green-bg); border-color: var(--green-border); }
@@ -887,7 +899,7 @@
       <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
       <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
     </svg>
-    <span class="m-brand-word">Astro Chaganti Panchangam</span>
+    <span class="m-brand-word">Astro Chaganti</span>
   </span>
   <button class="m-icon-btn m-help-btn" id="m-help-btn"
           aria-label="How to read this" aria-controls="m-help-sheet" aria-expanded="false">
@@ -1866,7 +1878,8 @@
       windows += `<div class="tile-strip"><div class="strip-title good-t">🟢 Auspicious</div><div class="win-grid">${groupWins(data.auspicious).map(e => winCell(e, 'good')).join('')}</div></div>`;
     }
     if (data.inauspicious.length) {
-      windows += `<div class="tile-strip"><div class="strip-title bad-t">🔴 Avoid</div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
+      const avoidCount = groupWins(data.inauspicious).length;
+      windows += `<details class="tile-strip avoid-strip"><summary class="strip-title bad-t">🔴 Avoid <span class="avoid-count">(${avoidCount} window${avoidCount === 1 ? '' : 's'})</span></summary><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></details>`;
     }
 
     // 4 · The day's timeline — Choghadiya as full-width colour-coded strips,
