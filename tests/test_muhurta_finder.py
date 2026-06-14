@@ -449,6 +449,107 @@ def test_neutral_nitya_yoga_no_score():
     assert nitya_disposition('Variyan') == 'neutral'
 
 
+# --- Reason grouping + doctrinal notes (Batch C #16) ---
+
+def test_reason_groups_present_with_expected_keys():
+    """Every slot carries a 'reason_groups' dict with the five categories."""
+    day = _day(2026, 6, 17)
+    slots = day_slots(day, janma_nakshatras=['Krittika'])
+    assert slots
+    for s in slots:
+        rg = s['reason_groups']
+        assert set(rg.keys()) == {'slot_quality', 'day_quality',
+                                  'group_fit', 'activity_match', 'notes'}
+        # slot_quality always has at least the choghadiya line
+        assert any('choghadiya' in r for r in rg['slot_quality'])
+
+
+def test_reason_groups_categorise_correctly():
+    """A slot with Sarvartha Siddhi + tarabalam mixed + tithi-class match
+    routes each reason to its category."""
+    # 2026-06-25 (Thu) — Sarvartha Siddhi at sunrise, Shukla Ekadashi (Nanda).
+    # Activity 'business' prefers Nanda + Guruvaram, so all categories fire.
+    day = _day(2026, 6, 25)
+    slots = day_slots(day, activity='business',
+                      janma_nakshatras=['Krittika'])
+    assert slots
+    rg = slots[0]['reason_groups']
+    # Slot quality has choghadiya + clearness
+    assert any('choghadiya' in r for r in rg['slot_quality'])
+    assert 'clear of all inauspicious windows' in rg['slot_quality']
+    # Day quality contains the Sarvartha yoga reason
+    assert any('Sarvartha Siddhi' in r for r in rg['day_quality']) or \
+           any('Sarvartha Siddhi' in r for s in slots for r in s['reason_groups']['day_quality'])
+    # Group fit contains tarabalam line (favourable or avoid)
+    assert any('tarabalam' in r for r in rg['group_fit'])
+    # Activity match contains Nanda + Guruvaram bonuses
+    assert any('Nanda' in r and 'favoured for Business' in r for r in rg['activity_match'])
+    assert any('Guruvaram favoured for Business' in r for r in rg['activity_match'])
+
+
+def test_doctrinal_note_sarvartha_rectifies_tara():
+    """When Sarvartha Siddhi is present AND someone has unfavourable tara,
+    a classical-doctrine note appears in reason_groups['notes']."""
+    # 2026-06-25 Sarvartha Siddhi day. Krittika on Swati = ?
+    # Punarvasu has Krittika at tara=5 (Pratyak — avoid). But 2026-06-25
+    # nakshatra is Swati (idx 14). Krittika idx 2. (14-2)%27+1 = 13.
+    # (12)%9+1 = 4 (Kshema, favourable). Not unfav.
+    # Need someone with unfav tara on Swati: tara=1 (Janma) → Swati itself,
+    # so use 'Swati' as janma. (14-14)%27+1 = 1, Janma — avoid.
+    day = _day(2026, 6, 25)
+    slots = day_slots(day, janma_nakshatras=['Swati'])
+    assert slots
+    notes = slots[0]['reason_groups']['notes']
+    assert any('rectifies tara dosha' in n for n in notes), \
+        f'expected Sarvartha rectification note; got {notes}'
+
+
+def test_doctrinal_note_chandra_dosha_not_rectified():
+    """Sarvartha doesn't rectify chandra dosha — that caution surfaces
+    when a Siddhi yoga is present AND someone has Moon@4/8/12."""
+    day = _day(2026, 6, 25)
+    # Krittika padam 1 → Mesha rashi. On 2026-06-25 Moon's rashi
+    # is Tula (Swati nakshatra spans Tula). From Mesha to Tula = position
+    # 7 (good). Need a rashi with Moon-avoid from Tula.
+    # Moon=Tula (idx 6). Avoid positions are {4,8,12}. From rashi r:
+    #   pos = (6 - r) % 12 + 1
+    # pos=4 → r=3 (Karka). pos=8 → r=11 (Meena). pos=12 → r=7 (Vrischika).
+    # Use Pushya (Karka rashi) → Moon@4
+    slots = day_slots(day, janma_nakshatras=['Pushya'], janma_rasis=['Karka'])
+    assert slots
+    notes = slots[0]['reason_groups']['notes']
+    assert any('not rectified' in n and 'chandra' in n.lower() for n in notes), \
+        f'expected chandra-not-rectified note; got {notes}'
+
+
+def test_no_notes_on_clean_day():
+    """A day with no Siddhi yoga and clean fits — no doctrinal notes."""
+    day = _day(2026, 6, 16)  # no special yogas
+    slots = day_slots(day, janma_nakshatras=['Krittika'])
+    assert slots
+    for s in slots:
+        assert s['reason_groups']['notes'] == []
+
+
+def test_reason_groups_score_consistency():
+    """The sum of (+N)/(-N) across all groups equals the slot's score."""
+    import re
+    day = _day(2026, 6, 25)
+    slots = day_slots(day, activity='wedding',
+                      janma_nakshatras=['Krittika'], janma_rasis=['Mesha'])
+    assert slots
+    for s in slots:
+        rg = s['reason_groups']
+        total = 0
+        for cat in ('slot_quality', 'day_quality', 'group_fit', 'activity_match'):
+            for r in rg[cat]:
+                m = re.search(r'\(([+-]\d+)\)\s*$', r)
+                if m:
+                    total += int(m.group(1))
+        assert total == s['score'], \
+            f'groups sum {total} != score {s["score"]} ({rg})'
+
+
 def test_unknown_tithi_name_does_not_explode():
     # Robustness: tithi_family is wrapped in try/except inside day_slots,
     # so an unknown tithi name silently skips tithi-class scoring.

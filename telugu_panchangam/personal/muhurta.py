@@ -167,35 +167,43 @@ def _label(janma: str, idx: int) -> str:
 
 
 def _score_tara(janma_nakshatras, day_nakshatra_name):
-    """Per-person tarabalam contribution against a specific nakshatra."""
+    """Per-person tarabalam contribution against a specific nakshatra.
+
+    Returns (bonus, reasons, unfav_names). The unfav_names list (people
+    whose tara is in Janma/Vipat/Pratyak/Naidhana) is used by the
+    doctrinal-notes engine to surface Sarvartha-rectification messages.
+    """
     if not janma_nakshatras:
-        return 0, []
-    bonus, fav, unfav = 0, [], []
+        return 0, [], []
+    bonus, fav, unfav, unfav_names = 0, [], [], []
     for i, janma in enumerate(janma_nakshatras):
         t = tara_number(janma, day_nakshatra_name)
         label = _label(janma, i)
         if t in AUSPICIOUS_TARAS:
             fav.append(label); bonus += 1
         else:
-            unfav.append(f'{label} {tara_name(t)}'); bonus -= 1
+            unfav.append(f'{label} {tara_name(t)}')
+            unfav_names.append(label)
+            bonus -= 1
     reasons = []
     if fav:
         reasons.append(f"tarabalam favourable for {', '.join(fav)} (+{len(fav)})")
     if unfav:
         reasons.append(f"tarabalam avoid for {', '.join(unfav)} (-{len(unfav)})")
-    return bonus, reasons
+    return bonus, reasons, unfav_names
 
 
 def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
     """Per-person chandrabalam against a specific moon rashi.
 
-    Returns (bonus, reasons, dropped_by_mode). When dropped_by_mode is True,
-    the caller should skip this slot/day under the active chandra_mode.
+    Returns (bonus, reasons, dropped_by_mode, avoid_names). avoid_names
+    lists people whose Moon is at 4/8/12 (used by doctrinal-notes engine
+    to surface the 'chandra dosha is not rectified' caution).
     """
     if janma_rasis is None or not any(r is not None for r in janma_rasis):
-        return 0, [], False
+        return 0, [], False, []
     bonus = 0
-    good, puja, avoid = [], [], []
+    good, puja, avoid, avoid_names = [], [], [], []
     for i, rasi in enumerate(janma_rasis):
         if rasi is None:
             continue
@@ -208,7 +216,9 @@ def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
             puja.append(f'{label} Moon@{pos}')
         else:
             ashtama = ' Ashtama' if pos == 8 else ''
-            avoid.append(f'{label}{ashtama} Moon@{pos}'); bonus -= 1
+            avoid.append(f'{label}{ashtama} Moon@{pos}')
+            avoid_names.append(label)
+            bonus -= 1
     reasons = []
     if good:
         reasons.append(f"chandrabalam favourable for {', '.join(good)} (+{len(good)})")
@@ -218,20 +228,70 @@ def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
         reasons.append(f"chandrabalam avoid for {', '.join(avoid)} (-{len(avoid)})")
     dropped = (chandra_mode == 'strict' and (puja or avoid)) \
               or (chandra_mode == 'puja_ok' and avoid)
-    return bonus, reasons, bool(dropped)
+    return bonus, reasons, bool(dropped), avoid_names
 
 
 def _score_tithi_class(tithi_name, prefer_tithi_class, activity_label):
-    """Universal Rikta -2; activity-preferred class +1."""
+    """Universal Rikta -2; activity-preferred class +1.
+
+    Returns (bonus, day_reason, activity_reason, family). The Rikta
+    penalty is a day-quality concern; the class-match is activity-match.
+    """
     try:
         fam = tithi_family(tithi_name)
     except ValueError:
-        return 0, []
+        return 0, None, None, None
     if fam == 'Rikta':
-        return -2, [f'{tithi_name} (Rikta tithi) (-2)']
+        return -2, f'{tithi_name} (Rikta tithi) (-2)', None, fam
     if prefer_tithi_class and fam == prefer_tithi_class:
-        return 1, [f'{tithi_name} ({prefer_tithi_class}) favoured for {activity_label} (+1)']
-    return 0, []
+        return 1, None, f'{tithi_name} ({prefer_tithi_class}) favoured for {activity_label} (+1)', fam
+    return 0, None, None, fam
+
+
+def _doctrinal_notes(*, special_yogas, tara_unfav_names, chandra_avoid_names,
+                     tithi_fam):
+    """Generate classical-doctrine notes from the day's flags.
+
+    These are explanatory only — they do NOT change the score. They surface
+    the *relationships* the score's reasons can't communicate on their own:
+    e.g. why a Sarvartha day still ranks high despite one person's tara
+    dosha (the yoga rectifies it), and why Sarvartha doesn't help with
+    Ashtama Chandra (chandra dosha isn't rectifiable by group-level yogas).
+
+    Sources: Muhurta Chintamani, Muhurta Martanda; modern panchangam
+    commentaries (Drik Panchang, TTD Panchanga Nirnayam).
+    """
+    notes: list[str] = []
+    siddhi_yogas = [y for y in special_yogas
+                    if y in ('Sarvartha Siddhi Yoga', 'Amrita Siddhi Yoga')]
+    has_pushkara = any(y in ('Dvipushkara Yoga', 'Tripushkara Yoga')
+                       for y in special_yogas)
+
+    # 1. Sarvartha/Amrita Siddhi rectifies tara dosha
+    if siddhi_yogas and tara_unfav_names:
+        siddhi_label = ' + '.join(siddhi_yogas)
+        names = ', '.join(tara_unfav_names)
+        notes.append(
+            f'{siddhi_label} traditionally rectifies tara dosha '
+            f'(Muhurta Chintamani) — {names} mitigated.'
+        )
+
+    # 2. Chandra dosha is NOT rectified by Siddhi yogas
+    if siddhi_yogas and chandra_avoid_names:
+        names = ', '.join(chandra_avoid_names)
+        notes.append(
+            'Chandra dosha is not rectified by Siddhi yogas — '
+            f'{names} remains a personal caution.'
+        )
+
+    # 3. Pushkara amplifier + Rikta tithi caveat
+    if has_pushkara and tithi_fam == 'Rikta':
+        notes.append(
+            'Pushkara amplifies the day\'s nature; combined with Rikta '
+            'tithi, even small inauspicious factors magnify.'
+        )
+
+    return notes
 
 
 def _score_special_yogas(special_yogas, skip_yogas):
@@ -398,21 +458,22 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 continue
 
             # Tarabalam (slot-time nakshatra)
-            tara_bonus, tara_reasons = _score_tara(janma_nakshatras, facts.nakshatra)
+            tara_bonus, tara_reasons, tara_unfav_names = _score_tara(
+                janma_nakshatras, facts.nakshatra)
 
             # Chandrabalam (slot-time moon rashi + mode filter)
-            chandra_bonus, chandra_reasons, dropped = _score_chandra(
+            chandra_bonus, chandra_reasons, dropped, chandra_avoid_names = _score_chandra(
                 janma_nakshatras, janma_rasis, facts.lunar_sign, chandra_mode)
             if dropped:
                 continue
 
             # Tithi class (slot-time tithi)
-            tithi_bonus, tithi_reasons = _score_tithi_class(
-                facts.tithi, prefer_tithi_class, label)
+            tithi_bonus, tithi_day_reason, tithi_activity_reason, tithi_fam = \
+                _score_tithi_class(facts.tithi, prefer_tithi_class, label)
 
             # Nitya yoga (slot-time yoga). Samskara activities defer on
             # Vyatipata/Vaidhriti the same way they defer on Visha/Dagdha.
-            skip_on_nitya_hard = bool(skip_yogas)  # any activity with samskara skip
+            skip_on_nitya_hard = bool(skip_yogas)
             nitya_bonus, nitya_reasons, defer_nitya = _score_nitya_yoga(
                 facts.yoga, s, day, skip_on_nitya_hard)
             if defer_nitya:
@@ -420,26 +481,54 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
 
             score = base + vara_bonus + tara_bonus + chandra_bonus \
                     + tithi_bonus + yoga_bonus + nitya_bonus
-            reasons = [f'{block.name} choghadiya (+{base})',
-                       'clear of all inauspicious windows']
-            reasons += tara_reasons + chandra_reasons + tithi_reasons + yoga_reasons + nitya_reasons
+
+            # Reason groups — assemble each category as we go.
+            slot_quality = [
+                f'{block.name} choghadiya (+{base})',
+                'clear of all inauspicious windows',
+            ]
+            day_quality = list(yoga_reasons) + list(nitya_reasons)
+            if tithi_day_reason:
+                day_quality.append(tithi_day_reason)
+            group_fit = list(tara_reasons) + list(chandra_reasons)
+            activity_match: list[str] = []
+            if tithi_activity_reason:
+                activity_match.append(tithi_activity_reason)
             if vara_reason:
-                reasons.append(vara_reason)
+                activity_match.append(vara_reason)
 
             if abhijit and _overlaps(s, e, abhijit.start, abhijit.end):
                 score += 2
-                reasons.append('overlaps Abhijit Muhurta (+2)')
+                slot_quality.append('overlaps Abhijit Muhurta (+2)')
             if any(_overlaps(s, e, a.start, a.end) for a in amrita):
                 score += 2
-                reasons.append('overlaps Amrita Kalam (+2)')
+                slot_quality.append('overlaps Amrita Kalam (+2)')
             if prefer_chog and block.name == prefer_chog[0]:
                 score += prefer_chog[1]
-                reasons.append(f'{block.name} favoured for {label} (+{prefer_chog[1]})')
+                activity_match.append(f'{block.name} favoured for {label} (+{prefer_chog[1]})')
             for kname in avoid_karana_names:
-                reasons.append(f'{kname} karana avoided')
+                activity_match.append(f'{kname} karana avoided')
+
+            notes = _doctrinal_notes(
+                special_yogas=facts.special_yogas,
+                tara_unfav_names=tara_unfav_names,
+                chandra_avoid_names=chandra_avoid_names,
+                tithi_fam=tithi_fam,
+            )
+
+            reason_groups = {
+                'slot_quality': slot_quality,
+                'day_quality': day_quality,
+                'group_fit': group_fit,
+                'activity_match': activity_match,
+                'notes': notes,
+            }
+            # Backward-compat flat list (existing callers / tests use this)
+            reasons = slot_quality + group_fit + day_quality + activity_match
 
             slots.append({'date': day.date.isoformat(), 'vaaram': day.vaaram,
-                          'start': s, 'end': e, 'score': score, 'reasons': reasons})
+                          'start': s, 'end': e, 'score': score,
+                          'reasons': reasons, 'reason_groups': reason_groups})
 
     slots.sort(key=lambda x: (-x['score'], x['start']))
     return slots
