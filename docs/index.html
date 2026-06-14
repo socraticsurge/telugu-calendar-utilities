@@ -248,7 +248,6 @@
     .go-moves b { color: #1F1A17; }
     .mu-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.8rem;
                border: 1px solid #E7DECC; border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: #FFFFFF; }
-    .mu-slot.top { background: var(--green-bg); border-color: var(--green-border); }
     .mu-when { font-weight: 700; color: #1F1A17; white-space: nowrap; }
     .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
                 background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
@@ -272,7 +271,12 @@
     .mu-rg { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.74rem; line-height: 1.45; }
     .mu-rg-label { flex: none; font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
                    letter-spacing: 0.06em; color: #94a3b8; min-width: 4.5rem; padding-top: 0.05rem; }
-    .mu-rg-items { color: #475569; flex: 1 1 auto; }
+    .mu-rg-items { flex: 1 1 auto; list-style: none; margin: 0; padding: 0;
+                   display: flex; flex-direction: column; gap: 0.15rem; }
+    .mu-rg-items li { color: #475569; }
+    .mu-rg-items li.mu-pos { color: #166534; }
+    .mu-rg-items li.mu-neg { color: #b91c1c; }
+    .mu-rg-items li.mu-caution { color: #92400e; }
     .mu-rg-notes { background: #fffaeb; border: 1px solid #fde68a; border-radius: 8px;
                    padding: 0.4rem 0.6rem; }
     .mu-rg-notes .mu-rg-label { color: var(--amber); }
@@ -3267,8 +3271,8 @@
                 if (TARA_GOOD.has(t)) { fav.push(label); score += 1; }
                 else { unfav.push(`${label} ${TARA_NAMES[t - 1]}`); taraUnfavNames.push(label); score -= 1; }
               }
-              if (fav.length) groupFit.push(`tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
-              if (unfav.length) groupFit.push(`tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
+              if (fav.length) groupFit.push(`Tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
+              if (unfav.length) groupFit.push(`Tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
             }
 
             // Chandrabalam — slot-time moon rashi (per-person + mode filter)
@@ -3290,9 +3294,9 @@
                   avoid.push(`${label}${ashtama} Moon@${pos}`); chandraAvoidNames.push(label); score -= 1;
                 }
               }
-              if (good.length) groupFit.push(`chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
-              if (puja.length) groupFit.push(`chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
-              if (avoid.length) groupFit.push(`chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
+              if (good.length) groupFit.push(`Chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
+              if (puja.length) groupFit.push(`Chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
+              if (avoid.length) groupFit.push(`Chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
 
               if (chandraMode === 'strict' && (puja.length || avoid.length)) dropSlot = true;
               else if (chandraMode === 'puja_ok' && avoid.length) dropSlot = true;
@@ -3493,11 +3497,19 @@
       return;
     }
     const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
+    const muLineClass = (item) => {
+      if (/\(\+\d+\)\s*$/.test(item)) return 'mu-pos';
+      if (/\(-\d+\)\s*$/.test(item)) return 'mu-neg';
+      if (/rectifies/i.test(item)) return 'mu-pos';
+      if (/not rectified|remains a personal caution|puja recommended/i.test(item)) return 'mu-caution';
+      return '';
+    };
     const renderGroup = (label, items, extraClass = '') => {
       if (!items || !items.length) return '';
+      const lis = items.map(it => `<li class="${muLineClass(it)}">${it}</li>`).join('');
       return `<div class="mu-rg ${extraClass}">
                 <span class="mu-rg-label">${label}</span>
-                <span class="mu-rg-items">${items.join(' · ')}</span>
+                <ul class="mu-rg-items">${lis}</ul>
               </div>`;
     };
     const renderSlot = (s, i) => {
@@ -3513,7 +3525,7 @@
         : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
       const tier = s.tier || muScoreTier(s.score);
       const tierClass = `mu-tier-${tier.toLowerCase()}`;
-      return `<div class="mu-slot ${i === 0 ? 'top' : ''}">
+      return `<div class="mu-slot">
                 <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
                 <span class="mu-tier ${tierClass}">${tier}</span>
                 <span class="mu-score">score ${s.score}</span>
