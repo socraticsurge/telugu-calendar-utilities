@@ -328,3 +328,9 @@ class DrikGanitaEngine(PanchangamEngine):
 
     def _sun_sign_idx_at(self, jd: float) -> int:
         return int(sun_longitude(jd) / 30.0) % 12
+
+    def _sun_longitude_func(self):
+        return sun_longitude
+
+    def _moon_longitude_func(self):
+        return moon_longitude

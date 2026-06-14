@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-from datetime import date
-from telugu_panchangam.models.panchangam_day import Location, PanchangamDay, Span, Window
+from datetime import date, datetime, timezone
+from telugu_panchangam.models.panchangam_day import (
+    Location, PanchangamDay, SlotFacts, Span, Window,
+)
 
 TITHI_NAMES: list[str] = [
     # Shukla Paksha (0-14)
@@ -297,6 +299,89 @@ class PanchangamEngine(ABC):
     def calculate(self, d: date, location: Location, include_eclipse: bool = True) -> PanchangamDay:
         """Calculate full Panchangam for a single date and location."""
         ...
+
+    # --- Per-instant fact computation (slot-time precision) --------------
+    #
+    # Subclasses expose the two longitude functions they use; the base
+    # class derives every other anga name from them. Each engine keeps its
+    # own astronomical model (Drik = Swiss Ephemeris; SS = mean motion +
+    # manda correction; Vakya = tables + Moon correction).
+
+    def _sun_longitude_func(self):
+        """Function f(jd) -> sidereal Sun longitude in degrees [0, 360)."""
+        raise NotImplementedError
+
+    def _moon_longitude_func(self):
+        """Function f(jd) -> sidereal Moon longitude in degrees [0, 360)."""
+        raise NotImplementedError
+
+    def facts_at(self, dt: datetime, location: Location,
+                 vaaram: str | None = None) -> SlotFacts:
+        """Return the panchangam facts active at `dt` for this engine.
+
+        The vaaram of the panchangam day (one constant per civil-day-at-
+        sunrise) is supplied by the caller, since vaaram is decided by
+        the sunrise weekday and does not flip during the day. If omitted,
+        we derive it from the UTC weekday of `dt` — which is an
+        approximation suitable for slot-time scoring within a single day.
+        """
+        # Local import to avoid circular dependency: special_yogas
+        # imports TITHI_NAMES from this module.
+        from telugu_panchangam.special_yogas import get_special_yogas
+        from telugu_panchangam.engines.utils import datetime_to_jd
+
+        # Anchor dt in UTC
+        dt_utc = dt.astimezone(timezone.utc) if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        jd = datetime_to_jd(dt_utc)
+
+        sun_long_fn = self._sun_longitude_func()
+        moon_long_fn = self._moon_longitude_func()
+        sun_long = sun_long_fn(jd) % 360.0
+        moon_long = moon_long_fn(jd) % 360.0
+        elongation = (moon_long - sun_long) % 360.0
+
+        # Nakshatra: Moon longitude / (360/27)
+        nak_size = 360.0 / 27.0
+        nak_idx = int(moon_long / nak_size) % 27
+        nakshatra_name = NAKSHATRA_NAMES[nak_idx]
+
+        # Tithi: elongation / 12
+        tithi_idx = int(elongation / 12.0) % 30
+        tithi_name = TITHI_NAMES[tithi_idx]
+
+        # Nitya Yoga: (Sun + Moon) longitude / (360/27)
+        yoga_combined = (sun_long + moon_long) % 360.0
+        yoga_idx = int(yoga_combined / nak_size) % 27
+        yoga_name = YOGA_NAMES[yoga_idx]
+
+        # Karana: half-tithi
+        ht_idx = int(elongation / 6.0) % 60
+        if ht_idx in KARANA_FIXED:
+            karana_name = KARANA_FIXED[ht_idx]
+        else:
+            karana_name = KARANA_REPEATING[(ht_idx - 1) % 7]
+
+        # Moon's rashi (12 signs, 30 degrees each)
+        rashi_idx = int(moon_long / 30.0) % 12
+        lunar_sign_name = RASHI_NAMES[rashi_idx]
+
+        # Vaaram: passed in (sunrise-decided). Fallback to UTC weekday — but
+        # callers from day_slots will always pass the day's vaaram.
+        if vaaram is None:
+            # Map Python weekday (Mon=0..Sun=6) to our Adivaram(Sun=0)..
+            vaaram = VAARAM_NAMES[(dt_utc.weekday() + 1) % 7]
+
+        special_yogas = get_special_yogas(vaaram, tithi_name, nakshatra_name)
+
+        return SlotFacts(
+            nakshatra=nakshatra_name,
+            tithi=tithi_name,
+            yoga=yoga_name,
+            karana=karana_name,
+            lunar_sign=lunar_sign_name,
+            vaaram=vaaram,
+            special_yogas=special_yogas,
+        )
 
     def _sun_sign_idx_at(self, jd: float) -> int:
         """Sidereal sun sign index (0=Mesha) at jd, per this engine's model."""
