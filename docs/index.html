@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AstroChaganti's Panchangam — Calendar Feeds</title>
+  <title>Astro Chaganti Panchangam — Calendar Feeds</title>
   <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities — plus Tarabalam & Muhurtam good-day and time-slot finders, and the Gochara chart with daily Rasi Phalalu. Free, no account needed.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22><ellipse cx=%2224%22 cy=%2224%22 rx=%2221%22 ry=%227%22 transform=%22rotate(-8 24 24)%22 fill=%22none%22 stroke=%22%238E2A1F%22 stroke-width=%221.6%22 stroke-opacity=%220.82%22/><ellipse cx=%2224%22 cy=%2224%22 rx=%2212%22 ry=%2219%22 transform=%22rotate(22 24 24)%22 fill=%22none%22 stroke=%22%238E2A1F%22 stroke-width=%221.3%22 stroke-opacity=%220.6%22/><circle cx=%2213.5%22 cy=%2216%22 r=%221.6%22 fill=%22%238E2A1F%22 fill-opacity=%220.8%22/><circle cx=%2234.5%22 cy=%2232%22 r=%221.6%22 fill=%22%238E2A1F%22 fill-opacity=%220.8%22/><circle cx=%2224%22 cy=%2224%22 r=%222.8%22 fill=%22%238E2A1F%22/></svg>">
-  <meta property="og:title" content="AstroChaganti's Panchangam">
+  <meta property="og:title" content="Astro Chaganti Panchangam">
   <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days — plus Tarabalam, Muhurtam, Gochara and Rasi Phalalu tools. Subscribe once, updated automatically.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://panchangam.astrochaganti.com/">
@@ -30,21 +30,28 @@
 
     html { scroll-behavior: smooth; }
     .hero { text-align: center; padding: 1.75rem 0 1.25rem; }
-    .hero .brand-row { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+    .hero .brand-row { display: flex; align-items: center; justify-content: center; gap: 0.7rem; }
     .hero .sunmoon { flex: none; animation: none; }
+    .hero .brand-text { text-align: left; }
     .hero h1 { font-family: var(--brand-display); font-size: 2.1rem; font-weight: 400; margin: 0; letter-spacing: 0.005em; line-height: 1.2; color: #1F1A17; }
     .hero h1 em {
       font-style: italic; font-weight: 400;
       background: linear-gradient(135deg, #b83a2a 0%, #8E2A1F 50%, #6d1f16 100%);
       -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
     }
-    .hero .tagline { color: #58504A; font-size: 0.95rem; margin: 0.5rem auto 0; max-width: 540px; }
+    .hero .brand-sub {
+      font-family: var(--brand-display); font-style: italic; font-weight: 400;
+      font-size: 0.85rem; letter-spacing: 0.16em; color: rgba(31,26,23,0.45);
+      margin-top: 0.2rem;
+    }
+    .hero .tagline { color: #58504A; font-size: 0.95rem; margin: 0.6rem auto 0; max-width: 540px; }
     .hero .tagline-short { display: none; }
     .hero .hero-cta { display: inline-block; margin-top: 1rem; text-decoration: none; padding: 0.6rem 1.3rem; font-size: 0.9rem; }
     @media (max-width: 620px) {
       .hero { padding: 0.9rem 0 0.75rem; }
       .hero .brand-row { gap: 0.4rem; }
       .hero h1 { font-size: 1.5rem; line-height: 1.15; }
+      .hero .brand-sub { font-size: 0.65rem; letter-spacing: 0.14em; margin-top: 0.1rem; }
       .hero .sunmoon { width: 34px; height: 34px; }
       .hero .tagline-full { display: none; }
       .hero .tagline-short { display: block; font-size: 0.88rem; margin-top: 0.35rem; }
@@ -880,7 +887,7 @@
       <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
       <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
     </svg>
-    <span class="m-brand-word">AstroChaganti's Panchangam</span>
+    <span class="m-brand-word">Astro Chaganti Panchangam</span>
   </span>
   <button class="m-icon-btn m-help-btn" id="m-help-btn"
           aria-label="How to read this" aria-controls="m-help-sheet" aria-expanded="false">
@@ -1022,7 +1029,7 @@
   <div class="m-drawer-body" id="m-subscribe-body">
     <!-- Subscribe and MCP cards relocate here -->
     <div class="m-about" id="m-about">
-      <strong>AstroChaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
+      <strong>Astro Chaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
       a daily glance, and a family timing tool. It's open source, runs without an account,
       and updates automatically. For personal readings and consultations, visit
       <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>.
@@ -1045,12 +1052,13 @@
         <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
         <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
       </svg>
-      <h1>Astro<em>Chaganti's Panchangam</em></h1>
+      <div class="brand-text">
+        <h1>Astro <em>Chaganti</em></h1>
+        <div class="brand-sub">Panchangam</div>
+      </div>
     </div>
-    <div class="tagline tagline-full">The full Telugu panchangam in your calendar app — Tithi, muhurtams, Ekadashi, eclipses
-    and festival days — plus daily tools: the Gochara chart with Rasi Phalalu, and Tarabalam &amp; Muhurtam
-    for your family's good days and time slots. Free, no account, updated automatically.</div>
-    <div class="tagline tagline-short">Telugu panchangam in your calendar — plus daily tools.</div>
+    <div class="tagline tagline-full">Making Vedic panchangam guidance accessible to the world — free, automatic, and updated every day.</div>
+    <div class="tagline tagline-short">Vedic panchangam guidance, accessible to the world.</div>
     <a class="btn hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
   </div>
 
