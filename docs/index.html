@@ -29,11 +29,11 @@
     .page { max-width: 760px; margin: 0 auto; }
 
     html { scroll-behavior: smooth; }
-    .hero { text-align: center; padding: 1.75rem 0 1.25rem; }
-    .hero .brand-row { display: flex; align-items: center; justify-content: center; gap: 0.7rem; }
+    .hero { text-align: center; padding: 2.25rem 0 2rem; }
+    .hero .brand-row { display: flex; align-items: center; justify-content: center; gap: 1rem; }
     .hero .sunmoon { flex: none; animation: none; }
     .hero .brand-text { text-align: left; }
-    .hero h1 { font-family: var(--brand-display); font-size: 2.1rem; font-weight: 400; margin: 0; letter-spacing: 0.005em; line-height: 1.2; color: #1F1A17; }
+    .hero h1 { font-family: var(--brand-display); font-size: 2.5rem; font-weight: 400; margin: 0; letter-spacing: 0.005em; line-height: 1.2; color: #1F1A17; }
     .hero h1 em {
       font-style: italic; font-weight: 400;
       background: linear-gradient(135deg, #b83a2a 0%, #8E2A1F 50%, #6d1f16 100%);
@@ -41,12 +41,11 @@
     }
     .hero .brand-sub {
       font-family: var(--brand-display); font-style: italic; font-weight: 400;
-      font-size: 0.85rem; letter-spacing: 0.16em; color: rgba(31,26,23,0.45);
-      margin-top: 0.2rem;
+      font-size: 0.92rem; letter-spacing: 0.22em; color: rgba(31,26,23,0.45);
+      margin-top: 0.25rem;
     }
-    .hero .tagline { color: #58504A; font-size: 0.95rem; margin: 0.6rem auto 0; max-width: 540px; }
+    .hero .tagline { color: #58504A; font-size: 1rem; margin: 1rem auto 0; max-width: 540px; }
     .hero .tagline-short { display: none; }
-    .hero .hero-cta { display: inline-block; margin-top: 1rem; text-decoration: none; padding: 0.6rem 1.3rem; font-size: 0.9rem; }
     @media (max-width: 620px) {
       .hero { padding: 0.9rem 0 0.75rem; }
       .hero .brand-row { gap: 0.4rem; }
@@ -55,7 +54,6 @@
       .hero .sunmoon { width: 34px; height: 34px; }
       .hero .tagline-full { display: none; }
       .hero .tagline-short { display: block; font-size: 0.88rem; margin-top: 0.35rem; }
-      .hero .hero-cta { margin-top: 0.7rem; padding: 0.5rem 1rem; font-size: 0.85rem; }
     }
     #subscribe { scroll-margin-top: 1rem; }
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
@@ -125,16 +123,15 @@
     .strip-title { font-size: 0.75rem; font-weight: 700; color: #8B8377; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.45rem; font-style: italic; font-family: var(--brand-display), serif; }
     .strip-title.good-t { color: #15803d; }
     .strip-title.bad-t { color: #8E2A1F; }
-    .avoid-strip > summary.strip-title { cursor: pointer; list-style: none; display: flex; align-items: center; }
-    .avoid-strip > summary.strip-title::-webkit-details-marker { display: none; }
-    .avoid-strip > summary.strip-title::after { content: '▾'; margin-left: auto; font-style: normal; color: #B5AC9C; }
-    .avoid-strip[open] > summary.strip-title::after { content: '▴'; }
     .avoid-strip > .win-grid { margin-top: 0.45rem; }
     .avoid-count { font-style: normal; font-weight: 600; color: #B5AC9C; text-transform: none; letter-spacing: normal; }
+    /* Mobile: collapse the Avoid windows behind a tap-to-expand toggle */
+    body[data-mode="mobile"] .avoid-strip > .avoid-toggle { cursor: pointer; display: flex; align-items: center; }
+    body[data-mode="mobile"] .avoid-strip > .avoid-toggle::after { content: '▾'; margin-left: auto; font-style: normal; color: #B5AC9C; }
+    body[data-mode="mobile"] .avoid-strip.open > .avoid-toggle::after { content: '▴'; }
+    body[data-mode="mobile"] .avoid-strip > .win-grid { display: none; }
+    body[data-mode="mobile"] .avoid-strip.open > .win-grid { display: flex; }
     /* Desktop: always show the Avoid windows, hide the toggle affordance */
-    body:not([data-mode="mobile"]) .avoid-strip > .win-grid { display: grid !important; }
-    body:not([data-mode="mobile"]) .avoid-strip > summary.strip-title { cursor: default; }
-    body:not([data-mode="mobile"]) .avoid-strip > summary.strip-title::after { content: ''; }
     body:not([data-mode="mobile"]) .avoid-count { display: none; }
     .win-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.3rem; }
     .chog-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; }
@@ -1057,7 +1054,7 @@
 
   <div class="hero">
     <div class="brand-row">
-      <svg class="sunmoon" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="width:48px;height:48px;">
+      <svg class="sunmoon" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="width:58px;height:58px;">
         <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
         <ellipse cx="24" cy="24" rx="12" ry="19" transform="rotate(22 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.3" stroke-opacity="0.6"/>
         <circle cx="13.5" cy="16" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
@@ -1071,7 +1068,6 @@
     </div>
     <div class="tagline tagline-full">Making Vedic panchangam guidance accessible to the world — free, automatic, and updated every day.</div>
     <div class="tagline tagline-short">Vedic panchangam guidance, accessible to the world.</div>
-    <a class="btn hero-cta" href="#subscribe">📅 Subscribe to your calendar</a>
   </div>
 
   <div class="card">
@@ -1879,7 +1875,7 @@
     }
     if (data.inauspicious.length) {
       const avoidCount = groupWins(data.inauspicious).length;
-      windows += `<details class="tile-strip avoid-strip"><summary class="strip-title bad-t">🔴 Avoid <span class="avoid-count">(${avoidCount} window${avoidCount === 1 ? '' : 's'})</span></summary><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></details>`;
+      windows += `<div class="tile-strip avoid-strip"><div class="strip-title bad-t avoid-toggle" onclick="this.closest('.avoid-strip').classList.toggle('open')">🔴 Avoid <span class="avoid-count">(${avoidCount} window${avoidCount === 1 ? '' : 's'})</span></div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
     }
 
     // 4 · The day's timeline — Choghadiya as full-width colour-coded strips,
