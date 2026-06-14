@@ -87,3 +87,66 @@ def test_ayanam_uttarayanam_signs():
     assert ayanam_name(3) == 'Dakshinayanam' # Karkataka
     assert ayanam_name(4) == 'Dakshinayanam' # Simha
     assert ayanam_name(8) == 'Dakshinayanam' # Dhanu
+
+
+# --- Nakshatra Ghati Window ---
+
+def test_nakshatra_ghati_window_happy_path():
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+    from telugu_panchangam.models.panchangam_day import Span
+    from datetime import datetime, timezone, timedelta
+
+    start_time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
+    # Span of 1 hour (3600 seconds)
+    end_time = start_time + timedelta(hours=1)
+    span = Span(name='Ashvini', start=start_time, end=end_time)
+
+    # Fake ghatis list where Ashvini (index 0) has a start of 30 ghatis
+    ghatis = [30] + [0] * 26
+
+    window = nakshatra_ghati_window(span, ghatis, 'Test Window')
+
+    assert window.name == 'Test Window'
+    # 30/60 is exactly halfway, so start is 12:30
+    assert window.start == start_time + timedelta(minutes=30)
+    # Duration is always 4/60 of the span, which is 1 hour * (4/60) = 4 minutes
+    assert window.end == window.start + timedelta(minutes=4)
+
+
+def test_nakshatra_ghati_window_zero_duration():
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+    from telugu_panchangam.models.panchangam_day import Span
+    from datetime import datetime, timezone
+
+    time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
+    span = Span(name='Bharani', start=time, end=time)
+
+    # Bharani is index 1
+    ghatis = [0, 24] + [0] * 25
+
+    window = nakshatra_ghati_window(span, ghatis, 'Zero Duration')
+
+    assert window.name == 'Zero Duration'
+    assert window.start == time
+    assert window.end == time
+
+
+def test_nakshatra_ghati_window_different_nakshatra():
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+    from telugu_panchangam.models.panchangam_day import Span
+    from datetime import datetime, timezone, timedelta
+
+    start_time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
+    end_time = start_time + timedelta(hours=2)
+    span = Span(name='Krittika', start=start_time, end=end_time)
+
+    # Krittika is index 2
+    ghatis = [0, 0, 45] + [0] * 24
+
+    window = nakshatra_ghati_window(span, ghatis, 'Krittika Window')
+
+    assert window.name == 'Krittika Window'
+    # 45/60 is 3/4. 3/4 of 2 hours is 1.5 hours (90 minutes)
+    assert window.start == start_time + timedelta(minutes=90)
+    # Duration is 4/60. 4/60 of 2 hours is 120 * 4 / 60 = 8 minutes
+    assert window.end == window.start + timedelta(minutes=8)
