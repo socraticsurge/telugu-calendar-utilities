@@ -1,5 +1,4 @@
 # src/engines/vakya.py
-import math
 from datetime import date
 
 from telugu_panchangam.engines.surya_siddhanta import (
