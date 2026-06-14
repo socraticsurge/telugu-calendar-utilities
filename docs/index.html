@@ -526,10 +526,21 @@
     body[data-mode="mobile"] #panel-gochara .tb-controls .selector-row { gap: 0.4rem; }
     body[data-mode="mobile"] #panel-gochara .tb-controls .selector { flex: 1 1 48%; }
     body[data-mode="mobile"] #panel-gochara .tb-controls .selector label { font-size: 0.68rem; }
-    /* Sade Sati / Ashtama Shani banner prominent above the chart */
+    /* Chart first, then the Sade Sati banner + Coming up below it — keeps the
+       12-house grid visible without scrolling past the conditions banner. */
+    body[data-mode="mobile"] #panel-gochara { display: flex; flex-direction: column; }
+    body[data-mode="mobile"] #panel-gochara > .tb-controls { order: 1; }
+    body[data-mode="mobile"] #panel-gochara > #go-chart { order: 2; }
+    body[data-mode="mobile"] #panel-gochara > #go-conditions { order: 3; }
+    body[data-mode="mobile"] #panel-gochara > #go-note { order: 4; }
+    body[data-mode="mobile"] #panel-gochara > #go-moves { order: 5; }
+    body[data-mode="mobile"] #panel-gochara > #go-phalalu { order: 6; }
+    body[data-mode="mobile"] #panel-gochara > #go-legend { order: 7; }
+    body[data-mode="mobile"] #panel-gochara > .preview-note { order: 8; }
+    /* Sade Sati / Ashtama Shani banner, now below the chart */
     body[data-mode="mobile"] #go-conditions .go-cond {
       background: linear-gradient(180deg, #FBF6EB, #F5E6D3);
-      border: 1px solid #D9A85C; border-radius: 8px; padding: 0.65rem 0.8rem; margin: 0.4rem 0 0.6rem;
+      border: 1px solid #D9A85C; border-radius: 8px; padding: 0.65rem 0.8rem; margin: 0.6rem 0 0.4rem;
     }
     body[data-mode="mobile"] #go-conditions .chip {
       background: #f59e0b; color: #fff; border: 0; font-weight: 700;
