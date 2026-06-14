@@ -229,17 +229,166 @@ def test_naming_uses_shubh_bonus():
         assert any('Shubh favoured for Naming' in r for r in shubh[0]['reasons'])
 
 
-def test_court_no_special_rules():
-    # 'court' has no skip_on_yoga, no prefer_choghadiya, no avoid_karana.
-    # It should still produce slots and not add an activity-specific reason.
+def test_court_uses_jaya_class():
+    # court prefers Jaya tithi class. 2026-06-17 is Krishna Trayodashi
+    # (tithi 13 — Jaya family). Court slots should pick up the bonus.
     day = _day(2026, 6, 17)
     slots = day_slots(day, activity='court')
     assert slots
-    # no 'favoured for Court' or 'Vishti karana avoided' lines
+    assert any('Jaya' in r and 'favoured for Court' in r for s in slots for r in s['reasons'])
+
+
+# --- Tithi family + Vara (Batch B) ---
+#
+# Calendar pins (verified against the Drik engine for Hyderabad):
+#   2026-06-16  Tue  Shukla Dwitiya       Bhadra   (no special yogas)
+#   2026-06-17  Wed  Shukla Tritiya       Jaya     (Dagdha Yoga)
+#   2026-06-18  Thu  Shukla Chaturthi     Rikta    (Sarvartha + Amrita Siddhi)
+#   2026-06-19  Fri  Shukla Panchami      Purna    (no yogas)
+#   2026-06-21  Sun  Shukla Saptami       Bhadra   (no yogas)
+#   2026-06-23  Tue  Shukla Navami        Rikta    (no yogas)
+#   2026-06-26  Fri  Shukla Dwadashi      Bhadra   (no yogas)
+#   2026-06-29  Mon  Pournami             Purna    (no yogas)
+#   2026-07-02  Thu  Krishna Dwitiya      Bhadra   (no yogas)
+
+def test_tithi_family_classification():
+    from telugu_panchangam.personal.tithi_class import (
+        tithi_number, tithi_family, FAMILIES,
+    )
+    # Engine-canonical names (Pratipat, Shashthi) and the two terminus
+    # aliases (Pournami / Amavasya) all map correctly.
+    assert tithi_family('Shukla Pratipat') == 'Nanda'        # 1
+    assert tithi_family('Shukla Shashthi') == 'Nanda'        # 6
+    assert tithi_family('Parama Ekadashi') == 'Nanda'        # 11 — named Ekadashi
+    assert tithi_family('Shukla Dwitiya') == 'Bhadra'        # 2
+    assert tithi_family('Krishna Trayodashi') == 'Jaya'      # 13
+    assert tithi_family('Krishna Chaturdashi') == 'Rikta'    # 14
+    assert tithi_family('Pournami') == 'Purna'               # Shukla terminus
+    assert tithi_family('Amavasya') == 'Purna'               # Krishna terminus
+    # Common spelling alternates still parse.
+    assert tithi_family('Shukla Pratipada') == 'Nanda'       # alias for Pratipat
+    assert tithi_family('Krishna Shashti') == 'Nanda'        # alias for Shashthi
+    # tithi_number returns 1..15
+    assert tithi_number('Krishna Dwadashi') == 12
+    # every family has 3 tithis
+    from telugu_panchangam.personal.tithi_class import TITHI_NUMBER_FAMILY
+    from collections import Counter
+    counts = Counter(TITHI_NUMBER_FAMILY.values())
+    for fam in FAMILIES:
+        assert counts[fam] == 3, f'{fam} should have 3 tithis, got {counts[fam]}'
+
+
+def test_rikta_tithi_universal_penalty():
+    # 2026-06-23 — Shukla Navami (9, Rikta), no special yogas. Pure Rikta.
+    day = _day(2026, 6, 23)
+    slots = day_slots(day, activity='any')
+    assert slots
+    assert any('Rikta tithi' in r and '(-2)' in r
+               for s in slots for r in s['reasons'])
+
+
+def test_rikta_penalty_applies_to_any_activity():
+    # Same Rikta day, with 'court' activity — penalty still appears.
+    day = _day(2026, 6, 23)
+    slots = day_slots(day, activity='court')
+    assert any('Rikta tithi' in r and '(-2)' in r
+               for s in slots for r in s['reasons'])
+
+
+def test_purna_tithi_wedding_bonus():
+    # 2026-06-29 (Mon) = Pournami (Purna). Wedding prefers Purna + Somavaram.
+    # Both the tithi-class AND vara bonuses should fire.
+    day = _day(2026, 6, 29)
+    slots = day_slots(day, activity='wedding')
+    assert slots, 'fixture: 2026-06-29 has no Visha/Dagdha'
+    reasons = [r for s in slots for r in s['reasons']]
+    assert any('Purna' in r and 'favoured for Wedding' in r for r in reasons), \
+        f'expected Purna wedding reason; saw {reasons}'
+    assert any('Somavaram favoured for Wedding' in r for r in reasons), \
+        f'expected Somavaram wedding vara reason; saw {reasons}'
+
+
+def test_jaya_tithi_court_bonus():
+    # 2026-06-17 (Wed) = Shukla Tritiya (Jaya). Court has prefer Jaya.
+    # Court has no skip_on_yoga, so Dagdha just adds a -2 penalty here.
+    slots = day_slots(_day(2026, 6, 17), activity='court')
+    assert any('Jaya' in r and 'favoured for Court' in r
+               for s in slots for r in s['reasons'])
+
+
+def test_bhadra_tithi_gruhapravesha_bonus():
+    # 2026-06-21 (Sun) = Shukla Saptami (Bhadra). Gruhapravesha prefers
+    # Bhadra. Adivaram is not in gruhapravesha's preferred vara list, so
+    # only the tithi-class +1 should fire — clean isolation.
+    day = _day(2026, 6, 21)
+    slots = day_slots(day, activity='gruhapravesha')
+    assert slots
+    reasons = [r for s in slots for r in s['reasons']]
+    assert any('Bhadra' in r and 'favoured for Gruhapravesha' in r for r in reasons)
+    # Sunday is NOT preferred — no Adivaram vara bonus should appear.
+    assert not any('Adivaram favoured for Gruhapravesha' in r for r in reasons)
+
+
+def test_vara_bonus_thursday_wedding():
+    # 2026-07-02 (Thu) = Krishna Dwitiya (Bhadra). Wedding prefers Purna
+    # tithi (not Bhadra) and Guruvaram vara — so only the vara bonus fires.
+    day = _day(2026, 7, 2)
+    slots = day_slots(day, activity='wedding')
+    assert slots
+    reasons = [r for s in slots for r in s['reasons']]
+    assert any('Guruvaram favoured for Wedding' in r for r in reasons)
+    # Bhadra is not preferred by wedding — no tithi-class line.
+    assert not any('Bhadra' in r and 'favoured for Wedding' in r for r in reasons)
+
+
+def test_vara_bonus_friday_vehicle():
+    # 2026-06-19 (Fri) = Shukla Panchami (Purna). Vehicle prefers Bhadra
+    # tithi (not Purna) and Shukravaram vara — only vara fires.
+    day = _day(2026, 6, 19)
+    slots = day_slots(day, activity='vehicle')
+    assert slots
+    reasons = [r for s in slots for r in s['reasons']]
+    assert any('Shukravaram favoured for Vehicle' in r for r in reasons)
+
+
+def test_vara_and_tithi_class_stack():
+    # 2026-06-26 (Fri) = Shukla Dwadashi (Bhadra). Vehicle prefers both
+    # Bhadra tithi AND Shukravaram vara — both bonuses should appear.
+    day = _day(2026, 6, 26)
+    slots = day_slots(day, activity='vehicle')
+    assert slots
+    reasons = [r for s in slots for r in s['reasons']]
+    assert any('Bhadra' in r and 'favoured for Vehicle' in r for r in reasons)
+    assert any('Shukravaram favoured for Vehicle' in r for r in reasons)
+
+
+def test_vara_bonus_tuesday_court():
+    # 2026-06-16 (Tue) = Shukla Dwitiya (Bhadra). Court prefers Jaya
+    # (not Bhadra) and Mangalavaram — only vara bonus fires.
+    day = _day(2026, 6, 16)
+    slots = day_slots(day, activity='court')
+    assert slots
+    reasons = [r for s in slots for r in s['reasons']]
+    assert any('Mangalavaram favoured for Court' in r for r in reasons)
+
+
+def test_no_vara_match_no_bonus():
+    # 2026-06-16 (Tue) with activity='any' — 'any' has no prefer_vara.
+    day = _day(2026, 6, 16)
+    slots = day_slots(day, activity='any')
+    assert slots
     for s in slots:
         for r in s['reasons']:
-            assert 'favoured for Court' not in r
-            assert 'Vishti' not in r
+            assert 'Mangalavaram favoured' not in r
+            assert 'favoured for Anything auspicious' not in r
+
+
+def test_unknown_tithi_name_does_not_explode():
+    # Robustness: tithi_family is wrapped in try/except inside day_slots,
+    # so an unknown tithi name silently skips tithi-class scoring.
+    from telugu_panchangam.personal.tithi_class import tithi_family
+    with pytest.raises(ValueError):
+        tithi_family('Unknown Mystery Tithi')
 
 
 def test_invalid_chandra_mode_raises():

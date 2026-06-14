@@ -1929,6 +1929,121 @@
   const MU_CHANDRA_PUJA = new Set([2, 5, 9]);
   // CHANDRA bad = {4, 8, 12} (everything else)
 
+  // Tithi family — mirror telugu_panchangam/personal/tithi_class.py
+  const TITHI_NAMES_ORDER = [
+    'Pratipat', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
+    'Shashthi', 'Saptami', 'Ashtami', 'Navami',    'Dashami',
+    'Ekadashi', 'Dwadashi','Trayodashi','Chaturdashi','Pournami',
+  ];
+  const TITHI_ALIASES = { Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15 };
+  const TITHI_NUMBER_FAMILY = {
+    1:'Nanda',  6:'Nanda',  11:'Nanda',
+    2:'Bhadra', 7:'Bhadra', 12:'Bhadra',
+    3:'Jaya',   8:'Jaya',   13:'Jaya',
+    4:'Rikta',  9:'Rikta',  14:'Rikta',
+    5:'Purna', 10:'Purna',  15:'Purna',
+  };
+  function tithiFamily(name) {
+    if (!name) return null;
+    const last = name.trim().split(/\s+/).pop();
+    if (TITHI_ALIASES[last]) return TITHI_NUMBER_FAMILY[TITHI_ALIASES[last]];
+    const idx = TITHI_NAMES_ORDER.indexOf(last);
+    return idx >= 0 ? TITHI_NUMBER_FAMILY[idx + 1] : null;
+  }
+
+  // Activity rules — mirror telugu_panchangam/personal/muhurta.py
+  // ACTIVITY_RULES. Only the fields the JS scorer consumes are duplicated
+  // here (label, prefer_tithi_class, prefer_vara). skip_on_yoga and
+  // avoid_karana are still enforced by the engine; the JS reads
+  // parsed-feed yogas and karanas to mirror behaviour for activities the
+  // user picks via the in-page dropdown.
+  const MU_ACTIVITY = {
+    any:           { label: 'Anything auspicious' },
+    travel:        { label: 'Travel / journey', avoid_karana: ['Vishti'] },
+    purchase:      { label: 'Purchase (general)', prefer_choghadiya: ['Labh', 1] },
+    ceremony:      { label: 'Ceremony / puja (general)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_vara: ['Somavaram','Guruvaram'] },
+    beginning:     { label: 'New beginning (general)',
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    wedding:       { label: 'Wedding (Vivaha)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Purna',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    engagement:    { label: 'Engagement (Nischayam)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Purna',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    naming:        { label: 'Naming (Namakaranam)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_choghadiya: ['Shubh', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    annaprasana:   { label: 'Annaprasana (First feeding)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_choghadiya: ['Shubh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Somavaram','Guruvaram'] },
+    karnavedha:    { label: 'Karnavedha (Ear-piercing)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Budhavaram','Shukravaram'] },
+    mundana:       { label: 'Mundana / Chaula (First head-shave)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    upanayana:     { label: 'Upanayana (Sacred thread)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram','Guruvaram'] },
+    vidyarambha:   { label: 'Education start (Vidyarambha)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Budhavaram'] },
+    gruhapravesha: { label: 'Gruhapravesha (Home entry)',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    vehicle:       { label: 'Vehicle purchase',
+                     prefer_choghadiya: ['Labh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Shukravaram'] },
+    property:      { label: 'Property / Land purchase',
+                     prefer_choghadiya: ['Labh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Guruvaram','Shukravaram'] },
+    gold:          { label: 'Gold / Jewelry purchase',
+                     prefer_choghadiya: ['Labh', 1],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Shukravaram','Guruvaram'] },
+    bhumi_puja:    { label: 'Bhumi Puja / Foundation laying',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Bhadra',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    business:      { label: 'Business launch',
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Guruvaram','Budhavaram'] },
+    job:           { label: 'Job start / Contract signing',
+                     prefer_choghadiya: ['Amrit', 1],
+                     prefer_tithi_class: 'Nanda',
+                     prefer_vara: ['Guruvaram','Budhavaram'] },
+    yajna:         { label: 'Yajna / Homam',
+                     skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
+                     prefer_tithi_class: 'Purna',
+                     prefer_vara: ['Guruvaram','Somavaram'] },
+    pilgrimage:    { label: 'Pilgrimage (Tirtha Yatra)', avoid_karana: ['Vishti'] },
+    court:         { label: 'Court / legal matter',
+                     prefer_tithi_class: 'Jaya',
+                     prefer_vara: ['Mangalavaram'] },
+    surgery:       { label: 'Surgery / medical procedure',
+                     avoid_karana: ['Vishti'],
+                     prefer_vara: ['Mangalavaram'] },
+  };
+
   // HTML-escape user-typed values (profile names) before they enter the
   // `reasons` strings that renderMuhurta concatenates via innerHTML.
   function muEsc(s) {
@@ -2004,20 +2119,44 @@
           if (chandraMode === 'puja_ok' && chandraBad) { droppedModeDays++; continue; }
         }
 
+        const rules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
+        const skipYogas = new Set(rules.skip_on_yoga || []);
+        const preferChog = rules.prefer_choghadiya || null;     // ['Block', bonus]
+        const avoidKaranaNames = new Set(rules.avoid_karana || []);
+        const preferTithiClass = rules.prefer_tithi_class || null;
+        const preferVaras = new Set(rules.prefer_vara || []);
+        const activityLabel = rules.label;
+
+        // Tithi family — universal Rikta penalty + activity-class bonus.
+        const tFam = tithiFamily(data.tithi && data.tithi.name);
+        if (tFam === 'Rikta') {
+          dayBonus -= 2;
+          dayReasons.push(`${data.tithi.name} (Rikta tithi) (-2)`);
+        } else if (tFam && preferTithiClass && tFam === preferTithiClass) {
+          dayBonus += 1;
+          dayReasons.push(`${data.tithi.name} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
+        }
+
+        // Vara — activity-preferred weekday (+1).
+        if (data.vaaram && preferVaras.has(data.vaaram)) {
+          dayBonus += 1;
+          dayReasons.push(`${data.vaaram} favoured for ${activityLabel} (+1)`);
+        }
+
         let skipDay = false;
         for (const y of data.yogas) {
           if (MU_YOGA_BONUS[y]) { dayBonus += MU_YOGA_BONUS[y]; dayReasons.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
           if (MU_YOGA_PENALTY[y] !== undefined) {
-            if (activity === 'ceremony') { skipDay = true; break; }
+            if (skipYogas.has(y)) { skipDay = true; break; }
             dayBonus += MU_YOGA_PENALTY[y]; dayReasons.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
           }
         }
         if (skipDay) continue;
         const bad = data.inauspicious.map(w => [muMin(w.start, w.sflag), muMin(w.end, w.eflag)]);
-        if (activity === 'travel' && data.karana) {
+        if (avoidKaranaNames.size && data.karana) {
           for (const k of data.karana.split(/\s+\/\s+/)) {
             const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-            if (m && m[1].trim() === 'Vishti') bad.push([muMin(m[2], m[3]), muMin(m[4], m[5])]);
+            if (m && avoidKaranaNames.has(m[1].trim())) bad.push([muMin(m[2], m[3]), muMin(m[4], m[5])]);
           }
         }
         const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
@@ -2035,9 +2174,11 @@
             if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
               score += 2; reasons.push('overlaps Amrita Kalam (+2)');
             }
-            if (activity === 'purchase' && c.name === 'Labh') { score += 1; reasons.push('Labh favoured for purchases (+1)'); }
-            if (activity === 'beginning' && c.name === 'Amrit') { score += 1; reasons.push('Amrit favoured for beginnings (+1)'); }
-            if (activity === 'travel') reasons.push('Vishti karana avoided');
+            if (preferChog && c.name === preferChog[0]) {
+              score += preferChog[1];
+              reasons.push(`${c.name} favoured for ${activityLabel} (+${preferChog[1]})`);
+            }
+            for (const kn of avoidKaranaNames) reasons.push(`${kn} karana avoided`);
             slots.push({ d: new Date(d), s0, e0, score, reasons });
           }
         }
