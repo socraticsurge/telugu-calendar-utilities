@@ -1,0 +1,40 @@
+name: Generate Lagna Data
+
+on:
+  schedule:
+    - cron: '45 2 1 * *'   # 1st of every month, just after gochara.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lagna:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+
+      - name: Build lagna feeds
+        run: python -m scripts.build_lagna_json
+
+      # keep_files preserves feeds/, index.html and gochara.json on
+      # gh-pages — we only add/replace the per-city *-lagna.json files.
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: true
+          cname: panchangam.astrochaganti.com
