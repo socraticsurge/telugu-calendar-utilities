@@ -16,7 +16,7 @@ from telugu_panchangam.engines.base import (
     maasam_name,
     VARJYAM_GHATIS, AMRITA_GHATIS, nakshatra_day_windows, next_nakshatra_span,
 )
-from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, Span, PanchangamDay
 from telugu_panchangam.eclipses import get_eclipse_for_date
 from telugu_panchangam.special_yogas import get_special_yogas
 
