@@ -41,6 +41,34 @@ _TIMEZONE_COUNTRY = {
     'Asia/Dubai': 'UAE',
 }
 
+_MUHURTA_DISCLAIMER = (
+    'Slots intersect good choghadiya blocks with every inauspicious '
+    'window removed (Rahu Kalam, Gulika, Yamagandam, Varjyam, '
+    'Durmuhurtham). Scoring: tarabalam +/-1 per person, chandrabalam '
+    '+/-1 per person, tithi class +1 / Rikta -2, vara match +1, '
+    'special-yoga bonuses, Nitya yoga (auspicious +1, Vyatipata/'
+    'Vaidhriti -2 + samskara skip, dosha-window -1), Abhijit/Amrita '
+    '+2, activity bias +1. Eclipse days are skipped outright. '
+    'Each slot carries a tier (Excellent/Good/Fair/Avoid), assigned '
+    'relative to the highest/lowest score found across this search '
+    '(so "Excellent" means the best of what turned up, not a fixed '
+    'absolute bar), and a reason_groups breakdown '
+    '(slot_quality, day_quality, group_fit, '
+    'activity_match, notes) for transparent reasoning. '
+    'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '
+    'flags an unrectified personal Moon caution, and day_dosha '
+    '(rikta_tithi/visha_dagdha_yoga/vyatipata_vaidhriti/null) flags a '
+    'day-level dosha: either keeps a slot capped below Excellent, and '
+    'slots are ranked tier-first (Excellent > Good > '
+    'Fair > Avoid), then by score, then preferring dosha-free slots. '
+    'Tiers are relative to this search, not a universal standard — '
+    '"Good"/"Fair" slots with personal_dosha and day_dosha both null are '
+    'workable choices, not just runner-ups. When presenting results, '
+    'surface personal_dosha/day_dosha and notes regardless of tier, and '
+    'for weddings, major samskaras, or any caution the devotee is unsure '
+    'about, recommend consulting their purohit.'
+)
+
 
 def _parse_date(date_str: str) -> date:
     try:
@@ -563,6 +591,70 @@ def tool_get_rasi_phalalu(
         return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
 
 
+def _validate_muhurta_inputs(
+    days: int,
+    activity: str,
+    chandra_mode: str,
+    janma_nakshatras: Optional[list],
+    janma_rasis: Optional[list]
+) -> None:
+    if not 1 <= days <= 14:
+        raise ValueError('days must be between 1 and 14.')
+    if activity not in ACTIVITIES:
+        raise ValueError(f'activity must be one of {ACTIVITIES}.')
+    if chandra_mode not in ('stars', 'puja_ok', 'strict'):
+        raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
+    if janma_nakshatras:
+        if len(janma_nakshatras) > 4:
+            raise ValueError('Provide at most 4 janma nakshatras.')
+        for nak in janma_nakshatras:
+            if not isinstance(nak, str) or len(nak) > _MAX_NAME:
+                raise ValueError('Invalid nakshatra name.')
+            _nak_index(nak)
+    if janma_rasis is not None:
+        if not janma_nakshatras or len(janma_rasis) != len(janma_nakshatras):
+            raise ValueError('janma_rasis must align with janma_nakshatras '
+                             '(use null for people whose rashi is unknown).')
+        for r in janma_rasis:
+            if r is not None:
+                if not isinstance(r, str) or len(r) > _MAX_NAME:
+                    raise ValueError('Invalid rashi name.')
+                _rasi_index(r)
+
+
+def _gather_muhurta_slots(
+    start: date,
+    days: int,
+    loc: Location,
+    engine: object,
+    activity: str,
+    janma_nakshatras: Optional[list],
+    janma_rasis: Optional[list],
+    chandra_mode: str
+) -> tuple[list, list]:
+    slots = []
+    dropped_days = []
+    tz = loc.timezone
+    for i in range(days):
+        day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
+        day_results = day_slots(day, activity=activity,
+                                janma_nakshatras=janma_nakshatras,
+                                janma_rasis=janma_rasis,
+                                chandra_mode=chandra_mode,
+                                engine=engine)
+        if not day_results:
+            reason = diagnose_day(day, activity=activity,
+                                  janma_nakshatras=janma_nakshatras,
+                                  janma_rasis=janma_rasis,
+                                  chandra_mode=chandra_mode)
+            if reason:
+                dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
+        for s in day_results:
+            slots.append({**s, 'start': _fmt_time(s['start'], tz),
+                          'end': _fmt_time(s['end'], tz)})
+    return slots, dropped_days
+
+
 def tool_find_muhurta(
     start_date: str,
     days: int = 7,
@@ -577,53 +669,16 @@ def tool_find_muhurta(
     timezone: Optional[str] = None,
 ) -> str:
     try:
-        if not 1 <= days <= 14:
-            raise ValueError('days must be between 1 and 14.')
-        if activity not in ACTIVITIES:
-            raise ValueError(f'activity must be one of {ACTIVITIES}.')
-        if chandra_mode not in ('stars', 'puja_ok', 'strict'):
-            raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
-        if janma_nakshatras:
-            if len(janma_nakshatras) > 4:
-                raise ValueError('Provide at most 4 janma nakshatras.')
-            for nak in janma_nakshatras:
-                if not isinstance(nak, str) or len(nak) > _MAX_NAME:
-                    raise ValueError('Invalid nakshatra name.')
-                _nak_index(nak)
-        if janma_rasis is not None:
-            if not janma_nakshatras or len(janma_rasis) != len(janma_nakshatras):
-                raise ValueError('janma_rasis must align with janma_nakshatras '
-                                 '(use null for people whose rashi is unknown).')
-            for r in janma_rasis:
-                if r is not None:
-                    if not isinstance(r, str) or len(r) > _MAX_NAME:
-                        raise ValueError('Invalid rashi name.')
-                    _rasi_index(r)
+        _validate_muhurta_inputs(days, activity, chandra_mode, janma_nakshatras, janma_rasis)
         start = _parse_date(start_date)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
         engine = _ENGINES[system]
-        tz = loc.timezone
 
-        slots = []
-        dropped_days = []
-        for i in range(days):
-            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
-            day_results = day_slots(day, activity=activity,
-                                    janma_nakshatras=janma_nakshatras,
-                                    janma_rasis=janma_rasis,
-                                    chandra_mode=chandra_mode,
-                                    engine=engine)
-            if not day_results:
-                reason = diagnose_day(day, activity=activity,
-                                      janma_nakshatras=janma_nakshatras,
-                                      janma_rasis=janma_rasis,
-                                      chandra_mode=chandra_mode)
-                if reason:
-                    dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
-            for s in day_results:
-                slots.append({**s, 'start': _fmt_time(s['start'], tz),
-                              'end': _fmt_time(s['end'], tz)})
+        slots, dropped_days = _gather_muhurta_slots(
+            start, days, loc, engine, activity, janma_nakshatras, janma_rasis, chandra_mode
+        )
+
         # Re-tier across the whole search, not just one day — "Excellent"
         # means the best of what turned up over the full date range.
         assign_tiers(slots)
@@ -635,31 +690,7 @@ def tool_find_muhurta(
             'city': city, 'system': system, 'chandra_mode': chandra_mode,
             'slots': slots[:12],
             'dropped_days': dropped_days,
-            'disclaimer': 'Slots intersect good choghadiya blocks with every inauspicious '
-                          'window removed (Rahu Kalam, Gulika, Yamagandam, Varjyam, '
-                          'Durmuhurtham). Scoring: tarabalam +/-1 per person, chandrabalam '
-                          '+/-1 per person, tithi class +1 / Rikta -2, vara match +1, '
-                          'special-yoga bonuses, Nitya yoga (auspicious +1, Vyatipata/'
-                          'Vaidhriti -2 + samskara skip, dosha-window -1), Abhijit/Amrita '
-                          '+2, activity bias +1. Eclipse days are skipped outright. '
-                          'Each slot carries a tier (Excellent/Good/Fair/Avoid), assigned '
-                          'relative to the highest/lowest score found across this search '
-                          '(so "Excellent" means the best of what turned up, not a fixed '
-                          'absolute bar), and a reason_groups breakdown '
-                          '(slot_quality, day_quality, group_fit, '
-                          'activity_match, notes) for transparent reasoning. '
-                          'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '
-                          'flags an unrectified personal Moon caution, and day_dosha '
-                          '(rikta_tithi/visha_dagdha_yoga/vyatipata_vaidhriti/null) flags a '
-                          'day-level dosha: either keeps a slot capped below Excellent, and '
-                          'slots are ranked tier-first (Excellent > Good > '
-                          'Fair > Avoid), then by score, then preferring dosha-free slots. '
-                          'Tiers are relative to this search, not a universal standard — '
-                          '"Good"/"Fair" slots with personal_dosha and day_dosha both null are '
-                          'workable choices, not just runner-ups. When presenting results, '
-                          'surface personal_dosha/day_dosha and notes regardless of tier, and '
-                          'for weddings, major samskaras, or any caution the devotee is unsure '
-                          'about, recommend consulting their purohit.',
+            'disclaimer': _MUHURTA_DISCLAIMER,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
