@@ -108,9 +108,8 @@ def test_abhijit_is_full_muhurta():
 def test_window_durations_scale_with_nakshatra(engine_cls):
     # Structural check for the classical engines: varjyam and amrita kalam
     # windows last 4/60 of their nakshatra's duration, not 4 minutes.
-    # Upper bound is loose because the SS manda correction currently
-    # exaggerates nakshatra durations — tighten to ~120 once that is fixed.
+    # Upper bound tightened to 120 since SS manda correction is exact.
     day = engine_cls().calculate(date(2026, 6, 11), HYD)
     for w in day.varjyam + day.amrita_kalam:
         dur_min = (w.end - w.start).total_seconds() / 60
-        assert 60 <= dur_min <= 200, f'{w.name} lasts {dur_min:.0f} min'
+        assert 60 <= dur_min <= 120, f'{w.name} lasts {dur_min:.0f} min'
