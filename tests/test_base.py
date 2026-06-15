@@ -87,3 +87,35 @@ def test_ayanam_uttarayanam_signs():
     assert ayanam_name(3) == 'Dakshinayanam' # Karkataka
     assert ayanam_name(4) == 'Dakshinayanam' # Simha
     assert ayanam_name(8) == 'Dakshinayanam' # Dhanu
+
+def test_nakshatra_ghati_window():
+    from datetime import datetime, timedelta, timezone
+    from telugu_panchangam.models.panchangam_day import Span, Window
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+
+    # Create a 60-hour span to make calculations straightforward (1 hour = 1 ghati proportion)
+    start = datetime(2025, 1, 1, 0, 0, tzinfo=timezone.utc)
+    end = start + timedelta(hours=60)
+
+    # Ashvini is at index 0 in NAKSHATRA_NAMES
+    span = Span(name='Ashvini', start=start, end=end)
+
+    # Create a mock ghatis list.
+    # The length must be at least up to the index. Let's make it 27, all 0s, except index 0 which we test.
+    # Let's say the window starts at 30 ghatis.
+    ghatis = [0] * 27
+    ghatis[0] = 30
+
+    # Run function
+    window = nakshatra_ghati_window(span, ghatis, 'Test Window')
+
+    # Calculations:
+    # duration = 60 hours
+    # start_offset = 60 * (30/60) = 30 hours
+    # window duration = 60 * (4/60) = 4 hours
+    expected_start = start + timedelta(hours=30)
+    expected_end = expected_start + timedelta(hours=4)
+
+    assert window.name == 'Test Window'
+    assert window.start == expected_start
+    assert window.end == expected_end
