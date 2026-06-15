@@ -19,6 +19,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install Playwright (for browser smoke tests)
+        # Local dev environments can skip this; tests/test_browser_smoke.py
+        # uses pytest.importorskip to auto-skip when Playwright isn't
+        # available. CI always installs so the smoke tests actually run.
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
       - name: Run tests
         run: python -m pytest tests/ -v
 
