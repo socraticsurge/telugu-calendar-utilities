@@ -87,3 +87,32 @@ def test_ayanam_uttarayanam_signs():
     assert ayanam_name(3) == 'Dakshinayanam' # Karkataka
     assert ayanam_name(4) == 'Dakshinayanam' # Simha
     assert ayanam_name(8) == 'Dakshinayanam' # Dhanu
+
+# --- Window boundary testing ---
+
+def test_nakshatra_day_windows_boundaries():
+    from datetime import datetime, timedelta
+    from telugu_panchangam.models.panchangam_day import Span
+    from telugu_panchangam.engines.base import nakshatra_day_windows
+
+    day_start = datetime(2023, 1, 1, 6, 0)
+    day_end = datetime(2023, 1, 2, 6, 0)
+
+    # Use Ashvini (index 0) with a custom ghatis list where ghatis[0] = 0.
+    # This means the window starts exactly at the span's start time.
+    ghatis = [0] * 27
+
+    span_exact_start = Span(name='Ashvini', start=day_start, end=day_start + timedelta(hours=1))
+    span_before_start = Span(name='Ashvini', start=day_start - timedelta(microseconds=1), end=day_start + timedelta(hours=1))
+    span_before_end = Span(name='Ashvini', start=day_end - timedelta(microseconds=1), end=day_end + timedelta(hours=1))
+    span_exact_end = Span(name='Ashvini', start=day_end, end=day_end + timedelta(hours=1))
+
+    spans = [span_exact_start, span_before_start, span_before_end, span_exact_end]
+
+    windows = nakshatra_day_windows(spans, ghatis, "Test", day_start, day_end)
+
+    assert len(windows) == 2
+    # Included: starting exactly at day_start
+    assert windows[0].start == span_exact_start.start
+    # Included: starting just before day_end
+    assert windows[1].start == span_before_end.start
