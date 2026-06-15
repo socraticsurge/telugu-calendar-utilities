@@ -314,53 +314,91 @@ def _slot_lagna_name(lagnas, slot_start):
     return None
 
 
-def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna):
+def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
+                 janma_lagnas=None):
     """Per-person lagna position against the slot's rising sign.
 
     Kendra (1/4/7/10 from janma) and Trikona (1/5/9) are favourable;
     Ashtama (8) is the personal "lagna dosha" — same tier-cap treatment
     as Ashtama Chandra. Position 1 is reported as 'own' (the strongest
-    single position — janma rashi itself rising).
+    single position).
 
-    Reference convention: counting is from the person's janma RASHI
-    (derived from their janma nakshatra), not their janma lagna. Strict
-    "Lagna Shuddhi" muhurta selection would count from the natal
-    ascendant; we follow the Chandra-Rashi-as-lagna tradition because
-    janma lagna requires exact birth time + place that most users
-    don't have at hand. Reason chips name the reference rashi
-    explicitly so the convention is visible at-a-glance.
+    Two independent reference checks, both scored when both are set:
+      - **From janma rashi** — slot lagna's position counted from the
+        person's Moon-rashi at birth (derived from their nakshatra).
+        Chandra-Rashi-as-lagna tradition; chip ends with "from <rasi>".
+      - **From janma lagna** — slot lagna's position counted from the
+        person's natal ascendant. Strict Lagna Shuddhi; chip ends with
+        "from <rasi> lagna" so the reference is visible.
+
+    Both checks contribute independently to score and reason chips —
+    the natal Moon and the natal ascendant are usually in different
+    rashis, so kendra-from-Moon and kendra-from-Lagna capture genuinely
+    different astrological qualities. Classical purohits compute both.
 
     Returns (bonus, reasons, ashtama_names).
     """
     if not janma_rasis or not slot_lagna:
         return 0, [], []
     bonus = 0
-    favourable, ashtama, ashtama_names = [], [], []
+    fav_rashi, ash_rashi = [], []
+    fav_lagna, ash_lagna = [], []
+    ashtama_names: list[str] = []
+
+    def _record_ashtama(label):
+        if label not in ashtama_names:
+            ashtama_names.append(label)
+
     for i, rasi in enumerate(janma_rasis):
         if rasi is None:
             continue
         janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
         label = _label(janma_label, i)
-        pos = lagna_position(rasi, slot_lagna)
-        if is_ashtama_lagna(pos):
-            ashtama.append(f'{label} lagna@{pos} from {rasi}')
-            ashtama_names.append(label)
+        # Always: position from janma rashi.
+        pos_r = lagna_position(rasi, slot_lagna)
+        if is_ashtama_lagna(pos_r):
+            ash_rashi.append(f'{label} lagna@{pos_r} from {rasi}')
+            _record_ashtama(label)
             bonus -= 1
-        elif is_favourable_lagna(pos):
-            favourable.append(
-                f'{label} {lagna_verdict(pos)}@{pos} from {rasi}'
+        elif is_favourable_lagna(pos_r):
+            fav_rashi.append(
+                f'{label} {lagna_verdict(pos_r)}@{pos_r} from {rasi}'
             )
             bonus += 1
+        # Additionally: position from janma lagna when supplied.
+        if janma_lagnas and i < len(janma_lagnas) and janma_lagnas[i]:
+            jl = janma_lagnas[i]
+            pos_l = lagna_position(jl, slot_lagna)
+            if is_ashtama_lagna(pos_l):
+                ash_lagna.append(f'{label} lagna@{pos_l} from {jl} lagna')
+                _record_ashtama(label)
+                bonus -= 1
+            elif is_favourable_lagna(pos_l):
+                fav_lagna.append(
+                    f'{label} {lagna_verdict(pos_l)}@{pos_l} from {jl} lagna'
+                )
+                bonus += 1
+
     reasons = []
-    if favourable:
+    if fav_rashi:
         reasons.append(
-            f"{slot_lagna} lagna favourable for {', '.join(favourable)} "
-            f"(+{len(favourable)})"
+            f"{slot_lagna} lagna favourable for {', '.join(fav_rashi)} "
+            f"(+{len(fav_rashi)})"
         )
-    if ashtama:
+    if fav_lagna:
         reasons.append(
-            f"{slot_lagna} lagna Ashtama for {', '.join(ashtama)} "
-            f"(-{len(ashtama)})"
+            f"{slot_lagna} lagna favourable for {', '.join(fav_lagna)} "
+            f"(+{len(fav_lagna)})"
+        )
+    if ash_rashi:
+        reasons.append(
+            f"{slot_lagna} lagna Ashtama for {', '.join(ash_rashi)} "
+            f"(-{len(ash_rashi)})"
+        )
+    if ash_lagna:
+        reasons.append(
+            f"{slot_lagna} lagna Ashtama for {', '.join(ash_lagna)} "
+            f"(-{len(ash_lagna)})"
         )
     return bonus, reasons, ashtama_names
 
@@ -565,7 +603,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    vara_bonus, vara_reason, abhijit, amrita, prefer_chog,
                    avoid_karana_names, horas: list[Window] | None = None,
                    prefer_varas: set[str] | None = None,
-                   lagnas: list[Window] | None = None):
+                   lagnas: list[Window] | None = None,
+                   janma_lagnas: list[str | None] | None = None):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -644,7 +683,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     # Ashtama Chandra on the moon-sign axis).
     slot_lagna_name = _slot_lagna_name(lagnas, s)
     lagna_bonus, lagna_reasons, lagna_ashtama_names = _score_lagna(
-        janma_nakshatras, janma_rasis, slot_lagna_name)
+        janma_nakshatras, janma_rasis, slot_lagna_name,
+        janma_lagnas=janma_lagnas)
     score += lagna_bonus
     group_fit.extend(lagna_reasons)
 
@@ -711,6 +751,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
 
               janma_nakshatras: list[str] | None = None,
               janma_rasis: list[str | None] | None = None,
+              janma_lagnas: list[str | None] | None = None,
               chandra_mode: str = 'stars',
               *, engine=None) -> list[dict]:
     """Ranked auspicious slots for one day (daytime, sunrise to sunset).
@@ -778,12 +819,14 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
 
     horas = get_horas(day)
     # Lagnas are only needed when the caller supplied at least one
-    # janma rashi — get_lagna_transitions does a Swiss Ephemeris
-    # bisection per day and isn't free, so we keep generic muhurta
-    # queries (no rasi) on the fast path.
-    lagnas = (get_lagna_transitions(day)
-              if janma_rasis and any(r is not None for r in janma_rasis)
-              else None)
+    # janma rashi or janma lagna — get_lagna_transitions does a Swiss
+    # Ephemeris bisection per day and isn't free, so we keep generic
+    # muhurta queries (no personal reference) on the fast path.
+    _has_personal_ref = (
+        (janma_rasis and any(r is not None for r in janma_rasis))
+        or (janma_lagnas and any(l is not None for l in janma_lagnas))
+    )
+    lagnas = get_lagna_transitions(day) if _has_personal_ref else None
 
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.
@@ -809,7 +852,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 vara_bonus=vara_bonus, vara_reason=vara_reason,
                 abhijit=abhijit, amrita=amrita, prefer_chog=prefer_chog,
                 avoid_karana_names=avoid_karana_names,
-                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas
+                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
+                janma_lagnas=janma_lagnas
             )
             if slot_dict is not None:
                 slots.append(slot_dict)
