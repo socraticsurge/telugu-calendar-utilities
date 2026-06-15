@@ -635,8 +635,16 @@ def _gather_muhurta_slots(
     slots = []
     dropped_days = []
     tz = loc.timezone
+
+    end_date = start + timedelta(days=days - 1)
+    jd_start_range = local_midnight_jd(start, loc.timezone)
+    jd_end_range = local_midnight_jd(end_date + timedelta(days=1), loc.timezone)
+    eclipses_in_range = list_eclipses_in_range(jd_start_range, jd_end_range)
+
     for i in range(days):
-        day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
+        d_curr = start + timedelta(days=i)
+        day = engine.calculate(d_curr, loc, include_eclipse=False)
+        day.eclipse = get_eclipse_from_precomputed(d_curr, eclipses_in_range, loc)
         day_results = day_slots(day, activity=activity,
                                 janma_nakshatras=janma_nakshatras,
                                 janma_rasis=janma_rasis,
