@@ -61,3 +61,15 @@ def test_diaspora_city_still_produces_valid_json():
     data = build_for_city(sydney, date(2026, 6, 15), 1)
     assert data['days']
     assert 0 <= data['days'][0]['lagna0'] < 12
+
+
+def test_cell_count_is_consistent_across_consecutive_days():
+    """The 24h panchangam slice can capture 13 OR 14 engine windows
+    depending on how far past the leading rashi the cycle wraps before
+    next sunrise. Both must collapse to the same 12 visible cells —
+    that's a previous regression (2026-06-16 wrongly produced 13 cells
+    next to 2026-06-15's 12)."""
+    data = build_for_city(_hyderabad(), date(2026, 6, 15), 5)
+    counts = [1 + len(d['transitions']) for d in data['days']]
+    assert all(c == 12 for c in counts), \
+        f'expected 12 cells per day, got {counts}'

@@ -69,22 +69,41 @@ def build_for_city(loc, start: date, days: int) -> dict:
         sunrise_local = day.sunrise.astimezone(tz)
         # First lagna covers sunrise; subsequent windows mark transitions.
         first = transitions[0]
-        lagna0 = RASHI_NAMES.index(first.name.replace(' Lagna', ''))
+        leading_name = first.name
+        lagna0 = RASHI_NAMES.index(leading_name.replace(' Lagna', ''))
         # Each transition: minutes-from-sunrise of the NEW lagna's start,
         # plus the new lagna's rashi index. Times are timezone-naive
         # offsets — the site adds them to the local-time sunrise.
-        # The last window in `transitions` is a trailing partial that
-        # repeats the leading rashi (the cycle returning ~24h later).
-        # We drop it from the visible cells but keep its START offset
-        # as ``cycleEnd`` — that's the moment the last visible rashi
-        # actually ends. (Using the trailing partial's END here would
-        # extend the last cell by ~2h, masking the real rashi window.)
-        body = transitions[1:-1] if len(transitions) >= 2 else []
+        #
+        # The cycle wraps back to the leading rashi ~22h after sunrise,
+        # but the 24h panchangam-day slice can capture 13 OR 14 engine
+        # windows depending on whether the cycle had time to advance
+        # past the leading rashi into the next one before next sunrise
+        # (sidereal day is ~23h56m, so a 24h window can hold ~1.003
+        # cycles). Detecting the wrap by NAME (where the leading rashi
+        # next appears) is robust to both cases; slicing by [1:-1] was
+        # not, and left the wrap window visible on the 14-window days.
+        wrap_idx = None
+        for i in range(1, len(transitions)):
+            if transitions[i].name == leading_name:
+                wrap_idx = i
+                break
+        if wrap_idx is None:
+            # No wrap detected — keep everything after the leading.
+            wrap_idx = len(transitions)
+        visible = transitions[1:wrap_idx]
         tx = []
-        for w in body:
+        for w in visible:
             new_idx = RASHI_NAMES.index(w.name.replace(' Lagna', ''))
             tx.append([_minute_of_day(w.start, day.sunrise), new_idx])
-        cycle_end = _minute_of_day(transitions[-1].start, day.sunrise)
+        # cycleEnd is the START of the trailing wrap — i.e. when the
+        # last visible rashi actually ends. After this offset the
+        # ribbon stops (the trailing wrap and any overflow into the
+        # next rashi are hidden; see the panchangam-day footnote).
+        if wrap_idx < len(transitions):
+            cycle_end = _minute_of_day(transitions[wrap_idx].start, day.sunrise)
+        else:
+            cycle_end = _minute_of_day(transitions[-1].end, day.sunrise)
         rows.append({
             'date': d.isoformat(),
             'sunrise': sunrise_local.strftime('%H:%M'),

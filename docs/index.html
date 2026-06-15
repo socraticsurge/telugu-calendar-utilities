@@ -153,34 +153,22 @@
     .lagna-seg { padding: 0.45rem 0.25rem; text-align: center; border: 1px solid transparent; border-radius: 6px; }
     .lagna-name { font-size: 0.78rem; font-weight: 700; font-family: var(--brand-display), Georgia, serif; }
     .lagna-time { font-size: 0.7rem; color: #58504A; margin-top: 0.15rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
-    .palette-toggle { float: right; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.04em;
-                      background: var(--indigo-bg); border: 1px solid var(--indigo-border); color: var(--indigo);
-                      border-radius: 999px; padding: 0.12rem 0.55rem; cursor: pointer; font-family: inherit;
-                      text-transform: uppercase; }
-    .palette-toggle:hover { background: rgba(142,42,31,0.14); }
-
-    /* Site palette (default) — saturation steps encode favourability, not identity. */
-    .hora-cell { background: var(--indigo-bg); border-color: var(--indigo-border); color: var(--indigo); }
-    .hora-cell.benefic { background: rgba(142,42,31,0.16); border-color: rgba(142,42,31,0.34); }
-    .hora-cell.malefic { background: rgba(142,42,31,0.04); border-color: rgba(142,42,31,0.14); color: rgba(142,42,31,0.65); }
-    .lagna-seg { background: var(--indigo-bg); border-color: var(--indigo-border); color: var(--indigo); }
-    .lagna-seg.fav { background: rgba(142,42,31,0.18); border-color: rgba(142,42,31,0.38); }
-    .lagna-seg.unfav { background: rgba(142,42,31,0.04); border-color: rgba(142,42,31,0.14); color: rgba(142,42,31,0.55); }
-
-    /* Classical palette (opt-in via body[data-hora-palette="classical"]) —
-       one hue per planet, rashi blocks by elemental family. */
-    body[data-hora-palette="classical"] .hora-cell { color: inherit; }
-    body[data-hora-palette="classical"] .hora-cell.sun     { background: #FFF4D6; border-color: #F2C94C; color: #7A5C00; }
-    body[data-hora-palette="classical"] .hora-cell.moon    { background: #F4F7FB; border-color: #C8D2DE; color: #4A5867; }
-    body[data-hora-palette="classical"] .hora-cell.mars    { background: #FEE7E0; border-color: #F2887A; color: #8C2A1A; }
-    body[data-hora-palette="classical"] .hora-cell.mercury { background: #E7F5E7; border-color: #95C695; color: #2D6A3D; }
-    body[data-hora-palette="classical"] .hora-cell.jupiter { background: #FFF1CE; border-color: #E5B548; color: #6B4A00; }
-    body[data-hora-palette="classical"] .hora-cell.venus   { background: #FBF1F6; border-color: #E5C6D5; color: #7A3960; }
-    body[data-hora-palette="classical"] .hora-cell.saturn  { background: #E3E4EA; border-color: #9BA1B0; color: #2E3340; }
-    body[data-hora-palette="classical"] .lagna-seg.fire  { background: #FEEAE0; border-color: #F2887A; color: #8C2A1A; }
-    body[data-hora-palette="classical"] .lagna-seg.earth { background: #EEE5D2; border-color: #C8B27A; color: #6B4F1A; }
-    body[data-hora-palette="classical"] .lagna-seg.air   { background: #E7F1F8; border-color: #99BEDB; color: #1F4A75; }
-    body[data-hora-palette="classical"] .lagna-seg.water { background: #E6F1EE; border-color: #87BDB0; color: #1F5C4F; }
+    /* Classical planetary colours — one hue per planet for horas,
+       elemental family for lagna rashis. (The earlier "site palette"
+       toggle was dropped: it didn't carry enough signal to justify
+       the toggle baggage. Personalised favourability — kendra/trikona
+       from janma rasi — is the better path and lives in a follow-up.) */
+    .hora-cell.sun     { background: #FFF4D6; border-color: #F2C94C; color: #7A5C00; }
+    .hora-cell.moon    { background: #F4F7FB; border-color: #C8D2DE; color: #4A5867; }
+    .hora-cell.mars    { background: #FEE7E0; border-color: #F2887A; color: #8C2A1A; }
+    .hora-cell.mercury { background: #E7F5E7; border-color: #95C695; color: #2D6A3D; }
+    .hora-cell.jupiter { background: #FFF1CE; border-color: #E5B548; color: #6B4A00; }
+    .hora-cell.venus   { background: #FBF1F6; border-color: #E5C6D5; color: #7A3960; }
+    .hora-cell.saturn  { background: #E3E4EA; border-color: #9BA1B0; color: #2E3340; }
+    .lagna-seg.fire  { background: #FEEAE0; border-color: #F2887A; color: #8C2A1A; }
+    .lagna-seg.earth { background: #EEE5D2; border-color: #C8B27A; color: #6B4F1A; }
+    .lagna-seg.air   { background: #E7F1F8; border-color: #99BEDB; color: #1F4A75; }
+    .lagna-seg.water { background: #E6F1EE; border-color: #87BDB0; color: #1F5C4F; }
 
     .preview-note { font-size: 0.75rem; color: #B5AC9C; margin: 0.6rem 0 0; }
     .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #E7DECC; }
@@ -1949,23 +1937,8 @@
       + `<div class="lagna-time">${range}</div></div>`;
   }
 
-  // --- Classical / site palette toggle ---
-  const HORA_PALETTE_KEY = 'tc-hora-palette';
-  function getHoraPalette() {
-    try { return localStorage.getItem(HORA_PALETTE_KEY) || 'site'; } catch (e) { return 'site'; }
-  }
-  function setHoraPalette(value) {
-    try { localStorage.setItem(HORA_PALETTE_KEY, value); } catch (e) { /* ignore */ }
-    document.body.dataset.horaPalette = value;
-  }
-  function toggleHoraPalette() {
-    const next = getHoraPalette() === 'classical' ? 'site' : 'classical';
-    setHoraPalette(next);
-    // The CSS handles the colour flip; rebuild the day card so the
-    // toggle chip's "→ X view" label updates to the inverse.
-    if (typeof window.renderAll === 'function') window.renderAll();
-  }
-  window.toggleHoraPalette = toggleHoraPalette;
+  // (Removed: site/classical palette toggle. Classical-only now —
+  // see the CSS block above for the rationale.)
   // Apply persisted palette on first load.
   setHoraPalette(getHoraPalette());
 
@@ -2198,17 +2171,19 @@
       // cross midnight, so feed them through the marker pass with
       // sunset as the "today" anchor.
       const nightFlagged = markFirstMidnightCrossing(horas.night, data.sunset);
-      const otherLabel = getHoraPalette() === 'classical' ? 'Site view' : 'Classical view';
-      const toggleBtn = `<button class="palette-toggle" onclick="toggleHoraPalette()" title="Switch hora &amp; lagna colouring">→ ${otherLabel}</button>`;
-      horaHtml = `<div class="tile-strip"><div class="strip-title">🕒 Horas — day · sunrise to sunset${toggleBtn}</div><div class="hora-grid">${horas.day.map(horaCell).join('')}</div></div>`;
-      horaHtml += `<div class="tile-strip"><div class="strip-title">🌙 Horas — night · sunset to next sunrise</div><div class="hora-grid">${nightFlagged.map(horaCell).join('')}</div></div>`;
+      horaHtml = `<div class="tile-strip"><div class="strip-title">🕒 Horas — day</div><div class="hora-grid">${horas.day.map(horaCell).join('')}</div></div>`;
+      horaHtml += `<div class="tile-strip"><div class="strip-title">🌙 Horas — night</div><div class="hora-grid">${nightFlagged.map(horaCell).join('')}</div></div>`;
     }
     const isoDate = `${selectedDate().getFullYear()}-${String(selectedDate().getMonth()+1).padStart(2,'0')}-${String(selectedDate().getDate()).padStart(2,'0')}`;
     const lagnaPlaceholder = `<div class="tile-strip" id="lagna-strip" data-iso="${isoDate}">`
-      + `<div class="strip-title">🌅 Lagna — rising sign through the day</div>`
+      + `<div class="strip-title">🌅 Lagna — rising sign</div>`
       + `<div class="lagna-ribbon" id="lagna-ribbon">`
       + `<div class="preview-note" style="grid-column:1/-1;margin:0;padding:0.4rem;text-align:center;">Loading lagna data…</div>`
-      + `</div></div>`;
+      + `</div>`
+      + `<p class="preview-note" style="margin:0.5rem 0 0;">`
+      + `Lagna list spans this day's sunrise to the next, by panchangam convention. `
+      + `For times after the last cell, check the next day's view.`
+      + `</p></div>`;
 
     container.innerHTML = `
       <div class="preview-card">
