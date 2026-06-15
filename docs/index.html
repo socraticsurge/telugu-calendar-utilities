@@ -3628,11 +3628,11 @@
                   if (!pos) continue;
                   const label = `#${pi + 1} (${htmlEsc(pr.name || pr.nak)})`;
                   if (pos === 8) {
-                    ashLagna.push(`${label} lagna@8`);
+                    ashLagna.push(`${label} lagna@8 from ${pr.rasi}`);
                     ashtamaLagnaNames.push(label);
                     score -= 1;
                   } else if (muIsFavourableLagna(pos)) {
-                    favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos}`);
+                    favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.rasi}`);
                     score += 1;
                   }
                 }

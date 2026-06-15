@@ -322,6 +322,14 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna):
     as Ashtama Chandra. Position 1 is reported as 'own' (the strongest
     single position — janma rashi itself rising).
 
+    Reference convention: counting is from the person's janma RASHI
+    (derived from their janma nakshatra), not their janma lagna. Strict
+    "Lagna Shuddhi" muhurta selection would count from the natal
+    ascendant; we follow the Chandra-Rashi-as-lagna tradition because
+    janma lagna requires exact birth time + place that most users
+    don't have at hand. Reason chips name the reference rashi
+    explicitly so the convention is visible at-a-glance.
+
     Returns (bonus, reasons, ashtama_names).
     """
     if not janma_rasis or not slot_lagna:
@@ -335,11 +343,13 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna):
         label = _label(janma_label, i)
         pos = lagna_position(rasi, slot_lagna)
         if is_ashtama_lagna(pos):
-            ashtama.append(f'{label} lagna@{pos}')
+            ashtama.append(f'{label} lagna@{pos} from {rasi}')
             ashtama_names.append(label)
             bonus -= 1
         elif is_favourable_lagna(pos):
-            favourable.append(f'{label} {lagna_verdict(pos)}@{pos}')
+            favourable.append(
+                f'{label} {lagna_verdict(pos)}@{pos} from {rasi}'
+            )
             bonus += 1
     reasons = []
     if favourable:
