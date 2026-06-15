@@ -118,10 +118,10 @@ def test_previous_new_moon_overshoot():
     res = previous_new_moon(mock_elong, 0.0)
     assert abs(res - (1.0 - 29.530589)) < 1e-4
 
-def test_sidereal_longitude_mocked(mocker):
+@patch('telugu_panchangam.engines.utils.swe.set_sid_mode')
+@patch('telugu_panchangam.engines.utils.swe.calc_ut', return_value=([370.5, 0, 0, 0, 0, 0], 0))
+def test_sidereal_longitude_mocked(mock_calc_ut, mock_set_sid_mode):
     import swisseph as swe
-    mock_set_sid_mode = mocker.patch('telugu_panchangam.engines.utils.swe.set_sid_mode')
-    mock_calc_ut = mocker.patch('telugu_panchangam.engines.utils.swe.calc_ut', return_value=([370.5, 0, 0, 0, 0, 0], 0))
 
     jd = 2451545.0
     planet = swe.SUN
@@ -133,6 +133,7 @@ def test_sidereal_longitude_mocked(mocker):
     mock_calc_ut.assert_called_once_with(jd, planet, expected_flags)
 
     assert result == 10.5
+
 
 def test_tropical_sun_longitude_known_value():
     # JD 2451545.0 corresponds to Jan 1.5, 2000 (J2000 epoch)
