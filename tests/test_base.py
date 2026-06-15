@@ -22,6 +22,50 @@ def test_engine_is_abstract():
         PanchangamEngine()
 
 
+def test_next_nakshatra_span():
+    from datetime import datetime, timezone
+    from unittest.mock import patch, MagicMock
+    from telugu_panchangam.models.panchangam_day import Span
+    from telugu_panchangam.engines.base import next_nakshatra_span
+
+    span_end = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
+    # Test typical transition: Ashvini (0) -> Bharani (1)
+    span = Span(name='Ashvini', start=datetime(2023, 1, 1, 0, 0, tzinfo=timezone.utc), end=span_end)
+
+    mock_moon_func = MagicMock()
+
+    with patch('telugu_panchangam.engines.utils.find_crossing', return_value=2459947.5) as mock_find, \
+         patch('telugu_panchangam.engines.utils.jd_to_utc', return_value=datetime(2023, 1, 2, 12, 0, tzinfo=timezone.utc)) as mock_jd_to_utc, \
+         patch('telugu_panchangam.engines.utils.datetime_to_jd', return_value=2459946.5) as mock_dt_to_jd:
+
+        result = next_nakshatra_span(span, mock_moon_func)
+
+        assert result.name == 'Bharani'
+        assert result.start == span_end
+        assert result.end == datetime(2023, 1, 2, 12, 0, tzinfo=timezone.utc)
+
+        # Verify find_crossing was called with correct target longitude
+        # Ashvini is index 0. Next is Bharani, index 1. Target should be (1 + 1) * 360/27 = 2 * 13.333 = 26.666
+        args, _ = mock_find.call_args
+        assert abs(args[1] - 26.666666666666668) < 1e-9
+
+    # Test wrap-around transition: Revati (26) -> Ashvini (0)
+    span_wrap = Span(name='Revati', start=datetime(2023, 1, 1, 0, 0, tzinfo=timezone.utc), end=span_end)
+
+    with patch('telugu_panchangam.engines.utils.find_crossing', return_value=2459947.5) as mock_find, \
+         patch('telugu_panchangam.engines.utils.jd_to_utc', return_value=datetime(2023, 1, 2, 12, 0, tzinfo=timezone.utc)), \
+         patch('telugu_panchangam.engines.utils.datetime_to_jd', return_value=2459946.5):
+
+        result_wrap = next_nakshatra_span(span_wrap, mock_moon_func)
+
+        assert result_wrap.name == 'Ashvini'
+
+        # Target for next nakshatra after Revati (index 26) is Ashvini (index 0).
+        # Internal idx calculation gives idx = 0. Target is (0 + 1) * 360/27 = 13.333
+        args, _ = mock_find.call_args
+        assert abs(args[1] - 13.333333333333334) < 1e-9
+
+
 # --- Ekadashi naming ---
 
 def test_ekadashi_name_regular_months():
