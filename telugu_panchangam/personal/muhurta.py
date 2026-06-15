@@ -9,7 +9,9 @@
 # which days appear in the returned list; it does not change scores.
 from datetime import datetime, timedelta
 
-from telugu_panchangam.models.panchangam_day import PanchangamDay
+from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
+from telugu_panchangam.engines.base import VAARAM_NAMES
+from telugu_panchangam.personal.lagna_hora import get_horas
 from telugu_panchangam.personal.tarabalam import (
     AUSPICIOUS_TARAS, tara_number, tara_name,
 )
@@ -497,7 +499,8 @@ def _get_bad_windows(day, avoid_karana_names):
 def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    janma_rasis, chandra_mode, prefer_tithi_class, label,
                    vara_bonus, vara_reason, abhijit, amrita, prefer_chog,
-                   avoid_karana_names):
+                   avoid_karana_names, horas: list[Window] | None = None,
+                   prefer_varas: set[str] | None = None):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -555,6 +558,21 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
         activity_match.append(f'{block.name} favoured for {label} (+{prefer_chog[1]})')
     for kname in avoid_karana_names:
         activity_match.append(f'{kname} karana avoided')
+
+    if horas and prefer_varas:
+        # Find which hora this slot starts in
+        for h in horas:
+            if h.start <= s < h.end:
+                ruler_name = h.name.split(' ')[0]
+                # Map ruler to Vaaram (Sunday=0, Monday=1, ..., Saturday=6)
+                ruler_idx = {'Sun': 0, 'Moon': 1, 'Mars': 2, 'Mercury': 3,
+                             'Jupiter': 4, 'Venus': 5, 'Saturn': 6}.get(ruler_name)
+                if ruler_idx is not None:
+                    mapped_vaaram = VAARAM_NAMES[ruler_idx]
+                    if mapped_vaaram in prefer_varas:
+                        score += 1
+                        activity_match.append(f'{h.name} favoured for {label} (+1)')
+                break
 
     notes = _doctrinal_notes(
         special_yogas=facts.special_yogas,
@@ -679,6 +697,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     abhijit = day.abhijit_muhurta
     amrita = list(day.amrita_kalam)
 
+    horas = get_horas(day)
+
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.
     use_engine = engine is not None and hasattr(engine, 'facts_at')
@@ -702,7 +722,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 prefer_tithi_class=prefer_tithi_class, label=label,
                 vara_bonus=vara_bonus, vara_reason=vara_reason,
                 abhijit=abhijit, amrita=amrita, prefer_chog=prefer_chog,
-                avoid_karana_names=avoid_karana_names
+                avoid_karana_names=avoid_karana_names,
+                horas=horas, prefer_varas=prefer_varas
             )
             if slot_dict is not None:
                 slots.append(slot_dict)

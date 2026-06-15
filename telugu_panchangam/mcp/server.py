@@ -11,6 +11,8 @@ from telugu_panchangam.mcp.tools import (
     tool_get_gochara,
     tool_get_rasi_phalalu,
     tool_find_muhurta,
+    tool_get_daily_horas,
+    tool_get_lagna_transitions,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -60,6 +62,32 @@ def get_special_days(
 ) -> str:
     """Returns a JSON list of special days in a given month: Ekadashi (fasting days), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, and Eclipses. Args: year=e.g. 2026, month=1-12, city=city name (or pass latitude+longitude; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
     return tool_get_special_days(year, month, city, system, latitude, longitude, timezone)
+
+
+@mcp.tool()
+def get_daily_horas(
+    date: str,
+    city: str,
+    system: str = 'drik',
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Returns 24 planetary hours (horas) for a date and city as JSON. The 12 daytime horas start at sunrise and the 12 nighttime horas start at sunset. The first hora is ruled by the weekday lord. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
+    return tool_get_daily_horas(date, city, system, latitude, longitude, timezone)
+
+
+@mcp.tool()
+def get_lagna_transitions(
+    date: str,
+    city: str,
+    system: str = 'drik',
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Returns Ascendant (Lagna) sign boundaries for a date and city as JSON, tracking the rising sign on the eastern horizon from sunrise to next sunrise. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
+    return tool_get_lagna_transitions(date, city, system, latitude, longitude, timezone)
 
 
 @mcp.tool()
