@@ -1,0 +1,36 @@
+--- telugu_panchangam/engines/utils.py	2024-05-23 00:00:00.000000000 +0000
++++ telugu_panchangam/engines/utils.py.new	2024-05-23 00:00:00.000000000 +0000
+@@ -2,6 +2,7 @@
+ from datetime import date as date_type
+ import swisseph as swe
+ import pytz
++from functools import lru_cache
+
+
+ def datetime_to_jd(dt: datetime) -> float:
+@@ -27,18 +28,21 @@
+     return datetime_to_jd(midnight_local)
+
+
++@lru_cache(maxsize=16384)
+ def sidereal_longitude(jd: float, planet: int) -> float:
+     """Sidereal longitude (Lahiri ayanamsa) for a planet at JD."""
+     swe.set_sid_mode(swe.SIDM_LAHIRI)
+     flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+     result, _ = swe.calc_ut(jd, planet, flags)
+     return result[0] % 360.0
+
+
+ def sun_longitude(jd: float) -> float:
+     return sidereal_longitude(jd, swe.SUN)
+
+
+ def moon_longitude(jd: float) -> float:
+     return sidereal_longitude(jd, swe.MOON)
+
+
++@lru_cache(maxsize=4096)
+ def tropical_sun_longitude(jd: float) -> float:
+     """Tropical (sayana) sun longitude — used for season (rituvu) reckoning."""
+     result, _ = swe.calc_ut(jd, swe.SUN, swe.FLG_SWIEPH)
+     return result[0] % 360.0

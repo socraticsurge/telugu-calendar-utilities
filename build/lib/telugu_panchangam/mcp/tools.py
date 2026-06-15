@@ -595,33 +595,23 @@ def tool_find_muhurta(
 
         slots = []
         dropped_days = []
-
-        # Optimization: locally cache astronomical computations during this 14-day sweep
-        import telugu_panchangam.engines.utils as engine_utils
-        from functools import lru_cache
-        orig_sidereal = engine_utils.sidereal_longitude
-        engine_utils.sidereal_longitude = lru_cache(maxsize=16384)(orig_sidereal)
-
-        try:
-            for i in range(days):
-                day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
-                day_results = day_slots(day, activity=activity,
-                                        janma_nakshatras=janma_nakshatras,
-                                        janma_rasis=janma_rasis,
-                                        chandra_mode=chandra_mode,
-                                        engine=engine)
-                if not day_results:
-                    reason = diagnose_day(day, activity=activity,
-                                          janma_nakshatras=janma_nakshatras,
-                                          janma_rasis=janma_rasis,
-                                          chandra_mode=chandra_mode)
-                    if reason:
-                        dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
-                for s in day_results:
-                    slots.append({**s, 'start': _fmt_time(s['start'], tz),
-                                  'end': _fmt_time(s['end'], tz)})
-        finally:
-            engine_utils.sidereal_longitude = orig_sidereal
+        for i in range(days):
+            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
+            day_results = day_slots(day, activity=activity,
+                                    janma_nakshatras=janma_nakshatras,
+                                    janma_rasis=janma_rasis,
+                                    chandra_mode=chandra_mode,
+                                    engine=engine)
+            if not day_results:
+                reason = diagnose_day(day, activity=activity,
+                                      janma_nakshatras=janma_nakshatras,
+                                      janma_rasis=janma_rasis,
+                                      chandra_mode=chandra_mode)
+                if reason:
+                    dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
+            for s in day_results:
+                slots.append({**s, 'start': _fmt_time(s['start'], tz),
+                              'end': _fmt_time(s['end'], tz)})
         # Re-tier across the whole search, not just one day — "Excellent"
         # means the best of what turned up over the full date range.
         assign_tiers(slots)
