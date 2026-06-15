@@ -2,6 +2,7 @@ from datetime import datetime, timezone, date
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
     moon_sun_elongation, moon_longitude, sun_longitude,
+    tropical_sun_longitude,
 )
 
 def test_datetime_to_jd_known_value():
@@ -30,3 +31,10 @@ def test_moon_sun_elongation_range():
     jd = swe.julday(2024, 3, 15, 0)
     elong = moon_sun_elongation(jd)
     assert 0.0 <= elong < 360.0
+
+def test_tropical_sun_longitude_known_value():
+    # JD 2451545.0 corresponds to Jan 1.5, 2000 (J2000 epoch)
+    # The expected tropical sun longitude is ~280.3689 degrees
+    jd = 2451545.0
+    val = tropical_sun_longitude(jd)
+    assert abs(val - 280.3689) < 1e-4
