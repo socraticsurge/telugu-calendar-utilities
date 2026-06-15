@@ -3733,6 +3733,9 @@
             if (chandraAvoidNames.length) personalDosha = hasAshtama ? 'ashtama_chandra' : 'chandra_avoid';
             else if (ashtamaLagnaNames.length) personalDosha = 'ashtama_lagna';
             else if (chandraPujaNames.length) personalDosha = 'chandra_remedial';
+            // tara_dosha: unrectified by Sarvartha/Amrita Siddhi. Last
+            // in the cascade — matches the Python order in muhurta.py.
+            else if (taraUnfavNames.length && !siddhiYogas.length) personalDosha = 'tara_dosha';
 
             // Day-level dosha (Rikta tithi, Visha/Dagdha yoga, Vyatipata/
             // Vaidhriti) — same "can't be Excellent" treatment as a
