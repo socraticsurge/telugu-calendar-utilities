@@ -4145,14 +4145,28 @@
   populateCitySelect(document.getElementById('sub-city'));
   populateSystemSelect(document.getElementById('sub-system'));
 
-  document.getElementById('tp-city').addEventListener('change', loadPreview);
-  document.getElementById('tp-system').addEventListener('change', loadPreview);
+  function syncCity(val) {
+    document.getElementById('tp-city').value = val;
+    document.getElementById('sub-city').value = val;
+    updateSubscribeUrl();
+    loadPreview();
+  }
+
+  function syncSystem(val) {
+    document.getElementById('tp-system').value = val;
+    document.getElementById('sub-system').value = val;
+    updateSubscribeUrl();
+    loadPreview();
+  }
+
+  document.getElementById('tp-city').addEventListener('change', (e) => syncCity(e.target.value));
+  document.getElementById('tp-system').addEventListener('change', (e) => syncSystem(e.target.value));
   const _d = new Date();
   const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   document.getElementById('tp-date').value = todayISO;
   document.getElementById('tp-date').addEventListener('change', loadPreview);
-  document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
-  document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
+  document.getElementById('sub-city').addEventListener('change', (e) => syncCity(e.target.value));
+  document.getElementById('sub-system').addEventListener('change', (e) => syncSystem(e.target.value));
 
   setTimeFmt(TIME_FMT);
 
