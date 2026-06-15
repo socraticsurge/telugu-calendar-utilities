@@ -724,9 +724,12 @@ def test_mcp_find_muhurta_emits_tier_on_each_slot():
 def test_unknown_tithi_name_does_not_explode():
     # Robustness: tithi_family is wrapped in try/except inside day_slots,
     # so an unknown tithi name silently skips tithi-class scoring.
-    from telugu_panchangam.personal.tithi_class import tithi_family
+    from telugu_panchangam.personal.tithi_class import tithi_family, is_rikta
     with pytest.raises(ValueError):
         tithi_family('Unknown Mystery Tithi')
+
+    # is_rikta swallows the ValueError and returns False
+    assert is_rikta('Unknown Mystery Tithi') is False
 
 
 def test_is_rikta_unknown_tithi_returns_false():
