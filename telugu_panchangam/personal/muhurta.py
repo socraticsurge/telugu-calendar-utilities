@@ -14,6 +14,7 @@ from telugu_panchangam.engines.base import VAARAM_NAMES
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.lagna_position import (
     lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,
+    lagnas_in_class,
 )
 from telugu_panchangam.personal.tarabalam import (
     AUSPICIOUS_TARAS, tara_number, tara_name,
@@ -113,7 +114,8 @@ ACTIVITY_RULES: dict[str, dict] = {
     # — Generic (existing — backward-compatible MCP keys) —
     'any':           {'label': 'Anything auspicious'},
     'travel':        {'label': 'Travel / journey',
-                      'avoid_karana': ['Vishti']},
+                      'avoid_karana': ['Vishti'],
+                      'prefer_lagna_class': 'Chara'},
     'purchase':      {'label': 'Purchase (general)',
                       'prefer_choghadiya': ('Labh', 1)},
     'ceremony':      {'label': 'Ceremony / puja (general)',
@@ -127,75 +129,92 @@ ACTIVITY_RULES: dict[str, dict] = {
     'wedding':       {'label': 'Wedding (Vivaha)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Purna',
-                      'prefer_vara': ['Guruvaram', 'Somavaram']},
+                      'prefer_vara': ['Guruvaram', 'Somavaram'],
+                      'prefer_lagna_class': 'Sthira'},
     'engagement':    {'label': 'Engagement (Nischayam)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Purna',
-                      'prefer_vara': ['Guruvaram', 'Somavaram']},
+                      'prefer_vara': ['Guruvaram', 'Somavaram'],
+                      'prefer_lagna_class': 'Sthira'},
     'naming':        {'label': 'Naming (Namakaranam)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
+                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
+                      'prefer_lagna_class': 'Dvisvabhava'},
     'annaprasana':   {'label': 'Annaprasana (First feeding)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Somavaram', 'Guruvaram']},
+                      'prefer_vara': ['Somavaram', 'Guruvaram'],
+                      'prefer_lagna_class': 'Dvisvabhava'},
     'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Budhavaram', 'Shukravaram']},
+                      'prefer_vara': ['Budhavaram', 'Shukravaram'],
+                      'prefer_lagna_class': 'Dvisvabhava'},
     'mundana':       {'label': 'Mundana / Chaula (First head-shave)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
+                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
+                      'prefer_lagna_class': 'Dvisvabhava'},
     'upanayana':     {'label': 'Upanayana (Sacred thread)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
+                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
+                      'prefer_lagna_class': 'Dvisvabhava'},
     'vidyarambha':   {'label': 'Education start (Vidyarambha)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Budhavaram']},
+                      'prefer_vara': ['Budhavaram'],
+                      'prefer_lagna_class': 'Dvisvabhava'},
     'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Guruvaram', 'Somavaram']},
+                      'prefer_vara': ['Guruvaram', 'Somavaram'],
+                      'prefer_lagna_class': 'Sthira'},
     # — Acquisitions —
     'vehicle':       {'label': 'Vehicle purchase',
                       'prefer_choghadiya': ('Labh', 1),
                       'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Shukravaram']},
+                      'prefer_vara': ['Shukravaram'],
+                      'prefer_lagna_class': 'Sthira'},
     'property':      {'label': 'Property / Land purchase',
                       'prefer_choghadiya': ('Labh', 1),
                       'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Guruvaram', 'Shukravaram']},
+                      'prefer_vara': ['Guruvaram', 'Shukravaram'],
+                      'prefer_lagna_class': 'Sthira'},
     'gold':          {'label': 'Gold / Jewelry purchase',
                       'prefer_choghadiya': ('Labh', 1),
                       'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Shukravaram', 'Guruvaram']},
+                      'prefer_vara': ['Shukravaram', 'Guruvaram'],
+                      'prefer_lagna_class': 'Sthira'},
     # — Construction & Ventures —
     'bhumi_puja':    {'label': 'Bhumi Puja / Foundation laying',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Guruvaram', 'Somavaram']},
+                      'prefer_vara': ['Guruvaram', 'Somavaram'],
+                      'prefer_lagna_class': 'Sthira'},
     'business':      {'label': 'Business launch',
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Guruvaram', 'Budhavaram']},
+                      'prefer_vara': ['Guruvaram', 'Budhavaram'],
+                      'prefer_lagna_class': 'Sthira'},
     'job':           {'label': 'Job start / Contract signing',
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Guruvaram', 'Budhavaram']},
+                      'prefer_vara': ['Guruvaram', 'Budhavaram'],
+                      'prefer_lagna_class': 'Sthira'},
     # — Spiritual —
     'yajna':         {'label': 'Yajna / Homam',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Purna',
-                      'prefer_vara': ['Guruvaram', 'Somavaram']},
+                      'prefer_vara': ['Guruvaram', 'Somavaram'],
+                      'prefer_lagna_class': 'Sthira'},
     'pilgrimage':    {'label': 'Pilgrimage (Tirtha Yatra)',
-                      'avoid_karana': ['Vishti']},
+                      'avoid_karana': ['Vishti'],
+                      'prefer_lagna_class': 'Chara'},
     # — Civil & Medical —
     'court':         {'label': 'Court / legal matter',
                       'prefer_tithi_class': 'Jaya',
@@ -312,6 +331,27 @@ def _slot_lagna_name(lagnas, slot_start):
         if w.start <= slot_start < w.end:
             return w.name.replace(' Lagna', '')
     return None
+
+
+def _score_lagna_activity(prefer_lagna_class, slot_lagna, activity_label):
+    """Activity-class lagna preference (Muhurta Chintamani):
+    wedding/gruhapravesha favour Sthira (fixed) lagnas; travel
+    favours Chara (movable); learning rites favour Dvisvabhava
+    (dual). Score +1 when the slot's rising sign matches the
+    activity's preferred class.
+
+    Independent of the personal kendra/trikona check — that's about
+    the user's chart; this is about the activity's nature.
+
+    Returns (bonus, reason_text or None).
+    """
+    if not prefer_lagna_class or not slot_lagna:
+        return 0, None
+    favoured = lagnas_in_class(prefer_lagna_class)
+    if slot_lagna in favoured:
+        return 1, (f'{slot_lagna} lagna ({prefer_lagna_class}) '
+                   f'favoured for {activity_label} (+1)')
+    return 0, None
 
 
 def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
@@ -604,7 +644,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    avoid_karana_names, horas: list[Window] | None = None,
                    prefer_varas: set[str] | None = None,
                    lagnas: list[Window] | None = None,
-                   janma_lagnas: list[str | None] | None = None):
+                   janma_lagnas: list[str | None] | None = None,
+                   prefer_lagna_class: str | None = None):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -687,6 +728,15 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
         janma_lagnas=janma_lagnas)
     score += lagna_bonus
     group_fit.extend(lagna_reasons)
+
+    # Activity-class lagna preference (Muhurta Chintamani):
+    # independent of personal kendra/trikona — this is about the
+    # nature of the activity, not the user's chart.
+    lagna_act_bonus, lagna_act_reason = _score_lagna_activity(
+        prefer_lagna_class, slot_lagna_name, label)
+    if lagna_act_reason:
+        score += lagna_act_bonus
+        activity_match.append(lagna_act_reason)
 
     notes = _doctrinal_notes(
         special_yogas=facts.special_yogas,
@@ -806,6 +856,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     avoid_karana_names = set(rules.get('avoid_karana', ()))
     prefer_tithi_class = rules.get('prefer_tithi_class')
     prefer_varas = set(rules.get('prefer_vara', ()))
+    prefer_lagna_class = rules.get('prefer_lagna_class')
     label = rules['label']
 
     # Vara is sunrise-anchored (one constant per panchangam day).
@@ -818,15 +869,18 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     amrita = list(day.amrita_kalam)
 
     horas = get_horas(day)
-    # Lagnas are only needed when the caller supplied at least one
-    # janma rashi or janma lagna — get_lagna_transitions does a Swiss
-    # Ephemeris bisection per day and isn't free, so we keep generic
-    # muhurta queries (no personal reference) on the fast path.
+    # Lagnas are needed when the caller has any personal reference
+    # (janma rashi/lagna) OR when the activity itself has a
+    # preferred-lagna-class. get_lagna_transitions does a Swiss
+    # Ephemeris bisection per day and isn't free, so generic muhurta
+    # queries (no personal reference AND no activity preference) stay
+    # on the fast path.
     _has_personal_ref = (
         (janma_rasis and any(r is not None for r in janma_rasis))
         or (janma_lagnas and any(l is not None for l in janma_lagnas))
     )
-    lagnas = get_lagna_transitions(day) if _has_personal_ref else None
+    _needs_lagnas = _has_personal_ref or bool(prefer_lagna_class)
+    lagnas = get_lagna_transitions(day) if _needs_lagnas else None
 
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.
@@ -853,7 +907,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 abhijit=abhijit, amrita=amrita, prefer_chog=prefer_chog,
                 avoid_karana_names=avoid_karana_names,
                 horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
-                janma_lagnas=janma_lagnas
+                janma_lagnas=janma_lagnas,
+                prefer_lagna_class=prefer_lagna_class
             )
             if slot_dict is not None:
                 slots.append(slot_dict)
