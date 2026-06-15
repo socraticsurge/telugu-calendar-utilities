@@ -215,3 +215,88 @@ def test_nakshatra_ghati_window_different_nakshatra():
     assert window.name == 'Krittika Window'
     assert window.start == start_time + timedelta(minutes=90)
     assert window.end == window.start + timedelta(minutes=8)
+
+
+# --- Maasam naming ---
+
+from unittest.mock import patch
+from telugu_panchangam.engines.base import maasam_name
+
+def _mock_prev_new_moon(elong_func, jd):
+    if jd == 100.0: return 90.0
+    if jd == 89.0: return 60.0
+    return 0.0
+
+def _mock_next_new_moon(elong_func, jd):
+    if jd == 91.0: return 120.0
+    return 0.0
+
+@patch('telugu_panchangam.engines.utils.previous_new_moon', _mock_prev_new_moon)
+@patch('telugu_panchangam.engines.utils.next_new_moon', _mock_next_new_moon)
+def test_maasam_name_regular():
+    def mock_sun_lon(jd):
+        if jd == 90.0: return 11 * 30.0 + 15.0 # sign 11 -> Chaitra
+        if jd == 120.0: return 0 * 30.0 + 15.0 # sign 0
+        if jd == 60.0: return 10 * 30.0 + 15.0 # sign 10
+        return 0.0
+
+    name = maasam_name(None, mock_sun_lon, 100.0)
+    assert name == 'Chaitra'
+
+@patch('telugu_panchangam.engines.utils.previous_new_moon', _mock_prev_new_moon)
+@patch('telugu_panchangam.engines.utils.next_new_moon', _mock_next_new_moon)
+def test_maasam_name_adhika():
+    def mock_sun_lon(jd):
+        if jd == 90.0: return 11 * 30.0 + 5.0 # sign 11 -> Chaitra
+        if jd == 120.0: return 11 * 30.0 + 25.0 # sign 11
+        if jd == 60.0: return 10 * 30.0 + 15.0 # sign 10
+        return 0.0
+
+    name = maasam_name(None, mock_sun_lon, 100.0)
+    assert name == 'Adhika Chaitra'
+
+@patch('telugu_panchangam.engines.utils.previous_new_moon', _mock_prev_new_moon)
+@patch('telugu_panchangam.engines.utils.next_new_moon', _mock_next_new_moon)
+def test_maasam_name_nija():
+    def mock_sun_lon(jd):
+        if jd == 90.0: return 11 * 30.0 + 25.0 # sign 11 -> Chaitra
+        if jd == 120.0: return 0 * 30.0 + 15.0 # sign 0
+        if jd == 60.0: return 11 * 30.0 + 5.0 # sign 11
+        return 0.0
+
+    name = maasam_name(None, mock_sun_lon, 100.0)
+    assert name == 'Nija Chaitra'
+
+
+def test_nakshatra_ghati_window_calculation():
+    from datetime import datetime, timedelta, timezone
+    from telugu_panchangam.models.panchangam_day import Span, Window
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+
+    # Create a 60-hour span to make calculations straightforward (1 hour = 1 ghati proportion)
+    start = datetime(2025, 1, 1, 0, 0, tzinfo=timezone.utc)
+    end = start + timedelta(hours=60)
+
+    # Ashvini is at index 0 in NAKSHATRA_NAMES
+    span = Span(name='Ashvini', start=start, end=end)
+
+    # Create a mock ghatis list.
+    # The length must be at least up to the index. Let's make it 27, all 0s, except index 0 which we test.
+    # Let's say the window starts at 30 ghatis.
+    ghatis = [0] * 27
+    ghatis[0] = 30
+
+    # Run function
+    window = nakshatra_ghati_window(span, ghatis, 'Test Window')
+
+    # Calculations:
+    # duration = 60 hours
+    # start_offset = 60 * (30/60) = 30 hours
+    # window duration = 60 * (4/60) = 4 hours
+    expected_start = start + timedelta(hours=30)
+    expected_end = expected_start + timedelta(hours=4)
+
+    assert window.name == 'Test Window'
+    assert window.start == expected_start
+    assert window.end == expected_end
+
