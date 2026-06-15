@@ -298,10 +298,11 @@ def tool_get_panchangam_range(
         engine = _ENGINES[system]
         tz = loc.timezone
 
+        days_count = (end - start).days + 1
+        calculated_days = engine.calculate_bulk(start, days_count, loc)
+
         days = []
-        d = start
-        while d <= end:
-            day = engine.calculate(d, loc)
+        for d, day in zip([start + timedelta(days=i) for i in range(days_count)], calculated_days):
             specials = _special_events(day)
             days.append({
                 'date': d.isoformat(),
@@ -440,9 +441,9 @@ def tool_find_tarabalam_days(
 
         out_days = []
         good_dates = []
-        for i in range(days):
+        calculated_days = engine.calculate_bulk(start, days, loc, include_eclipse=False)
+        for i, day in enumerate(calculated_days):
             d = start + timedelta(days=i)
-            day = engine.calculate(d, loc, include_eclipse=False)
             nak = day.nakshatra.name
             taras = taras_for_day(nak, janma_nakshatras)
             if janma_rasis is not None:
