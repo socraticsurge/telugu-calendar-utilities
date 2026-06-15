@@ -1975,13 +1975,17 @@
       if (!line.trim()) { section = null; continue; }
 
       let m;
-      // Header: "Samvatsara  ·  Maasam  ·  Paksham  ·  Vaaram"
+      // Header: "<year> [Nama Samvatsara]  ·  Maasam  ·  Paksham  ·  Vaaram".
+      // The " Nama Samvatsara" suffix is the new (devotee-preferred)
+      // form; older deployed feeds still have just "<year>" — strip
+      // whichever shows up so data.samvatsara is always the bare year.
       if ((m = line.match(/^(.+?)\s+·\s+(.+?) Maasam\s+·\s+(.+?) Paksham\s+·\s+(.+)$/))) {
-        data.samvatsara = m[1].trim();
+        const yearRaw = m[1].trim().replace(/\s+Nama Samvatsara$/i, '').replace(/\s+Samvatsara$/i, '');
+        data.samvatsara = yearRaw;
         data.maasam = m[2].trim();
         data.paksham = m[3].trim();
         data.vaaram = m[4].trim();
-        data.meta = `${m[1]} Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4].trim()}`;
+        data.meta = `${yearRaw} Nama Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4].trim()}`;
         continue;
       }
       // Sky: "Sunrise HH:MM  ·  Sunset HH:MM  ·  Moonrise HH:MM  ·  Moonset HH:MM"
@@ -2117,7 +2121,7 @@
 
     // Header context lines: year context · month context · today's sky frame.
     const metaLines = data.samvatsara
-      ? `<div class="meta">${data.samvatsara} Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
+      ? `<div class="meta">${data.samvatsara} Nama Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
          <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>
          <div class="meta sky">🌅 ${fmtT(data.sunrise)} – ${fmtT(data.sunset)} &nbsp;·&nbsp; 🌙 ${fmtT(data.moonrise)} – ${fmtT(data.moonset)}</div>`
       : `<div class="meta">${data.meta}</div>`;
@@ -2347,7 +2351,7 @@
     lines.push(`📍 ${cityLabel} · ${sysLabel}`);
     lines.push('');
     if (data.samvatsara) {
-      const yearBits = [data.samvatsara + ' Samvatsara', data.ayanam, data.rituvu ? data.rituvu + ' Rituvu' : null].filter(Boolean);
+      const yearBits = [data.samvatsara + ' Nama Samvatsara', data.ayanam, data.rituvu ? data.rituvu + ' Rituvu' : null].filter(Boolean);
       lines.push(yearBits.join(' · '));
       lines.push(`${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}`);
     }
