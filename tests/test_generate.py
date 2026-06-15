@@ -2,7 +2,7 @@
 import os
 import tempfile
 from datetime import date
-from telugu_panchangam.generate import generate_feeds
+from telugu_panchangam.generate import generate_feeds, city_slug
 
 def test_generate_creates_ics_files():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -21,3 +21,10 @@ def test_generate_file_is_nonempty():
                        systems=['drik'], city_names=['Hyderabad'])
         path = os.path.join(tmpdir, 'hyderabad-drik.ics')
         assert os.path.getsize(path) > 100
+
+def test_city_slug():
+    assert city_slug("Hyderabad") == "hyderabad"
+    assert city_slug("New York") == "new-york"
+    assert city_slug("San Francisco, CA") == "san-francisco-ca"
+    assert city_slug(" Washington, D.C. ") == "-washington-d.c.-"
+    assert city_slug("Chennai, Tamil Nadu") == "chennai-tamil-nadu"
