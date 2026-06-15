@@ -1,7 +1,8 @@
 from datetime import datetime, timezone, date
+from unittest.mock import patch
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
-    moon_sun_elongation, moon_longitude, sun_longitude,
+    moon_sun_elongation, moon_longitude, sun_longitude, get_sunset,
 )
 
 def test_datetime_to_jd_known_value():
@@ -30,3 +31,18 @@ def test_moon_sun_elongation_range():
     jd = swe.julday(2024, 3, 15, 0)
     elong = moon_sun_elongation(jd)
     assert 0.0 <= elong < 360.0
+
+@patch('telugu_panchangam.engines.utils.swe.rise_trans')
+def test_get_sunset(mock_rise_trans):
+    import swisseph as swe
+    mock_rise_trans.return_value = (0, (2451545.5,))
+
+    jd_start = 2451545.0
+    geopos = [78.4744, 17.3850, 0.0]
+
+    result = get_sunset(jd_start, geopos)
+
+    assert result == 2451545.5
+    mock_rise_trans.assert_called_once_with(
+        jd_start, swe.SUN, swe.CALC_SET, geopos, 1013.25, 15.0
+    )
