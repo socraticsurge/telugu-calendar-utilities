@@ -2221,7 +2221,17 @@
           const flagged = markFirstMidnightCrossing(segs, dayData.sunrise);
           ribbon.innerHTML = flagged.map(lagnaCell).join('');
         } else {
-          strip.style.display = 'none';
+          // Date is outside the generated lagna window (we precompute
+          // ~18 months ahead per city). Keep the strip visible with a
+          // clear explanation instead of vanishing silently. Built via
+          // DOM API + textContent so no string ever reaches innerHTML.
+          const note = document.createElement('div');
+          note.className = 'preview-note';
+          note.style.cssText = 'grid-column:1/-1;margin:0;padding:0.5rem;text-align:center;';
+          note.textContent = d
+            ? 'Lagna data is generated ~18 months ahead. This date is outside the current window — it will appear once the next monthly build runs.'
+            : 'Lagna data is loading from a separate feed. If this persists, the feed may be unreachable from your network.';
+          ribbon.replaceChildren(note);
         }
       });
     }

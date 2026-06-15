@@ -47,8 +47,9 @@ from telugu_panchangam.engines.base import RASHI_NAMES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
 
-DAYS_AHEAD = 90  # ~3 months; the ICS feed window is longer but lagna
-                 # changes meaningfully day-to-day, so we keep it tighter.
+DAYS_AHEAD = 550  # ~18 months, matching the ICS feed and gochara.json
+                  # windows so the lagna strip is available for any date
+                  # the rest of the site can browse to.
 
 
 def _slug(name: str) -> str:
