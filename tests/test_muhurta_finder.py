@@ -592,12 +592,27 @@ def test_each_slot_carries_a_tier():
 
 # --- Personal (chandra) dosha: tier cap + sort tiebreaker ---
 
-def test_personal_dosha_none_when_chandra_clean():
-    # 2026-06-17: Mesha -> Moon@3 (good) — no personal caution.
+def test_personal_dosha_none_when_chandra_and_tara_clean():
+    # 2026-06-17: Mesha -> Moon@3 (good) — no chandra caution.
+    # janma=Krittika may still set tara_dosha for the day's nakshatras;
+    # what we're asserting here is the chandra branch stays clean.
     day = _day(2026, 6, 17)
     slots = day_slots(day, janma_nakshatras=['Krittika'], janma_rasis=['Mesha'])
     assert slots
-    assert all(s['personal_dosha'] is None for s in slots)
+    assert all(s['personal_dosha'] not in ('chandra_avoid', 'chandra_remedial')
+               for s in slots)
+
+
+def test_personal_dosha_tara_dosha_caps_tier():
+    # 2026-06-20: janma Ashvini sees an unfavourable tara on this day's
+    # nakshatra, and no Sarvartha/Amrita Siddhi Yoga rectifies it. The
+    # top slot should be flagged 'tara_dosha' and capped below Excellent.
+    day = _day(2026, 6, 20)
+    slots = day_slots(day, janma_nakshatras=['Ashvini'])
+    assert slots
+    top = slots[0]
+    assert top['personal_dosha'] == 'tara_dosha'
+    assert top['tier'] != 'Excellent'
 
 
 def test_personal_dosha_chandra_avoid_caps_tier():
@@ -650,6 +665,18 @@ def test_day_dosha_rikta_tithi_caps_tier_when_excellent():
     rikta_slots = [s for s in slots if s['day_dosha'] == 'rikta_tithi']
     assert rikta_slots
     for s in rikta_slots:
+        assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'], s['day_dosha'])
+        assert s['tier'] != 'Excellent'
+
+
+def test_day_dosha_amavasya_caps_tier_when_excellent():
+    # 2026-06-15: Amavasya. Treated same as Rikta tithi for tier-cap.
+    day = _day(2026, 6, 15)
+    slots = day_slots(day)
+    assert slots
+    amavasya_slots = [s for s in slots if s['day_dosha'] == 'amavasya']
+    assert amavasya_slots
+    for s in amavasya_slots:
         assert s['tier'] == _expected_tier(slots, s['score'], s['personal_dosha'], s['day_dosha'])
         assert s['tier'] != 'Excellent'
 
