@@ -87,3 +87,49 @@ def test_ayanam_uttarayanam_signs():
     assert ayanam_name(3) == 'Dakshinayanam' # Karkataka
     assert ayanam_name(4) == 'Dakshinayanam' # Simha
     assert ayanam_name(8) == 'Dakshinayanam' # Dhanu
+
+
+# --- Nakshatra Day Windows ---
+
+def test_nakshatra_day_windows_boundaries():
+    from datetime import datetime, timedelta
+    from telugu_panchangam.models.panchangam_day import Span
+    from telugu_panchangam.engines.base import nakshatra_day_windows, NAKSHATRA_NAMES
+
+    day_start = datetime(2024, 1, 1, 6, 0)
+    day_end = datetime(2024, 1, 2, 6, 0)
+
+    # Use first nakshatra for simplicity
+    nak_name = NAKSHATRA_NAMES[0]
+    idx = 0
+
+    # Dummy ghatis list, all 0 except we modify the first one for each case
+    ghatis = [0] * 27
+
+    # Helper to test a single span and ghati
+    def check_window(span_start: datetime, span_end: datetime, ghati: int) -> int:
+        ghatis[idx] = ghati
+        span = Span(name=nak_name, start=span_start, end=span_end)
+        res = nakshatra_day_windows([span], ghatis, "Test", day_start, day_end)
+        return len(res)
+
+    # Test 1: Window starts exactly at day_start (included)
+    # span is 60 hours long, ghati is 30 -> window start = span.start + 30/60 * 60 = span.start + 30
+    # Let's use simpler math: 60 minutes span.
+    # span_start = day_start - 30 mins
+    # dur = 60 mins. ghati = 30 -> start + 30/60 * 60 mins = start + 30 mins = day_start
+    assert check_window(day_start - timedelta(minutes=30), day_start + timedelta(minutes=30), 30) == 1
+
+    # Test 2: Window starts slightly before day_start (excluded)
+    # window start = day_start - 1 minute
+    assert check_window(day_start - timedelta(minutes=31), day_start + timedelta(minutes=29), 30) == 0
+
+    # Test 3: Window starts strictly inside [day_start, day_end) (included)
+    # window start = day_start + 1 minute
+    assert check_window(day_start - timedelta(minutes=29), day_start + timedelta(minutes=31), 30) == 1
+
+    # Test 4: Window starts exactly at day_end (excluded)
+    assert check_window(day_end - timedelta(minutes=30), day_end + timedelta(minutes=30), 30) == 0
+
+    # Test 5: Window starts slightly after day_end (excluded)
+    assert check_window(day_end - timedelta(minutes=29), day_end + timedelta(minutes=31), 30) == 0
