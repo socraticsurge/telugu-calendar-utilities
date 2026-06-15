@@ -3116,7 +3116,7 @@
     const phBox = document.getElementById('go-phalalu');
     if (jr === null) { phBox.innerHTML = ''; }
     else {
-      const ph = buildPhalalu(jr, row, view, idx);
+      const ph = buildPhalalu(jr, jl, row, view, idx);
       const phShare = `<button class="wa-share-mini" style="position:static;width:26px;height:26px;margin-left:auto;flex:none;" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
       phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:0.4rem;">Rasi Phalalu — ${htmlEsc(view.label)}
         <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
@@ -3144,41 +3144,85 @@
   const PHALALU_ORDER = ['Shani','Guru','Rahu','Ketu','Kuja','Surya','Shukra','Budha'];
   const ordinal = n => n + (['st','nd','rd'][n-1] || 'th');
 
-  function buildPhalalu(jr, row, view, idx) {
-    const houseOf = gi => ((row[gi] - jr + 12) % 12) + 1;
-    const occupants = {};
-    GO_DATA.grahas.forEach((g, gi) => { (occupants[houseOf(gi)] = occupants[houseOf(gi)] || []).push(g); });
-    const verdictFor = gi => {
-      const g = GO_DATA.grahas[gi], pos = houseOf(gi);
+  function buildPhalalu(jr, jl, row, view, idx) {
+    // Per-reference helpers — same Brihat Samhita rules applied from
+    // a chosen reference index (rashi or lagna). The phalalu prose
+    // is anchored to the rashi houses (matches chart numbering), but
+    // verdicts are the worst-of (rashi-verdict, lagna-verdict) so
+    // they match the colours users see in the chart.
+    const houseFromRef = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
+    const occFor = (ref) => {
+      const o = {};
+      GO_DATA.grahas.forEach((g, gi) => {
+        const h = houseFromRef(gi, ref);
+        (o[h] = o[h] || []).push(g);
+      });
+      return o;
+    };
+    const verdictForRef = (gi, ref, occ) => {
+      const g = GO_DATA.grahas[gi], pos = houseFromRef(gi, ref);
       if (!GO_FAV[g].includes(pos)) return { v: 'adverse' };
       if (!GO_NODES.has(g)) {
         const vh = GO_VEDHA[g][pos];
-        for (const other of (occupants[vh] || [])) {
+        for (const other of (occ[vh] || [])) {
           if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return { v: 'blocked', by: other };
         }
       }
       return { v: 'favourable' };
     };
+    const occR = occFor(jr);
+    const occL = (jl !== null) ? occFor(jl) : null;
+    const WORST = { adverse: 3, blocked: 2, favourable: 1 };
+    // Combined per-graha verdict + which lens drove it (for tooltip-
+    // like clarity inside the prose when verdicts differ).
+    const verdictFor = (gi) => {
+      const r = verdictForRef(gi, jr, occR);
+      if (occL === null) return { ...r, source: 'rashi', other: null };
+      const l = verdictForRef(gi, jl, occL);
+      if (WORST[l.v] > WORST[r.v]) return { ...l, source: 'lagna', other: r };
+      if (WORST[r.v] > WORST[l.v]) return { ...r, source: 'rashi', other: l };
+      return { ...r, source: 'both', other: l };
+    };
+    const houseOf = gi => houseFromRef(gi, jr);     // chart anchor stays rashi
     const moonPos = houseOf(GO_DATA.grahas.indexOf('Chandra'));
     const mv = CHANDRA_GOOD.has(moonPos) ? 'good' : (CHANDRA_PUJA.has(moonPos) ? 'puja' : 'bad');
     let fav = 0, blocked = 0;
     const detail = {};
-    GO_DATA.grahas.forEach((g, gi) => { const r = verdictFor(gi); detail[g] = { ...r, pos: houseOf(gi) };
-      if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++; });
+    GO_DATA.grahas.forEach((g, gi) => {
+      const r = verdictFor(gi);
+      detail[g] = { ...r, pos: houseOf(gi) };
+      if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++;
+    });
     const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
     const lines = [PHALALU_OPENERS[mv]];
-    const shaniPos = detail['Shani'].pos;
-    const cond = shaniPos === 12 ? 'Sade Sati (rising phase)' : shaniPos === 1 ? 'Sade Sati (peak phase)'
-      : shaniPos === 2 ? 'Sade Sati (setting phase)' : shaniPos === 8 ? 'Ashtama Shani'
-      : shaniPos === 4 ? 'Ardhastama Shani' : null;
-    if (cond) lines.push(cond.startsWith('Sade Sati')
-      ? `${cond} is running — Shani asks for patience, discipline and steady work.`
-      : `${cond} is running — avoid risks and keep commitments minimal.`);
+
+    // Shani condition checked from BOTH references (matches the
+    // chart's conditions banner). Each hit gets its own line so the
+    // reader sees which lens triggered it.
+    const shaniIdx = GO_DATA.grahas.indexOf('Shani');
+    const shaniCondText = (sp) => sp === 12 ? 'Sade Sati (rising phase)' : sp === 1 ? 'Sade Sati (peak phase)'
+      : sp === 2 ? 'Sade Sati (setting phase)' : sp === 8 ? 'Ashtama Shani'
+      : sp === 4 ? 'Ardhastama Shani' : null;
+    const shaniLineFor = (cond, refLabel) => {
+      const suffix = refLabel ? ` (from ${refLabel})` : '';
+      return cond.startsWith('Sade Sati')
+        ? `${cond}${suffix} is running — Shani asks for patience, discipline and steady work.`
+        : `${cond}${suffix} is running — avoid risks and keep commitments minimal.`;
+    };
+    const condR = shaniCondText(houseFromRef(shaniIdx, jr));
+    const condL = (jl !== null) ? shaniCondText(houseFromRef(shaniIdx, jl)) : null;
+    if (condR) lines.push(shaniLineFor(condR, jl !== null ? 'rashi' : null));
+    if (condL) lines.push(shaniLineFor(condL, 'lagna'));
+
     for (const g of PHALALU_ORDER) {
       const d = detail[g], m = HOUSE_MEANINGS[d.pos];
+      // When lagna and rashi disagree on the verdict, mention the
+      // lens that drove the harsher reading so prose ≠ chart isn't
+      // a surprise.
+      const lensTag = (d.other && d.source !== 'both') ? ` (from your ${d.source})` : '';
       lines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.pos)} house favours ${m}.`
-        : d.v === 'blocked' ? `${g}'s good ${ordinal(d.pos)}-house transit is under vedha by ${d.by} — gains in ${m} may arrive with friction.`
-        : `${g} in the ${ordinal(d.pos)} house tests ${m}; avoid forcing matters there.`);
+        : d.v === 'blocked' ? `${g}'s ${ordinal(d.pos)}-house transit is under vedha${d.by ? ' by ' + d.by : ''}${lensTag} — gains in ${m} may arrive with friction.`
+        : `${g} in the ${ordinal(d.pos)} house tests ${m}${lensTag}; avoid forcing matters there.`);
     }
     lines.push(`${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''}.`);
     return { quality, lines };
@@ -3189,11 +3233,12 @@
     const view = goCurrentView();
     if (view.jr === null) return;
     const jr = view.jr;
+    const jl = (typeof view.jl === 'number') ? view.jl : null;
     const idx = goDateIndex();
     const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const ord = n => n + (['st','nd','rd'][n-1] || 'th');
-    const ph = buildPhalalu(jr, row, view, idx);
+    const ph = buildPhalalu(jr, jl, row, view, idx);
     const lines = [];
     const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
     lines.push(`📜 *Rasi Phalalu — ${fmtD(shown)}*`);
