@@ -28,13 +28,13 @@ def test_get_horas_count_and_sequence():
     for i in range(23):
             assert abs((horas[i].end - horas[i+1].start).total_seconds()) < 1.0
 
-def test_get_lagna_transitions_mock(mocker):
+from unittest.mock import patch
+
+def test_get_lagna_transitions_mock():
     """Test the transition finding logic by mocking swisseph."""
     # We will mock the internal get_ascendant_sign function to return dummy values
     loc = Location(name='Hyderabad', lat=17.3850, lon=78.4867, timezone='Asia/Kolkata')
     day = DrikGanitaEngine().calculate(date(2024, 1, 1), loc)
-
-    mocker.patch('swisseph.set_sid_mode')
 
     # Mock houses to return different ascendants as JD progresses
     # To do this, we mock the houses function itself
@@ -45,10 +45,11 @@ def test_get_lagna_transitions_mock(mocker):
         deg = (offset * 12 * 30) % 360 # full circle in 24h
         return [0], [deg] # return just the ascendant part we need
 
-    mocker.patch('swisseph.houses', side_effect=dummy_houses)
-    mocker.patch('swisseph.get_ayanamsa_ut', return_value=0.0) # simplify
+    with patch('swisseph.set_sid_mode'), \
+         patch('swisseph.houses', side_effect=dummy_houses), \
+         patch('swisseph.get_ayanamsa_ut', return_value=0.0):
 
-    lagnas = get_lagna_transitions(day)
+        lagnas = get_lagna_transitions(day)
 
     # We should have roughly 12-13 lagnas in a day
     assert 11 <= len(lagnas) <= 14
