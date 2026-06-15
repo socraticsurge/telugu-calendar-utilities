@@ -30,3 +30,21 @@ def test_moon_sun_elongation_range():
     jd = swe.julday(2024, 3, 15, 0)
     elong = moon_sun_elongation(jd)
     assert 0.0 <= elong < 360.0
+
+def test_sidereal_longitude_mocked(mocker):
+    import swisseph as swe
+    from telugu_panchangam.engines.utils import sidereal_longitude
+
+    mock_set_sid_mode = mocker.patch('telugu_panchangam.engines.utils.swe.set_sid_mode')
+    mock_calc_ut = mocker.patch('telugu_panchangam.engines.utils.swe.calc_ut', return_value=([370.5, 0, 0, 0, 0, 0], 0))
+
+    jd = 2451545.0
+    planet = swe.SUN
+
+    result = sidereal_longitude(jd, planet)
+
+    mock_set_sid_mode.assert_called_once_with(swe.SIDM_LAHIRI)
+    expected_flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+    mock_calc_ut.assert_called_once_with(jd, planet, expected_flags)
+
+    assert result == 10.5
