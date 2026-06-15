@@ -135,19 +135,24 @@
     .chog-cell.bad .chog-name { color: #b91c1c; }
     .chog-time { font-size: 0.72rem; color: #58504A; }
 
-    /* ── Hora + Lagna strips (mirror chog-grid sizing for visual cohesion) ── */
-    .hora-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0.25rem; }
-    @media (max-width: 620px) { .hora-grid { grid-template-columns: repeat(6, 1fr); } }
-    .hora-cell { border-radius: 6px; padding: 0.32rem 0.18rem; text-align: center; border: 1px solid transparent; }
+    /* ── Hora + Lagna strips ──
+       Match Choghadiya's 8-col footprint visually by using 6 cols
+       (12 cells = 2 even rows). Cells now show full ranges with the
+       same <wbr> break-opportunity Choghadiya uses, so on narrow
+       widths the time wraps gracefully to two lines instead of
+       overflowing the container. */
+    .hora-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .hora-grid { grid-template-columns: repeat(4, 1fr); } }
+    .hora-cell { border-radius: 6px; padding: 0.35rem 0.25rem; text-align: center; border: 1px solid transparent; }
     .hora-glyph { font-size: 0.95rem; line-height: 1; margin-bottom: 0.15rem; }
-    .hora-lord { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em; }
-    .hora-time { font-size: 0.6rem; color: #6B6358; margin-top: 0.1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .hora-time sup, .lagna-time sup { font-size: 0.55em; vertical-align: super; color: var(--indigo); margin: 0 0.05em; }
-    .lagna-ribbon { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; border-radius: 6px; overflow: hidden; }
-    @media (max-width: 620px) { .lagna-ribbon { grid-template-columns: repeat(6, 1fr); } }
-    .lagna-seg { padding: 0.45rem 0.25rem; text-align: center; border: 1px solid transparent; }
-    .lagna-name { font-size: 0.72rem; font-weight: 700; font-family: var(--brand-display), Georgia, serif; }
-    .lagna-time { font-size: 0.6rem; color: #6B6358; margin-top: 0.12rem; font-variant-numeric: tabular-nums; }
+    .hora-lord { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.02em; }
+    .hora-time { font-size: 0.7rem; color: #58504A; margin-top: 0.15rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .hora-time sup, .lagna-time sup { font-size: 0.6em; vertical-align: super; color: var(--indigo); margin: 0 0.05em; }
+    .lagna-ribbon { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .lagna-ribbon { grid-template-columns: repeat(4, 1fr); } }
+    .lagna-seg { padding: 0.45rem 0.25rem; text-align: center; border: 1px solid transparent; border-radius: 6px; }
+    .lagna-name { font-size: 0.78rem; font-weight: 700; font-family: var(--brand-display), Georgia, serif; }
+    .lagna-time { font-size: 0.7rem; color: #58504A; margin-top: 0.15rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
     .palette-toggle { float: right; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.04em;
                       background: var(--indigo-bg); border: 1px solid var(--indigo-border); color: var(--indigo);
                       border-radius: 999px; padding: 0.12rem 0.55rem; cursor: pointer; font-family: inherit;
@@ -1844,17 +1849,11 @@
     return { day, night };
   }
 
-  // Format a HH:MM string with an optional '+1' next-day flag, e.g.
-  // "12:16am*+1". Matches the convention the existing Choghadiya
-  // rendering uses (see fmtRange + sflag/eflag in renderPreview).
-  function fmtHM(t, flag) {
-    return flag ? `${t}<sup>*+1</sup>` : t;
-  }
   // Walk a sequence of HH:MM start/end pairs and mark the first cell
   // whose end is the FIRST time past midnight. Subsequent cells that
   // already live past midnight don't get a flag — the convention is
   // "mark only the crossing", and after that the next-day-ness is
-  // visually obvious.
+  // visually obvious. Matches Choghadiya night.
   function markFirstMidnightCrossing(cells, anchorStartTime) {
     const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
     const anchor = toMin(anchorStartTime);
@@ -1877,11 +1876,13 @@
     // Defense-in-depth: every interpolation goes through htmlEsc even
     // though h.lord / h.start / h.end come from hard-coded arrays and
     // arithmetic on HH:MM strings. Matches the pattern PR #59 set.
+    // Times go through fmtRange so the 12/24 hour toggle and the
+    // <wbr> break behaviour match the rest of the day card.
     const fav = HORA_FAVOURABILITY[h.lord] || 'neutral';
     const palClass = HORA_PALETTE_CLASS[h.lord] || '';
     const cls = `hora-cell ${palClass} ${fav}`;
     const glyph = HORA_GLYPH[h.lord] || '';
-    const range = `${fmtHM(htmlEsc(h.start), h.sflag)}–${fmtHM(htmlEsc(h.end), h.eflag)}`;
+    const range = fmtRange(h.start, h.end, '–<wbr>', h.sflag, h.eflag);
     return `<div class="${cls}" title="${htmlEsc(h.lord)} hora · ${htmlEsc(h.start)}–${htmlEsc(h.end)}">`
       + `<div class="hora-glyph">${htmlEsc(glyph)}</div>`
       + `<div class="hora-lord">${htmlEsc(h.lord)}</div>`
@@ -1942,7 +1943,7 @@
     // from a hard-coded array. Defense-in-depth: escape anyway.
     const name = RASHI_NAMES_JS[seg.rashi] || '?';
     const elem = RASHI_ELEMENT[seg.rashi] || '';
-    const range = `${fmtHM(htmlEsc(seg.start), seg.sflag)}–${fmtHM(htmlEsc(seg.end), seg.eflag)}`;
+    const range = fmtRange(seg.start, seg.end, '–<wbr>', seg.sflag, seg.eflag);
     return `<div class="lagna-seg ${elem}" title="${htmlEsc(name)} lagna · ${htmlEsc(seg.start)}–${htmlEsc(seg.end)}">`
       + `<div class="lagna-name">${htmlEsc(name)}</div>`
       + `<div class="lagna-time">${range}</div></div>`;

@@ -74,15 +74,17 @@ def build_for_city(loc, start: date, days: int) -> dict:
         # plus the new lagna's rashi index. Times are timezone-naive
         # offsets — the site adds them to the local-time sunrise.
         # The last window in `transitions` is a trailing partial that
-        # duplicates the leading rashi (the cycle returning ~24h later).
-        # We drop it but keep its END offset as ``cycleEnd`` so the UI
-        # can render the previous cell with a proper end time.
+        # repeats the leading rashi (the cycle returning ~24h later).
+        # We drop it from the visible cells but keep its START offset
+        # as ``cycleEnd`` — that's the moment the last visible rashi
+        # actually ends. (Using the trailing partial's END here would
+        # extend the last cell by ~2h, masking the real rashi window.)
         body = transitions[1:-1] if len(transitions) >= 2 else []
         tx = []
         for w in body:
             new_idx = RASHI_NAMES.index(w.name.replace(' Lagna', ''))
             tx.append([_minute_of_day(w.start, day.sunrise), new_idx])
-        cycle_end = _minute_of_day(transitions[-1].end, day.sunrise)
+        cycle_end = _minute_of_day(transitions[-1].start, day.sunrise)
         rows.append({
             'date': d.isoformat(),
             'sunrise': sunrise_local.strftime('%H:%M'),

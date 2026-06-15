@@ -27,9 +27,13 @@ def test_build_shape_and_indices_for_hyderabad():
         assert all(0 < o < d['cycleEnd'] for o in offsets)
         # Each transition index is a valid rashi index.
         assert all(0 <= idx < 12 for _, idx in d['transitions'])
-        # cycleEnd is the end of the last visible rashi — should be
-        # close to ~1440 min (24h), within seasonal sunrise drift.
-        assert 1380 <= d['cycleEnd'] <= 1500
+        # cycleEnd marks where the last visible rashi ends — i.e. the
+        # start of the trailing partial wrap that duplicates the
+        # leading rashi. Typically ~22h after sunrise for Hyderabad
+        # (varies with latitude/season).
+        assert 1200 <= d['cycleEnd'] < 1440
+        # cycleEnd must be strictly later than the last transition.
+        assert d['cycleEnd'] > offsets[-1]
 
 
 def test_sunrise_is_local_time_not_utc():
