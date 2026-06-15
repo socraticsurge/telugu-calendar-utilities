@@ -2,8 +2,6 @@
 import math
 from datetime import date
 
-import pytz
-
 from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, rituvu_name, ayanam_name,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
@@ -15,7 +13,7 @@ from telugu_panchangam.engines.base import (
     nakshatra_day_windows, next_nakshatra_span,
 )
 from telugu_panchangam.engines.utils import (
-    datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
+    jd_to_utc, local_midnight_jd, find_crossing,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay

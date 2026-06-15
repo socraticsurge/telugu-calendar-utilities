@@ -116,3 +116,58 @@ def test_nakshatra_day_windows_boundaries():
     assert windows[0].start == span_exact_start.start
     # Included: starting just before day_end
     assert windows[1].start == span_before_end.start
+
+
+# --- Nakshatra Ghati Window ---
+
+def test_nakshatra_ghati_window_happy_path():
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+    from telugu_panchangam.models.panchangam_day import Span
+    from datetime import datetime, timezone, timedelta
+
+    start_time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
+    end_time = start_time + timedelta(hours=1)
+    span = Span(name='Ashvini', start=start_time, end=end_time)
+
+    ghatis = [30] + [0] * 26
+
+    window = nakshatra_ghati_window(span, ghatis, 'Test Window')
+
+    assert window.name == 'Test Window'
+    assert window.start == start_time + timedelta(minutes=30)
+    assert window.end == window.start + timedelta(minutes=4)
+
+
+def test_nakshatra_ghati_window_zero_duration():
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+    from telugu_panchangam.models.panchangam_day import Span
+    from datetime import datetime, timezone
+
+    time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
+    span = Span(name='Bharani', start=time, end=time)
+
+    ghatis = [0, 24] + [0] * 25
+
+    window = nakshatra_ghati_window(span, ghatis, 'Zero Duration')
+
+    assert window.name == 'Zero Duration'
+    assert window.start == time
+    assert window.end == time
+
+
+def test_nakshatra_ghati_window_different_nakshatra():
+    from telugu_panchangam.engines.base import nakshatra_ghati_window
+    from telugu_panchangam.models.panchangam_day import Span
+    from datetime import datetime, timezone, timedelta
+
+    start_time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
+    end_time = start_time + timedelta(hours=2)
+    span = Span(name='Krittika', start=start_time, end=end_time)
+
+    ghatis = [0, 0, 45] + [0] * 24
+
+    window = nakshatra_ghati_window(span, ghatis, 'Krittika Window')
+
+    assert window.name == 'Krittika Window'
+    assert window.start == start_time + timedelta(minutes=90)
+    assert window.end == window.start + timedelta(minutes=8)
