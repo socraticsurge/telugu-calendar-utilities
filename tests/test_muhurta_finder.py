@@ -729,6 +729,11 @@ def test_unknown_tithi_name_does_not_explode():
         tithi_family('Unknown Mystery Tithi')
 
 
+def test_is_rikta_unknown_tithi_returns_false():
+    from telugu_panchangam.personal.tithi_class import is_rikta
+    assert is_rikta('InvalidTithi') is False
+
+
 # --- B1-Heavy: per-slot precision via engine.facts_at() ---
 
 def test_engine_kwarg_changes_late_slot_nakshatra():
