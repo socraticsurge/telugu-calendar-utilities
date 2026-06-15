@@ -30,3 +30,31 @@ def test_moon_sun_elongation_range():
     jd = swe.julday(2024, 3, 15, 0)
     elong = moon_sun_elongation(jd)
     assert 0.0 <= elong < 360.0
+
+from unittest.mock import patch
+from telugu_panchangam.engines.utils import (
+    get_sunrise, get_sunset, get_moonrise, get_moonset
+)
+import swisseph as swe
+
+def test_rise_trans_functions():
+    with patch('telugu_panchangam.engines.utils.swe.rise_trans') as mock_rise_trans:
+        mock_rise_trans.return_value = (0, (2451545.123,))
+        jd_start = 2451545.0
+        geopos = [78.4867, 17.3850, 0.0]
+
+        res = get_sunrise(jd_start, geopos)
+        assert res == 2451545.123
+        mock_rise_trans.assert_called_with(jd_start, swe.SUN, swe.CALC_RISE, geopos, 1013.25, 15.0)
+
+        res = get_sunset(jd_start, geopos)
+        assert res == 2451545.123
+        mock_rise_trans.assert_called_with(jd_start, swe.SUN, swe.CALC_SET, geopos, 1013.25, 15.0)
+
+        res = get_moonrise(jd_start, geopos)
+        assert res == 2451545.123
+        mock_rise_trans.assert_called_with(jd_start, swe.MOON, swe.CALC_RISE, geopos, 1013.25, 15.0)
+
+        res = get_moonset(jd_start, geopos)
+        assert res == 2451545.123
+        mock_rise_trans.assert_called_with(jd_start, swe.MOON, swe.CALC_SET, geopos, 1013.25, 15.0)
