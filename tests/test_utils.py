@@ -2,6 +2,7 @@ from datetime import datetime, timezone, date
 from telugu_panchangam.engines.utils import (
     datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
     moon_sun_elongation, moon_longitude, sun_longitude,
+    previous_new_moon, next_new_moon
 )
 
 def test_datetime_to_jd_known_value():
@@ -30,3 +31,26 @@ def test_moon_sun_elongation_range():
     jd = swe.julday(2024, 3, 15, 0)
     elong = moon_sun_elongation(jd)
     assert 0.0 <= elong < 360.0
+
+def test_next_new_moon():
+    import swisseph as swe
+    # Use a known date, e.g., March 15, 2024
+    jd_start = swe.julday(2024, 3, 15, 0)
+
+    # Calculate the next new moon
+    jd_next = next_new_moon(moon_sun_elongation, jd_start)
+
+    # Ensure it's strictly after jd_start
+    assert jd_next > jd_start
+
+    # Elongation at the next new moon should be close to 0 (or 360)
+    elong = moon_sun_elongation(jd_next)
+    assert elong < 0.1 or elong > 359.9
+
+    # Ensure it's the *first* new moon after jd_start
+    # The gap between jd_start and the next new moon should be <= a full lunar month (~29.53 days)
+    assert jd_next - jd_start <= 29.6
+
+    # Check that previous_new_moon applied to jd_next + a little offset gives jd_next back
+    jd_prev = previous_new_moon(moon_sun_elongation, jd_next + 1.0)
+    assert abs(jd_prev - jd_next) < 0.01
