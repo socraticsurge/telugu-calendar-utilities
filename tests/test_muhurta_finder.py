@@ -27,6 +27,16 @@ def _expected_tier(slots, score, personal_dosha, day_dosha):
     return tier
 
 
+def test_relative_tier_negative_scores_never_elevated():
+    from telugu_panchangam.personal.muhurta import relative_tier
+    # Even if the 'best' slot in a batch has a relative score of 1.0 (spread > 0)
+    # or the batch only contains scores of -2 (spread == 0),
+    # a score <= 0 intrinsically indicates "Avoid".
+    assert relative_tier(-2, -2, -5) == 'Avoid'
+    assert relative_tier(0, 0, -2) == 'Avoid'
+    assert relative_tier(-1, -1, -1) == 'Avoid'
+
+
 def test_slots_never_overlap_inauspicious_windows():
     day = _day(2026, 6, 17)
     bad = [day.rahu_kalam, day.gulika_kalam, day.yamagandam] + day.varjyam + day.durmuhurtham

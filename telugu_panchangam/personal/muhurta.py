@@ -65,6 +65,12 @@ _RELATIVE_BANDS = (0.75, 0.5, 0.25)
 
 def relative_tier(score: int, ceiling: int, floor: int) -> str:
     """Map raw score to a tier relative to a [floor, ceiling] range."""
+    # Never label a mathematically inauspicious or completely neutral slot
+    # as "Excellent", "Good", or "Fair". A score <= 0 means negatives
+    # strictly outweigh or exactly match positives.
+    if score <= 0:
+        return 'Avoid'
+
     spread = ceiling - floor
     if spread <= 0:
         return score_tier(score)
