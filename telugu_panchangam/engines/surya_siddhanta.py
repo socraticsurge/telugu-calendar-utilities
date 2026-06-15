@@ -2,8 +2,6 @@
 import math
 from datetime import date
 
-import pytz
-
 from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, rituvu_name, ayanam_name,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
