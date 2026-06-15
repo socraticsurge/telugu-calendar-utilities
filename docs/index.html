@@ -3012,19 +3012,15 @@
     // verdict layer, not a chart re-anchoring.
     const houseOf = gi => jr === null ? null : houseFrom(gi, jr);
 
-    // Combined verdict per graha: take the worst of rashi-verdict and
-    // (when lagna is set) lagna-verdict. Worst order: bad > blocked >
-    // good. Conservative: any flaw in either lens flags caution.
-    const WORST = { bad: 3, blocked: 2, good: 1 };
+    // Chart colour is anchored to the janma RASHI verdict — the
+    // traditional Brihat Samhita gochara frame. The lagna lens is
+    // surfaced separately (tooltip + prose) without judgement;
+    // classical texts don't prescribe a single rule for merging the
+    // two into one verdict, so we don't invent one.
     const verdictOf = gi => {
       if (jr === null) return null;
-      const vr = verdictFrom(gi, jr, occRashi);
-      if (jl === null) return vr;
-      const vl = verdictFrom(gi, jl, occLagna);
-      return WORST[vl] > WORST[vr] ? vl : vr;
+      return verdictFrom(gi, jr, occRashi);
     };
-    // Per-reference verdicts surface in the tooltip when lagna is set
-    // so the user can see why a graha was flagged.
     const verdictsBoth = gi => {
       if (jr === null) return null;
       const vr = verdictFrom(gi, jr, occRashi);
@@ -3145,11 +3141,11 @@
   const ordinal = n => n + (['st','nd','rd'][n-1] || 'th');
 
   function buildPhalalu(jr, jl, row, view, idx) {
-    // Per-reference helpers — same Brihat Samhita rules applied from
-    // a chosen reference index (rashi or lagna). The phalalu prose
-    // is anchored to the rashi houses (matches chart numbering), but
-    // verdicts are the worst-of (rashi-verdict, lagna-verdict) so
-    // they match the colours users see in the chart.
+    // Two independent verdicts per graha — one from each reference.
+    // No "combine into one" judgement; classical Jyotisha doesn't
+    // prescribe a merge rule, so we surface both lenses side by side
+    // when janma lagna is set. Chart colour and the count tally
+    // stay anchored to janma rashi (matches the chart visual).
     const houseFromRef = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
     const occFor = (ref) => {
       const o = {};
@@ -3172,25 +3168,17 @@
     };
     const occR = occFor(jr);
     const occL = (jl !== null) ? occFor(jl) : null;
-    const WORST = { adverse: 3, blocked: 2, favourable: 1 };
-    // Combined per-graha verdict + which lens drove it (for tooltip-
-    // like clarity inside the prose when verdicts differ).
-    const verdictFor = (gi) => {
-      const r = verdictForRef(gi, jr, occR);
-      if (occL === null) return { ...r, source: 'rashi', other: null };
-      const l = verdictForRef(gi, jl, occL);
-      if (WORST[l.v] > WORST[r.v]) return { ...l, source: 'lagna', other: r };
-      if (WORST[r.v] > WORST[l.v]) return { ...r, source: 'rashi', other: l };
-      return { ...r, source: 'both', other: l };
-    };
     const houseOf = gi => houseFromRef(gi, jr);     // chart anchor stays rashi
     const moonPos = houseOf(GO_DATA.grahas.indexOf('Chandra'));
     const mv = CHANDRA_GOOD.has(moonPos) ? 'good' : (CHANDRA_PUJA.has(moonPos) ? 'puja' : 'bad');
     let fav = 0, blocked = 0;
     const detail = {};
     GO_DATA.grahas.forEach((g, gi) => {
-      const r = verdictFor(gi);
-      detail[g] = { ...r, pos: houseOf(gi) };
+      // Rashi verdict drives the tally (and the chart colours).
+      const r = verdictForRef(gi, jr, occR);
+      const l = (occL !== null) ? verdictForRef(gi, jl, occL) : null;
+      detail[g] = { ...r, lagna: l, posR: houseOf(gi),
+                    posL: (jl !== null) ? houseFromRef(gi, jl) : null };
       if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++;
     });
     const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
@@ -3214,17 +3202,30 @@
     if (condR) lines.push(shaniLineFor(condR, jl !== null ? 'rashi' : null));
     if (condL) lines.push(shaniLineFor(condL, 'lagna'));
 
+    const verdictClause = (v, pos, m) => v === 'favourable' ? `favours ${m}`
+      : v === 'blocked' ? `is under vedha — ${m} arrives with friction`
+      : `tests ${m}; don't force matters there`;
     for (const g of PHALALU_ORDER) {
-      const d = detail[g], m = HOUSE_MEANINGS[d.pos];
-      // When lagna and rashi disagree on the verdict, mention the
-      // lens that drove the harsher reading so prose ≠ chart isn't
-      // a surprise.
-      const lensTag = (d.other && d.source !== 'both') ? ` (from your ${d.source})` : '';
-      lines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.pos)} house favours ${m}.`
-        : d.v === 'blocked' ? `${g}'s ${ordinal(d.pos)}-house transit is under vedha${d.by ? ' by ' + d.by : ''}${lensTag} — gains in ${m} may arrive with friction.`
-        : `${g} in the ${ordinal(d.pos)} house tests ${m}${lensTag}; avoid forcing matters there.`);
+      const d = detail[g];
+      if (d.lagna === null) {
+        const m = HOUSE_MEANINGS[d.posR];
+        lines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.posR)} house favours ${m}.`
+          : d.v === 'blocked' ? `${g}'s good ${ordinal(d.posR)}-house transit is under vedha by ${d.by} — gains in ${m} may arrive with friction.`
+          : `${g} in the ${ordinal(d.posR)} house tests ${m}; avoid forcing matters there.`);
+        continue;
+      }
+      // Both lenses set. If they agree, one clean line. If they
+      // differ, two clauses: "X from your rashi … and from your lagna …".
+      const mR = HOUSE_MEANINGS[d.posR];
+      const mL = HOUSE_MEANINGS[d.posL];
+      if (d.v === d.lagna.v && d.posR === d.posL) {
+        // Same house, same verdict → one line.
+        lines.push(`${g} in your ${ordinal(d.posR)} house ${verdictClause(d.v, d.posR, mR)}.`);
+      } else {
+        lines.push(`${g}: from your rashi, ${ordinal(d.posR)} house — ${verdictClause(d.v, d.posR, mR)}; from your lagna, ${ordinal(d.posL)} house — ${verdictClause(d.lagna.v, d.posL, mL)}.`);
+      }
     }
-    lines.push(`${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''}.`);
+    lines.push(`${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''} (from your rashi).`);
     return { quality, lines };
   }
 
