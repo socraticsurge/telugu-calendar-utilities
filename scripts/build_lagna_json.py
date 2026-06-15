@@ -16,14 +16,20 @@ the rising sign next changes, paired with the new rashi index.
       "days": [
         { "date": "YYYY-MM-DD",
           "sunrise": "HH:MM", "lagna0": 2,
-          "transitions": [[114, 3], [231, 4], ...],
-          "cycleEnd": 1438 }
+          "transitions": [[5, 3], [137, 4], ...],
+          "cycleEnd": 1440 }
       ]
     }
 
-The site uses ``cycleEnd`` (minute-offset from sunrise to next
-sunrise) to compute the end time of the last visible rashi instead
-of showing a duplicated trailing wrap cell.
+We emit every window the engine returns — the 5-min leading partial
+(tail of yesterday's wrap), every full rashi window, and the
+trailing partial(s) before next sunrise. So a typical 24h day has
+13 windows (the leading rashi appears twice — short tail at sunrise
++ ~2h wrap before next sunrise); some days have 14 (the wrap also
+advances into the *next* rashi for a short sliver before next
+sunrise). Intentional and accurate; the ribbon shows the cycle as
+it actually unfolds. ``cycleEnd`` is the minute-offset to next
+sunrise — used as the end time of the last visible cell.
 
 Hora is NOT precomputed — the static site derives it client-side from
 sunrise / sunset / next-sunrise (already in the ICS feed) since the
@@ -67,43 +73,23 @@ def build_for_city(loc, start: date, days: int) -> dict:
         if not transitions:
             continue
         sunrise_local = day.sunrise.astimezone(tz)
-        # First lagna covers sunrise; subsequent windows mark transitions.
+        # First window covers sunrise; emit it as lagna0 (rashi index
+        # at sunrise) and the rest as (offset, rashi_idx) transitions.
+        # We deliberately include the trailing wrap window(s) — the
+        # leading rashi reappearing late in the day, and on overflow
+        # days a small sliver of the next rashi before next sunrise.
+        # Showing the full cycle is more honest than hiding the wrap.
         first = transitions[0]
-        leading_name = first.name
-        lagna0 = RASHI_NAMES.index(leading_name.replace(' Lagna', ''))
-        # Each transition: minutes-from-sunrise of the NEW lagna's start,
-        # plus the new lagna's rashi index. Times are timezone-naive
-        # offsets — the site adds them to the local-time sunrise.
-        #
-        # The cycle wraps back to the leading rashi ~22h after sunrise,
-        # but the 24h panchangam-day slice can capture 13 OR 14 engine
-        # windows depending on whether the cycle had time to advance
-        # past the leading rashi into the next one before next sunrise
-        # (sidereal day is ~23h56m, so a 24h window can hold ~1.003
-        # cycles). Detecting the wrap by NAME (where the leading rashi
-        # next appears) is robust to both cases; slicing by [1:-1] was
-        # not, and left the wrap window visible on the 14-window days.
-        wrap_idx = None
-        for i in range(1, len(transitions)):
-            if transitions[i].name == leading_name:
-                wrap_idx = i
-                break
-        if wrap_idx is None:
-            # No wrap detected — keep everything after the leading.
-            wrap_idx = len(transitions)
-        visible = transitions[1:wrap_idx]
+        lagna0 = RASHI_NAMES.index(first.name.replace(' Lagna', ''))
         tx = []
-        for w in visible:
+        for w in transitions[1:]:
             new_idx = RASHI_NAMES.index(w.name.replace(' Lagna', ''))
             tx.append([_minute_of_day(w.start, day.sunrise), new_idx])
-        # cycleEnd is the START of the trailing wrap — i.e. when the
-        # last visible rashi actually ends. After this offset the
-        # ribbon stops (the trailing wrap and any overflow into the
-        # next rashi are hidden; see the panchangam-day footnote).
-        if wrap_idx < len(transitions):
-            cycle_end = _minute_of_day(transitions[wrap_idx].start, day.sunrise)
-        else:
-            cycle_end = _minute_of_day(transitions[-1].end, day.sunrise)
+        # cycleEnd is the end of the last window — i.e. the moment
+        # this panchangam day's lagna cycle ends and the next day's
+        # begins (next sunrise). Used as the end time of the last
+        # visible cell.
+        cycle_end = _minute_of_day(transitions[-1].end, day.sunrise)
         rows.append({
             'date': d.isoformat(),
             'sunrise': sunrise_local.strftime('%H:%M'),

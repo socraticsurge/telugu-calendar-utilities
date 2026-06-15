@@ -27,11 +27,10 @@ def test_build_shape_and_indices_for_hyderabad():
         assert all(0 < o < d['cycleEnd'] for o in offsets)
         # Each transition index is a valid rashi index.
         assert all(0 <= idx < 12 for _, idx in d['transitions'])
-        # cycleEnd marks where the last visible rashi ends — i.e. the
-        # start of the trailing partial wrap that duplicates the
-        # leading rashi. Typically ~22h after sunrise for Hyderabad
-        # (varies with latitude/season).
-        assert 1200 <= d['cycleEnd'] < 1440
+        # cycleEnd is the engine cycle's end — i.e. next sunrise as
+        # an offset from this day's sunrise. Should be ~1440 min (24h)
+        # within a couple of minutes of seasonal sunrise drift.
+        assert 1430 <= d['cycleEnd'] <= 1450
         # cycleEnd must be strictly later than the last transition.
         assert d['cycleEnd'] > offsets[-1]
 
@@ -44,15 +43,16 @@ def test_sunrise_is_local_time_not_utc():
     assert 4 <= hour <= 7, f'Expected IST sunrise hour 4-7, got {sunrise}'
 
 
-def test_lagna_advances_through_12_rashis_in_a_day():
-    """Over ~24h the ascendant should pass through all 12 signs once.
-    With the trailing wrap dropped, lagna0 + the 11 transitions cover
-    every rashi exactly once."""
+def test_lagna_covers_all_12_rashis_in_a_day():
+    """Over ~24h the ascendant passes through all 12 signs at least
+    once. The leading rashi typically also appears as a trailing wrap
+    (cycle is ~23h56m), so the set of distinct rashis seen equals
+    exactly the 12 zodiac signs."""
     data = build_for_city(_hyderabad(), date(2026, 6, 15), 1)
     d0 = data['days'][0]
-    rashis = [d0['lagna0']] + [idx for _, idx in d0['transitions']]
-    assert sorted(rashis) == list(range(12)), \
-        f'expected each rashi once, got {sorted(rashis)}'
+    rashis = {d0['lagna0']} | {idx for _, idx in d0['transitions']}
+    assert rashis == set(range(12)), \
+        f'expected all 12 rashis, missing {set(range(12)) - rashis}'
 
 
 def test_diaspora_city_still_produces_valid_json():
@@ -63,13 +63,15 @@ def test_diaspora_city_still_produces_valid_json():
     assert 0 <= data['days'][0]['lagna0'] < 12
 
 
-def test_cell_count_is_consistent_across_consecutive_days():
-    """The 24h panchangam slice can capture 13 OR 14 engine windows
-    depending on how far past the leading rashi the cycle wraps before
-    next sunrise. Both must collapse to the same 12 visible cells —
-    that's a previous regression (2026-06-16 wrongly produced 13 cells
-    next to 2026-06-15's 12)."""
-    data = build_for_city(_hyderabad(), date(2026, 6, 15), 5)
+def test_cell_count_is_13_or_14_per_day():
+    """The 24h panchangam slice captures 13 OR 14 engine windows
+    depending on how far past the leading rashi the cycle has wrapped
+    by next sunrise. Both are intellectually honest representations
+    of the actual lagna cycle; we display all windows the engine
+    returns so users see the cycle as it really unfolds, including
+    the leading partial (tail of yesterday's wrap) and trailing
+    partial(s) (start of tomorrow's leading rashi)."""
+    data = build_for_city(_hyderabad(), date(2026, 6, 15), 7)
     counts = [1 + len(d['transitions']) for d in data['days']]
-    assert all(c == 12 for c in counts), \
-        f'expected 12 cells per day, got {counts}'
+    assert all(c in (13, 14) for c in counts), \
+        f'expected 13 or 14 cells per day, got {counts}'
