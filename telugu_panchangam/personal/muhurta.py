@@ -11,7 +11,10 @@ from datetime import datetime, timedelta
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 from telugu_panchangam.engines.base import VAARAM_NAMES
-from telugu_panchangam.personal.lagna_hora import get_horas
+from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
+from telugu_panchangam.personal.lagna_position import (
+    lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,
+)
 from telugu_panchangam.personal.tarabalam import (
     AUSPICIOUS_TARAS, tara_number, tara_name,
 )
@@ -301,6 +304,57 @@ def _score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
     return bonus, reasons, bool(dropped), avoid_names, puja_names
 
 
+def _slot_lagna_name(lagnas, slot_start):
+    """Find which lagna's rashi is rising at slot_start; None if missed."""
+    if not lagnas:
+        return None
+    for w in lagnas:
+        if w.start <= slot_start < w.end:
+            return w.name.replace(' Lagna', '')
+    return None
+
+
+def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna):
+    """Per-person lagna position against the slot's rising sign.
+
+    Kendra (1/4/7/10 from janma) and Trikona (1/5/9) are favourable;
+    Ashtama (8) is the personal "lagna dosha" — same tier-cap treatment
+    as Ashtama Chandra. Position 1 is reported as 'own' (the strongest
+    single position — janma rashi itself rising).
+
+    Returns (bonus, reasons, ashtama_names).
+    """
+    if not janma_rasis or not slot_lagna:
+        return 0, [], []
+    bonus = 0
+    favourable, ashtama, ashtama_names = [], [], []
+    for i, rasi in enumerate(janma_rasis):
+        if rasi is None:
+            continue
+        janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
+        label = _label(janma_label, i)
+        pos = lagna_position(rasi, slot_lagna)
+        if is_ashtama_lagna(pos):
+            ashtama.append(f'{label} lagna@{pos}')
+            ashtama_names.append(label)
+            bonus -= 1
+        elif is_favourable_lagna(pos):
+            favourable.append(f'{label} {lagna_verdict(pos)}@{pos}')
+            bonus += 1
+    reasons = []
+    if favourable:
+        reasons.append(
+            f"{slot_lagna} lagna favourable for {', '.join(favourable)} "
+            f"(+{len(favourable)})"
+        )
+    if ashtama:
+        reasons.append(
+            f"{slot_lagna} lagna Ashtama for {', '.join(ashtama)} "
+            f"(-{len(ashtama)})"
+        )
+    return bonus, reasons, ashtama_names
+
+
 def _score_tithi_class(tithi_name, prefer_tithi_class, activity_label):
     """Universal Rikta -2; activity-preferred class +1.
 
@@ -500,7 +554,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    janma_rasis, chandra_mode, prefer_tithi_class, label,
                    vara_bonus, vara_reason, abhijit, amrita, prefer_chog,
                    avoid_karana_names, horas: list[Window] | None = None,
-                   prefer_varas: set[str] | None = None):
+                   prefer_varas: set[str] | None = None,
+                   lagnas: list[Window] | None = None):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -574,6 +629,15 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                         activity_match.append(f'{h.name} favoured for {label} (+1)')
                 break
 
+    # Lagna position vs janma rashi — kendra/trikona favour, Ashtama
+    # is the personal-dosha flag for the rising-sign axis (peer of
+    # Ashtama Chandra on the moon-sign axis).
+    slot_lagna_name = _slot_lagna_name(lagnas, s)
+    lagna_bonus, lagna_reasons, lagna_ashtama_names = _score_lagna(
+        janma_nakshatras, janma_rasis, slot_lagna_name)
+    score += lagna_bonus
+    group_fit.extend(lagna_reasons)
+
     notes = _doctrinal_notes(
         special_yogas=facts.special_yogas,
         tara_unfav_names=tara_unfav_names,
@@ -598,6 +662,11 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     if chandra_avoid_names:
         personal_dosha = 'ashtama_chandra' if any(
             'Ashtama' in n for n in chandra_avoid_names) else 'chandra_avoid'
+    elif lagna_ashtama_names:
+        # Ashtama lagna — same tier-cap treatment as Ashtama Chandra,
+        # but on the rising-sign axis. Group-level yogas don't rectify
+        # it; equal-scored slots prefer the personally-clean alternative.
+        personal_dosha = 'ashtama_lagna'
     elif chandra_puja_names:
         personal_dosha = 'chandra_remedial'
     elif tara_unfav_names and not any(
@@ -698,6 +767,13 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     amrita = list(day.amrita_kalam)
 
     horas = get_horas(day)
+    # Lagnas are only needed when the caller supplied at least one
+    # janma rashi — get_lagna_transitions does a Swiss Ephemeris
+    # bisection per day and isn't free, so we keep generic muhurta
+    # queries (no rasi) on the fast path.
+    lagnas = (get_lagna_transitions(day)
+              if janma_rasis and any(r is not None for r in janma_rasis)
+              else None)
 
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.
@@ -723,7 +799,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 vara_bonus=vara_bonus, vara_reason=vara_reason,
                 abhijit=abhijit, amrita=amrita, prefer_chog=prefer_chog,
                 avoid_karana_names=avoid_karana_names,
-                horas=horas, prefer_varas=prefer_varas
+                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas
             )
             if slot_dict is not None:
                 slots.append(slot_dict)
