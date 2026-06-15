@@ -21,3 +21,17 @@ jobs:
 
       - name: Run tests
         run: python -m pytest tests/ -v
+
+      - name: Set up Node (for JS scorer parity tests)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run JS scorer tests
+        # Zero-dependency: tests/js/*.js use node:test + node:assert
+        # built-ins, so no npm install step is needed. Loops so a new
+        # test file added under tests/js/ is picked up automatically.
+        run: |
+          for f in tests/js/*.js; do
+            node --test "$f"
+          done
