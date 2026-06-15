@@ -1571,6 +1571,11 @@
   </footer>
 </div>
 
+<!-- Pure muhurta scoring helpers. Loaded before the inline script so
+     constants like MU_LAGNA_KENDRA / functions like muLagnaPosition
+     are on window when the inline code runs. The same file is
+     require()'d by Node tests under tests/js/ — dual-context export. -->
+<script src="muhurta-scorer.js"></script>
 <script>
   const FEED_BASE_URL = 'https://panchangam.astrochaganti.com/feeds/';
 
@@ -3095,26 +3100,10 @@
                           'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1 };
   const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
 
-  // Tier mapping — mirror telugu_panchangam/personal/muhurta.score_tier
-  const MU_TIER_NAMES = ['Avoid', 'Fair', 'Good', 'Excellent'];
-  function muScoreTier(score) {
-    if (score >= 7) return 'Excellent';
-    if (score >= 4) return 'Good';
-    if (score >= 1) return 'Fair';
-    return 'Avoid';
-  }
-
-  // Relative tier — mirror telugu_panchangam/personal/muhurta.relative_tier.
-  // Buckets a score by its position within [floor, ceiling].
-  function muRelativeTier(score, ceiling, floor) {
-    const spread = ceiling - floor;
-    if (spread <= 0) return muScoreTier(score);
-    const rel = (score - floor) / spread;
-    if (rel >= 0.75) return 'Excellent';
-    if (rel >= 0.5) return 'Good';
-    if (rel >= 0.25) return 'Fair';
-    return 'Avoid';
-  }
+  // MU_TIER_NAMES, muScoreTier, muRelativeTier — moved to
+  // docs/muhurta-scorer.js (loaded via <script> below the existing
+  // tarabalam panel). The script tag assigns them to window so
+  // existing references in this file keep working unchanged.
   // Tier each slot relative to the min/max score in this batch — mirror
   // telugu_panchangam/personal/muhurta.assign_tiers. "Excellent" means
   // the best of what turned up in this search, not a fixed bar.
@@ -3313,54 +3302,12 @@
     return { nakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
   }
 
-  // Chandrabalam sets — mirror telugu_panchangam/personal/chandrabalam.py
-  const MU_CHANDRA_GOOD = new Set([1, 3, 6, 7, 10, 11]);
-  const MU_CHANDRA_PUJA = new Set([2, 5, 9]);
-  // Lagna position classification — mirrors
-  // telugu_panchangam/personal/lagna_position.py. Kendra (1/4/7/10)
-  // and Trikona (1/5/9) favour the slot; Ashtama (8) is the personal
-  // dosha peer of Ashtama Chandra on the rising-sign axis.
-  const MU_LAGNA_KENDRA = new Set([1, 4, 7, 10]);
-  const MU_LAGNA_TRIKONA = new Set([1, 5, 9]);
-  const MU_RASHI_NAMES = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
-
-  function muLagnaPosition(janmaRashi, lagnaRashi) {
-    const j = MU_RASHI_NAMES.indexOf(janmaRashi);
-    const l = MU_RASHI_NAMES.indexOf(lagnaRashi);
-    if (j < 0 || l < 0) return null;
-    return ((l - j) % 12 + 12) % 12 + 1;
-  }
-  function muLagnaVerdict(pos) {
-    if (pos === 1) return 'own';
-    if (pos === 8) return 'ashtama';
-    if (MU_LAGNA_TRIKONA.has(pos)) return 'trikona';
-    if (MU_LAGNA_KENDRA.has(pos)) return 'kendra';
-    return 'neutral';
-  }
-  function muIsFavourableLagna(pos) {
-    return MU_LAGNA_KENDRA.has(pos) || MU_LAGNA_TRIKONA.has(pos);
-  }
-  // Find the rashi rising at slotMin (minutes from midnight of the day
-  // whose lagnaDayData this is). Uses the JSON's offset-from-sunrise
-  // encoding to walk the windows. Day-choghadiya slots are always
-  // after sunrise, so we don't need to handle pre-sunrise lookups.
-  function muLagnaAtMin(lagnaDayData, slotMin) {
-    if (!lagnaDayData) return null;
-    const [srH, srM] = lagnaDayData.sunrise.split(':').map(Number);
-    const sunriseMin = srH * 60 + srM;
-    const offset = slotMin - sunriseMin;
-    if (offset < 0) return null;
-    const starts = [[0, lagnaDayData.lagna0], ...lagnaDayData.transitions];
-    for (let i = 0; i < starts.length; i++) {
-      const [startOff, rashiIdx] = starts[i];
-      const endOff = (i + 1 < starts.length) ? starts[i + 1][0] : lagnaDayData.cycleEnd;
-      if (startOff <= offset && offset < endOff) {
-        return MU_RASHI_NAMES[rashiIdx];
-      }
-    }
-    return null;
-  }
-  // CHANDRA bad = {4, 8, 12} (everything else)
+  // MU_CHANDRA_GOOD/MU_CHANDRA_PUJA, MU_LAGNA_KENDRA/MU_LAGNA_TRIKONA,
+  // MU_RASHI_NAMES, muLagnaPosition, muLagnaVerdict, muIsFavourableLagna,
+  // muLagnaAtMin — all moved to docs/muhurta-scorer.js so they can be
+  // unit-tested under Node. Loaded via <script src> below; assigned to
+  // window so the inline references in this file still resolve.
+  // CHANDRA bad = {4, 8, 12} (the complement).
 
   // Tithi family — mirror telugu_panchangam/personal/tithi_class.py
   const TITHI_NAMES_ORDER = [
