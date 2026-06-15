@@ -269,6 +269,16 @@
     .go-box .house { position: absolute; top: 0.25rem; right: 0.35rem; font-size: 0.62rem; font-weight: 700; color: #DCC1B5; }
     .go-box.janma { outline: 2px solid var(--indigo); outline-offset: -2px; }
     .go-box.janma .rname { color: var(--indigo); }
+    /* Janma lagna highlight — distinct from janma rashi (solid
+       indigo) so a user with both set can tell their Moon-rashi
+       cell from their ascendant cell at a glance. Gold dashed. */
+    .go-box.lagna { outline: 2px dashed #C28A1A; outline-offset: -2px; }
+    .go-box.lagna .rname { color: #8A5518; }
+    /* When janma rashi == janma lagna (same cell), both classes
+       apply — the solid indigo + gold dashed double-ring is a
+       useful visual: "this is BOTH your natal Moon and ascendant". */
+    .go-box.janma.lagna { outline: 2px solid var(--indigo);
+                           box-shadow: 0 0 0 2px #C28A1A inset; }
     .go-center { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--indigo-bg); display: flex; flex-direction: column;
                  align-items: center; justify-content: center; text-align: center; padding: 0.5rem; gap: 0.25rem; }
     .go-center .d1 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; color: var(--indigo); font-size: 1.05rem; }
@@ -3086,8 +3096,20 @@
         return `<span class="go-g ${v || ''}" title="${htmlEsc(tip)}">${GO_DATA.grahas[gi]}${retro[gi] ? '<span class="go-retro">℞</span>' : ''}</span>`;
       }).join('');
       const house = jr !== null ? `<span class="house">${((r - jr + 12) % 12) + 1}</span>` : '';
-      boxes += `<div class="go-box ${jr === r ? 'janma' : ''}" style="grid-row:${gr};grid-column:${gc};">
-        <span class="rname">${GO_DATA.rasis[r]}${jr === r ? ' · janma' : ''}</span>${house}<br>${grahas}</div>`;
+      // Highlight both natal cells when known. When they coincide
+      // (janma rashi == janma lagna) we render a single combined
+      // label rather than 'janma · lagna' which would look odd.
+      const isJanma = (jr === r);
+      const isLagna = (jl !== null && jl === r);
+      const classes = ['go-box'];
+      if (isJanma) classes.push('janma');
+      if (isLagna) classes.push('lagna');
+      let label = '';
+      if (isJanma && isLagna) label = ' · janma + lagna';
+      else if (isJanma) label = ' · janma';
+      else if (isLagna) label = ' · lagna';
+      boxes += `<div class="${classes.join(' ')}" style="grid-row:${gr};grid-column:${gc};">
+        <span class="rname">${GO_DATA.rasis[r]}${label}</span>${house}<br>${grahas}</div>`;
     }
     const typed = document.getElementById('go-date').value;
     const shownISO = `${dateShown.getFullYear()}-${String(dateShown.getMonth()+1).padStart(2,'0')}-${String(dateShown.getDate()).padStart(2,'0')}`;
