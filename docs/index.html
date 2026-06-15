@@ -169,15 +169,6 @@
     .lagna-seg.earth { background: #EEE5D2; border-color: #C8B27A; color: #6B4F1A; }
     .lagna-seg.air   { background: #E7F1F8; border-color: #99BEDB; color: #1F4A75; }
     .lagna-seg.water { background: #E6F1EE; border-color: #87BDB0; color: #1F5C4F; }
-    /* Personal overlays — when the user has set a Tarabalam profile,
-       the ribbon shades cells by their relationship to that profile.
-       Ring colour priority: Ashtama (red) > janma-lagna match (gold)
-       > favourable kendra/trikona (green). Box-shadow inset overlays
-       the elemental border without disrupting layout. */
-    .lagna-seg.is-favourable { box-shadow: inset 0 0 0 2px rgba(21, 128, 61, 0.55); }
-    .lagna-seg.is-janma-lagna { box-shadow: inset 0 0 0 2px #C28A1A; }
-    .lagna-seg.is-janma-lagna .lagna-name { font-weight: 800; }
-    .lagna-seg.is-ashtama { box-shadow: inset 0 0 0 2px rgba(142, 42, 31, 0.65); }
 
     .preview-note { font-size: 0.75rem; color: #B5AC9C; margin: 0.6rem 0 0; }
     .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #E7DECC; }
@@ -1940,43 +1931,13 @@
     });
   }
 
-  function lagnaCell(seg, profile) {
+  function lagnaCell(seg) {
     // seg.rashi is a JSON-supplied integer 0..11; we look up the name
     // from a hard-coded array. Defense-in-depth: escape anyway.
     const name = RASHI_NAMES_JS[seg.rashi] || '?';
     const elem = RASHI_ELEMENT[seg.rashi] || '';
     const range = fmtRange(seg.start, seg.end, '–<wbr>', seg.sflag, seg.eflag);
-    // Personal overlay — uses the first profile's janma rashi/lagna
-    // when set. Priority: ashtama > janma-lagna match > favourable.
-    // muLagnaPosition + muIsFavourableLagna come from
-    // docs/muhurta-scorer.js (loaded above this script).
-    let overlay = '', titleExtra = '';
-    if (profile) {
-      let ashtama = false, ownLagna = false, favourable = false;
-      const ashtamaFrom = [], favFrom = [];
-      if (profile.rasi) {
-        const p = muLagnaPosition(profile.rasi, name);
-        if (p === 8) { ashtama = true; ashtamaFrom.push(`8th from ${profile.rasi} rashi`); }
-        else if (muIsFavourableLagna(p)) { favourable = true; favFrom.push(`${p}th from ${profile.rasi} rashi`); }
-      }
-      if (profile.lagna) {
-        const p = muLagnaPosition(profile.lagna, name);
-        if (p === 8) { ashtama = true; ashtamaFrom.push(`8th from ${profile.lagna} lagna`); }
-        else if (p === 1) { ownLagna = true; }
-        else if (muIsFavourableLagna(p)) { favourable = true; favFrom.push(`${p}th from ${profile.lagna} lagna`); }
-      }
-      if (ashtama) {
-        overlay = 'is-ashtama';
-        titleExtra = ' · Ashtama — ' + ashtamaFrom.join(', ');
-      } else if (ownLagna) {
-        overlay = 'is-janma-lagna';
-        titleExtra = ' · your janma lagna';
-      } else if (favourable) {
-        overlay = 'is-favourable';
-        titleExtra = ' · favourable — ' + favFrom.join(', ');
-      }
-    }
-    return `<div class="lagna-seg ${elem} ${overlay}" title="${htmlEsc(name)} lagna · ${htmlEsc(seg.start)}–${htmlEsc(seg.end)}${htmlEsc(titleExtra)}">`
+    return `<div class="lagna-seg ${elem}" title="${htmlEsc(name)} lagna · ${htmlEsc(seg.start)}–${htmlEsc(seg.end)}">`
       + `<div class="lagna-name">${htmlEsc(name)}</div>`
       + `<div class="lagna-time">${range}</div></div>`;
   }
@@ -2227,10 +2188,6 @@
       + `<em>same rashi</em> — a short partial at sunrise and a longer wrap before `
       + `next sunrise, because the lagna cycle (~23h 56m) is slightly shorter than `
       + `the panchangam day (24h).`
-      + ` When a Tarabalam profile is set, cells gain a coloured ring: `
-      + `<span style="box-shadow:inset 0 0 0 2px #C28A1A;padding:0 0.3rem;border-radius:3px;">gold</span> for your janma lagna, `
-      + `<span style="box-shadow:inset 0 0 0 2px rgba(21,128,61,0.55);padding:0 0.3rem;border-radius:3px;">green</span> for kendra/trikona, `
-      + `<span style="box-shadow:inset 0 0 0 2px rgba(142,42,31,0.65);padding:0 0.3rem;border-radius:3px;">red</span> for Ashtama (8th).`
       + `</p></div>`;
 
     container.innerHTML = `
@@ -2267,12 +2224,7 @@
           // crosses past midnight gets *+1 and subsequent cells stay
           // unmarked (matches the existing Choghadiya convention).
           const flagged = markFirstMidnightCrossing(segs, dayData.sunrise);
-          // Personal overlay uses the first profile's janma rashi/lagna
-          // (the "You" row by default). When no profile is set, cells
-          // render plain — same as before.
-          const profile = (typeof tbProfiles === 'function')
-            ? (tbProfiles()[0] || null) : null;
-          ribbon.innerHTML = flagged.map(seg => lagnaCell(seg, profile)).join('');
+          ribbon.innerHTML = flagged.map(lagnaCell).join('');
         } else {
           // Date is outside the generated lagna window (we precompute
           // ~18 months ahead per city). Keep the strip visible with a
@@ -2919,10 +2871,11 @@
     // people may have changed in the Tarabalam tab — rebuild, keep selection
     const sel = document.getElementById('go-view');
     let keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
-    // Pre-Option-B saved values are bare 'p<i>'; the new schema is
-    // 'p<i>r' / 'p<i>l'. Migrate the old form to the rashi view so
-    // users don't lose their saved selection across the upgrade.
-    if (keep && /^p\d+$/.test(keep)) keep = keep + 'r';
+    // An earlier iteration of this PR had separate 'p<i>r' / 'p<i>l'
+    // options; we collapsed those into a single 'p<i>' combined
+    // option. Strip the suffix on load so test users who saved a
+    // suffixed value during the iteration don't end up unselected.
+    if (keep && /^p\d+[rl]$/.test(keep)) keep = keep.slice(0, -1);
     goBuildViewSelect();
     if (keep && [...sel.options].some(o => o.value === keep)) sel.value = keep;
     renderGochara();
@@ -2970,16 +2923,15 @@
     const people = goSavedPeople();
     let html = '<option value="">Transits only — whole sky</option>';
     if (people.length) {
-      // Each saved person gets one row per available reference. Janma
-      // lagna only appears when filled in the Tarabalam profile —
-      // strict Lagna Shuddhi requires birth time + place that not
-      // everyone has at hand.
-      const rows = [];
-      people.forEach((k, i) => {
-        rows.push(`<option value="p${i}r">${htmlEsc(k.name)} · ${htmlEsc(k.rasi)} rashi</option>`);
-        if (k.lagna) {
-          rows.push(`<option value="p${i}l">${htmlEsc(k.name)} · ${htmlEsc(k.lagna)} lagna</option>`);
-        }
+      // One row per person — when janma lagna is also on the profile,
+      // the row label says so. The chart then uses BOTH references to
+      // verdict each graha; you don't pick rashi-or-lagna, you get
+      // the personalised combined view.
+      const rows = people.map((k, i) => {
+        const refs = k.lagna
+          ? `${htmlEsc(k.rasi)} rashi + ${htmlEsc(k.lagna)} lagna`
+          : `${htmlEsc(k.rasi)} rashi`;
+        return `<option value="p${i}">${htmlEsc(k.name)} · ${refs}</option>`;
       });
       html += '<optgroup label="Your saved people">' + rows.join('') + '</optgroup>';
     }
@@ -2990,20 +2942,24 @@
 
   function goCurrentView() {
     const val = document.getElementById('go-view').value;
-    if (val === '') return { jr: null, label: null };
-    // 'p<i>r' / 'p<i>l' — profile-keyed (rashi / lagna).
-    // Bare 'p<i>' (no suffix) is the pre-Option-B format kept in
-    // older localStorage values; treat as the rashi view.
-    const profMatch = val.match(/^p(\d+)([rl]?)$/);
+    if (val === '') return { jr: null, jl: null, label: null };
+    // 'p<i>' — profile-keyed combined view. We carry BOTH the rashi
+    // index (jr, used to lay out the chart and number houses) AND the
+    // optional lagna index (jl, used as a second reference for graha
+    // verdicts and the conditions banner).
+    const profMatch = val.match(/^p(\d+)$/);
     if (profMatch) {
       const k = goSavedPeople()[Number(profMatch[1])];
-      if (!k) return { jr: null, label: null };
-      if (profMatch[2] === 'l' && k.lagna) {
-        return { jr: TB_RASIS.indexOf(k.lagna), label: `${k.lagna} lagna (${k.name})` };
-      }
-      return { jr: TB_RASIS.indexOf(k.rasi), label: `${k.rasi} rashi (${k.name})` };
+      if (!k) return { jr: null, jl: null, label: null };
+      const jr = TB_RASIS.indexOf(k.rasi);
+      const jl = k.lagna ? TB_RASIS.indexOf(k.lagna) : null;
+      const refLabel = k.lagna
+        ? `${k.rasi} rashi + ${k.lagna} lagna (${k.name})`
+        : `${k.rasi} rashi (${k.name})`;
+      return { jr, jl, label: refLabel };
     }
-    return { jr: Number(val), label: GO_DATA.rasis[Number(val)] + ' rashi' };
+    // Bare rashi-index option from the "Any rashi" group.
+    return { jr: Number(val), jl: null, label: GO_DATA.rasis[Number(val)] + ' rashi' };
   }
 
   // South Indian chart: fixed rasi positions on a 4x4 grid (row, col)
@@ -3016,58 +2972,122 @@
     const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
     const view = goCurrentView();
     const jr = view.jr;
+    const jl = (typeof view.jl === 'number') ? view.jl : null;
     localStorage.setItem('tc-go-view', document.getElementById('go-view').value);
 
     const dateShown = new Date(GO_DATA.start + 'T00:00:00');
     dateShown.setDate(dateShown.getDate() + idx);
     const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
-    // per-graha verdicts when a janma rashi is chosen
-    const houseOf = gi => jr === null ? null : ((row[gi] - jr + 12) % 12) + 1;
-    const occupants = {};
-    if (jr !== null) GO_DATA.grahas.forEach((g, gi) => {
-      (occupants[houseOf(gi)] = occupants[houseOf(gi)] || []).push(g);
-    });
-    const verdictOf = gi => {
-      if (jr === null) return null;
-      const g = GO_DATA.grahas[gi], pos = houseOf(gi);
+    // Per-graha verdicts using a chosen reference index (rashi index
+    // 0..11). Works for both janma rashi and janma lagna — same
+    // Brihat Samhita rules, different reference frame.
+    const houseFrom = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
+    const occupantsFor = (ref) => {
+      const o = {};
+      GO_DATA.grahas.forEach((g, gi) => {
+        const h = houseFrom(gi, ref);
+        (o[h] = o[h] || []).push(g);
+      });
+      return o;
+    };
+    const verdictFrom = (gi, ref, occ) => {
+      const g = GO_DATA.grahas[gi], pos = houseFrom(gi, ref);
       if (!GO_FAV[g].includes(pos)) return 'bad';
       if (!GO_NODES.has(g)) {
         const vh = GO_VEDHA[g][pos];
-        for (const other of (occupants[vh] || [])) {
+        for (const other of (occ[vh] || [])) {
           if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return 'blocked';
         }
       }
       return 'good';
     };
 
-    // conditions banner
+    // Pre-compute occupants for each reference we'll use.
+    const occRashi = (jr !== null) ? occupantsFor(jr) : null;
+    const occLagna = (jl !== null) ? occupantsFor(jl) : null;
+
+    // House numbering for the chart stays anchored to janma RASHI —
+    // that's what users have always seen. The lagna lens is an extra
+    // verdict layer, not a chart re-anchoring.
+    const houseOf = gi => jr === null ? null : houseFrom(gi, jr);
+
+    // Combined verdict per graha: take the worst of rashi-verdict and
+    // (when lagna is set) lagna-verdict. Worst order: bad > blocked >
+    // good. Conservative: any flaw in either lens flags caution.
+    const WORST = { bad: 3, blocked: 2, good: 1 };
+    const verdictOf = gi => {
+      if (jr === null) return null;
+      const vr = verdictFrom(gi, jr, occRashi);
+      if (jl === null) return vr;
+      const vl = verdictFrom(gi, jl, occLagna);
+      return WORST[vl] > WORST[vr] ? vl : vr;
+    };
+    // Per-reference verdicts surface in the tooltip when lagna is set
+    // so the user can see why a graha was flagged.
+    const verdictsBoth = gi => {
+      if (jr === null) return null;
+      const vr = verdictFrom(gi, jr, occRashi);
+      const vl = (jl !== null) ? verdictFrom(gi, jl, occLagna) : null;
+      return { vr, vl };
+    };
+
+    // Conditions banner — Sade Sati / Ashtama / Ardhastama Shani.
+    // Checked from BOTH references when both are set, so users see
+    // conditions that fire on only one lens (a common Jyotisha case).
     const condBox = document.getElementById('go-conditions');
+    const shaniIdx = GO_DATA.grahas.indexOf('Shani');
+    const shaniCondFor = (sp) => {
+      if (sp === 12) return 'Sade Sati (rising phase)';
+      if (sp === 1) return 'Sade Sati (peak phase)';
+      if (sp === 2) return 'Sade Sati (setting phase)';
+      if (sp === 8) return 'Ashtama Shani';
+      if (sp === 4) return 'Ardhastama Shani';
+      return null;
+    };
     let conds = [];
     if (jr !== null) {
-      const sp = houseOf(GO_DATA.grahas.indexOf('Shani'));
-      conds = sp === 12 ? ['Sade Sati (rising phase)'] : sp === 1 ? ['Sade Sati (peak phase)']
-        : sp === 2 ? ['Sade Sati (setting phase)'] : sp === 8 ? ['Ashtama Shani']
-        : sp === 4 ? ['Ardhastama Shani'] : [];
+      const cR = shaniCondFor(houseFrom(shaniIdx, jr));
+      if (cR) conds.push(jl !== null ? `${cR} — from rashi` : cR);
+    }
+    if (jl !== null) {
+      const cL = shaniCondFor(houseFrom(shaniIdx, jl));
+      if (cL) conds.push(`${cL} — from lagna`);
     }
     condBox.innerHTML = conds.length
-      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${c}</span>`).join('')}
-         <div class="tb-sub" style="margin-top:0.25rem;">Running ${conds[0].split(' (')[0]}? Personalised guidance:
+      ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${htmlEsc(c)}</span>`).join('')}
+         <div class="tb-sub" style="margin-top:0.25rem;">Running ${conds[0].split(' — ')[0].split(' (')[0]}? Personalised guidance:
          <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a></div></div>` : '';
 
     // chart
     const byRasi = {};
     GO_DATA.grahas.forEach((g, gi) => { (byRasi[row[gi]] = byRasi[row[gi]] || []).push(gi); });
+    const ord = n => `${n}${['st','nd','rd'][n-1] || 'th'}`;
+    const verdictLabel = v => v === 'good' ? 'favourable' : v === 'blocked' ? 'vedha' : 'adverse';
     let boxes = '';
     for (let r = 0; r < 12; r++) {
       const [gr, gc] = GO_LAYOUT[r];
       const grahas = (byRasi[r] || []).map(gi => {
         const v = verdictOf(gi);
+        const both = verdictsBoth(gi);
         const t = goTill(idx, gi);
-        const tip = `${GO_DATA.grahas[gi]} in ${GO_DATA.rasis[r]}` +
-          (jr !== null ? ` — ${houseOf(gi)}${['st','nd','rd'][houseOf(gi)-1]||'th'} house, ${v === 'good' ? 'favourable' : v === 'blocked' ? 'vedha' : 'adverse'}` : '') +
+        // Tooltip surfaces BOTH references when lagna is set so the
+        // user can see exactly why a combined verdict landed where it
+        // did (e.g. "good from rashi · adverse from lagna" → adverse).
+        let perRef = '';
+        if (both) {
+          const hr = houseFrom(gi, jr);
+          const partR = `${ord(hr)} from rashi (${verdictLabel(both.vr)})`;
+          if (both.vl !== null) {
+            const hl = houseFrom(gi, jl);
+            perRef = ` — ${partR} · ${ord(hl)} from lagna (${verdictLabel(both.vl)})`;
+          } else {
+            perRef = ` — ${partR}`;
+          }
+        }
+        const tip = `${GO_DATA.grahas[gi]} in ${GO_DATA.rasis[r]}${perRef}` +
           (t ? ` · till ${t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '');
-        return `<span class="go-g ${v || ''}" title="${tip}">${GO_DATA.grahas[gi]}${retro[gi] ? '<span class="go-retro">℞</span>' : ''}</span>`;
+        return `<span class="go-g ${v || ''}" title="${htmlEsc(tip)}">${GO_DATA.grahas[gi]}${retro[gi] ? '<span class="go-retro">℞</span>' : ''}</span>`;
       }).join('');
       const house = jr !== null ? `<span class="house">${((r - jr + 12) % 12) + 1}</span>` : '';
       boxes += `<div class="go-box ${jr === r ? 'janma' : ''}" style="grid-row:${gr};grid-column:${gc};">
