@@ -24,6 +24,7 @@ from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_t
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
 from telugu_panchangam.eclipses import list_eclipses_in_range, get_eclipse_from_precomputed
+from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 
 _ENGINES = {
     'drik': DrikGanitaEngine(),
@@ -268,6 +269,68 @@ def tool_get_muhurta(
                 'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
                 'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
             },
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+
+
+def tool_get_daily_horas(
+    date_str: str,
+    city: str,
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        d = _parse_date(date_str)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        day = _ENGINES[system].calculate(d, loc)
+        tz = loc.timezone
+        horas = get_horas(day)
+        return json.dumps({
+            'date': date_str,
+            'city': city,
+            'system': system,
+            'horas': [
+                {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
+                for w in horas
+            ]
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+
+
+def tool_get_lagna_transitions(
+    date_str: str,
+    city: str,
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    try:
+        d = _parse_date(date_str)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        day = _ENGINES[system].calculate(d, loc)
+        tz = loc.timezone
+        lagnas = get_lagna_transitions(day)
+        return json.dumps({
+            'date': date_str,
+            'city': city,
+            'system': system,
+            'lagnas': [
+                {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
+                for w in lagnas
+            ]
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
