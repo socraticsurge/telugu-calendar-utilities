@@ -321,57 +321,84 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
     Kendra (1/4/7/10 from janma) and Trikona (1/5/9) are favourable;
     Ashtama (8) is the personal "lagna dosha" — same tier-cap treatment
     as Ashtama Chandra. Position 1 is reported as 'own' (the strongest
-    single position — janma rashi/lagna itself rising).
+    single position).
 
-    Reference convention. Two modes, per person:
-      - **Strict Lagna Shuddhi** — when ``janma_lagnas[i]`` is set,
-        count from that person's natal ascendant. Most accurate;
-        requires exact birth time + place. Reason chip ends with
-        "from <rasi> lagna" to signal the reference.
-      - **Chandra-Rashi-as-lagna** (fallback) — when janma_lagna is
-        missing, count from the person's janma rashi (derived from
-        their nakshatra). Still a legitimate Jyotisha tradition.
-        Reason chip ends with "from <rasi>".
+    Two independent reference checks, both scored when both are set:
+      - **From janma rashi** — slot lagna's position counted from the
+        person's Moon-rashi at birth (derived from their nakshatra).
+        Chandra-Rashi-as-lagna tradition; chip ends with "from <rasi>".
+      - **From janma lagna** — slot lagna's position counted from the
+        person's natal ascendant. Strict Lagna Shuddhi; chip ends with
+        "from <rasi> lagna" so the reference is visible.
 
-    Mode is per-person; one profile in a group can use Lagna Shuddhi
-    while another falls back to Chandra-Rashi.
+    Both checks contribute independently to score and reason chips —
+    the natal Moon and the natal ascendant are usually in different
+    rashis, so kendra-from-Moon and kendra-from-Lagna capture genuinely
+    different astrological qualities. Classical purohits compute both.
 
     Returns (bonus, reasons, ashtama_names).
     """
     if not janma_rasis or not slot_lagna:
         return 0, [], []
     bonus = 0
-    favourable, ashtama, ashtama_names = [], [], []
+    fav_rashi, ash_rashi = [], []
+    fav_lagna, ash_lagna = [], []
+    ashtama_names: list[str] = []
+
+    def _record_ashtama(label):
+        if label not in ashtama_names:
+            ashtama_names.append(label)
+
     for i, rasi in enumerate(janma_rasis):
         if rasi is None:
             continue
         janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
         label = _label(janma_label, i)
-        # Per-person reference: prefer natal ascendant when supplied.
-        use_lagna = bool(janma_lagnas and i < len(janma_lagnas)
-                         and janma_lagnas[i])
-        reference = janma_lagnas[i] if use_lagna else rasi
-        ref_suffix = ' lagna' if use_lagna else ''
-        pos = lagna_position(reference, slot_lagna)
-        if is_ashtama_lagna(pos):
-            ashtama.append(f'{label} lagna@{pos} from {reference}{ref_suffix}')
-            ashtama_names.append(label)
+        # Always: position from janma rashi.
+        pos_r = lagna_position(rasi, slot_lagna)
+        if is_ashtama_lagna(pos_r):
+            ash_rashi.append(f'{label} lagna@{pos_r} from {rasi}')
+            _record_ashtama(label)
             bonus -= 1
-        elif is_favourable_lagna(pos):
-            favourable.append(
-                f'{label} {lagna_verdict(pos)}@{pos} from {reference}{ref_suffix}'
+        elif is_favourable_lagna(pos_r):
+            fav_rashi.append(
+                f'{label} {lagna_verdict(pos_r)}@{pos_r} from {rasi}'
             )
             bonus += 1
+        # Additionally: position from janma lagna when supplied.
+        if janma_lagnas and i < len(janma_lagnas) and janma_lagnas[i]:
+            jl = janma_lagnas[i]
+            pos_l = lagna_position(jl, slot_lagna)
+            if is_ashtama_lagna(pos_l):
+                ash_lagna.append(f'{label} lagna@{pos_l} from {jl} lagna')
+                _record_ashtama(label)
+                bonus -= 1
+            elif is_favourable_lagna(pos_l):
+                fav_lagna.append(
+                    f'{label} {lagna_verdict(pos_l)}@{pos_l} from {jl} lagna'
+                )
+                bonus += 1
+
     reasons = []
-    if favourable:
+    if fav_rashi:
         reasons.append(
-            f"{slot_lagna} lagna favourable for {', '.join(favourable)} "
-            f"(+{len(favourable)})"
+            f"{slot_lagna} lagna favourable for {', '.join(fav_rashi)} "
+            f"(+{len(fav_rashi)})"
         )
-    if ashtama:
+    if fav_lagna:
         reasons.append(
-            f"{slot_lagna} lagna Ashtama for {', '.join(ashtama)} "
-            f"(-{len(ashtama)})"
+            f"{slot_lagna} lagna favourable for {', '.join(fav_lagna)} "
+            f"(+{len(fav_lagna)})"
+        )
+    if ash_rashi:
+        reasons.append(
+            f"{slot_lagna} lagna Ashtama for {', '.join(ash_rashi)} "
+            f"(-{len(ash_rashi)})"
+        )
+    if ash_lagna:
+        reasons.append(
+            f"{slot_lagna} lagna Ashtama for {', '.join(ash_lagna)} "
+            f"(-{len(ash_lagna)})"
         )
     return bonus, reasons, ashtama_names
 

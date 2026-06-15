@@ -81,66 +81,82 @@ def test_ashtama_lagna_sets_personal_dosha_and_caps_tier():
         assert s['tier'] != 'Excellent'
 
 
-def test_janma_lagna_overrides_janma_rashi_when_provided():
-    """When janma_lagnas[i] is set, that person's kendra/trikona/
-    Ashtama positions count from the natal ascendant instead of
-    janma rashi. Different reference → potentially different
-    scoring."""
+def test_janma_lagna_adds_independent_check_not_replacing_rashi():
+    """When janma_lagnas[i] is set, the rashi-based check is NOT
+    suppressed — both references contribute independently. So a
+    slot whose lagna is favourable from janma rashi but neutral
+    from janma lagna still shows the rashi chip; if both are
+    favourable, BOTH chips appear and BOTH +1s land on the score.
+    """
     day = _day(2026, 6, 17)
-    # On 2026-06-17 Hyderabad a choghadiya slot starts in Tula lagna
-    # (~10:04 IST). From janma rashi Mesha, Tula is position 7
-    # (kendra) → favourable. From janma lagna Vrishabha, Tula is
-    # position 6 (neutral) → no chip.
-    slots_rashi = day_slots(day,
-                            janma_nakshatras=['Krittika'],
-                            janma_rasis=['Mesha'])
-    slots_lagna = day_slots(day,
-                            janma_nakshatras=['Krittika'],
-                            janma_rasis=['Mesha'],
-                            janma_lagnas=['Vrishabha'])
-    def has_tula_fav(slots):
-        return any(
-            'Tula lagna favourable' in r
-            for s in slots for r in s['reasons']
-        )
-    assert has_tula_fav(slots_rashi), \
-        'Tula should be kendra from Mesha (rashi mode)'
-    assert not has_tula_fav(slots_lagna), \
-        'Tula should NOT be kendra/trikona from Vrishabha (lagna mode)'
+    # On 2026-06-17 Hyderabad a choghadiya slot starts in Tula
+    # lagna (~10:04 IST). From janma rashi Mesha → position 7
+    # (kendra). From janma lagna Vrishabha → position 6 (neutral).
+    # Rashi chip MUST still appear even though lagna check is silent.
+    slots = day_slots(day,
+                      janma_nakshatras=['Krittika'],
+                      janma_rasis=['Mesha'],
+                      janma_lagnas=['Vrishabha'])
+    rashi_chip = any('from Mesha' in r and ' lagna' not in r.split('from Mesha')[1][:8]
+                     for s in slots for r in s['reasons']
+                     if 'Tula lagna favourable' in r)
+    lagna_chip = any('from Vrishabha lagna' in r
+                     for s in slots for r in s['reasons']
+                     if 'Tula lagna favourable' in r)
+    assert rashi_chip, 'janma-rashi check must still fire when lagna is also set'
+    assert not lagna_chip, 'Tula is not kendra/trikona from Vrishabha — no lagna chip'
+
+
+def test_janma_lagna_both_references_score_when_both_favourable():
+    """Both checks favourable on the same slot → both chips +
+    both +1s contribute to the score."""
+    day = _day(2026, 6, 17)
+    # Tula is position 7 from Mesha (kendra) and position 5 from
+    # Mithuna (trikona). Both checks fire.
+    slots = day_slots(day,
+                      janma_nakshatras=['Krittika'],
+                      janma_rasis=['Mesha'],
+                      janma_lagnas=['Mithuna'])
+    rashi = [r for s in slots for r in s['reasons']
+             if 'Tula lagna favourable' in r and 'from Mesha' in r
+             and 'from Mesha lagna' not in r]
+    lagna = [r for s in slots for r in s['reasons']
+             if 'Tula lagna favourable' in r and 'from Mithuna lagna' in r]
+    assert rashi, 'expected rashi-reference chip'
+    assert lagna, 'expected lagna-reference chip'
 
 
 def test_janma_lagna_chip_carries_lagna_suffix():
-    """Reason chip should end with 'from <rasi> lagna' (not just
-    'from <rasi>') when janma_lagnas is set — so users see at-a-
-    glance which reference convention was applied."""
+    """The 'from <rasi> lagna' suffix differentiates lagna-reference
+    chips from rashi-reference chips at-a-glance."""
     day = _day(2026, 6, 17)
     slots = day_slots(day,
                       janma_nakshatras=['Krittika'],
                       janma_rasis=['Mesha'],
                       janma_lagnas=['Mesha'])
-    matched = [r for s in slots for r in s['reasons']
-               if 'Tula lagna favourable' in r]
-    assert matched, 'expected at least one Tula kendra reason'
-    assert all('from Mesha lagna' in r for r in matched), \
-        f'expected "from Mesha lagna" suffix, got: {matched}'
+    # janma lagna == janma rashi (both Mesha) → both checks fire.
+    lagna_chips = [r for s in slots for r in s['reasons']
+                   if 'Tula lagna favourable' in r and 'from Mesha lagna' in r]
+    assert lagna_chips, 'expected a Mesha-lagna chip with the suffix'
 
 
-def test_janma_lagna_falls_back_to_rashi_when_null():
-    """When janma_lagnas[i] is None, that person's scoring falls
-    back to janma rashi — chip stays in the original 'from <rasi>'
-    format (no ' lagna' suffix)."""
+def test_janma_lagna_falls_back_cleanly_when_null():
+    """When janma_lagnas[i] is None, only the rashi-reference
+    check runs — no lagna-reference chip is added (back to
+    pre-Option-B behaviour for that person)."""
     day = _day(2026, 6, 17)
     slots = day_slots(day,
                       janma_nakshatras=['Krittika'],
                       janma_rasis=['Mesha'],
                       janma_lagnas=[None])
-    matched = [r for s in slots for r in s['reasons']
-               if 'Tula lagna favourable' in r]
-    assert matched, 'expected at least one Tula kendra reason'
-    for r in matched:
-        assert 'from Mesha lagna' not in r, \
+    rashi_chips = [r for s in slots for r in s['reasons']
+                   if 'Tula lagna favourable' in r]
+    assert rashi_chips, 'expected at least one Tula kendra reason'
+    # No reason should carry the ' lagna' reference suffix.
+    for r in rashi_chips:
+        assert 'lagna favourable' in r  # the leading "Tula lagna" mention
+        assert ' lagna' not in r.split('from ')[1], \
             f'unexpected lagna suffix in fallback chip: {r}'
-        assert 'from Mesha' in r
 
 
 def test_ashtama_chandra_takes_precedence_over_ashtama_lagna():

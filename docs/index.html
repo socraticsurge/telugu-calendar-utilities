@@ -3627,29 +3627,47 @@
               const lagnaDay = lagnaDayFor(lagnaCityData, isoDate);
               const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
               if (slotLagna) {
+                // Two independent checks per person. Both run when both
+                // references are set; each contributes its own +1/-1.
+                const favRashi = [], ashRashi = [];
                 const favLagna = [], ashLagna = [];
+                const recordAshtama = (label) => {
+                  if (!ashtamaLagnaNames.includes(label)) ashtamaLagnaNames.push(label);
+                };
                 for (let pi = 0; pi < people.length; pi++) {
                   const pr = people[pi];
-                  // Strict Lagna Shuddhi when the user has supplied
-                  // their natal ascendant; otherwise fall back to
-                  // janma rashi (Chandra-Rashi-as-lagna tradition).
-                  const reference = pr.lagna || pr.rasi;
-                  if (!reference) continue;
-                  const refSuffix = pr.lagna ? ' lagna' : '';
-                  const pos = muLagnaPosition(reference, slotLagna);
-                  if (!pos) continue;
                   const label = `#${pi + 1} (${htmlEsc(pr.name || pr.nak)})`;
-                  if (pos === 8) {
-                    ashLagna.push(`${label} lagna@8 from ${reference}${refSuffix}`);
-                    ashtamaLagnaNames.push(label);
-                    score -= 1;
-                  } else if (muIsFavourableLagna(pos)) {
-                    favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${reference}${refSuffix}`);
-                    score += 1;
+                  // Always: from janma rashi (Chandra-Rashi-as-lagna).
+                  if (pr.rasi) {
+                    const pos = muLagnaPosition(pr.rasi, slotLagna);
+                    if (pos === 8) {
+                      ashRashi.push(`${label} lagna@8 from ${pr.rasi}`);
+                      recordAshtama(label);
+                      score -= 1;
+                    } else if (pos && muIsFavourableLagna(pos)) {
+                      favRashi.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.rasi}`);
+                      score += 1;
+                    }
+                  }
+                  // Additionally: from janma lagna (strict Lagna Shuddhi).
+                  if (pr.lagna) {
+                    const pos = muLagnaPosition(pr.lagna, slotLagna);
+                    if (pos === 8) {
+                      ashLagna.push(`${label} lagna@8 from ${pr.lagna} lagna`);
+                      recordAshtama(label);
+                      score -= 1;
+                    } else if (pos && muIsFavourableLagna(pos)) {
+                      favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.lagna} lagna`);
+                      score += 1;
+                    }
                   }
                 }
+                if (favRashi.length) groupFit.push(
+                  `${slotLagna} lagna favourable for ${favRashi.join(', ')} (+${favRashi.length})`);
                 if (favLagna.length) groupFit.push(
                   `${slotLagna} lagna favourable for ${favLagna.join(', ')} (+${favLagna.length})`);
+                if (ashRashi.length) groupFit.push(
+                  `${slotLagna} lagna Ashtama for ${ashRashi.join(', ')} (-${ashRashi.length})`);
                 if (ashLagna.length) groupFit.push(
                   `${slotLagna} lagna Ashtama for ${ashLagna.join(', ')} (-${ashLagna.length})`);
               }
