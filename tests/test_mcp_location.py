@@ -63,3 +63,21 @@ def test_timezone_not_found_raises_value_error():
         mock_tf.timezone_at.return_value = None
         with pytest.raises(ValueError, match="Could not determine timezone"):
             resolve_location('Some Ocean Point')
+
+
+def test_timezone_for_coordinates_success():
+    from telugu_panchangam.mcp.location import timezone_for_coordinates
+    with patch('telugu_panchangam.mcp.location._TF') as mock_tf:
+        mock_tf.timezone_at.return_value = 'Asia/Kolkata'
+        tz = timezone_for_coordinates(17.385, 78.487)
+        mock_tf.timezone_at.assert_called_once_with(lat=17.385, lng=78.487)
+        assert tz == 'Asia/Kolkata'
+
+
+def test_timezone_for_coordinates_failure():
+    from telugu_panchangam.mcp.location import timezone_for_coordinates
+    with patch('telugu_panchangam.mcp.location._TF') as mock_tf:
+        mock_tf.timezone_at.return_value = None
+        with pytest.raises(ValueError, match=r"Could not determine timezone for \(0\.0, 0\.0\). Pass timezone explicitly."):
+            timezone_for_coordinates(0.0, 0.0)
+        mock_tf.timezone_at.assert_called_once_with(lat=0.0, lng=0.0)
