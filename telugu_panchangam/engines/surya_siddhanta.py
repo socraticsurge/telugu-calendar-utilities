@@ -30,11 +30,6 @@ _MOON_REVS        = 57_753_336
 _MOON_APOGEE_REVS = 488_219
 _MOON_APOGEE_AT_EPOCH = 90.0   # SS places the moon's mandocca at 90 deg at Kali epoch
 _SUN_APOGEE_DEG   = 77.333
-# Manda epicycle circumferences in degrees; the equation-of-centre amplitude
-# is circumference / 2*pi, subtracted when the anomaly (from apogee) is 0-180.
-_SUN_MANDA_R      = 13.5
-_MOON_MANDA_R     = 31.5
-
 _DAY_CHOGHADIYA = {
     0: ['Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg'],
     1: ['Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit'],
@@ -54,7 +49,11 @@ def ss_sun_longitude(jd: float) -> float:
     ka = jd - _KALI_EPOCH_JD
     mean_sun = _mean_longitude(ka, _SUN_REVS)
     anomaly = (mean_sun - _SUN_APOGEE_DEG) % 360.0
-    correction = _SUN_MANDA_R / (2.0 * math.pi) * math.sin(math.radians(anomaly))
+    # SS 2.38: Manda epicycle circumferences vary between even and odd quadrants.
+    base_even = 14.0
+    base_odd = 13.666666666666666
+    circumference = base_even - (base_even - base_odd) * abs(math.sin(math.radians(anomaly)))
+    correction = math.degrees(math.asin((circumference / 360.0) * math.sin(math.radians(anomaly))))
     return (mean_sun - correction) % 360.0
 
 
@@ -63,7 +62,11 @@ def ss_moon_longitude(jd: float) -> float:
     mean_moon = _mean_longitude(ka, _MOON_REVS)
     moon_apogee = (_mean_longitude(ka, _MOON_APOGEE_REVS) + _MOON_APOGEE_AT_EPOCH) % 360.0
     anomaly = (mean_moon - moon_apogee) % 360.0
-    correction = _MOON_MANDA_R / (2.0 * math.pi) * math.sin(math.radians(anomaly))
+    # SS 2.38: Manda epicycle circumferences vary between even and odd quadrants.
+    base_even = 32.0
+    base_odd = 31.666666666666668
+    circumference = base_even - (base_even - base_odd) * abs(math.sin(math.radians(anomaly)))
+    correction = math.degrees(math.asin((circumference / 360.0) * math.sin(math.radians(anomaly))))
     return (mean_moon - correction) % 360.0
 
 
