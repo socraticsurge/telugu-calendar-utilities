@@ -134,6 +134,42 @@
     .chog-cell.good .chog-name { color: var(--green); }
     .chog-cell.bad .chog-name { color: #b91c1c; }
     .chog-time { font-size: 0.72rem; color: #58504A; }
+
+    /* ── Hora + Lagna strips ──
+       Match Choghadiya's 8-col footprint visually by using 6 cols
+       (12 cells = 2 even rows). Cells now show full ranges with the
+       same <wbr> break-opportunity Choghadiya uses, so on narrow
+       widths the time wraps gracefully to two lines instead of
+       overflowing the container. */
+    .hora-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .hora-grid { grid-template-columns: repeat(4, 1fr); } }
+    .hora-cell { border-radius: 6px; padding: 0.35rem 0.25rem; text-align: center; border: 1px solid transparent; }
+    .hora-glyph { font-size: 0.95rem; line-height: 1; margin-bottom: 0.15rem; }
+    .hora-lord { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.02em; }
+    .hora-time { font-size: 0.7rem; color: #58504A; margin-top: 0.15rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .hora-time sup, .lagna-time sup { font-size: 0.6em; vertical-align: super; color: var(--indigo); margin: 0 0.05em; }
+    .lagna-ribbon { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .lagna-ribbon { grid-template-columns: repeat(4, 1fr); } }
+    .lagna-seg { padding: 0.45rem 0.25rem; text-align: center; border: 1px solid transparent; border-radius: 6px; }
+    .lagna-name { font-size: 0.78rem; font-weight: 700; font-family: var(--brand-display), Georgia, serif; }
+    .lagna-time { font-size: 0.7rem; color: #58504A; margin-top: 0.15rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
+    /* Classical planetary colours — one hue per planet for horas,
+       elemental family for lagna rashis. (The earlier "site palette"
+       toggle was dropped: it didn't carry enough signal to justify
+       the toggle baggage. Personalised favourability — kendra/trikona
+       from janma rasi — is the better path and lives in a follow-up.) */
+    .hora-cell.sun     { background: #FFF4D6; border-color: #F2C94C; color: #7A5C00; }
+    .hora-cell.moon    { background: #F4F7FB; border-color: #C8D2DE; color: #4A5867; }
+    .hora-cell.mars    { background: #FEE7E0; border-color: #F2887A; color: #8C2A1A; }
+    .hora-cell.mercury { background: #E7F5E7; border-color: #95C695; color: #2D6A3D; }
+    .hora-cell.jupiter { background: #FFF1CE; border-color: #E5B548; color: #6B4A00; }
+    .hora-cell.venus   { background: #FBF1F6; border-color: #E5C6D5; color: #7A3960; }
+    .hora-cell.saturn  { background: #E3E4EA; border-color: #9BA1B0; color: #2E3340; }
+    .lagna-seg.fire  { background: #FEEAE0; border-color: #F2887A; color: #8C2A1A; }
+    .lagna-seg.earth { background: #EEE5D2; border-color: #C8B27A; color: #6B4F1A; }
+    .lagna-seg.air   { background: #E7F1F8; border-color: #99BEDB; color: #1F4A75; }
+    .lagna-seg.water { background: #E6F1EE; border-color: #87BDB0; color: #1F5C4F; }
+
     .preview-note { font-size: 0.75rem; color: #B5AC9C; margin: 0.6rem 0 0; }
     .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #E7DECC; }
     .tool-tab { font-family: inherit; font-size: 0.95rem; font-weight: 700; color: #B5AC9C;
@@ -1755,6 +1791,155 @@
     return blocks;
   }
 
+  // --- Horas (planetary hours) + Lagna (rising sign) ---
+  //
+  // Horas: computed purely client-side. Sequence is fixed by the
+  // weekday lord; 12 day horas span sunrise→sunset and 12 night horas
+  // span sunset→next sunrise. Mirrors telugu_panchangam/personal/lagna_hora.py.
+  //
+  // Lagna: requires Swiss Ephemeris, so it's precomputed by
+  // scripts/build_lagna_json.py and served as feeds/<slug>-lagna.json.
+
+  const HORA_LORDS = ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'];
+  const HORA_GLYPH = { Sun: '☉', Venus: '♀', Mercury: '☿', Moon: '☽', Saturn: '♄', Jupiter: '♃', Mars: '♂' };
+  const HORA_PALETTE_CLASS = { Sun: 'sun', Venus: 'venus', Mercury: 'mercury', Moon: 'moon', Saturn: 'saturn', Jupiter: 'jupiter', Mars: 'mars' };
+  // Benefic / neutral / malefic — used by the site palette to encode
+  // favourability rather than planetary identity. Sun is neutral
+  // because its hora is benefic for some activities and malefic for
+  // others; the classical scheme is more nuanced and is opt-in.
+  const HORA_FAVOURABILITY = { Sun: '', Venus: 'benefic', Mercury: 'benefic', Moon: 'benefic', Jupiter: 'benefic', Saturn: 'malefic', Mars: 'malefic' };
+  // JS Date.getDay() index -> starting hora lord. Order matches
+  // _WEEKDAY_TO_LORD_START in telugu_panchangam/personal/lagna_hora.py.
+  const WEEKDAY_TO_LORD_IDX = [0, 3, 6, 2, 5, 1, 4];  // Sun, Mon, Tue, Wed, Thu, Fri, Sat
+
+  const RASHI_ELEMENT = ['fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'];
+  const RASHI_NAMES_JS = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
+
+  function computeHoras(weekday, sunrise, sunset, nextSunrise) {
+    // weekday: 0..6 (Sun..Sat). All times are 'HH:MM'.
+    const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    const toT = mm => { const m = ((Math.round(mm) % 1440) + 1440) % 1440;
+                        return `${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`; };
+    const sr = toMin(sunrise), ss = toMin(sunset);
+    const dayLen = ss - sr;
+    const nextSrAbs = toMin(nextSunrise) + 1440;
+    const nightLen = nextSrAbs - ss;
+    const lordStart = WEEKDAY_TO_LORD_IDX[weekday];
+    const day = [], night = [];
+    for (let i = 0; i < 12; i++) {
+      const lord = HORA_LORDS[(lordStart + i) % 7];
+      day.push({ lord, start: toT(sr + dayLen * i / 12), end: toT(sr + dayLen * (i + 1) / 12) });
+    }
+    for (let i = 0; i < 12; i++) {
+      const lord = HORA_LORDS[(lordStart + 12 + i) % 7];
+      night.push({ lord, start: toT(ss + nightLen * i / 12), end: toT(ss + nightLen * (i + 1) / 12) });
+    }
+    return { day, night };
+  }
+
+  // Walk a sequence of HH:MM start/end pairs and mark the first cell
+  // whose end is the FIRST time past midnight. Subsequent cells that
+  // already live past midnight don't get a flag — the convention is
+  // "mark only the crossing", and after that the next-day-ness is
+  // visually obvious. Matches Choghadiya night.
+  function markFirstMidnightCrossing(cells, anchorStartTime) {
+    const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    const anchor = toMin(anchorStartTime);
+    let prevMin = anchor;
+    let marked = false;
+    return cells.map(c => {
+      const startMin = toMin(c.start);
+      const endMin = toMin(c.end);
+      const sflag = !marked && startMin < prevMin ? '+1' : '';
+      // The "crossing" cell is the one whose end wraps backward.
+      const crosses = !marked && endMin < startMin;
+      const eflag = crosses ? '+1' : '';
+      if (sflag || crosses) marked = true;
+      prevMin = endMin;
+      return { ...c, sflag, eflag };
+    });
+  }
+
+  function horaCell(h) {
+    // Defense-in-depth: every interpolation goes through htmlEsc even
+    // though h.lord / h.start / h.end come from hard-coded arrays and
+    // arithmetic on HH:MM strings. Matches the pattern PR #59 set.
+    // Times go through fmtRange so the 12/24 hour toggle and the
+    // <wbr> break behaviour match the rest of the day card.
+    const fav = HORA_FAVOURABILITY[h.lord] || 'neutral';
+    const palClass = HORA_PALETTE_CLASS[h.lord] || '';
+    const cls = `hora-cell ${palClass} ${fav}`;
+    const glyph = HORA_GLYPH[h.lord] || '';
+    const range = fmtRange(h.start, h.end, '–<wbr>', h.sflag, h.eflag);
+    return `<div class="${cls}" title="${htmlEsc(h.lord)} hora · ${htmlEsc(h.start)}–${htmlEsc(h.end)}">`
+      + `<div class="hora-glyph">${htmlEsc(glyph)}</div>`
+      + `<div class="hora-lord">${htmlEsc(h.lord)}</div>`
+      + `<div class="hora-time">${range}</div></div>`;
+  }
+
+  // --- Lagna data layer: cached per-session, per-city fetch ---
+  const LAGNA_CACHE = new Map();
+  async function loadLagna(city) {
+    if (LAGNA_CACHE.has(city)) return LAGNA_CACHE.get(city);
+    const filename = `${slug(city)}-lagna.json`;
+    let promise = fetch(`feeds/${filename}`).then(r => r.ok ? r.json() : null).catch(() => null);
+    promise = promise.then(d => d || fetch(`${FEED_BASE_URL}${filename}`).then(r => r.ok ? r.json() : null).catch(() => null));
+    LAGNA_CACHE.set(city, promise);
+    return promise;
+  }
+
+  function lagnaDayFor(data, isoDate) {
+    if (!data || !data.days || !data.days.length) return null;
+    const direct = data.days.find(d => d.date === isoDate);
+    if (direct) return direct;
+    // Fallback for older formats without 'date': offset from data.start.
+    const start = new Date(`${data.start}T00:00:00`);
+    const target = new Date(`${isoDate}T00:00:00`);
+    const idx = Math.round((target - start) / 86400000);
+    return data.days[idx] || null;
+  }
+
+  function lagnaSegments(dayData) {
+    // dayData: { sunrise: 'HH:MM', lagna0: int,
+    //            transitions: [[minOffset, newIdx], ...],
+    //            cycleEnd: int }   // minute-offset from sunrise to next sunrise
+    if (!dayData) return [];
+    const fmt = m => {
+      const w = ((m % 1440) + 1440) % 1440;
+      return `${String(Math.floor(w / 60)).padStart(2,'0')}:${String(w % 60).padStart(2,'0')}`;
+    };
+    const [srH, srM] = dayData.sunrise.split(':').map(Number);
+    const baseMin = srH * 60 + srM;
+    // Build raw (rashi, startOffset) entries so we can derive ends.
+    const raw = [{ rashi: dayData.lagna0, off: 0 }];
+    for (const [off, idx] of dayData.transitions) {
+      raw.push({ rashi: idx, off });
+    }
+    const cycleEnd = typeof dayData.cycleEnd === 'number' ? dayData.cycleEnd : (24 * 60);
+    return raw.map((r, i) => {
+      const endOff = i < raw.length - 1 ? raw[i + 1].off : cycleEnd;
+      return {
+        rashi: r.rashi,
+        start: fmt(baseMin + r.off),
+        end: fmt(baseMin + endOff),
+      };
+    });
+  }
+
+  function lagnaCell(seg) {
+    // seg.rashi is a JSON-supplied integer 0..11; we look up the name
+    // from a hard-coded array. Defense-in-depth: escape anyway.
+    const name = RASHI_NAMES_JS[seg.rashi] || '?';
+    const elem = RASHI_ELEMENT[seg.rashi] || '';
+    const range = fmtRange(seg.start, seg.end, '–<wbr>', seg.sflag, seg.eflag);
+    return `<div class="lagna-seg ${elem}" title="${htmlEsc(name)} lagna · ${htmlEsc(seg.start)}–${htmlEsc(seg.end)}">`
+      + `<div class="lagna-name">${htmlEsc(name)}</div>`
+      + `<div class="lagna-time">${range}</div></div>`;
+  }
+
+  // (Removed: site/classical palette toggle. Classical-only now —
+  // see the CSS block above for the rationale.)
+
   // A time plus optional (+1)/(-1) relative-day marker, as emitted by the feed.
   const TIME_PART = '(\\d{2}:\\d{2})(?:\\s*\\(([+-]1)\\))?';
   // \s+ not \s{2,}: long names (Krishna Chaturdashi, named Ekadashis) overflow the column padding
@@ -1966,6 +2151,40 @@
       chog += `<div class="tile-strip"><div class="strip-title">🌙 Choghadiya — night in 8 blocks</div><div class="chog-grid">${night.map(chogCell).join('')}</div></div>`;
     }
 
+    // Horas + lagna — horas are derived client-side from sunrise/sunset/
+    // tomorrow's sunrise; lagna is fetched asynchronously and injected
+    // into the placeholder once it loads.
+    let tomorrowSr = null;
+    if (data.sunset && events) {
+      const tomorrow = new Date(selectedDate());
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const next = events.get(stampOf(tomorrow));
+      const m = next && next.description.match(/Sunrise (\d{2}:\d{2})/);
+      if (m) tomorrowSr = m[1];
+    }
+    let horaHtml = '';
+    if (data.sunrise && data.sunset && tomorrowSr) {
+      const horas = computeHoras(selectedDate().getDay(), data.sunrise, data.sunset, tomorrowSr);
+      // Day horas live entirely within one calendar day; night horas
+      // cross midnight, so feed them through the marker pass with
+      // sunset as the "today" anchor.
+      const nightFlagged = markFirstMidnightCrossing(horas.night, data.sunset);
+      horaHtml = `<div class="tile-strip"><div class="strip-title">🕒 Horas — day</div><div class="hora-grid">${horas.day.map(horaCell).join('')}</div></div>`;
+      horaHtml += `<div class="tile-strip"><div class="strip-title">🌙 Horas — night</div><div class="hora-grid">${nightFlagged.map(horaCell).join('')}</div></div>`;
+    }
+    const isoDate = `${selectedDate().getFullYear()}-${String(selectedDate().getMonth()+1).padStart(2,'0')}-${String(selectedDate().getDate()).padStart(2,'0')}`;
+    const lagnaPlaceholder = `<div class="tile-strip" id="lagna-strip" data-iso="${isoDate}">`
+      + `<div class="strip-title">🌅 Lagna — rising sign</div>`
+      + `<div class="lagna-ribbon" id="lagna-ribbon">`
+      + `<div class="preview-note" style="grid-column:1/-1;margin:0;padding:0.4rem;text-align:center;">Loading lagna data…</div>`
+      + `</div>`
+      + `<p class="preview-note" style="margin:0.5rem 0 0;">`
+      + `Cells span sunrise to next sunrise. The first and last cells are often the `
+      + `<em>same rashi</em> — a short partial at sunrise and a longer wrap before `
+      + `next sunrise, because the lagna cycle (~23h 56m) is slightly shorter than `
+      + `the panchangam day (24h).`
+      + `</p></div>`;
+
     container.innerHTML = `
       <div class="preview-card">
         <div class="preview-head">
@@ -1980,8 +2199,42 @@
         ${angaGrid}
         ${windows}
         ${chog}
+        ${horaHtml}
+        ${lagnaPlaceholder}
       </div>
     `;
+
+    // Async lagna fetch — guarded by the strip's data-iso so a quick
+    // date change before the fetch resolves doesn't paint stale data.
+    const cityForLagna = document.getElementById('tp-city')?.value;
+    if (cityForLagna) {
+      loadLagna(cityForLagna).then(d => {
+        const ribbon = document.getElementById('lagna-ribbon');
+        const strip = document.getElementById('lagna-strip');
+        if (!ribbon || !strip || strip.dataset.iso !== isoDate) return;
+        const dayData = lagnaDayFor(d, isoDate);
+        const segs = lagnaSegments(dayData);
+        if (segs.length) {
+          // Anchor midnight detection on sunrise — the first cell that
+          // crosses past midnight gets *+1 and subsequent cells stay
+          // unmarked (matches the existing Choghadiya convention).
+          const flagged = markFirstMidnightCrossing(segs, dayData.sunrise);
+          ribbon.innerHTML = flagged.map(lagnaCell).join('');
+        } else {
+          // Date is outside the generated lagna window (we precompute
+          // ~18 months ahead per city). Keep the strip visible with a
+          // clear explanation instead of vanishing silently. Built via
+          // DOM API + textContent so no string ever reaches innerHTML.
+          const note = document.createElement('div');
+          note.className = 'preview-note';
+          note.style.cssText = 'grid-column:1/-1;margin:0;padding:0.5rem;text-align:center;';
+          note.textContent = d
+            ? 'Lagna data is generated ~18 months ahead. This date is outside the current window — it will appear once the next monthly build runs.'
+            : 'Lagna data is loading from a separate feed. If this persists, the feed may be unreachable from your network.';
+          ribbon.replaceChildren(note);
+        }
+      });
+    }
   }
 
   // --- Upcoming special days (next 30 days, same city/system as preview) ---
@@ -2042,6 +2295,7 @@
     }
     renderUpcoming(LAST_EVENTS);
   }
+  window.renderAll = renderAll;
 
   async function loadPreview() {
     const city = document.getElementById('tp-city').value;
