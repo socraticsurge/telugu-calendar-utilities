@@ -10,5 +10,9 @@ for f in os.listdir('feeds'):
 
 shutil.copy('docs/index.html', 'public/index.html')
 shutil.copy('docs/og-image.png', 'public/og-image.png')
+# muhurta-scorer.js — sidecar loaded by index.html via <script src>.
+# Must be staged alongside index.html or the muhurta finder errors
+# out on every search (ReferenceError on muLagnaPosition etc.).
+shutil.copy('docs/muhurta-scorer.js', 'public/muhurta-scorer.js')
 
 print(f"Published {len(os.listdir('public/feeds'))} feeds.")
