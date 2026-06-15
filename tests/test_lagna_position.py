@@ -4,6 +4,8 @@ import pytest
 from telugu_panchangam.personal.lagna_position import (
     lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,
     LAGNA_KENDRA, LAGNA_TRIKONA,
+    LAGNA_CHARA, LAGNA_STHIRA, LAGNA_DVISVABHAVA,
+    LAGNA_CLASSES, lagna_class_of, lagnas_in_class,
 )
 
 
@@ -64,3 +66,47 @@ def test_is_favourable_lagna_covers_kendra_or_trikona():
 def test_is_ashtama_lagna_is_only_position_8():
     for p in range(1, 13):
         assert is_ashtama_lagna(p) == (p == 8)
+
+
+# ── Lagna class helpers (Chara / Sthira / Dvisvabhava) ─────────────
+
+def test_lagna_classes_partition_all_12_rashis():
+    """Every rashi belongs to exactly one class — Chara, Sthira, or
+    Dvisvabhava. No overlap, no gaps."""
+    union = LAGNA_CHARA | LAGNA_STHIRA | LAGNA_DVISVABHAVA
+    assert len(union) == 12, f'expected 12 rashis total, got {len(union)}'
+    assert not (LAGNA_CHARA & LAGNA_STHIRA)
+    assert not (LAGNA_CHARA & LAGNA_DVISVABHAVA)
+    assert not (LAGNA_STHIRA & LAGNA_DVISVABHAVA)
+    assert len(LAGNA_CHARA) == 4
+    assert len(LAGNA_STHIRA) == 4
+    assert len(LAGNA_DVISVABHAVA) == 4
+
+
+def test_class_membership_matches_classical_assignment():
+    """Spot-check the classical mapping (Muhurta Chintamani)."""
+    # Chara (movable): Mesha, Karka, Tula, Makara
+    assert lagna_class_of('Mesha') == 'Chara'
+    assert lagna_class_of('Makara') == 'Chara'
+    # Sthira (fixed): Vrishabha, Simha, Vrischika, Kumbha
+    assert lagna_class_of('Vrishabha') == 'Sthira'
+    assert lagna_class_of('Simha') == 'Sthira'
+    # Dvisvabhava (dual): Mithuna, Kanya, Dhanu, Meena
+    assert lagna_class_of('Mithuna') == 'Dvisvabhava'
+    assert lagna_class_of('Meena') == 'Dvisvabhava'
+
+
+def test_lagna_class_of_unknown_rashi_returns_none():
+    assert lagna_class_of('NotARashi') is None
+
+
+def test_lagnas_in_class_returns_the_right_set():
+    assert lagnas_in_class('Chara') == LAGNA_CHARA
+    assert lagnas_in_class('Sthira') == LAGNA_STHIRA
+    assert lagnas_in_class('Dvisvabhava') == LAGNA_DVISVABHAVA
+
+
+def test_lagnas_in_class_raises_on_unknown_class():
+    import pytest
+    with pytest.raises(ValueError):
+        lagnas_in_class('Bogus')

@@ -27,6 +27,50 @@ LAGNA_OWN: int = 1
 LAGNA_ASHTAMA: int = 8
 
 
+# ─── Lagna classes (Chara / Sthira / Dvisvabhava) ─────────────────
+#
+# The three classical groupings of the 12 rashis by their nature, used
+# by Muhurta Chintamani (ch. on lagna selection) and Muhurta Martanda
+# to recommend activity-appropriate lagnas:
+#
+#   Chara (movable / cardinal):     Mesha, Karka, Tula, Makara
+#       — favours activities involving motion: travel, journey starts.
+#   Sthira (fixed):                 Vrishabha, Simha, Vrischika, Kumbha
+#       — favours stability-seeking: wedding, gruhapravesha, vehicle.
+#   Dvisvabhava (dual / mutable):   Mithuna, Kanya, Dhanu, Meena
+#       — favours learning and rites: upanayana, vidyarambha, mundana.
+LAGNA_CHARA: frozenset[str] = frozenset(
+    ['Mesha', 'Karka', 'Tula', 'Makara'])
+LAGNA_STHIRA: frozenset[str] = frozenset(
+    ['Vrishabha', 'Simha', 'Vrischika', 'Kumbha'])
+LAGNA_DVISVABHAVA: frozenset[str] = frozenset(
+    ['Mithuna', 'Kanya', 'Dhanu', 'Meena'])
+
+LAGNA_CLASSES: dict[str, frozenset[str]] = {
+    'Chara': LAGNA_CHARA,
+    'Sthira': LAGNA_STHIRA,
+    'Dvisvabhava': LAGNA_DVISVABHAVA,
+}
+
+
+def lagna_class_of(rashi: str) -> str | None:
+    """Return 'Chara' | 'Sthira' | 'Dvisvabhava' for a rashi name."""
+    for class_name, members in LAGNA_CLASSES.items():
+        if rashi in members:
+            return class_name
+    return None
+
+
+def lagnas_in_class(class_name: str) -> frozenset[str]:
+    """Set of rashi names in the given class. Raises on unknown class."""
+    if class_name not in LAGNA_CLASSES:
+        raise ValueError(
+            f'Unknown lagna class {class_name!r} — '
+            f'expected one of {sorted(LAGNA_CLASSES)}'
+        )
+    return LAGNA_CLASSES[class_name]
+
+
 def _rasi_index(name: str) -> int:
     try:
         return RASHI_NAMES.index(name)

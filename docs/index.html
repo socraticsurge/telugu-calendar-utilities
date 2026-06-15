@@ -3521,7 +3521,8 @@
   // user picks via the in-page dropdown.
   const MU_ACTIVITY = {
     any:           { label: 'Anything auspicious' },
-    travel:        { label: 'Travel / journey', avoid_karana: ['Vishti'] },
+    travel:        { label: 'Travel / journey', avoid_karana: ['Vishti'],
+                     prefer_lagna_class: 'Chara' },
     purchase:      { label: 'Purchase (general)', prefer_choghadiya: ['Labh', 1] },
     ceremony:      { label: 'Ceremony / puja (general)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
@@ -3533,71 +3534,88 @@
     wedding:       { label: 'Wedding (Vivaha)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Purna',
-                     prefer_vara: ['Guruvaram','Somavaram'] },
+                     prefer_vara: ['Guruvaram','Somavaram'],
+                     prefer_lagna_class: 'Sthira' },
     engagement:    { label: 'Engagement (Nischayam)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Purna',
-                     prefer_vara: ['Guruvaram','Somavaram'] },
+                     prefer_vara: ['Guruvaram','Somavaram'],
+                     prefer_lagna_class: 'Sthira' },
     naming:        { label: 'Naming (Namakaranam)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_choghadiya: ['Shubh', 1],
                      prefer_tithi_class: 'Nanda',
-                     prefer_vara: ['Budhavaram','Guruvaram'] },
+                     prefer_vara: ['Budhavaram','Guruvaram'],
+                     prefer_lagna_class: 'Dvisvabhava' },
     annaprasana:   { label: 'Annaprasana (First feeding)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_choghadiya: ['Shubh', 1],
                      prefer_tithi_class: 'Bhadra',
-                     prefer_vara: ['Somavaram','Guruvaram'] },
+                     prefer_vara: ['Somavaram','Guruvaram'],
+                     prefer_lagna_class: 'Dvisvabhava' },
     karnavedha:    { label: 'Karnavedha (Ear-piercing)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Bhadra',
-                     prefer_vara: ['Budhavaram','Shukravaram'] },
+                     prefer_vara: ['Budhavaram','Shukravaram'],
+                     prefer_lagna_class: 'Dvisvabhava' },
     mundana:       { label: 'Mundana / Chaula (First head-shave)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Nanda',
-                     prefer_vara: ['Budhavaram','Guruvaram'] },
+                     prefer_vara: ['Budhavaram','Guruvaram'],
+                     prefer_lagna_class: 'Dvisvabhava' },
     upanayana:     { label: 'Upanayana (Sacred thread)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Nanda',
-                     prefer_vara: ['Budhavaram','Guruvaram'] },
+                     prefer_vara: ['Budhavaram','Guruvaram'],
+                     prefer_lagna_class: 'Dvisvabhava' },
     vidyarambha:   { label: 'Education start (Vidyarambha)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_choghadiya: ['Amrit', 1],
                      prefer_tithi_class: 'Nanda',
-                     prefer_vara: ['Budhavaram'] },
+                     prefer_vara: ['Budhavaram'],
+                     prefer_lagna_class: 'Dvisvabhava' },
     gruhapravesha: { label: 'Gruhapravesha (Home entry)',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Bhadra',
-                     prefer_vara: ['Guruvaram','Somavaram'] },
+                     prefer_vara: ['Guruvaram','Somavaram'],
+                     prefer_lagna_class: 'Sthira' },
     vehicle:       { label: 'Vehicle purchase',
                      prefer_choghadiya: ['Labh', 1],
                      prefer_tithi_class: 'Bhadra',
-                     prefer_vara: ['Shukravaram'] },
+                     prefer_vara: ['Shukravaram'],
+                     prefer_lagna_class: 'Sthira' },
     property:      { label: 'Property / Land purchase',
                      prefer_choghadiya: ['Labh', 1],
                      prefer_tithi_class: 'Bhadra',
-                     prefer_vara: ['Guruvaram','Shukravaram'] },
+                     prefer_vara: ['Guruvaram','Shukravaram'],
+                     prefer_lagna_class: 'Sthira' },
     gold:          { label: 'Gold / Jewelry purchase',
                      prefer_choghadiya: ['Labh', 1],
                      prefer_tithi_class: 'Bhadra',
-                     prefer_vara: ['Shukravaram','Guruvaram'] },
+                     prefer_vara: ['Shukravaram','Guruvaram'],
+                     prefer_lagna_class: 'Sthira' },
     bhumi_puja:    { label: 'Bhumi Puja / Foundation laying',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Bhadra',
-                     prefer_vara: ['Guruvaram','Somavaram'] },
+                     prefer_vara: ['Guruvaram','Somavaram'],
+                     prefer_lagna_class: 'Sthira' },
     business:      { label: 'Business launch',
                      prefer_choghadiya: ['Amrit', 1],
                      prefer_tithi_class: 'Nanda',
-                     prefer_vara: ['Guruvaram','Budhavaram'] },
+                     prefer_vara: ['Guruvaram','Budhavaram'],
+                     prefer_lagna_class: 'Sthira' },
     job:           { label: 'Job start / Contract signing',
                      prefer_choghadiya: ['Amrit', 1],
                      prefer_tithi_class: 'Nanda',
-                     prefer_vara: ['Guruvaram','Budhavaram'] },
+                     prefer_vara: ['Guruvaram','Budhavaram'],
+                     prefer_lagna_class: 'Sthira' },
     yajna:         { label: 'Yajna / Homam',
                      skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
                      prefer_tithi_class: 'Purna',
-                     prefer_vara: ['Guruvaram','Somavaram'] },
-    pilgrimage:    { label: 'Pilgrimage (Tirtha Yatra)', avoid_karana: ['Vishti'] },
+                     prefer_vara: ['Guruvaram','Somavaram'],
+                     prefer_lagna_class: 'Sthira' },
+    pilgrimage:    { label: 'Pilgrimage (Tirtha Yatra)', avoid_karana: ['Vishti'],
+                     prefer_lagna_class: 'Chara' },
     court:         { label: 'Court / legal matter',
                      prefer_tithi_class: 'Jaya',
                      prefer_vara: ['Mangalavaram'] },
@@ -3630,10 +3648,14 @@
       const city = document.getElementById('tp-city').value;
       const system = document.getElementById('tp-system').value;
       const events = LAST_EVENTS || await loadFeed(city, system);
-      // Lagna data is only needed when people are set (we score
-      // kendra/trikona/Ashtama per janma rashi). Cached per session,
-      // shared with the day-card's lagna ribbon fetch.
-      const lagnaCityData = people.length ? await loadLagna(city) : null;
+      // Lagna data is needed when (a) people are set — for the
+      // per-person kendra/trikona/Ashtama check — OR (b) the chosen
+      // activity has a preferred lagna class (Sthira/Chara/...).
+      // Cached per session, shared with the day-card's lagna ribbon.
+      const activityRules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
+      const activityNeedsLagna = !!activityRules.prefer_lagna_class;
+      const lagnaCityData = (people.length || activityNeedsLagna)
+        ? await loadLagna(city) : null;
       const slots = [];
       let droppedEclipseDays = 0;
       let droppedModeDays = 0;
@@ -3661,6 +3683,7 @@
         const avoidKaranaNames = new Set(rules.avoid_karana || []);
         const preferTithiClass = rules.prefer_tithi_class || null;
         const preferVaras = new Set(rules.prefer_vara || []);
+        const preferLagnaClass = rules.prefer_lagna_class || null;
         const activityLabel = rules.label;
 
         // Vara is sunrise-anchored — compute once per day.
@@ -3758,14 +3781,19 @@
               if (slotLagna) {
                 // Two independent checks per person. Both run when both
                 // references are set; each contributes its own +1/-1.
-                const favRashi = [], ashRashi = [];
-                const favLagna = [], ashLagna = [];
+                // When the user opted into Lagna Shuddhi (provided lagna
+                // too), we ALSO emit neutral chips so both lenses always
+                // appear — no asymmetric silences across slots.
+                const favRashi = [], ashRashi = [], neutRashi = [];
+                const favLagna = [], ashLagna = [], neutLagna = [];
                 const recordAshtama = (label) => {
                   if (!ashtamaLagnaNames.includes(label)) ashtamaLagnaNames.push(label);
                 };
+                const ord = n => `${n}${ ({1:'st',2:'nd',3:'rd'})[n] || 'th' }`;
                 for (let pi = 0; pi < people.length; pi++) {
                   const pr = people[pi];
                   const label = `#${pi + 1} (${htmlEsc(pr.name || pr.nak)})`;
+                  const hasLagna = !!pr.lagna;
                   // Always: from janma rashi (Chandra-Rashi-as-lagna).
                   if (pr.rasi) {
                     const pos = muLagnaPosition(pr.rasi, slotLagna);
@@ -3776,10 +3804,13 @@
                     } else if (pos && muIsFavourableLagna(pos)) {
                       favRashi.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.rasi}`);
                       score += 1;
+                    } else if (hasLagna && pos) {
+                      // Symmetry chip — opt-in via janma_lagna.
+                      neutRashi.push(`${label} ${ord(pos)} from ${pr.rasi}`);
                     }
                   }
                   // Additionally: from janma lagna (strict Lagna Shuddhi).
-                  if (pr.lagna) {
+                  if (hasLagna) {
                     const pos = muLagnaPosition(pr.lagna, slotLagna);
                     if (pos === 8) {
                       ashLagna.push(`${label} lagna@8 from ${pr.lagna} lagna`);
@@ -3788,6 +3819,8 @@
                     } else if (pos && muIsFavourableLagna(pos)) {
                       favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.lagna} lagna`);
                       score += 1;
+                    } else if (pos) {
+                      neutLagna.push(`${label} ${ord(pos)} from ${pr.lagna} lagna`);
                     }
                   }
                 }
@@ -3799,6 +3832,26 @@
                   `${slotLagna} lagna Ashtama for ${ashRashi.join(', ')} (-${ashRashi.length})`);
                 if (ashLagna.length) groupFit.push(
                   `${slotLagna} lagna Ashtama for ${ashLagna.join(', ')} (-${ashLagna.length})`);
+                if (neutRashi.length) groupFit.push(
+                  `${slotLagna} lagna neutral for ${neutRashi.join(', ')} (no effect)`);
+                if (neutLagna.length) groupFit.push(
+                  `${slotLagna} lagna neutral for ${neutLagna.join(', ')} (no effect)`);
+              }
+            }
+
+            // Activity-class lagna preference (Muhurta Chintamani):
+            // independent of any personal kendra/trikona check —
+            // this is about the activity's nature (wedding wants
+            // Sthira, travel wants Chara, learning rites want
+            // Dvisvabhava). Mirrors _score_lagna_activity in Python.
+            if (preferLagnaClass && lagnaCityData) {
+              const lagnaDay = lagnaDayFor(lagnaCityData, isoDate);
+              const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+              const favoured = muLagnasInClass(preferLagnaClass);
+              if (slotLagna && favoured && favoured.has(slotLagna)) {
+                score += 1;
+                activityMatch.push(
+                  `${slotLagna} lagna (${preferLagnaClass}) favoured for ${activityLabel} (+1)`);
               }
             }
 
