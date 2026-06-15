@@ -7,7 +7,7 @@ from telugu_panchangam.engines.surya_siddhanta import (
     _KALI_EPOCH_JD, _CIVIL_DAYS, _MOON_REVS, _MOON_APOGEE_REVS,
 )
 from telugu_panchangam.engines.utils import (
-    datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
+    jd_to_utc, local_midnight_jd, find_crossing,
     get_sunrise, get_sunset, get_moonrise, get_moonset, previous_new_moon,
 )
 from telugu_panchangam.engines.base import (
