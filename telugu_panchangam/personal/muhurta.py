@@ -314,21 +314,27 @@ def _slot_lagna_name(lagnas, slot_start):
     return None
 
 
-def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna):
+def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
+                 janma_lagnas=None):
     """Per-person lagna position against the slot's rising sign.
 
     Kendra (1/4/7/10 from janma) and Trikona (1/5/9) are favourable;
     Ashtama (8) is the personal "lagna dosha" — same tier-cap treatment
     as Ashtama Chandra. Position 1 is reported as 'own' (the strongest
-    single position — janma rashi itself rising).
+    single position — janma rashi/lagna itself rising).
 
-    Reference convention: counting is from the person's janma RASHI
-    (derived from their janma nakshatra), not their janma lagna. Strict
-    "Lagna Shuddhi" muhurta selection would count from the natal
-    ascendant; we follow the Chandra-Rashi-as-lagna tradition because
-    janma lagna requires exact birth time + place that most users
-    don't have at hand. Reason chips name the reference rashi
-    explicitly so the convention is visible at-a-glance.
+    Reference convention. Two modes, per person:
+      - **Strict Lagna Shuddhi** — when ``janma_lagnas[i]`` is set,
+        count from that person's natal ascendant. Most accurate;
+        requires exact birth time + place. Reason chip ends with
+        "from <rasi> lagna" to signal the reference.
+      - **Chandra-Rashi-as-lagna** (fallback) — when janma_lagna is
+        missing, count from the person's janma rashi (derived from
+        their nakshatra). Still a legitimate Jyotisha tradition.
+        Reason chip ends with "from <rasi>".
+
+    Mode is per-person; one profile in a group can use Lagna Shuddhi
+    while another falls back to Chandra-Rashi.
 
     Returns (bonus, reasons, ashtama_names).
     """
@@ -341,14 +347,19 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna):
             continue
         janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
         label = _label(janma_label, i)
-        pos = lagna_position(rasi, slot_lagna)
+        # Per-person reference: prefer natal ascendant when supplied.
+        use_lagna = bool(janma_lagnas and i < len(janma_lagnas)
+                         and janma_lagnas[i])
+        reference = janma_lagnas[i] if use_lagna else rasi
+        ref_suffix = ' lagna' if use_lagna else ''
+        pos = lagna_position(reference, slot_lagna)
         if is_ashtama_lagna(pos):
-            ashtama.append(f'{label} lagna@{pos} from {rasi}')
+            ashtama.append(f'{label} lagna@{pos} from {reference}{ref_suffix}')
             ashtama_names.append(label)
             bonus -= 1
         elif is_favourable_lagna(pos):
             favourable.append(
-                f'{label} {lagna_verdict(pos)}@{pos} from {rasi}'
+                f'{label} {lagna_verdict(pos)}@{pos} from {reference}{ref_suffix}'
             )
             bonus += 1
     reasons = []
@@ -565,7 +576,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    vara_bonus, vara_reason, abhijit, amrita, prefer_chog,
                    avoid_karana_names, horas: list[Window] | None = None,
                    prefer_varas: set[str] | None = None,
-                   lagnas: list[Window] | None = None):
+                   lagnas: list[Window] | None = None,
+                   janma_lagnas: list[str | None] | None = None):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -644,7 +656,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     # Ashtama Chandra on the moon-sign axis).
     slot_lagna_name = _slot_lagna_name(lagnas, s)
     lagna_bonus, lagna_reasons, lagna_ashtama_names = _score_lagna(
-        janma_nakshatras, janma_rasis, slot_lagna_name)
+        janma_nakshatras, janma_rasis, slot_lagna_name,
+        janma_lagnas=janma_lagnas)
     score += lagna_bonus
     group_fit.extend(lagna_reasons)
 
@@ -711,6 +724,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
 
               janma_nakshatras: list[str] | None = None,
               janma_rasis: list[str | None] | None = None,
+              janma_lagnas: list[str | None] | None = None,
               chandra_mode: str = 'stars',
               *, engine=None) -> list[dict]:
     """Ranked auspicious slots for one day (daytime, sunrise to sunset).
@@ -778,12 +792,14 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
 
     horas = get_horas(day)
     # Lagnas are only needed when the caller supplied at least one
-    # janma rashi — get_lagna_transitions does a Swiss Ephemeris
-    # bisection per day and isn't free, so we keep generic muhurta
-    # queries (no rasi) on the fast path.
-    lagnas = (get_lagna_transitions(day)
-              if janma_rasis and any(r is not None for r in janma_rasis)
-              else None)
+    # janma rashi or janma lagna — get_lagna_transitions does a Swiss
+    # Ephemeris bisection per day and isn't free, so we keep generic
+    # muhurta queries (no personal reference) on the fast path.
+    _has_personal_ref = (
+        (janma_rasis and any(r is not None for r in janma_rasis))
+        or (janma_lagnas and any(l is not None for l in janma_lagnas))
+    )
+    lagnas = get_lagna_transitions(day) if _has_personal_ref else None
 
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.
@@ -809,7 +825,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 vara_bonus=vara_bonus, vara_reason=vara_reason,
                 abhijit=abhijit, amrita=amrita, prefer_chog=prefer_chog,
                 avoid_karana_names=avoid_karana_names,
-                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas
+                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
+                janma_lagnas=janma_lagnas
             )
             if slot_dict is not None:
                 slots.append(slot_dict)

@@ -81,6 +81,68 @@ def test_ashtama_lagna_sets_personal_dosha_and_caps_tier():
         assert s['tier'] != 'Excellent'
 
 
+def test_janma_lagna_overrides_janma_rashi_when_provided():
+    """When janma_lagnas[i] is set, that person's kendra/trikona/
+    Ashtama positions count from the natal ascendant instead of
+    janma rashi. Different reference → potentially different
+    scoring."""
+    day = _day(2026, 6, 17)
+    # On 2026-06-17 Hyderabad a choghadiya slot starts in Tula lagna
+    # (~10:04 IST). From janma rashi Mesha, Tula is position 7
+    # (kendra) → favourable. From janma lagna Vrishabha, Tula is
+    # position 6 (neutral) → no chip.
+    slots_rashi = day_slots(day,
+                            janma_nakshatras=['Krittika'],
+                            janma_rasis=['Mesha'])
+    slots_lagna = day_slots(day,
+                            janma_nakshatras=['Krittika'],
+                            janma_rasis=['Mesha'],
+                            janma_lagnas=['Vrishabha'])
+    def has_tula_fav(slots):
+        return any(
+            'Tula lagna favourable' in r
+            for s in slots for r in s['reasons']
+        )
+    assert has_tula_fav(slots_rashi), \
+        'Tula should be kendra from Mesha (rashi mode)'
+    assert not has_tula_fav(slots_lagna), \
+        'Tula should NOT be kendra/trikona from Vrishabha (lagna mode)'
+
+
+def test_janma_lagna_chip_carries_lagna_suffix():
+    """Reason chip should end with 'from <rasi> lagna' (not just
+    'from <rasi>') when janma_lagnas is set — so users see at-a-
+    glance which reference convention was applied."""
+    day = _day(2026, 6, 17)
+    slots = day_slots(day,
+                      janma_nakshatras=['Krittika'],
+                      janma_rasis=['Mesha'],
+                      janma_lagnas=['Mesha'])
+    matched = [r for s in slots for r in s['reasons']
+               if 'Tula lagna favourable' in r]
+    assert matched, 'expected at least one Tula kendra reason'
+    assert all('from Mesha lagna' in r for r in matched), \
+        f'expected "from Mesha lagna" suffix, got: {matched}'
+
+
+def test_janma_lagna_falls_back_to_rashi_when_null():
+    """When janma_lagnas[i] is None, that person's scoring falls
+    back to janma rashi — chip stays in the original 'from <rasi>'
+    format (no ' lagna' suffix)."""
+    day = _day(2026, 6, 17)
+    slots = day_slots(day,
+                      janma_nakshatras=['Krittika'],
+                      janma_rasis=['Mesha'],
+                      janma_lagnas=[None])
+    matched = [r for s in slots for r in s['reasons']
+               if 'Tula lagna favourable' in r]
+    assert matched, 'expected at least one Tula kendra reason'
+    for r in matched:
+        assert 'from Mesha lagna' not in r, \
+            f'unexpected lagna suffix in fallback chip: {r}'
+        assert 'from Mesha' in r
+
+
 def test_ashtama_chandra_takes_precedence_over_ashtama_lagna():
     """Both doshas can co-occur on the same slot. The personal_dosha
     cascade puts ashtama_chandra above ashtama_lagna — verify that

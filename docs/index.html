@@ -2423,7 +2423,9 @@
       if (!nak) continue;
       const name = document.getElementById(`tb-name-${i}`).value.trim() || (i === 0 ? 'You' : `Person ${i+1}`);
       const pada = Number(document.getElementById(`tb-pada-${i}`).value) || null;
-      out.push({ name, nak, pada, rasi: rasiFromStar(nak, pada) });
+      const lagnaInput = document.getElementById(`tb-lagna-${i}`);
+      const lagna = (lagnaInput && lagnaInput.value) ? lagnaInput.value : null;
+      out.push({ name, nak, pada, rasi: rasiFromStar(nak, pada), lagna });
     }
     return out;
   }
@@ -2431,9 +2433,11 @@
   function tbSaveProfiles() {
     const raw = [];
     for (let i = 0; i < TB_ROWS; i++) {
+      const lagnaInput = document.getElementById(`tb-lagna-${i}`);
       raw.push({ name: document.getElementById(`tb-name-${i}`).value,
                  nak: document.getElementById(`tb-nak-${i}`).value,
-                 pada: document.getElementById(`tb-pada-${i}`).value });
+                 pada: document.getElementById(`tb-pada-${i}`).value,
+                 lagna: lagnaInput ? lagnaInput.value : '' });
     }
     localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
   }
@@ -2446,11 +2450,13 @@
     const wrap = document.getElementById('tb-profiles');
     let html = '';
     for (let i = 0; i < TB_ROWS; i++) {
-      const v = saved[i] || { name: '', nak: '', pada: '' };
+      const v = saved[i] || { name: '', nak: '', pada: '', lagna: '' };
       const opts = ['<option value="">— birth star —</option>']
         .concat(TB_NAKSHATRAS.map(n => `<option value="${n}" ${n === v.nak ? 'selected' : ''}>${n}</option>`)).join('');
       const padaOpts = ['<option value="">padam?</option>']
         .concat([1,2,3,4].map(q => `<option value="${q}" ${String(q) === String(v.pada) ? 'selected' : ''}>${q}</option>`)).join('');
+      const lagnaOpts = ['<option value="">lagna? (optional)</option>']
+        .concat(TB_RASIS.map(r => `<option value="${r}" ${r === v.lagna ? 'selected' : ''}>${r}</option>`)).join('');
       const rasi = v.nak ? rasiFromStar(v.nak, Number(v.pada) || null) : null;
       const rasiNote = (v.nak && !rasi)
         ? '<span class="tb-you" style="color:#8A5518;">add padam for rashi</span>'
@@ -2459,6 +2465,7 @@
         <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
         <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
         <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star — needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
+        <select id="tb-lagna-${i}" style="min-width:130px;" title="Janma Lagna — the rising sign at the moment of birth. Leave blank if you don't know it; we'll use your janma rashi instead for muhurta scoring." onchange="tbSaveProfiles();">${lagnaOpts}</select>
         ${rasiNote}
         ${i === 0 ? '' : `<button class="tb-remove" title="Remove" onclick="tbRemoveRow(${i})">✕</button>`}
       </div>`;
@@ -3623,16 +3630,21 @@
                 const favLagna = [], ashLagna = [];
                 for (let pi = 0; pi < people.length; pi++) {
                   const pr = people[pi];
-                  if (!pr.rasi) continue;
-                  const pos = muLagnaPosition(pr.rasi, slotLagna);
+                  // Strict Lagna Shuddhi when the user has supplied
+                  // their natal ascendant; otherwise fall back to
+                  // janma rashi (Chandra-Rashi-as-lagna tradition).
+                  const reference = pr.lagna || pr.rasi;
+                  if (!reference) continue;
+                  const refSuffix = pr.lagna ? ' lagna' : '';
+                  const pos = muLagnaPosition(reference, slotLagna);
                   if (!pos) continue;
                   const label = `#${pi + 1} (${htmlEsc(pr.name || pr.nak)})`;
                   if (pos === 8) {
-                    ashLagna.push(`${label} lagna@8 from ${pr.rasi}`);
+                    ashLagna.push(`${label} lagna@8 from ${reference}${refSuffix}`);
                     ashtamaLagnaNames.push(label);
                     score -= 1;
                   } else if (muIsFavourableLagna(pos)) {
-                    favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.rasi}`);
+                    favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${reference}${refSuffix}`);
                     score += 1;
                   }
                 }
