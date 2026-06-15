@@ -311,6 +311,8 @@ def _score_tithi_class(tithi_name, prefer_tithi_class, activity_label):
         return 0, None, None, None
     if fam == 'Rikta':
         return -2, f'{tithi_name} (Rikta tithi) (-2)', None, fam
+    if 'Amavasya' in tithi_name:
+        return -2, f'{tithi_name} (-2)', None, 'Amavasya'
     if prefer_tithi_class and fam == prefer_tithi_class:
         return 1, None, f'{tithi_name} ({prefer_tithi_class}) favoured for {activity_label} (+1)', fam
     return 0, None, None, fam
@@ -580,15 +582,21 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
             'Ashtama' in n for n in chandra_avoid_names) else 'chandra_avoid'
     elif chandra_puja_names:
         personal_dosha = 'chandra_remedial'
+    elif tara_unfav_names and not any(
+            y in ('Sarvartha Siddhi Yoga', 'Amrita Siddhi Yoga')
+            for y in facts.special_yogas):
+        personal_dosha = 'tara_dosha'
     else:
         personal_dosha = None
 
-    # Day-level dosha (Rikta tithi, Visha/Dagdha yoga, Vyatipata/
-    # Vaidhriti) — same "can't be Excellent" treatment as a
+    # Day-level dosha (Rikta tithi, Amavasya, Visha/Dagdha yoga,
+    # Vyatipata/Vaidhriti) — same "can't be Excellent" treatment as a
     # personal chandra dosha: these are traditionally avoided
     # regardless of how high other yogas push the score.
     if tithi_fam == 'Rikta':
         day_dosha = 'rikta_tithi'
+    elif 'Amavasya' in facts.tithi:
+        day_dosha = 'amavasya'
     elif any(y in _YOGA_PENALTY for y in facts.special_yogas):
         day_dosha = 'visha_dagdha_yoga'
     elif facts.yoga in NITYA_HARD_AVOID:
