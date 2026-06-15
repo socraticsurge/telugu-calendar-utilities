@@ -111,7 +111,8 @@ class ICSGenerator:
         fmtr = lambda dt: self._fmt_time_rel(dt, tz, day.date)
         fmtw = lambda w: self._fmt_window(w, tz, day.date)
         lines = [
-            f'{day.samvatsara}  ·  {day.maasam} Maasam  ·  {day.paksham} Paksham  ·  {day.vaaram}',
+            f'{day.samvatsara} Nama Samvatsara  ·  {day.maasam} Maasam  ·  '
+            f'{day.paksham} Paksham  ·  {day.vaaram}',
             f'Ayanam: {day.ayanam}  ·  Rituvu: {day.rituvu}',
             f'Sunrise {fmt(day.sunrise, tz)}  ·  Sunset {fmt(day.sunset, tz)}  ·  '
             f'Moonrise {fmt(day.moonrise, tz)}  ·  Moonset {fmt(day.moonset, tz)}',
