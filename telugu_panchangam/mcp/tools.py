@@ -23,6 +23,7 @@ from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, assign_t
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
+from telugu_panchangam.eclipses import list_eclipses_in_range, get_eclipse_from_precomputed
 
 _ENGINES = {
     'drik': DrikGanitaEngine(),
@@ -269,10 +270,15 @@ def tool_get_panchangam_range(
         engine = _ENGINES[system]
         tz = loc.timezone
 
+        jd_start_range = local_midnight_jd(start, loc.timezone)
+        jd_end_range = local_midnight_jd(end + timedelta(days=1), loc.timezone)
+        eclipses_in_range = list_eclipses_in_range(jd_start_range, jd_end_range)
+
         days = []
         d = start
         while d <= end:
-            day = engine.calculate(d, loc)
+            day = engine.calculate(d, loc, include_eclipse=False)
+            day.eclipse = get_eclipse_from_precomputed(d, eclipses_in_range, loc)
             specials = _special_events(day)
             days.append({
                 'date': d.isoformat(),
@@ -331,10 +337,17 @@ def tool_get_special_days(
         loc = _resolve_city(city, latitude, longitude, timezone)
         engine = _ENGINES[system]
         _, days_in_month = calendar.monthrange(year, month)
+        d_start = date(year, month, 1)
+        d_end = date(year, month, days_in_month)
+        jd_start_range = local_midnight_jd(d_start, loc.timezone)
+        jd_end_range = local_midnight_jd(d_end + timedelta(days=1), loc.timezone)
+        eclipses_in_range = list_eclipses_in_range(jd_start_range, jd_end_range)
+
         special_days = []
         for day_num in range(1, days_in_month + 1):
             d = date(year, month, day_num)
-            day = engine.calculate(d, loc)
+            day = engine.calculate(d, loc, include_eclipse=False)
+            day.eclipse = get_eclipse_from_precomputed(d, eclipses_in_range, loc)
             is_notable = (
                 day.is_ekadashi or day.is_amavasya or day.is_pournami
                 or day.is_pradosham or day.is_sankranti or day.eclipse is not None
@@ -593,10 +606,17 @@ def tool_find_muhurta(
         engine = _ENGINES[system]
         tz = loc.timezone
 
+        end_date = start + timedelta(days=days - 1)
+        jd_start_range = local_midnight_jd(start, loc.timezone)
+        jd_end_range = local_midnight_jd(end_date + timedelta(days=1), loc.timezone)
+        eclipses_in_range = list_eclipses_in_range(jd_start_range, jd_end_range)
+
         slots = []
         dropped_days = []
         for i in range(days):
-            day = engine.calculate(start + timedelta(days=i), loc, include_eclipse=True)
+            d_curr = start + timedelta(days=i)
+            day = engine.calculate(d_curr, loc, include_eclipse=False)
+            day.eclipse = get_eclipse_from_precomputed(d_curr, eclipses_in_range, loc)
             day_results = day_slots(day, activity=activity,
                                     janma_nakshatras=janma_nakshatras,
                                     janma_rasis=janma_rasis,
