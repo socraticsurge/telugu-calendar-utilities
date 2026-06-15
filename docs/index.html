@@ -169,6 +169,15 @@
     .lagna-seg.earth { background: #EEE5D2; border-color: #C8B27A; color: #6B4F1A; }
     .lagna-seg.air   { background: #E7F1F8; border-color: #99BEDB; color: #1F4A75; }
     .lagna-seg.water { background: #E6F1EE; border-color: #87BDB0; color: #1F5C4F; }
+    /* Personal overlays — when the user has set a Tarabalam profile,
+       the ribbon shades cells by their relationship to that profile.
+       Ring colour priority: Ashtama (red) > janma-lagna match (gold)
+       > favourable kendra/trikona (green). Box-shadow inset overlays
+       the elemental border without disrupting layout. */
+    .lagna-seg.is-favourable { box-shadow: inset 0 0 0 2px rgba(21, 128, 61, 0.55); }
+    .lagna-seg.is-janma-lagna { box-shadow: inset 0 0 0 2px #C28A1A; }
+    .lagna-seg.is-janma-lagna .lagna-name { font-weight: 800; }
+    .lagna-seg.is-ashtama { box-shadow: inset 0 0 0 2px rgba(142, 42, 31, 0.65); }
 
     .preview-note { font-size: 0.75rem; color: #B5AC9C; margin: 0.6rem 0 0; }
     .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #E7DECC; }
@@ -1931,13 +1940,43 @@
     });
   }
 
-  function lagnaCell(seg) {
+  function lagnaCell(seg, profile) {
     // seg.rashi is a JSON-supplied integer 0..11; we look up the name
     // from a hard-coded array. Defense-in-depth: escape anyway.
     const name = RASHI_NAMES_JS[seg.rashi] || '?';
     const elem = RASHI_ELEMENT[seg.rashi] || '';
     const range = fmtRange(seg.start, seg.end, '–<wbr>', seg.sflag, seg.eflag);
-    return `<div class="lagna-seg ${elem}" title="${htmlEsc(name)} lagna · ${htmlEsc(seg.start)}–${htmlEsc(seg.end)}">`
+    // Personal overlay — uses the first profile's janma rashi/lagna
+    // when set. Priority: ashtama > janma-lagna match > favourable.
+    // muLagnaPosition + muIsFavourableLagna come from
+    // docs/muhurta-scorer.js (loaded above this script).
+    let overlay = '', titleExtra = '';
+    if (profile) {
+      let ashtama = false, ownLagna = false, favourable = false;
+      const ashtamaFrom = [], favFrom = [];
+      if (profile.rasi) {
+        const p = muLagnaPosition(profile.rasi, name);
+        if (p === 8) { ashtama = true; ashtamaFrom.push(`8th from ${profile.rasi} rashi`); }
+        else if (muIsFavourableLagna(p)) { favourable = true; favFrom.push(`${p}th from ${profile.rasi} rashi`); }
+      }
+      if (profile.lagna) {
+        const p = muLagnaPosition(profile.lagna, name);
+        if (p === 8) { ashtama = true; ashtamaFrom.push(`8th from ${profile.lagna} lagna`); }
+        else if (p === 1) { ownLagna = true; }
+        else if (muIsFavourableLagna(p)) { favourable = true; favFrom.push(`${p}th from ${profile.lagna} lagna`); }
+      }
+      if (ashtama) {
+        overlay = 'is-ashtama';
+        titleExtra = ' · Ashtama — ' + ashtamaFrom.join(', ');
+      } else if (ownLagna) {
+        overlay = 'is-janma-lagna';
+        titleExtra = ' · your janma lagna';
+      } else if (favourable) {
+        overlay = 'is-favourable';
+        titleExtra = ' · favourable — ' + favFrom.join(', ');
+      }
+    }
+    return `<div class="lagna-seg ${elem} ${overlay}" title="${htmlEsc(name)} lagna · ${htmlEsc(seg.start)}–${htmlEsc(seg.end)}${htmlEsc(titleExtra)}">`
       + `<div class="lagna-name">${htmlEsc(name)}</div>`
       + `<div class="lagna-time">${range}</div></div>`;
   }
@@ -2188,6 +2227,10 @@
       + `<em>same rashi</em> — a short partial at sunrise and a longer wrap before `
       + `next sunrise, because the lagna cycle (~23h 56m) is slightly shorter than `
       + `the panchangam day (24h).`
+      + ` When a Tarabalam profile is set, cells gain a coloured ring: `
+      + `<span style="box-shadow:inset 0 0 0 2px #C28A1A;padding:0 0.3rem;border-radius:3px;">gold</span> for your janma lagna, `
+      + `<span style="box-shadow:inset 0 0 0 2px rgba(21,128,61,0.55);padding:0 0.3rem;border-radius:3px;">green</span> for kendra/trikona, `
+      + `<span style="box-shadow:inset 0 0 0 2px rgba(142,42,31,0.65);padding:0 0.3rem;border-radius:3px;">red</span> for Ashtama (8th).`
       + `</p></div>`;
 
     container.innerHTML = `
@@ -2224,7 +2267,12 @@
           // crosses past midnight gets *+1 and subsequent cells stay
           // unmarked (matches the existing Choghadiya convention).
           const flagged = markFirstMidnightCrossing(segs, dayData.sunrise);
-          ribbon.innerHTML = flagged.map(lagnaCell).join('');
+          // Personal overlay uses the first profile's janma rashi/lagna
+          // (the "You" row by default). When no profile is set, cells
+          // render plain — same as before.
+          const profile = (typeof tbProfiles === 'function')
+            ? (tbProfiles()[0] || null) : null;
+          ribbon.innerHTML = flagged.map(seg => lagnaCell(seg, profile)).join('');
         } else {
           // Date is outside the generated lagna window (we precompute
           // ~18 months ahead per city). Keep the strip visible with a
@@ -2654,8 +2702,16 @@
       }
       return;
     }
-    const head = `<tr><th>Date</th><th>Moon in</th><th>Tithi</th>${profiles.map(p =>
-      `<th>${p.name}<div class="tb-sub">${p.nak}</div></th>`).join('')}${profiles.length > 1 ? '<th title="Auspicious for everyone selected">All ✦</th>' : ''}</tr>`;
+    const head = `<tr><th>Date</th><th>Moon in</th><th>Tithi</th>${profiles.map(p => {
+      // Sub-line surfaces nakshatra + derived rashi + (when set)
+      // natal lagna so the user can see which Jyotisha frame each
+      // column is being scored against. Lagna only appears when
+      // the optional dropdown was filled for that profile.
+      const parts = [htmlEsc(p.nak)];
+      if (p.rasi) parts.push(`${htmlEsc(p.rasi)} rashi`);
+      if (p.lagna) parts.push(`${htmlEsc(p.lagna)} lagna`);
+      return `<th>${htmlEsc(p.name)}<div class="tb-sub">${parts.join(' · ')}</div></th>`;
+    }).join('')}${profiles.length > 1 ? '<th title="Auspicious for everyone selected">All ✦</th>' : ''}</tr>`;
     const body = rows.map(r => {
       const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
       const chips = r.taras.map(t => {
@@ -2715,7 +2771,16 @@
           : '';
         const cls = !passes ? 'bad'
           : (TB_MODE === 'puja_ok' && caveat === 'puja' ? 'puja' : 'good');
-        const sub = profiles[i] ? `<span class="tb-sub">${profiles[i].name}<span style="color:#DDD2BC"> · ${profiles[i].nak}</span></span>` : '';
+        // Mobile card sub-line: name · nak · optional rashi/lagna.
+        const p = profiles[i];
+        let subText = '';
+        if (p) {
+          const extras = [htmlEsc(p.nak)];
+          if (p.rasi) extras.push(`${htmlEsc(p.rasi)} rashi`);
+          if (p.lagna) extras.push(`${htmlEsc(p.lagna)} lagna`);
+          subText = `<span class="tb-sub">${htmlEsc(p.name)}<span style="color:#DDD2BC"> · ${extras.join(' · ')}</span></span>`;
+        }
+        const sub = subText;
         return `<div class="tb-card-row">${sub}<span class="tara-chip ${cls}">${t.tara} ${t.label}${chandraTag}</span></div>`;
       }).join('');
       const star = (r.allGood && profiles.length > 1) ? '<span class="tb-star">✦</span> good for everyone' : '&nbsp;';
@@ -2853,7 +2918,11 @@
     }
     // people may have changed in the Tarabalam tab — rebuild, keep selection
     const sel = document.getElementById('go-view');
-    const keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
+    let keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
+    // Pre-Option-B saved values are bare 'p<i>'; the new schema is
+    // 'p<i>r' / 'p<i>l'. Migrate the old form to the rashi view so
+    // users don't lose their saved selection across the upgrade.
+    if (keep && /^p\d+$/.test(keep)) keep = keep + 'r';
     goBuildViewSelect();
     if (keep && [...sel.options].some(o => o.value === keep)) sel.value = keep;
     renderGochara();
@@ -2884,7 +2953,15 @@
     return saved.map((v, i) => {
       if (!v || !v.nak) return null;
       const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
-      return rasi ? { name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)), rasi } : null;
+      if (!rasi) return null;
+      // Janma lagna is optional — only surfaced as a separate view
+      // option when the user has filled it on the Tarabalam profile.
+      const lagna = v.lagna || null;
+      return {
+        name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)),
+        rasi,
+        lagna,
+      };
     }).filter(Boolean);
   }
 
@@ -2893,8 +2970,18 @@
     const people = goSavedPeople();
     let html = '<option value="">Transits only — whole sky</option>';
     if (people.length) {
-      html += '<optgroup label="Your saved people">' + people.map((k, i) =>
-        `<option value="p${i}">${k.name} · ${k.rasi}</option>`).join('') + '</optgroup>';
+      // Each saved person gets one row per available reference. Janma
+      // lagna only appears when filled in the Tarabalam profile —
+      // strict Lagna Shuddhi requires birth time + place that not
+      // everyone has at hand.
+      const rows = [];
+      people.forEach((k, i) => {
+        rows.push(`<option value="p${i}r">${htmlEsc(k.name)} · ${htmlEsc(k.rasi)} rashi</option>`);
+        if (k.lagna) {
+          rows.push(`<option value="p${i}l">${htmlEsc(k.name)} · ${htmlEsc(k.lagna)} lagna</option>`);
+        }
+      });
+      html += '<optgroup label="Your saved people">' + rows.join('') + '</optgroup>';
     }
     html += '<optgroup label="Any rashi">' +
       GO_DATA.rasis.map((r, i) => `<option value="${i}">${r}</option>`).join('') + '</optgroup>';
@@ -2904,9 +2991,16 @@
   function goCurrentView() {
     const val = document.getElementById('go-view').value;
     if (val === '') return { jr: null, label: null };
-    if (val.startsWith('p')) {
-      const k = goSavedPeople()[Number(val.slice(1))];
+    // 'p<i>r' / 'p<i>l' — profile-keyed (rashi / lagna).
+    // Bare 'p<i>' (no suffix) is the pre-Option-B format kept in
+    // older localStorage values; treat as the rashi view.
+    const profMatch = val.match(/^p(\d+)([rl]?)$/);
+    if (profMatch) {
+      const k = goSavedPeople()[Number(profMatch[1])];
       if (!k) return { jr: null, label: null };
+      if (profMatch[2] === 'l' && k.lagna) {
+        return { jr: TB_RASIS.indexOf(k.lagna), label: `${k.lagna} lagna (${k.name})` };
+      }
       return { jr: TB_RASIS.indexOf(k.rasi), label: `${k.rasi} rashi (${k.name})` };
     }
     return { jr: Number(val), label: GO_DATA.rasis[Number(val)] + ' rashi' };
