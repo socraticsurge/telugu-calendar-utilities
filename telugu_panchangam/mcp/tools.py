@@ -660,7 +660,8 @@ def _validate_muhurta_inputs(
     activity: str,
     chandra_mode: str,
     janma_nakshatras: Optional[list],
-    janma_rasis: Optional[list]
+    janma_rasis: Optional[list],
+    janma_lagnas: Optional[list] = None,
 ) -> None:
     if not 1 <= days <= 14:
         raise ValueError('days must be between 1 and 14.')
@@ -684,6 +685,15 @@ def _validate_muhurta_inputs(
                 if not isinstance(r, str) or len(r) > _MAX_NAME:
                     raise ValueError('Invalid rashi name.')
                 _rasi_index(r)
+    if janma_lagnas is not None:
+        if not janma_nakshatras or len(janma_lagnas) != len(janma_nakshatras):
+            raise ValueError('janma_lagnas must align with janma_nakshatras '
+                             '(use null for people whose lagna is unknown).')
+        for l in janma_lagnas:
+            if l is not None:
+                if not isinstance(l, str) or len(l) > _MAX_NAME:
+                    raise ValueError('Invalid lagna rashi name.')
+                _rasi_index(l)
 
 
 def _gather_muhurta_slots(
@@ -694,7 +704,8 @@ def _gather_muhurta_slots(
     activity: str,
     janma_nakshatras: Optional[list],
     janma_rasis: Optional[list],
-    chandra_mode: str
+    chandra_mode: str,
+    janma_lagnas: Optional[list] = None,
 ) -> tuple[list, list]:
     slots = []
     dropped_days = []
@@ -712,6 +723,7 @@ def _gather_muhurta_slots(
         day_results = day_slots(day, activity=activity,
                                 janma_nakshatras=janma_nakshatras,
                                 janma_rasis=janma_rasis,
+                                janma_lagnas=janma_lagnas,
                                 chandra_mode=chandra_mode,
                                 engine=engine)
         if not day_results:
@@ -735,20 +747,29 @@ def tool_find_muhurta(
     system: str = 'drik',
     janma_nakshatras: Optional[list] = None,
     janma_rasis: Optional[list] = None,
+    janma_lagnas: Optional[list] = None,
     chandra_mode: str = 'stars',
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
 ) -> str:
+    """When janma_lagnas[i] is provided, strict Lagna Shuddhi is used
+    for that person — kendra/trikona/Ashtama count from the natal
+    ascendant. Otherwise we fall back to counting from janma_rasis[i]
+    (Chandra-Rashi-as-lagna tradition). Mode is per-person.
+    """
     try:
-        _validate_muhurta_inputs(days, activity, chandra_mode, janma_nakshatras, janma_rasis)
+        _validate_muhurta_inputs(days, activity, chandra_mode,
+                                 janma_nakshatras, janma_rasis,
+                                 janma_lagnas)
         start = _parse_date(start_date)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
         engine = _ENGINES[system]
 
         slots, dropped_days = _gather_muhurta_slots(
-            start, days, loc, engine, activity, janma_nakshatras, janma_rasis, chandra_mode
+            start, days, loc, engine, activity, janma_nakshatras, janma_rasis, chandra_mode,
+            janma_lagnas=janma_lagnas,
         )
 
         # Re-tier across the whole search, not just one day — "Excellent"
