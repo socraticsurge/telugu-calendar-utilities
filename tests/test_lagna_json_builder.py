@@ -21,13 +21,15 @@ def test_build_shape_and_indices_for_hyderabad():
         assert 0 <= d['lagna0'] < 12
         assert len(d['sunrise']) == 5 and d['sunrise'][2] == ':'
         # Transitions are minutes from sunrise; should be strictly
-        # increasing and stay below ~28h (since the lagna ribbon covers
-        # ~24h plus the trailing partial window).
+        # increasing and stay strictly inside the day cycle.
         offsets = [t[0] for t in d['transitions']]
         assert offsets == sorted(offsets)
-        assert all(0 < o < 28 * 60 for o in offsets)
+        assert all(0 < o < d['cycleEnd'] for o in offsets)
         # Each transition index is a valid rashi index.
         assert all(0 <= idx < 12 for _, idx in d['transitions'])
+        # cycleEnd is the end of the last visible rashi — should be
+        # close to ~1440 min (24h), within seasonal sunrise drift.
+        assert 1380 <= d['cycleEnd'] <= 1500
 
 
 def test_sunrise_is_local_time_not_utc():
@@ -39,12 +41,14 @@ def test_sunrise_is_local_time_not_utc():
 
 
 def test_lagna_advances_through_12_rashis_in_a_day():
-    """Over ~24h the ascendant should pass through all 12 signs once,
-    so the lagna0 sign should reappear among the transitions."""
+    """Over ~24h the ascendant should pass through all 12 signs once.
+    With the trailing wrap dropped, lagna0 + the 11 transitions cover
+    every rashi exactly once."""
     data = build_for_city(_hyderabad(), date(2026, 6, 15), 1)
     d0 = data['days'][0]
-    seen = {d0['lagna0']} | {idx for _, idx in d0['transitions']}
-    assert seen == set(range(12)), f'missing rashis: {set(range(12)) - seen}'
+    rashis = [d0['lagna0']] + [idx for _, idx in d0['transitions']]
+    assert sorted(rashis) == list(range(12)), \
+        f'expected each rashi once, got {sorted(rashis)}'
 
 
 def test_diaspora_city_still_produces_valid_json():

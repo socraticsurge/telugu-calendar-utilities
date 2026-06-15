@@ -14,10 +14,16 @@ the rising sign next changes, paired with the new rashi index.
       "start": "YYYY-MM-DD",
       "rasis": ["Mesha", "Vrishabha", ...],
       "days": [
-        { "sunrise": "HH:MM", "lagna0": 2,
-          "transitions": [[114, 3], [231, 4], ...] }
+        { "date": "YYYY-MM-DD",
+          "sunrise": "HH:MM", "lagna0": 2,
+          "transitions": [[114, 3], [231, 4], ...],
+          "cycleEnd": 1438 }
       ]
     }
+
+The site uses ``cycleEnd`` (minute-offset from sunrise to next
+sunrise) to compute the end time of the last visible rashi instead
+of showing a duplicated trailing wrap cell.
 
 Hora is NOT precomputed — the static site derives it client-side from
 sunrise / sunset / next-sunrise (already in the ICS feed) since the
@@ -67,15 +73,22 @@ def build_for_city(loc, start: date, days: int) -> dict:
         # Each transition: minutes-from-sunrise of the NEW lagna's start,
         # plus the new lagna's rashi index. Times are timezone-naive
         # offsets — the site adds them to the local-time sunrise.
+        # The last window in `transitions` is a trailing partial that
+        # duplicates the leading rashi (the cycle returning ~24h later).
+        # We drop it but keep its END offset as ``cycleEnd`` so the UI
+        # can render the previous cell with a proper end time.
+        body = transitions[1:-1] if len(transitions) >= 2 else []
         tx = []
-        for w in transitions[1:]:
+        for w in body:
             new_idx = RASHI_NAMES.index(w.name.replace(' Lagna', ''))
             tx.append([_minute_of_day(w.start, day.sunrise), new_idx])
+        cycle_end = _minute_of_day(transitions[-1].end, day.sunrise)
         rows.append({
             'date': d.isoformat(),
             'sunrise': sunrise_local.strftime('%H:%M'),
             'lagna0': lagna0,
             'transitions': tx,
+            'cycleEnd': cycle_end,
         })
     return {
         'city': loc.name,

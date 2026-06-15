@@ -141,7 +141,8 @@
     .hora-cell { border-radius: 6px; padding: 0.32rem 0.18rem; text-align: center; border: 1px solid transparent; }
     .hora-glyph { font-size: 0.95rem; line-height: 1; margin-bottom: 0.15rem; }
     .hora-lord { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em; }
-    .hora-time { font-size: 0.6rem; color: #6B6358; margin-top: 0.1rem; font-variant-numeric: tabular-nums; }
+    .hora-time { font-size: 0.6rem; color: #6B6358; margin-top: 0.1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .hora-time sup, .lagna-time sup { font-size: 0.55em; vertical-align: super; color: var(--indigo); margin: 0 0.05em; }
     .lagna-ribbon { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; border-radius: 6px; overflow: hidden; }
     @media (max-width: 620px) { .lagna-ribbon { grid-template-columns: repeat(6, 1fr); } }
     .lagna-seg { padding: 0.45rem 0.25rem; text-align: center; border: 1px solid transparent; }
@@ -1843,6 +1844,35 @@
     return { day, night };
   }
 
+  // Format a HH:MM string with an optional '+1' next-day flag, e.g.
+  // "12:16am*+1". Matches the convention the existing Choghadiya
+  // rendering uses (see fmtRange + sflag/eflag in renderPreview).
+  function fmtHM(t, flag) {
+    return flag ? `${t}<sup>*+1</sup>` : t;
+  }
+  // Walk a sequence of HH:MM start/end pairs and mark the first cell
+  // whose end is the FIRST time past midnight. Subsequent cells that
+  // already live past midnight don't get a flag — the convention is
+  // "mark only the crossing", and after that the next-day-ness is
+  // visually obvious.
+  function markFirstMidnightCrossing(cells, anchorStartTime) {
+    const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    const anchor = toMin(anchorStartTime);
+    let prevMin = anchor;
+    let marked = false;
+    return cells.map(c => {
+      const startMin = toMin(c.start);
+      const endMin = toMin(c.end);
+      const sflag = !marked && startMin < prevMin ? '+1' : '';
+      // The "crossing" cell is the one whose end wraps backward.
+      const crosses = !marked && endMin < startMin;
+      const eflag = crosses ? '+1' : '';
+      if (sflag || crosses) marked = true;
+      prevMin = endMin;
+      return { ...c, sflag, eflag };
+    });
+  }
+
   function horaCell(h) {
     // Defense-in-depth: every interpolation goes through htmlEsc even
     // though h.lord / h.start / h.end come from hard-coded arrays and
@@ -1851,10 +1881,11 @@
     const palClass = HORA_PALETTE_CLASS[h.lord] || '';
     const cls = `hora-cell ${palClass} ${fav}`;
     const glyph = HORA_GLYPH[h.lord] || '';
+    const range = `${fmtHM(htmlEsc(h.start), h.sflag)}–${fmtHM(htmlEsc(h.end), h.eflag)}`;
     return `<div class="${cls}" title="${htmlEsc(h.lord)} hora · ${htmlEsc(h.start)}–${htmlEsc(h.end)}">`
       + `<div class="hora-glyph">${htmlEsc(glyph)}</div>`
       + `<div class="hora-lord">${htmlEsc(h.lord)}</div>`
-      + `<div class="hora-time">${htmlEsc(h.start)}</div></div>`;
+      + `<div class="hora-time">${range}</div></div>`;
   }
 
   // --- Lagna data layer: cached per-session, per-city fetch ---
@@ -1880,19 +1911,30 @@
   }
 
   function lagnaSegments(dayData) {
-    // dayData: { sunrise: 'HH:MM', lagna0: int, transitions: [[minOffset, newIdx], ...] }
+    // dayData: { sunrise: 'HH:MM', lagna0: int,
+    //            transitions: [[minOffset, newIdx], ...],
+    //            cycleEnd: int }   // minute-offset from sunrise to next sunrise
     if (!dayData) return [];
+    const fmt = m => {
+      const w = ((m % 1440) + 1440) % 1440;
+      return `${String(Math.floor(w / 60)).padStart(2,'0')}:${String(w % 60).padStart(2,'0')}`;
+    };
     const [srH, srM] = dayData.sunrise.split(':').map(Number);
     const baseMin = srH * 60 + srM;
-    const segs = [{ rashi: dayData.lagna0, start: dayData.sunrise }];
+    // Build raw (rashi, startOffset) entries so we can derive ends.
+    const raw = [{ rashi: dayData.lagna0, off: 0 }];
     for (const [off, idx] of dayData.transitions) {
-      const m = ((baseMin + off) % 1440 + 1440) % 1440;
-      segs.push({
-        rashi: idx,
-        start: `${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`,
-      });
+      raw.push({ rashi: idx, off });
     }
-    return segs;
+    const cycleEnd = typeof dayData.cycleEnd === 'number' ? dayData.cycleEnd : (24 * 60);
+    return raw.map((r, i) => {
+      const endOff = i < raw.length - 1 ? raw[i + 1].off : cycleEnd;
+      return {
+        rashi: r.rashi,
+        start: fmt(baseMin + r.off),
+        end: fmt(baseMin + endOff),
+      };
+    });
   }
 
   function lagnaCell(seg) {
@@ -1900,9 +1942,10 @@
     // from a hard-coded array. Defense-in-depth: escape anyway.
     const name = RASHI_NAMES_JS[seg.rashi] || '?';
     const elem = RASHI_ELEMENT[seg.rashi] || '';
-    return `<div class="lagna-seg ${elem}" title="${htmlEsc(name)} lagna from ${htmlEsc(seg.start)}">`
+    const range = `${fmtHM(htmlEsc(seg.start), seg.sflag)}–${fmtHM(htmlEsc(seg.end), seg.eflag)}`;
+    return `<div class="lagna-seg ${elem}" title="${htmlEsc(name)} lagna · ${htmlEsc(seg.start)}–${htmlEsc(seg.end)}">`
       + `<div class="lagna-name">${htmlEsc(name)}</div>`
-      + `<div class="lagna-time">${htmlEsc(seg.start)}</div></div>`;
+      + `<div class="lagna-time">${range}</div></div>`;
   }
 
   // --- Classical / site palette toggle ---
@@ -2150,10 +2193,14 @@
     let horaHtml = '';
     if (data.sunrise && data.sunset && tomorrowSr) {
       const horas = computeHoras(selectedDate().getDay(), data.sunrise, data.sunset, tomorrowSr);
+      // Day horas live entirely within one calendar day; night horas
+      // cross midnight, so feed them through the marker pass with
+      // sunset as the "today" anchor.
+      const nightFlagged = markFirstMidnightCrossing(horas.night, data.sunset);
       const otherLabel = getHoraPalette() === 'classical' ? 'Site view' : 'Classical view';
       const toggleBtn = `<button class="palette-toggle" onclick="toggleHoraPalette()" title="Switch hora &amp; lagna colouring">→ ${otherLabel}</button>`;
       horaHtml = `<div class="tile-strip"><div class="strip-title">🕒 Horas — day · sunrise to sunset${toggleBtn}</div><div class="hora-grid">${horas.day.map(horaCell).join('')}</div></div>`;
-      horaHtml += `<div class="tile-strip"><div class="strip-title">🌙 Horas — night · sunset to next sunrise</div><div class="hora-grid">${horas.night.map(horaCell).join('')}</div></div>`;
+      horaHtml += `<div class="tile-strip"><div class="strip-title">🌙 Horas — night · sunset to next sunrise</div><div class="hora-grid">${nightFlagged.map(horaCell).join('')}</div></div>`;
     }
     const isoDate = `${selectedDate().getFullYear()}-${String(selectedDate().getMonth()+1).padStart(2,'0')}-${String(selectedDate().getDate()).padStart(2,'0')}`;
     const lagnaPlaceholder = `<div class="tile-strip" id="lagna-strip" data-iso="${isoDate}">`
@@ -2192,7 +2239,11 @@
         const dayData = lagnaDayFor(d, isoDate);
         const segs = lagnaSegments(dayData);
         if (segs.length) {
-          ribbon.innerHTML = segs.map(lagnaCell).join('');
+          // Anchor midnight detection on sunrise — the first cell that
+          // crosses past midnight gets *+1 and subsequent cells stay
+          // unmarked (matches the existing Choghadiya convention).
+          const flagged = markFirstMidnightCrossing(segs, dayData.sunrise);
+          ribbon.innerHTML = flagged.map(lagnaCell).join('');
         } else {
           strip.style.display = 'none';
         }
