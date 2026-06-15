@@ -15,7 +15,7 @@ from telugu_panchangam.engines.base import (
     nakshatra_day_windows, next_nakshatra_span,
 )
 from telugu_panchangam.engines.utils import (
-    datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
+    jd_to_utc, local_midnight_jd, find_crossing,
     get_sunrise, get_sunset, get_moonrise, get_moonset, previous_new_moon,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
