@@ -1,7 +1,5 @@
 # src/engines/drik.py
 from datetime import date, datetime, timezone
-import swisseph as swe
-import pytz
 
 from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, rituvu_name, ayanam_name,
