@@ -300,6 +300,13 @@ class PanchangamEngine(ABC):
         """Calculate full Panchangam for a single date and location."""
         ...
 
+    def calculate_bulk(self, start_date: date, days: int, location: Location, include_eclipse: bool = True) -> list[PanchangamDay]:
+        """Calculate full Panchangam for a consecutive range of days and location.
+        Default implementation calls `calculate` sequentially.
+        """
+        from datetime import timedelta
+        return [self.calculate(start_date + timedelta(days=i), location, include_eclipse) for i in range(days)]
+
     # --- Per-instant fact computation (slot-time precision) --------------
     #
     # Subclasses expose the two longitude functions they use; the base
