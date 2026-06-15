@@ -140,6 +140,56 @@ def test_janma_lagna_chip_carries_lagna_suffix():
     assert lagna_chips, 'expected a Mesha-lagna chip with the suffix'
 
 
+def test_neutral_chip_emitted_when_lagna_set_and_other_ref_silent():
+    """When the user opts into Lagna Shuddhi by setting janma_lagna,
+    both references emit a chip for EVERY slot — favourable, Ashtama,
+    or neutral. Without the symmetry, slots where one ref is
+    favourable and the other neutral show only the favourable line,
+    which confuses readers (asymmetric silence across slots).
+    """
+    day = _day(2026, 6, 17)
+    # janma rashi=Meena (12), janma lagna=Vrishabha (2).
+    # On 2026-06-17 Hyderabad, a Tula-lagna slot starts ~10:04 IST.
+    # Tula from Meena: 8 (Ashtama) — that's NOT neutral. Pick a
+    # different example. Use janma rashi=Meena + janma lagna=Makara
+    # so Tula from Meena is 8 (Ashtama) -> ash chip,
+    # but Tula from Makara is 10 (kendra) -> fav chip. Not neutral.
+    # Better: janma rashi=Mesha (1) + lagna=Vrishabha (2). On a Tula
+    # slot: from Mesha 7 (kendra) -> fav. From Vrishabha 6 (neutral)
+    # -> neutral chip when lagna is supplied.
+    slots = day_slots(day,
+                      janma_nakshatras=['Krittika'],
+                      janma_rasis=['Mesha'],
+                      janma_lagnas=['Vrishabha'])
+    # Find a slot where the rashi check fires (favourable) but the
+    # lagna check would be silent — verify both lines present.
+    fav_lines = []
+    neutral_lines = []
+    for s in slots:
+        for r in s['reasons']:
+            if 'Tula lagna favourable' in r and 'from Mesha' in r and 'lagna' not in r.split('from Mesha')[1][:6]:
+                fav_lines.append(r)
+            if 'Tula lagna neutral' in r and 'Vrishabha lagna' in r:
+                neutral_lines.append(r)
+    assert fav_lines, 'expected Tula kendra@7 from Mesha to fire'
+    assert neutral_lines, \
+        'expected a "neutral … from Vrishabha lagna" chip when janma_lagna is set'
+
+
+def test_no_neutral_chip_when_lagna_not_set():
+    """Backward compat: users who only supply janma_rashi (no lagna)
+    must NOT see any 'neutral' chips. Behaviour unchanged for the
+    common case."""
+    day = _day(2026, 6, 17)
+    slots = day_slots(day,
+                      janma_nakshatras=['Krittika'],
+                      janma_rasis=['Mesha'])
+    neutral_lines = [r for s in slots for r in s['reasons']
+                     if 'lagna neutral' in r]
+    assert not neutral_lines, \
+        f'unexpected neutral chip(s) without janma_lagna: {neutral_lines}'
+
+
 def test_janma_lagna_falls_back_cleanly_when_null():
     """When janma_lagnas[i] is None, only the rashi-reference
     check runs — no lagna-reference chip is added (back to

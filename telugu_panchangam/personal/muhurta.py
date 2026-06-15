@@ -381,19 +381,25 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
     if not janma_rasis or not slot_lagna:
         return 0, [], []
     bonus = 0
-    fav_rashi, ash_rashi = [], []
-    fav_lagna, ash_lagna = [], []
+    fav_rashi, ash_rashi, neut_rashi = [], [], []
+    fav_lagna, ash_lagna, neut_lagna = [], [], []
     ashtama_names: list[str] = []
 
     def _record_ashtama(label):
         if label not in ashtama_names:
             ashtama_names.append(label)
 
+    _ord_suffix = {1: 'st', 2: 'nd', 3: 'rd'}
+    def _ord(n):
+        return f'{n}{_ord_suffix.get(n, "th")}'
+
     for i, rasi in enumerate(janma_rasis):
         if rasi is None:
             continue
         janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
         label = _label(janma_label, i)
+        has_lagna = bool(janma_lagnas and i < len(janma_lagnas)
+                         and janma_lagnas[i])
         # Always: position from janma rashi.
         pos_r = lagna_position(rasi, slot_lagna)
         if is_ashtama_lagna(pos_r):
@@ -405,8 +411,17 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
                 f'{label} {lagna_verdict(pos_r)}@{pos_r} from {rasi}'
             )
             bonus += 1
+        elif has_lagna:
+            # Neutral from rashi — only emitted when the user also
+            # supplied janma_lagna for this person. Without that
+            # opt-in we stay silent (existing behaviour). Score
+            # unaffected; the line is purely an audit-trail entry
+            # so both lenses appear symmetrically in the slot's
+            # reasons (no asymmetric silences when one ref is
+            # favourable and the other neutral).
+            neut_rashi.append(f'{label} {_ord(pos_r)} from {rasi}')
         # Additionally: position from janma lagna when supplied.
-        if janma_lagnas and i < len(janma_lagnas) and janma_lagnas[i]:
+        if has_lagna:
             jl = janma_lagnas[i]
             pos_l = lagna_position(jl, slot_lagna)
             if is_ashtama_lagna(pos_l):
@@ -418,6 +433,10 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
                     f'{label} {lagna_verdict(pos_l)}@{pos_l} from {jl} lagna'
                 )
                 bonus += 1
+            else:
+                # Same symmetry rule: emit a neutral line so the
+                # lagna lens is never silently absent.
+                neut_lagna.append(f'{label} {_ord(pos_l)} from {jl} lagna')
 
     reasons = []
     if fav_rashi:
@@ -439,6 +458,16 @@ def _score_lagna(janma_nakshatras, janma_rasis, slot_lagna,
         reasons.append(
             f"{slot_lagna} lagna Ashtama for {', '.join(ash_lagna)} "
             f"(-{len(ash_lagna)})"
+        )
+    if neut_rashi:
+        reasons.append(
+            f"{slot_lagna} lagna neutral for {', '.join(neut_rashi)} "
+            f"(no effect)"
+        )
+    if neut_lagna:
+        reasons.append(
+            f"{slot_lagna} lagna neutral for {', '.join(neut_lagna)} "
+            f"(no effect)"
         )
     return bonus, reasons, ashtama_names
 
