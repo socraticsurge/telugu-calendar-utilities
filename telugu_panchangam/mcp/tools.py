@@ -23,6 +23,7 @@ from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, assign_t
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
+from telugu_panchangam.eclipses import list_eclipses_in_range, get_eclipse_from_precomputed
 
 _ENGINES = {
     'drik': DrikGanitaEngine(),
@@ -331,10 +332,21 @@ def tool_get_special_days(
         loc = _resolve_city(city, latitude, longitude, timezone)
         engine = _ENGINES[system]
         _, days_in_month = calendar.monthrange(year, month)
+
+        jd_start = local_midnight_jd(date(year, month, 1), loc.timezone)
+        if month == 12:
+            next_month_date = date(year + 1, 1, 1)
+        else:
+            next_month_date = date(year, month + 1, 1)
+        jd_end = local_midnight_jd(next_month_date, loc.timezone)
+        precomputed_eclipses = list_eclipses_in_range(jd_start, jd_end)
+
         special_days = []
         for day_num in range(1, days_in_month + 1):
             d = date(year, month, day_num)
-            day = engine.calculate(d, loc)
+            day = engine.calculate(d, loc, include_eclipse=False)
+            day.eclipse = get_eclipse_from_precomputed(d, precomputed_eclipses, loc)
+
             is_notable = (
                 day.is_ekadashi or day.is_amavasya or day.is_pournami
                 or day.is_pradosham or day.is_sankranti or day.eclipse is not None
