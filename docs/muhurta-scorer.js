@@ -21,6 +21,26 @@
   const MU_LAGNA_KENDRA = new Set([1, 4, 7, 10]);
   const MU_LAGNA_TRIKONA = new Set([1, 5, 9]);
 
+  // Lagna classes (Chara / Sthira / Dvisvabhava) — Muhurta Chintamani
+  // groupings. Used by per-activity lagna preferences.
+  const MU_LAGNA_CHARA = new Set(['Mesha', 'Karka', 'Tula', 'Makara']);
+  const MU_LAGNA_STHIRA = new Set(['Vrishabha', 'Simha', 'Vrischika', 'Kumbha']);
+  const MU_LAGNA_DVISVABHAVA = new Set(['Mithuna', 'Kanya', 'Dhanu', 'Meena']);
+  const MU_LAGNA_CLASSES = {
+    Chara: MU_LAGNA_CHARA,
+    Sthira: MU_LAGNA_STHIRA,
+    Dvisvabhava: MU_LAGNA_DVISVABHAVA,
+  };
+  function muLagnaClassOf(rashi) {
+    for (const k of Object.keys(MU_LAGNA_CLASSES)) {
+      if (MU_LAGNA_CLASSES[k].has(rashi)) return k;
+    }
+    return null;
+  }
+  function muLagnasInClass(className) {
+    return MU_LAGNA_CLASSES[className] || null;
+  }
+
   // Chandrabalam (mirrors chandrabalam.py). Used by the dosha cascade.
   const MU_CHANDRA_GOOD = new Set([1, 3, 6, 7, 10, 11]);
   const MU_CHANDRA_PUJA = new Set([2, 5, 9]);
@@ -145,10 +165,12 @@
   const api = {
     MU_RASHI_NAMES,
     MU_LAGNA_KENDRA, MU_LAGNA_TRIKONA,
+    MU_LAGNA_CHARA, MU_LAGNA_STHIRA, MU_LAGNA_DVISVABHAVA, MU_LAGNA_CLASSES,
     MU_CHANDRA_GOOD, MU_CHANDRA_PUJA,
     MU_TIER_NAMES, MU_RELATIVE_BANDS,
     muLagnaPosition, muLagnaVerdict,
     muIsFavourableLagna, muIsAshtamaLagna, muLagnaAtMin,
+    muLagnaClassOf, muLagnasInClass,
     muScoreTier, muRelativeTier,
     computePersonalDosha, computeDayDosha,
   };

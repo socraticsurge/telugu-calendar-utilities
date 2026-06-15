@@ -201,3 +201,41 @@ test('computeDayDosha: Visha/Dagdha yoga', () => {
 test('computeDayDosha: Vyatipata/Vaidhriti', () => {
   assert.equal(M.computeDayDosha({ nityaHardAvoid: true }), 'vyatipata_vaidhriti');
 });
+
+// ── Lagna classes (Chara / Sthira / Dvisvabhava) ────────────────
+
+test('Lagna classes partition the 12 rashis cleanly', () => {
+  const union = new Set([...M.MU_LAGNA_CHARA, ...M.MU_LAGNA_STHIRA, ...M.MU_LAGNA_DVISVABHAVA]);
+  assert.equal(union.size, 12);
+  assert.equal(M.MU_LAGNA_CHARA.size, 4);
+  assert.equal(M.MU_LAGNA_STHIRA.size, 4);
+  assert.equal(M.MU_LAGNA_DVISVABHAVA.size, 4);
+  // No overlap
+  for (const r of M.MU_LAGNA_CHARA) {
+    assert.ok(!M.MU_LAGNA_STHIRA.has(r));
+    assert.ok(!M.MU_LAGNA_DVISVABHAVA.has(r));
+  }
+});
+
+test('muLagnaClassOf classical spot-checks', () => {
+  // Movable: Mesha, Karka, Tula, Makara
+  assert.equal(M.muLagnaClassOf('Mesha'), 'Chara');
+  assert.equal(M.muLagnaClassOf('Makara'), 'Chara');
+  // Fixed: Vrishabha, Simha, Vrischika, Kumbha
+  assert.equal(M.muLagnaClassOf('Vrishabha'), 'Sthira');
+  assert.equal(M.muLagnaClassOf('Simha'), 'Sthira');
+  // Dual: Mithuna, Kanya, Dhanu, Meena
+  assert.equal(M.muLagnaClassOf('Mithuna'), 'Dvisvabhava');
+  assert.equal(M.muLagnaClassOf('Meena'), 'Dvisvabhava');
+});
+
+test('muLagnaClassOf unknown rashi returns null', () => {
+  assert.equal(M.muLagnaClassOf('NotARashi'), null);
+});
+
+test('muLagnasInClass returns the right set', () => {
+  assert.equal(M.muLagnasInClass('Chara'), M.MU_LAGNA_CHARA);
+  assert.equal(M.muLagnasInClass('Sthira'), M.MU_LAGNA_STHIRA);
+  assert.equal(M.muLagnasInClass('Dvisvabhava'), M.MU_LAGNA_DVISVABHAVA);
+  assert.equal(M.muLagnasInClass('Bogus'), null);
+});
