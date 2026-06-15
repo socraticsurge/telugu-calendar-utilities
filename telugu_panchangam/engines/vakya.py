@@ -11,7 +11,7 @@ from telugu_panchangam.engines.utils import (
     get_sunrise, get_sunset, get_moonrise, get_moonset, previous_new_moon,
 )
 from telugu_panchangam.engines.base import (
-    RASHI_NAMES, rituvu_name, ayanam_name, VAARAM_NAMES, MAASAM_NAMES,
+    RASHI_NAMES, rituvu_name, ayanam_name, VAARAM_NAMES,
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, KARANA_REPEATING, KARANA_FIXED,
     maasam_name,
     VARJYAM_GHATIS, AMRITA_GHATIS, nakshatra_day_windows, next_nakshatra_span,
