@@ -8,7 +8,7 @@ from telugu_panchangam.engines.surya_siddhanta import (
 )
 from telugu_panchangam.engines.utils import (
     jd_to_utc, local_midnight_jd, find_crossing,
-    get_sunrise, get_sunset, get_moonrise, get_moonset, previous_new_moon,
+    get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
 from telugu_panchangam.engines.base import (
     RASHI_NAMES, rituvu_name, ayanam_name, VAARAM_NAMES,
