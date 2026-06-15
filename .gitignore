@@ -35,3 +35,6 @@ tests/test_sync_tracker_on_task.py
 docs/gochara.json
 public/
 build/
+
+# Generated lagna/feed data lives on gh-pages, not master.
+docs/feeds/
