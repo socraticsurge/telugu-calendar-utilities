@@ -273,6 +273,7 @@ def tool_get_panchangam(
                     'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
                 } if day.ghati_clock else None
             ),
+            'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -323,6 +324,7 @@ def tool_get_muhurta(
                     'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
                 } if day.ghati_clock else None
             ),
+            'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -458,6 +460,7 @@ def tool_get_panchangam_range(
                 'special_yogas': day.special_yogas,
                 'special_days': specials,
                 'is_special': bool(specials),
+                'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
             })
 
         return json.dumps({

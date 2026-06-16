@@ -126,6 +126,8 @@ class VakyaEngine(SuryaSiddhantaEngine):
         _, sankranti_jd = self._sankramanam_name_and_jd(jd_sunrise, jd_sunset)
         sankranti_dt = jd_to_utc(sankranti_jd) if sankranti_jd is not None else None
         day.sankramana_avoidance = compute_sankramana_window(sankranti_dt, day.ghati_clock)
+        from telugu_panchangam.nakshatra_filters import is_panchaka_nakshatra
+        day.in_panchaka_nakshatra = is_panchaka_nakshatra(day.nakshatra.name)
         return day
 
     # Override Moon-dependent helpers to use vakya functions

@@ -236,6 +236,13 @@ ACTIVITY_RULES: dict[str, dict] = {
     'surgery':       {'label': 'Surgery / medical procedure',
                       'avoid_karana': ['Vishti'],
                       'prefer_vara': ['Mangalavaram']},
+    # — Panchaka-restricted activities —
+    'cremation':         {'label': 'Cremation rites',
+                          'skip_on_panchaka_nakshatra': True},
+    'construction_roof': {'label': 'Roof-laying / construction milestone',
+                          'skip_on_panchaka_nakshatra': True},
+    'wood_cutting':      {'label': 'Wood-cutting',
+                          'skip_on_panchaka_nakshatra': True},
 }
 
 ACTIVITIES = tuple(ACTIVITY_RULES.keys())
@@ -624,6 +631,11 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
         return f'{kind} — auspicious activities deferred'
 
     rules = ACTIVITY_RULES.get(activity, ACTIVITY_RULES['any'])
+
+    # Panchaka Nakshatra: cremation/roof-laying/wood-cutting are deferred.
+    if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
+        return (f'Panchaka Nakshatra ({day.nakshatra.name}) — '
+                f'{rules["label"]} traditionally avoided')
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     if skip_yogas:
         for y in day.special_yogas:
@@ -903,6 +915,10 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         return []
 
     rules = ACTIVITY_RULES[activity]
+
+    # Panchaka Nakshatra: cremation/roof-laying/wood-cutting are deferred.
+    if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
+        return []
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     prefer_chog = rules.get('prefer_choghadiya')   # ('Block', bonus) or None
     avoid_karana_names = set(rules.get('avoid_karana', ()))
