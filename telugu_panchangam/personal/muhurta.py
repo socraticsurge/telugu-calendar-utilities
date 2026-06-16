@@ -123,6 +123,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_vara': ['Somavaram', 'Guruvaram']},
     'beginning':     {'label': 'New beginning (general)',
                       'prefer_choghadiya': ('Amrit', 1),
@@ -134,6 +135,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'skip_on_simha_stha_guru': True,      # hard-skip: Guru in Simha
                       'penalty_on_simha_stha_shukra': -2,   # soft penalty: Shukra in Simha
                       'skip_on_combust': ['Guru', 'Shukra'],
@@ -145,6 +147,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Purna',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
@@ -153,6 +156,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
@@ -162,6 +166,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Somavaram', 'Guruvaram'],
@@ -171,6 +176,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Budhavaram', 'Shukravaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
@@ -179,6 +185,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
@@ -187,6 +194,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'skip_on_combust': ['Guru', 'Shukra'],
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
@@ -196,6 +204,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram'],
@@ -205,6 +214,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
@@ -670,6 +680,10 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
     if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
         return f'Adhika Maasa — {rules["label"]} traditionally avoided'
 
+    # Pitru Paksha: samskaras are restricted during Bhadrapada Krishna paksha.
+    if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
+        return f'Pitru Paksha (Bhadrapada Krishna paksha) — {rules["label"]} traditionally avoided'
+
     # Simha-Stha Guru: wedding is hard-skipped while Jupiter is in Simha.
     if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
         return (f'Simha-Stha Guru — '
@@ -977,6 +991,10 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
 
     # Adhika Maasa: samskaras are classically forbidden during intercalary months.
     if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
+        return []
+
+    # Pitru Paksha: samskaras are restricted during Bhadrapada Krishna paksha.
+    if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
         return []
 
     # Simha-Stha Guru: wedding is hard-skipped while Jupiter is in Simha.

@@ -150,6 +150,7 @@ class PanchangamDay:
     in_panchaka_nakshatra: bool = False
     is_khar_maasa: bool = False
     khar_maasa_name: str | None = None
+    is_pitru_paksha: bool = False
     # Simha-Stha Guru/Shukra — Jupiter or Venus in Simha rasi.
     # Populated by Drik engine only (SS/Vakya don't model outer planets).
     simha_stha_guru: bool = False

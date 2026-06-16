@@ -131,6 +131,8 @@ class VakyaEngine(SuryaSiddhantaEngine):
         from telugu_panchangam.maasa_filters import khar_maasa_name
         day.khar_maasa_name = khar_maasa_name(day.solar_sign)
         day.is_khar_maasa = day.khar_maasa_name is not None
+        from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
+        day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
         # simha_stha_guru / simha_stha_shukra: Vakya does not model outer planets
         # (Jupiter, Venus) — both flags remain False (PanchangamDay defaults).
         return day

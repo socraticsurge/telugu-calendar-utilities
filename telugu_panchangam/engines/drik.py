@@ -378,6 +378,8 @@ class DrikGanitaEngine(PanchangamEngine):
         from telugu_panchangam.maasa_filters import khar_maasa_name
         day.khar_maasa_name = khar_maasa_name(day.solar_sign)
         day.is_khar_maasa = day.khar_maasa_name is not None
+        from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
+        day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
         # Simha-Stha Guru / Shukra — Jupiter/Venus rasis from sidereal
         # longitudes at sunrise. Drik uses Swiss Ephemeris outer planets;
         # SS and Vakya don't model them so those engines leave defaults (False).
