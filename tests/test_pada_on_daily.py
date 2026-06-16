@@ -48,8 +48,5 @@ def test_pada_in_mcp_output():
     import json
     from telugu_panchangam.mcp.tools import tool_get_panchangam
     out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
-    # nakshatra_pada surfaces alongside the existing nakshatra serialization;
-    # exact placement is implementation choice (top-level or under
-    # pancha_anga) — but it MUST be present and in range 1..4.
-    pada = out.get('nakshatra_pada') or out.get('pancha_anga', {}).get('nakshatra_pada')
+    pada = out['pancha_anga']['nakshatra_pada']
     assert pada in (1, 2, 3, 4), f"nakshatra_pada missing or invalid: {pada}"
