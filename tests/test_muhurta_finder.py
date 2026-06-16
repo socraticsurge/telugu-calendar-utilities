@@ -748,6 +748,34 @@ def test_mcp_find_muhurta_emits_tier_on_each_slot():
         assert s['tier'] in ('Excellent', 'Good', 'Fair', 'Avoid')
 
 
+def test_mcp_find_muhurta_exposes_janma_rasis_janma_lagnas_chandra_mode():
+    """The MCP-exposed find_muhurta (server.py) must thread all per-person
+    inputs that the underlying tool_find_muhurta (tools.py) accepts.
+
+    Regression guard: until this fix, MCP clients could pass only
+    janma_nakshatras — the Chandrabalam (janma_rasis), Lagna Shuddhi
+    (janma_lagnas), and chandra_mode parameters that tool_find_muhurta
+    already supported were unreachable from any MCP client.
+    """
+    import json
+    from telugu_panchangam.mcp.server import find_muhurta
+    # FastMCP @mcp.tool() wraps the function — original is on .fn
+    fn = getattr(find_muhurta, 'fn', find_muhurta)
+    result = json.loads(fn(
+        '2026-06-15',
+        days=3,
+        activity='any',
+        city='Hyderabad',
+        janma_nakshatras=['Ashvini', 'Bharani'],
+        janma_rasis=['Mesha', None],         # second person's rashi unknown
+        janma_lagnas=[None, 'Karka'],        # first person's lagna unknown
+        chandra_mode='puja_ok',
+    ))
+    assert 'error' not in result, f'unexpected error: {result.get("error")}'
+    assert 'slots' in result
+    assert result.get('chandra_mode') == 'puja_ok'
+
+
 def test_unknown_tithi_name_does_not_explode():
     # Robustness: tithi_family is wrapped in try/except inside day_slots,
     # so an unknown tithi name silently skips tithi-class scoring.
