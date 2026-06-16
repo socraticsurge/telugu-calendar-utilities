@@ -9,6 +9,14 @@ on:
       - 'docs/muhurta-scorer.js'
   workflow_dispatch:
 
+# Singleton across every workflow that publishes to gh-pages
+# (deploy-landing, generate, gochara, lagna). They all push to the
+# same branch — concurrent runs collide. cancel-in-progress: false
+# means we queue instead of dropping work mid-deploy.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 permissions:
   contents: write
 

@@ -5,6 +5,11 @@ on:
     - cron: '30 2 1 * *'   # 1st of every month, after feed generation
   workflow_dispatch:
 
+# Singleton across every workflow that publishes to gh-pages.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
