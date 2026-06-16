@@ -32,6 +32,19 @@ _ENGINES = {
     'vakya': VakyaEngine(),
 }
 
+_ENGINE_CLASSES = {
+    'drik': DrikGanitaEngine,
+    'surya_siddhanta': SuryaSiddhantaEngine,
+    'vakya': VakyaEngine,
+}
+
+
+def _get_engine(system: str, ayanamsa: str = 'lahiri'):
+    """Return the cached singleton for Lahiri; instantiate fresh for others."""
+    if ayanamsa == 'lahiri':
+        return _ENGINES[system]
+    return _ENGINE_CLASSES[system](ayanamsa=ayanamsa)
+
 _TIMEZONE_COUNTRY = {
     'Asia/Kolkata': 'India',
     'America/Chicago': 'USA',
@@ -189,18 +202,21 @@ def tool_get_panchangam(
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
     try:
         d = _parse_date(date_str)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
-        day = _ENGINES[system].calculate(d, loc)
+        engine = _get_engine(system, ayanamsa)
+        day = engine.calculate(d, loc)
         tz = loc.timezone
         specials = _special_events(day)
         return json.dumps({
             'date': date_str,
             'city': city,
             'system': system,
+            'ayanamsa': ayanamsa,
             'metadata': {
                 'samvatsara': day.samvatsara,
                 'ayanam': day.ayanam,
@@ -367,6 +383,7 @@ def tool_get_panchangam_range(
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
     """Return a compact Panchangam summary for each day in [start_date, end_date]. Maximum span: 31 days."""
     try:
@@ -378,7 +395,7 @@ def tool_get_panchangam_range(
             raise ValueError("Date range exceeds 31-day limit. Use multiple calls for longer spans.")
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
-        engine = _ENGINES[system]
+        engine = _get_engine(system, ayanamsa)
         tz = loc.timezone
 
         days_count = (end - start).days + 1
@@ -418,6 +435,7 @@ def tool_get_panchangam_range(
             'end_date': end_date,
             'city': city,
             'system': system,
+            'ayanamsa': ayanamsa,
             'days': days,
         })
     except ValueError as e:
@@ -580,8 +598,14 @@ def tool_get_graha_positions(
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
+    # TODO: route ayanamsa into graha_positions() — gochara/positions.py still
+    # uses Lahiri internally. The parameter is accepted for API symmetry and
+    # surfaced in the response, but positions are always Lahiri for now.
     try:
+        from telugu_panchangam.engines.utils import _validate_ayanamsa
+        _validate_ayanamsa(ayanamsa)
         d = _parse_date(date_str)
         loc = _resolve_city(city, latitude, longitude, timezone)
         geopos = [loc.lon, loc.lat, 0.0]
@@ -591,7 +615,9 @@ def tool_get_graha_positions(
             'city': city,
             'at': 'sunrise',
             'sunrise': _fmt_time(jd_to_utc(jd_sunrise), loc.timezone),
-            'ayanamsa': 'Lahiri (sidereal)',
+            'ayanamsa': ayanamsa,
+            'ayanamsa_note': 'lahiri' if ayanamsa == 'lahiri' else
+                'graha positions use Lahiri internally; alternate ayanamsa accepted but not yet applied to gochara',
             'grahas': graha_positions(jd_sunrise),
         })
     except ValueError as e:
@@ -771,6 +797,7 @@ def tool_find_muhurta(
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
     """When janma_lagnas[i] is provided, strict Lagna Shuddhi is used
     for that person — kendra/trikona/Ashtama count from the natal
@@ -784,7 +811,7 @@ def tool_find_muhurta(
         start = _parse_date(start_date)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
-        engine = _ENGINES[system]
+        engine = _get_engine(system, ayanamsa)
 
         slots, dropped_days = _gather_muhurta_slots(
             start, days, loc, engine, activity, janma_nakshatras, janma_rasis, chandra_mode,
@@ -800,6 +827,7 @@ def tool_find_muhurta(
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
             'city': city, 'system': system, 'chandra_mode': chandra_mode,
+            'ayanamsa': ayanamsa,
             'slots': slots[:12],
             'dropped_days': dropped_days,
             'disclaimer': _MUHURTA_DISCLAIMER,

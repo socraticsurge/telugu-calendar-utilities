@@ -4,6 +4,34 @@ import swisseph as swe
 import pytz
 
 
+AYANAMSA_MODES = {
+    'lahiri':            swe.SIDM_LAHIRI,
+    'raman':             swe.SIDM_RAMAN,
+    'krishnamurti':      swe.SIDM_KRISHNAMURTI,
+    'true_chitrapaksha': swe.SIDM_TRUE_CITRA,
+}
+
+
+def _validate_ayanamsa(name: str) -> int:
+    if name not in AYANAMSA_MODES:
+        raise ValueError(
+            'ayanamsa must be one of: ' + ', '.join(sorted(AYANAMSA_MODES))
+        )
+    return AYANAMSA_MODES[name]
+
+
+def sidereal_longitude_with_ayanamsa(jd: float, planet: int, ayanamsa: str) -> float:
+    """Sidereal longitude under the named ayanamsa. The existing
+    sidereal_longitude (Lahiri-only) is kept for backward compatibility
+    with cached/hot paths.
+    """
+    mode = _validate_ayanamsa(ayanamsa)
+    swe.set_sid_mode(mode)
+    flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+    result, _ = swe.calc_ut(jd, planet, flags)
+    return result[0] % 360.0
+
+
 def datetime_to_jd(dt: datetime) -> float:
     """Convert UTC datetime to Julian Day Number."""
     utc = dt.astimezone(timezone.utc)

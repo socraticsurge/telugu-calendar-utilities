@@ -74,6 +74,14 @@ def ss_elongation(jd: float) -> float:
 
 class SuryaSiddhantaEngine(PanchangamEngine):
 
+    def __init__(self, ayanamsa: str = 'lahiri'):
+        # The ayanamsa parameter is accepted for API symmetry with DrikEngine.
+        # SS uses its own mean-motion model and is independent of Swiss ayanamsa.
+        from telugu_panchangam.engines.utils import _validate_ayanamsa
+        _validate_ayanamsa(ayanamsa)
+        self.ayanamsa = ayanamsa
+        super().__init__()
+
     def calculate(self, d: date, location: Location, include_eclipse: bool = True) -> PanchangamDay:
         geopos = [location.lon, location.lat, 0.0]
         jd_midnight = local_midnight_jd(d, location.timezone)
