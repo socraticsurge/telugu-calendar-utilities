@@ -7,6 +7,145 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+The theme: **operational maturity**. Release safety net, dependency
+hygiene, dual-axis CI matrix, security scanning, contributor docs,
+forward-year DP-verified festival regression, and a uniform table-
+driven festival dispatcher. No engine math changes; 21 new tests
+(825 → 846 passed).
+
+### Added
+- **MCP — `find_muhurta` now exposes per-person Chandrabalam, strict
+  Lagna Shuddhi, and `chandra_mode`** ([`janma_rasis`, `janma_lagnas`,
+  `chandra_mode`] kwargs) — previously unreachable from MCP clients
+  even though the underlying tool already supported them. Pattern
+  matches `find_tarabalam_days`.
+  ([PR #91](https://github.com/socraticsurge/telugu-calendar-utilities/pull/91)).
+- **Per-anga ICS variant feed generators** in new
+  `telugu_panchangam/generators/anga_variants.py`: Ekadashi-only,
+  Festivals-only, Moon-Cycles (Pournami + Amavasya). Caller-side
+  only for now; deploy + subscribe-UI is a deliberate follow-up.
+  ([PR #94](https://github.com/socraticsurge/telugu-calendar-utilities/pull/94)).
+- **Forward-year DP-verified festival regression**: 30 cells
+  (5 anchor festivals × 2027–2028 × Hyderabad / Bengaluru / Chennai)
+  with DP day-page URL provenance per cell. Locks engine behaviour
+  against drikpanchang.com for two years out.
+  ([PR #89](https://github.com/socraticsurge/telugu-calendar-utilities/pull/89)).
+- **ICS golden-snapshot regression test** pinning byte-stable
+  subscriber feed format for a 3-day stretch (Hyderabad / drik,
+  5131 bytes).
+  ([PR #93](https://github.com/socraticsurge/telugu-calendar-utilities/pull/93)).
+- **MCP tool tests** for `tool_get_daily_horas` (4 tests including
+  full-week planetary-hour-rule sweep) and `tool_get_lagna_transitions`
+  (5 tests including cyclic-order invariant) — previously zero direct
+  coverage.
+  ([PR #92](https://github.com/socraticsurge/telugu-calendar-utilities/pull/92)).
+- **`ARCHITECTURE.md` and `MAINTENANCE_RUNBOOK.md`** at repo root —
+  layer-cake diagram, engine API contract, release flow, monthly
+  cron map, add-a-city / add-a-festival recipes, emergency runbooks.
+  ([PR #85](https://github.com/socraticsurge/telugu-calendar-utilities/pull/85)).
+- **SEO surface on the landing page**: JSON-LD (`WebSite` +
+  `SoftwareApplication`), `<link rel="canonical">`, sitemap.xml,
+  robots.txt, OG/Twitter share preview metadata.
+  ([PR #86](https://github.com/socraticsurge/telugu-calendar-utilities/pull/86)).
+- **PyPI release safety**: `publish.yml` now gates on three pre-build
+  checks — pyproject ↔ server.json ↔ tag version sync, CHANGELOG
+  section presence (this entry's gate), and auto-creates a GitHub
+  Release with extracted notes.
+  ([PR #81](https://github.com/socraticsurge/telugu-calendar-utilities/pull/81)).
+- **Security scanning workflow** (`security.yml`): CodeQL (Python,
+  `security-and-quality` query suite) + pip-audit (`--strict`) on
+  every PR, master push, and weekly Monday cron. Zero CVEs at
+  baseline.
+  ([PR #82](https://github.com/socraticsurge/telugu-calendar-utilities/pull/82)).
+- **`tests/test_version_sync.py`** — three asserts pinning
+  `pyproject.toml` ↔ `server.json.version` ↔ `server.json.packages[0].version`.
+  ([PR #74](https://github.com/socraticsurge/telugu-calendar-utilities/pull/74)).
+- **CNAME pin guard** in `tests/test_deploy_drift.py` — every deploy
+  workflow must contain `cname: panchangam.astrochaganti.com`.
+  ([PR #76](https://github.com/socraticsurge/telugu-calendar-utilities/pull/76)).
+
+### Changed
+- **`_festivals` dispatcher refactored** — Karthika Somavaram,
+  Varalakshmi Vratam, Sankashti Chaturthi, and Masa Shivaratri lifted
+  from inline conditionals into named rule tables
+  (`_WEEKDAY_IN_MAASAM_FESTIVALS`, `_LAST_WEEKDAY_IN_PAKSHAM_FESTIVALS`,
+  `_MOONRISE_MONTHLY_FESTIVALS`, `_NISHITA_MONTHLY_FESTIVALS`).
+  **Byte-identical festival output** across 63 DP-verification cells.
+  Adding new festivals of these shapes is now a routine row-append.
+  ([PR #90](https://github.com/socraticsurge/telugu-calendar-utilities/pull/90)).
+- **`ICSGenerator.generate()`** accepts an optional `variant_label`
+  kwarg used by the new per-anga variant feeds. Default empty string
+  preserves existing dense-feed output byte-for-byte (golden snapshot
+  pinned).
+  ([PR #94](https://github.com/socraticsurge/telugu-calendar-utilities/pull/94)).
+- **`README_PYPI.md`** updated with 3 previously-missing 1.8.0 tools
+  (`get_panchangam_range`, `get_daily_horas`, `get_lagna_transitions`).
+  Picked up on the next PyPI release automatically.
+  ([PR #75](https://github.com/socraticsurge/telugu-calendar-utilities/pull/75)).
+- **CI matrix expanded to Python 3.10 / 3.11 / 3.12 / 3.13** (was
+  3.11 only); Node runtime bumped 20 → 24 (current Active LTS, post-
+  EoL); concurrency groups added to all 7 workflows.
+  ([PR #77](https://github.com/socraticsurge/telugu-calendar-utilities/pull/77),
+  [PR #87](https://github.com/socraticsurge/telugu-calendar-utilities/pull/87)).
+- **Dependency declaration consolidated**: `pyproject.toml` is the
+  source of truth; `requirements.txt` is a thin `-e .[test]` shim.
+  `requirements.lock` committed for reproducible builds.
+  ([PR #83](https://github.com/socraticsurge/telugu-calendar-utilities/pull/83),
+  [PR #88](https://github.com/socraticsurge/telugu-calendar-utilities/pull/88)).
+
+### Fixed
+- **`server.json` version drift** — both top-level and `packages[0]`
+  were pinned at 1.7.1 while PyPI shipped 1.8.0; the MCP registry was
+  advertising the wrong package version. Now in lockstep with
+  `pyproject.toml` and enforced by `tests/test_version_sync.py` + the
+  publish-time gate.
+  ([PR #74](https://github.com/socraticsurge/telugu-calendar-utilities/pull/74)).
+- **`CODE_OF_CONDUCT.md` enforcement section had a blank email**
+  ("reports go to … at ."). Filled in `cvk.atreya@gmail.com`.
+  ([PR #75](https://github.com/socraticsurge/telugu-calendar-utilities/pull/75)).
+
+### Removed
+- Three unused imports in `engines/vakya.py` (`_CIVIL_DAYS`,
+  `_MOON_REVS`, `_MOON_APOGEE_REVS`) and a dead `d += timedelta(days=1)`
+  rebind in `tool_get_panchangam_range`. Byte-identical behaviour.
+  ([PR #95](https://github.com/socraticsurge/telugu-calendar-utilities/pull/95)).
+
+### Security
+- **All third-party GitHub Actions pinned to commit SHAs** with
+  version comments (Dependabot understands the convention). Closes
+  the tag-move supply-chain risk on `peaceiris/actions-gh-pages`
+  (writes to gh-pages) and `pypa/gh-action-pypi-publish` (OIDC to
+  PyPI).
+  ([PR #84](https://github.com/socraticsurge/telugu-calendar-utilities/pull/84)).
+- **Branch protection on master** with 6 required CI contexts (4-Python
+  matrix + CodeQL + pip-audit); `delete-branch-on-merge` enabled.
+- **Dependabot configured** for `pip` + `github-actions` weekly bumps
+  (Mondays 06:00 IST).
+  ([PR #77](https://github.com/socraticsurge/telugu-calendar-utilities/pull/77)).
+- `.editorconfig` + opt-in `.pre-commit-config.yaml` (ruff E/F/I +
+  check-yaml + end-of-file-fixer + merge-conflict + line-ending fix).
+  ([PR #83](https://github.com/socraticsurge/telugu-calendar-utilities/pull/83)).
+
+### Verification (per `verify-against-drikpanchang.md`)
+Every engine-touching change in this release is verified byte-identical
+against the project's DP-verification surface:
+- **33 existing DP-pinned festival dates** (`tests/test_festivals.py`) —
+  unchanged
+- **30 forward-year DP-verified cells** ([PR #89]) — unchanged
+- **5131-byte ICS golden snapshot** ([PR #93]) — unchanged
+
+Aggregate: 846 passed, 1 skipped (was 825 before Phase 1; +21 from
+the new tests added here). Zero behaviour regressions.
+
+### Engine surface change (sign-off recorded)
+Two engine files touched:
+- `engines/base.py` — `_festivals` dispatcher refactor ([PR #90]):
+  inline cases for Karthika Somavaram, Varalakshmi Vratam, Sankashti
+  Chaturthi, Masa Shivaratri are now data-table entries. No math
+  change. Byte-identical output verified across 33+30 cells.
+- `engines/vakya.py` — three unused imports removed ([PR #95]). No
+  math change.
+
 ## [1.8.0] — 2026-06-15
 
 The big theme: **janma lagna across the panchangam**. The engine now
