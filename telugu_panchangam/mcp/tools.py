@@ -392,7 +392,6 @@ def tool_get_panchangam_range(
                 'special_days': specials,
                 'is_special': bool(specials),
             })
-            d += timedelta(days=1)
 
         return json.dumps({
             'start_date': start_date,
