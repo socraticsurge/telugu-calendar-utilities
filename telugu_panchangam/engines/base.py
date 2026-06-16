@@ -293,6 +293,54 @@ _NISHITA_FESTIVALS: list[tuple[str, int, str]] = [
     ('Magha',    28, 'Maha Shivaratri'),
 ]
 
+# --- Specialty rule tables (previously inline-cased in _festivals) ---
+#
+# These four rule patterns were special cases inside the _festivals body
+# until Phase 6. Lifting them into named tables makes the dispatcher
+# uniform: every festival is now described by a row in a table, not by
+# a block of inline conditionals.
+#
+# Adding new festivals of these shapes is now an "append a row" change
+# — the routine modification CLAUDE.md explicitly permits.
+
+# Pattern: every <weekday> of <maasam>. No tithi condition.
+# Example: Karthika Somavaram = every Monday in Kartika maasam.
+# Weekday convention: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+# (matches the `weekday` int passed into _festivals).
+_WEEKDAY_IN_MAASAM_FESTIVALS: list[tuple[str, int, str]] = [
+    ('Kartika',  1, 'Karthika Somavaram'),
+]
+
+# Pattern: the LAST <weekday> in <paksham> of <maasam>. "Last" means
+# the next <weekday> falls in the other paksham (i.e., crossed
+# Pournami if paksha=Shukla, or crossed Amavasya if paksha=Krishna).
+# Example: Varalakshmi Vratam = the last Shukla Friday in Shravana
+# (the next Friday falls in Krishna paksha, after Shravana Pournami).
+_LAST_WEEKDAY_IN_PAKSHAM_FESTIVALS: list[tuple[str, int, str, str]] = [
+    # (maasam, weekday_idx, paksham, festival_name)
+    ('Shravana', 5, 'Shukla', 'Varalakshmi Vratam'),
+]
+
+# Pattern: every month, the tithi at moonrise equals <tithi_idx>
+# (with the prev-day moonrise tithi check to dedupe a tithi that
+# spans two moonrises). Observed in Adhika months too.
+# Example: Sankashti Chaturthi = Krishna Chaturthi (tithi 18) at moonrise.
+_MOONRISE_MONTHLY_FESTIVALS: list[tuple[int, str]] = [
+    # (tithi_idx, festival_name)
+    (18, 'Sankashti Chaturthi'),
+]
+
+# Pattern: every month, the tithi at nishita equals <tithi_idx>
+# (with the prev-day nishita tithi check). Suppressed when the
+# annual variant fires the same day (e.g. Masa Shivaratri yields
+# to Maha Shivaratri in Magha).
+# Example: Masa Shivaratri = Krishna Chaturdashi (tithi 28) at nishita,
+# except when Maha Shivaratri (annual, also tithi 28) fires.
+_NISHITA_MONTHLY_FESTIVALS: list[tuple[int, str, str | None]] = [
+    # (tithi_idx, festival_name, suppress_if_present)
+    (28, 'Masa Shivaratri', 'Maha Shivaratri'),
+]
+
 
 class PanchangamEngine(ABC):
     @abstractmethod
@@ -460,25 +508,41 @@ class PanchangamEngine(ABC):
                 for m, idx, name in rules:
                     if m_moment == m and t_now == idx and t_prev != idx:
                         fests.append(name)
-            if base_m == 'Kartika' and weekday == 1:
-                fests.append('Karthika Somavaram')
-            # Varalakshmi Vratam: the last Shukla-paksha Friday on or before
-            # Shravana Pournami (the next Friday falls in Krishna paksha)
-            if base_m == 'Shravana' and weekday == 5 and t_sr <= 14 \
-                    and self._tithi_index_at(jd_sr + 7.0) >= 15:
-                fests.append('Varalakshmi Vratam')
+            # Weekday-in-maasam: e.g. Karthika Somavaram (every Monday in Kartika)
+            for m, wd, name in _WEEKDAY_IN_MAASAM_FESTIVALS:
+                if base_m == m and weekday == wd:
+                    fests.append(name)
+            # Last-weekday-in-paksham: e.g. Varalakshmi Vratam (last Shukla
+            # Friday in Shravana, identified by "today is in this paksham
+            # AND the same weekday a week from now has crossed into the
+            # other paksham")
+            for m, wd, paksha, name in _LAST_WEEKDAY_IN_PAKSHAM_FESTIVALS:
+                if base_m != m or weekday != wd:
+                    continue
+                today_shukla = t_sr <= 14
+                next_week_shukla = self._tithi_index_at(jd_sr + 7.0) <= 14
+                this_paksha_now = today_shukla if paksha == 'Shukla' else (not today_shukla)
+                crosses_paksha_in_week = (this_paksha_now != (next_week_shukla if paksha == 'Shukla' else (not next_week_shukla)))
+                if this_paksha_now and crosses_paksha_in_week:
+                    fests.append(name)
 
         # --- Monthly vrats (observed in Adhika months too) ---
         if jd_ss < jd_moonrise < jd_next_sr:
-            jd_sankashti = jd_moonrise
+            jd_moonrise_eff = jd_moonrise
         else:
-            jd_sankashti = jd_ss + 0.1
-        if self._tithi_index_at(jd_sankashti) == 18 \
-                and self._tithi_index_at(jd_sankashti - 1.0) != 18:
-            fests.append('Sankashti Chaturthi')
-        if 'Maha Shivaratri' not in fests \
-                and self._tithi_index_at(nishita) == 28 \
-                and self._tithi_index_at(nishita - 1.0) != 28:
-            fests.append('Masa Shivaratri')
+            jd_moonrise_eff = jd_ss + 0.1
+        # Moonrise-monthly: e.g. Sankashti Chaturthi
+        for tithi_idx, name in _MOONRISE_MONTHLY_FESTIVALS:
+            if self._tithi_index_at(jd_moonrise_eff) == tithi_idx \
+                    and self._tithi_index_at(jd_moonrise_eff - 1.0) != tithi_idx:
+                fests.append(name)
+        # Nishita-monthly with annual-variant suppression: e.g. Masa Shivaratri
+        # (suppressed when Maha Shivaratri already fired today)
+        for tithi_idx, name, suppress_if in _NISHITA_MONTHLY_FESTIVALS:
+            if suppress_if and suppress_if in fests:
+                continue
+            if self._tithi_index_at(nishita) == tithi_idx \
+                    and self._tithi_index_at(nishita - 1.0) != tithi_idx:
+                fests.append(name)
 
         return fests
