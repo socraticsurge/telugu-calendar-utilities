@@ -116,7 +116,8 @@ ACTIVITY_RULES: dict[str, dict] = {
     'any':           {'label': 'Anything auspicious'},
     'travel':        {'label': 'Travel / journey',
                       'avoid_karana': ['Vishti'],
-                      'prefer_lagna_class': 'Chara'},
+                      'prefer_lagna_class': 'Chara',
+                      'prefer_nakshatra_mukha': (['Tiryan'], 1)},
     'purchase':      {'label': 'Purchase (general)',
                       'prefer_choghadiya': ('Labh', 1)},
     'ceremony':      {'label': 'Ceremony / puja (general)',
@@ -278,6 +279,12 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'skip_on_panchaka_nakshatra': True},
     'wood_cutting':      {'label': 'Wood-cutting',
                           'skip_on_panchaka_nakshatra': True},
+    # — Nakshatra Mukha (mouth-direction) activity rules —
+    'well_digging':          {'label': 'Well / foundation digging',
+                              'prefer_nakshatra_mukha': (['Adho'], 1)},
+    'coronation':            {'label': 'Coronation / title ceremony',
+                              'skip_on_yoga': list(_SAMSKARA_SKIP),
+                              'prefer_nakshatra_mukha': (['Urdhva'], 1)},
 }
 
 ACTIVITIES = tuple(ACTIVITY_RULES.keys())
@@ -792,7 +799,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    janma_lagnas: list[str | None] | None = None,
                    prefer_lagna_class: str | None = None,
                    prefer_bhadra_puchha: int = 0,
-                   simha_stha_shukra_penalty: int = 0):
+                   simha_stha_shukra_penalty: int = 0,
+                   prefer_nakshatra_mukha: tuple | None = None):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -859,6 +867,14 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
             and _overlaps(s, e, day.bhadra_puchha.start, day.bhadra_puchha.end):
         score += prefer_bhadra_puchha
         activity_match.append(f'Bhadra Puchha overlap (+{prefer_bhadra_puchha})')
+    if prefer_nakshatra_mukha is not None:
+        preferred_classes, mukha_bonus = prefer_nakshatra_mukha
+        day_mukha = getattr(day, 'nakshatra_mukha', None)
+        if day_mukha is not None and day_mukha in preferred_classes:
+            score += mukha_bonus
+            activity_match.append(
+                f'Nakshatra Mukha {day_mukha} (+{mukha_bonus})'
+            )
     if prefer_chog and block.name == prefer_chog[0]:
         score += prefer_chog[1]
         activity_match.append(f'{block.name} favoured for {label} (+{prefer_chog[1]})')
@@ -1053,6 +1069,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     prefer_varas = set(rules.get('prefer_vara', ()))
     prefer_lagna_class = rules.get('prefer_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
+    prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')   # ([classes], bonus) or None
     label = rules['label']
 
     # Simha-Stha Shukra: soft penalty (-2) for wedding when Venus is in Simha.
@@ -1115,7 +1132,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 janma_lagnas=janma_lagnas,
                 prefer_lagna_class=prefer_lagna_class,
                 prefer_bhadra_puchha=prefer_bhadra_puchha,
-                simha_stha_shukra_penalty=_shukra_penalty
+                simha_stha_shukra_penalty=_shukra_penalty,
+                prefer_nakshatra_mukha=prefer_nakshatra_mukha,
             )
             if slot_dict is not None:
                 slots.append(slot_dict)

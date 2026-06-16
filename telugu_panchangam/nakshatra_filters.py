@@ -22,3 +22,37 @@ PANCHAKA_NAKSHATRAS = frozenset({
 def is_panchaka_nakshatra(name: str) -> bool:
     """Return True if *name* is one of the 5 Panchaka Nakshatras."""
     return name in PANCHAKA_NAKSHATRAS
+
+
+# ---- Nakshatra mouth-direction classification (Mukha) ----
+# Used as an activity-conditioned filter in muhurta:
+#   Adho   → foundations, digging, mining
+#   Urdhva → coronation, roofing, ceremony tops
+#   Tiryan → travel, journey, horizontal works
+
+NAKSHATRA_MUKHA: dict[str, str] = {
+    'Mrigashira': 'Urdhva', 'Ardra': 'Urdhva', 'Punarvasu': 'Urdhva',
+    'Pushya': 'Urdhva', 'Shravana': 'Urdhva', 'Dhanishtha': 'Urdhva',
+    'Shatabhisha': 'Urdhva', 'Purva Phalguni': 'Urdhva',
+    'Purva Ashadha': 'Urdhva', 'Purva Bhadrapada': 'Urdhva',
+
+    'Krittika': 'Adho', 'Bharani': 'Adho', 'Magha': 'Adho',
+    'Vishakha': 'Adho', 'Mula': 'Adho', 'Ashlesha': 'Adho',
+    'Jyeshtha': 'Adho',
+
+    'Ashvini': 'Tiryan', 'Hasta': 'Tiryan', 'Swati': 'Tiryan',
+    'Anuradha': 'Tiryan', 'Chitra': 'Tiryan', 'Revati': 'Tiryan',
+    'Uttara Phalguni': 'Tiryan', 'Uttara Ashadha': 'Tiryan',
+    'Uttara Bhadrapada': 'Tiryan', 'Rohini': 'Tiryan',
+}
+
+
+def nakshatra_mukha(name: str | None) -> str | None:
+    """Return the Mukha (mouth direction) for a nakshatra name.
+
+    Returns 'Adho', 'Urdhva', or 'Tiryan', or None when name is None
+    or not in the table (e.g. an unrecognised nakshatra spelling).
+    """
+    if name is None:
+        return None
+    return NAKSHATRA_MUKHA.get(name)

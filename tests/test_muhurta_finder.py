@@ -175,19 +175,22 @@ def test_invalid_activity_raises():
 
 # --- Activity taxonomy (Batch D) ---
 
-def test_all_28_activities_callable():
+def test_all_30_activities_callable():
     from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
-    assert len(ACTIVITIES) == 28
+    assert len(ACTIVITIES) == 30
     # backward-compat: every old key must still be accepted
     for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
         assert old in ACTIVITY_RULES
-    # spot check new keys
+    # spot check existing keys
     for new in ('wedding', 'gruhapravesha', 'naming', 'annaprasana',
                 'karnavedha', 'mundana', 'upanayana', 'vidyarambha',
                 'engagement', 'vehicle', 'property', 'gold', 'bhumi_puja',
                 'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery',
                 'litigation'):
         assert new in ACTIVITY_RULES
+    # Task 15: Nakshatra Mukha activities
+    for mukha_act in ('well_digging', 'coronation'):
+        assert mukha_act in ACTIVITY_RULES
     # Panchaka-restricted activities
     for panchaka in ('cremation', 'construction_roof', 'wood_cutting'):
         assert panchaka in ACTIVITY_RULES

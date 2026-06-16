@@ -163,3 +163,5 @@ class PanchangamDay:
     anandadi_yoga: 'str | None' = None
     # Disha Shoola — weekday direction-of-blocked-travel.
     disha_shoola_direction: 'str | None' = None
+    # Nakshatra Mukha — mouth direction (Adho/Urdhva/Tiryan).
+    nakshatra_mukha: 'str | None' = None
