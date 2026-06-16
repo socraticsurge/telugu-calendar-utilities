@@ -74,6 +74,18 @@ Ranked auspicious time slots: good choghadiya blocks (Amrit/Shubh/Labh/Char) wit
 
 Lists special days in a given month: named festivals, Ekadashi (fasting), Amavasya (new moon), Pournami (full moon), Pradosham, Sankranti, Ganda Moola, and Solar/Lunar Eclipses. Each entry includes a `special_yogas` list for that day.
 
+### `get_panchangam_range(start_date, end_date, city, system="drik", latitude=None, longitude=None, timezone=None)`
+
+Compact Panchangam summary for each day in a date range (max 31 days). Each day carries Tithi, Nakshatra, Yoga, sunrise/sunset, every auspicious and inauspicious window, eclipse (if any), special yogas, and special-day flags. Useful for planning muhurtas across a week or comparing multiple days side-by-side.
+
+### `get_daily_horas(date, city, system="drik", latitude=None, longitude=None, timezone=None)`
+
+24 planetary hours (horas) for a date and city: 12 daytime horas starting at sunrise and 12 nighttime horas starting at sunset, each ruled by one of Sun/Moon/Mars/Mercury/Jupiter/Venus/Saturn. The first hora of the day is ruled by that weekday's lord (Sunday → Sun, Monday → Moon, …). Useful for fine-grained timing within a day.
+
+### `get_lagna_transitions(date, city, system="drik", latitude=None, longitude=None, timezone=None)`
+
+Ascendant (Lagna) sign boundaries for the day — the rising sign on the eastern horizon, tracked from sunrise to next sunrise. Returns each lagna with its start and end time and the rashi name. Combined with `get_daily_horas`, gives the two classical day-level subdivisions used in Muhurta selection.
+
 ## Cities and locations
 
 `city` accepts any of the 22 pre-configured cities (instant, no network) or any free-text city name (geocoded via OpenStreetMap). You can also bypass city lookup entirely by passing `latitude`, `longitude`, and `timezone` directly.
