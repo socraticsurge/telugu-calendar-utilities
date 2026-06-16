@@ -52,3 +52,21 @@ def test_vishaghati_in_mcp_output():
 def test_vishaghati_offsets_table_has_27():
     from telugu_panchangam.karana_windows import VISHAGHATI_OFFSETS_GHATI
     assert len(VISHAGHATI_OFFSETS_GHATI) == 27
+
+
+def test_vishaghati_in_all_mcp_tool_responses():
+    import json
+    from telugu_panchangam.mcp.tools import (
+        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+    )
+    # tool_get_panchangam
+    out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
+    assert 'vishaghati' in out['inauspicious']
+
+    # tool_get_muhurta
+    out2 = json.loads(tool_get_muhurta('2026-06-11', city='Hyderabad'))
+    assert 'vishaghati' in out2['inauspicious']
+
+    # tool_get_panchangam_range — per-day block inside the 'days' list
+    out3 = json.loads(tool_get_panchangam_range('2026-06-11', '2026-06-12', city='Hyderabad'))
+    assert 'vishaghati' in out3['days'][0]['inauspicious']

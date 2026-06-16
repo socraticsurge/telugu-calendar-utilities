@@ -50,3 +50,21 @@ def test_pada_in_mcp_output():
     out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
     pada = out['pancha_anga']['nakshatra_pada']
     assert pada in (1, 2, 3, 4), f"nakshatra_pada missing or invalid: {pada}"
+
+
+def test_nakshatra_pada_in_all_mcp_tool_responses():
+    import json
+    from telugu_panchangam.mcp.tools import (
+        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+    )
+    # tool_get_panchangam — under pancha_anga
+    out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
+    assert out['pancha_anga']['nakshatra_pada'] in (1, 2, 3, 4)
+
+    # tool_get_muhurta — top-level (this tool is intentionally minimal, no pancha_anga block)
+    out2 = json.loads(tool_get_muhurta('2026-06-11', city='Hyderabad'))
+    assert out2['nakshatra_pada'] in (1, 2, 3, 4)
+
+    # tool_get_panchangam_range — nakshatra_pada at top level of each per-day dict
+    out3 = json.loads(tool_get_panchangam_range('2026-06-11', '2026-06-12', city='Hyderabad'))
+    assert out3['days'][0]['nakshatra_pada'] in (1, 2, 3, 4)

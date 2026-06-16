@@ -70,3 +70,26 @@ def test_ayanamsa_in_mcp_response_metadata():
     out2 = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad', ayanamsa='raman'))
     ay2 = out2.get('ayanamsa') or out2.get('metadata', {}).get('ayanamsa')
     assert ay2 == 'raman'
+
+
+def test_ayanamsa_in_all_ayanamsa_aware_mcp_tools():
+    import json
+    from telugu_panchangam.mcp.tools import (
+        tool_get_panchangam, tool_get_panchangam_range,
+        tool_get_graha_positions, tool_find_muhurta,
+    )
+    # tool_get_panchangam — top-level ayanamsa
+    out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
+    assert out.get('ayanamsa') == 'lahiri'
+
+    # tool_get_panchangam_range — top-level ayanamsa
+    out2 = json.loads(tool_get_panchangam_range('2026-06-11', '2026-06-12', city='Hyderabad'))
+    assert out2.get('ayanamsa') == 'lahiri'
+
+    # tool_get_graha_positions — top-level ayanamsa
+    out3 = json.loads(tool_get_graha_positions('2026-06-11', city='Hyderabad'))
+    assert out3.get('ayanamsa') == 'lahiri'
+
+    # tool_find_muhurta — top-level ayanamsa
+    out4 = json.loads(tool_find_muhurta('2026-06-11', days=1, city='Hyderabad'))
+    assert out4.get('ayanamsa') == 'lahiri'

@@ -51,3 +51,20 @@ def test_ghati_clock_in_mcp_output():
     gc = out['ghati_clock']
     assert 'sunrise' in gc and 'next_sunrise' in gc and 'seconds_per_ghati' in gc
     assert 1400 < gc['seconds_per_ghati'] < 1500   # ~24-min sanity bound
+
+
+def test_ghati_clock_in_all_mcp_tool_responses():
+    from telugu_panchangam.mcp.tools import (
+        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+    )
+    # tool_get_panchangam — top-level ghati_clock
+    out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
+    assert 'ghati_clock' in out and out['ghati_clock'] is not None
+
+    # tool_get_muhurta — top-level ghati_clock
+    out2 = json.loads(tool_get_muhurta('2026-06-11', city='Hyderabad'))
+    assert 'ghati_clock' in out2 and out2['ghati_clock'] is not None
+
+    # tool_get_panchangam_range — ghati_clock inside each per-day dict
+    out3 = json.loads(tool_get_panchangam_range('2026-06-11', '2026-06-12', city='Hyderabad'))
+    assert 'ghati_clock' in out3['days'][0] and out3['days'][0]['ghati_clock'] is not None

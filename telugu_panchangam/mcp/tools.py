@@ -305,7 +305,16 @@ def tool_get_muhurta(
                 'yamagandam':   _window_to_dict(day.yamagandam, tz),
                 'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
                 'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+                'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
             },
+            'nakshatra_pada': day.nakshatra_pada,
+            'ghati_clock': (
+                {
+                    'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
+                    'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
+                    'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
+                } if day.ghati_clock else None
+            ),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -424,7 +433,16 @@ def tool_get_panchangam_range(
                     'yamagandam':   _window_to_dict(day.yamagandam, tz),
                     'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
                     'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+                    'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
                 },
+                'nakshatra_pada': day.nakshatra_pada,
+                'ghati_clock': (
+                    {
+                        'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
+                        'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
+                        'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
+                    } if day.ghati_clock else None
+                ),
                 'eclipse': _eclipse_to_dict(day.eclipse, tz),
                 'special_yogas': day.special_yogas,
                 'special_days': specials,
