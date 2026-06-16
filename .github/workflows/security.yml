@@ -1,0 +1,73 @@
+name: Security
+
+# Two scanners — both run on PR + push-to-master + weekly cron + on demand.
+#
+# CodeQL: catches Python correctness/security antipatterns at the source level.
+# pip-audit: catches known CVEs in the dependency closure that CI actually
+# installs (i.e. requirements.txt — the same closure that ships in the
+# generate.yml / publish.yml workflows).
+#
+# Both are blocking on PRs. SECURITY.md promises a 72h ack — discovering
+# CVEs at PR time is how that ack gets enforced.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: '0 9 * * 1'   # Mondays 09:00 UTC — weekly fresh scan
+  workflow_dispatch:
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write    # for CodeQL to upload SARIF
+  actions: read
+
+jobs:
+  codeql:
+    name: CodeQL (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          # security-and-quality is slightly wider than the default
+          # security-extended; catches both vulns and quality issues
+          # (dead code, exception-swallow, etc.) — fits a maintenance
+          # project.
+          queries: security-and-quality
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:python'
+
+  pip-audit:
+    name: pip-audit (requirements.txt)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install runtime deps
+        run: pip install -r requirements.txt
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run pip-audit (strict — fail on any known CVE)
+        # --strict here is pip-audit's "fail if any dependency-collection
+        # step fails" — combined with the default behaviour of exiting
+        # non-zero on findings, this is the tightest reasonable setting.
+        run: pip-audit -r requirements.txt --strict
