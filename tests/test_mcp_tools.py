@@ -221,3 +221,134 @@ def test_special_days_use_named_sankramanam():
     result = json.loads(tool_get_panchangam('2026-06-15', 'Hyderabad', 'drik'))
     assert 'Mithuna Sankramanam' in result['special_days']
     assert 'Sankranti' not in result['special_days']
+
+
+# --- tool_get_daily_horas (Phase 7 PR 2 — was zero-direct-coverage) ----------
+
+PLANET_HORA_NAMES = {
+    'Sun Hora', 'Moon Hora', 'Mars Hora', 'Mercury Hora',
+    'Jupiter Hora', 'Venus Hora', 'Saturn Hora',
+}
+# Hora rulers indexed by weekday-Sun=0 (planetary-hour rule): the first
+# hora of the day is the day's lord — Sun on Sunday, Moon on Monday,
+# Mars on Tuesday, Mercury on Wednesday, Jupiter on Thursday, Venus on
+# Friday, Saturn on Saturday.
+WEEKDAY_FIRST_HORA = [
+    'Sun Hora', 'Moon Hora', 'Mars Hora', 'Mercury Hora',
+    'Jupiter Hora', 'Venus Hora', 'Saturn Hora',
+]
+
+
+def test_get_daily_horas_top_level_shape():
+    """Golden-day shape: 2027-09-04 Hyderabad — same Saturday as the
+    DP-verified pilot cell in tests/fixtures/forward_year_festivals.json.
+    """
+    from telugu_panchangam.mcp.tools import tool_get_daily_horas
+    result = json.loads(tool_get_daily_horas('2027-09-04', 'Hyderabad'))
+    assert 'error' not in result, f'unexpected error: {result.get("error")}'
+    for key in ('date', 'city', 'system', 'horas'):
+        assert key in result, f'missing key {key!r} in {result.keys()}'
+    assert result['date'] == '2027-09-04'
+    assert result['city'] == 'Hyderabad'
+    assert result['system'] == 'drik'
+
+
+def test_get_daily_horas_entries_have_valid_planet_names():
+    from telugu_panchangam.mcp.tools import tool_get_daily_horas
+    result = json.loads(tool_get_daily_horas('2027-09-04', 'Hyderabad'))
+    horas = result['horas']
+    assert horas, 'horas list is empty'
+    for h in horas:
+        assert h['name'] in PLANET_HORA_NAMES, f"unknown hora ruler {h['name']!r}"
+        assert 'start' in h and 'end' in h
+        assert h['start'] != h['end'], f'zero-length hora: {h}'
+
+
+def test_get_daily_horas_first_hora_is_weekday_lord_each_weekday():
+    """Planetary-hour rule: the first hora of every day is the weekday's
+    own ruler (Sun on Sunday, Moon on Monday, … Saturn on Saturday).
+    Sweeps a full week (2027-08-29 Sunday → 2027-09-04 Saturday).
+    """
+    from datetime import date, timedelta
+    from telugu_panchangam.mcp.tools import tool_get_daily_horas
+    start = date(2027, 8, 29)  # Sunday
+    for offset in range(7):
+        d = start + timedelta(days=offset)
+        result = json.loads(tool_get_daily_horas(d.isoformat(), 'Hyderabad'))
+        # Python weekday(): Mon=0..Sun=6; remap to Sun=0..Sat=6 (planetary-hour convention)
+        wd_sun_first = (d.weekday() + 1) % 7
+        expected = WEEKDAY_FIRST_HORA[wd_sun_first]
+        actual = result['horas'][0]['name']
+        assert actual == expected, (
+            f'{d} ({d.strftime("%A")}): first hora {actual!r} != expected {expected!r}'
+        )
+
+
+def test_get_daily_horas_invalid_system_returns_error():
+    from telugu_panchangam.mcp.tools import tool_get_daily_horas
+    result = json.loads(tool_get_daily_horas('2026-06-15', 'Hyderabad', system='nonsense'))
+    assert 'error' in result
+
+
+# --- tool_get_lagna_transitions (Phase 7 PR 2 — was zero-direct-coverage) -----
+
+RASHI_LAGNA_ORDER = [
+    'Mesha Lagna', 'Vrishabha Lagna', 'Mithuna Lagna', 'Karka Lagna',
+    'Simha Lagna', 'Kanya Lagna', 'Tula Lagna', 'Vrischika Lagna',
+    'Dhanu Lagna', 'Makara Lagna', 'Kumbha Lagna', 'Meena Lagna',
+]
+
+
+def test_get_lagna_transitions_top_level_shape():
+    """Golden-day shape: 2027-09-04 Hyderabad."""
+    from telugu_panchangam.mcp.tools import tool_get_lagna_transitions
+    result = json.loads(tool_get_lagna_transitions('2027-09-04', 'Hyderabad'))
+    assert 'error' not in result, f'unexpected error: {result.get("error")}'
+    for key in ('date', 'city', 'system', 'lagnas'):
+        assert key in result, f'missing key {key!r} in {result.keys()}'
+    assert result['date'] == '2027-09-04'
+
+
+def test_get_lagna_transitions_entries_have_valid_rashi_names():
+    from telugu_panchangam.mcp.tools import tool_get_lagna_transitions
+    result = json.loads(tool_get_lagna_transitions('2027-09-04', 'Hyderabad'))
+    lagnas = result['lagnas']
+    assert lagnas, 'lagnas list is empty'
+    for L in lagnas:
+        assert L['name'] in RASHI_LAGNA_ORDER, f"unknown lagna {L['name']!r}"
+        assert 'start' in L and 'end' in L
+        assert L['start'] != L['end'], f'zero-length lagna: {L}'
+
+
+def test_get_lagna_transitions_count_in_expected_range():
+    """A full sunrise-to-sunrise sky cycle yields 12–16 lagna windows.
+    The Earth rotates ~13 rashis through 24 h; declination + latitude
+    add ±2. Hyderabad's ~17.4°N typically gives 13–14.
+    """
+    from telugu_panchangam.mcp.tools import tool_get_lagna_transitions
+    result = json.loads(tool_get_lagna_transitions('2027-09-04', 'Hyderabad'))
+    n = len(result['lagnas'])
+    assert 12 <= n <= 16, f'expected 12-16 lagna windows; got {n}'
+
+
+def test_get_lagna_transitions_cyclic_order():
+    """Consecutive lagnas advance one rashi at a time around the zodiac:
+    Mesha → Vrishabha → … → Meena → Mesha. Any non-adjacent step is a
+    regression in the bisection / transition logic.
+    """
+    from telugu_panchangam.mcp.tools import tool_get_lagna_transitions
+    result = json.loads(tool_get_lagna_transitions('2027-09-04', 'Hyderabad'))
+    lagnas = result['lagnas']
+    idx = [RASHI_LAGNA_ORDER.index(L['name']) for L in lagnas]
+    for i in range(len(idx) - 1):
+        nxt_expected = (idx[i] + 1) % 12
+        assert idx[i + 1] == nxt_expected, (
+            f'lagna {i} ({lagnas[i]["name"]}) → {i+1} ({lagnas[i+1]["name"]}) '
+            f'broke cyclic order (expected {RASHI_LAGNA_ORDER[nxt_expected]})'
+        )
+
+
+def test_get_lagna_transitions_invalid_date_returns_error():
+    from telugu_panchangam.mcp.tools import tool_get_lagna_transitions
+    result = json.loads(tool_get_lagna_transitions('not-a-date', 'Hyderabad'))
+    assert 'error' in result
