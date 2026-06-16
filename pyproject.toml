@@ -19,6 +19,21 @@ dependencies = [
     "icalendar>=5.0.0",
 ]
 
+[project.optional-dependencies]
+# pyproject.toml is the source of truth for what the package and its
+# tests need. requirements.txt is a thin shim that does
+# `pip install -e .[test]` so existing tooling keeps working.
+test = [
+    "pytest>=8.0.0",
+]
+# Browser-smoke deps. Heavy install (~100 MB chromium); kept separate
+# so plain `pip install -e .[test]` stays light for local dev — the
+# browser smoke tests use pytest.importorskip and auto-skip when
+# Playwright isn't present.
+browser-test = [
+    "playwright>=1.40",
+]
+
 [project.urls]
 Homepage = "https://panchangam.astrochaganti.com"
 Repository = "https://github.com/socraticsurge/telugu-calendar-utilities"
