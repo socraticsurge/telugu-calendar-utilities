@@ -9,10 +9,14 @@ def _hyderabad():
 
 def test_no_window_on_non_sankranti_day():
     eng = DrikEngine()
-    # 2026-06-11 is not a Sankranti day in Hyderabad
     day = eng.calculate(date(2026, 6, 11), _hyderabad())
-    if day.sankramanam is None:
-        assert day.sankramana_avoidance is None
+    # 2026-06-11 is intentionally chosen as a non-Sankranti day.
+    # Assert the precondition unconditionally, then the consequent.
+    assert day.sankramanam is None, (
+        f"2026-06-11 was expected to be a non-Sankranti day in Hyderabad; "
+        f"got {day.sankramanam!r}. Pick a different date if Sankranti drift occurs."
+    )
+    assert day.sankramana_avoidance is None
 
 
 def test_window_present_around_sankranti():
@@ -97,7 +101,11 @@ def test_sankramana_window_none_for_non_sankranti_day_all_engines():
     d = date(2026, 6, 11)
     for eng in [DrikEngine(), SuryaSiddhantaEngine(), VakyaEngine()]:
         day = eng.calculate(d, city)
-        if day.sankramanam is None:
-            assert day.sankramana_avoidance is None, (
-                f"{eng.__class__.__name__}: expected None avoidance on non-Sankranti day"
-            )
+        # Assert the precondition unconditionally before checking the consequent.
+        assert day.sankramanam is None, (
+            f"{eng.__class__.__name__}: 2026-06-11 was expected to be a non-Sankranti day "
+            f"in Hyderabad; got {day.sankramanam!r}. Pick a different date if Sankranti drift occurs."
+        )
+        assert day.sankramana_avoidance is None, (
+            f"{eng.__class__.__name__}: expected None avoidance on non-Sankranti day"
+        )
