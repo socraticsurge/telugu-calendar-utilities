@@ -135,3 +135,4 @@ class PanchangamDay:
     sankramanam: str | None = None
     ghati_clock: 'GhatiClock | None' = None
     nakshatra_pada: int | None = None
+    vishaghati: list['GhatiWindow'] = field(default_factory=list)

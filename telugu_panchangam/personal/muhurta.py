@@ -661,7 +661,8 @@ def _day_snapshot_facts(day):
 def _get_bad_windows(day, avoid_karana_names):
     bad = [(w.start, w.end) for w in
            [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
-           + list(day.varjyam) + list(day.durmuhurtham)]
+           + list(day.varjyam) + list(day.durmuhurtham)
+           + list(day.vishaghati)]  # Vishaghati windows treated as inauspicious cuts
     if avoid_karana_names:
         bad += [(k.start, k.end) for k in day.karana if k.name in avoid_karana_names]
     return bad

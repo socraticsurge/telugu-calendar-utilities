@@ -251,6 +251,7 @@ def tool_get_panchangam(
                 'yamagandam':   _window_to_dict(day.yamagandam, tz),
                 'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
                 'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+                'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
             },
             'choghadiya': [
                 {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
