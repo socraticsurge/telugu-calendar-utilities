@@ -134,3 +134,4 @@ class PanchangamDay:
     # e.g. 'Mithuna' — None on ordinary days.
     sankramanam: str | None = None
     ghati_clock: 'GhatiClock | None' = None
+    nakshatra_pada: int | None = None

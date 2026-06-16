@@ -116,6 +116,8 @@ class VakyaEngine(SuryaSiddhantaEngine):
             **special,
         )
         day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
+        nak_arc = 360.0 / 27.0
+        day.nakshatra_pada = int((moon_lon % nak_arc) / (nak_arc / 4.0)) + 1
         return day
 
     # Override Moon-dependent helpers to use vakya functions

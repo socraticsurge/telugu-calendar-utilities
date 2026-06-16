@@ -324,6 +324,8 @@ class DrikGanitaEngine(PanchangamEngine):
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
         )
         day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
+        nak_arc = 360.0 / 27.0
+        day.nakshatra_pada = int((moon_lon_sr % nak_arc) / (nak_arc / 4.0)) + 1
         return day
 
     def _sun_sign_idx_at(self, jd: float) -> int:

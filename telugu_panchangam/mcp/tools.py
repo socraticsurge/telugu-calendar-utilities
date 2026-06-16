@@ -212,10 +212,11 @@ def tool_get_panchangam(
                 'lunar_sign': day.lunar_sign,
             },
             'pancha_anga': {
-                'tithi':     _span_to_dict(day.tithi, tz),
-                'nakshatra': _span_to_dict(day.nakshatra, tz),
-                'yoga':      _span_to_dict(day.yoga, tz),
-                'karana':    [_span_to_dict(k, tz) for k in day.karana],
+                'tithi':          _span_to_dict(day.tithi, tz),
+                'nakshatra':      _span_to_dict(day.nakshatra, tz),
+                'nakshatra_pada': day.nakshatra_pada,
+                'yoga':           _span_to_dict(day.yoga, tz),
+                'karana':         [_span_to_dict(k, tz) for k in day.karana],
             },
             'sky': {
                 'sunrise':  _fmt_time(day.sunrise, tz),
