@@ -42,6 +42,13 @@ CNAME_PINNED_WORKFLOWS = [
     '.github/workflows/lagna.yml',
 ]
 
+# Search-engine static assets at docs/ root. Unlike .js sidecars,
+# these are never referenced from <script src=...> in index.html —
+# search engines pick them up by convention (robots.txt at /, then
+# sitemap.xml as declared in robots.txt). Dropping either from the
+# deploy steps silently de-indexes the site over time.
+SEO_STATIC_ASSETS = ['sitemap.xml', 'robots.txt']
+
 # Matches <script src="…"> / <script src='…'> with a relative path
 # (no http://, no leading slash — those are external resources, not
 # files we need to stage).
@@ -104,6 +111,43 @@ def test_sidecar_listed_in_build_landing_page_script(sidecar: str):
         f'scripts/build_landing_page.py does not copy '
         f'docs/{sidecar}. The next monthly generate.yml run will '
         f'remove it from gh-pages.'
+    )
+
+
+@pytest.mark.parametrize('asset', SEO_STATIC_ASSETS)
+def test_seo_asset_exists_in_repo(asset: str):
+    """docs/sitemap.xml and docs/robots.txt must exist on disk.
+    They're the search-engine surface; dropping either de-indexes
+    the site over time."""
+    path = REPO_ROOT / 'docs' / asset
+    assert path.is_file(), (
+        f'docs/{asset} is missing. The SEO surface depends on it; '
+        f'restore it before any other deploy fires.'
+    )
+
+
+@pytest.mark.parametrize('asset', SEO_STATIC_ASSETS)
+def test_seo_asset_staged_in_deploy_landing_workflow(asset: str):
+    """deploy-landing.yml must include the SEO asset in both the
+    push `paths:` filter and the staging cp."""
+    yml = DEPLOY_WORKFLOW.read_text(encoding='utf-8')
+    assert f"docs/{asset}" in yml, (
+        f'.github/workflows/deploy-landing.yml does not mention '
+        f'docs/{asset}. Saves to that file will not redeploy the '
+        f'SEO surface. Add it to the paths filter AND the cp step.'
+    )
+
+
+@pytest.mark.parametrize('asset', SEO_STATIC_ASSETS)
+def test_seo_asset_staged_in_build_landing_page_script(asset: str):
+    """build_landing_page.py (invoked monthly by generate.yml) must
+    copy the SEO asset alongside the other landing assets — else
+    the monthly cron wipes it from gh-pages."""
+    src = BUILD_SCRIPT.read_text(encoding='utf-8')
+    assert f"docs/{asset}" in src, (
+        f'scripts/build_landing_page.py does not copy '
+        f'docs/{asset}. The next monthly generate.yml run will '
+        f'wipe it from gh-pages.'
     )
 
 
