@@ -121,6 +121,7 @@ ACTIVITY_RULES: dict[str, dict] = {
     'ceremony':      {'label': 'Ceremony / puja (general)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_vara': ['Somavaram', 'Guruvaram']},
     'beginning':     {'label': 'New beginning (general)',
                       'prefer_choghadiya': ('Amrit', 1),
@@ -130,18 +131,21 @@ ACTIVITY_RULES: dict[str, dict] = {
     'wedding':       {'label': 'Wedding (Vivaha)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_tithi_class': 'Purna',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'engagement':    {'label': 'Engagement (Nischayam)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_tithi_class': 'Purna',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'naming':        {'label': 'Naming (Namakaranam)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
@@ -149,6 +153,7 @@ ACTIVITY_RULES: dict[str, dict] = {
     'annaprasana':   {'label': 'Annaprasana (First feeding)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Somavaram', 'Guruvaram'],
@@ -156,24 +161,28 @@ ACTIVITY_RULES: dict[str, dict] = {
     'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Budhavaram', 'Shukravaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'mundana':       {'label': 'Mundana / Chaula (First head-shave)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'upanayana':     {'label': 'Upanayana (Sacred thread)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'vidyarambha':   {'label': 'Education start (Vidyarambha)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram'],
@@ -181,6 +190,7 @@ ACTIVITY_RULES: dict[str, dict] = {
     'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
@@ -636,6 +646,12 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
     if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
         return (f'Panchaka Nakshatra ({day.nakshatra.name}) — '
                 f'{rules["label"]} traditionally avoided')
+
+    # Khar-Maasa: samskara activities are deferred when Sun is in Dhanu or Meena.
+    if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
+        return (f'Khar-Maasa ({day.khar_maasa_name} Maasa) — '
+                f'{rules["label"]} traditionally avoided')
+
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     if skip_yogas:
         for y in day.special_yogas:
@@ -919,6 +935,11 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     # Panchaka Nakshatra: cremation/roof-laying/wood-cutting are deferred.
     if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
         return []
+
+    # Khar-Maasa: samskara activities are deferred when Sun is in Dhanu or Meena.
+    if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
+        return []
+
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     prefer_chog = rules.get('prefer_choghadiya')   # ('Block', bonus) or None
     avoid_karana_names = set(rules.get('avoid_karana', ()))

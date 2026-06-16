@@ -140,3 +140,5 @@ class PanchangamDay:
     bhadra_puchha: 'GhatiWindow | None' = None
     sankramana_avoidance: 'Window | None' = None
     in_panchaka_nakshatra: bool = False
+    is_khar_maasa: bool = False
+    khar_maasa_name: str | None = None

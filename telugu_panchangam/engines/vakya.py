@@ -128,6 +128,9 @@ class VakyaEngine(SuryaSiddhantaEngine):
         day.sankramana_avoidance = compute_sankramana_window(sankranti_dt, day.ghati_clock)
         from telugu_panchangam.nakshatra_filters import is_panchaka_nakshatra
         day.in_panchaka_nakshatra = is_panchaka_nakshatra(day.nakshatra.name)
+        from telugu_panchangam.maasa_filters import khar_maasa_name
+        day.khar_maasa_name = khar_maasa_name(day.solar_sign)
+        day.is_khar_maasa = day.khar_maasa_name is not None
         return day
 
     # Override Moon-dependent helpers to use vakya functions
