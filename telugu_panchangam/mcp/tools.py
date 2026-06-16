@@ -276,6 +276,8 @@ def tool_get_panchangam(
             'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
             'is_khar_maasa': day.is_khar_maasa,
             'khar_maasa_name': day.khar_maasa_name,
+            'simha_stha_guru': day.simha_stha_guru,
+            'simha_stha_shukra': day.simha_stha_shukra,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -329,6 +331,8 @@ def tool_get_muhurta(
             'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
             'is_khar_maasa': day.is_khar_maasa,
             'khar_maasa_name': day.khar_maasa_name,
+            'simha_stha_guru': day.simha_stha_guru,
+            'simha_stha_shukra': day.simha_stha_shukra,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -467,6 +471,8 @@ def tool_get_panchangam_range(
                 'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
                 'is_khar_maasa': day.is_khar_maasa,
                 'khar_maasa_name': day.khar_maasa_name,
+                'simha_stha_guru': day.simha_stha_guru,
+                'simha_stha_shukra': day.simha_stha_shukra,
             })
 
         return json.dumps({

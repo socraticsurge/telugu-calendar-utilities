@@ -132,6 +132,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
+                      'skip_on_simha_stha_guru': True,      # hard-skip: Guru in Simha
+                      'penalty_on_simha_stha_shukra': -2,   # soft penalty: Shukra in Simha
                       'prefer_tithi_class': 'Purna',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
@@ -652,6 +654,11 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
         return (f'Khar-Maasa ({day.khar_maasa_name} Maasa) — '
                 f'{rules["label"]} traditionally avoided')
 
+    # Simha-Stha Guru: wedding is hard-skipped while Jupiter is in Simha.
+    if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
+        return (f'Simha-Stha Guru — '
+                f'{rules["label"]} traditionally avoided while Jupiter is in Simha')
+
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     if skip_yogas:
         for y in day.special_yogas:
@@ -721,7 +728,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    lagnas: list[Window] | None = None,
                    janma_lagnas: list[str | None] | None = None,
                    prefer_lagna_class: str | None = None,
-                   prefer_bhadra_puchha: int = 0):
+                   prefer_bhadra_puchha: int = 0,
+                   simha_stha_shukra_penalty: int = 0):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -751,7 +759,7 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
         return None
 
     score = base + vara_bonus + tara_bonus + chandra_bonus \
-            + tithi_bonus + yoga_bonus + nitya_bonus
+            + tithi_bonus + yoga_bonus + nitya_bonus + simha_stha_shukra_penalty
 
     # Reason groups — assemble each category as we go.
     slot_quality = [
@@ -759,6 +767,10 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
         'clear of all inauspicious windows',
     ]
     day_quality = list(yoga_reasons) + list(nitya_reasons)
+    if simha_stha_shukra_penalty:
+        day_quality.append(
+            f'Simha-Stha Shukra (Venus in Simha) ({simha_stha_shukra_penalty})'
+        )
     if tithi_day_reason:
         day_quality.append(tithi_day_reason)
     group_fit = list(tara_reasons) + list(chandra_reasons)
@@ -940,6 +952,10 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
         return []
 
+    # Simha-Stha Guru: wedding is hard-skipped while Jupiter is in Simha.
+    if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
+        return []
+
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     prefer_chog = rules.get('prefer_choghadiya')   # ('Block', bonus) or None
     avoid_karana_names = set(rules.get('avoid_karana', ()))
@@ -948,6 +964,11 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     prefer_lagna_class = rules.get('prefer_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     label = rules['label']
+
+    # Simha-Stha Shukra: soft penalty (-2) for wedding when Venus is in Simha.
+    # Applied at slot-scoring time (day-level, constant across all slots).
+    _shukra_penalty = rules.get('penalty_on_simha_stha_shukra', 0) \
+        if day.simha_stha_shukra else 0
 
     # Vara is sunrise-anchored (one constant per panchangam day).
     vara_bonus = 1 if day.vaaram in prefer_varas else 0
@@ -1003,7 +1024,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
                 janma_lagnas=janma_lagnas,
                 prefer_lagna_class=prefer_lagna_class,
-                prefer_bhadra_puchha=prefer_bhadra_puchha
+                prefer_bhadra_puchha=prefer_bhadra_puchha,
+                simha_stha_shukra_penalty=_shukra_penalty
             )
             if slot_dict is not None:
                 slots.append(slot_dict)

@@ -378,6 +378,24 @@ class DrikGanitaEngine(PanchangamEngine):
         from telugu_panchangam.maasa_filters import khar_maasa_name
         day.khar_maasa_name = khar_maasa_name(day.solar_sign)
         day.is_khar_maasa = day.khar_maasa_name is not None
+        # Simha-Stha Guru / Shukra — Jupiter/Venus rasis from sidereal
+        # longitudes at sunrise. Drik uses Swiss Ephemeris outer planets;
+        # SS and Vakya don't model them so those engines leave defaults (False).
+        import swisseph as swe
+        from telugu_panchangam.gochara.simha_stha import is_simha_stha
+        if self.ayanamsa == 'lahiri':
+            swe.set_sid_mode(swe.SIDM_LAHIRI)
+            _flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+            guru_lon = swe.calc_ut(jd_sunrise, swe.JUPITER, _flags)[0][0] % 360.0
+            shukra_lon = swe.calc_ut(jd_sunrise, swe.VENUS, _flags)[0][0] % 360.0
+        else:
+            from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
+            guru_lon = sidereal_longitude_with_ayanamsa(jd_sunrise, swe.JUPITER, self.ayanamsa)
+            shukra_lon = sidereal_longitude_with_ayanamsa(jd_sunrise, swe.VENUS, self.ayanamsa)
+        guru_rasi = RASHI_NAMES[int(guru_lon / 30) % 12]
+        shukra_rasi = RASHI_NAMES[int(shukra_lon / 30) % 12]
+        day.simha_stha_guru = is_simha_stha(guru_rasi)
+        day.simha_stha_shukra = is_simha_stha(shukra_rasi)
         return day
 
     def _sun_sign_idx_at(self, jd: float) -> int:

@@ -169,6 +169,8 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         from telugu_panchangam.maasa_filters import khar_maasa_name
         day.khar_maasa_name = khar_maasa_name(day.solar_sign)
         day.is_khar_maasa = day.khar_maasa_name is not None
+        # simha_stha_guru / simha_stha_shukra: SS does not model outer planets
+        # (Jupiter, Venus) — both flags remain False (PanchangamDay defaults).
         return day
 
     def _sun_sign_idx_at(self, jd: float) -> int:
