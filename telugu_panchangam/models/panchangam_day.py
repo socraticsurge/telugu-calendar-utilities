@@ -136,3 +136,5 @@ class PanchangamDay:
     ghati_clock: 'GhatiClock | None' = None
     nakshatra_pada: int | None = None
     vishaghati: list['GhatiWindow'] = field(default_factory=list)
+    bhadra_mukha: 'GhatiWindow | None' = None
+    bhadra_puchha: 'GhatiWindow | None' = None

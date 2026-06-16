@@ -175,9 +175,9 @@ def test_invalid_activity_raises():
 
 # --- Activity taxonomy (Batch D) ---
 
-def test_all_24_activities_callable():
+def test_all_25_activities_callable():
     from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
-    assert len(ACTIVITIES) == 24
+    assert len(ACTIVITIES) == 25
     # backward-compat: every old key must still be accepted
     for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
         assert old in ACTIVITY_RULES
@@ -185,7 +185,8 @@ def test_all_24_activities_callable():
     for new in ('wedding', 'gruhapravesha', 'naming', 'annaprasana',
                 'karnavedha', 'mundana', 'upanayana', 'vidyarambha',
                 'engagement', 'vehicle', 'property', 'gold', 'bhumi_puja',
-                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery'):
+                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery',
+                'litigation'):
         assert new in ACTIVITY_RULES
     # every row has a label
     for k, row in ACTIVITY_RULES.items():

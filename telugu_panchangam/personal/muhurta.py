@@ -219,6 +219,10 @@ ACTIVITY_RULES: dict[str, dict] = {
     'court':         {'label': 'Court / legal matter',
                       'prefer_tithi_class': 'Jaya',
                       'prefer_vara': ['Mangalavaram']},
+    'litigation':    {'label': 'Litigation / contest',
+                      'prefer_tithi_class': 'Jaya',
+                      'prefer_vara': ['Mangalavaram'],
+                      'prefer_bhadra_puchha': 2},
     'surgery':       {'label': 'Surgery / medical procedure',
                       'avoid_karana': ['Vishti'],
                       'prefer_vara': ['Mangalavaram']},
@@ -663,6 +667,9 @@ def _get_bad_windows(day, avoid_karana_names):
            [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
            + list(day.varjyam) + list(day.durmuhurtham)
            + list(day.vishaghati)]  # Vishaghati windows treated as inauspicious cuts
+    # Bhadra Mukha (first 5/16 of Vishti) — hard-cut; most inauspicious
+    if day.bhadra_mukha is not None:
+        bad.append((day.bhadra_mukha.start, day.bhadra_mukha.end))
     if avoid_karana_names:
         bad += [(k.start, k.end) for k in day.karana if k.name in avoid_karana_names]
     return bad
@@ -675,7 +682,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    prefer_varas: set[str] | None = None,
                    lagnas: list[Window] | None = None,
                    janma_lagnas: list[str | None] | None = None,
-                   prefer_lagna_class: str | None = None):
+                   prefer_lagna_class: str | None = None,
+                   prefer_bhadra_puchha: int = 0):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -728,6 +736,10 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     if any(_overlaps(s, e, a.start, a.end) for a in amrita):
         score += 2
         slot_quality.append('overlaps Amrita Kalam (+2)')
+    if prefer_bhadra_puchha and day.bhadra_puchha is not None \
+            and _overlaps(s, e, day.bhadra_puchha.start, day.bhadra_puchha.end):
+        score += prefer_bhadra_puchha
+        activity_match.append(f'Bhadra Puchha overlap (+{prefer_bhadra_puchha})')
     if prefer_chog and block.name == prefer_chog[0]:
         score += prefer_chog[1]
         activity_match.append(f'{block.name} favoured for {label} (+{prefer_chog[1]})')
@@ -887,6 +899,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     prefer_tithi_class = rules.get('prefer_tithi_class')
     prefer_varas = set(rules.get('prefer_vara', ()))
     prefer_lagna_class = rules.get('prefer_lagna_class')
+    prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     label = rules['label']
 
     # Vara is sunrise-anchored (one constant per panchangam day).

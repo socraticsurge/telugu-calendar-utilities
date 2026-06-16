@@ -253,6 +253,8 @@ def tool_get_panchangam(
                 'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
                 'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
             },
+            'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
+            'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
             'choghadiya': [
                 {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
                 for w in day.choghadiya
@@ -307,6 +309,8 @@ def tool_get_muhurta(
                 'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
                 'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
             },
+            'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
+            'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
             'nakshatra_pada': day.nakshatra_pada,
             'ghati_clock': (
                 {
@@ -435,6 +439,8 @@ def tool_get_panchangam_range(
                     'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
                     'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
                 },
+                'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
+                'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
                 'nakshatra_pada': day.nakshatra_pada,
                 'ghati_clock': (
                     {

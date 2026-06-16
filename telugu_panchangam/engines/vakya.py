@@ -119,8 +119,9 @@ class VakyaEngine(SuryaSiddhantaEngine):
         nak_arc = 360.0 / 27.0
         nak_pos = moon_lon / nak_arc
         day.nakshatra_pada = int(nak_pos * 4) % 4 + 1
-        from telugu_panchangam.karana_windows import compute_vishaghati
+        from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
         day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
+        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(day.karana, day.ghati_clock)
         return day
 
     # Override Moon-dependent helpers to use vakya functions
