@@ -1,7 +1,6 @@
-pyswisseph>=2.10.3
-icalendar>=5.0.0
-pytz>=2024.1
-pytest>=8.0.0
-geopy
-timezonefinder
-mcp>=1.0
+# Thin shim — pyproject.toml is the source of truth for runtime + test deps.
+# This file exists so that `pip install -r requirements.txt` keeps working
+# in CI and local-dev muscle memory. The editable install picks up every
+# direct dep (mcp, pyswisseph, pytz, geopy, timezonefinder, icalendar) plus
+# the [test] extra (pytest). Playwright is installed separately in CI.
+-e .[test]

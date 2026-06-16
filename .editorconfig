@@ -1,0 +1,28 @@
+# EditorConfig — universal indentation & whitespace rules.
+# https://editorconfig.org/
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# YAML, JSON, TOML — 2-space convention
+[*.{yml,yaml,json,toml}]
+indent_size = 2
+
+# Frontend — 2-space convention
+[*.{js,ts,mjs,cjs,html,css}]
+indent_size = 2
+
+# Markdown uses trailing double-space for line breaks — don't strip
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefile recipes require tabs
+[Makefile]
+indent_style = tab
