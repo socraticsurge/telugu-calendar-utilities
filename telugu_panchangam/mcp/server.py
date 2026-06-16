@@ -172,9 +172,14 @@ def find_muhurta(
     city: str = 'Hyderabad',
     system: str = 'drik',
     janma_nakshatras: list[str] | None = None,
+    janma_rasis: list[str | None] | None = None,
+    janma_lagnas: list[str | None] | None = None,
+    chandra_mode: str = 'stars',
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
 ) -> str:
-    """Find ranked auspicious time slots over the coming days. Slots are good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), scored with Abhijit Muhurta / Amrita Kalam overlap and special-yoga bonuses. activity tunes the rules: travel additionally avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit. Pass janma_nakshatras (1-4 birth stars) to keep only days whose tarabalam favours everyone. Args: start_date=YYYY-MM-DD, days=1-14, activity=any|travel|purchase|ceremony|beginning, city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya."""
-    return tool_find_muhurta(start_date, days, activity, city, system, janma_nakshatras, latitude, longitude, timezone)
+    """Find ranked auspicious time slots over the coming days. Slots are good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), scored with Abhijit Muhurta / Amrita Kalam overlap and special-yoga bonuses. activity tunes the rules: travel additionally avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit. Pass janma_nakshatras (1-4 birth stars) to keep only days whose tarabalam favours everyone. Optionally pass janma_rasis (aligned with janma_nakshatras, null entries allowed) to add Chandrabalam scoring — each person then gets the Moon's position from their rashi with a verdict (good / needs remedial puja / avoid), and chandra_mode selects how this affects the day filter: 'stars' (annotate only, default), 'puja_ok' (drop Moon-avoid days), 'strict' (Moon must be good). Optionally pass janma_lagnas (aligned, null entries allowed) to use strict Lagna Shuddhi for that person — kendra/trikona/Ashtama count from the natal ascendant; otherwise we fall back to counting from janma_rasis (Chandra-Rashi-as-lagna tradition). Args: start_date=YYYY-MM-DD, days=1-14, activity=any|travel|purchase|ceremony|beginning, city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya, janma_rasis=optional birth rashis (e.g. ['Meena', 'Simha']), janma_lagnas=optional birth lagnas (e.g. ['Vrishabha', None]), chandra_mode=stars|puja_ok|strict."""
+    return tool_find_muhurta(start_date, days, activity, city, system,
+                             janma_nakshatras, janma_rasis, janma_lagnas,
+                             chandra_mode, latitude, longitude, timezone)
