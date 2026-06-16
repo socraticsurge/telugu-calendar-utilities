@@ -5,6 +5,12 @@ on:
     tags:
       - 'v*.*.*'
 
+# Per-tag singleton. A repushed identical tag (rare) won't kill an
+# in-flight publish, and back-to-back tags queue cleanly.
+concurrency:
+  group: pypi-publish-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   id-token: write
 

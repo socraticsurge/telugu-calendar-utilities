@@ -5,16 +5,32 @@ on:
   push:
     branches-ignore: [master, gh-pages]
 
+# Cancel superseded CI runs on the same ref. Master and gh-pages
+# don't get CI runs (push is filtered above), so the ref here is
+# always a feature branch or a PR.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      # Don't kill the other versions if one fails — we want to see
+      # exactly which Python version regresses.
+      fail-fast: false
+      matrix:
+        # pyproject.toml declares requires-python = ">=3.10". This
+        # matrix exercises everything we claim to support. Adjust
+        # the floor here and in pyproject.toml together.
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -37,9 +53,16 @@ jobs:
 
       - name: Run JS scorer tests
         # Zero-dependency: tests/js/*.js use node:test + node:assert
-        # built-ins, so no npm install step is needed. Loops so a new
-        # test file added under tests/js/ is picked up automatically.
+        # built-ins, so no npm install step is needed. nullglob means
+        # an empty tests/js/ directory exits cleanly instead of running
+        # the literal pattern as a filename.
         run: |
-          for f in tests/js/*.js; do
+          shopt -s nullglob
+          files=(tests/js/*.js)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No JS tests under tests/js/ — skipping."
+            exit 0
+          fi
+          for f in "${files[@]}"; do
             node --test "$f"
           done

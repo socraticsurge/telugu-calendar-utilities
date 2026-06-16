@@ -5,6 +5,13 @@ on:
     - cron: '0 2 1 * *'   # 1st of every month at 02:00 UTC
   workflow_dispatch:        # allow manual trigger from Actions tab
 
+# Singleton across every workflow that publishes to gh-pages.
+# Queue, don't cancel — a half-finished feed regeneration would
+# leave gh-pages in a bad state.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
