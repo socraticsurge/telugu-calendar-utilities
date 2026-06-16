@@ -130,6 +130,17 @@ def _span_to_dict(span, tz: str) -> dict:
     }
 
 
+def _maudhya_to_dict(m) -> dict | None:
+    if m is None:
+        return None
+    return {
+        'graha': m.graha,
+        'elongation_deg': round(m.elongation_deg, 3),
+        'combust': m.combust,
+        'threshold_deg': m.threshold_deg,
+    }
+
+
 def _window_to_dict(window, tz: str) -> dict | None:
     if window is None:
         return None
@@ -278,6 +289,8 @@ def tool_get_panchangam(
             'khar_maasa_name': day.khar_maasa_name,
             'simha_stha_guru': day.simha_stha_guru,
             'simha_stha_shukra': day.simha_stha_shukra,
+            'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
+            'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -333,6 +346,8 @@ def tool_get_muhurta(
             'khar_maasa_name': day.khar_maasa_name,
             'simha_stha_guru': day.simha_stha_guru,
             'simha_stha_shukra': day.simha_stha_shukra,
+            'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
+            'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -473,6 +488,8 @@ def tool_get_panchangam_range(
                 'khar_maasa_name': day.khar_maasa_name,
                 'simha_stha_guru': day.simha_stha_guru,
                 'simha_stha_shukra': day.simha_stha_shukra,
+                'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
+                'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
             })
 
         return json.dumps({

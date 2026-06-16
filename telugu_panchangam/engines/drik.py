@@ -396,6 +396,11 @@ class DrikGanitaEngine(PanchangamEngine):
         shukra_rasi = RASHI_NAMES[int(shukra_lon / 30) % 12]
         day.simha_stha_guru = is_simha_stha(guru_rasi)
         day.simha_stha_shukra = is_simha_stha(shukra_rasi)
+        # Guru/Shukra Maudhya (combustion) — reuse the longitudes already
+        # computed above for Simha-Stha; sun_lon_sr is from the day's setup.
+        from telugu_panchangam.gochara.combustion import compute_maudhya
+        day.guru_maudhya = compute_maudhya('Guru', sun_lon_sr, guru_lon)
+        day.shukra_maudhya = compute_maudhya('Shukra', sun_lon_sr, shukra_lon)
         return day
 
     def _sun_sign_idx_at(self, jd: float) -> int:

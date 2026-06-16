@@ -134,6 +134,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_khar_maasa': True,
                       'skip_on_simha_stha_guru': True,      # hard-skip: Guru in Simha
                       'penalty_on_simha_stha_shukra': -2,   # soft penalty: Shukra in Simha
+                      'skip_on_combust': ['Guru', 'Shukra'],
                       'prefer_tithi_class': 'Purna',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
@@ -178,6 +179,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
+                      'skip_on_combust': ['Guru', 'Shukra'],
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
@@ -659,6 +661,13 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
         return (f'Simha-Stha Guru — '
                 f'{rules["label"]} traditionally avoided while Jupiter is in Simha')
 
+    # Guru/Shukra Maudhya (combustion): samskara activities deferred.
+    for g in rules.get('skip_on_combust', []):
+        info = getattr(day, f'{g.lower()}_maudhya', None)
+        if info is not None and info.combust:
+            return (f'{g} Maudhya ({info.elongation_deg:.1f}° < {info.threshold_deg}°) — '
+                    f'{rules["label"]} traditionally avoided when {g} is combust')
+
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     if skip_yogas:
         for y in day.special_yogas:
@@ -955,6 +964,12 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     # Simha-Stha Guru: wedding is hard-skipped while Jupiter is in Simha.
     if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
         return []
+
+    # Guru/Shukra Maudhya (combustion): samskara activities deferred.
+    for g in rules.get('skip_on_combust', []):
+        info = getattr(day, f'{g.lower()}_maudhya', None)
+        if info is not None and info.combust:
+            return []
 
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     prefer_chog = rules.get('prefer_choghadiya')   # ('Block', bonus) or None

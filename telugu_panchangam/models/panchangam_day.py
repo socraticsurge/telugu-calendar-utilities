@@ -45,6 +45,14 @@ class GhatiWindow:
 
 
 @dataclass
+class MaudhyaInfo:
+    graha: str               # 'Guru' | 'Shukra'
+    elongation_deg: float    # Absolute shortest-arc Sun-planet elongation
+    combust: bool            # True iff elongation < threshold
+    threshold_deg: float     # 11.0 Guru, 10.0 Shukra
+
+
+@dataclass
 class EclipseInfo:
     kind: str        # 'Solar' | 'Lunar'
     subtype: str     # 'Total' | 'Partial' | 'Annular' | 'Penumbral'
@@ -146,3 +154,7 @@ class PanchangamDay:
     # Populated by Drik engine only (SS/Vakya don't model outer planets).
     simha_stha_guru: bool = False
     simha_stha_shukra: bool = False
+    # Guru/Shukra Maudhya (combustion) — populated by Drik engine only.
+    # None when the engine doesn't model outer planets (SS/Vakya).
+    guru_maudhya: 'MaudhyaInfo | None' = None
+    shukra_maudhya: 'MaudhyaInfo | None' = None

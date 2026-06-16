@@ -346,18 +346,17 @@ def test_bhadra_tithi_gruhapravesha_bonus():
 
 
 def test_vara_bonus_thursday_wedding():
-    # 2026-07-16 (Thu) = Shukla Dwitiya (Bhadra), Nitya yoga = Siddhi
-    # (auspicious), no Visha/Dagdha/Vyatipata/Vaidhriti. A clean Thursday
-    # for wedding scoring. Wedding prefers Purna tithi (not Bhadra) and
-    # Guruvaram vara — so only the vara bonus fires (Nitya yoga adds +1
-    # auspicious bonus separately).
-    day = _day(2026, 7, 16)
+    # 2026-08-20 (Thu) = Shukla Ashtami (Jaya), Nitya yoga = Indra.
+    # Neither Guru nor Shukra combust; no Simha-Stha; not Khar-Maasa.
+    # Wedding prefers Purna tithi (not Jaya) and Guruvaram vara —
+    # so only the vara bonus fires.
+    day = _day(2026, 8, 20)
     slots = day_slots(day, activity='wedding')
     assert slots
     reasons = [r for s in slots for r in s['reasons']]
     assert any('Guruvaram favoured for Wedding' in r for r in reasons)
-    # Bhadra is not preferred by wedding — no tithi-class line.
-    assert not any('Bhadra' in r and 'favoured for Wedding' in r for r in reasons)
+    # Jaya is not preferred by wedding — no tithi-class line for it.
+    assert not any('Jaya' in r and 'favoured for Wedding' in r for r in reasons)
 
 
 def test_vara_bonus_friday_vehicle():
