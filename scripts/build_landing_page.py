@@ -14,5 +14,9 @@ shutil.copy('docs/og-image.png', 'public/og-image.png')
 # Must be staged alongside index.html or the muhurta finder errors
 # out on every search (ReferenceError on muLagnaPosition etc.).
 shutil.copy('docs/muhurta-scorer.js', 'public/muhurta-scorer.js')
+# SEO static files — referenced by search engines, never by JS at
+# runtime. Deploy-drift guard parametrises over both.
+shutil.copy('docs/sitemap.xml', 'public/sitemap.xml')
+shutil.copy('docs/robots.txt', 'public/robots.txt')
 
 print(f"Published {len(os.listdir('public/feeds'))} feeds.")
