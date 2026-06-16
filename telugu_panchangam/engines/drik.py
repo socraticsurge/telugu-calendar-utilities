@@ -281,7 +281,7 @@ class DrikGanitaEngine(PanchangamEngine):
         day_start = jd_to_utc(jd_sunrise)
         day_end = jd_to_utc(jd_next_sunrise)
 
-        return PanchangamDay(
+        day = PanchangamDay(
             date=d,
             location=location,
             system='drik',
@@ -323,6 +323,8 @@ class DrikGanitaEngine(PanchangamEngine):
                                       jd_next_sunrise, jd_moonrise),
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
         )
+        day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
+        return day
 
     def _sun_sign_idx_at(self, jd: float) -> int:
         return int(sun_longitude(jd) / 30.0) % 12

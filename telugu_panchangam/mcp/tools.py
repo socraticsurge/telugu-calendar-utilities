@@ -124,6 +124,18 @@ def _window_to_dict(window, tz: str) -> dict:
     }
 
 
+def _ghati_window_to_dict(gw, tz: str) -> dict | None:
+    if gw is None:
+        return None
+    return {
+        'name': gw.name,
+        'start': _fmt_time(gw.start, tz),
+        'end': _fmt_time(gw.end, tz),
+        'start_ghati': round(gw.start_ghati, 4),
+        'end_ghati': round(gw.end_ghati, 4),
+    }
+
+
 def _eclipse_to_dict(eclipse, tz: str) -> Optional[dict]:
     if eclipse is None:
         return None
@@ -231,6 +243,13 @@ def tool_get_panchangam(
             'special_yogas': day.special_yogas,
             'special_days': specials,
             'is_special': bool(specials),
+            'ghati_clock': (
+                {
+                    'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
+                    'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
+                    'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
+                } if day.ghati_clock else None
+            ),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})

@@ -91,7 +91,7 @@ class VakyaEngine(SuryaSiddhantaEngine):
         day_start = jd_to_utc(jd_sunrise)
         day_end   = jd_to_utc(jd_next_sunrise)
 
-        return PanchangamDay(
+        day = PanchangamDay(
             date=d, location=location, system='vakya',
             samvatsara=samvatsara, ayanam=ayanam, rituvu=rituvu,
             maasam=maasam, paksham=paksham,
@@ -115,6 +115,8 @@ class VakyaEngine(SuryaSiddhantaEngine):
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
             **special,
         )
+        day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
+        return day
 
     # Override Moon-dependent helpers to use vakya functions
 

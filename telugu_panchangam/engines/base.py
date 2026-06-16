@@ -546,3 +546,7 @@ class PanchangamEngine(ABC):
                 fests.append(name)
 
         return fests
+
+    def _build_ghati_clock(self, sunrise_dt, next_sunrise_dt):
+        from telugu_panchangam.ghati import make_clock
+        return make_clock(sunrise_dt, next_sunrise_dt)

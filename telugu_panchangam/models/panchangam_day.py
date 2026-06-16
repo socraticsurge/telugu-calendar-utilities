@@ -25,6 +25,26 @@ class Window:
 
 
 @dataclass
+class GhatiClock:
+    """Ghati/vighati clock anchored at sunrise.
+    1 ghati = 1/60 ahoratri (sunrise→next-sunrise). 60 vighatis = 1 ghati.
+    """
+    sunrise: datetime
+    next_sunrise: datetime
+    seconds_per_ghati: float
+
+
+@dataclass
+class GhatiWindow:
+    """A window expressed in both civil time and ghatis-from-sunrise."""
+    name: str
+    start: datetime
+    end: datetime
+    start_ghati: float
+    end_ghati: float
+
+
+@dataclass
 class EclipseInfo:
     kind: str        # 'Solar' | 'Lunar'
     subtype: str     # 'Total' | 'Partial' | 'Annular' | 'Penumbral'
@@ -113,3 +133,4 @@ class PanchangamDay:
     # Rashi the sun enters this day (entry-after-sunset counts as next day),
     # e.g. 'Mithuna' — None on ordinary days.
     sankramanam: str | None = None
+    ghati_clock: 'GhatiClock | None' = None

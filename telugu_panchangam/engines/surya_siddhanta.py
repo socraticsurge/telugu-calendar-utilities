@@ -121,7 +121,7 @@ class SuryaSiddhantaEngine(PanchangamEngine):
         day_start = jd_to_utc(jd_sunrise)
         day_end   = jd_to_utc(jd_next_sunrise)
 
-        return PanchangamDay(
+        day = PanchangamDay(
             date=d, location=location, system='surya_siddhanta',
             samvatsara=samvatsara, ayanam=ayanam, rituvu=rituvu,
             maasam=maasam, paksham=paksham,
@@ -145,6 +145,8 @@ class SuryaSiddhantaEngine(PanchangamEngine):
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
             **special,
         )
+        day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
+        return day
 
     def _sun_sign_idx_at(self, jd: float) -> int:
         return int(ss_sun_longitude(jd) / 30.0) % 12
