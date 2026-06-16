@@ -1,0 +1,941 @@
+{
+  "version": 1,
+  "generated_on": "2026-06-16",
+  "purpose": "Forward-year DP-verified festival regression \u2014 pins engine output for 2027-2028 across 5 anchor festivals \u00d7 3 cities against drikpanchang.com day-pages. See tests/test_festivals_forward_year.py.",
+  "dp_geoname_ids": {
+    "Hyderabad": 1269843,
+    "Bengaluru": 1277333,
+    "Chennai": 1264527
+  },
+  "tolerances": {
+    "sunrise_sunset_seconds": 60,
+    "anga_end_seconds": 120
+  },
+  "cells": [
+    {
+      "festival": "Vinayaka Chavithi",
+      "festival_dp_name": "Ganesh Chaturthi",
+      "city": "Hyderabad",
+      "year": 2027,
+      "expected": {
+        "date": "2027-09-04",
+        "weekday": "Shanivaram",
+        "maasam": "Bhadrapada",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturthi",
+        "tithi_ends_ist": "2027-09-04T12:25",
+        "nakshatra_name": "Chitra",
+        "nakshatra_ends_ist": "2027-09-04T14:49",
+        "yoga_ends_ist": "2027-09-04T08:13",
+        "sunrise_ist": "2027-09-04T06:03",
+        "sunset_ist": "2027-09-04T18:28",
+        "deciding_moment": "madhyahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/ganesh-chaturthi/ganesh-chaturthi-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=04/09/2027&geoname-id=1269843",
+        "screenshot_dated": "2026-06-16",
+        "screenshot_notes": "User-provided DP screenshot confirmed 2027-09-04 + day-page timings."
+      }
+    },
+    {
+      "festival": "Vinayaka Chavithi",
+      "festival_dp_name": "Vinayaka Chavithi",
+      "city": "Bengaluru",
+      "year": 2027,
+      "expected": {
+        "date": "2027-09-04",
+        "weekday": "Shanivaram",
+        "maasam": "Bhadrapada",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturthi",
+        "tithi_ends_ist": "2027-09-04T12:26",
+        "nakshatra_name": "Chitra",
+        "nakshatra_ends_ist": "2027-09-04T14:50",
+        "yoga_ends_ist": "2027-09-04T08:14",
+        "sunrise_ist": "2027-09-04T06:09",
+        "sunset_ist": "2027-09-04T18:29",
+        "deciding_moment": "madhyahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/ganesh-chaturthi/ganesh-chaturthi-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=04/09/2027&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Vinayaka Chavithi",
+      "festival_dp_name": "Vinayaka Chavithi",
+      "city": "Chennai",
+      "year": 2027,
+      "expected": {
+        "date": "2027-09-04",
+        "weekday": "Shanivaram",
+        "maasam": "Bhadrapada",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturthi",
+        "tithi_ends_ist": "2027-09-04T12:26",
+        "nakshatra_name": "Chitra",
+        "nakshatra_ends_ist": "2027-09-04T14:50",
+        "yoga_ends_ist": "2027-09-04T08:14",
+        "sunrise_ist": "2027-09-04T05:58",
+        "sunset_ist": "2027-09-04T18:18",
+        "deciding_moment": "madhyahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/ganesh-chaturthi/ganesh-chaturthi-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=04/09/2027&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Vinayaka Chavithi",
+      "festival_dp_name": "Vinayaka Chavithi",
+      "city": "Hyderabad",
+      "year": 2028,
+      "expected": {
+        "date": "2028-08-23",
+        "weekday": "Budhavaram",
+        "maasam": "Bhadrapada",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturthi",
+        "tithi_ends_ist": "2028-08-24T01:56",
+        "nakshatra_name": "Hasta",
+        "nakshatra_ends_ist": "2028-08-23T23:16",
+        "yoga_ends_ist": "2028-08-23T12:51",
+        "sunrise_ist": "2028-08-23T06:01",
+        "sunset_ist": "2028-08-23T18:36",
+        "deciding_moment": "madhyahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/ganesh-chaturthi/ganesh-chaturthi-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=23/08/2028&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Vinayaka Chavithi",
+      "festival_dp_name": "Vinayaka Chavithi",
+      "city": "Bengaluru",
+      "year": 2028,
+      "expected": {
+        "date": "2028-08-23",
+        "weekday": "Budhavaram",
+        "maasam": "Bhadrapada",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturthi",
+        "tithi_ends_ist": "2028-08-24T01:56",
+        "nakshatra_name": "Hasta",
+        "nakshatra_ends_ist": "2028-08-23T23:16",
+        "yoga_ends_ist": "2028-08-23T12:51",
+        "sunrise_ist": "2028-08-23T06:08",
+        "sunset_ist": "2028-08-23T18:36",
+        "deciding_moment": "madhyahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/ganesh-chaturthi/ganesh-chaturthi-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=23/08/2028&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Vinayaka Chavithi",
+      "festival_dp_name": "Vinayaka Chavithi",
+      "city": "Chennai",
+      "year": 2028,
+      "expected": {
+        "date": "2028-08-23",
+        "weekday": "Budhavaram",
+        "maasam": "Bhadrapada",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturthi",
+        "tithi_ends_ist": "2028-08-24T01:56",
+        "nakshatra_name": "Hasta",
+        "nakshatra_ends_ist": "2028-08-23T23:16",
+        "yoga_ends_ist": "2028-08-23T12:51",
+        "sunrise_ist": "2028-08-23T05:57",
+        "sunset_ist": "2028-08-23T18:25",
+        "deciding_moment": "madhyahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/ganesh-chaturthi/ganesh-chaturthi-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=23/08/2028&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Maha Shivaratri",
+      "festival_dp_name": "Maha Shivaratri",
+      "city": "Hyderabad",
+      "year": 2027,
+      "expected": {
+        "date": "2027-03-06",
+        "weekday": "Shanivaram",
+        "maasam": "Magha",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Trayodashi",
+        "tithi_ends_ist": "2027-03-06T12:04",
+        "nakshatra_name": "Dhanishtha",
+        "nakshatra_ends_ist": "2027-03-07T06:42",
+        "yoga_ends_ist": "2027-03-07T03:05",
+        "sunrise_ist": "2027-03-06T06:31",
+        "sunset_ist": "2027-03-06T18:24",
+        "deciding_moment": "nishita"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/maha-shivaratri/maha-shivaratri-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=06/03/2027&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Maha Shivaratri",
+      "festival_dp_name": "Maha Shivaratri",
+      "city": "Bengaluru",
+      "year": 2027,
+      "expected": {
+        "date": "2027-03-06",
+        "weekday": "Shanivaram",
+        "maasam": "Magha",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Trayodashi",
+        "tithi_ends_ist": "2027-03-06T12:04",
+        "nakshatra_name": "Dhanishtha",
+        "nakshatra_ends_ist": "2027-03-07T06:42",
+        "yoga_ends_ist": "2027-03-07T03:05",
+        "sunrise_ist": "2027-03-06T06:33",
+        "sunset_ist": "2027-03-06T18:29",
+        "deciding_moment": "nishita"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/maha-shivaratri/maha-shivaratri-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=06/03/2027&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Maha Shivaratri",
+      "festival_dp_name": "Maha Shivaratri",
+      "city": "Chennai",
+      "year": 2027,
+      "expected": {
+        "date": "2027-03-06",
+        "weekday": "Shanivaram",
+        "maasam": "Magha",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Trayodashi",
+        "tithi_ends_ist": "2027-03-06T12:04",
+        "nakshatra_name": "Dhanishtha",
+        "nakshatra_ends_ist": "2027-03-07T06:42",
+        "yoga_ends_ist": "2027-03-07T03:05",
+        "sunrise_ist": "2027-03-06T06:22",
+        "sunset_ist": "2027-03-06T18:18",
+        "deciding_moment": "nishita"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/maha-shivaratri/maha-shivaratri-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=06/03/2027&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Maha Shivaratri",
+      "festival_dp_name": "Maha Shivaratri",
+      "city": "Hyderabad",
+      "year": 2028,
+      "expected": {
+        "date": "2028-02-23",
+        "weekday": "Budhavaram",
+        "maasam": "Magha",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Trayodashi",
+        "tithi_ends_ist": "2028-02-23T10:45",
+        "nakshatra_name": "Shravana",
+        "nakshatra_ends_ist": "2028-02-24T01:58",
+        "yoga_ends_ist": "2028-02-23T18:48",
+        "sunrise_ist": "2028-02-23T06:39",
+        "sunset_ist": "2028-02-23T18:20",
+        "deciding_moment": "nishita"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/maha-shivaratri/maha-shivaratri-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=23/02/2028&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Maha Shivaratri",
+      "festival_dp_name": "Maha Shivaratri",
+      "city": "Bengaluru",
+      "year": 2028,
+      "expected": {
+        "date": "2028-02-23",
+        "weekday": "Budhavaram",
+        "maasam": "Magha",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Trayodashi",
+        "tithi_ends_ist": "2028-02-23T10:45",
+        "nakshatra_name": "Shravana",
+        "nakshatra_ends_ist": "2028-02-24T01:58",
+        "yoga_ends_ist": "2028-02-23T18:48",
+        "sunrise_ist": "2028-02-23T06:39",
+        "sunset_ist": "2028-02-23T18:27",
+        "deciding_moment": "nishita"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/maha-shivaratri/maha-shivaratri-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=23/02/2028&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Maha Shivaratri",
+      "festival_dp_name": "Maha Shivaratri",
+      "city": "Chennai",
+      "year": 2028,
+      "expected": {
+        "date": "2028-02-23",
+        "weekday": "Budhavaram",
+        "maasam": "Magha",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Trayodashi",
+        "tithi_ends_ist": "2028-02-23T10:45",
+        "nakshatra_name": "Shravana",
+        "nakshatra_ends_ist": "2028-02-24T01:58",
+        "yoga_ends_ist": "2028-02-23T18:48",
+        "sunrise_ist": "2028-02-23T06:28",
+        "sunset_ist": "2028-02-23T18:16",
+        "deciding_moment": "nishita"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/maha-shivaratri/maha-shivaratri-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=23/02/2028&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Deepavali",
+      "festival_dp_name": "Diwali",
+      "city": "Hyderabad",
+      "year": 2027,
+      "expected": {
+        "date": "2027-10-29",
+        "weekday": "Shukravaram",
+        "maasam": "Ashvina",
+        "paksham": "Krishna",
+        "tithi_name": "Amavasya",
+        "tithi_ends_ist": "2027-10-29T19:07",
+        "nakshatra_name": "Chitra",
+        "nakshatra_ends_ist": "2027-10-29T10:28",
+        "yoga_ends_ist": "2027-10-30T00:34",
+        "sunrise_ist": "2027-10-29T06:13",
+        "sunset_ist": "2027-10-29T17:46",
+        "deciding_moment": "pradosha"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/diwali/diwali-puja-calendar.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=29/10/2027&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Deepavali",
+      "festival_dp_name": "Diwali",
+      "city": "Bengaluru",
+      "year": 2027,
+      "expected": {
+        "date": "2027-10-29",
+        "weekday": "Shukravaram",
+        "maasam": "Ashvina",
+        "paksham": "Krishna",
+        "tithi_name": "Amavasya",
+        "tithi_ends_ist": "2027-10-29T19:07",
+        "nakshatra_name": "Chitra",
+        "nakshatra_ends_ist": "2027-10-29T10:28",
+        "yoga_ends_ist": "2027-10-30T00:34",
+        "sunrise_ist": "2027-10-29T06:12",
+        "sunset_ist": "2027-10-29T17:54",
+        "deciding_moment": "pradosha"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/diwali/diwali-puja-calendar.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=29/10/2027&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Deepavali",
+      "festival_dp_name": "Diwali",
+      "city": "Chennai",
+      "year": 2027,
+      "expected": {
+        "date": "2027-10-29",
+        "weekday": "Shukravaram",
+        "maasam": "Ashvina",
+        "paksham": "Krishna",
+        "tithi_name": "Amavasya",
+        "tithi_ends_ist": "2027-10-29T19:07",
+        "nakshatra_name": "Chitra",
+        "nakshatra_ends_ist": "2027-10-29T10:28",
+        "yoga_ends_ist": "2027-10-30T00:34",
+        "sunrise_ist": "2027-10-29T06:02",
+        "sunset_ist": "2027-10-29T17:43",
+        "deciding_moment": "pradosha"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/diwali/diwali-puja-calendar.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=29/10/2027&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Deepavali",
+      "festival_dp_name": "Diwali",
+      "city": "Hyderabad",
+      "year": 2028,
+      "expected": {
+        "date": "2028-10-17",
+        "weekday": "Mangalavaram",
+        "maasam": "Ashvina",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Chaturdashi",
+        "tithi_ends_ist": "2028-10-17T12:06",
+        "nakshatra_name": "Hasta",
+        "nakshatra_ends_ist": "2028-10-17T20:17",
+        "yoga_ends_ist": "2028-10-17T09:39",
+        "sunrise_ist": "2028-10-17T06:10",
+        "sunset_ist": "2028-10-17T17:53",
+        "deciding_moment": "pradosha"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/diwali/diwali-puja-calendar.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=17/10/2028&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Deepavali",
+      "festival_dp_name": "Diwali",
+      "city": "Bengaluru",
+      "year": 2028,
+      "expected": {
+        "date": "2028-10-17",
+        "weekday": "Mangalavaram",
+        "maasam": "Ashvina",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Chaturdashi",
+        "tithi_ends_ist": "2028-10-17T12:06",
+        "nakshatra_name": "Hasta",
+        "nakshatra_ends_ist": "2028-10-17T20:17",
+        "yoga_ends_ist": "2028-10-17T09:39",
+        "sunrise_ist": "2028-10-17T06:10",
+        "sunset_ist": "2028-10-17T17:59",
+        "deciding_moment": "pradosha"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/diwali/diwali-puja-calendar.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=17/10/2028&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Deepavali",
+      "festival_dp_name": "Diwali",
+      "city": "Chennai",
+      "year": 2028,
+      "expected": {
+        "date": "2028-10-17",
+        "weekday": "Mangalavaram",
+        "maasam": "Ashvina",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Chaturdashi",
+        "tithi_ends_ist": "2028-10-17T12:06",
+        "nakshatra_name": "Hasta",
+        "nakshatra_ends_ist": "2028-10-17T20:17",
+        "yoga_ends_ist": "2028-10-17T09:39",
+        "sunrise_ist": "2028-10-17T06:00",
+        "sunset_ist": "2028-10-17T17:49",
+        "deciding_moment": "pradosha"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/diwali/diwali-puja-calendar.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=17/10/2028&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Makara Sankranti",
+      "festival_dp_name": "Makara Sankranti",
+      "city": "Hyderabad",
+      "year": 2027,
+      "expected": {
+        "date": "2027-01-15",
+        "weekday": "Shukravaram",
+        "maasam": "Pushya",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Saptami",
+        "tithi_ends_ist": "2027-01-15T14:14",
+        "nakshatra_name": "Revati",
+        "nakshatra_ends_ist": "2027-01-15T23:51",
+        "yoga_ends_ist": "2027-01-15T16:18",
+        "sunrise_ist": "2027-01-15T06:49",
+        "sunset_ist": "2027-01-15T18:01",
+        "deciding_moment": "solar_event"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/sankranti/makar-sankranti-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=15/01/2027&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Makara Sankranti",
+      "festival_dp_name": "Makara Sankranti",
+      "city": "Bengaluru",
+      "year": 2027,
+      "expected": {
+        "date": "2027-01-15",
+        "weekday": "Shukravaram",
+        "maasam": "Pushya",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Saptami",
+        "tithi_ends_ist": "2027-01-15T14:14",
+        "nakshatra_name": "Revati",
+        "nakshatra_ends_ist": "2027-01-15T23:51",
+        "yoga_ends_ist": "2027-01-15T16:18",
+        "sunrise_ist": "2027-01-15T06:46",
+        "sunset_ist": "2027-01-15T18:12",
+        "deciding_moment": "solar_event"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/sankranti/makar-sankranti-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=15/01/2027&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Makara Sankranti",
+      "festival_dp_name": "Makara Sankranti",
+      "city": "Chennai",
+      "year": 2027,
+      "expected": {
+        "date": "2027-01-15",
+        "weekday": "Shukravaram",
+        "maasam": "Pushya",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Saptami",
+        "tithi_ends_ist": "2027-01-15T14:14",
+        "nakshatra_name": "Revati",
+        "nakshatra_ends_ist": "2027-01-15T23:51",
+        "yoga_ends_ist": "2027-01-15T16:18",
+        "sunrise_ist": "2027-01-15T06:35",
+        "sunset_ist": "2027-01-15T18:01",
+        "deciding_moment": "solar_event"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/sankranti/makar-sankranti-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=15/01/2027&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Makara Sankranti",
+      "festival_dp_name": "Makara Sankranti",
+      "city": "Hyderabad",
+      "year": 2028,
+      "expected": {
+        "date": "2028-01-15",
+        "weekday": "Shanivaram",
+        "maasam": "Pushya",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Chaturthi",
+        "tithi_ends_ist": "2028-01-15T20:11",
+        "nakshatra_name": "Magha",
+        "nakshatra_ends_ist": "2028-01-15T11:26",
+        "yoga_ends_ist": "2028-01-16T02:10",
+        "sunrise_ist": "2028-01-15T06:49",
+        "sunset_ist": "2028-01-15T18:01",
+        "deciding_moment": "solar_event"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/sankranti/makar-sankranti-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=15/01/2028&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Makara Sankranti",
+      "festival_dp_name": "Makara Sankranti",
+      "city": "Bengaluru",
+      "year": 2028,
+      "expected": {
+        "date": "2028-01-15",
+        "weekday": "Shanivaram",
+        "maasam": "Pushya",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Chaturthi",
+        "tithi_ends_ist": "2028-01-15T20:11",
+        "nakshatra_name": "Magha",
+        "nakshatra_ends_ist": "2028-01-15T11:26",
+        "yoga_ends_ist": "2028-01-16T02:10",
+        "sunrise_ist": "2028-01-15T06:46",
+        "sunset_ist": "2028-01-15T18:12",
+        "deciding_moment": "solar_event"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/sankranti/makar-sankranti-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=15/01/2028&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Makara Sankranti",
+      "festival_dp_name": "Makara Sankranti",
+      "city": "Chennai",
+      "year": 2028,
+      "expected": {
+        "date": "2028-01-15",
+        "weekday": "Shanivaram",
+        "maasam": "Pushya",
+        "paksham": "Krishna",
+        "tithi_name": "Krishna Chaturthi",
+        "tithi_ends_ist": "2028-01-15T20:11",
+        "nakshatra_name": "Magha",
+        "nakshatra_ends_ist": "2028-01-15T11:26",
+        "yoga_ends_ist": "2028-01-16T02:10",
+        "sunrise_ist": "2028-01-15T06:35",
+        "sunset_ist": "2028-01-15T18:01",
+        "deciding_moment": "solar_event"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/sankranti/makar-sankranti-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=15/01/2028&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Varalakshmi Vratam",
+      "festival_dp_name": "Varalakshmi Vratam",
+      "city": "Hyderabad",
+      "year": 2027,
+      "expected": {
+        "date": "2027-08-13",
+        "weekday": "Shukravaram",
+        "maasam": "Shravana",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Dwadashi",
+        "tithi_ends_ist": "2027-08-14T05:22",
+        "nakshatra_name": "Mula",
+        "nakshatra_ends_ist": "2027-08-13T14:20",
+        "yoga_ends_ist": "2027-08-13T21:30",
+        "sunrise_ist": "2027-08-13T05:59",
+        "sunset_ist": "2027-08-13T18:43",
+        "deciding_moment": "aparahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/varalakshmi-vratam/varalakshmi-vratam-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=13/08/2027&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Varalakshmi Vratam",
+      "festival_dp_name": "Varalakshmi Vratam",
+      "city": "Bengaluru",
+      "year": 2027,
+      "expected": {
+        "date": "2027-08-13",
+        "weekday": "Shukravaram",
+        "maasam": "Shravana",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Dwadashi",
+        "tithi_ends_ist": "2027-08-14T05:22",
+        "nakshatra_name": "Mula",
+        "nakshatra_ends_ist": "2027-08-13T14:20",
+        "yoga_ends_ist": "2027-08-13T21:30",
+        "sunrise_ist": "2027-08-13T06:07",
+        "sunset_ist": "2027-08-13T18:42",
+        "deciding_moment": "aparahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/varalakshmi-vratam/varalakshmi-vratam-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=13/08/2027&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Varalakshmi Vratam",
+      "festival_dp_name": "Varalakshmi Vratam",
+      "city": "Chennai",
+      "year": 2027,
+      "expected": {
+        "date": "2027-08-13",
+        "weekday": "Shukravaram",
+        "maasam": "Shravana",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Dwadashi",
+        "tithi_ends_ist": "2027-08-14T05:22",
+        "nakshatra_name": "Mula",
+        "nakshatra_ends_ist": "2027-08-13T14:20",
+        "yoga_ends_ist": "2027-08-13T21:30",
+        "sunrise_ist": "2027-08-13T05:56",
+        "sunset_ist": "2027-08-13T18:31",
+        "deciding_moment": "aparahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/varalakshmi-vratam/varalakshmi-vratam-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=13/08/2027&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Varalakshmi Vratam",
+      "festival_dp_name": "Varalakshmi Vratam",
+      "city": "Hyderabad",
+      "year": 2028,
+      "expected": {
+        "date": "2028-08-04",
+        "weekday": "Shukravaram",
+        "maasam": "Shravana",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturdashi",
+        "tithi_ends_ist": "2028-08-04T11:52",
+        "nakshatra_name": "Uttara Ashadha",
+        "nakshatra_ends_ist": "2028-08-04T19:28",
+        "yoga_ends_ist": "2028-08-04T16:12",
+        "sunrise_ist": "2028-08-04T05:56",
+        "sunset_ist": "2028-08-04T18:48",
+        "deciding_moment": "aparahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/varalakshmi-vratam/varalakshmi-vratam-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=04/08/2028&geoname-id=1269843",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Varalakshmi Vratam",
+      "festival_dp_name": "Varalakshmi Vratam",
+      "city": "Bengaluru",
+      "year": 2028,
+      "expected": {
+        "date": "2028-08-04",
+        "weekday": "Shukravaram",
+        "maasam": "Shravana",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturdashi",
+        "tithi_ends_ist": "2028-08-04T11:52",
+        "nakshatra_name": "Uttara Ashadha",
+        "nakshatra_ends_ist": "2028-08-04T19:28",
+        "yoga_ends_ist": "2028-08-04T16:12",
+        "sunrise_ist": "2028-08-04T06:06",
+        "sunset_ist": "2028-08-04T18:45",
+        "deciding_moment": "aparahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/varalakshmi-vratam/varalakshmi-vratam-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=04/08/2028&geoname-id=1277333",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    },
+    {
+      "festival": "Varalakshmi Vratam",
+      "festival_dp_name": "Varalakshmi Vratam",
+      "city": "Chennai",
+      "year": 2028,
+      "expected": {
+        "date": "2028-08-04",
+        "weekday": "Shukravaram",
+        "maasam": "Shravana",
+        "paksham": "Shukla",
+        "tithi_name": "Shukla Chaturdashi",
+        "tithi_ends_ist": "2028-08-04T11:52",
+        "nakshatra_name": "Uttara Ashadha",
+        "nakshatra_ends_ist": "2028-08-04T19:28",
+        "yoga_ends_ist": "2028-08-04T16:12",
+        "sunrise_ist": "2028-08-04T05:55",
+        "sunset_ist": "2028-08-04T18:35",
+        "deciding_moment": "aparahna"
+      },
+      "dp_source": {
+        "festival_page": "https://www.drikpanchang.com/festivals/varalakshmi-vratam/varalakshmi-vratam-date-time.html",
+        "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=04/08/2028&geoname-id=1264527",
+        "screenshot_dated": null,
+        "screenshot_notes": "Cell engine-pinned 2026-06-16; not yet DP-verified at day-page level."
+      },
+      "verification": {
+        "status": "ENGINE_PINNED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
+      }
+    }
+  ]
+}
