@@ -28,6 +28,7 @@ from telugu_panchangam.personal.nitya_yoga import (
     NITYA_PARTIAL_DOSHA_WINDOW, NITYA_PARTIAL_PENALTY,
     NITYA_AUSPICIOUS, NITYA_AUSPICIOUS_BONUS,
 )
+from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MIN_SLOT_MINUTES = 24  # one ghati
@@ -757,6 +758,22 @@ def _get_bad_windows(day, avoid_karana_names):
     return bad
 
 
+def _anandadi_day_modifier(day) -> tuple[int, str | None]:
+    """Return (score_delta, reason_chip) for the day's Anandadi yoga.
+
+    Auspicious yogas give +1; inauspicious give -1. This is a day-level
+    characterisation — all slots on the day receive the same modifier.
+    """
+    yoga = getattr(day, 'anandadi_yoga', None)
+    if yoga is None:
+        return 0, None
+    if yoga in ANANDADI_AUSPICIOUS:
+        return 1, f'Anandadi: {yoga} (+1)'
+    if yoga in ANANDADI_INAUSPICIOUS:
+        return -1, f'Anandadi: {yoga} (-1)'
+    return 0, None
+
+
 def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    janma_rasis, chandra_mode, prefer_tithi_class, label,
                    vara_bonus, vara_reason, abhijit, amrita, prefer_chog,
@@ -795,8 +812,12 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     if defer_nitya:
         return None
 
+    # Anandadi day-level modifier (Muhurta Chintamani)
+    anandadi_bonus, anandadi_reason = _anandadi_day_modifier(day)
+
     score = base + vara_bonus + tara_bonus + chandra_bonus \
-            + tithi_bonus + yoga_bonus + nitya_bonus + simha_stha_shukra_penalty
+            + tithi_bonus + yoga_bonus + nitya_bonus + simha_stha_shukra_penalty \
+            + anandadi_bonus
 
     # Reason groups — assemble each category as we go.
     slot_quality = [
@@ -808,6 +829,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
         day_quality.append(
             f'Simha-Stha Shukra (Venus in Simha) ({simha_stha_shukra_penalty})'
         )
+    if anandadi_reason:
+        day_quality.append(anandadi_reason)
     if tithi_day_reason:
         day_quality.append(tithi_day_reason)
     group_fit = list(tara_reasons) + list(chandra_reasons)

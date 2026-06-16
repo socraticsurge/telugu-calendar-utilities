@@ -292,6 +292,7 @@ def tool_get_panchangam(
             'simha_stha_shukra': day.simha_stha_shukra,
             'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
             'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
+            'anandadi_yoga': day.anandadi_yoga,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -350,6 +351,7 @@ def tool_get_muhurta(
             'simha_stha_shukra': day.simha_stha_shukra,
             'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
             'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
+            'anandadi_yoga': day.anandadi_yoga,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -493,6 +495,7 @@ def tool_get_panchangam_range(
                 'simha_stha_shukra': day.simha_stha_shukra,
                 'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
                 'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
+                'anandadi_yoga': day.anandadi_yoga,
             })
 
         return json.dumps({

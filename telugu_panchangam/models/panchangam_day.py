@@ -159,3 +159,5 @@ class PanchangamDay:
     # None when the engine doesn't model outer planets (SS/Vakya).
     guru_maudhya: 'MaudhyaInfo | None' = None
     shukra_maudhya: 'MaudhyaInfo | None' = None
+    # Anandadi muhurta yoga (Muhurta Chintamani): derived from vaaram + nakshatra.
+    anandadi_yoga: 'str | None' = None

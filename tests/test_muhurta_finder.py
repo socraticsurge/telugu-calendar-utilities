@@ -620,14 +620,14 @@ def test_personal_dosha_tara_dosha_caps_tier():
 
 def test_personal_dosha_chandra_avoid_caps_tier():
     # 2026-06-25: Pushya + Karka -> Moon@4 (avoid, non-Ashtama). The
-    # top slot scores 7 (Excellent by raw score) but the unrectified
-    # chandra dosha caps it at Good.
+    # top slot scores 8 (Excellent by raw score; +1 from auspicious Anandadi
+    # yoga Sthira) but the unrectified chandra dosha caps it at Good.
     from telugu_panchangam.personal.muhurta import score_tier
     day = _day(2026, 6, 25)
     slots = day_slots(day, janma_nakshatras=['Pushya'], janma_rasis=['Karka'])
     assert slots
     top = slots[0]
-    assert top['score'] == 7
+    assert top['score'] == 8
     assert score_tier(top['score']) == 'Excellent'
     assert top['personal_dosha'] == 'chandra_avoid'
     assert top['tier'] == 'Good'
