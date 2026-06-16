@@ -457,14 +457,41 @@ class PanchangamEngine(ABC):
         """Name of the rashi the sun enters this day, or None. Uses the same
         convention as Makara Sankranti: entry after sunset belongs to the
         next day."""
-        sr, ss = self._sun_sign_idx_at(jd_sr), self._sun_sign_idx_at(jd_ss)
+        name, _ = self._sankramanam_name_and_jd(jd_sr, jd_ss)
+        return name
+
+    def _sankramanam_name_and_jd(
+        self, jd_sr: float, jd_ss: float
+    ) -> tuple[str | None, float | None]:
+        """Name + exact JD of the Sun's rasi-ingress this day, or (None, None).
+
+        Bisects for the crossing using this engine's sun-longitude model when
+        a sign change is detected. The bisection window is chosen to span the
+        crossing safely:
+          - Intra-day crossing (between jd_sr and jd_ss): bisect in that range.
+          - After-previous-sunset crossing (entry after yesterday's sunset counts
+            today): bisect in [jd_sr - 1.0, jd_sr].
+        """
+        from telugu_panchangam.engines.utils import find_crossing
+        sr = self._sun_sign_idx_at(jd_sr)
+        ss = self._sun_sign_idx_at(jd_ss)
         if sr != ss:
-            return RASHI_NAMES[ss]
+            # Crossing happened between sunrise and sunset today
+            target_deg = ss * 30.0
+            jd_cross = find_crossing(
+                self._sun_longitude_func(), target_deg, jd_sr, jd_ss
+            )
+            return RASHI_NAMES[ss], jd_cross
         prev_sr = self._sun_sign_idx_at(jd_sr - 1.0)
         prev_ss = self._sun_sign_idx_at(jd_ss - 1.0)
         if sr != prev_ss and prev_ss == prev_sr:
-            return RASHI_NAMES[sr]
-        return None
+            # Crossing happened after yesterday's sunset (observed today)
+            target_deg = sr * 30.0
+            jd_cross = find_crossing(
+                self._sun_longitude_func(), target_deg, jd_ss - 1.0, jd_sr
+            )
+            return RASHI_NAMES[sr], jd_cross
+        return None, None
 
     def _festivals(self, maasam: str, weekday: int,
                    jd_sr: float, jd_ss: float, jd_next_sr: float,

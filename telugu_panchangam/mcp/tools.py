@@ -130,7 +130,9 @@ def _span_to_dict(span, tz: str) -> dict:
     }
 
 
-def _window_to_dict(window, tz: str) -> dict:
+def _window_to_dict(window, tz: str) -> dict | None:
+    if window is None:
+        return None
     return {
         'start': _fmt_time(window.start, tz),
         'end': _fmt_time(window.end, tz),
@@ -255,6 +257,7 @@ def tool_get_panchangam(
             },
             'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
             'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
+            'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
             'choghadiya': [
                 {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
                 for w in day.choghadiya
@@ -311,6 +314,7 @@ def tool_get_muhurta(
             },
             'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
             'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
+            'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
             'nakshatra_pada': day.nakshatra_pada,
             'ghati_clock': (
                 {
@@ -441,6 +445,7 @@ def tool_get_panchangam_range(
                 },
                 'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
                 'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
+                'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
                 'nakshatra_pada': day.nakshatra_pada,
                 'ghati_clock': (
                     {

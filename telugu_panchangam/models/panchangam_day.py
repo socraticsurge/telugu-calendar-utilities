@@ -138,3 +138,4 @@ class PanchangamDay:
     vishaghati: list['GhatiWindow'] = field(default_factory=list)
     bhadra_mukha: 'GhatiWindow | None' = None
     bhadra_puchha: 'GhatiWindow | None' = None
+    sankramana_avoidance: 'Window | None' = None
