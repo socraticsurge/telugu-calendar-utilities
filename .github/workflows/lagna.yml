@@ -5,6 +5,11 @@ on:
     - cron: '45 2 1 * *'   # 1st of every month, just after gochara.yml
   workflow_dispatch:
 
+# Singleton across every workflow that publishes to gh-pages.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
