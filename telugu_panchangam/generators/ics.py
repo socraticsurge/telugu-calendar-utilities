@@ -28,15 +28,33 @@ _NIGHT_CHOGHADIYA = {
 
 class ICSGenerator:
 
-    def generate(self, days: list[PanchangamDay], system: str) -> bytes:
+    def generate(self, days: list[PanchangamDay], system: str,
+                 variant_label: str = '') -> bytes:
+        """Generate an ICS calendar from a list of PanchangamDay.
+
+        variant_label, if non-empty, is appended to the calendar name
+        and rewrites the description — used by the per-anga variant
+        feeds (Ekadashi-only, Festivals-only, Moon-Cycles) to give
+        subscribers a distinguishable calendar in their client. Empty
+        string preserves the existing dense-feed output byte-for-byte
+        (sanity-checked by the golden-snapshot regression test).
+        """
         cal = Calendar()
         cal.add('prodid', '-//Telugu Panchangam//EN')
         cal.add('version', '2.0')
-        cal.add('x-wr-calname',
-                f"AstroChaganti's Panchangam — {days[0].location.name} ({SYSTEM_LABELS[system]})")
+        if variant_label:
+            cal.add('x-wr-calname',
+                    f"AstroChaganti's Panchangam — {days[0].location.name} "
+                    f"({SYSTEM_LABELS[system]}, {variant_label})")
+            cal.add('x-wr-caldesc',
+                    f'Telugu Panchangam — {variant_label} only. '
+                    f'Slim feed; subscribe to the dense feed for full daily detail.')
+        else:
+            cal.add('x-wr-calname',
+                    f"AstroChaganti's Panchangam — {days[0].location.name} ({SYSTEM_LABELS[system]})")
+            cal.add('x-wr-caldesc',
+                    'Telugu Panchangam: Tithi, Nakshatra, Yoga, Muhurtas, and special days')
         cal.add('x-wr-timezone', days[0].location.timezone)
-        cal.add('x-wr-caldesc',
-                'Telugu Panchangam: Tithi, Nakshatra, Yoga, Muhurtas, and special days')
         # Hint clients to refetch twice a day so corrections propagate quickly
         cal.add('refresh-interval;value=duration', 'PT12H')
         cal.add('x-published-ttl', 'PT12H')
