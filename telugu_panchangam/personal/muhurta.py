@@ -951,7 +951,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 avoid_karana_names=avoid_karana_names,
                 horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
                 janma_lagnas=janma_lagnas,
-                prefer_lagna_class=prefer_lagna_class
+                prefer_lagna_class=prefer_lagna_class,
+                prefer_bhadra_puchha=prefer_bhadra_puchha
             )
             if slot_dict is not None:
                 slots.append(slot_dict)

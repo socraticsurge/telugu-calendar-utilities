@@ -58,6 +58,82 @@ def test_mukha_5_16_puchha_3_16_proportional():
     # If we couldn't find a clean case, that's OK — the rule still holds in theory.
 
 
+def test_litigation_activity_gets_puchha_bonus():
+    """A slot overlapping day.bhadra_puchha must score +2 for 'litigation' activity.
+
+    We scan for a day where a good choghadiya block actually overlaps the Puchha
+    window (not every Puchha day has a good block in that range), then assert the
+    scoring path emits the 'Bhadra Puchha' bonus reason.
+    """
+    from datetime import timedelta
+    from telugu_panchangam.personal.muhurta import day_slots, GOOD_CHOGHADIYA
+
+    eng = DrikGanitaEngine()
+    city = _hyderabad()
+
+    for d in range(0, 90):
+        target = date(2026, 6, 1) + timedelta(days=d)
+        day = eng.calculate(target, city)
+        if day.bhadra_puchha is None:
+            continue
+        p = day.bhadra_puchha
+        # Only proceed when a good choghadiya block actually overlaps Puchha;
+        # otherwise there can never be a bonus slot regardless of scoring.
+        has_overlap = any(
+            b.start < p.end and b.end > p.start
+            for b in day.choghadiya
+            if GOOD_CHOGHADIYA.get(b.name) is not None
+        )
+        if not has_overlap:
+            continue
+        slots = day_slots(day, activity='litigation')
+        bonus_slots = [
+            s for s in slots
+            if any('Bhadra Puchha' in r for r in s.get('reasons', []))
+        ]
+        assert len(bonus_slots) > 0, (
+            f"Expected at least one slot with 'Bhadra Puchha' bonus reason "
+            f"for litigation activity on {target} (puchha={p.start.time()}–"
+            f"{p.end.time()}); got {len(slots)} slots, none with Puchha bonus. "
+            f"Reasons across slots: {[s.get('reasons', []) for s in slots[:3]]}"
+        )
+        return  # one passing day is enough
+
+    # If no qualifying day was found, skip rather than fail.
+    import pytest
+    pytest.skip('No day with good-choghadiya/Puchha overlap found in 90-day scan')
+
+
+def test_no_slot_overlaps_bhadra_mukha():
+    """No auspicious slot may overlap day.bhadra_mukha (hard cut-out window)."""
+    from datetime import timedelta
+    from telugu_panchangam.personal.muhurta import day_slots
+
+    eng = DrikGanitaEngine()
+    city = _hyderabad()
+
+    found_mukha_day = False
+    for d in range(0, 60):
+        target = date(2026, 6, 1) + timedelta(days=d)
+        day = eng.calculate(target, city)
+        if day.bhadra_mukha is None:
+            continue
+        found_mukha_day = True
+        slots = day_slots(day, activity='any')
+        mukha_s = day.bhadra_mukha.start
+        mukha_e = day.bhadra_mukha.end
+        for slot in slots:
+            overlaps = slot['start'] < mukha_e and slot['end'] > mukha_s
+            assert not overlaps, (
+                f"Slot {slot['start'].time()}–{slot['end'].time()} on {target} "
+                f"overlaps Bhadra Mukha {mukha_s.time()}–{mukha_e.time()}"
+            )
+
+    if not found_mukha_day:
+        import pytest
+        pytest.skip('No Bhadra Mukha window found in 60-day scan')
+
+
 def test_bhadra_windows_in_all_mcp_tool_responses():
     """bhadra_mukha and bhadra_puchha must be serialized by all per-day MCP tools."""
     import json
