@@ -161,3 +161,5 @@ class PanchangamDay:
     shukra_maudhya: 'MaudhyaInfo | None' = None
     # Anandadi muhurta yoga (Muhurta Chintamani): derived from vaaram + nakshatra.
     anandadi_yoga: 'str | None' = None
+    # Disha Shoola — weekday direction-of-blocked-travel.
+    disha_shoola_direction: 'str | None' = None

@@ -293,6 +293,7 @@ def tool_get_panchangam(
             'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
             'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
             'anandadi_yoga': day.anandadi_yoga,
+            'disha_shoola_direction': day.disha_shoola_direction,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -352,6 +353,7 @@ def tool_get_muhurta(
             'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
             'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
             'anandadi_yoga': day.anandadi_yoga,
+            'disha_shoola_direction': day.disha_shoola_direction,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -496,6 +498,7 @@ def tool_get_panchangam_range(
                 'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
                 'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
                 'anandadi_yoga': day.anandadi_yoga,
+                'disha_shoola_direction': day.disha_shoola_direction,
             })
 
         return json.dumps({
@@ -819,6 +822,7 @@ def _gather_muhurta_slots(
     janma_rasis: Optional[list],
     chandra_mode: str,
     janma_lagnas: Optional[list] = None,
+    travel_direction: Optional[str] = None,
 ) -> tuple[list, list]:
     slots = []
     dropped_days = []
@@ -838,12 +842,14 @@ def _gather_muhurta_slots(
                                 janma_rasis=janma_rasis,
                                 janma_lagnas=janma_lagnas,
                                 chandra_mode=chandra_mode,
+                                travel_direction=travel_direction,
                                 engine=engine)
         if not day_results:
             reason = diagnose_day(day, activity=activity,
                                   janma_nakshatras=janma_nakshatras,
                                   janma_rasis=janma_rasis,
-                                  chandra_mode=chandra_mode)
+                                  chandra_mode=chandra_mode,
+                                  travel_direction=travel_direction)
             if reason:
                 dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
         for s in day_results:
@@ -866,11 +872,16 @@ def tool_find_muhurta(
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
     ayanamsa: str = 'lahiri',
+    travel_direction: Optional[str] = None,
 ) -> str:
     """When janma_lagnas[i] is provided, strict Lagna Shuddhi is used
     for that person — kendra/trikona/Ashtama count from the natal
     ascendant. Otherwise we fall back to counting from janma_rasis[i]
     (Chandra-Rashi-as-lagna tradition). Mode is per-person.
+
+    travel_direction: optional cardinal direction ('North', 'South',
+    'East', 'West'). When activity='travel' and this is supplied, days
+    whose Disha Shoola blocks that direction are excluded entirely.
     """
     try:
         _validate_muhurta_inputs(days, activity, chandra_mode,
@@ -884,6 +895,7 @@ def tool_find_muhurta(
         slots, dropped_days = _gather_muhurta_slots(
             start, days, loc, engine, activity, janma_nakshatras, janma_rasis, chandra_mode,
             janma_lagnas=janma_lagnas,
+            travel_direction=travel_direction,
         )
 
         # Re-tier across the whole search, not just one day — "Excellent"

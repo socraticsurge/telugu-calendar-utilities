@@ -648,7 +648,8 @@ def _score_nitya_yoga(yoga_name, slot_start, day, skip_on_hard_avoid):
 
 
 def diagnose_day(day, activity='any', janma_nakshatras=None,
-                 janma_rasis=None, chandra_mode='stars'):
+                 janma_rasis=None, chandra_mode='stars',
+                 travel_direction: str | None = None):
     """If day_slots() would return [] for these inputs, explain why.
 
     Returns a string (the reason) or None when the day is not filtered.
@@ -658,12 +659,20 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
     This is a lightweight pre-check — it does NOT run the full scoring
     loop. It catches the day-level skip conditions:
       - Eclipse
+      - Disha Shoola (travel blocked in specified direction)
       - Activity-skip yoga (samskara on Visha/Dagdha/Vyatipata/Vaidhriti)
       - chandra_mode strict/puja_ok filtering out the day's sunrise rashi
     """
     if day.eclipse is not None:
         kind = f'{day.eclipse.kind} eclipse'
         return f'{kind} — auspicious activities deferred'
+
+    # Disha Shoola: travel toward the blocked direction is inauspicious.
+    if activity == 'travel' and travel_direction is not None:
+        blocked = getattr(day, 'disha_shoola_direction', None)
+        if blocked is not None and travel_direction == blocked:
+            return (f'Disha Shoola ({day.vaaram}) — travel toward {blocked} '
+                    f'is inauspicious on this weekday')
 
     rules = ACTIVITY_RULES.get(activity, ACTIVITY_RULES['any'])
 
@@ -955,6 +964,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
               janma_rasis: list[str | None] | None = None,
               janma_lagnas: list[str | None] | None = None,
               chandra_mode: str = 'stars',
+              travel_direction: str | None = None,
               *, engine=None) -> list[dict]:
     """Ranked auspicious slots for one day (daytime, sunrise to sunset).
 
@@ -1001,6 +1011,12 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     # Eclipse: auspicious activities are deferred outright.
     if day.eclipse is not None:
         return []
+
+    # Disha Shoola: travel toward the blocked direction is inauspicious.
+    if activity == 'travel' and travel_direction is not None:
+        blocked = getattr(day, 'disha_shoola_direction', None)
+        if blocked is not None and travel_direction == blocked:
+            return []
 
     rules = ACTIVITY_RULES[activity]
 

@@ -382,6 +382,8 @@ class DrikGanitaEngine(PanchangamEngine):
         day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
         from telugu_panchangam.special_yogas import compute_anandadi_yoga
         day.anandadi_yoga = compute_anandadi_yoga(day.vaaram, day.nakshatra.name)
+        from telugu_panchangam.disha_shoola import disha_shoola
+        day.disha_shoola_direction = disha_shoola(day.vaaram)
         # Simha-Stha Guru / Shukra — Jupiter/Venus rasis from sidereal
         # longitudes at sunrise. Drik uses Swiss Ephemeris outer planets;
         # SS and Vakya don't model them so those engines leave defaults (False).
