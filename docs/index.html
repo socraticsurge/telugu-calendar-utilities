@@ -65,9 +65,9 @@
 
     html { scroll-behavior: smooth; }
     .hero { text-align: center; padding: 2.5rem 0 2.25rem; }
-    .hero .brand-row { display: flex; align-items: center; justify-content: center; gap: 0.85rem; }
+    .hero .brand-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; }
     .hero .sunmoon { flex: none; animation: none; }
-    .hero .brand-text { text-align: left; }
+    .hero .brand-text { text-align: center; }
     .hero h1 { font-family: var(--brand-display); font-size: 2.3rem; font-weight: 400; margin: 0; letter-spacing: 0.005em; line-height: 1.15; color: #1F1A17; }
     .hero h1 em {
       font-style: italic; font-weight: 400;
@@ -79,16 +79,26 @@
       font-size: 0.78rem; letter-spacing: 0.08em; color: rgba(31,26,23,0.45);
       margin-top: 0.3rem;
     }
-    .hero .tagline { color: #58504A; font-size: 1rem; margin: 1.25rem auto 0; max-width: 540px; }
-    .hero .tagline-short { display: none; }
+    .hero .tagline { color: #58504A; margin: 1.25rem auto 0; max-width: 540px; text-align: center; }
+    .hero .shloka {
+      font-family: var(--brand-display); font-style: italic;
+      font-size: 1.05rem; line-height: 1.55;
+      display: flex; flex-direction: column; gap: 0.05rem;
+      color: #4A413B;
+    }
+    .hero .shloka-gist {
+      margin-top: 0.9rem; font-size: 0.95rem; color: #6A5F58;
+      letter-spacing: 0.01em;
+    }
     @media (max-width: 620px) {
       .hero { padding: 0.9rem 0 0.75rem; }
-      .hero .brand-row { gap: 0.4rem; }
+      .hero .brand-row { gap: 0.3rem; }
       .hero h1 { font-size: 1.5rem; line-height: 1.15; }
       .hero .brand-sub { font-size: 0.58rem; letter-spacing: 0.06em; margin-top: 0.15rem; }
       .hero .sunmoon { width: 34px; height: 34px; }
-      .hero .tagline-full { display: none; }
-      .hero .tagline-short { display: block; font-size: 0.88rem; margin-top: 0.35rem; }
+      .hero .tagline { margin-top: 0.55rem; }
+      .hero .shloka { font-size: 0.92rem; line-height: 1.5; }
+      .hero .shloka-gist { font-size: 0.85rem; margin-top: 0.65rem; }
     }
     #subscribe { scroll-margin-top: 1rem; }
     .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
@@ -1176,8 +1186,15 @@
         <div class="brand-sub">Panchangam · Rasi Phalalu · Muhurtam</div>
       </div>
     </div>
-    <div class="tagline tagline-full">Making Vedic panchangam guidance accessible to the world — free, automatic, and updated every day.</div>
-    <div class="tagline tagline-short">Vedic panchangam guidance, accessible to the world.</div>
+    <div class="tagline">
+      <div class="shloka">
+        <span>satyaṃ brūyāt priyaṃ brūyān</span>
+        <span>na brūyāt satyam apriyam</span>
+        <span>priyaṃ ca nānṛtaṃ brūyād</span>
+        <span>eṣa dharmaḥ sanātanaḥ</span>
+      </div>
+      <div class="shloka-gist">Be truthful. Be kind.</div>
+    </div>
   </div>
 
   <div class="card">
