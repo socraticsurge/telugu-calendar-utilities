@@ -28,6 +28,20 @@ INDEX_HTML = REPO_ROOT / 'docs' / 'index.html'
 DEPLOY_WORKFLOW = REPO_ROOT / '.github' / 'workflows' / 'deploy-landing.yml'
 BUILD_SCRIPT = REPO_ROOT / 'scripts' / 'build_landing_page.py'
 
+# Every workflow that publishes to gh-pages MUST pin this CNAME — the
+# custom domain panchangam.astrochaganti.com is load-bearing for
+# subscribers (their webcal:// URLs point at it) and for SEO continuity
+# from the old github.io URL. CLAUDE.md spells this out explicitly.
+# If any of these workflows drops the cname line, the next deploy
+# wipes the CNAME file from gh-pages and the domain stops resolving.
+CNAME_VALUE = 'panchangam.astrochaganti.com'
+CNAME_PINNED_WORKFLOWS = [
+    '.github/workflows/deploy-landing.yml',
+    '.github/workflows/generate.yml',
+    '.github/workflows/gochara.yml',
+    '.github/workflows/lagna.yml',
+]
+
 # Matches <script src="…"> / <script src='…'> with a relative path
 # (no http://, no leading slash — those are external resources, not
 # files we need to stage).
@@ -90,4 +104,28 @@ def test_sidecar_listed_in_build_landing_page_script(sidecar: str):
         f'scripts/build_landing_page.py does not copy '
         f'docs/{sidecar}. The next monthly generate.yml run will '
         f'remove it from gh-pages.'
+    )
+
+
+@pytest.mark.parametrize('workflow_path', CNAME_PINNED_WORKFLOWS)
+def test_deploy_workflow_pins_cname(workflow_path: str):
+    """Every workflow that publishes to gh-pages must include the
+    `cname: panchangam.astrochaganti.com` line. Dropping it would
+    erase the CNAME file from gh-pages on the next deploy and the
+    custom domain stops resolving — subscribers' webcal:// URLs
+    break silently. CLAUDE.md forbids removing this line; this
+    test makes the rule machine-enforceable.
+
+    The substring check is intentionally literal: no YAML parsing,
+    no aliases, no quoting variants. The string must appear exactly
+    as it does in every existing deploy workflow today.
+    """
+    yml = (REPO_ROOT / workflow_path).read_text(encoding='utf-8')
+    needle = f'cname: {CNAME_VALUE}'
+    assert needle in yml, (
+        f'{workflow_path} does not contain {needle!r}. If you '
+        f'intentionally removed the cname pin you also need to '
+        f'plan a CNAME-file replacement on gh-pages, otherwise '
+        f'{CNAME_VALUE} stops serving the site after the next '
+        f'deploy. See CLAUDE.md.'
     )
