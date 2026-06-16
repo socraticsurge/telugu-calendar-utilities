@@ -114,9 +114,8 @@ class DrikGanitaEngine(PanchangamEngine):
 
     def _yoga_span(self, jd_sunrise: float) -> Span:
         """Yoga at sunrise (Sun+Moon combined longitude)."""
-        _self = self
         def yoga_longitude(jd: float) -> float:
-            return (_self._sun_lon(jd) + _self._moon_lon(jd)) % 360.0
+            return (self._sun_lon(jd) + self._moon_lon(jd)) % 360.0
 
         combined = yoga_longitude(jd_sunrise)
         nak_size = 360.0 / 27.0

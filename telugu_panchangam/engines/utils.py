@@ -29,6 +29,7 @@ def sidereal_longitude_with_ayanamsa(jd: float, planet: int, ayanamsa: str) -> f
     swe.set_sid_mode(mode)
     flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
     result, _ = swe.calc_ut(jd, planet, flags)
+    swe.set_sid_mode(swe.SIDM_LAHIRI)  # restore Lahiri so cached Lahiri callers see correct mode
     return result[0] % 360.0
 
 
