@@ -154,10 +154,16 @@ def _assess_vaara(day: PanchangamDay) -> LimbAssessment:
             quality='shuddha', shuddha=True,
             reason='Auspicious weekday (Soma/Budha/Guru/Shukra)',
         )
+    if vara in _VARA_ASHUDDHA:
+        return LimbAssessment(
+            limb='Vaara', value=vara,
+            quality='ashuddha', shuddha=False,
+            reason='Inauspicious weekday for gentle/auspicious activities (Ravi/Kuja/Shani)',
+        )
     return LimbAssessment(
         limb='Vaara', value=vara,
-        quality='ashuddha', shuddha=False,
-        reason='Inauspicious weekday for gentle/auspicious activities (Ravi/Kuja/Shani)',
+        quality='mixed', shuddha=False,
+        reason=f'{vara} — unrecognized weekday; consult a Jyotishi',
     )
 
 
