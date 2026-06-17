@@ -1,4 +1,4 @@
-# Sidereal (Lahiri) positions of the nine grahas, with rasi, nakshatra,
+# Sidereal positions of the nine grahas, with rasi, nakshatra,
 # retrograde state and next sign ingress. Verified against
 # drikpanchang.com sidereal planetary positions.
 from datetime import date
@@ -6,6 +6,7 @@ from datetime import date
 import swisseph as swe
 
 from telugu_panchangam.engines.base import RASHI_NAMES, NAKSHATRA_NAMES
+from telugu_panchangam.engines.utils import AYANAMSA_MODES
 
 GRAHA_NAMES: list[str] = [
     'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani', 'Rahu', 'Ketu',
@@ -23,8 +24,7 @@ _MAX_INGRESS_DAYS = 2000.0
 
 
 def _lon_speed(jd: float, graha: str) -> tuple[float, float]:
-    """Sidereal longitude and daily speed for a graha at jd."""
-    swe.set_sid_mode(swe.SIDM_LAHIRI)
+    """Sidereal longitude and daily speed (sid mode must be pre-set by caller)."""
     flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
     if graha == 'Ketu':
         result, _ = swe.calc_ut(jd, swe.MEAN_NODE, flags)
@@ -64,23 +64,35 @@ def _jd_to_date(jd: float, tz_offset_hours: float = 5.5) -> date:
     return date(y, m, d)
 
 
-def graha_positions(jd: float) -> list[dict]:
+def graha_positions(jd: float, ayanamsa: str = 'lahiri') -> list[dict]:
     """All nine grahas at instant `jd` (UT): longitude, rasi, nakshatra,
-    pada, retrograde, and the date (IST) the graha enters its next rasi."""
-    out = []
-    for graha in GRAHA_NAMES:
-        lon, speed = _lon_speed(jd, graha)
-        retro = speed < 0
-        ingress = _next_ingress(jd, graha)
-        nak_pos = lon / (360.0 / 27.0)
-        out.append({
-            'graha': graha,
-            'longitude': round(lon, 4),
-            'rasi': RASHI_NAMES[_rasi_idx(lon)],
-            'nakshatra': NAKSHATRA_NAMES[int(nak_pos) % 27],
-            'pada': int(nak_pos * 4) % 4 + 1,
-            'retrograde': retro,
-            'rasi_until': _jd_to_date(ingress[0]).isoformat() if ingress else None,
-            'next_rasi': RASHI_NAMES[ingress[1]] if ingress else None,
-        })
-    return out
+    pada, retrograde, and the date (IST) the graha enters its next rasi.
+
+    Parameters
+    ----------
+    jd : float
+        Julian Day (UT) at which to evaluate positions (typically sunrise).
+    ayanamsa : str
+        One of 'lahiri' (default), 'raman', 'krishnamurti', 'true_chitrapaksha'.
+    """
+    swe.set_sid_mode(AYANAMSA_MODES[ayanamsa])
+    try:
+        out = []
+        for graha in GRAHA_NAMES:
+            lon, speed = _lon_speed(jd, graha)
+            retro = speed < 0
+            ingress = _next_ingress(jd, graha)
+            nak_pos = lon / (360.0 / 27.0)
+            out.append({
+                'graha': graha,
+                'longitude': round(lon, 4),
+                'rasi': RASHI_NAMES[_rasi_idx(lon)],
+                'nakshatra': NAKSHATRA_NAMES[int(nak_pos) % 27],
+                'pada': int(nak_pos * 4) % 4 + 1,
+                'retrograde': retro,
+                'rasi_until': _jd_to_date(ingress[0]).isoformat() if ingress else None,
+                'next_rasi': RASHI_NAMES[ingress[1]] if ingress else None,
+            })
+        return out
+    finally:
+        swe.set_sid_mode(swe.SIDM_LAHIRI)
