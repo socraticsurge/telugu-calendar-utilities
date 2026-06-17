@@ -38,7 +38,7 @@ Everything is shareable to WhatsApp.
 
 | System | Basis | Best for |
 |--------|-------|----------|
-| **Drik Ganita** | Swiss Ephemeris (pyswisseph) + Lahiri ayanamsa | Modern apps, accurate sky events |
+| **Drik Ganita** | Swiss Ephemeris (pyswisseph) — supports Lahiri, Raman, Krishnamurti, True Chitrapaksha ayanamsas | Modern apps, accurate sky events |
 | **Surya Siddhanta** | Mean-motion algorithms from classical SS text | Traditions rooted in classical siddhantic calculation |
 | **Vakya** | Surya Siddhanta + published correction tables | Traditional Telugu/Tamil printed Panchangams |
 
@@ -114,7 +114,9 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 |------|-------------|
 | `list_supported_cities` | 22 pre-configured cities with lat/lon/timezone |
 
-All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly. Full API documentation and parameter details: [mcp-server-panchangam on PyPI](https://pypi.org/project/mcp-server-panchangam/).
+All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
+
+Drik-system tools that accept a `city` or date also accept `ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha` (default: `lahiri`). Full API documentation and parameter details: [mcp-server-panchangam on PyPI](https://pypi.org/project/mcp-server-panchangam/).
 
 ## How it works
 
