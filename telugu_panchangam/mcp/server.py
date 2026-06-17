@@ -17,6 +17,7 @@ from telugu_panchangam.mcp.tools import (
     tool_get_graha_yuddha,
     tool_get_rashi_ingresses,
     tool_get_eclipse_calendar,
+    tool_get_panchanga_shuddhi,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -155,6 +156,19 @@ def get_eclipse_calendar(
 ) -> str:
     """Returns all solar and lunar eclipses in a date range with per-city visibility and Sutak timing. Each eclipse entry includes: kind (Solar/Lunar), subtype (Total/Annular/Partial/Penumbral), visible (whether it is observable from the given city), start/end times in local time, and sutak (ritual impurity window — 12 hours before Solar, 9 hours before Lunar) for visible eclipses only. Max range: 730 days (two years). Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone derived if omitted)."""
     return tool_get_eclipse_calendar(start_date, end_date, city, latitude, longitude, timezone)
+
+
+@mcp.tool()
+def get_panchanga_shuddhi(
+    date: str,
+    city: str = 'Hyderabad',
+    system: str = 'drik',
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Panchanga Shuddhi — five-limb purity assessment for any date. Returns a verdict (Sarva Shuddha / Chatushka Shuddha / Tri Shuddha / Dvi Shuddha / Eka Shuddha / Sarva Ashuddha) and a per-limb breakdown (Tithi, Vaara, Nakshatra, Yoga, Karana) with quality ('shuddha' | 'ashuddha' | 'mixed') and a one-line reason for each. Rules: Tithi — Rikta (4th/9th/14th) are ashuddha; Vaara — Mon/Wed/Thu/Fri are shuddha, Sun/Tue/Sat are ashuddha; Nakshatra — Laghu/Mridu/Dhruva/Chara are shuddha, Tikshna/Ugra are ashuddha, Krittika/Vishakha are mixed; Yoga — the 17 Nitya auspicious yogas are shuddha, Vyatipata/Vaidhriti are ashuddha, partial-dosha yogas (Vishkambha/Atiganda/Shoola/Ganda/Vyaghata/Parigha) are mixed; Karana — Vishti (Bhadra) and the four fixed karanas are ashuddha, all movable karanas are shuddha. Values are taken at sunrise. Args: date=YYYY-MM-DD, city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya (default: drik)."""
+    return tool_get_panchanga_shuddhi(date, city, system, latitude, longitude, timezone)
 
 
 def main() -> None:
