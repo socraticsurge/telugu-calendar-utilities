@@ -15,6 +15,8 @@ from telugu_panchangam.mcp.tools import (
     tool_get_lagna_transitions,
     tool_get_combustion_calendar,
     tool_get_graha_yuddha,
+    tool_get_rashi_ingresses,
+    tool_get_eclipse_calendar,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -130,6 +132,29 @@ def get_graha_yuddha(
 ) -> str:
     """Returns Graha Yuddha (planetary war) periods in a date range. A planetary war occurs when two of the five tara grahas — Mercury, Venus, Mars, Jupiter, Saturn — come within 1° of each other in ecliptic longitude. The planet with the higher ecliptic latitude (more northerly) at the closest approach is the victor; the vanquished loses astrological strength for the duration. The Sun, Moon, Rahu, and Ketu are exempt by classical convention. Each war entry includes: the two planets, winner, loser, start/exact/end times in UTC, and minimum separation in arc-minutes. Max date range: 366 days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, planets=optional subset e.g. ['Venus', 'Jupiter'] (default: all five, yielding all 10 pair combinations)."""
     return tool_get_graha_yuddha(start_date, end_date, planets)
+
+
+@mcp.tool()
+def get_rashi_ingresses(
+    start_date: str,
+    end_date: str,
+    planets: list[str] | None = None,
+) -> str:
+    """Returns all rashi (sign) ingress events for the classical planets over a date range. A rashi ingress is when a planet crosses from one zodiac sign into the next — the foundational event for gochara (transit) period boundaries. Sidereal (Lahiri) coordinates throughout. Includes retrograde ingresses (a planet re-entering a sign it recently left). Each entry has: planet, rashi entered, enters (UTC), exits (next ingress, UTC — may fall outside the range). Planets with no sign change in the range (e.g. Saturn in Meena all of 2026) do not appear. Supported planets: Sun, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu. Moon is excluded (too frequent — a sign every ~2.25 days). Max range: 366 days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, planets=optional subset (default: all eight)."""
+    return tool_get_rashi_ingresses(start_date, end_date, planets)
+
+
+@mcp.tool()
+def get_eclipse_calendar(
+    start_date: str,
+    end_date: str,
+    city: str = 'Hyderabad',
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Returns all solar and lunar eclipses in a date range with per-city visibility and Sutak timing. Each eclipse entry includes: kind (Solar/Lunar), subtype (Total/Annular/Partial/Penumbral), visible (whether it is observable from the given city), start/end times in local time, and sutak (ritual impurity window — 12 hours before Solar, 9 hours before Lunar) for visible eclipses only. Max range: 730 days (two years). Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone derived if omitted)."""
+    return tool_get_eclipse_calendar(start_date, end_date, city, latitude, longitude, timezone)
 
 
 def main() -> None:
