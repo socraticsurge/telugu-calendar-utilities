@@ -40,7 +40,6 @@ from telugu_panchangam.models.panchangam_day import Location
 PLANET_NAMES: list[str] = ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
 
 _OUTER = frozenset({'Mars', 'Jupiter', 'Saturn'})
-_INNER = frozenset({'Mercury', 'Venus'})
 
 # Approximate synodic periods in days (used for look-back window).
 _SYNODIC: dict[str, int] = {
