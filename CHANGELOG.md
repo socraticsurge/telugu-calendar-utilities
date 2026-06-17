@@ -5,6 +5,37 @@ All notable changes to this project are documented here. Format follows
 [SemVer](https://semver.org/spec/v2.0.0.html). The `mcp-server-panchangam`
 PyPI version tracks this file's most recent release entry.
 
+## [1.10.4] — 2026-06-17
+
+The theme: **ayanamsa full support across gochara, ingress, and phalalu tools**.
+`get_graha_positions`, `get_gochara`, `get_rasi_phalalu`, and
+`get_rashi_ingresses` previously accepted an `ayanamsa` parameter but
+always computed in Lahiri. All four now apply it end-to-end.
+**+9 tests (1054 → 1063 passed).**
+
+### Changed
+- **`get_graha_positions`** — `ayanamsa` parameter now applied to all nine
+  graha longitude and ingress calculations (previously Lahiri-only with a
+  warning note in the response). Stale `ayanamsa_note` field removed.
+- **`get_gochara`** — `ayanamsa` parameter added and applied; graha
+  positions are now computed under the requested ayanamsa.
+- **`get_rasi_phalalu`** — `ayanamsa` parameter added and applied; reading
+  is rendered from positions under the requested ayanamsa.
+- **`get_rashi_ingresses`** — `ayanamsa` parameter added and applied;
+  sign-boundary crossings are computed under the requested ayanamsa.
+- `gochara/positions.py` refactored: `graha_positions()` owns the Swiss
+  Ephemeris sid mode (set once, restored in `finally`); internal helpers
+  are now mode-agnostic, avoiding redundant `set_sid_mode` calls on every
+  loop iteration of the ingress search.
+- `ingress.py` refactored: same own-the-mode pattern in `rashi_ingresses()`.
+
+### Documentation
+- README and PyPI page updated: tool signatures show `ayanamsa="lahiri"` for
+  all seven ayanamsa-aware tools; new Ayanamsa section lists the four
+  supported keys and clarifies SS/Vakya accept-but-ignore behaviour.
+
+([PR #105](https://github.com/socraticsurge/telugu-calendar-utilities/pull/105))
+
 ## [1.10.3] — 2026-06-17
 
 The theme: **astronomical timing computations — four new MCP tools**.
