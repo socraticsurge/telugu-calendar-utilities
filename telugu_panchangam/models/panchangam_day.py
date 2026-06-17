@@ -8,6 +8,7 @@ class Location:
     lat: float
     lon: float
     timezone: str
+    alt: float = 0.0   # metres above sea level; used by heliacal visibility computation
 
 
 @dataclass
