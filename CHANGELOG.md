@@ -5,6 +5,48 @@ All notable changes to this project are documented here. Format follows
 [SemVer](https://semver.org/spec/v2.0.0.html). The `mcp-server-panchangam`
 PyPI version tracks this file's most recent release entry.
 
+## [1.10.3] — 2026-06-17
+
+The theme: **astronomical timing computations — four new MCP tools**.
+All-planet combustion/visibility calendar, planetary war detection,
+rashi ingress + eclipse calendar, and five-limb Panchanga Shuddhi
+assessment. Every tool is a new module consuming engine outputs;
+the frozen core and ICS feeds are untouched. **+84 tests
+(991 → 1054 passed, 63 previously counted across PRs 101–103).**
+
+### Added
+- **`get_combustion_calendar` MCP tool** — heliacal Asta (setting) and
+  Udaya (rising) periods for the five classical planets (Mercury, Venus,
+  Mars, Jupiter, Saturn) via `swe.heliacal_ut()`, matching the
+  Drik Panchang Asta/Udaya calendar. Per-city altitude used for
+  sky-visibility accuracy. New module `telugu_panchangam/maudhya_calendar.py`.
+  ([PR #101](https://github.com/socraticsurge/telugu-calendar-utilities/pull/101)).
+- **`get_graha_yuddha` MCP tool** — Graha Yuddha (planetary war) periods:
+  two tara grahas within 1° ecliptic longitude, winner by higher ecliptic
+  latitude, entry/exit via binary search + ternary-search minimum.
+  New module `telugu_panchangam/graha_yuddha.py`.
+  ([PR #102](https://github.com/socraticsurge/telugu-calendar-utilities/pull/102)).
+- **`get_rashi_ingresses` MCP tool** — all rashi (sign) ingress events
+  for Sun, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu; Lahiri
+  sidereal; retrograde ingresses included; adaptive-step scan + 44-iter
+  bisection. New module `telugu_panchangam/ingress.py`.
+  ([PR #103](https://github.com/socraticsurge/telugu-calendar-utilities/pull/103)).
+- **`get_eclipse_calendar` MCP tool** — solar and lunar eclipses in a
+  date range with per-city visibility and Sutak timing (12 h Solar,
+  9 h Lunar). Wraps the existing eclipse engine.
+  ([PR #103](https://github.com/socraticsurge/telugu-calendar-utilities/pull/103)).
+- **`get_panchanga_shuddhi` MCP tool** — five-limb purity assessment
+  (Tithi, Vaara, Nakshatra, Yoga, Karana) with quality
+  (shuddha / ashuddha / mixed) and one-line reason per limb; overall
+  verdict from Sarva Ashuddha (0) to Sarva Shuddha (5). New module
+  `telugu_panchangam/panchanga_shuddhi.py`.
+  ([PR #104](https://github.com/socraticsurge/telugu-calendar-utilities/pull/104)).
+- **`Location.alt`** — altitude (metres) added to the `Location` dataclass;
+  all 22 bundled cities updated with real-world elevation values.
+  Required for heliacal visibility accuracy.
+
+---
+
 ## [1.9.0] — 2026-06-17
 
 The theme: **classical muhurta sharpening — non-personal timing layer**.
