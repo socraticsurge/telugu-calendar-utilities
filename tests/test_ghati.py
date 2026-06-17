@@ -3,7 +3,6 @@ import json
 from telugu_panchangam.ghati import (
     make_clock, civil_to_ghati, ghati_to_civil, ghati_window,
 )
-from telugu_panchangam.models.panchangam_day import GhatiClock
 
 
 def test_make_clock_seconds_per_ghati():

@@ -7,8 +7,6 @@ Sidereal (Lahiri) solar sign boundaries verified with drikpanchang.com:
 import json
 from datetime import date
 
-import pytest
-
 from telugu_panchangam.maasa_filters import KHAR_MAASA_SIGNS, khar_maasa_name
 from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.cities import CITIES

@@ -1,8 +1,8 @@
-from datetime import datetime, timezone, date, timedelta
+from datetime import datetime, timezone, date
 from unittest.mock import patch
 from telugu_panchangam.engines.utils import (
-    datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
-    moon_sun_elongation, moon_longitude, sun_longitude,
+    datetime_to_jd, jd_to_utc, local_midnight_jd,
+    moon_sun_elongation,
     previous_new_moon, next_new_moon,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
     sidereal_longitude, tropical_sun_longitude
@@ -172,7 +172,7 @@ def test_next_new_moon_real_data():
 
     # Verify the elongation at the calculated JD is extremely close to 0
     elong = moon_sun_elongation(next_nm_jd)
-    assert elong < 1e-4 or elong > 360.0 - 1e-4
+    assert min(elong, 360.0 - elong) < 1e-4
 
     # The next new moon should be in March 2024.
     dt_nm = jd_to_utc(next_nm_jd)
