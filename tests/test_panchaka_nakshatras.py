@@ -93,7 +93,7 @@ def test_cremation_allowed_on_non_panchaka_day():
         day = eng.calculate(target, city)
         if day.in_panchaka_nakshatra or day.eclipse is not None:
             continue
-        _slots = day_slots(day, activity='cremation')
+        day_slots(day, activity='cremation')
         # May be 0 if all choghadiya are blocked, but the panchaka rule
         # itself must not be the reason. We verify by checking diagnose_day.
         from telugu_panchangam.personal.muhurta import diagnose_day
