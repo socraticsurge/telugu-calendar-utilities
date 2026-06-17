@@ -13,6 +13,7 @@ from telugu_panchangam.mcp.tools import (
     tool_find_muhurta,
     tool_get_daily_horas,
     tool_get_lagna_transitions,
+    tool_get_combustion_calendar,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -104,6 +105,20 @@ def get_panchangam_range(
 ) -> str:
     """Returns a compact Panchangam summary for each day in a date range (max 31 days). Each day includes: Tithi, Nakshatra, Yoga, Sunrise/Sunset, all auspicious and inauspicious windows, eclipse (if any), special yogas, and special day flags. New in 1.9.0: each day also carries all timing-computation fields — ghati_clock, nakshatra_pada, vishaghati, bhadra_mukha/bhadra_puchha, sankramana_avoidance, in_panchaka_nakshatra, nakshatra_mukha, anandadi_yoga, is_khar_maasa/khar_maasa_name, is_pitru_paksha, simha_stha_guru/shukra, guru_maudhya/shukra_maudhya, disha_shoola_direction, panchaka_rahita. Useful for planning muhurtas over a week or comparing multiple days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, city=city name, system=drik|surya_siddhanta|vakya (default: drik), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
     return tool_get_panchangam_range(start_date, end_date, city, system, latitude, longitude, timezone, ayanamsa)
+
+
+@mcp.tool()
+def get_combustion_calendar(
+    start_date: str,
+    end_date: str,
+    city: str = 'Hyderabad',
+    planets: list[str] | None = None,
+    latitude: float | None = None,
+    longitude: float | None = None,
+    timezone: str | None = None,
+) -> str:
+    """Returns Asta (heliacal setting / combustion entry) and Udaya (heliacal rising / re-emergence) periods for the five classical planets — Mercury, Venus, Mars, Jupiter, Saturn — over a date range for a given city. Asta marks when a planet becomes invisible due to proximity to the Sun; Udaya marks when it re-emerges. This matches the Drik Panchang Asta/Udaya calendar (sky-visibility criterion), not the fixed BPHS elongation Maudhya thresholds used in per-day combustion flags. Accuracy: within 1–2 days of Drik Panchang for most planets; Mars ±2 days. Max date range: 366 days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone derived if omitted), planets=optional subset e.g. ['Saturn', 'Jupiter'] (default: all five)."""
+    return tool_get_combustion_calendar(start_date, end_date, city, planets, latitude, longitude, timezone)
 
 
 def main() -> None:

@@ -10,6 +10,7 @@ _log = logging.getLogger(__name__)
 _MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
 
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.maudhya_calendar import combustion_periods, PLANET_NAMES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
@@ -781,6 +782,91 @@ def tool_get_rasi_phalalu(
                           'This is a daily reading, not a horoscope consultation or a muhurta.',
         })
         return json.dumps(out)
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+
+
+def _resolve_city_with_alt(
+    city: str,
+    latitude: Optional[float],
+    longitude: Optional[float],
+    timezone: Optional[str],
+) -> Location:
+    """Like _resolve_city but preserves altitude from the CITIES list for heliacal accuracy."""
+    if isinstance(city, str) and len(city) > _MAX_NAME:
+        raise ValueError('City name too long.')
+    if latitude is not None and longitude is not None:
+        if not (-90.0 <= float(latitude) <= 90.0):
+            raise ValueError('latitude must be between -90 and 90.')
+        if not (-180.0 <= float(longitude) <= 180.0):
+            raise ValueError('longitude must be between -180 and 180.')
+        if timezone is None:
+            timezone = timezone_for_coordinates(float(latitude), float(longitude))
+        return Location(name=city or 'Custom', lat=float(latitude), lon=float(longitude), timezone=timezone)
+    known = next((c for c in CITIES if c.name.lower() == (city or '').lower()), None)
+    if known:
+        return known
+    lat, lon, tz = resolve_location(city)
+    return Location(name=city, lat=lat, lon=lon, timezone=tz)
+
+
+def tool_get_combustion_calendar(
+    start_date: str,
+    end_date: str,
+    city: str = 'Hyderabad',
+    planets: Optional[list] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    """Return Asta (combustion entry) and Udaya (emergence) periods for the five classical planets."""
+    try:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if end < start:
+            raise ValueError('end_date must be >= start_date.')
+        if (end - start).days > 365:
+            raise ValueError('Date range exceeds 366-day limit. Use multiple calls for longer spans.')
+        if planets is not None:
+            bad = [p for p in planets if p not in set(PLANET_NAMES)]
+            if bad:
+                raise ValueError(f'Unknown planet(s): {bad}. Valid: {PLANET_NAMES}')
+        loc = _resolve_city_with_alt(city, latitude, longitude, timezone)
+        tz_str = loc.timezone
+
+        periods = combustion_periods(start, end, loc, planets=planets)
+
+        def _fmt_dt(dt, tz_s):
+            if dt is None:
+                return None
+            return dt.astimezone(pytz.timezone(tz_s)).strftime('%Y-%m-%d %H:%M')
+
+        return json.dumps({
+            'start_date': start_date,
+            'end_date': end_date,
+            'city': city,
+            'timezone': tz_str,
+            'note': (
+                'Heliacal Asta (planet becomes invisible near the Sun) and Udaya '
+                '(re-emergence) computed via Swiss Ephemeris sky-visibility criterion. '
+                'This matches the Drik Panchang Asta/Udaya calendar, not the fixed '
+                'BPHS elongation Maudhya thresholds used in per-day combustion flags. '
+                'Accuracy: within 1-2 days of Drik Panchang for most events; '
+                'Mars ±2 days. ongoing=true means the planet is still combust at end_date.'
+            ),
+            'periods': [
+                {
+                    'planet': p.planet,
+                    'asta': _fmt_dt(p.enters, tz_str),
+                    'udaya': _fmt_dt(p.exits, tz_str) if p.exits else None,
+                    'ongoing': p.exits is None,
+                }
+                for p in periods
+            ],
+        })
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
