@@ -5,6 +5,25 @@ All notable changes to this project are documented here. Format follows
 [SemVer](https://semver.org/spec/v2.0.0.html). The `mcp-server-panchangam`
 PyPI version tracks this file's most recent release entry.
 
+## [Unreleased]
+
+Documentation and repository housekeeping only — no engine, MCP, or
+ICS-feed behaviour changes; all code trees byte-identical.
+
+### Documentation
+- CHANGELOG reconciled against the full git history. The operational-
+  maturity round that actually shipped **inside the v1.9.0 tag** is now
+  folded into the [1.9.0] entry — it had been stranded under a misplaced
+  `[Unreleased]` heading below newer releases. Every release back to the
+  project's first tag (**v1.0.5**) is now documented here, with
+  comparison links.
+
+### Housekeeping
+- The 15 automated-assistant cleanup commits from the 1.9.0 round were
+  re-authored to the maintainer identity, so the assistant bot no longer
+  appears in the contributor list. Author/committer metadata only — every
+  tree SHA is unchanged, so released artifacts are byte-identical.
+
 ## [1.10.4] — 2026-06-17
 
 The theme: **ayanamsa full support across gochara, ingress, and phalalu tools**.
@@ -80,18 +99,25 @@ the frozen core and ICS feeds are untouched. **+84 tests
 
 ## [1.9.0] — 2026-06-17
 
-The theme: **classical muhurta sharpening — non-personal timing layer**.
+1.9.0 bundled **two rounds of work under a single release tag**: an
+operational-maturity round (release safety, dependency hygiene, CI and
+security hardening, contributor docs) merged first, then the headline
+classical-muhurta-sharpening round (sixteen non-personal timing
+computations). No engine math beyond additive fields; the frozen core
+is untouched and ICS subscriber feeds are byte-identical. **+166 tests
+overall (825 → 991 passed).** Both rounds are documented below.
+
+### Headline — Classical muhurta sharpening: 16 timing computations (849 → 991)
+
 Sixteen computations from Muhurta Chintamani, Brihat Samhita,
 Dharmasindhu, and standard panchangam authority — all surface as
 additive properties on `PanchangamDay` and across the three per-day
 MCP response paths (`tool_get_panchangam`, `tool_get_muhurta`,
 `tool_get_panchangam_range`). No personal-astrology computations
 (Dasha, Navamsa, Kuta match) — those are reserved for a separate
-project. Engine math is additive only; the frozen core is untouched
-and ICS subscriber feeds are byte-identical. **+142 tests
-(849 → 991 passed).**
+project.
 
-### Added — Timing computations (16 features)
+#### Added — Timing computations (16 features)
 
 **Foundational (Tasks 1–3):**
 - **Ghati/vighati clock infrastructure** — sunrise-anchored ghati
@@ -208,7 +234,7 @@ and ICS subscriber feeds are byte-identical. **+142 tests
   `avoid_for`. Module: `telugu_panchangam/panchaka.py` (sources:
   Muhurta Chintamani, Dharmasindhu).
 
-### Changed
+#### Changed
 
 **MCP surface:**
 - All 19 new computation fields land on `tool_get_panchangam`,
@@ -260,7 +286,7 @@ and ICS subscriber feeds are byte-identical. **+142 tests
   every field to all three per-day MCP tool responses with parity
   tests baked into each subsequent task.
 
-### Notes
+#### Notes
 
 - **Frozen-core compliance** — no festival rules in `engines/base.py`
   touched, no `generators/ics.py` changes, no `docs/` UI changes.
@@ -280,17 +306,15 @@ and ICS subscriber feeds are byte-identical. **+142 tests
   Brihat Samhita (Maudhya thresholds), Dharmasindhu (Pitru Paksha,
   Panchaka Rahita).
 
----
+### Also shipped — Operational-maturity round (825 → 846)
 
-## [Unreleased]
-
-The theme: **operational maturity**. Release safety net, dependency
+Merged ahead of the timing work: release safety net, dependency
 hygiene, dual-axis CI matrix, security scanning, contributor docs,
 forward-year DP-verified festival regression, and a uniform table-
-driven festival dispatcher. No engine math changes; 21 new tests
+driven festival dispatcher. No engine math changes; +21 tests
 (825 → 846 passed).
 
-### Added
+#### Added
 - **MCP — `find_muhurta` now exposes per-person Chandrabalam, strict
   Lagna Shuddhi, and `chandra_mode`** ([`janma_rasis`, `janma_lagnas`,
   `chandra_mode`] kwargs) — previously unreachable from MCP clients
@@ -341,7 +365,7 @@ driven festival dispatcher. No engine math changes; 21 new tests
   workflow must contain `cname: panchangam.astrochaganti.com`.
   ([PR #76](https://github.com/socraticsurge/telugu-calendar-utilities/pull/76)).
 
-### Changed
+#### Changed
 - **`_festivals` dispatcher refactored** — Karthika Somavaram,
   Varalakshmi Vratam, Sankashti Chaturthi, and Masa Shivaratri lifted
   from inline conditionals into named rule tables
@@ -370,7 +394,7 @@ driven festival dispatcher. No engine math changes; 21 new tests
   ([PR #83](https://github.com/socraticsurge/telugu-calendar-utilities/pull/83),
   [PR #88](https://github.com/socraticsurge/telugu-calendar-utilities/pull/88)).
 
-### Fixed
+#### Fixed
 - **`server.json` version drift** — both top-level and `packages[0]`
   were pinned at 1.7.1 while PyPI shipped 1.8.0; the MCP registry was
   advertising the wrong package version. Now in lockstep with
@@ -381,13 +405,13 @@ driven festival dispatcher. No engine math changes; 21 new tests
   ("reports go to … at ."). Filled in `cvk.atreya@gmail.com`.
   ([PR #75](https://github.com/socraticsurge/telugu-calendar-utilities/pull/75)).
 
-### Removed
+#### Removed
 - Three unused imports in `engines/vakya.py` (`_CIVIL_DAYS`,
   `_MOON_REVS`, `_MOON_APOGEE_REVS`) and a dead `d += timedelta(days=1)`
   rebind in `tool_get_panchangam_range`. Byte-identical behaviour.
   ([PR #95](https://github.com/socraticsurge/telugu-calendar-utilities/pull/95)).
 
-### Security
+#### Security
 - **All third-party GitHub Actions pinned to commit SHAs** with
   version comments (Dependabot understands the convention). Closes
   the tag-move supply-chain risk on `peaceiris/actions-gh-pages`
@@ -411,8 +435,10 @@ against the project's DP-verification surface:
 - **30 forward-year DP-verified cells** ([PR #89]) — unchanged
 - **5131-byte ICS golden snapshot** ([PR #93]) — unchanged
 
-Aggregate: 846 passed, 1 skipped (was 825 before Phase 1; +21 from
-the new tests added here). Zero behaviour regressions.
+Aggregate across both rounds: 991 passed, 1 skipped (825 before this
+release; +21 from the operational-maturity round, +142 from the
+timing-computations round, +3 intermediate — +166 net). Zero
+behaviour regressions.
 
 ### Engine surface change (sign-off recorded)
 Two engine files touched:
@@ -491,5 +517,242 @@ No engine math changed; 75-test engine regression suite + DP-verified
 lagna transition test (Hyderabad 2024-01-01 Dhanu→Makara at 07:47 IST
 ±2 min) all pass against this code.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.8.0...HEAD
-[1.8.0]: https://github.com/socraticsurge/telugu-calendar-utilities/releases/tag/v1.8.0
+## [1.7.1] — 2026-06-14
+
+Patch release refining Muhurta finder tiering.
+
+### Changed
+- Muhurta slots now tiered by the empirical min/max score of the current
+  search, so tiers are relative to each query's range.
+- Reframed tier footnotes to present Good/Fair slots as genuinely
+  workable, not merely runner-ups.
+
+### Added
+- Day-level dosha cap that downgrades slots on Rikta tithi, Visha/Dagdha
+  yogas, and Vyatipata/Vaidhriti Nitya yogas.
+
+## [1.7.0] — 2026-06-14
+
+Major Muhurta scoring overhaul plus a full mobile app-shell redesign and
+AstroChaganti rebrand.
+
+### Added
+- Graded Muhurta scoring engine: tithi-class and vara-activity scoring,
+  Nitya Yoga scoring (Vyatipata/Vaidhriti), eclipse hard-skip, expanded
+  24-entry activity taxonomy, and per-slot `day_slots` scoring with
+  `dropped_days` transparency.
+- `facts_at()` for slot-time anga precision, with a JavaScript Meeus port
+  for matching slot-time accuracy in the browser preview.
+- Relative tiering (Excellent/Good/Fair) with tier-first sort and a
+  personal Chandra-dosha tier cap applied in both engine and JS.
+- Mobile app-shell: top bar, bottom navigation, settings/subscribe
+  drawers, swipe, per-screen titles, contextual help sheet, and
+  Gochara/Tarabalam mobile screens.
+
+### Changed
+- Rebranded to Astro Chaganti Panchangam; adopted the astrochaganti.com
+  Vellum light theme and ringed-glyph brand mark.
+- Design refresh across the landing page: neutral cards, eyebrow labels,
+  flatter shadows, rebalanced hero masthead.
+
+### Fixed
+- Reverted rogue AI-agent edits, restoring the landing page to its 1.6.2
+  baseline before the redesign.
+- Mobile fixes: always show Avoid windows, show the full Gochara chart
+  before the Sade Sati banner, wrap Karana timings.
+
+## [1.6.2] — 2026-06-13
+
+Patch release hardening MCP Marketplace presence.
+
+### Added
+- `glama.json` manifest for the Glama MCP directory.
+
+### Fixed
+- Trimmed the registry description to the 100-character limit; corrected
+  PyPI URLs.
+
+## [1.6.1] — 2026-06-12
+
+MCP registry manifest, ownership marker, and analytics.
+
+### Added
+- GoatCounter analytics tracking pageviews, growth-loop events, and share
+  attribution.
+- Tab subtitles carrying the devotee's question.
+
+### Changed
+- Tabs reordered to follow devotee cadence (Today; Gochara · Rasi Phalalu;
+  Tarabalam · Muhurtam) and restyled as true equal-thirds segmented
+  navigation.
+- MCP section compressed to a button-first card; footer reduced to three
+  lines.
+
+## [1.6.0] — 2026-06-12
+
+Daily Rasi Phalalu, a Muhurta finder, and a consolidated three-tab
+structure.
+
+### Added
+- Muhurta finder surfacing ranked auspicious slots with per-reason point
+  scores.
+- Daily Rasi Phalalu: a deterministic daily reading derived from computed
+  facts.
+- Three-tab structure adding Muhurtam alongside Tarabalam, with full
+  Phalalu sharing.
+
+### Changed
+- Polished panel anatomy, contextual date control, global time toggle,
+  mobile chart labels, and accessibility.
+
+### Fixed
+- Ran the Gochara builder in module mode so the package resolves on CI;
+  bumped GitHub Actions to Node-24-ready versions.
+
+## [1.5.0] — 2026-06-11
+
+Gochara rendered as a South Indian chart with transit verdicts.
+
+### Added
+- Gochara tab showing today's sky and transit verdicts from the user's
+  rashi, with Brihat Samhita-style verdicts from the janma rasi.
+- South Indian chart rendering with date selection.
+
+### Changed
+- Documented the sunrise-snapshot convention for Gochara.
+
+### Fixed
+- Gochara UX: single Viewing control, honest blank state, profile reset,
+  and an explicit notice when a typed date falls outside the data window
+  (with footnote pointing to MCP for any date).
+
+## [1.4.0] — 2026-06-11
+
+Graha positions groundwork for Gochara.
+
+### Added
+- Graha positions for all nine grahas, each with rasi, retrograde flag,
+  and ingress dates.
+
+## [1.3.0] — 2026-06-11
+
+Chandrabalam joins the Tarabalam tool.
+
+### Added
+- Chandrabalam: rashi strength combined with Tarabalam, with a
+  devotee-selectable standard (`janma_rasis`, `chandra_mode`) in
+  `find_tarabalam_days`.
+- Tarabalam WhatsApp share, completing the daily WhatsApp share flow.
+
+## [1.2.0] — 2026-06-11
+
+Tarabalam tool and project governance for post-conclusion feature work.
+
+### Added
+- `find_tarabalam_days` MCP tool and web tab finding favourable days for
+  up to four birth stars.
+- WhatsApp sharing of the selected day's panchangam from the preview
+  header.
+- Custom domain `panchangam.astrochaganti.com`.
+
+### Changed
+- Established working agreement, CI guardrails, contributing guide,
+  security policy, PR/issue templates, and a Contributor Covenant Code of
+  Conduct.
+
+## [1.1.1] — 2026-06-11
+
+Patch release naming monthly sign transitions.
+
+### Added
+- Feeds declare a `REFRESH-INTERVAL` / `X-PUBLISHED-TTL` of 12h; calendar
+  name carries AstroChaganti's Panchangam branding.
+
+### Fixed
+- Monthly sign transitions are now named `<Rashi> Sankramanam` in MCP
+  `special_days` and are no longer flagged as special days.
+
+## [1.1.0] — 2026-06-11
+
+The festival layer, plus engine and muhurta corrections verified against
+Drik Panchang.
+
+### Added
+- Festival layer: 30+ named Telugu festivals, monthly vrats, and Ganda
+  Moola nakshatra flagging, surfaced in MCP `special_days`.
+- Feed-level named Ekadashis, night Choghadiya, and (+1)/(−1) day
+  boundary markers.
+- Devotee-focused preview upgrades: 12h time toggle, named Ekadashis,
+  upcoming special days, and OG/social meta.
+
+### Fixed
+- Corrected muhurta window calculations against the Drik Panchang
+  reference.
+- Fixed tropical (Drik) rituvu, the ayanam sign-set, and the Surya
+  Siddhanta manda equation.
+
+### Changed
+- Landing page now states the measured Surya Siddhanta accuracy (2–6 hour
+  tithi drift) honestly; AstroChaganti branding and a two-column preview
+  redesign.
+
+## [1.0.6] — 2026-06-10
+
+Adhika/Nija maasam detection and corrected eclipse visibility.
+
+### Added
+- Adhika/Nija maasam detection: a lunar month bounded by new moons in the
+  same solar sign (no sankranti) is labeled `Adhika <name>` and the
+  following month `Nija <name>` (detected live for Adhika Jyeshtha, 2026).
+
+### Fixed
+- Eclipse visibility now evaluates the whole eclipse window rather than
+  just the maximum, correctly marking the 2026-03-03 total lunar eclipse
+  visible at moonrise across India (and restoring its Sutak).
+
+## [1.0.5] — 2026-06-10
+
+Initial public release — the founding panchangam library, MCP server, and
+ICS feed pipeline.
+
+### Added
+- Three calculation engines: **Drik Ganita** (Tithi, Nakshatra, Yoga,
+  Karana with start/end times; solar/lunar rise-set; signs; ayanam;
+  rituvu; temporal windows for Rahu Kalam, muhurtas, Choghadiya, Varjyam;
+  Samvatsara/Maasam metadata; special-day flags), **Surya Siddhanta**
+  (mean-motion plus manda correction), and **Vakya** (Surya Siddhanta base
+  with a Moon correction table).
+- ICS calendar feed generation for 22 cities × 3 systems, with full
+  Panchangam day descriptions, ayanam/rituvu, and webcal + https subscribe
+  links.
+- FastMCP server (`mcp-server-panchangam`) exposing panchangam, muhurta,
+  special-days, choghadiya, and multi-day `get_panchangam_range` tools,
+  plus a location resolver (predefined cities with Nominatim fallback).
+- Eclipse computation and special-yoga detection (including Dvipushkara
+  and Tripushkara) surfaced in engines, ICS output, and MCP tools.
+- Landing page with a live panchangam preview, city + system picker, date
+  picker, and system guidance.
+- GitHub Actions workflows for monthly feed generation, Pages deploy, and
+  PyPI publishing on version tags.
+
+### Performance
+- Precompute eclipses once per generation run instead of per-day per-feed.
+
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.4...HEAD
+[1.10.4]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.3...v1.10.4
+[1.10.3]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.9.0...v1.10.3
+[1.9.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.7.1...v1.8.0
+[1.7.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.7.0...v1.7.1
+[1.7.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.6.2...v1.7.0
+[1.6.2]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.6.1...v1.6.2
+[1.6.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.6.0...v1.6.1
+[1.6.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.1.1...v1.2.0
+[1.1.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.0.6...v1.1.0
+[1.0.6]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.0.5...v1.0.6
+[1.0.5]: https://github.com/socraticsurge/telugu-calendar-utilities/releases/tag/v1.0.5
