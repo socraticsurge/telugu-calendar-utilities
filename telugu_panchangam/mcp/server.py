@@ -14,6 +14,7 @@ from telugu_panchangam.mcp.tools import (
     tool_get_daily_horas,
     tool_get_lagna_transitions,
     tool_get_combustion_calendar,
+    tool_get_graha_yuddha,
 )
 
 mcp = FastMCP('mcp-server-panchangam')
@@ -119,6 +120,16 @@ def get_combustion_calendar(
 ) -> str:
     """Returns Asta (heliacal setting / combustion entry) and Udaya (heliacal rising / re-emergence) periods for the five classical planets — Mercury, Venus, Mars, Jupiter, Saturn — over a date range for a given city. Asta marks when a planet becomes invisible due to proximity to the Sun; Udaya marks when it re-emerges. This matches the Drik Panchang Asta/Udaya calendar (sky-visibility criterion), not the fixed BPHS elongation Maudhya thresholds used in per-day combustion flags. Accuracy: within 1–2 days of Drik Panchang for most planets; Mars ±2 days. Max date range: 366 days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone derived if omitted), planets=optional subset e.g. ['Saturn', 'Jupiter'] (default: all five)."""
     return tool_get_combustion_calendar(start_date, end_date, city, planets, latitude, longitude, timezone)
+
+
+@mcp.tool()
+def get_graha_yuddha(
+    start_date: str,
+    end_date: str,
+    planets: list[str] | None = None,
+) -> str:
+    """Returns Graha Yuddha (planetary war) periods in a date range. A planetary war occurs when two of the five tara grahas — Mercury, Venus, Mars, Jupiter, Saturn — come within 1° of each other in ecliptic longitude. The planet with the higher ecliptic latitude (more northerly) at the closest approach is the victor; the vanquished loses astrological strength for the duration. The Sun, Moon, Rahu, and Ketu are exempt by classical convention. Each war entry includes: the two planets, winner, loser, start/exact/end times in UTC, and minimum separation in arc-minutes. Max date range: 366 days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, planets=optional subset e.g. ['Venus', 'Jupiter'] (default: all five, yielding all 10 pair combinations)."""
+    return tool_get_graha_yuddha(start_date, end_date, planets)
 
 
 def main() -> None:
