@@ -30,7 +30,7 @@ def test_samvatsara_names_are_unique():
 
 @pytest.mark.parametrize('engine', [DrikGanitaEngine(), SuryaSiddhantaEngine(), VakyaEngine()],
                          ids=['drik', 'surya_siddhanta', 'vakya'])
-@pytest.mark.parametrize('d,expected', KNOWN_YEARS, ids=lambda v: str(v))
+@pytest.mark.parametrize('d,expected', KNOWN_YEARS, ids=str)
 def test_samvatsara_known_years(engine, d, expected):
     result = engine.calculate(d, HYD, include_eclipse=False)
     assert result.samvatsara == expected
@@ -67,7 +67,7 @@ def test_default_feed_window(today, expected_end):
     (date(2026, 6, 20), 'Nija Jyeshtha'),
     (date(2026, 7, 20), 'Ashadha'),
     (date(2023, 8, 1), 'Adhika Shravana'),
-], ids=lambda v: str(v))
+], ids=str)
 def test_adhika_nija_maasam_drik(d, expected):
     result = DrikGanitaEngine().calculate(d, HYD, include_eclipse=False)
     assert result.maasam == expected

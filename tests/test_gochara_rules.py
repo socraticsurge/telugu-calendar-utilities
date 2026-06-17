@@ -1,10 +1,6 @@
 # Gochara (transit) rules from the janma rasi, per the classical
 # Brihat Samhita scheme: favourable houses per graha, vedha
 # (obstruction) points, and the named Shani conditions.
-from datetime import date
-
-import pytest
-
 from telugu_panchangam.gochara.rules import (
     GOCHARA_FAVOURABLE, VEDHA, gochara_for, named_conditions,
 )

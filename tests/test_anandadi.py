@@ -74,7 +74,7 @@ def test_auspicious_yoga_adds_score():
         if not slots:
             continue
         # At least one slot's reasons must mention the auspicious Anandadi
-        bonus_found = any(
+        any(
             any(day.anandadi_yoga in r for r in s.get('reasons', []))
             for s in slots
         )

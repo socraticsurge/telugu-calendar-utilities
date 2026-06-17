@@ -5,7 +5,6 @@ from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
-from telugu_panchangam.cities import CITIES
 from telugu_panchangam.models.panchangam_day import Location
 
 # CITIES is a list; use a fixed Hyderabad location for these tests.

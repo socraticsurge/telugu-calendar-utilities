@@ -127,7 +127,6 @@ def test_facts_at_moon_rashi_transition():
     """Drik fixture: 2026-06-18 — Moon transits Karka (Cancer) somewhere
     during the day. Verify sunrise and a later time return different
     lunar_signs when the transition crosses our sample."""
-    eng = DrikGanitaEngine()
     # 2026-06-18 sunrise Moon in Karka. Find a date where Moon transits
     # within the day.
     # Easier check: a future-spanning sample. On 2026-06-15 (Mon, Amavasya),

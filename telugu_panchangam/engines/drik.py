@@ -1,5 +1,5 @@
 # src/engines/drik.py
-from datetime import date, datetime, timezone
+from datetime import date
 
 from telugu_panchangam.engines.base import (
     PanchangamEngine, RASHI_NAMES, rituvu_name, ayanam_name,
@@ -12,8 +12,8 @@ from telugu_panchangam.engines.base import (
     nakshatra_day_windows, next_nakshatra_span,
 )
 from telugu_panchangam.engines.utils import (
-    datetime_to_jd, jd_to_utc, local_midnight_jd, find_crossing,
-    sun_longitude, moon_longitude, moon_sun_elongation, previous_new_moon,
+    jd_to_utc, local_midnight_jd, find_crossing,
+    sun_longitude, moon_longitude, moon_sun_elongation,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay

@@ -1,6 +1,5 @@
 from datetime import date
-import pytest
-from telugu_panchangam.disha_shoola import disha_shoola, DISHA_SHOOLA
+from telugu_panchangam.disha_shoola import disha_shoola
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
 
