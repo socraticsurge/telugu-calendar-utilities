@@ -67,23 +67,54 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 
 ### Available tools
 
+**Daily Panchangam**
+
 | Tool | Description |
 |------|-------------|
-| `list_supported_cities` | 22 pre-configured cities with lat/lon/timezone |
 | `get_panchangam` | Full Panchangam for any date and city |
-| `get_muhurta` | One day's auspicious/inauspicious windows (see `find_muhurta` to search across days) |
-| `get_special_days` | Named festivals, Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Ganda Moola, and Eclipses for a month |
-| `find_tarabalam_days` | Tarabalam & Chandrabalam — days favourable for 1–4 people by birth star (and rashi), with selectable strictness |
-| `get_graha_positions` | All nine grahas at sunrise — rasi, nakshatra, retrograde, next-rasi ingress dates |
-| `get_gochara` | Gochara verdicts from a janma rashi — Brihat Samhita houses, vedha, Sade Sati / Ashtama Shani |
-| `get_rasi_phalalu` | Daily Rasi Phalalu — deterministic daily reading rendered from computed facts |
+| `get_muhurta` | One day's auspicious/inauspicious windows (lighter call; use `find_muhurta` to search across days) |
+| `get_panchanga_shuddhi` | Five-limb purity verdict (Sarva Shuddha → Sarva Ashuddha) with per-limb quality and reason |
+
+**Planning across days**
+
+| Tool | Description |
+|------|-------------|
+| `get_panchangam_range` | Compact Panchangam summary for each day in a range (max 31 days) |
+| `get_special_days` | Named festivals, Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, and Eclipses for a month |
 | `find_muhurta` | Ranked auspicious time slots — activity-aware, every slot with its reasons |
+| `find_tarabalam_days` | Tarabalam & Chandrabalam — days favourable for 1–4 people by birth star (and rashi) |
+
+**Sky events**
+
+| Tool | Description |
+|------|-------------|
+| `get_combustion_calendar` | Asta/Udaya (combustion entry/exit) periods for Mercury, Venus, Mars, Jupiter, Saturn |
+| `get_graha_yuddha` | Graha Yuddha (planetary war) periods — winner, loser, timing in UTC |
+| `get_rashi_ingresses` | All rashi sign-change events for the classical planets over a date range |
+| `get_eclipse_calendar` | Solar and lunar eclipses with per-city visibility and Sutak timing |
+
+**Gochara and personal transits**
+
+| Tool | Description |
+|------|-------------|
+| `get_graha_positions` | All nine grahas at sunrise — rasi, nakshatra, retrograde, next-rasi dates |
+| `get_gochara` | Gochara verdicts from a janma rashi — houses, vedha, Sade Sati / Ashtama Shani |
+| `get_rasi_phalalu` | Deterministic daily reading rendered from computed facts |
+
+**Intraday timing**
+
+| Tool | Description |
+|------|-------------|
 | `get_daily_horas` | 24 planetary hours (horas) for the day, starting at sunrise with the weekday lord |
 | `get_lagna_transitions` | Ascendant (Lagna) sign boundaries tracking the eastern horizon across the day |
 
-All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
+**Utility**
 
-`get_panchangam`, `get_muhurta`, and `get_panchangam_range` include 16 new timing-computation fields added in 1.9.0: `ghati_clock`, `nakshatra_pada`, `vishaghati`, `bhadra_mukha`/`bhadra_puchha`, `sankramana_avoidance`, `in_panchaka_nakshatra`, `nakshatra_mukha`, `anandadi_yoga`, `is_khar_maasa`, `is_pitru_paksha`, `simha_stha_guru`/`simha_stha_shukra`, `guru_maudhya`/`shukra_maudhya`, `disha_shoola_direction`, and `panchaka_rahita`. `find_muhurta` gains six new activities (`litigation`, `cremation`, `construction_roof`, `wood_cutting`, `well_digging`, `coronation`) and an optional `travel_direction` parameter for Disha Shoola filtering.
+| Tool | Description |
+|------|-------------|
+| `list_supported_cities` | 22 pre-configured cities with lat/lon/timezone |
+
+All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly. Full API documentation and parameter details: [mcp-server-panchangam on PyPI](https://pypi.org/project/mcp-server-panchangam/).
 
 ## How it works
 
