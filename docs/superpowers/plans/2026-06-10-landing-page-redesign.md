@@ -1,0 +1,608 @@
+# Landing Page Redesign Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Redesign `docs/index.html` with a "Bright & Colorful" theme, a live "Today's Panchangam" preview, and an expanded calculation-system guidance section — as a single self-contained HTML file.
+
+**Architecture:** Replace `docs/index.html` entirely with a new single-file page (inline `<style>` and `<script>`, no build step, no external dependencies). Three stacked cards: Today's Panchangam (live preview, parsed client-side from the existing `.ics` feeds), Subscribe (picker + URL + per-app instructions), and Choosing a calculation system (color-coded cards with inline "read more" accordions and external references).
+
+**Tech Stack:** Plain HTML/CSS/JS (vanilla, ES2017+), existing `.ics` feed files under `feeds/` (sibling to `index.html` when deployed).
+
+---
+
+## Reference: spec
+
+See [docs/specs/2026-06-10-landing-page-redesign.md](../../specs/2026-06-10-landing-page-redesign.md) for the approved design (visual direction, card layouts, color palette).
+
+---
+
+## Task 1: Replace docs/index.html with the redesigned page
+
+**Files:**
+- Modify: `docs/index.html` (full rewrite)
+
+- [ ] **Step 1: Write the new docs/index.html**
+
+Replace the entire contents of `docs/index.html` with:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telugu Panchangam Calendar Feeds</title>
+  <style>
+    :root {
+      --indigo: #4338ca; --indigo-bg: #eef2ff; --indigo-border: #c7d2fe;
+      --amber: #92400e; --amber-bg: #fffbeb; --amber-border: #fde68a;
+      --green: #166534; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; color: #1e1b4b; background: #f8fafc; margin: 0; padding: 0 1rem 2rem; line-height: 1.6; }
+    .page { max-width: 760px; margin: 0 auto; }
+
+    .hero { text-align: center; padding: 1.5rem 0 1rem; }
+    .hero h1 { font-size: 2rem; margin: 0; }
+    .hero .tagline { color: var(--indigo); font-size: 0.95rem; margin-top: 0.25rem; }
+    .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; margin: 1rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .card h2 { margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+
+    .selector-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.6rem 0 1rem; }
+    .selector { display: flex; flex-direction: column; gap: 0.2rem; }
+    .selector label { font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .selector select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--indigo-border); background: var(--indigo-bg); color: var(--indigo); font-weight: 600; min-width: 160px; }
+
+    .url-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.9rem; font-family: monospace; font-size: 0.8rem; margin: 0.5rem 0; word-break: break-all; }
+    .btn { background: var(--indigo); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .btn:hover { background: #3730a3; }
+    .copy-confirm { margin-left: 0.75rem; color: #16a34a; display: none; font-size: 0.8rem; }
+
+    .app-tabs { display: flex; gap: 0.4rem; margin-top: 0.85rem; }
+    .app-tab { font-size: 0.75rem; padding: 0.3rem 0.7rem; border-radius: 6px 6px 0 0; background: #f1f5f9; color: #64748b; cursor: pointer; border: none; font-family: inherit; }
+    .app-tab.active { background: var(--indigo-bg); color: var(--indigo); font-weight: 600; }
+    .app-panel { background: var(--indigo-bg); border-radius: 0 8px 8px 8px; padding: 0.7rem; font-size: 0.8rem; display: none; }
+    .app-panel.active { display: block; }
+    .app-panel ol { margin: 0; padding-left: 1.1rem; color: #475569; columns: 2; column-gap: 1.5rem; }
+    .app-panel ol li { margin-bottom: 0.2rem; break-inside: avoid; }
+
+    .preview-card { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+    .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; }
+    .preview-head .date { font-weight: 700; font-size: 0.9rem; }
+    .preview-head .meta { font-size: 0.72rem; opacity: 0.85; margin-top: 0.1rem; }
+    .preview-head .badge { display: inline-block; background: #fbbf24; color: #78350f; font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
+
+    .preview-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .preview-table tr { border-bottom: 1px solid #f1f5f9; }
+    .preview-table tr:last-child { border-bottom: none; }
+    .preview-table td { padding: 0.4rem 0.9rem; vertical-align: top; }
+    .preview-table td.k { color: #94a3b8; font-weight: 600; width: 38%; white-space: nowrap; }
+    .preview-table td.v { color: #1e1b4b; }
+    .preview-table .group-head td { background: #f8fafc; color: var(--indigo); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.3rem 0.9rem; }
+    .preview-table .group-head.good td { color: #16a34a; }
+    .preview-table .group-head.bad td { color: #dc2626; }
+    .preview-note { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0 0; }
+    .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
+
+    .sys-card { border-radius: 10px; padding: 0.9rem; margin-bottom: 0.6rem; }
+    .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
+    .sys-card.ss { background: var(--amber-bg); border: 1px solid var(--amber-border); }
+    .sys-card.vakya { background: var(--green-bg); border: 1px solid var(--green-border); }
+    .sys-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+    .sys-card.drik h3 { color: var(--indigo); }
+    .sys-card.ss h3 { color: var(--amber); }
+    .sys-card.vakya h3 { color: var(--green); }
+    .sys-card p { margin: 0.35rem 0; font-size: 0.85rem; color: #475569; }
+    .read-more { font-size: 0.8rem; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; }
+    .sys-card.drik .read-more { color: var(--indigo); }
+    .sys-card.ss .read-more { color: var(--amber); }
+    .sys-card.vakya .read-more { color: var(--green); }
+    .expanded { display: none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(0,0,0,0.08); font-size: 0.8rem; color: #475569; }
+    .expanded.open { display: block; }
+    .expanded a { color: inherit; font-weight: 600; }
+
+    .tip { font-size: 0.8rem; color: #94a3b8; margin-bottom: 0; }
+    footer { text-align: center; font-size: 0.8rem; color: #94a3b8; padding: 1.5rem 0; }
+    footer a { color: var(--indigo); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div><span class="sunmoon">🌅</span></div>
+    <h1>Telugu Panchangam</h1>
+    <div class="tagline">Subscribe to Tithi, Nakshatra, Muhurtams &amp; more — right in your calendar</div>
+  </div>
+
+  <div class="card">
+    <h2>🔆 Today's Panchangam</h2>
+    <div class="selector-row">
+      <div class="selector">
+        <label for="tp-city">City</label>
+        <select id="tp-city"></select>
+      </div>
+      <div class="selector">
+        <label for="tp-system">System</label>
+        <select id="tp-system"></select>
+      </div>
+    </div>
+    <div id="tp-result"><p class="preview-error">Loading…</p></div>
+    <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.</p>
+  </div>
+
+  <div class="card">
+    <h2>📅 Subscribe to your calendar</h2>
+    <div class="selector-row">
+      <div class="selector">
+        <label for="sub-city">City</label>
+        <select id="sub-city"></select>
+      </div>
+      <div class="selector">
+        <label for="sub-system">System</label>
+        <select id="sub-system"></select>
+      </div>
+    </div>
+
+    <h3 class="sub">1 · Your subscription URL</h3>
+    <div class="url-box" id="sub-url">—</div>
+    <button class="btn" onclick="copyUrl()">Copy URL</button>
+    <span class="copy-confirm" id="copy-confirm">Copied!</span>
+
+    <h3 class="sub" style="margin-top:1.25rem;">2 · Add it to your calendar</h3>
+    <div class="app-tabs">
+      <button class="app-tab active" data-app="google" onclick="showAppTab('google')">Google</button>
+      <button class="app-tab" data-app="apple" onclick="showAppTab('apple')">Apple</button>
+      <button class="app-tab" data-app="outlook" onclick="showAppTab('outlook')">Outlook</button>
+    </div>
+    <div class="app-panel active" data-app="google">
+      <ol>
+        <li>Open Google Calendar on the web</li>
+        <li>In the left sidebar, find "Other calendars"</li>
+        <li>Click the <strong>+</strong> next to it</li>
+        <li>Select <strong>From URL</strong></li>
+        <li>Paste the subscription URL above</li>
+        <li>Click <strong>Add calendar</strong></li>
+      </ol>
+    </div>
+    <div class="app-panel" data-app="apple">
+      <ol>
+        <li>Open the Calendar app on your Mac</li>
+        <li>Go to <strong>File → New Calendar Subscription</strong></li>
+        <li>Paste the subscription URL above</li>
+        <li>Click <strong>Subscribe</strong></li>
+        <li>Choose how often to refresh (Daily recommended)</li>
+        <li>Click <strong>OK</strong></li>
+      </ol>
+    </div>
+    <div class="app-panel" data-app="outlook">
+      <ol>
+        <li>Open Outlook on the web</li>
+        <li>Go to <strong>Add calendar → Subscribe from web</strong></li>
+        <li>Paste the subscription URL above</li>
+        <li>Give the calendar a name</li>
+        <li>Click <strong>Import</strong></li>
+        <li>It refreshes automatically every few hours</li>
+      </ol>
+    </div>
+
+    <p class="preview-note">Updated automatically on the 1st of every month, 18 months ahead. No account needed.</p>
+  </div>
+
+  <div class="card">
+    <h2>🧭 Choosing a calculation system</h2>
+    <p style="font-size:0.85rem;color:#475569;">
+      Panchangams aren't one-size-fits-all. Different traditions calculate Tithi, Nakshatra, and muhurtam
+      timings slightly differently — sometimes by minutes, sometimes by a full day for festivals like
+      Ekadashi. Here's what each system means, who uses it, and how to pick.
+    </p>
+
+    <div class="sys-card drik">
+      <h3>☀️ Drik Ganita — Modern Observational Astronomy</h3>
+      <p>Calculated directly from real planetary positions using the Swiss Ephemeris with the Lahiri
+      ayanamsa — the same kind of engine used by professional astronomy software. Because it tracks the
+      sky as it actually is, it's the most accurate system for sunrise, sunset, moonrise, and moonset, and
+      is the default in most modern digital panchangam apps.</p>
+      <button class="read-more" data-more="Read more about Drik Ganita ▾" data-less="Show less ▴" onclick="toggleReadMore('drik-more', this)">Read more about Drik Ganita ▾</button>
+      <div class="expanded" id="drik-more">
+        Drik Ganita ("observation-based calculation") replaced older mean-motion methods once accurate
+        ephemeris data became widely available. It directly computes the true positions of the sun and
+        moon for a given place and time, so sunrise/sunset and Tithi/Nakshatra transitions match what
+        you'd observe in the sky. Most contemporary panchangam websites and apps use this as their
+        default.
+        <br/><br/>
+        References: <a href="https://en.wikipedia.org/wiki/Hindu_calendar" target="_blank" rel="noopener">Wikipedia — Hindu calendar</a> · <a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">DrikPanchang.com</a>
+      </div>
+    </div>
+
+    <div class="sys-card ss">
+      <h3>🛕 Surya Siddhanta — The Classical Temple Standard</h3>
+      <p>Based on mean-motion formulas from the Surya Siddhanta, a foundational astronomical text composed
+      over a thousand years ago. Tirumala Tirupati Devasthanams (TTD) and most South Indian temples still
+      use this system for festival dates and ritual timings — so if you're following a temple-aligned
+      vratam or muhurtam, this is usually the calendar your priest follows.</p>
+      <button class="read-more" data-more="Read more about Surya Siddhanta ▾" data-less="Show less ▴" onclick="toggleReadMore('ss-more', this)">Read more about Surya Siddhanta ▾</button>
+      <div class="expanded" id="ss-more">
+        The Surya Siddhanta's mean-motion approach predates modern observational astronomy by centuries,
+        yet remains the liturgical standard for many institutions because changing it would shift centuries
+        of established festival dates. Differences from Drik Ganita are usually small (minutes to hours)
+        but can occasionally shift a tithi-based festival by a full day — which is why some festival dates
+        differ between a TTD-style panchangam and a modern app.
+        <br/><br/>
+        References: <a href="https://en.wikipedia.org/wiki/Surya_Siddhanta" target="_blank" rel="noopener">Wikipedia — Surya Siddhanta</a> · <a href="https://www.tirumala.org/" target="_blank" rel="noopener">Tirumala Tirupati Devasthanams</a>
+      </div>
+    </div>
+
+    <div class="sys-card vakya">
+      <h3>📜 Vakya — Traditional Printed Panchangam</h3>
+      <p>Builds on Surya Siddhanta with "Vakyas" — pre-computed correction tables passed down through
+      generations of traditional astronomers. This is the basis for most printed Telugu and Tamil
+      panchangams sold in stores each year, and is preferred by households following long-standing family
+      or regional conventions.</p>
+      <button class="read-more" data-more="Read more about Vakya ▾" data-less="Show less ▴" onclick="toggleReadMore('vakya-more', this)">Read more about Vakya ▾</button>
+      <div class="expanded" id="vakya-more">
+        Vakya panchangams use short verse-encoded correction tables (vakyas) that approximate planetary
+        positions without needing modern computation — a method refined and handed down for generations
+        in Tamil Nadu, Andhra Pradesh, and Telangana. Many families follow the specific printed panchangam
+        their household has used for decades, which is typically Vakya-based.
+        <br/><br/>
+        References: <a href="https://en.wikipedia.org/wiki/Pancanga" target="_blank" rel="noopener">Wikipedia — Pañcāṅga</a> · <a href="https://www.drikpanchang.com/panchang/about-panchang.html" target="_blank" rel="noopener">DrikPanchang — About Panchang</a>
+      </div>
+    </div>
+
+    <p class="tip">Not sure? Drik Ganita is a safe modern default. If your family or temple follows a
+    specific printed panchangam, match it to Surya Siddhanta or Vakya instead.</p>
+  </div>
+
+  <footer>
+    Telugu Panchangam is open source. Feeds are regenerated on the 1st of each month covering 18 months ahead.
+    <a href="https://github.com/socraticsurge/telugu-calendar-utilities">GitHub</a>
+  </footer>
+</div>
+
+<script>
+  const FEED_BASE_URL = 'https://socraticsurge.github.io/telugu-calendar-utilities/feeds/';
+
+  const CITY_GROUPS = [
+    ['Telugu Heartland', ['Hyderabad', 'Vijayawada', 'Visakhapatnam', 'Tirupati', 'Warangal', 'Guntur', 'Nizamabad', 'Rajahmundry', 'Kurnool', 'Nellore']],
+    ['Major Indian Metros', ['Bengaluru', 'Chennai', 'Mumbai', 'Delhi']],
+    ['International', ['Dallas', 'San Jose', 'San Francisco', 'Edison', 'New York', 'London', 'Sydney', 'Dubai']],
+  ];
+  const SYSTEMS = [['drik', 'Drik Ganita'], ['surya-siddhanta', 'Surya Siddhanta'], ['vakya', 'Vakya']];
+
+  function slug(name) {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '');
+  }
+
+  function feedFilename(city, system) {
+    return `${slug(city)}-${system}.ics`;
+  }
+
+  function populateCitySelect(select) {
+    CITY_GROUPS.forEach(([label, cities]) => {
+      const og = document.createElement('optgroup');
+      og.label = label;
+      cities.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        og.appendChild(opt);
+      });
+      select.appendChild(og);
+    });
+  }
+
+  function populateSystemSelect(select) {
+    SYSTEMS.forEach(([value, label]) => {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = label;
+      select.appendChild(opt);
+    });
+  }
+
+  // --- Subscribe card ---
+
+  function updateSubscribeUrl() {
+    const city = document.getElementById('sub-city').value;
+    const system = document.getElementById('sub-system').value;
+    const url = `webcal://${FEED_BASE_URL.replace('https://', '')}${feedFilename(city, system)}`;
+    document.getElementById('sub-url').textContent = url;
+  }
+
+  function copyUrl() {
+    const url = document.getElementById('sub-url').textContent;
+    navigator.clipboard.writeText(url).then(() => {
+      const el = document.getElementById('copy-confirm');
+      el.style.display = 'inline';
+      setTimeout(() => { el.style.display = 'none'; }, 2000);
+    });
+  }
+
+  function showAppTab(name) {
+    document.querySelectorAll('.app-tab').forEach(t => t.classList.toggle('active', t.dataset.app === name));
+    document.querySelectorAll('.app-panel').forEach(p => p.classList.toggle('active', p.dataset.app === name));
+  }
+
+  // --- Choosing a system card ---
+
+  function toggleReadMore(id, btn) {
+    const el = document.getElementById(id);
+    const open = el.classList.toggle('open');
+    btn.textContent = open ? btn.dataset.less : btn.dataset.more;
+  }
+
+  // --- Today's Panchangam preview ---
+
+  function unfoldICS(text) {
+    return text.replace(/\r\n/g, '\n').split('\n').reduce((lines, line) => {
+      if (line.startsWith(' ') && lines.length) {
+        lines[lines.length - 1] += line.slice(1);
+      } else {
+        lines.push(line);
+      }
+      return lines;
+    }, []);
+  }
+
+  function todayStamp() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}${mm}${dd}`;
+  }
+
+  function findTodayEvent(text) {
+    const lines = unfoldICS(text);
+    const target = todayStamp();
+    let block = null;
+    let current = null;
+    for (const line of lines) {
+      if (line === 'BEGIN:VEVENT') { current = []; continue; }
+      if (line === 'END:VEVENT') {
+        if (current) {
+          const dtstart = current.find(l => l.startsWith('DTSTART;VALUE=DATE:'));
+          if (dtstart && dtstart.endsWith(target)) block = current;
+        }
+        current = null;
+        continue;
+      }
+      if (current) current.push(line);
+    }
+    if (!block) return null;
+    const summary = (block.find(l => l.startsWith('SUMMARY:')) || '').slice('SUMMARY:'.length);
+    const descLine = block.find(l => l.startsWith('DESCRIPTION:')) || '';
+    const description = descLine.slice('DESCRIPTION:'.length)
+      .replace(/\\n/g, '\n')
+      .replace(/\\,/g, ',')
+      .replace(/\\;/g, ';')
+      .replace(/\\\\/g, '\\');
+    return { summary, description };
+  }
+
+  function parseDescription(description) {
+    const data = {
+      meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
+      sunrise: null, sunset: null, moonrise: null, moonset: null,
+      auspicious: [], inauspicious: [],
+    };
+    let section = null;
+    for (const raw of description.split('\n')) {
+      const line = raw.trimEnd();
+      if (!line.trim()) { section = null; continue; }
+
+      let m;
+      if ((m = line.match(/^Samvatsara: (.+) \| (.+) Maasam \| (.+) Paksham \| (.+)$/))) {
+        data.meta = `${m[1]} Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4]}`;
+        continue;
+      }
+      if ((m = line.match(/^Sunrise: (\d{2}:\d{2}) \| Sunset: (\d{2}:\d{2}) \| Moonrise: (\d{2}:\d{2}) \| Moonset: (\d{2}:\d{2})$/))) {
+        [, data.sunrise, data.sunset, data.moonrise, data.moonset] = m;
+        continue;
+      }
+      if ((m = line.match(/^(Tithi|Nakshatra|Yoga):\s+(.+?)\s+(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})$/))) {
+        data[m[1].toLowerCase()] = { name: m[2].trim(), start: m[3], end: m[4] };
+        continue;
+      }
+      if ((m = line.match(/^Karana:\s+(.+)$/))) {
+        data.karana = m[1].trim();
+        continue;
+      }
+      if (line === 'Auspicious:') { section = 'auspicious'; continue; }
+      if (line === 'Inauspicious:') { section = 'inauspicious'; continue; }
+      if (section && (m = line.match(/^\s*(.+?)\s{2,}(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s*$/))) {
+        data[section].push({ name: m[1].trim(), start: m[2], end: m[3] });
+        continue;
+      }
+    }
+    return data;
+  }
+
+  function formatToday() {
+    return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function renderPreview(container, event) {
+    const data = parseDescription(event.description);
+    const special = event.summary.includes('⚡') ? '<span class="badge">Special day</span>' : '';
+    const row = (k, v) => `<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`;
+    const groupHead = (label, cls) => `<tr class="group-head ${cls || ''}"><td colspan="2">${label}</td></tr>`;
+    const span = entry => entry ? `${entry.name} <span style="color:#94a3b8;">(${entry.start} – ${entry.end})</span>` : '—';
+
+    let rows = '';
+    if (data.tithi) rows += row('Tithi', span(data.tithi));
+    if (data.nakshatra) rows += row('Nakshatra', span(data.nakshatra));
+    if (data.yoga) rows += row('Yoga', span(data.yoga));
+    if (data.karana) rows += row('Karana', data.karana);
+
+    rows += groupHead('Sky');
+    rows += row('Sunrise / Sunset', `${data.sunrise} / ${data.sunset}`);
+    rows += row('Moonrise / Moonset', `${data.moonrise} / ${data.moonset}`);
+
+    if (data.auspicious.length) {
+      rows += groupHead('🟢 Auspicious', 'good');
+      data.auspicious.forEach(e => { rows += row(e.name, `${e.start} – ${e.end}`); });
+    }
+    if (data.inauspicious.length) {
+      rows += groupHead('🔴 Inauspicious', 'bad');
+      data.inauspicious.forEach(e => { rows += row(e.name, `${e.start} – ${e.end}`); });
+    }
+
+    container.innerHTML = `
+      <div class="preview-card">
+        <div class="preview-head">
+          <div class="date">${formatToday()}${special}</div>
+          <div class="meta">${data.meta}</div>
+        </div>
+        <table class="preview-table">${rows}</table>
+      </div>
+    `;
+  }
+
+  async function loadPreview() {
+    const city = document.getElementById('tp-city').value;
+    const system = document.getElementById('tp-system').value;
+    const container = document.getElementById('tp-result');
+    container.innerHTML = '<p class="preview-error">Loading…</p>';
+    try {
+      const res = await fetch(`feeds/${feedFilename(city, system)}`);
+      if (!res.ok) throw new Error('fetch failed');
+      const text = await res.text();
+      const event = findTodayEvent(text);
+      if (!event) {
+        container.innerHTML = '<p class="preview-error">Preview unavailable for today — try the subscription link below.</p>';
+        return;
+      }
+      renderPreview(container, event);
+    } catch (e) {
+      container.innerHTML = '<p class="preview-error">Preview unavailable — try the subscription link below.</p>';
+    }
+  }
+
+  // --- Init ---
+
+  populateCitySelect(document.getElementById('tp-city'));
+  populateSystemSelect(document.getElementById('tp-system'));
+  populateCitySelect(document.getElementById('sub-city'));
+  populateSystemSelect(document.getElementById('sub-system'));
+
+  document.getElementById('tp-city').addEventListener('change', loadPreview);
+  document.getElementById('tp-system').addEventListener('change', loadPreview);
+  document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
+  document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
+
+  updateSubscribeUrl();
+  loadPreview();
+</script>
+</body>
+</html>
+```
+
+- [ ] **Step 2: Verify the file is well-formed HTML**
+
+```bash
+python3 -c "import html.parser; p = html.parser.HTMLParser(); p.feed(open('docs/index.html').read()); print('OK')"
+```
+
+Expected: `OK` (no exception)
+
+---
+
+## Task 2: Verify locally in a browser
+
+**Files:** none (manual verification only)
+
+- [ ] **Step 1: Generate a feed for Hyderabad/Drik covering today's date**
+
+The live preview needs a real `.ics` file containing today's date for at least one city/system
+combination, served alongside `index.html` at `feeds/<slug>.ics`.
+
+```bash
+mkdir -p docs/feeds
+python3 -c "
+from datetime import date, timedelta
+from telugu_panchangam.generate import generate_feeds
+today = date.today()
+generate_feeds(output_dir='docs/feeds', start=today - timedelta(days=1), end=today + timedelta(days=2))
+"
+ls docs/feeds | head -5
+```
+
+Expected: a list of `.ics` files including `hyderabad-drik.ics`, `hyderabad-surya-siddhanta.ics`, `hyderabad-vakya.ics`, etc.
+
+- [ ] **Step 2: Serve docs/ locally**
+
+```bash
+cd docs && python3 -m http.server 8000
+```
+
+- [ ] **Step 3: Open the page and check Today's Panchangam**
+
+Open `http://localhost:8000/` in a browser. Confirm:
+- The page loads with a light background, indigo accents, and the bobbing 🌅 icon in the hero.
+- The "🔆 Today's Panchangam" card shows a populated table for Hyderabad / Drik Ganita: today's
+  date, Samvatsara/Maasam/Paksham line, Tithi/Nakshatra/Yoga/Karana rows, Sky row group, and
+  Auspicious/Inauspicious row groups with real times (not "Loading…" or an error message).
+- Changing the City or System dropdown in this card re-fetches and re-renders the table for the
+  new combination (try Surya Siddhanta and Vakya for Hyderabad — both feeds were generated in
+  Step 1).
+
+- [ ] **Step 4: Check Subscribe card**
+
+Confirm:
+- The subscription URL box shows a `webcal://socraticsurge.github.io/telugu-calendar-utilities/feeds/hyderabad-drik.ics` URL by default.
+- Changing City/System updates the URL accordingly (e.g. selecting "Vakya" changes the filename
+  suffix to `-vakya.ics`).
+- Clicking "Copy URL" shows the "Copied!" confirmation and copies the URL to the clipboard.
+- Clicking the Google / Apple / Outlook tabs switches the visible instructions panel.
+
+- [ ] **Step 5: Check Choosing a calculation system card**
+
+Confirm:
+- All three system cards (Drik Ganita, Surya Siddhanta, Vakya) are visible with their summary
+  paragraphs, color-coded (indigo / amber / green).
+- Clicking "Read more about Drik Ganita" expands the accordion and changes the button text to
+  "Show less"; clicking again collapses it. Repeat for Surya Siddhanta and Vakya.
+- The reference links open in a new tab (Wikipedia, drikpanchang.com, tirumala.org).
+
+- [ ] **Step 6: Check mobile layout**
+
+Resize the browser window to ~375px wide (or use devtools device emulation). Confirm cards remain
+single-column, dropdowns wrap onto their own lines without overflowing, and the preview table
+remains readable (no horizontal scroll).
+
+- [ ] **Step 7: Clean up the temporary feeds directory**
+
+```bash
+cd .. && rm -rf docs/feeds
+```
+
+(`docs/feeds/` is a build artifact normally produced by the monthly GitHub Actions workflow into
+`public/feeds/`, not committed to `docs/`.)
+
+---
+
+## Task 3: Commit
+
+**Files:**
+- Modified: `docs/index.html`
+
+- [ ] **Step 1: Confirm docs/feeds was removed and only index.html changed**
+
+```bash
+git status --short
+```
+
+Expected: only `docs/index.html` shown as modified (no `docs/feeds/` entries).
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add docs/index.html
+git commit -m "feat: redesign landing page with live panchangam preview and system guidance"
+```

@@ -7,30 +7,11 @@ __pycache__/
 dist/
 node_modules/
 *.egg-info/
-docs/superpowers/
 
-# Harness / Claude Code internals
-.claude/
-CLAUDE.md
 dashboard.html
-docs/tracking/
-docs/plans/
-docs/specs/
-docs/reference/
-docs/GUIDELINES.md
-docs/NOW.md
-tests/test_checkpoint_logic.py
-tests/test_context_logic.py
-tests/test_csv_store.py
-tests/test_file_lock.py
-tests/test_gate_logic.py
-tests/test_gate_spec_required.py
-tests/test_paths.py
-tests/test_sync_logic.py
-tests/test_sync_tracker_on_task.py
+
 .DS_Store
 **/.DS_Store
-.superpowers/
 
 .playwright-mcp/
 /*.png
@@ -40,3 +21,4 @@ build/
 
 # Generated lagna/feed data lives on gh-pages, not master.
 docs/feeds/
+

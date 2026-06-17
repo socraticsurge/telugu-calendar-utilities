@@ -1,0 +1,84 @@
+# Reference Docs — Telugu Panchangam Utilities
+
+> **Audience:** the maintainer (you). A deep, diagram-first map of everything
+> the project computes, everything it exposes, and how it all fits together.
+> **Status:** generated 2026-06-17 from a full read of the codebase at master
+> (HEAD `045d828`, the jules-free rewrite). **Gitignored** — local only, per the
+> project's docs convention.
+>
+> These complement — they do not replace — the on-GitHub docs:
+> [`ARCHITECTURE.md`](../../ARCHITECTURE.md) (layer cake + engine boundary),
+> [`MAINTENANCE_RUNBOOK.md`](../../MAINTENANCE_RUNBOOK.md) (release/cron/recipes),
+> [`README.md`](../../README.md) / [`README_PYPI.md`](../../README_PYPI.md) (user-facing),
+> and [`CHANGELOG.md`](../../CHANGELOG.md) (what shipped when).
+
+## The one-paragraph mental model
+
+A **Telugu panchangam (Hindu almanac) engine** computes the five *angas*
+(Tithi, Nakshatra, Yoga, Karana, Vaaram) plus solar/lunar metadata, auspicious
+and inauspicious windows, festivals, and eclipses for **any date, any city**,
+under **three calculation systems** (Drik Ganita, Surya Siddhanta, Vakya). The
+engine emits one canonical object — `PanchangamDay`. Everything else is a
+**consumer** of that object: a muhurta (electional-timing) scorer, a Tarabalam /
+Gochara / Rasi-Phalalu personal layer, a set of standalone jyotisha calendars
+(combustion, planetary war, ingress, eclipse, panchanga-shuddhi), an ICS
+calendar-feed generator (22 cities × 3 systems), and an MCP server exposing
+**17 tools**. It ships to three surfaces: a landing page, webcal feeds, and a
+PyPI MCP package.
+
+## Doc map
+
+| # | Doc | What's inside |
+|---|-----|---------------|
+| 00 | **this file** | Mental model, doc map, glossary |
+| 01 | [System mindmap & architecture](01-system-mindmap.md) | The deep mindmap (engines → features → surfaces), layer-cake, class hierarchy |
+| 02 | [Engines & the PanchangamDay model](02-engines-and-model.md) | The 3 engines, how they differ algorithmically, the full field reference |
+| 03 | [Computational features](03-computational-features.md) | Every jyotisha computation, grouped, with classical source + output field |
+| 04 | [User-facing features](04-user-facing-features.md) | The 17 MCP tools, the ICS feeds, the landing page — how each works |
+| 05 | [Data flow & the muhurta pipeline](05-data-flow-and-muhurta.md) | End-to-end flow; the muhurta scorer in depth (the crown-jewel consumer) |
+| 06 | [Roadmap & backlog](06-roadmap-and-backlog.md) | Shipped phases, paused/parked work, and one governance inconsistency to reconcile |
+
+## How to read the diagrams
+
+Diagrams are [Mermaid](https://mermaid.js.org/) fenced code blocks. They render
+natively on GitHub, in VS Code (with the *Markdown Preview Mermaid* extension),
+in Obsidian, and in most modern markdown viewers. Where a diagram carries the
+load, the same information is also given as prose or a table so the file is
+useful as plain text too.
+
+## Glossary (transliterated terms, as used in code & UI)
+
+| Term | Meaning |
+|------|---------|
+| **Anga** | "Limb" — one of the five panchangam elements |
+| **Tithi** | Lunar day (1–30); Moon−Sun elongation / 12° |
+| **Nakshatra** | Lunar mansion (27); Moon's sidereal longitude / 13°20′ |
+| **Yoga** | *Nitya* yoga (27); (Sun+Moon longitude) / 13°20′ |
+| **Karana** | Half-tithi (60 total, 11 types); 2 per day |
+| **Vaaram** | Weekday, anchored at sunrise |
+| **Paksham** | Lunar fortnight — Shukla (waxing) / Krishna (waning) |
+| **Maasam** | Lunar month (Chaitra … Phalguna); `Adhika`/`Nija` for intercalary |
+| **Rituvu** | Tropical season (6) |
+| **Samvatsara** | Year in the 60-year cycle |
+| **Rasi / Rashi** | Zodiac sign (12) |
+| **Lagna** | Ascendant — the rising sign on the eastern horizon |
+| **Hora** | Planetary hour (24/day, weekday-lord sequence) |
+| **Muhurta** | An auspicious time window / the art of electing one |
+| **Choghadiya** | 8 weekday-keyed day/night blocks, auspicious or not |
+| **Rahu Kalam / Gulika / Yamagandam** | Inauspicious 1/8-day windows |
+| **Brahma / Abhijit Muhurta, Amrita Kalam** | Auspicious windows |
+| **Varjyam / Durmuhurtham / Vishaghati** | Inauspicious sub-windows |
+| **Tarabalam** | 9-fold star strength from a birth nakshatra |
+| **Chandrabalam** | 12-fold Moon-sign strength from a birth rasi |
+| **Gochara** | Planetary transit (and its verdicts from a natal sign) |
+| **Maudhya / Asta-Udaya** | Combustion / heliacal setting & rising |
+| **Graha Yuddha** | "Planetary war" — two planets within 1° |
+| **Sankramana** | Sun's ingress into a new rasi |
+| **Ayanamsa** | Sidereal–tropical offset (Lahiri default) |
+
+## Classical sources cited across the codebase
+
+Muhurta Chintamani · Brihat Samhita · Brihat Parashara Hora Shastra (BPHS) ·
+Dharmasindhu / Dharma Sindhu · Surya Siddhanta · standard panchangam authority,
+all cross-verified against **drikpanchang.com** day-pages (the project's
+verification surface).
