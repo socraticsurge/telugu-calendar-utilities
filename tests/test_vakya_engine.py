@@ -1,5 +1,5 @@
-from datetime import date, datetime, timezone
-from telugu_panchangam.engines.vakya import VakyaEngine, vakya_moon_longitude, vakya_elongation
+from datetime import date, datetime
+from telugu_panchangam.engines.vakya import VakyaEngine, vakya_moon_longitude
 from telugu_panchangam.engines.surya_siddhanta import ss_moon_longitude
 from telugu_panchangam.cities import CITIES
 

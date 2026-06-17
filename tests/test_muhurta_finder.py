@@ -807,7 +807,7 @@ def test_engine_kwarg_changes_late_slot_nakshatra():
     can differ from the same slot computed in snapshot mode."""
     day = _day(2026, 6, 17)
     # Snapshot mode (no engine): all slots score using sunrise Punarvasu
-    snap = day_slots(day, janma_nakshatras=['Pushya'])
+    _snap = day_slots(day, janma_nakshatras=['Pushya'])
     # Engine mode: slots after Punarvasu's end use the next nakshatra
     eng_slots = day_slots(day, janma_nakshatras=['Pushya'], engine=ENGINE)
     # Pushya's tara on Punarvasu (sunrise) = Parama Mitra (favourable, +1)

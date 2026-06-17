@@ -3,8 +3,6 @@ from collections import Counter
 from datetime import date
 import json
 
-import pytest
-
 from telugu_panchangam.nakshatra_filters import nakshatra_mukha, NAKSHATRA_MUKHA
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES

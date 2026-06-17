@@ -50,7 +50,7 @@ def test_nija_maasa_not_skipped():
     # Wedding must produce slots on this non-Adhika day (assuming no other
     # samskara dosha is active). We don't assert a count > 0 because other
     # filters could legitimately produce 0 slots.
-    slots = day_slots(day, activity='wedding')
+    _slots = day_slots(day, activity='wedding')
     # If we got 0, it's because of *another* filter, not Adhika.
     # No strict assertion — this test just exercises the code path.
 

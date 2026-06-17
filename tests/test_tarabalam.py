@@ -1,7 +1,5 @@
 # Tarabalam counting verified against a reference tarabala table
 # (June 2026, four janma nakshatras; see feature/tarabalam PR).
-from datetime import date
-
 from telugu_panchangam.personal.tarabalam import (
     tara_number, tara_name, is_auspicious_tara, taras_for_day, TARA_NAMES,
 )
