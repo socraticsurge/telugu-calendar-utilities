@@ -12,6 +12,7 @@ _MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.maudhya_calendar import combustion_periods, PLANET_NAMES
 from telugu_panchangam.graha_yuddha import graha_yuddha_periods, YUDDHA_PLANETS
+from telugu_panchangam.ingress import rashi_ingresses, INGRESS_PLANETS
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
@@ -1072,6 +1073,128 @@ def tool_get_graha_yuddha(
                 }
                 for w in wars
             ],
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+
+
+def tool_get_rashi_ingresses(
+    start_date: str,
+    end_date: str,
+    planets: Optional[list] = None,
+) -> str:
+    """Return all rashi ingress (sign-change) events in a date range."""
+    try:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if end < start:
+            raise ValueError('end_date must be >= start_date.')
+        if (end - start).days > 365:
+            raise ValueError('Date range exceeds 366-day limit. Use multiple calls for longer spans.')
+        if planets is not None:
+            bad = [p for p in planets if p not in set(INGRESS_PLANETS)]
+            if bad:
+                raise ValueError(f'Unknown planet(s): {bad}. Valid: {INGRESS_PLANETS}')
+
+        events = rashi_ingresses(start, end, planets=planets)
+
+        def _fmt(dt):
+            return dt.strftime('%Y-%m-%d %H:%M UTC') if dt else None
+
+        return json.dumps({
+            'start_date': start_date,
+            'end_date': end_date,
+            'ayanamsa': 'lahiri',
+            'note': (
+                'Sidereal (Lahiri) rashi ingresses — when each planet crosses a '
+                'sign boundary. Retrograde ingresses (planet re-enters a sign it '
+                'recently left) are included. exits = next sign change for that '
+                'planet, even if it falls outside the requested range; null if '
+                'the planet stays in the same sign for > 3 years.'
+            ),
+            'ingresses': [
+                {
+                    'planet': e.planet,
+                    'rashi': e.rashi,
+                    'enters': _fmt(e.enters),
+                    'exits': _fmt(e.exits),
+                }
+                for e in events
+            ],
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+
+
+def tool_get_eclipse_calendar(
+    start_date: str,
+    end_date: str,
+    city: str = 'Hyderabad',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    """Return all solar and lunar eclipses in a date range with per-city visibility."""
+    try:
+        import pytz as _pytz
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if end < start:
+            raise ValueError('end_date must be >= start_date.')
+        if (end - start).days > 730:
+            raise ValueError('Date range exceeds 730-day limit.')
+        loc = _resolve_city(city, latitude, longitude, timezone)
+
+        jd_start = local_midnight_jd(start, loc.timezone)
+        jd_end   = local_midnight_jd(end, loc.timezone) + 1.0
+        precomputed = list_eclipses_in_range(jd_start, jd_end)
+
+        tz_obj = _pytz.timezone(loc.timezone)
+        out = []
+        for ec in precomputed:
+            local_max = jd_to_utc(ec['jd_max']).astimezone(tz_obj)
+            eclipse_date = local_max.date()
+            info = get_eclipse_from_precomputed(eclipse_date, [ec], loc)
+            if info is None:
+                # eclipse exists globally but couldn't be processed — still include
+                info_dict = {
+                    'kind': ec['kind'],
+                    'subtype': ec['subtype'],
+                    'visible': False,
+                    'start': _fmt_time(jd_to_utc(ec['jd_start']), loc.timezone),
+                    'end':   _fmt_time(jd_to_utc(ec['jd_end']),   loc.timezone),
+                    'sutak': None,
+                }
+            else:
+                info_dict = {
+                    'kind': info.kind,
+                    'subtype': info.subtype,
+                    'visible': info.visible,
+                    'start': _fmt_time(info.start, loc.timezone),
+                    'end':   _fmt_time(info.end,   loc.timezone),
+                    'sutak': {
+                        'start': _fmt_time(info.sutak_start, loc.timezone),
+                        'end':   _fmt_time(info.sutak_end,   loc.timezone),
+                    } if info.sutak_start else None,
+                }
+            out.append({'date': eclipse_date.isoformat(), **info_dict})
+
+        return json.dumps({
+            'start_date': start_date,
+            'end_date': end_date,
+            'city': city,
+            'note': (
+                'visible=true means the eclipse is observable from the given city. '
+                'sutak (ritual impurity period) is only populated for visible eclipses: '
+                '12 hours before a Solar eclipse, 9 hours before a Lunar eclipse.'
+            ),
+            'eclipses': out,
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
