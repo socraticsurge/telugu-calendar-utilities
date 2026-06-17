@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hora + Lagna UI — palette comparison</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ────────────────────────────────────────────────────────────
+     Shared base — mirrors docs/index.html so what you see here
+     would look the same when transplanted into the live site.
+     ──────────────────────────────────────────────────────────── */
+  :root {
+    --indigo: #8E2A1F;
+    --indigo-bg: rgba(142,42,31,0.08);
+    --indigo-border: rgba(142,42,31,0.22);
+    --green: #15803d;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --cream: #FAF5EB;
+    --ink: #2A2520;
+    --muted: #8B8377;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    background: var(--cream); color: var(--ink); margin: 0; padding: 0;
+  }
+  .page-header {
+    background: var(--indigo); color: #fff; padding: 1.1rem 1.4rem;
+  }
+  .page-header h1 { margin: 0 0 0.2rem; font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 1.25rem; }
+  .page-header p  { margin: 0; opacity: 0.85; font-size: 0.85rem; }
+
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem;
+    padding: 1.4rem; max-width: 1400px; margin: 0 auto;
+  }
+  @media (max-width: 900px) {
+    .compare { grid-template-columns: 1fr; }
+  }
+  .col {
+    background: #fff;
+    border: 1px solid #E4DAC6;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .col-head { padding: 0.75rem 1rem; border-bottom: 1px solid #E4DAC6; background: #FBF6EC; }
+  .col-head h2 { margin: 0; font-size: 0.95rem; font-family: 'Fraunces', Georgia, serif; }
+  .col-head .sub { display: block; color: var(--muted); font-size: 0.72rem; margin-top: 0.15rem; }
+
+  /* ── Tile strip primitives — copied verbatim from docs/index.html ── */
+  .tile-strip { border-top: 1px solid #E4DAC6; padding: 0.7rem 0.9rem 0.85rem; }
+  .tile-strip:first-of-type { border-top: 0; }
+  .strip-title {
+    font-size: 0.72rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 0.45rem; font-style: italic;
+    font-family: 'Fraunces', Georgia, serif;
+  }
+  .hora-grid {
+    display: grid; grid-template-columns: repeat(12, 1fr); gap: 0.25rem;
+  }
+  @media (max-width: 620px) {
+    .hora-grid { grid-template-columns: repeat(6, 1fr); }
+  }
+  .hora-cell {
+    border-radius: 6px; padding: 0.32rem 0.18rem; text-align: center;
+    border: 1px solid transparent;
+    cursor: default; transition: transform 0.08s ease-out;
+  }
+  .hora-cell:hover { transform: translateY(-1px); }
+  .hora-glyph { font-size: 0.95rem; line-height: 1; margin-bottom: 0.15rem; }
+  .hora-lord { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em; }
+  .hora-time { font-size: 0.6rem; color: #6B6358; margin-top: 0.1rem; font-variant-numeric: tabular-nums; }
+
+  /* ── Lagna ribbon ── */
+  .lagna-ribbon {
+    display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px;
+    border-radius: 6px; overflow: hidden;
+  }
+  .lagna-seg {
+    padding: 0.45rem 0.25rem; text-align: center;
+    border: 1px solid transparent;
+  }
+  .lagna-name { font-size: 0.72rem; font-weight: 700; font-family: 'Fraunces', Georgia, serif; }
+  .lagna-time { font-size: 0.6rem; color: #6B6358; margin-top: 0.12rem; font-variant-numeric: tabular-nums; }
+
+  /* ────────────────────────────────────────────────────────────
+     Option A — Classical planetary colours.
+     Source: traditional Jyotisha planet-colour associations
+     (Brihat Parashara, common modern panchangam usage).
+     ──────────────────────────────────────────────────────────── */
+  .palette-classical .hora-cell.sun     { background: #FFF4D6; border-color: #F2C94C; color: #7A5C00; }
+  .palette-classical .hora-cell.moon    { background: #F4F7FB; border-color: #C8D2DE; color: #4A5867; }
+  .palette-classical .hora-cell.mars    { background: #FEE7E0; border-color: #F2887A; color: #8C2A1A; }
+  .palette-classical .hora-cell.mercury { background: #E7F5E7; border-color: #95C695; color: #2D6A3D; }
+  .palette-classical .hora-cell.jupiter { background: #FFF1CE; border-color: #E5B548; color: #6B4A00; }
+  .palette-classical .hora-cell.venus   { background: #FBF1F6; border-color: #E5C6D5; color: #7A3960; }
+  .palette-classical .hora-cell.saturn  { background: #E3E4EA; border-color: #9BA1B0; color: #2E3340; }
+
+  /* Rashi colours follow the element of each sign (Fire/Earth/Air/Water)
+     — the most common classical mapping. */
+  .palette-classical .lagna-seg.fire  { background: #FEEAE0; border-color: #F2887A; color: #8C2A1A; }
+  .palette-classical .lagna-seg.earth { background: #EEE5D2; border-color: #C8B27A; color: #6B4F1A; }
+  .palette-classical .lagna-seg.air   { background: #E7F1F8; border-color: #99BEDB; color: #1F4A75; }
+  .palette-classical .lagna-seg.water { background: #E6F1EE; border-color: #87BDB0; color: #1F5C4F; }
+
+  /* ────────────────────────────────────────────────────────────
+     Option B — Site indigo palette.
+     Uses the existing --indigo family with intensity steps
+     instead of hue changes. Distinctions come from saturation.
+     ──────────────────────────────────────────────────────────── */
+  .palette-site .hora-cell {
+    background: var(--indigo-bg); border-color: var(--indigo-border); color: var(--indigo);
+  }
+  .palette-site .hora-cell.benefic   { background: rgba(142,42,31,0.16); border-color: rgba(142,42,31,0.34); }
+  .palette-site .hora-cell.malefic   { background: rgba(142,42,31,0.04); border-color: rgba(142,42,31,0.14); color: rgba(142,42,31,0.65); }
+  .palette-site .hora-cell.neutral   { background: rgba(142,42,31,0.10); border-color: rgba(142,42,31,0.22); }
+
+  .palette-site .lagna-seg { background: var(--indigo-bg); border-color: var(--indigo-border); color: var(--indigo); }
+  .palette-site .lagna-seg.fav   { background: rgba(142,42,31,0.18); border-color: rgba(142,42,31,0.38); }
+  .palette-site .lagna-seg.unfav { background: rgba(142,42,31,0.04); border-color: rgba(142,42,31,0.14); color: rgba(142,42,31,0.55); }
+
+  /* ── Footer trade-off notes ── */
+  .notes {
+    max-width: 1400px; margin: 0 auto; padding: 0 1.4rem 2.2rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem;
+    font-size: 0.85rem; line-height: 1.5;
+  }
+  @media (max-width: 900px) { .notes { grid-template-columns: 1fr; } }
+  .notes h3 {
+    margin: 0 0 0.5rem; font-family: 'Fraunces', Georgia, serif; font-size: 1rem;
+  }
+  .notes ul { padding-left: 1.1rem; margin: 0.3rem 0 0.6rem; }
+  .notes li { margin-bottom: 0.3rem; }
+  .pros { color: #15803d; }
+  .cons { color: #8E2A1F; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Hora + Lagna UI — palette comparison</h1>
+  <p>Same data, two visual treatments. Mock day: <strong>Sunday 15 Jun 2026, Hyderabad</strong>. Left = classical planetary colours · Right = site indigo palette.</p>
+</header>
+
+<section class="compare">
+
+  <!-- ════════════════════════════════════════════════════════════════
+       OPTION A — Classical planetary colours
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="col palette-classical">
+    <div class="col-head">
+      <h2>A · Classical planetary colours</h2>
+      <span class="sub">One hue per planet · rashi blocks by elemental family</span>
+    </div>
+
+    <!-- Daytime horas -->
+    <div class="tile-strip">
+      <div class="strip-title">🕒 Horas — day · sunrise to sunset</div>
+      <div class="hora-grid">
+        <div class="hora-cell sun"     title="Sun · authority, leadership, government"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">05:43</div></div>
+        <div class="hora-cell venus"   title="Venus · arts, relationships, luxury"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">06:43</div></div>
+        <div class="hora-cell mercury" title="Mercury · study, communication, signing"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">07:42</div></div>
+        <div class="hora-cell moon"    title="Moon · travel, emotional matters, gentle work"><div class="hora-glyph">☽</div><div class="hora-lord">Moon</div><div class="hora-time">08:41</div></div>
+        <div class="hora-cell saturn"  title="Saturn · discipline, labour, structure"><div class="hora-glyph">♄</div><div class="hora-lord">Saturn</div><div class="hora-time">09:40</div></div>
+        <div class="hora-cell jupiter" title="Jupiter · ceremonies, learning, expansion"><div class="hora-glyph">♃</div><div class="hora-lord">Jupiter</div><div class="hora-time">10:39</div></div>
+        <div class="hora-cell mars"    title="Mars · action, courage, contention"><div class="hora-glyph">♂</div><div class="hora-lord">Mars</div><div class="hora-time">11:38</div></div>
+        <div class="hora-cell sun"     title="Sun"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">12:37</div></div>
+        <div class="hora-cell venus"   title="Venus"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">13:36</div></div>
+        <div class="hora-cell mercury" title="Mercury"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">14:36</div></div>
+        <div class="hora-cell moon"    title="Moon"><div class="hora-glyph">☽</div><div class="hora-lord">Moon</div><div class="hora-time">15:35</div></div>
+        <div class="hora-cell saturn"  title="Saturn"><div class="hora-glyph">♄</div><div class="hora-lord">Saturn</div><div class="hora-time">16:34</div></div>
+      </div>
+    </div>
+
+    <!-- Nighttime horas -->
+    <div class="tile-strip">
+      <div class="strip-title">🌙 Horas — night · sunset to next sunrise</div>
+      <div class="hora-grid">
+        <div class="hora-cell jupiter" title="Jupiter"><div class="hora-glyph">♃</div><div class="hora-lord">Jupiter</div><div class="hora-time">18:43</div></div>
+        <div class="hora-cell mars"    title="Mars"><div class="hora-glyph">♂</div><div class="hora-lord">Mars</div><div class="hora-time">19:39</div></div>
+        <div class="hora-cell sun"     title="Sun"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">20:35</div></div>
+        <div class="hora-cell venus"   title="Venus"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">21:31</div></div>
+        <div class="hora-cell mercury" title="Mercury"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">22:26</div></div>
+        <div class="hora-cell moon"    title="Moon"><div class="hora-glyph">☽</div><div class="hora-lord">Moon</div><div class="hora-time">23:22</div></div>
+        <div class="hora-cell saturn"  title="Saturn"><div class="hora-glyph">♄</div><div class="hora-lord">Saturn</div><div class="hora-time">00:18</div></div>
+        <div class="hora-cell jupiter" title="Jupiter"><div class="hora-glyph">♃</div><div class="hora-lord">Jupiter</div><div class="hora-time">01:14</div></div>
+        <div class="hora-cell mars"    title="Mars"><div class="hora-glyph">♂</div><div class="hora-lord">Mars</div><div class="hora-time">02:10</div></div>
+        <div class="hora-cell sun"     title="Sun"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">03:06</div></div>
+        <div class="hora-cell venus"   title="Venus"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">04:01</div></div>
+        <div class="hora-cell mercury" title="Mercury"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">04:57</div></div>
+      </div>
+    </div>
+
+    <!-- Lagna ribbon -->
+    <div class="tile-strip">
+      <div class="strip-title">🌅 Lagna — rising sign through the day</div>
+      <div class="lagna-ribbon">
+        <div class="lagna-seg air"   title="Mithuna · air"><div class="lagna-name">Mithuna</div><div class="lagna-time">05:38</div></div>
+        <div class="lagna-seg water" title="Karka · water"><div class="lagna-name">Karka</div><div class="lagna-time">07:33</div></div>
+        <div class="lagna-seg fire"  title="Simha · fire"><div class="lagna-name">Simha</div><div class="lagna-time">09:42</div></div>
+        <div class="lagna-seg earth" title="Kanya · earth"><div class="lagna-name">Kanya</div><div class="lagna-time">11:58</div></div>
+        <div class="lagna-seg air"   title="Tula · air"><div class="lagna-name">Tula</div><div class="lagna-time">14:14</div></div>
+        <div class="lagna-seg water" title="Vrishchika · water"><div class="lagna-name">Vrishchika</div><div class="lagna-time">16:24</div></div>
+        <div class="lagna-seg fire"  title="Dhanu · fire"><div class="lagna-name">Dhanu</div><div class="lagna-time">18:24</div></div>
+        <div class="lagna-seg earth" title="Makara · earth"><div class="lagna-name">Makara</div><div class="lagna-time">20:13</div></div>
+        <div class="lagna-seg air"   title="Kumbha · air"><div class="lagna-name">Kumbha</div><div class="lagna-time">21:52</div></div>
+        <div class="lagna-seg water" title="Meena · water"><div class="lagna-name">Meena</div><div class="lagna-time">23:24</div></div>
+        <div class="lagna-seg fire"  title="Mesha · fire"><div class="lagna-name">Mesha</div><div class="lagna-time">00:55</div></div>
+        <div class="lagna-seg earth" title="Vrishabha · earth"><div class="lagna-name">Vrishabha</div><div class="lagna-time">02:32</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       OPTION B — Site indigo palette
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="col palette-site">
+    <div class="col-head">
+      <h2>B · Site indigo palette</h2>
+      <span class="sub">One hue · saturation steps separate benefic / neutral / malefic</span>
+    </div>
+
+    <!-- Daytime horas -->
+    <div class="tile-strip">
+      <div class="strip-title">🕒 Horas — day · sunrise to sunset</div>
+      <div class="hora-grid">
+        <div class="hora-cell neutral" title="Sun · authority, leadership"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">05:43</div></div>
+        <div class="hora-cell benefic" title="Venus · arts, relationships"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">06:43</div></div>
+        <div class="hora-cell benefic" title="Mercury · study, communication"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">07:42</div></div>
+        <div class="hora-cell benefic" title="Moon · travel, emotional matters"><div class="hora-glyph">☽</div><div class="hora-lord">Moon</div><div class="hora-time">08:41</div></div>
+        <div class="hora-cell malefic" title="Saturn · discipline, labour"><div class="hora-glyph">♄</div><div class="hora-lord">Saturn</div><div class="hora-time">09:40</div></div>
+        <div class="hora-cell benefic" title="Jupiter · ceremonies, learning"><div class="hora-glyph">♃</div><div class="hora-lord">Jupiter</div><div class="hora-time">10:39</div></div>
+        <div class="hora-cell malefic" title="Mars · action, courage"><div class="hora-glyph">♂</div><div class="hora-lord">Mars</div><div class="hora-time">11:38</div></div>
+        <div class="hora-cell neutral" title="Sun"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">12:37</div></div>
+        <div class="hora-cell benefic" title="Venus"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">13:36</div></div>
+        <div class="hora-cell benefic" title="Mercury"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">14:36</div></div>
+        <div class="hora-cell benefic" title="Moon"><div class="hora-glyph">☽</div><div class="hora-lord">Moon</div><div class="hora-time">15:35</div></div>
+        <div class="hora-cell malefic" title="Saturn"><div class="hora-glyph">♄</div><div class="hora-lord">Saturn</div><div class="hora-time">16:34</div></div>
+      </div>
+    </div>
+
+    <!-- Nighttime horas -->
+    <div class="tile-strip">
+      <div class="strip-title">🌙 Horas — night · sunset to next sunrise</div>
+      <div class="hora-grid">
+        <div class="hora-cell benefic" title="Jupiter"><div class="hora-glyph">♃</div><div class="hora-lord">Jupiter</div><div class="hora-time">18:43</div></div>
+        <div class="hora-cell malefic" title="Mars"><div class="hora-glyph">♂</div><div class="hora-lord">Mars</div><div class="hora-time">19:39</div></div>
+        <div class="hora-cell neutral" title="Sun"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">20:35</div></div>
+        <div class="hora-cell benefic" title="Venus"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">21:31</div></div>
+        <div class="hora-cell benefic" title="Mercury"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">22:26</div></div>
+        <div class="hora-cell benefic" title="Moon"><div class="hora-glyph">☽</div><div class="hora-lord">Moon</div><div class="hora-time">23:22</div></div>
+        <div class="hora-cell malefic" title="Saturn"><div class="hora-glyph">♄</div><div class="hora-lord">Saturn</div><div class="hora-time">00:18</div></div>
+        <div class="hora-cell benefic" title="Jupiter"><div class="hora-glyph">♃</div><div class="hora-lord">Jupiter</div><div class="hora-time">01:14</div></div>
+        <div class="hora-cell malefic" title="Mars"><div class="hora-glyph">♂</div><div class="hora-lord">Mars</div><div class="hora-time">02:10</div></div>
+        <div class="hora-cell neutral" title="Sun"><div class="hora-glyph">☉</div><div class="hora-lord">Sun</div><div class="hora-time">03:06</div></div>
+        <div class="hora-cell benefic" title="Venus"><div class="hora-glyph">♀</div><div class="hora-lord">Venus</div><div class="hora-time">04:01</div></div>
+        <div class="hora-cell benefic" title="Mercury"><div class="hora-glyph">☿</div><div class="hora-lord">Mercury</div><div class="hora-time">04:57</div></div>
+      </div>
+    </div>
+
+    <!-- Lagna ribbon -->
+    <div class="tile-strip">
+      <div class="strip-title">🌅 Lagna — rising sign through the day</div>
+      <div class="lagna-ribbon">
+        <div class="lagna-seg fav"   title="Mithuna · kendra from janma Kanya"><div class="lagna-name">Mithuna</div><div class="lagna-time">05:38</div></div>
+        <div class="lagna-seg unfav" title="Karka"><div class="lagna-name">Karka</div><div class="lagna-time">07:33</div></div>
+        <div class="lagna-seg"       title="Simha"><div class="lagna-name">Simha</div><div class="lagna-time">09:42</div></div>
+        <div class="lagna-seg fav"   title="Kanya · janma lagna"><div class="lagna-name">Kanya</div><div class="lagna-time">11:58</div></div>
+        <div class="lagna-seg"       title="Tula"><div class="lagna-name">Tula</div><div class="lagna-time">14:14</div></div>
+        <div class="lagna-seg unfav" title="Vrishchika"><div class="lagna-name">Vrishchika</div><div class="lagna-time">16:24</div></div>
+        <div class="lagna-seg fav"   title="Dhanu · trikona"><div class="lagna-name">Dhanu</div><div class="lagna-time">18:24</div></div>
+        <div class="lagna-seg"       title="Makara"><div class="lagna-name">Makara</div><div class="lagna-time">20:13</div></div>
+        <div class="lagna-seg"       title="Kumbha"><div class="lagna-name">Kumbha</div><div class="lagna-time">21:52</div></div>
+        <div class="lagna-seg fav"   title="Meena · trikona"><div class="lagna-name">Meena</div><div class="lagna-time">23:24</div></div>
+        <div class="lagna-seg unfav" title="Mesha"><div class="lagna-name">Mesha</div><div class="lagna-time">00:55</div></div>
+        <div class="lagna-seg"       title="Vrishabha"><div class="lagna-name">Vrishabha</div><div class="lagna-time">02:32</div></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section class="notes">
+  <div>
+    <h3>A · Classical planetary colours</h3>
+    <ul class="pros">
+      <li><strong>Recognisable.</strong> A Jyotisha-literate user reads the strip without the labels — Saturn’s slate-grey and Jupiter’s gold are recognised at a glance.</li>
+      <li><strong>Carries meaning.</strong> Colour itself encodes the planet’s nature (Mars red = active, Moon silver = receptive). Lagna ribbon’s elemental colouring (fire/earth/air/water) tells the user what kind of energy each lagna brings.</li>
+      <li><strong>Differentiation.</strong> Seven distinct hues + four rashi elements give the eye real information density. Pattern-recognition is fast across a 24-cell strip.</li>
+    </ul>
+    <ul class="cons">
+      <li><strong>Visual noise.</strong> Introduces seven new colour families to a page that today is calmly indigo/cream. Reads as a different app pinned next to the muhurta finder.</li>
+      <li><strong>Brand drift.</strong> Site has built equity around the single saffron-maroon hue. Any future component is now asking “planetary, or site?”.</li>
+      <li><strong>Subjective mappings.</strong> Mars red, Saturn black, Sun gold are standard. Mercury green / Venus white / Moon silver / Jupiter yellow vary by lineage — purists will push back on individual choices.</li>
+      <li><strong>Accessibility cost.</strong> Seven hues at the saturation level shown need WCAG verification on text contrast; some pairings (Mercury green text on green bg) are borderline.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>B · Site indigo palette</h3>
+    <ul class="pros">
+      <li><strong>Coherent.</strong> Looks like it grew out of the existing UI. No visual seam between the new strips and the rest of the page.</li>
+      <li><strong>Information stays in labels.</strong> Forces the planet glyph + name to do the identification work — which is arguably correct for users who don’t already read the classical colours.</li>
+      <li><strong>Encodes <em>favourability</em> instead of <em>identity</em>.</strong> Saturation steps say “better / worse for you today”, which is the question users actually ask. Identity (which planet) is still in the glyph and text.</li>
+      <li><strong>Cheap to extend.</strong> Personal lagna favourability, hora-vara match bonuses from the muhurta finder, “current hora” highlighting all slot into the same saturation language.</li>
+    </ul>
+    <ul class="cons">
+      <li><strong>Lower information density.</strong> Three intensity steps is fewer than seven hues. Users can’t scan and read “that’s a Mars hour” without looking at the glyph.</li>
+      <li><strong>Slower for experts.</strong> Devotees who know the classical scheme have to translate.</li>
+      <li><strong>Benefic/malefic is a simplification.</strong> Sun is classed “neutral”, Saturn/Mars “malefic” — but a Saturn hora is the right hora for disciplined labour, not a “bad” hora. The site palette flattens that nuance to a single axis.</li>
+    </ul>
+  </div>
+  <div style="grid-column: 1 / -1; padding: 1rem 1.2rem; background: #FBF6EC; border: 1px solid #E4DAC6; border-radius: 8px; font-size: 0.88rem;">
+    <h3 style="margin-top: 0;">Recommendation</h3>
+    <p>
+      <strong>Ship Option B (site palette) as default and offer Option A as an opt-in toggle.</strong>
+      Reason: most visitors are not yet Jyotisha-literate, and the site’s pedagogical value comes from showing what’s <em>good for them</em> (favourability) rather than what’s <em>cosmically true</em> (planetary identity). The classical scheme is a power-user view — wire it behind a “Classical view” toggle in the help drawer for the devotees who want it. That way you keep brand coherence without losing the experts.
+    </p>
+    <p style="margin-bottom: 0;">
+      Lagna ribbon: regardless of which palette wins for horas, lagna favours <em>relative</em> colouring (kendra/trikona from janma) over elemental colouring, because the elemental view is informationally weaker than the personal-fit view once you’ve already collected janma rasi in the Tarabalam panel.
+    </p>
+  </div>
+</section>
+
+</body>
+</html>
