@@ -11,6 +11,7 @@ _MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.maudhya_calendar import combustion_periods, PLANET_NAMES
+from telugu_panchangam.graha_yuddha import graha_yuddha_periods, YUDDHA_PLANETS
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
@@ -1014,6 +1015,63 @@ def tool_find_muhurta(
             'slots': slots[:12],
             'dropped_days': dropped_days,
             'disclaimer': _MUHURTA_DISCLAIMER,
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+
+
+def tool_get_graha_yuddha(
+    start_date: str,
+    end_date: str,
+    planets: Optional[list] = None,
+) -> str:
+    """Return Graha Yuddha (planetary war) periods in a date range."""
+    try:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if end < start:
+            raise ValueError('end_date must be >= start_date.')
+        if (end - start).days > 365:
+            raise ValueError('Date range exceeds 366-day limit. Use multiple calls for longer spans.')
+        if planets is not None:
+            bad = [p for p in planets if p not in set(YUDDHA_PLANETS)]
+            if bad:
+                raise ValueError(f'Unknown planet(s): {bad}. Valid: {YUDDHA_PLANETS}')
+
+        wars = graha_yuddha_periods(start, end, planets=planets)
+
+        def _fmt(dt):
+            return dt.strftime('%Y-%m-%d %H:%M UTC') if dt else None
+
+        return json.dumps({
+            'start_date': start_date,
+            'end_date': end_date,
+            'threshold': '1° ecliptic longitude',
+            'victor_rule': 'higher ecliptic latitude at closest approach',
+            'note': (
+                'Graha Yuddha (planetary war) occurs when two of the five tara '
+                'grahas come within 1° of each other in ecliptic longitude. The '
+                'vanquished planet loses astrological strength for the duration. '
+                'Sun, Moon, Rahu, and Ketu are exempt by classical convention. '
+                'ongoing=true means the war extends beyond the scan horizon.'
+            ),
+            'wars': [
+                {
+                    'planet1': w.planet1,
+                    'planet2': w.planet2,
+                    'winner': w.winner,
+                    'loser': w.loser,
+                    'starts': _fmt(w.starts),
+                    'exact': _fmt(w.exact),
+                    'ends': _fmt(w.ends),
+                    'ongoing': w.ends is None,
+                    'min_separation_arcmin': w.min_separation_arcmin,
+                }
+                for w in wars
+            ],
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
