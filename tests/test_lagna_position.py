@@ -5,7 +5,7 @@ from telugu_panchangam.personal.lagna_position import (
     lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,
     LAGNA_KENDRA, LAGNA_TRIKONA,
     LAGNA_CHARA, LAGNA_STHIRA, LAGNA_DVISVABHAVA,
-    LAGNA_CLASSES, lagna_class_of, lagnas_in_class,
+    lagna_class_of, lagnas_in_class,
 )
 
 

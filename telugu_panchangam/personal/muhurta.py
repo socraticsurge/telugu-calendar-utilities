@@ -935,10 +935,8 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                 # by applying a strong penalty.
                 day_quality.append('Mrityu Panchaka — universal samskara avoidance (-3)')
                 score -= 3
-                panchaka_dosha = 'mrityu_panchaka'
             elif _panchaka.name != 'Rahita':
                 # Activity-specific penalty for non-Rahita doshas
-                _activity_key = label.lower().replace(' ', '_').replace('/', '_')
                 _matched_avoid = None
                 for _avoid_key in _panchaka.avoid_for:
                     # Check if current activity matches any avoid_for key
@@ -955,7 +953,6 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                         f'{_panchaka.name} Panchaka conflicts with {label} (-2)'
                     )
                     score -= 2
-                    panchaka_dosha = f'{_panchaka.name.lower()}_panchaka'
         except (ValueError, KeyError):
             # If lagna or tithi lookup fails, skip panchaka scoring gracefully
             pass
@@ -1150,7 +1147,6 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     # and Panchaka Rahita slot-level recompute. Always compute — one bisection
     # pass per day (not per slot), so cost is O(1) per call regardless of slot
     # count.
-    _needs_lagnas = _has_personal_ref or bool(prefer_lagna_class) or True
     lagnas = get_lagna_transitions(day)
 
     # Engine-precise mode: per-slot facts via engine.facts_at(start).

@@ -1,6 +1,5 @@
 from telugu_panchangam.engines.base import (
     TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, RASHI_NAMES,
-    SAMVATSARA_NAMES, MAASAM_NAMES, RITUVU_NAMES, VAARAM_NAMES,
     PanchangamEngine,
 )
 

@@ -1,8 +1,6 @@
-import pytest
 from datetime import date
-from unittest.mock import MagicMock
 
-from telugu_panchangam.models.panchangam_day import PanchangamDay, Window, Location
+from telugu_panchangam.models.panchangam_day import Location
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 
