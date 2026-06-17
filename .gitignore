@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 .worktrees
 dist/
+node_modules/
 *.egg-info/
 docs/superpowers/
 
@@ -15,6 +16,7 @@ dashboard.html
 docs/tracking/
 docs/plans/
 docs/specs/
+docs/reference/
 docs/GUIDELINES.md
 docs/NOW.md
 tests/test_checkpoint_logic.py
