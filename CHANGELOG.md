@@ -7,49 +7,205 @@ PyPI version tracks this file's most recent release entry.
 
 ## [1.9.0] — 2026-06-17
 
-### Added — Timing computations round (16 features)
+The theme: **classical muhurta sharpening — non-personal timing layer**.
+Sixteen computations from Muhurta Chintamani, Brihat Samhita,
+Dharmasindhu, and standard panchangam authority — all surface as
+additive properties on `PanchangamDay` and across the three per-day
+MCP response paths (`tool_get_panchangam`, `tool_get_muhurta`,
+`tool_get_panchangam_range`). No personal-astrology computations
+(Dasha, Navamsa, Kuta match) — those are reserved for a separate
+project. Engine math is additive only; the frozen core is untouched
+and ICS subscriber feeds are byte-identical. **+142 tests
+(849 → 991 passed).**
 
-**Foundational:**
-- **Ghati/vighati infrastructure** — sunrise-anchored ghati clock (`GhatiClock`, `GhatiWindow`) on `PanchangamDay.ghati_clock`. Foundation for downstream classical timing windows.
-- **Moon's pada on the daily nakshatra span** — `PanchangamDay.nakshatra_pada` (1..4).
-- **Ayanamsa as engine parameter** — Drik accepts `ayanamsa: 'lahiri' | 'raman' | 'krishnamurti' | 'true_chitrapaksha'`; Lahiri default preserves prior byte-identical behaviour. SS and Vakya accept the parameter for API symmetry.
+### Added — Timing computations (16 features)
 
-**Ghati-precision filters:**
-- **Vishaghati windows** — `PanchangamDay.vishaghati` per Muhurta Chintamani nakshatra-poison offsets; treated as inauspicious cuts in slot scoring.
-- **Bhadra Mukha / Puchha** — Vishti karana split into Mukha (first 5/16, hard-avoid) and Puchha (last 3/16, auspicious for contests/litigation).
-- **Sankramana 16-ghati avoidance window** — `PanchangamDay.sankramana_avoidance`; samskara activities skip during this window.
+**Foundational (Tasks 1–3):**
+- **Ghati/vighati clock infrastructure** — sunrise-anchored ghati
+  scale (1 ghati = 1/60 ahoratri = sunrise→next-sunrise / 60).
+  New `GhatiClock` and `GhatiWindow` dataclasses;
+  `PanchangamDay.ghati_clock` exposes `sunrise`,
+  `next_sunrise`, `seconds_per_ghati`. Foundation for all
+  ghati-precision filters below. Module:
+  `telugu_panchangam/ghati.py`.
+- **Moon's pada on the daily nakshatra span** — `PanchangamDay.nakshatra_pada`
+  (1..4), computed from each engine's own Moon longitude at sunrise.
+  Drik value cross-pinned against `gochara/positions.py:81` (canonical
+  `int(nak_pos * 4) % 4 + 1` formula).
+- **Ayanamsa as engine parameter** — Drik now accepts
+  `ayanamsa: 'lahiri' | 'raman' | 'krishnamurti' | 'true_chitrapaksha'`
+  (default `'lahiri'`, byte-identical to prior behaviour).
+  Surya Siddhanta and Vakya accept the parameter for API symmetry
+  (their own mean-motion models drive sidereal positions; ayanamsa
+  is a no-op there). New `engines/utils.sidereal_longitude_with_ayanamsa`
+  helper restores Lahiri mode after each call to keep the hot-path
+  `@lru_cache` consistent.
 
-**Nakshatra / yoga filters:**
-- **5 Panchaka Nakshatras flag** — `in_panchaka_nakshatra` for cremation / roofing / wood-cutting muhurta.
-- **Adho / Urdhva / Tiryan-Mukha nakshatra** — `nakshatra_mukha` activity-conditioned bonus (foundations / coronation / travel).
-- **Anandadi 28 Yogas** — `anandadi_yoga` vaaram × nakshatra classification with auspicious/inauspicious scoring.
+**Ghati-precision filters (Tasks 4–6, ride on the ghati clock):**
+- **Vishaghati windows** — `PanchangamDay.vishaghati: list[GhatiWindow]`.
+  Per-nakshatra "poison ghatika" offsets from Muhurta Chintamani
+  (27-entry table in `karana_windows.VISHAGHATI_OFFSETS_GHATI`);
+  width = 4 vighatis (`VISHAGHATI_WIDTH_VIGHATIS`). Treated as
+  inauspicious cuts in muhurta slot scoring, alongside Rahu Kalam etc.
+  Exposed under `inauspicious.vishaghati` in MCP.
+- **Bhadra Mukha / Puchha** — Vishti karana split into Mukha
+  (first 5/16 of the half-tithi, hard-avoid) and Puchha
+  (last 3/16, auspicious for contests/litigation per Muhurta
+  Chintamani). `PanchangamDay.bhadra_mukha` /
+  `PanchangamDay.bhadra_puchha` (`GhatiWindow | None`). Mukha is
+  cut from slots; Puchha grants +2 to `litigation` slots that overlap it.
+- **Sankramana 16-ghati avoidance window** —
+  `PanchangamDay.sankramana_avoidance: Window | None`. 16 ghatis
+  before + 16 ghatis after the Sun's exact rasi-ingress moment
+  (~12h 48m total). Conservative `16+16` rule (vs `30+30` for
+  Karkata/Makara cited in some sources) applied uniformly.
+  Samskaras with `skip_on_sankramana: True` drop slots overlapping
+  this window. New helper `base._sankramanam_name_and_jd` bisects
+  for the exact ingress JD via `find_crossing`.
 
-**Solar / lunar maasa filters:**
-- **Khar-Maasa flag** — `is_khar_maasa` and `khar_maasa_name` (Dhanur / Meena); samskara skip.
-- **Adhika Maasa muhurta consumption** — `find_muhurta` now skips Adhika months for samskaras (engine data already existed; consumption was missing).
-- **Pitru Paksha 15-day window** — `is_pitru_paksha` (Bhadrapada Krishna paksha); samskara skip.
+**Nakshatra / yoga filters (Tasks 7, 13, 15):**
+- **5 Panchaka Nakshatras flag** —
+  `PanchangamDay.in_panchaka_nakshatra: bool`. True for Dhanishtha,
+  Shatabhisha, Purva Bhadrapada, Uttara Bhadrapada, Revati. New
+  activities `cremation`, `construction_roof`, `wood_cutting` have
+  `skip_on_panchaka_nakshatra: True`. Distinct from Panchaka Rahita
+  (modular-9 dosha) below.
+- **Anandadi 28 Yogas** — `PanchangamDay.anandadi_yoga: str | None`.
+  Vaaram × Moon's nakshatra → one of 28 named muhurta yogas
+  (Ananda, Kalidanda, Dhumra, Dhata, … Vardhamana) per Muhurta
+  Chintamani. Auspicious yogas grant +1 / inauspicious -1 in slot
+  scoring; classification tables `ANANDADI_AUSPICIOUS` and
+  `ANANDADI_INAUSPICIOUS` in `special_yogas.py`.
+- **Adho / Urdhva / Tiryan-Mukha nakshatra classification** —
+  `PanchangamDay.nakshatra_mukha: str | None`. Activity-conditioned
+  bonus: Adho (`construction_foundation`, `well_digging`), Urdhva
+  (`coronation`), Tiryan (`travel`). Table in
+  `nakshatra_filters.NAKSHATRA_MUKHA`.
 
-**Graha-based filters (Drik only):**
-- **Simha-Stha Guru / Shukra** — `simha_stha_guru` (hard skip) and `simha_stha_shukra` (-2 penalty) for marriage muhurta.
-- **Guru / Shukra Maudhya (combustion)** — `guru_maudhya` and `shukra_maudhya` (`MaudhyaInfo` with elongation, threshold, combust flag); samskara skip when combust.
+**Solar / lunar maasa filters (Tasks 8, 11, 12):**
+- **Khar-Maasa flag** — `PanchangamDay.is_khar_maasa: bool` and
+  `PanchangamDay.khar_maasa_name: str | None` (`'Dhanur'` when Sun
+  in Dhanu rasi; `'Meena'` when Sun in Meena). Samskara activities
+  gain `skip_on_khar_maasa: True`. Note: codebase rasi spelling is
+  `'Dhanu'` (not `'Dhanus'`).
+- **Adhika Maasa muhurta consumption** — engine data was already
+  in place since 1.0 (`engines/base.py:121-143` names months as
+  `'Adhika <name>'` / `'Nija <name>'`), but `find_muhurta` ignored
+  it. Samskaras now skip on `day.maasam.startswith('Adhika ')`.
+  **Behaviour change:** prior versions returned slots on Adhika
+  days for `wedding`/`upanayana`/`gruhapravesha`/etc.; 1.9.0 returns
+  `[]` with diagnostic `'Adhika Maasa — <activity> traditionally avoided'`.
+- **Pitru Paksha 15-day window** — `PanchangamDay.is_pitru_paksha: bool`.
+  True for Bhadrapada Krishna paksha (15 days through Mahalaya
+  Amavasya inclusive). Samskaras skip.
 
-**Activity-conditioned filters:**
-- **Disha Shoola** — `disha_shoola_direction` (weekday direction-of-blocked-travel); travel activity drops days when `travel_direction` matches.
+**Graha-based filters — Drik only (Tasks 9, 10):**
+- **Simha-Stha Guru / Shukra** —
+  `PanchangamDay.simha_stha_guru: bool` (hard skip on `wedding`
+  via `skip_on_simha_stha_guru`) and
+  `PanchangamDay.simha_stha_shukra: bool` (-2 score penalty via
+  `penalty_on_simha_stha_shukra`). Strong south Indian custom
+  (12-year Jupiter cycle). Surya Siddhanta and Vakya engines don't
+  model outer planets — both fields stay `False` there.
+- **Guru / Shukra Maudhya (combustion / heliacal setting)** —
+  new `MaudhyaInfo` dataclass with `graha`, `elongation_deg`,
+  `combust`, `threshold_deg` fields. Thresholds per Brihat Samhita:
+  Jupiter 11°, Venus 10°. `PanchangamDay.guru_maudhya` and
+  `PanchangamDay.shukra_maudhya`. `wedding` and `upanayana` gain
+  `skip_on_combust: ['Guru', 'Shukra']` — universal samskara rule
+  across all regional traditions.
 
-**Modular-9 dosha:**
-- **Panchaka Rahita** — `panchaka_rahita` (mod-9 dosha: Mrityu / Agni / Raja / Chora / Roga / Rahita) at day-level (sunrise lagna) and slot-level (lagna at slot start). Mrityu universally caps; activity-specific avoidance applies penalty.
+**Activity-conditioned filter (Task 14):**
+- **Disha Shoola** — `PanchangamDay.disha_shoola_direction: str | None`
+  (one of `'East' | 'West' | 'North' | 'South'`). Classical weekday
+  → blocked-travel-direction table. `tool_find_muhurta` gains a
+  `travel_direction` parameter; when provided and matching the
+  day's Disha Shoola, the `travel` activity drops slots.
+
+**Modular-9 dosha — the headline addition (Task 16):**
+- **Panchaka Rahita** — new `PanchakaInfo` dataclass with
+  `remainder` (0..8), `name` (`'Rahita' | 'Mrityu' | 'Agni' |
+  'Raja' | 'Chora' | 'Roga'`), `auspicious` (bool), `avoid_for`
+  (list of activity tags). `PanchangamDay.panchaka_rahita` populated
+  at sunrise lagna. **Slot-level recompute:** muhurta slot scoring
+  recomputes Panchaka using the slot's start-moment lagna (computed
+  via `personal/lagna_hora.get_lagna_transitions`, cached once per
+  day). Mrityu Panchaka caps slot tier (-3 to score, day-quality
+  reason); other doshas apply -2 when the activity matches
+  `avoid_for`. Module: `telugu_panchangam/panchaka.py` (sources:
+  Muhurta Chintamani, Dharmasindhu).
 
 ### Changed
-- MCP `tool_get_panchangam`, `tool_get_muhurta`, `tool_get_panchangam_range` outputs gain all of the above fields consistently across all three response paths.
-- MCP `tool_find_muhurta` gains an optional `travel_direction` parameter for Disha Shoola filtering.
-- MCP `tool_get_panchangam`, `tool_get_panchangam_range`, `tool_get_graha_positions`, `tool_find_muhurta` gain an optional `ayanamsa` parameter.
-- New activities in muhurta `ACTIVITY_RULES`: `litigation`, `cremation`, `construction_roof`, `wood_cutting`, `well_digging`, `coronation`.
-- Test suite: 849 → 991 (+142 tests).
+
+**MCP surface:**
+- All 19 new computation fields land on `tool_get_panchangam`,
+  `tool_get_muhurta`, and `tool_get_panchangam_range` per-day dicts
+  — consistent shape across all three tools (the
+  multi-tool-serialization gap caught early in this round is now
+  guarded by parity tests in each feature's test file).
+- `tool_get_panchangam`, `tool_get_panchangam_range`,
+  `tool_get_graha_positions`, `tool_find_muhurta` gain an optional
+  `ayanamsa: str = 'lahiri'` parameter; the active ayanamsa is
+  surfaced in each response.
+- `tool_find_muhurta` gains an optional `travel_direction: str | None`
+  parameter for Disha Shoola filtering on the `travel` activity.
+- MCP server tool docstrings (`mcp/server.py`) updated to enumerate
+  the new outputs.
+
+**Muhurta activity rules (`personal/muhurta.ACTIVITY_RULES`):**
+- 10 samskara activities (`ceremony`, `wedding`, `engagement`,
+  `naming`, `annaprasana`, `karnavedha`, `mundana`, `upanayana`,
+  `vidyarambha`, `gruhapravesha`) gained `skip_on_sankramana`,
+  `skip_on_khar_maasa`, `skip_on_adhika`, `skip_on_pitru_paksha`
+  rules — these days now correctly return no slots / explanatory
+  diagnostic strings.
+- 6 new activities added: `litigation`, `cremation`, `coronation`,
+  `construction_roof`, `wood_cutting`, `well_digging`.
+- `wedding` additionally gains `skip_on_simha_stha_guru`,
+  `penalty_on_simha_stha_shukra: -2`, `skip_on_combust: ['Guru', 'Shukra']`.
+- The activity-count test in `tests/test_muhurta_finder.py` is
+  now `test_all_30_activities_callable` (was `_all_24_…`).
+
+**Behaviour-changing fixes caught during review:**
+- `prefer_bhadra_puchha` kwarg was extracted into `ACTIVITY_RULES`
+  and declared on `_evaluate_slot` but never forwarded at the call
+  site — the +2 Puchha bonus was a silent no-op. Now forwarded
+  with a scoring-path regression test (a slot's `reasons` list
+  must contain the bonus chip when overlap occurs).
+- `sidereal_longitude_with_ayanamsa` set the global swisseph
+  sid-mode but didn't restore it — restored on every call so the
+  Lahiri `@lru_cache` hot-path never sees a stale mode.
+- Daily pada formula initially used `(moon_lon % nak_arc) /
+  (nak_arc / 4.0)` which mismatches the canonical `gochara/positions.py`
+  form by 34 of 108 pada boundaries due to floating-point modulo
+  instability — aligned to the canonical single-division form.
+- One pre-existing `test_vara_bonus_thursday_wedding` was implicitly
+  relying on a date where Jupiter happened to be 9.9° from the Sun
+  (now correctly flagged combust); test rerouted to `2026-08-20`.
+- MCP serialization initially landed in only `tool_get_panchangam`
+  for the first three features (Tasks 1, 2, 4); swept fix added
+  every field to all three per-day MCP tool responses with parity
+  tests baked into each subsequent task.
 
 ### Notes
-- ICS feeds are byte-identical (golden snapshot guard passes).
-- No personal-astrology computations were added in this round (deferred to a separate project).
-- Frozen-core engines untouched beyond additive field assignments.
+
+- **Frozen-core compliance** — no festival rules in `engines/base.py`
+  touched, no `generators/ics.py` changes, no `docs/` UI changes.
+  Engine `calculate()` methods gained only additive field
+  assignments. ICS golden snapshot is byte-identical.
+- **Personal-astrology layer deliberately out of scope.** Dasha
+  (Vimshottari, Yogini), divisional charts (Navamsa et al.),
+  Ashta Kuta compatibility, and Shadbala are reserved for a
+  separate project that already has prior compute infrastructure.
+- **Website surface unchanged** — `docs/index.html` and
+  `docs/muhurta-scorer.js` were not edited. All 19 new fields are
+  reachable via MCP today; the static site can adopt them when the
+  paused Phase 3 (Vite + TypeScript) migration resumes.
+- **Classical sources cited per feature** in the module docstrings:
+  Muhurta Chintamani (Vishaghati, Bhadra Mukha/Puchha, Sankramana,
+  Anandadi, Disha Shoola, Mukha-nakshatra, Panchaka Rahita),
+  Brihat Samhita (Maudhya thresholds), Dharmasindhu (Pitru Paksha,
+  Panchaka Rahita).
 
 ---
 
