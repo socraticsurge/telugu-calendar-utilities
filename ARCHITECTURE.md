@@ -2,13 +2,16 @@
 
 How the project is layered and where each module sits. This is the
 mental model for "where should I add X?" and for understanding the
-engine-core refactor that's planned for [improvement-plan Phase 6](docs/tracking/improvement-plan.md).
+engine-core refactor designed but parked in [improvement-plan Phase 6](docs/tracking/improvement-plan.md).
 
-> **Status note (2026-06-16):** the engines were originally treated as
-> "frozen core" — additive features were required to live in new
-> modules consuming engine output. That constraint has been **lifted**;
-> the engines themselves are now editable, with the planned
-> `EngineCore` unification refactor scheduled for Phase 6.
+> **Status note (updated 2026-06-17):** the engines remain **frozen core** —
+> per [`CLAUDE.md`](CLAUDE.md), changes need explicit owner approval (the one
+> routine exception: appending a festival row to the rule tables in `base.py`
+> with a DP-verified test). Additive features live in new modules that consume
+> engine output. The `EngineCore` unification refactor described below is
+> **designed but parked** (improvement-plan "Phase 6"); it would revisit the
+> frozen-core constraint only when a real driver appears — a new engine variant,
+> or a bug that traces to the engine-inheritance duplication.
 
 ## The layer cake
 
@@ -98,11 +101,11 @@ The asymmetry creates two real correctness risks:
    currently know which is "right" against Drik Panchang — that's
    answered during Phase 6.
 
-The Phase 6 `EngineCore` refactor collapses all three engines into a
-single core class that consumes `(sun_long_fn, moon_long_fn,
-ayanamsa_fn)` and produces every span. Each engine becomes thin —
-just supplies the three longitude functions and any system-specific
-overrides.
+The (parked) Phase 6 `EngineCore` refactor *would* collapse all three
+engines into a single core class consuming `(sun_long_fn, moon_long_fn,
+ayanamsa_fn)` that produces every span, leaving each engine thin — just the
+three longitude functions plus any system-specific overrides. Until a real
+driver reactivates it, the refactor stays parked and the engines stay frozen.
 
 ## The engine API contract
 
