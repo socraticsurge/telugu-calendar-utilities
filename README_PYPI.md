@@ -35,7 +35,7 @@ Tools are grouped by purpose. All tools that accept a `city` name also accept `l
 
 ### Daily Panchangam
 
-#### `get_panchangam(date, city, system="drik", ...)`
+#### `get_panchangam(date, city, system="drik", ayanamsa="lahiri", ...)`
 
 Full Panchangam for a date and city:
 
@@ -70,7 +70,7 @@ Rules applied per limb:
 
 ### Planning across days
 
-#### `get_panchangam_range(start_date, end_date, city, system="drik", ...)`
+#### `get_panchangam_range(start_date, end_date, city, system="drik", ayanamsa="lahiri", ...)`
 
 Compact Panchangam summary for each day in a range (max 31 days): Tithi, Nakshatra, Yoga, sunrise/sunset, all auspicious and inauspicious windows, eclipse (if any), special yogas, and special-day flags. Useful for comparing multiple days or planning muhurtas across a week.
 
@@ -78,7 +78,7 @@ Compact Panchangam summary for each day in a range (max 31 days): Tithi, Nakshat
 
 Lists all special days in a given month: named festivals, Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Ganda Moola, and Solar/Lunar Eclipses, each with its special-yoga list.
 
-#### `find_muhurta(start_date, days=7, activity="any", city, system="drik", janma_nakshatras=None, ...)`
+#### `find_muhurta(start_date, days=7, activity="any", city, system="drik", ayanamsa="lahiri", janma_nakshatras=None, ...)`
 
 Ranked auspicious time slots: good Choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted, scored with Abhijit/Amrita overlap and special-yoga bonuses. Each slot carries its reasons.
 
@@ -102,7 +102,7 @@ Asta (heliacal setting / combustion entry) and Udaya (heliacal rising / re-emerg
 
 Graha Yuddha (planetary war) periods: when two of the five tara grahas come within 1° of each other in ecliptic longitude. The planet with the higher ecliptic latitude at closest approach is the victor. Returns winner, loser, start/exact/end times in UTC, and minimum separation in arc-minutes. Sun, Moon, Rahu, and Ketu are exempt by classical convention. Max range: 366 days.
 
-#### `get_rashi_ingresses(start_date, end_date, planets=None)`
+#### `get_rashi_ingresses(start_date, end_date, planets=None, ayanamsa="lahiri")`
 
 All rashi (sign) ingress events for the classical planets: when a planet crosses from one zodiac sign to the next, including retrograde re-entries. Sidereal (Lahiri) throughout. Each entry includes the rashi entered, entry time (UTC), and exit time (next ingress). Moon is excluded (changes signs every ~2.25 days). Supported planets: Sun, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu. Max range: 366 days.
 
@@ -114,15 +114,15 @@ All solar and lunar eclipses in a date range with per-city visibility and Sutak 
 
 ### Gochara and personal transits
 
-#### `get_graha_positions(date, city, ...)`
+#### `get_graha_positions(date, city, ayanamsa="lahiri", ...)`
 
 Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, nakshatra, pada, retrograde flag, plus `rasi_until` and `next_rasi` — when each graha next changes sign. Transit groundwork for gochara queries.
 
-#### `get_gochara(date, janma_rasi, city, ...)`
+#### `get_gochara(date, janma_rasi, city, ayanamsa="lahiri", ...)`
 
 Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position counted from the janma rashi with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse — per classical Brihat Samhita tables. Includes named conditions: Sade Sati (with phase), Ashtama Shani, Ardhastama Shani.
 
-#### `get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra=None, ...)`
+#### `get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra=None, ayanamsa="lahiri", ...)`
 
 Deterministic daily reading for a janma rashi, rendered entirely from computed facts: the Moon's Chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati/Ashtama Shani are stated when active, and passing `janma_nakshatra` adds the day's Tarabalam line. Every sentence maps to a calculation.
 
@@ -162,9 +162,24 @@ Returns the 22 pre-configured cities with name, latitude, longitude, timezone, a
 
 | System | Basis | Best for |
 |--------|-------|----------|
-| `drik` | Swiss Ephemeris (pyswisseph) + Lahiri ayanamsa | Modern apps, accurate sky events |
+| `drik` | Swiss Ephemeris (pyswisseph) — ayanamsa-configurable | Modern apps, accurate sky events |
 | `surya_siddhanta` | Mean-motion algorithms from the classical SS text | Traditions rooted in classical siddhantic calculation |
 | `vakya` | Surya Siddhanta + published correction tables | Traditional Telugu/Tamil printed Panchangams |
+
+## Ayanamsa
+
+The Drik engine supports four sidereal ayanamsas via the `ayanamsa=` parameter:
+
+| Key | System |
+|-----|--------|
+| `lahiri` *(default)* | Lahiri / Chitrapaksha — the standard for modern Indian Panchangams |
+| `raman` | B.V. Raman ayanamsa |
+| `krishnamurti` | KP ayanamsa (Krishnamurti Paddhati) |
+| `true_chitrapaksha` | True Chitrapaksha (star-based, not mean) |
+
+Tools that accept `ayanamsa`: `get_panchangam`, `get_panchangam_range`, `find_muhurta`, `get_graha_positions`, `get_gochara`, `get_rasi_phalalu`, `get_rashi_ingresses`.
+
+Surya Siddhanta and Vakya use their own mean-motion models and ignore this parameter (accepted for API symmetry, no effect on output).
 
 ## Source
 
