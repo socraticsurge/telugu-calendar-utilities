@@ -70,4 +70,8 @@ jobs:
         # --strict here is pip-audit's "fail if any dependency-collection
         # step fails" — combined with the default behaviour of exiting
         # non-zero on findings, this is the tightest reasonable setting.
-        run: pip-audit -r requirements.txt --strict
+        # --skip-editable excludes our own package (installed via `-e .[test]`
+        # from requirements.txt); during a version-bump PR the new version
+        # isn't on PyPI yet, so an audit lookup for it spuriously fails.
+        # We only care about the dependency closure, not the package itself.
+        run: pip-audit -r requirements.txt --strict --skip-editable
