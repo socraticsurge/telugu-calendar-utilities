@@ -67,7 +67,10 @@ jobs:
         run: pip install pip-audit
 
       - name: Run pip-audit (strict — fail on any known CVE)
-        # --strict here is pip-audit's "fail if any dependency-collection
-        # step fails" — combined with the default behaviour of exiting
-        # non-zero on findings, this is the tightest reasonable setting.
-        run: pip-audit -r requirements.txt --strict
+        # Audits requirements.lock (the resolved, pinned dependency closure
+        # — mcp, pyswisseph, pytz, geopy, timezonefinder, icalendar, pytest,
+        # all transitives) rather than requirements.txt. The lockfile does
+        # not include our own package, so version-bump PRs don't spuriously
+        # fail looking up the unreleased version on PyPI. --strict still
+        # fails on any known CVE in the closure.
+        run: pip-audit -r requirements.lock --strict

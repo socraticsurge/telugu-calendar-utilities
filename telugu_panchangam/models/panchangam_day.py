@@ -25,6 +25,42 @@ class Window:
 
 
 @dataclass
+class GhatiClock:
+    """Ghati/vighati clock anchored at sunrise.
+    1 ghati = 1/60 ahoratri (sunrise→next-sunrise). 60 vighatis = 1 ghati.
+    """
+    sunrise: datetime
+    next_sunrise: datetime
+    seconds_per_ghati: float
+
+
+@dataclass
+class GhatiWindow:
+    """A window expressed in both civil time and ghatis-from-sunrise."""
+    name: str
+    start: datetime
+    end: datetime
+    start_ghati: float
+    end_ghati: float
+
+
+@dataclass
+class MaudhyaInfo:
+    graha: str               # 'Guru' | 'Shukra'
+    elongation_deg: float    # Absolute shortest-arc Sun-planet elongation
+    combust: bool            # True iff elongation < threshold
+    threshold_deg: float     # 11.0 Guru, 10.0 Shukra
+
+
+@dataclass
+class PanchakaInfo:
+    remainder: int           # 0..8
+    name: str                # 'Rahita' | 'Mrityu' | 'Agni' | 'Raja' | 'Chora' | 'Roga'
+    auspicious: bool
+    avoid_for: list[str]
+
+
+@dataclass
 class EclipseInfo:
     kind: str        # 'Solar' | 'Lunar'
     subtype: str     # 'Total' | 'Partial' | 'Annular' | 'Penumbral'
@@ -113,3 +149,30 @@ class PanchangamDay:
     # Rashi the sun enters this day (entry-after-sunset counts as next day),
     # e.g. 'Mithuna' — None on ordinary days.
     sankramanam: str | None = None
+    ghati_clock: 'GhatiClock | None' = None
+    nakshatra_pada: int | None = None
+    vishaghati: list['GhatiWindow'] = field(default_factory=list)
+    bhadra_mukha: 'GhatiWindow | None' = None
+    bhadra_puchha: 'GhatiWindow | None' = None
+    sankramana_avoidance: 'Window | None' = None
+    in_panchaka_nakshatra: bool = False
+    is_khar_maasa: bool = False
+    khar_maasa_name: str | None = None
+    is_pitru_paksha: bool = False
+    # Simha-Stha Guru/Shukra — Jupiter or Venus in Simha rasi.
+    # Populated by Drik engine only (SS/Vakya don't model outer planets).
+    simha_stha_guru: bool = False
+    simha_stha_shukra: bool = False
+    # Guru/Shukra Maudhya (combustion) — populated by Drik engine only.
+    # None when the engine doesn't model outer planets (SS/Vakya).
+    guru_maudhya: 'MaudhyaInfo | None' = None
+    shukra_maudhya: 'MaudhyaInfo | None' = None
+    # Anandadi muhurta yoga (Muhurta Chintamani): derived from vaaram + nakshatra.
+    anandadi_yoga: 'str | None' = None
+    # Disha Shoola — weekday direction-of-blocked-travel.
+    disha_shoola_direction: 'str | None' = None
+    # Nakshatra Mukha — mouth direction (Adho/Urdhva/Tiryan).
+    nakshatra_mukha: 'str | None' = None
+    # Panchaka Rahita — mod-9 dosha from (tithi + vaaram + nakshatra + lagna).
+    # Uses sunrise lagna. None only if the engine failed to compute lagna.
+    panchaka_rahita: 'PanchakaInfo | None' = None

@@ -76,3 +76,57 @@ def get_special_yogas(vaaram: str, tithi_name: str, nakshatra_name: str) -> list
             yogas.append('Tripushkara Yoga')
 
     return yogas
+
+
+# ---------------------------------------------------------------------------
+# Anandadi 28 muhurta yogas (Muhurta Chintamani)
+# ---------------------------------------------------------------------------
+
+ANANDADI_YOGAS = [
+    'Ananda', 'Kalidanda', 'Dhumra', 'Dhata', 'Saumya', 'Dhwanksha',
+    'Dhwaja', 'Shrivatsa', 'Vajra', 'Mudgara', 'Chhatra', 'Maitra',
+    'Manasa', 'Padma', 'Lumba', 'Utpat', 'Mrityu', 'Kaana',
+    'Siddhi', 'Subha', 'Amrita', 'Musala', 'Gada', 'Matanga',
+    'Raksha', 'Chara', 'Sthira', 'Vardhamana',
+]
+
+# Starting nakshatra offset (0-indexed into the 27 nakshatras) per weekday.
+# Standard table from Muhurta Chintamani.
+_VAARA_OFFSET = {
+    'Adivaram':     0,    # Sunday   starts from Ashvini
+    'Somavaram':    4,    # Monday   starts from Mrigashira (Mrigashira = index 4)
+    'Mangalavaram': 8,    # Tuesday  starts from Ashlesha
+    'Budhavaram':  12,    # Wednesday starts from Hasta
+    'Guruvaram':   16,    # Thursday starts from Anuradha
+    'Shukravaram': 19,    # Friday   starts from Purva Ashadha
+    'Shanivaram':  23,    # Saturday starts from Shatabhisha
+}
+
+_NAKSHATRA_ORDER = [
+    'Ashvini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra',
+    'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni',
+    'Uttara Phalguni', 'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha',
+    'Jyeshtha', 'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana',
+    'Dhanishtha', 'Shatabhisha', 'Purva Bhadrapada', 'Uttara Bhadrapada',
+    'Revati',
+]
+
+ANANDADI_AUSPICIOUS = frozenset({
+    'Ananda', 'Dhata', 'Saumya', 'Dhwaja', 'Shrivatsa', 'Chhatra', 'Maitra',
+    'Manasa', 'Padma', 'Siddhi', 'Subha', 'Amrita', 'Matanga', 'Raksha',
+    'Sthira', 'Vardhamana',
+})
+
+ANANDADI_INAUSPICIOUS = frozenset({
+    'Kalidanda', 'Dhumra', 'Dhwanksha', 'Vajra', 'Mudgara', 'Lumba', 'Utpat',
+    'Mrityu', 'Kaana', 'Musala', 'Gada', 'Chara',
+})
+
+
+def compute_anandadi_yoga(vaaram: str, nakshatra: str) -> str | None:
+    """Return the Anandadi muhurta yoga for the given vaaram + nakshatra."""
+    offset = _VAARA_OFFSET.get(vaaram)
+    if offset is None or nakshatra not in _NAKSHATRA_ORDER:
+        return None
+    nak_idx = _NAKSHATRA_ORDER.index(nakshatra)
+    return ANANDADI_YOGAS[(nak_idx - offset) % 28]
