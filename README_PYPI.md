@@ -45,6 +45,7 @@ Full Panchangam for a date and city:
 - **Special day flags** — Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Ganda Moola
 - **Eclipse** — Solar/lunar eclipse with type (Total/Partial/Annular/Penumbral), visibility from your location, eclipse window, and Sutak period (or `null` if not visible)
 - **Special Yogas** — Sarvartha Siddhi, Amrita Siddhi, Visha, and Dagdha yogas
+- **Timing-computation fields (1.9.0)** — `ghati_clock` (sunrise-anchored ghati/vighati clock), `nakshatra_pada` (Moon's pada 1–4), `vishaghati` windows, `bhadra_mukha`/`bhadra_puchha` (Vishti split), `sankramana_avoidance`, `in_panchaka_nakshatra`, `nakshatra_mukha` (Adho/Urdhva/Tiryak), `anandadi_yoga`, `is_khar_maasa`/`khar_maasa_name`, `is_pitru_paksha`, `simha_stha_guru`/`simha_stha_shukra` (Drik only), `guru_maudhya`/`shukra_maudhya` (Drik only), `disha_shoola_direction`, `panchaka_rahita`
 
 ### `get_muhurta(date, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
@@ -68,7 +69,7 @@ Daily Rasi Phalalu: a deterministic daily reading. The Moon's chandrabalam house
 
 ### `find_muhurta(start_date, days=7, activity="any", city="Hyderabad", system="drik", janma_nakshatras=None, ...)`
 
-Ranked auspicious time slots: good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted, scored with Abhijit/Amrita overlap and special-yoga bonuses. `activity` tunes the rules (travel avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit); optional birth stars keep only days whose tarabalam favours everyone. Each slot carries its reasons.
+Ranked auspicious time slots: good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted, scored with Abhijit/Amrita overlap and special-yoga bonuses. `activity` tunes the rules (travel avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit); optional birth stars keep only days whose tarabalam favours everyone. Each slot carries its reasons. New in 1.9.0: additional activities `litigation`, `cremation`, `construction_roof`, `wood_cutting`, `well_digging`, `coronation`; Bhadra Mukha hard-avoid and Bhadra Puchha bonus for litigation; Khar-Maasa, Adhika Maasa, Pitru Paksha, Simha-Stha, Maudhya, and Panchaka Rahita filters applied per activity; optional `travel_direction` parameter (N/S/E/W/NE/NW/SE/SW) activates Disha Shoola filtering for travel.
 
 ### `get_special_days(year, month, city, system="drik", latitude=None, longitude=None, timezone=None)`
 
