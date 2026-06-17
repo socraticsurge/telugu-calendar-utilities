@@ -29,6 +29,7 @@ from telugu_panchangam.personal.nitya_yoga import (
     NITYA_AUSPICIOUS, NITYA_AUSPICIOUS_BONUS,
 )
 from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS
+from telugu_panchangam.panchaka import evaluate_panchaka
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MIN_SLOT_MINUTES = 24  # one ghati
@@ -915,6 +916,50 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
         score += lagna_act_bonus
         activity_match.append(lagna_act_reason)
 
+    # Panchaka Rahita (mod-9 dosha) — slot-level recompute using the slot's
+    # rising lagna. Uses slot-time tithi/nakshatra (from facts) and day-level
+    # vaaram (sunrise-anchored by convention). `slot_lagna_name` is already
+    # computed above from the lagnas list.
+    panchaka_dosha = None
+    if slot_lagna_name is not None:
+        try:
+            _panchaka = evaluate_panchaka(
+                tithi_name=facts.tithi,
+                vaaram_name=facts.vaaram,
+                nakshatra_name=facts.nakshatra,
+                lagna_name=slot_lagna_name,
+            )
+            if _panchaka.name == 'Mrityu':
+                # Hard-cap: Mrityu Panchaka is universally inauspicious for
+                # samskaras and beginnings. Cap the score to at most 'Fair'
+                # by applying a strong penalty.
+                day_quality.append('Mrityu Panchaka — universal samskara avoidance (-3)')
+                score -= 3
+                panchaka_dosha = 'mrityu_panchaka'
+            elif _panchaka.name != 'Rahita':
+                # Activity-specific penalty for non-Rahita doshas
+                _activity_key = label.lower().replace(' ', '_').replace('/', '_')
+                _matched_avoid = None
+                for _avoid_key in _panchaka.avoid_for:
+                    # Check if current activity matches any avoid_for key
+                    if (_avoid_key in ACTIVITY_RULES and
+                            ACTIVITY_RULES[_avoid_key]['label'].lower() == label.lower()):
+                        _matched_avoid = _avoid_key
+                        break
+                    # Fuzzy: check if the activity label string contains avoid key
+                    if _avoid_key in label.lower().replace(' ', '_'):
+                        _matched_avoid = _avoid_key
+                        break
+                if _matched_avoid is not None:
+                    day_quality.append(
+                        f'{_panchaka.name} Panchaka conflicts with {label} (-2)'
+                    )
+                    score -= 2
+                    panchaka_dosha = f'{_panchaka.name.lower()}_panchaka'
+        except (ValueError, KeyError):
+            # If lagna or tithi lookup fails, skip panchaka scoring gracefully
+            pass
+
     notes = _doctrinal_notes(
         special_yogas=facts.special_yogas,
         tara_unfav_names=tara_unfav_names,
@@ -1101,8 +1146,12 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         (janma_rasis and any(r is not None for r in janma_rasis))
         or (janma_lagnas and any(l is not None for l in janma_lagnas))
     )
-    _needs_lagnas = _has_personal_ref or bool(prefer_lagna_class)
-    lagnas = get_lagna_transitions(day) if _needs_lagnas else None
+    # Lagnas are needed for: personal kendra/trikona, activity lagna class,
+    # and Panchaka Rahita slot-level recompute. Always compute — one bisection
+    # pass per day (not per slot), so cost is O(1) per call regardless of slot
+    # count.
+    _needs_lagnas = _has_personal_ref or bool(prefer_lagna_class) or True
+    lagnas = get_lagna_transitions(day)
 
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.

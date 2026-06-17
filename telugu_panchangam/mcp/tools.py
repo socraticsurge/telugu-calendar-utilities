@@ -150,6 +150,17 @@ def _window_to_dict(window, tz: str) -> dict | None:
     }
 
 
+def _panchaka_to_dict(p) -> dict | None:
+    if p is None:
+        return None
+    return {
+        'remainder': p.remainder,
+        'name': p.name,
+        'auspicious': p.auspicious,
+        'avoid_for': p.avoid_for,
+    }
+
+
 def _ghati_window_to_dict(gw, tz: str) -> dict | None:
     if gw is None:
         return None
@@ -295,6 +306,7 @@ def tool_get_panchangam(
             'anandadi_yoga': day.anandadi_yoga,
             'disha_shoola_direction': day.disha_shoola_direction,
             'nakshatra_mukha': day.nakshatra_mukha,
+            'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -356,6 +368,7 @@ def tool_get_muhurta(
             'anandadi_yoga': day.anandadi_yoga,
             'disha_shoola_direction': day.disha_shoola_direction,
             'nakshatra_mukha': day.nakshatra_mukha,
+            'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -502,6 +515,7 @@ def tool_get_panchangam_range(
                 'anandadi_yoga': day.anandadi_yoga,
                 'disha_shoola_direction': day.disha_shoola_direction,
                 'nakshatra_mukha': day.nakshatra_mukha,
+                'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
             })
 
         return json.dumps({

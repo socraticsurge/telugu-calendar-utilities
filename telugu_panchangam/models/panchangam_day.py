@@ -53,6 +53,14 @@ class MaudhyaInfo:
 
 
 @dataclass
+class PanchakaInfo:
+    remainder: int           # 0..8
+    name: str                # 'Rahita' | 'Mrityu' | 'Agni' | 'Raja' | 'Chora' | 'Roga'
+    auspicious: bool
+    avoid_for: list[str]
+
+
+@dataclass
 class EclipseInfo:
     kind: str        # 'Solar' | 'Lunar'
     subtype: str     # 'Total' | 'Partial' | 'Annular' | 'Penumbral'
@@ -165,3 +173,6 @@ class PanchangamDay:
     disha_shoola_direction: 'str | None' = None
     # Nakshatra Mukha — mouth direction (Adho/Urdhva/Tiryan).
     nakshatra_mukha: 'str | None' = None
+    # Panchaka Rahita — mod-9 dosha from (tithi + vaaram + nakshatra + lagna).
+    # Uses sunrise lagna. None only if the engine failed to compute lagna.
+    panchaka_rahita: 'PanchakaInfo | None' = None
