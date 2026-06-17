@@ -20,7 +20,6 @@ from telugu_panchangam.panchanga_shuddhi import (
     _VERDICTS,
     _VARA_SHUDDHA,
     _VARA_ASHUDDHA,
-    _KARANA_ASHUDDHA,
 )
 
 _HYD = next(c for c in CITIES if c.name == 'Hyderabad')
