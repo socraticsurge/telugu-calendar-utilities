@@ -111,7 +111,7 @@
       .selector-row .selector { flex: 1 1 100%; }
       .selector select, .tb-date { width: 100%; min-width: 0; }
       /* tap-target floor: 44px for primary controls */
-      .selector select, input.tb-date, input#tp-date, input#go-date, input#tb-from, input#tb-to,
+      .selector select, input.tb-date, input#go-date, input#tb-from, input#tb-to,
       .tb-controls select, #mu-activity, #tb-mode, #go-view, #go-rasi,
       .tb-profile-row select, .tb-profile-row input[type=text],
       .btn, .fmt-toggle button, .app-tab, .read-more, .tb-add, .tb-remove, .tb-reset,
@@ -401,6 +401,15 @@
     .fmt-toggle button { border: none; background: #fff; color: #8B8377; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
     .fmt-toggle button.active { background: var(--indigo-bg); color: var(--indigo); }
 
+    #global-controls-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+                            padding: 0.45rem 0; margin-bottom: 0.25rem; }
+    #global-controls-bar .selector { gap: 0; }
+    #global-controls-bar .selector label { display: none; }
+    #global-controls-bar #sel-fmt-toggle { margin-left: auto; }
+    body[data-mode="mobile"] #global-controls-bar { display: none; }
+    .preview-head .date { cursor: pointer; }
+    .preview-head .date:hover { opacity: 0.85; }
+
     .upcoming-list { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.75rem; }
     .upcoming-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.45rem 0.6rem; border: 1px solid #E7DECC; border-radius: 8px; background: #FFFFFF; flex-wrap: wrap; }
     .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1F1A17; min-width: 7.5rem; white-space: nowrap; }
@@ -593,15 +602,6 @@
       #m-topbar .m-brand .m-brand-mark { width: 26px; height: 26px; }
     }
 
-    /* Mobile selector-row: City + System + Time format all live in Settings now.
-       Only the Today-screen Date input remains inline, full-width, as a single
-       compact row above the day content. */
-    body[data-mode="mobile"] #tp-selector-row {
-      gap: 0.5rem;
-      margin-bottom: 0.55rem;
-    }
-    body[data-mode="mobile"] #tp-selector-row #tp-date-wrap { flex: 1 1 100%; }
-    body[data-mode="mobile"] #tp-selector-row label { font-size: 0.7rem; }
 
     /* Drawer placement for relocated selectors — sit them as discrete rows */
     .m-drawer .selector { display: flex; flex-direction: column; gap: 0.3rem;
@@ -1197,6 +1197,23 @@
     </div>
   </div>
 
+  <div id="global-controls-bar">
+    <div class="selector" id="sel-tp-city">
+      <label for="tp-city">City</label>
+      <select id="tp-city"></select>
+    </div>
+    <div class="selector" id="sel-tp-system">
+      <label for="tp-system">System</label>
+      <select id="tp-system"></select>
+    </div>
+    <div class="selector" id="sel-fmt-toggle">
+      <label id="fmt-label">Time format</label>
+      <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
+        <button id="fmt-12" onclick="setTimeFmt('12')">12h</button>
+        <button id="fmt-24" onclick="setTimeFmt('24')">24h</button>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="tool-tabs" role="tablist">
       <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">
@@ -1207,27 +1224,6 @@
         <span class="tt">✦ Tarabalam · Muhurtam</span><span class="ts">When should we act?</span></button>
     </div>
     <div class="m-page-title" id="m-page-title"><span class="m-page-title-main" id="m-page-title-main">Today's Panchangam</span><span class="m-page-title-sub" id="m-page-title-sub">What is the day?</span></div>
-    <div class="selector-row" id="tp-selector-row">
-      <div class="selector" id="sel-tp-city">
-        <label for="tp-city">City</label>
-        <select id="tp-city"></select>
-      </div>
-      <div class="selector" id="sel-tp-system">
-        <label for="tp-system">System</label>
-        <select id="tp-system"></select>
-      </div>
-      <div class="selector" id="tp-date-wrap">
-        <label for="tp-date">Date</label>
-        <input type="date" id="tp-date" class="tb-date" style="min-width:140px;">
-      </div>
-      <div class="selector" id="sel-fmt-toggle">
-        <label id="fmt-label">Time format</label>
-        <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
-          <button id="fmt-12" onclick="setTimeFmt('12')">12h</button>
-          <button id="fmt-24" onclick="setTimeFmt('24')">24h</button>
-        </div>
-      </div>
-    </div>
     <div id="panel-today" role="tabpanel">
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
@@ -2115,9 +2111,9 @@
     return data;
   }
 
+  let _tpDateVal = null;
   function selectedDate() {
-    const val = document.getElementById('tp-date')?.value;
-    return val ? new Date(val + 'T00:00:00') : new Date();
+    return _tpDateVal ? new Date(_tpDateVal + 'T00:00:00') : new Date();
   }
 
   function formatToday() {
@@ -2263,7 +2259,7 @@
                   title="Share this day's panchangam on WhatsApp" aria-label="Share on WhatsApp">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
           </button>
-          <div class="date">${formatToday()}${special}</div>
+          <div class="date">${formatToday()}${special}<span style="position:relative;display:inline-block;vertical-align:middle;margin-left:0.4em;"><input type="date" class="tp-date-input" value="${_tpDateVal||''}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;" aria-label="Change date"><span aria-hidden="true" style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:5px;padding:2px 6px;font-size:0.75rem;pointer-events:none;">📅</span></span></div>
           ${metaLines}
         </div>
         ${flagStrip}
@@ -2895,7 +2891,6 @@
       b.classList.toggle('active', on);
       b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-    document.getElementById('tp-date-wrap').style.display = which === 'today' ? '' : 'none';
     document.getElementById('m-page-title-main').textContent = PAGE_TITLES[which][0];
     document.getElementById('m-page-title-sub').textContent = PAGE_TITLES[which][1];
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
@@ -4201,8 +4196,10 @@
   document.getElementById('tp-system').addEventListener('change', loadPreview);
   const _d = new Date();
   const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
-  document.getElementById('tp-date').value = todayISO;
-  document.getElementById('tp-date').addEventListener('change', loadPreview);
+  _tpDateVal = todayISO;
+  document.getElementById('tp-result').addEventListener('change', function(e) {
+    if (e.target.matches('input.tp-date-input')) { _tpDateVal = e.target.value; loadPreview(); }
+  });
   document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
   document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
 
