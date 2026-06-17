@@ -692,9 +692,6 @@ def tool_get_graha_positions(
     timezone: Optional[str] = None,
     ayanamsa: str = 'lahiri',
 ) -> str:
-    # TODO: route ayanamsa into graha_positions() — gochara/positions.py still
-    # uses Lahiri internally. The parameter is accepted for API symmetry and
-    # surfaced in the response, but positions are always Lahiri for now.
     try:
         from telugu_panchangam.engines.utils import _validate_ayanamsa
         _validate_ayanamsa(ayanamsa)
@@ -708,9 +705,7 @@ def tool_get_graha_positions(
             'at': 'sunrise',
             'sunrise': _fmt_time(jd_to_utc(jd_sunrise), loc.timezone),
             'ayanamsa': ayanamsa,
-            'ayanamsa_note': 'lahiri' if ayanamsa == 'lahiri' else
-                'graha positions use Lahiri internally; alternate ayanamsa accepted but not yet applied to gochara',
-            'grahas': graha_positions(jd_sunrise),
+            'grahas': graha_positions(jd_sunrise, ayanamsa),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -726,13 +721,16 @@ def tool_get_gochara(
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
     try:
+        from telugu_panchangam.engines.utils import _validate_ayanamsa
+        _validate_ayanamsa(ayanamsa)
         _rasi_index(janma_rasi)
         d = _parse_date(date_str)
         loc = _resolve_city(city, latitude, longitude, timezone)
         jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0])
-        positions = graha_positions(jd_sunrise)
+        positions = graha_positions(jd_sunrise, ayanamsa)
         sky = {p['graha']: p['rasi'] for p in positions}
         verdicts = {v['graha']: v for v in gochara_for(janma_rasi, sky)}
         merged = []
@@ -764,15 +762,18 @@ def tool_get_rasi_phalalu(
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
     timezone: Optional[str] = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
     try:
+        from telugu_panchangam.engines.utils import _validate_ayanamsa
+        _validate_ayanamsa(ayanamsa)
         _rasi_index(janma_rasi)
         if janma_nakshatra:
             _nak_index(janma_nakshatra)
         d = _parse_date(date_str)
         loc = _resolve_city(city, latitude, longitude, timezone)
         jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0])
-        positions = graha_positions(jd_sunrise)
+        positions = graha_positions(jd_sunrise, ayanamsa)
         sky = {p['graha']: p['rasi'] for p in positions}
         day_nak = next(p['nakshatra'] for p in positions if p['graha'] == 'Chandra')
         out = rasi_phalalu(janma_rasi, sky,
@@ -1086,9 +1087,12 @@ def tool_get_rashi_ingresses(
     start_date: str,
     end_date: str,
     planets: Optional[list] = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
     """Return all rashi ingress (sign-change) events in a date range."""
     try:
+        from telugu_panchangam.engines.utils import _validate_ayanamsa
+        _validate_ayanamsa(ayanamsa)
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         if end < start:
@@ -1100,7 +1104,7 @@ def tool_get_rashi_ingresses(
             if bad:
                 raise ValueError(f'Unknown planet(s): {bad}. Valid: {INGRESS_PLANETS}')
 
-        events = rashi_ingresses(start, end, planets=planets)
+        events = rashi_ingresses(start, end, planets=planets, ayanamsa=ayanamsa)
 
         def _fmt(dt):
             return dt.strftime('%Y-%m-%d %H:%M UTC') if dt else None
@@ -1108,7 +1112,7 @@ def tool_get_rashi_ingresses(
         return json.dumps({
             'start_date': start_date,
             'end_date': end_date,
-            'ayanamsa': 'lahiri',
+            'ayanamsa': ayanamsa,
             'note': (
                 'Sidereal (Lahiri) rashi ingresses — when each planet crosses a '
                 'sign boundary. Retrograde ingresses (planet re-enters a sign it '

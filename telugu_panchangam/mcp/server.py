@@ -140,9 +140,10 @@ def get_rashi_ingresses(
     start_date: str,
     end_date: str,
     planets: list[str] | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
-    """Returns all rashi (sign) ingress events for the classical planets over a date range. A rashi ingress is when a planet crosses from one zodiac sign into the next — the foundational event for gochara (transit) period boundaries. Sidereal (Lahiri) coordinates throughout. Includes retrograde ingresses (a planet re-entering a sign it recently left). Each entry has: planet, rashi entered, enters (UTC), exits (next ingress, UTC — may fall outside the range). Planets with no sign change in the range (e.g. Saturn in Meena all of 2026) do not appear. Supported planets: Sun, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu. Moon is excluded (too frequent — a sign every ~2.25 days). Max range: 366 days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, planets=optional subset (default: all eight)."""
-    return tool_get_rashi_ingresses(start_date, end_date, planets)
+    """Returns all rashi (sign) ingress events for the classical planets over a date range. A rashi ingress is when a planet crosses from one zodiac sign into the next — the foundational event for gochara (transit) period boundaries. Sidereal coordinates (ayanamsa-configurable). Includes retrograde ingresses (a planet re-entering a sign it recently left). Each entry has: planet, rashi entered, enters (UTC), exits (next ingress, UTC — may fall outside the range). Planets with no sign change in the range (e.g. Saturn in Meena all of 2026) do not appear. Supported planets: Sun, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu. Moon is excluded (too frequent — a sign every ~2.25 days). Max range: 366 days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, planets=optional subset (default: all eight), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
+    return tool_get_rashi_ingresses(start_date, end_date, planets, ayanamsa)
 
 
 @mcp.tool()
@@ -201,7 +202,7 @@ def get_graha_positions(
     timezone: str | None = None,
     ayanamsa: str = 'lahiri',
 ) -> str:
-    """Sidereal positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until + next_rasi; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri; note: gochara/positions module uses Lahiri internally, alternate ayanamsa is accepted but not yet applied to graha position calculations)."""
+    """Sidereal positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until + next_rasi; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
     return tool_get_graha_positions(date, city, latitude, longitude, timezone, ayanamsa)
 
 
@@ -213,9 +214,10 @@ def get_gochara(
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
-    """Gochara (transit) verdicts for a janma rasi (natal Moon sign): each of the nine grahas with its house position counted from the janma rasi, a verdict (favourable | blocked by vedha | adverse) per the classical Brihat Samhita tables, plus named conditions — Sade Sati with phase, Ashtama Shani, Ardhastama Shani. Positions at sunrise of the date. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha' (canonical rashi spellings), city=city name (or latitude+longitude)."""
-    return tool_get_gochara(date, janma_rasi, city, latitude, longitude, timezone)
+    """Gochara (transit) verdicts for a janma rasi (natal Moon sign): each of the nine grahas with its house position counted from the janma rasi, a verdict (favourable | blocked by vedha | adverse) per the classical Brihat Samhita tables, plus named conditions — Sade Sati with phase, Ashtama Shani, Ardhastama Shani. Positions at sunrise of the date. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha' (canonical rashi spellings), city=city name (or latitude+longitude), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
+    return tool_get_gochara(date, janma_rasi, city, latitude, longitude, timezone, ayanamsa)
 
 
 @mcp.tool()
@@ -227,9 +229,10 @@ def get_rasi_phalalu(
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
-    """Daily Rasi Phalalu — a deterministic daily reading for a janma rasi, rendered entirely from computed facts: the Moon's chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati/Ashtama Shani are stated when running, and passing janma_nakshatra adds the day's tarabalam line. Not fiction: every line maps to a calculation. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha', janma_nakshatra=optional birth star for the tara line, city=city name (or latitude+longitude)."""
-    return tool_get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra, latitude, longitude, timezone)
+    """Daily Rasi Phalalu — a deterministic daily reading for a janma rasi, rendered entirely from computed facts: the Moon's chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati/Ashtama Shani are stated when running, and passing janma_nakshatra adds the day's tarabalam line. Not fiction: every line maps to a calculation. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha', janma_nakshatra=optional birth star for the tara line, city=city name (or latitude+longitude), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
+    return tool_get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra, latitude, longitude, timezone, ayanamsa)
 
 
 @mcp.tool()

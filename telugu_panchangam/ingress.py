@@ -7,8 +7,7 @@ date range. Each entry records when a planet enters a rashi and when it leaves
 Includes retrograde ingresses — Mercury and Venus can enter a sign, station,
 and retreat to the previous sign before re-entering. All transitions appear.
 
-Sidereal (Lahiri) longitudes are used throughout, consistent with the rest of
-the engine.
+Sidereal coordinates (ayanamsa-configurable, Lahiri by default).
 """
 from __future__ import annotations
 
@@ -18,7 +17,7 @@ from datetime import date, datetime
 import swisseph as swe
 
 from telugu_panchangam.engines.base import RASHI_NAMES
-from telugu_panchangam.engines.utils import jd_to_utc
+from telugu_panchangam.engines.utils import AYANAMSA_MODES, jd_to_utc
 
 INGRESS_PLANETS: list[str] = [
     'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu',
@@ -53,8 +52,7 @@ def _date_to_jd(d: date) -> float:
 
 
 def _sidereal_lon_speed(jd: float, planet: str) -> tuple[float, float]:
-    """Sidereal longitude and daily speed for `planet` at `jd`."""
-    swe.set_sid_mode(swe.SIDM_LAHIRI)
+    """Sidereal longitude and daily speed (sid mode must be pre-set by caller)."""
     flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
     r, _ = swe.calc_ut(jd, _SWE_BODY[planet], flags)
     lon = (r[0] + 180.0) % 360.0 if planet == 'Ketu' else r[0] % 360.0
@@ -99,6 +97,7 @@ def rashi_ingresses(
     start: date,
     end: date,
     planets: list[str] | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> list[RashiIngress]:
     """Return all rashi ingress events within [start, end].
 
@@ -108,6 +107,8 @@ def rashi_ingresses(
         Inclusive date range.
     planets : list[str] | None
         Subset of INGRESS_PLANETS; defaults to all eight.
+    ayanamsa : str
+        One of 'lahiri' (default), 'raman', 'krishnamurti', 'true_chitrapaksha'.
 
     Returns
     -------
@@ -127,28 +128,32 @@ def rashi_ingresses(
     jd_start = _date_to_jd(start)
     jd_end   = _date_to_jd(end) + 1.0
 
-    results: list[RashiIngress] = []
+    swe.set_sid_mode(AYANAMSA_MODES[ayanamsa])
+    try:
+        results: list[RashiIngress] = []
 
-    for planet in planets:
-        # Start the scan from jd_start to find all ingresses within range.
-        jd = jd_start
-        while True:
-            result = _find_next_ingress(jd, planet)
-            if result is None:
-                break
-            jd_ingress, rashi_idx = result
-            if jd_ingress > jd_end:
-                break
-            # Find when this rashi period ends (the following ingress).
-            exit_result = _find_next_ingress(jd_ingress + 0.01, planet)
-            jd_exit = exit_result[0] if exit_result else None
-            results.append(RashiIngress(
-                planet=planet,
-                enters=jd_to_utc(jd_ingress),
-                rashi=RASHI_NAMES[rashi_idx],
-                exits=jd_to_utc(jd_exit) if jd_exit else None,
-            ))
-            jd = jd_ingress + 0.01  # just past this ingress to find the next
+        for planet in planets:
+            # Start the scan from jd_start to find all ingresses within range.
+            jd = jd_start
+            while True:
+                result = _find_next_ingress(jd, planet)
+                if result is None:
+                    break
+                jd_ingress, rashi_idx = result
+                if jd_ingress > jd_end:
+                    break
+                # Find when this rashi period ends (the following ingress).
+                exit_result = _find_next_ingress(jd_ingress + 0.01, planet)
+                jd_exit = exit_result[0] if exit_result else None
+                results.append(RashiIngress(
+                    planet=planet,
+                    enters=jd_to_utc(jd_ingress),
+                    rashi=RASHI_NAMES[rashi_idx],
+                    exits=jd_to_utc(jd_exit) if jd_exit else None,
+                ))
+                jd = jd_ingress + 0.01  # just past this ingress to find the next
+    finally:
+        swe.set_sid_mode(swe.SIDM_LAHIRI)
 
     results.sort(key=lambda r: r.enters)
     return results
