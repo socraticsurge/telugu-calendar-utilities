@@ -27,6 +27,7 @@ from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_t
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
 from telugu_panchangam.eclipses import list_eclipses_in_range, get_eclipse_from_precomputed
+from telugu_panchangam.panchanga_shuddhi import assess_shuddhi
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 
 _ENGINES = {
@@ -1195,6 +1196,52 @@ def tool_get_eclipse_calendar(
                 '12 hours before a Solar eclipse, 9 hours before a Lunar eclipse.'
             ),
             'eclipses': out,
+        })
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception('tool call failed')
+        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+
+
+def tool_get_panchanga_shuddhi(
+    date_str: str,
+    city: str = 'Hyderabad',
+    system: str = 'drik',
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    timezone: Optional[str] = None,
+) -> str:
+    """Panchanga Shuddhi — five-limb purity assessment for muhurta planning."""
+    try:
+        d = _parse_date(date_str)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        engine = _get_engine(system)
+        day = engine.calculate(d, loc)
+        result = assess_shuddhi(day)
+        return json.dumps({
+            'date': date_str,
+            'city': city,
+            'system': system,
+            'verdict': result.verdict,
+            'shuddha_count': result.shuddha_count,
+            'note': (
+                'Panchanga Shuddhi measures the purity of each of the five Panchangam '
+                'limbs at sunrise. shuddha_count (0-5) is the number of pure limbs; '
+                'Sarva Shuddha (5) is ideal for auspicious works. '
+                'Values marked "mixed" neither help nor harm; "ashuddha" are to be avoided.'
+            ),
+            'limbs': [
+                {
+                    'limb':    lb.limb,
+                    'value':   lb.value,
+                    'quality': lb.quality,
+                    'shuddha': lb.shuddha,
+                    'reason':  lb.reason,
+                }
+                for lb in result.limbs
+            ],
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
