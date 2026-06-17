@@ -33,19 +33,56 @@ _DAY_CHOGHADIYA = {
 
 class DrikGanitaEngine(PanchangamEngine):
 
+    def __init__(self, ayanamsa: str = 'lahiri'):
+        from telugu_panchangam.engines.utils import _validate_ayanamsa
+        _validate_ayanamsa(ayanamsa)
+        self.ayanamsa = ayanamsa
+        super().__init__()
+
+    # --- Ayanamsa-aware longitude helpers ------------------------------------
+    # When ayanamsa == 'lahiri' (default), the cached hot-path helpers are used
+    # (byte-identical to existing behavior). For other ayanamsas we bypass the
+    # lru_cache and call sidereal_longitude_with_ayanamsa directly.
+
+    def _moon_lon(self, jd: float) -> float:
+        if self.ayanamsa == 'lahiri':
+            return moon_longitude(jd)
+        from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
+        import swisseph as swe
+        return sidereal_longitude_with_ayanamsa(jd, swe.MOON, self.ayanamsa)
+
+    def _sun_lon(self, jd: float) -> float:
+        if self.ayanamsa == 'lahiri':
+            return sun_longitude(jd)
+        from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
+        import swisseph as swe
+        return sidereal_longitude_with_ayanamsa(jd, swe.SUN, self.ayanamsa)
+
+    def _elongation(self, jd: float) -> float:
+        if self.ayanamsa == 'lahiri':
+            return moon_sun_elongation(jd)
+        return (self._moon_lon(jd) - self._sun_lon(jd)) % 360.0
+
+    def _elongation_func(self):
+        """Return an elongation callable suitable for find_crossing."""
+        if self.ayanamsa == 'lahiri':
+            return moon_sun_elongation
+        return self._elongation
+
     def _tithi_index_at(self, jd: float) -> int:
         """Tithi index 0-29 (0=Shukla Pratipat, 14=Pournami, 29=Amavasya)."""
-        return int(moon_sun_elongation(jd) / 12.0) % 30
+        return int(self._elongation(jd) / 12.0) % 30
 
     def _tithi_span(self, jd_sunrise: float) -> Span:
         """Tithi active at sunrise, with start/end times."""
+        elong_func = self._elongation_func()
         idx = self._tithi_index_at(jd_sunrise)
         target_start = idx * 12.0
         target_end = ((idx + 1) * 12.0) % 360.0
 
-        jd_tithi_start = find_crossing(moon_sun_elongation, target_start,
+        jd_tithi_start = find_crossing(elong_func, target_start,
                                         jd_sunrise - 2.0, jd_sunrise)
-        jd_tithi_end = find_crossing(moon_sun_elongation, target_end,
+        jd_tithi_end = find_crossing(elong_func, target_end,
                                       jd_sunrise, jd_sunrise + 2.0)
 
         return Span(
@@ -56,16 +93,17 @@ class DrikGanitaEngine(PanchangamEngine):
 
     def _nakshatra_span(self, jd_sunrise: float) -> Span:
         """Nakshatra active at sunrise, with start/end times."""
-        moon_lon = moon_longitude(jd_sunrise)
+        moon_lon = self._moon_lon(jd_sunrise)
+        moon_lon_func = self._moon_longitude_func()
         nak_size = 360.0 / 27.0
         idx = int(moon_lon / nak_size) % 27
 
         target_start = idx * nak_size
         target_end = (idx + 1) * nak_size
 
-        jd_nak_start = find_crossing(moon_longitude, target_start,
+        jd_nak_start = find_crossing(moon_lon_func, target_start,
                                       jd_sunrise - 2.0, jd_sunrise)
-        jd_nak_end = find_crossing(moon_longitude, target_end,
+        jd_nak_end = find_crossing(moon_lon_func, target_end,
                                     jd_sunrise, jd_sunrise + 2.0)
 
         return Span(
@@ -77,7 +115,7 @@ class DrikGanitaEngine(PanchangamEngine):
     def _yoga_span(self, jd_sunrise: float) -> Span:
         """Yoga at sunrise (Sun+Moon combined longitude)."""
         def yoga_longitude(jd: float) -> float:
-            return (sun_longitude(jd) + moon_longitude(jd)) % 360.0
+            return (self._sun_lon(jd) + self._moon_lon(jd)) % 360.0
 
         combined = yoga_longitude(jd_sunrise)
         nak_size = 360.0 / 27.0
@@ -165,21 +203,21 @@ class DrikGanitaEngine(PanchangamEngine):
 
     def _maasam(self, jd_sunrise: float) -> str:
         """Amanta lunar month name, with Adhika/Nija prefix when applicable."""
-        return maasam_name(moon_sun_elongation, sun_longitude, jd_sunrise)
+        return maasam_name(self._elongation_func(), self._sun_longitude_func(), jd_sunrise)
 
     def _special_flags(self, tithi_idx: int, weekday: int,
                         jd_sunrise: float, jd_sunset: float) -> dict:
         is_ekadashi = tithi_idx in (10, 25)
         is_amavasya = tithi_idx == 29
         is_pournami = tithi_idx == 14
-        tithi_at_sunset = int(moon_sun_elongation(jd_sunset) / 12.0) % 30
+        tithi_at_sunset = int(self._elongation(jd_sunset) / 12.0) % 30
         is_pradosham = tithi_idx in (12, 27) or tithi_at_sunset in (12, 27)
         is_shani = is_pradosham and weekday == 6
         is_soma = is_pradosham and weekday == 1
-        sun_sign_sr = int(sun_longitude(jd_sunrise) / 30.0) % 12
+        sun_sign_sr = int(self._sun_lon(jd_sunrise) / 30.0) % 12
         # Check if a sign change occurred in the 24h window: prev midnight to next sunrise
-        sun_sign_prev_sr = int(sun_longitude(jd_sunrise - 1.0) / 30.0) % 12
-        sun_sign_next_sr = int(sun_longitude(jd_sunrise + 1.0) / 30.0) % 12
+        sun_sign_prev_sr = int(self._sun_lon(jd_sunrise - 1.0) / 30.0) % 12
+        sun_sign_next_sr = int(self._sun_lon(jd_sunrise + 1.0) / 30.0) % 12
         is_sankranti = (sun_sign_sr != sun_sign_next_sr) or (sun_sign_prev_sr != sun_sign_sr)
         return {
             'is_ekadashi': is_ekadashi,
@@ -193,7 +231,8 @@ class DrikGanitaEngine(PanchangamEngine):
 
     def _karana_spans(self, jd_sunrise: float, jd_sunset: float) -> list[Span]:
         """Karanas active between sunrise and sunset."""
-        elong_at_sunrise = moon_sun_elongation(jd_sunrise)
+        elong_func = self._elongation_func()
+        elong_at_sunrise = self._elongation(jd_sunrise)
         half_tithi_idx = int(elong_at_sunrise / 6.0) % 60
 
         karanas = []
@@ -202,9 +241,9 @@ class DrikGanitaEngine(PanchangamEngine):
             ht_start_deg = ht_idx * 6.0
             ht_end_deg = (ht_idx + 1) * 6.0
 
-            jd_k_start = find_crossing(moon_sun_elongation, ht_start_deg,
+            jd_k_start = find_crossing(elong_func, ht_start_deg,
                                         jd_sunrise - 0.5, jd_sunrise + 1.0)
-            jd_k_end = find_crossing(moon_sun_elongation, ht_end_deg,
+            jd_k_end = find_crossing(elong_func, ht_end_deg,
                                       jd_k_start, jd_k_start + 1.0)
 
             if jd_k_end < jd_sunrise or jd_k_start > jd_sunset:
@@ -242,8 +281,8 @@ class DrikGanitaEngine(PanchangamEngine):
         moonset = jd_to_utc(jd_moonset)
 
         # --- Signs ---
-        sun_lon_sr = sun_longitude(jd_sunrise)
-        moon_lon_sr = moon_longitude(jd_sunrise)
+        sun_lon_sr = self._sun_lon(jd_sunrise)
+        moon_lon_sr = self._moon_lon(jd_sunrise)
         solar_sign = RASHI_NAMES[int(sun_lon_sr / 30) % 12]
         lunar_sign = RASHI_NAMES[int(moon_lon_sr / 30) % 12]
 
@@ -277,11 +316,11 @@ class DrikGanitaEngine(PanchangamEngine):
 
         # Varjyam / Amrita Kalam: windows of the sunrise nakshatra and the one
         # following it that begin within this panchangam day.
-        nak_spans = [nakshatra_span, next_nakshatra_span(nakshatra_span, moon_longitude)]
+        nak_spans = [nakshatra_span, next_nakshatra_span(nakshatra_span, self._moon_longitude_func())]
         day_start = jd_to_utc(jd_sunrise)
         day_end = jd_to_utc(jd_next_sunrise)
 
-        return PanchangamDay(
+        day = PanchangamDay(
             date=d,
             location=location,
             system='drik',
@@ -323,12 +362,83 @@ class DrikGanitaEngine(PanchangamEngine):
                                       jd_next_sunrise, jd_moonrise),
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
         )
+        day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
+        nak_arc = 360.0 / 27.0
+        nak_pos = moon_lon_sr / nak_arc
+        day.nakshatra_pada = int(nak_pos * 4) % 4 + 1
+        from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
+        day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
+        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(day.karana, day.ghati_clock)
+        from telugu_panchangam.sankramana import compute_sankramana_window
+        _, sankranti_jd = self._sankramanam_name_and_jd(jd_sunrise, jd_sunset)
+        sankranti_dt = jd_to_utc(sankranti_jd) if sankranti_jd is not None else None
+        day.sankramana_avoidance = compute_sankramana_window(sankranti_dt, day.ghati_clock)
+        from telugu_panchangam.nakshatra_filters import is_panchaka_nakshatra
+        day.in_panchaka_nakshatra = is_panchaka_nakshatra(day.nakshatra.name)
+        from telugu_panchangam.maasa_filters import khar_maasa_name
+        day.khar_maasa_name = khar_maasa_name(day.solar_sign)
+        day.is_khar_maasa = day.khar_maasa_name is not None
+        from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
+        day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
+        from telugu_panchangam.special_yogas import compute_anandadi_yoga
+        day.anandadi_yoga = compute_anandadi_yoga(day.vaaram, day.nakshatra.name)
+        from telugu_panchangam.disha_shoola import disha_shoola
+        day.disha_shoola_direction = disha_shoola(day.vaaram)
+        from telugu_panchangam.nakshatra_filters import nakshatra_mukha
+        day.nakshatra_mukha = nakshatra_mukha(day.nakshatra.name)
+        from telugu_panchangam.panchaka import evaluate_panchaka
+        from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
+        _lagnas = get_lagna_transitions(day)
+        _sunrise_lagna = next(
+            (w.name.replace(' Lagna', '') for w in _lagnas
+             if w.start <= day.sunrise < w.end),
+            _lagnas[0].name.replace(' Lagna', '') if _lagnas else None,
+        )
+        if _sunrise_lagna is not None:
+            day.panchaka_rahita = evaluate_panchaka(
+                tithi_name=day.tithi.name,
+                vaaram_name=day.vaaram,
+                nakshatra_name=day.nakshatra.name,
+                lagna_name=_sunrise_lagna,
+            )
+        # Simha-Stha Guru / Shukra — Jupiter/Venus rasis from sidereal
+        # longitudes at sunrise. Drik uses Swiss Ephemeris outer planets;
+        # SS and Vakya don't model them so those engines leave defaults (False).
+        import swisseph as swe
+        from telugu_panchangam.gochara.simha_stha import is_simha_stha
+        if self.ayanamsa == 'lahiri':
+            swe.set_sid_mode(swe.SIDM_LAHIRI)
+            _flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+            guru_lon = swe.calc_ut(jd_sunrise, swe.JUPITER, _flags)[0][0] % 360.0
+            shukra_lon = swe.calc_ut(jd_sunrise, swe.VENUS, _flags)[0][0] % 360.0
+        else:
+            from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
+            guru_lon = sidereal_longitude_with_ayanamsa(jd_sunrise, swe.JUPITER, self.ayanamsa)
+            shukra_lon = sidereal_longitude_with_ayanamsa(jd_sunrise, swe.VENUS, self.ayanamsa)
+        guru_rasi = RASHI_NAMES[int(guru_lon / 30) % 12]
+        shukra_rasi = RASHI_NAMES[int(shukra_lon / 30) % 12]
+        day.simha_stha_guru = is_simha_stha(guru_rasi)
+        day.simha_stha_shukra = is_simha_stha(shukra_rasi)
+        # Guru/Shukra Maudhya (combustion) — reuse the longitudes already
+        # computed above for Simha-Stha; sun_lon_sr is from the day's setup.
+        from telugu_panchangam.gochara.combustion import compute_maudhya
+        day.guru_maudhya = compute_maudhya('Guru', sun_lon_sr, guru_lon)
+        day.shukra_maudhya = compute_maudhya('Shukra', sun_lon_sr, shukra_lon)
+        return day
 
     def _sun_sign_idx_at(self, jd: float) -> int:
-        return int(sun_longitude(jd) / 30.0) % 12
+        return int(self._sun_lon(jd) / 30.0) % 12
 
     def _sun_longitude_func(self):
-        return sun_longitude
+        if self.ayanamsa == 'lahiri':
+            return sun_longitude
+        return self._sun_lon
 
     def _moon_longitude_func(self):
-        return moon_longitude
+        if self.ayanamsa == 'lahiri':
+            return moon_longitude
+        return self._moon_lon
+
+
+# Alias so tests and callers can import either name.
+DrikEngine = DrikGanitaEngine

@@ -83,6 +83,8 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 
 All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
 
+`get_panchangam`, `get_muhurta`, and `get_panchangam_range` include 16 new timing-computation fields added in 1.9.0: `ghati_clock`, `nakshatra_pada`, `vishaghati`, `bhadra_mukha`/`bhadra_puchha`, `sankramana_avoidance`, `in_panchaka_nakshatra`, `nakshatra_mukha`, `anandadi_yoga`, `is_khar_maasa`, `is_pitru_paksha`, `simha_stha_guru`/`simha_stha_shukra`, `guru_maudhya`/`shukra_maudhya`, `disha_shoola_direction`, and `panchaka_rahita`. `find_muhurta` gains six new activities (`litigation`, `cremation`, `construction_roof`, `wood_cutting`, `well_digging`, `coronation`) and an optional `travel_direction` parameter for Disha Shoola filtering.
+
 ## How it works
 
 Feeds are generated on the 1st of every month via GitHub Actions, covering 18 months ahead. They are served as static `.ics` files from GitHub Pages — zero hosting cost.

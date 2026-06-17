@@ -32,9 +32,10 @@ def get_panchangam(
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
-    """Returns full Panchangam JSON for a date and city: Pancha Anga (Tithi, Nakshatra, Yoga, Karana), sky events (Sunrise, Sunset, Moonrise, Moonset), auspicious windows (Brahma Muhurta, Abhijit, Amrita Kalam), inauspicious windows (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), Choghadiya, and special day flags. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude for a custom location; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
-    return tool_get_panchangam(date, city, system, latitude, longitude, timezone)
+    """Returns full Panchangam JSON for a date and city: Pancha Anga (Tithi, Nakshatra, Yoga, Karana), sky events (Sunrise, Sunset, Moonrise, Moonset), auspicious windows (Brahma Muhurta, Abhijit, Amrita Kalam), inauspicious windows (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), Choghadiya, and special day flags. New in 1.9.0: ghati_clock (sunrise-anchored ghati/vighati clock), nakshatra_pada (Moon's pada 1-4), vishaghati windows, bhadra_mukha/bhadra_puchha (Vishti split), sankramana_avoidance, in_panchaka_nakshatra, nakshatra_mukha (Adho/Urdhva/Tiryak), anandadi_yoga, is_khar_maasa/khar_maasa_name, is_pitru_paksha, simha_stha_guru/simha_stha_shukra (Drik only), guru_maudhya/shukra_maudhya (Drik only), disha_shoola_direction, panchaka_rahita. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude for a custom location; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri; SS and Vakya accept the param for API symmetry but always use their own mean-motion model)."""
+    return tool_get_panchangam(date, city, system, latitude, longitude, timezone, ayanamsa)
 
 
 @mcp.tool()
@@ -46,7 +47,7 @@ def get_muhurta(
     longitude: float | None = None,
     timezone: str | None = None,
 ) -> str:
-    """Returns auspicious and inauspicious time windows for a date and city as JSON. Lighter than get_panchangam — use for quick 'is this a good time?' queries. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
+    """Returns auspicious and inauspicious time windows for a date and city as JSON. Lighter than get_panchangam — use for quick 'is this a good time?' queries. Includes all 1.9.0 timing fields: vishaghati, bhadra_mukha/bhadra_puchha, sankramana_avoidance, ghati_clock, in_panchaka_nakshatra, nakshatra_mukha, anandadi_yoga, is_khar_maasa, is_pitru_paksha, simha_stha_guru/shukra, guru_maudhya/shukra_maudhya, disha_shoola_direction, panchaka_rahita. Args: date=YYYY-MM-DD, city=city name (or pass latitude+longitude; timezone is derived if omitted), system=drik|surya_siddhanta|vakya (default: drik)."""
     return tool_get_muhurta(date, city, system, latitude, longitude, timezone)
 
 
@@ -99,9 +100,10 @@ def get_panchangam_range(
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
-    """Returns a compact Panchangam summary for each day in a date range (max 31 days). Each day includes: Tithi, Nakshatra, Yoga, Sunrise/Sunset, all auspicious and inauspicious windows, eclipse (if any), special yogas, and special day flags. Useful for planning muhurtas over a week or comparing multiple days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, city=city name, system=drik|surya_siddhanta|vakya (default: drik)."""
-    return tool_get_panchangam_range(start_date, end_date, city, system, latitude, longitude, timezone)
+    """Returns a compact Panchangam summary for each day in a date range (max 31 days). Each day includes: Tithi, Nakshatra, Yoga, Sunrise/Sunset, all auspicious and inauspicious windows, eclipse (if any), special yogas, and special day flags. New in 1.9.0: each day also carries all timing-computation fields — ghati_clock, nakshatra_pada, vishaghati, bhadra_mukha/bhadra_puchha, sankramana_avoidance, in_panchaka_nakshatra, nakshatra_mukha, anandadi_yoga, is_khar_maasa/khar_maasa_name, is_pitru_paksha, simha_stha_guru/shukra, guru_maudhya/shukra_maudhya, disha_shoola_direction, panchaka_rahita. Useful for planning muhurtas over a week or comparing multiple days. Args: start_date=YYYY-MM-DD, end_date=YYYY-MM-DD, city=city name, system=drik|surya_siddhanta|vakya (default: drik), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
+    return tool_get_panchangam_range(start_date, end_date, city, system, latitude, longitude, timezone, ayanamsa)
 
 
 def main() -> None:
@@ -132,9 +134,10 @@ def get_graha_positions(
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
-    """Sidereal (Lahiri) positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until + next_rasi; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted)."""
-    return tool_get_graha_positions(date, city, latitude, longitude, timezone)
+    """Sidereal positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until + next_rasi; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri; note: gochara/positions module uses Lahiri internally, alternate ayanamsa is accepted but not yet applied to graha position calculations)."""
+    return tool_get_graha_positions(date, city, latitude, longitude, timezone, ayanamsa)
 
 
 @mcp.tool()
@@ -178,8 +181,9 @@ def find_muhurta(
     latitude: float | None = None,
     longitude: float | None = None,
     timezone: str | None = None,
+    ayanamsa: str = 'lahiri',
 ) -> str:
-    """Find ranked auspicious time slots over the coming days. Slots are good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), scored with Abhijit Muhurta / Amrita Kalam overlap and special-yoga bonuses. activity tunes the rules: travel additionally avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit. Pass janma_nakshatras (1-4 birth stars) to keep only days whose tarabalam favours everyone. Optionally pass janma_rasis (aligned with janma_nakshatras, null entries allowed) to add Chandrabalam scoring — each person then gets the Moon's position from their rashi with a verdict (good / needs remedial puja / avoid), and chandra_mode selects how this affects the day filter: 'stars' (annotate only, default), 'puja_ok' (drop Moon-avoid days), 'strict' (Moon must be good). Optionally pass janma_lagnas (aligned, null entries allowed) to use strict Lagna Shuddhi for that person — kendra/trikona/Ashtama count from the natal ascendant; otherwise we fall back to counting from janma_rasis (Chandra-Rashi-as-lagna tradition). Args: start_date=YYYY-MM-DD, days=1-14, activity=any|travel|purchase|ceremony|beginning, city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya, janma_rasis=optional birth rashis (e.g. ['Meena', 'Simha']), janma_lagnas=optional birth lagnas (e.g. ['Vrishabha', None]), chandra_mode=stars|puja_ok|strict."""
+    """Find ranked auspicious time slots over the coming days. Slots are good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), scored with Abhijit Muhurta / Amrita Kalam overlap and special-yoga bonuses. activity tunes the rules: travel additionally avoids Vishti karana, ceremony skips Visha/Dagdha days, purchase favours Labh, beginning favours Amrit. New in 1.9.0: Bhadra Mukha is a hard-avoid cut; Bhadra Puchha is a bonus for litigation; Simha-Stha Guru/Shukra, Guru/Shukra Maudhya (combustion), Khar-Maasa, Adhika Maasa, and Pitru Paksha are all skipped for samskara activities; Panchaka Rahita (Mrityu/Agni/Raja/Chora/Roga) is checked at both day-level (sunrise lagna) and slot-level; optional travel_direction parameter activates Disha Shoola filtering. New activities: litigation, cremation, construction_roof, wood_cutting, well_digging, coronation. Pass janma_nakshatras (1-4 birth stars) to keep only days whose tarabalam favours everyone. Optionally pass janma_rasis (aligned with janma_nakshatras, null entries allowed) to add Chandrabalam scoring — each person then gets the Moon's position from their rashi with a verdict (good / needs remedial puja / avoid), and chandra_mode selects how this affects the day filter: 'stars' (annotate only, default), 'puja_ok' (drop Moon-avoid days), 'strict' (Moon must be good). Optionally pass janma_lagnas (aligned, null entries allowed) to use strict Lagna Shuddhi for that person — kendra/trikona/Ashtama count from the natal ascendant; otherwise we fall back to counting from janma_rasis (Chandra-Rashi-as-lagna tradition). Args: start_date=YYYY-MM-DD, days=1-14, activity=any|travel|purchase|ceremony|beginning|litigation|cremation|construction_roof|wood_cutting|well_digging|coronation, city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya, janma_rasis=optional birth rashis (e.g. ['Meena', 'Simha']), janma_lagnas=optional birth lagnas (e.g. ['Vrishabha', None]), chandra_mode=stars|puja_ok|strict, ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri), travel_direction=optional compass direction (N/S/E/W/NE/NW/SE/SW) to activate Disha Shoola filtering for travel activity."""
     return tool_find_muhurta(start_date, days, activity, city, system,
                              janma_nakshatras, janma_rasis, janma_lagnas,
-                             chandra_mode, latitude, longitude, timezone)
+                             chandra_mode, latitude, longitude, timezone, ayanamsa)

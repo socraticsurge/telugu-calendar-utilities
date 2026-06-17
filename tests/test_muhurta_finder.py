@@ -175,18 +175,25 @@ def test_invalid_activity_raises():
 
 # --- Activity taxonomy (Batch D) ---
 
-def test_all_24_activities_callable():
+def test_all_30_activities_callable():
     from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
-    assert len(ACTIVITIES) == 24
+    assert len(ACTIVITIES) == 30
     # backward-compat: every old key must still be accepted
     for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
         assert old in ACTIVITY_RULES
-    # spot check new keys
+    # spot check existing keys
     for new in ('wedding', 'gruhapravesha', 'naming', 'annaprasana',
                 'karnavedha', 'mundana', 'upanayana', 'vidyarambha',
                 'engagement', 'vehicle', 'property', 'gold', 'bhumi_puja',
-                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery'):
+                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery',
+                'litigation'):
         assert new in ACTIVITY_RULES
+    # Task 15: Nakshatra Mukha activities
+    for mukha_act in ('well_digging', 'coronation'):
+        assert mukha_act in ACTIVITY_RULES
+    # Panchaka-restricted activities
+    for panchaka in ('cremation', 'construction_roof', 'wood_cutting'):
+        assert panchaka in ACTIVITY_RULES
     # every row has a label
     for k, row in ACTIVITY_RULES.items():
         assert row.get('label'), f'activity {k!r} missing label'
@@ -342,18 +349,17 @@ def test_bhadra_tithi_gruhapravesha_bonus():
 
 
 def test_vara_bonus_thursday_wedding():
-    # 2026-07-16 (Thu) = Shukla Dwitiya (Bhadra), Nitya yoga = Siddhi
-    # (auspicious), no Visha/Dagdha/Vyatipata/Vaidhriti. A clean Thursday
-    # for wedding scoring. Wedding prefers Purna tithi (not Bhadra) and
-    # Guruvaram vara — so only the vara bonus fires (Nitya yoga adds +1
-    # auspicious bonus separately).
-    day = _day(2026, 7, 16)
+    # 2026-08-20 (Thu) = Shukla Ashtami (Jaya), Nitya yoga = Indra.
+    # Neither Guru nor Shukra combust; no Simha-Stha; not Khar-Maasa.
+    # Wedding prefers Purna tithi (not Jaya) and Guruvaram vara —
+    # so only the vara bonus fires.
+    day = _day(2026, 8, 20)
     slots = day_slots(day, activity='wedding')
     assert slots
     reasons = [r for s in slots for r in s['reasons']]
     assert any('Guruvaram favoured for Wedding' in r for r in reasons)
-    # Bhadra is not preferred by wedding — no tithi-class line.
-    assert not any('Bhadra' in r and 'favoured for Wedding' in r for r in reasons)
+    # Jaya is not preferred by wedding — no tithi-class line for it.
+    assert not any('Jaya' in r and 'favoured for Wedding' in r for r in reasons)
 
 
 def test_vara_bonus_friday_vehicle():
@@ -617,8 +623,9 @@ def test_personal_dosha_tara_dosha_caps_tier():
 
 def test_personal_dosha_chandra_avoid_caps_tier():
     # 2026-06-25: Pushya + Karka -> Moon@4 (avoid, non-Ashtama). The
-    # top slot scores 7 (Excellent by raw score) but the unrectified
-    # chandra dosha caps it at Good.
+    # top slot scores 7 (Excellent by raw score: Char+1, Abhijit+2,
+    # Sarvartha+2, Shiva nitya+1, Anandadi Sthira+1, tara+1, chandra-1)
+    # but the unrectified chandra dosha caps it at Good.
     from telugu_panchangam.personal.muhurta import score_tier
     day = _day(2026, 6, 25)
     slots = day_slots(day, janma_nakshatras=['Pushya'], janma_rasis=['Karka'])

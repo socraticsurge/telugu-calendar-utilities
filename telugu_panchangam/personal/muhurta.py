@@ -28,6 +28,8 @@ from telugu_panchangam.personal.nitya_yoga import (
     NITYA_PARTIAL_DOSHA_WINDOW, NITYA_PARTIAL_PENALTY,
     NITYA_AUSPICIOUS, NITYA_AUSPICIOUS_BONUS,
 )
+from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS
+from telugu_panchangam.panchaka import evaluate_panchaka
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MIN_SLOT_MINUTES = 24  # one ghati
@@ -115,11 +117,16 @@ ACTIVITY_RULES: dict[str, dict] = {
     'any':           {'label': 'Anything auspicious'},
     'travel':        {'label': 'Travel / journey',
                       'avoid_karana': ['Vishti'],
-                      'prefer_lagna_class': 'Chara'},
+                      'prefer_lagna_class': 'Chara',
+                      'prefer_nakshatra_mukha': (['Tiryan'], 1)},
     'purchase':      {'label': 'Purchase (general)',
                       'prefer_choghadiya': ('Labh', 1)},
     'ceremony':      {'label': 'Ceremony / puja (general)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_vara': ['Somavaram', 'Guruvaram']},
     'beginning':     {'label': 'New beginning (general)',
                       'prefer_choghadiya': ('Amrit', 1),
@@ -128,49 +135,89 @@ ACTIVITY_RULES: dict[str, dict] = {
     # — Samskaras —
     'wedding':       {'label': 'Wedding (Vivaha)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
+                      'skip_on_simha_stha_guru': True,      # hard-skip: Guru in Simha
+                      'penalty_on_simha_stha_shukra': -2,   # soft penalty: Shukra in Simha
+                      'skip_on_combust': ['Guru', 'Shukra'],
                       'prefer_tithi_class': 'Purna',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'engagement':    {'label': 'Engagement (Nischayam)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Purna',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'naming':        {'label': 'Naming (Namakaranam)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'annaprasana':   {'label': 'Annaprasana (First feeding)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Somavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Budhavaram', 'Shukravaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'mundana':       {'label': 'Mundana / Chaula (First head-shave)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'upanayana':     {'label': 'Upanayana (Sacred thread)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
+                      'skip_on_combust': ['Guru', 'Shukra'],
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'vidyarambha':   {'label': 'Education start (Vidyarambha)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Budhavaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
+                      'skip_on_sankramana': True,
+                      'skip_on_khar_maasa': True,
+                      'skip_on_adhika': True,
+                      'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
@@ -219,9 +266,26 @@ ACTIVITY_RULES: dict[str, dict] = {
     'court':         {'label': 'Court / legal matter',
                       'prefer_tithi_class': 'Jaya',
                       'prefer_vara': ['Mangalavaram']},
+    'litigation':    {'label': 'Litigation / contest',
+                      'prefer_tithi_class': 'Jaya',
+                      'prefer_vara': ['Mangalavaram'],
+                      'prefer_bhadra_puchha': 2},
     'surgery':       {'label': 'Surgery / medical procedure',
                       'avoid_karana': ['Vishti'],
                       'prefer_vara': ['Mangalavaram']},
+    # — Panchaka-restricted activities —
+    'cremation':         {'label': 'Cremation rites',
+                          'skip_on_panchaka_nakshatra': True},
+    'construction_roof': {'label': 'Roof-laying / construction milestone',
+                          'skip_on_panchaka_nakshatra': True},
+    'wood_cutting':      {'label': 'Wood-cutting',
+                          'skip_on_panchaka_nakshatra': True},
+    # — Nakshatra Mukha (mouth-direction) activity rules —
+    'well_digging':          {'label': 'Well / foundation digging',
+                              'prefer_nakshatra_mukha': (['Adho'], 1)},
+    'coronation':            {'label': 'Coronation / title ceremony',
+                              'skip_on_yoga': list(_SAMSKARA_SKIP),
+                              'prefer_nakshatra_mukha': (['Urdhva'], 1)},
 }
 
 ACTIVITIES = tuple(ACTIVITY_RULES.keys())
@@ -592,7 +656,8 @@ def _score_nitya_yoga(yoga_name, slot_start, day, skip_on_hard_avoid):
 
 
 def diagnose_day(day, activity='any', janma_nakshatras=None,
-                 janma_rasis=None, chandra_mode='stars'):
+                 janma_rasis=None, chandra_mode='stars',
+                 travel_direction: str | None = None):
     """If day_slots() would return [] for these inputs, explain why.
 
     Returns a string (the reason) or None when the day is not filtered.
@@ -602,6 +667,7 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
     This is a lightweight pre-check — it does NOT run the full scoring
     loop. It catches the day-level skip conditions:
       - Eclipse
+      - Disha Shoola (travel blocked in specified direction)
       - Activity-skip yoga (samskara on Visha/Dagdha/Vyatipata/Vaidhriti)
       - chandra_mode strict/puja_ok filtering out the day's sunrise rashi
     """
@@ -609,7 +675,45 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
         kind = f'{day.eclipse.kind} eclipse'
         return f'{kind} — auspicious activities deferred'
 
+    # Disha Shoola: travel toward the blocked direction is inauspicious.
+    if activity == 'travel' and travel_direction is not None:
+        blocked = getattr(day, 'disha_shoola_direction', None)
+        if blocked is not None and travel_direction == blocked:
+            return (f'Disha Shoola ({day.vaaram}) — travel toward {blocked} '
+                    f'is inauspicious on this weekday')
+
     rules = ACTIVITY_RULES.get(activity, ACTIVITY_RULES['any'])
+
+    # Panchaka Nakshatra: cremation/roof-laying/wood-cutting are deferred.
+    if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
+        return (f'Panchaka Nakshatra ({day.nakshatra.name}) — '
+                f'{rules["label"]} traditionally avoided')
+
+    # Khar-Maasa: samskara activities are deferred when Sun is in Dhanu or Meena.
+    if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
+        return (f'Khar-Maasa ({day.khar_maasa_name} Maasa) — '
+                f'{rules["label"]} traditionally avoided')
+
+    # Adhika Maasa: samskaras are classically forbidden during intercalary months.
+    if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
+        return f'Adhika Maasa — {rules["label"]} traditionally avoided'
+
+    # Pitru Paksha: samskaras are restricted during Bhadrapada Krishna paksha.
+    if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
+        return f'Pitru Paksha (Bhadrapada Krishna paksha) — {rules["label"]} traditionally avoided'
+
+    # Simha-Stha Guru: wedding is hard-skipped while Jupiter is in Simha.
+    if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
+        return (f'Simha-Stha Guru — '
+                f'{rules["label"]} traditionally avoided while Jupiter is in Simha')
+
+    # Guru/Shukra Maudhya (combustion): samskara activities deferred.
+    for g in rules.get('skip_on_combust', []):
+        info = getattr(day, f'{g.lower()}_maudhya', None)
+        if info is not None and info.combust:
+            return (f'{g} Maudhya ({info.elongation_deg:.1f}° < {info.threshold_deg}°) — '
+                    f'{rules["label"]} traditionally avoided when {g} is combust')
+
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     if skip_yogas:
         for y in day.special_yogas:
@@ -661,10 +765,30 @@ def _day_snapshot_facts(day):
 def _get_bad_windows(day, avoid_karana_names):
     bad = [(w.start, w.end) for w in
            [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
-           + list(day.varjyam) + list(day.durmuhurtham)]
+           + list(day.varjyam) + list(day.durmuhurtham)
+           + list(day.vishaghati)]  # Vishaghati windows treated as inauspicious cuts
+    # Bhadra Mukha (first 5/16 of Vishti) — hard-cut; most inauspicious
+    if day.bhadra_mukha is not None:
+        bad.append((day.bhadra_mukha.start, day.bhadra_mukha.end))
     if avoid_karana_names:
         bad += [(k.start, k.end) for k in day.karana if k.name in avoid_karana_names]
     return bad
+
+
+def _anandadi_day_modifier(day) -> tuple[int, str | None]:
+    """Return (score_delta, reason_chip) for the day's Anandadi yoga.
+
+    Auspicious yogas give +1; inauspicious give -1. This is a day-level
+    characterisation — all slots on the day receive the same modifier.
+    """
+    yoga = getattr(day, 'anandadi_yoga', None)
+    if yoga is None:
+        return 0, None
+    if yoga in ANANDADI_AUSPICIOUS:
+        return 1, f'Anandadi: {yoga} (+1)'
+    if yoga in ANANDADI_INAUSPICIOUS:
+        return -1, f'Anandadi: {yoga} (-1)'
+    return 0, None
 
 
 def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
@@ -674,7 +798,10 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
                    prefer_varas: set[str] | None = None,
                    lagnas: list[Window] | None = None,
                    janma_lagnas: list[str | None] | None = None,
-                   prefer_lagna_class: str | None = None):
+                   prefer_lagna_class: str | None = None,
+                   prefer_bhadra_puchha: int = 0,
+                   simha_stha_shukra_penalty: int = 0,
+                   prefer_nakshatra_mukha: tuple | None = None):
     # Special yogas (slot-time when engine given)
     yoga_bonus, yoga_reasons, defer = _score_special_yogas(
         facts.special_yogas, skip_yogas)
@@ -703,8 +830,12 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     if defer_nitya:
         return None
 
+    # Anandadi day-level modifier (Muhurta Chintamani)
+    anandadi_bonus, anandadi_reason = _anandadi_day_modifier(day)
+
     score = base + vara_bonus + tara_bonus + chandra_bonus \
-            + tithi_bonus + yoga_bonus + nitya_bonus
+            + tithi_bonus + yoga_bonus + nitya_bonus + simha_stha_shukra_penalty \
+            + anandadi_bonus
 
     # Reason groups — assemble each category as we go.
     slot_quality = [
@@ -712,6 +843,12 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
         'clear of all inauspicious windows',
     ]
     day_quality = list(yoga_reasons) + list(nitya_reasons)
+    if simha_stha_shukra_penalty:
+        day_quality.append(
+            f'Simha-Stha Shukra (Venus in Simha) ({simha_stha_shukra_penalty})'
+        )
+    if anandadi_reason:
+        day_quality.append(anandadi_reason)
     if tithi_day_reason:
         day_quality.append(tithi_day_reason)
     group_fit = list(tara_reasons) + list(chandra_reasons)
@@ -727,6 +864,18 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     if any(_overlaps(s, e, a.start, a.end) for a in amrita):
         score += 2
         slot_quality.append('overlaps Amrita Kalam (+2)')
+    if prefer_bhadra_puchha and day.bhadra_puchha is not None \
+            and _overlaps(s, e, day.bhadra_puchha.start, day.bhadra_puchha.end):
+        score += prefer_bhadra_puchha
+        activity_match.append(f'Bhadra Puchha overlap (+{prefer_bhadra_puchha})')
+    if prefer_nakshatra_mukha is not None:
+        preferred_classes, mukha_bonus = prefer_nakshatra_mukha
+        day_mukha = getattr(day, 'nakshatra_mukha', None)
+        if day_mukha is not None and day_mukha in preferred_classes:
+            score += mukha_bonus
+            activity_match.append(
+                f'Nakshatra Mukha {day_mukha} (+{mukha_bonus})'
+            )
     if prefer_chog and block.name == prefer_chog[0]:
         score += prefer_chog[1]
         activity_match.append(f'{block.name} favoured for {label} (+{prefer_chog[1]})')
@@ -766,6 +915,50 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     if lagna_act_reason:
         score += lagna_act_bonus
         activity_match.append(lagna_act_reason)
+
+    # Panchaka Rahita (mod-9 dosha) — slot-level recompute using the slot's
+    # rising lagna. Uses slot-time tithi/nakshatra (from facts) and day-level
+    # vaaram (sunrise-anchored by convention). `slot_lagna_name` is already
+    # computed above from the lagnas list.
+    panchaka_dosha = None
+    if slot_lagna_name is not None:
+        try:
+            _panchaka = evaluate_panchaka(
+                tithi_name=facts.tithi,
+                vaaram_name=facts.vaaram,
+                nakshatra_name=facts.nakshatra,
+                lagna_name=slot_lagna_name,
+            )
+            if _panchaka.name == 'Mrityu':
+                # Hard-cap: Mrityu Panchaka is universally inauspicious for
+                # samskaras and beginnings. Cap the score to at most 'Fair'
+                # by applying a strong penalty.
+                day_quality.append('Mrityu Panchaka — universal samskara avoidance (-3)')
+                score -= 3
+                panchaka_dosha = 'mrityu_panchaka'
+            elif _panchaka.name != 'Rahita':
+                # Activity-specific penalty for non-Rahita doshas
+                _activity_key = label.lower().replace(' ', '_').replace('/', '_')
+                _matched_avoid = None
+                for _avoid_key in _panchaka.avoid_for:
+                    # Check if current activity matches any avoid_for key
+                    if (_avoid_key in ACTIVITY_RULES and
+                            ACTIVITY_RULES[_avoid_key]['label'].lower() == label.lower()):
+                        _matched_avoid = _avoid_key
+                        break
+                    # Fuzzy: check if the activity label string contains avoid key
+                    if _avoid_key in label.lower().replace(' ', '_'):
+                        _matched_avoid = _avoid_key
+                        break
+                if _matched_avoid is not None:
+                    day_quality.append(
+                        f'{_panchaka.name} Panchaka conflicts with {label} (-2)'
+                    )
+                    score -= 2
+                    panchaka_dosha = f'{_panchaka.name.lower()}_panchaka'
+        except (ValueError, KeyError):
+            # If lagna or tithi lookup fails, skip panchaka scoring gracefully
+            pass
 
     notes = _doctrinal_notes(
         special_yogas=facts.special_yogas,
@@ -832,6 +1025,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
               janma_rasis: list[str | None] | None = None,
               janma_lagnas: list[str | None] | None = None,
               chandra_mode: str = 'stars',
+              travel_direction: str | None = None,
               *, engine=None) -> list[dict]:
     """Ranked auspicious slots for one day (daytime, sunrise to sunset).
 
@@ -879,14 +1073,54 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     if day.eclipse is not None:
         return []
 
+    # Disha Shoola: travel toward the blocked direction is inauspicious.
+    if activity == 'travel' and travel_direction is not None:
+        blocked = getattr(day, 'disha_shoola_direction', None)
+        if blocked is not None and travel_direction == blocked:
+            return []
+
     rules = ACTIVITY_RULES[activity]
+
+    # Panchaka Nakshatra: cremation/roof-laying/wood-cutting are deferred.
+    if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
+        return []
+
+    # Khar-Maasa: samskara activities are deferred when Sun is in Dhanu or Meena.
+    if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
+        return []
+
+    # Adhika Maasa: samskaras are classically forbidden during intercalary months.
+    if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
+        return []
+
+    # Pitru Paksha: samskaras are restricted during Bhadrapada Krishna paksha.
+    if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
+        return []
+
+    # Simha-Stha Guru: wedding is hard-skipped while Jupiter is in Simha.
+    if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
+        return []
+
+    # Guru/Shukra Maudhya (combustion): samskara activities deferred.
+    for g in rules.get('skip_on_combust', []):
+        info = getattr(day, f'{g.lower()}_maudhya', None)
+        if info is not None and info.combust:
+            return []
+
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     prefer_chog = rules.get('prefer_choghadiya')   # ('Block', bonus) or None
     avoid_karana_names = set(rules.get('avoid_karana', ()))
     prefer_tithi_class = rules.get('prefer_tithi_class')
     prefer_varas = set(rules.get('prefer_vara', ()))
     prefer_lagna_class = rules.get('prefer_lagna_class')
+    prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
+    prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')   # ([classes], bonus) or None
     label = rules['label']
+
+    # Simha-Stha Shukra: soft penalty (-2) for wedding when Venus is in Simha.
+    # Applied at slot-scoring time (day-level, constant across all slots).
+    _shukra_penalty = rules.get('penalty_on_simha_stha_shukra', 0) \
+        if day.simha_stha_shukra else 0
 
     # Vara is sunrise-anchored (one constant per panchangam day).
     vara_bonus = 1 if day.vaaram in prefer_varas else 0
@@ -894,6 +1128,10 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                    if vara_bonus else None)
 
     bad = _get_bad_windows(day, avoid_karana_names)
+    # Sankramana avoidance: slots overlapping the 16+16 ghati window are cut
+    # for samskaras and ceremonies that carry skip_on_sankramana=True.
+    if rules.get('skip_on_sankramana') and day.sankramana_avoidance is not None:
+        bad.append((day.sankramana_avoidance.start, day.sankramana_avoidance.end))
     abhijit = day.abhijit_muhurta
     amrita = list(day.amrita_kalam)
 
@@ -908,8 +1146,12 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         (janma_rasis and any(r is not None for r in janma_rasis))
         or (janma_lagnas and any(l is not None for l in janma_lagnas))
     )
-    _needs_lagnas = _has_personal_ref or bool(prefer_lagna_class)
-    lagnas = get_lagna_transitions(day) if _needs_lagnas else None
+    # Lagnas are needed for: personal kendra/trikona, activity lagna class,
+    # and Panchaka Rahita slot-level recompute. Always compute — one bisection
+    # pass per day (not per slot), so cost is O(1) per call regardless of slot
+    # count.
+    _needs_lagnas = _has_personal_ref or bool(prefer_lagna_class) or True
+    lagnas = get_lagna_transitions(day)
 
     # Engine-precise mode: per-slot facts via engine.facts_at(start).
     # Snapshot mode: every slot sees the day's sunrise facts.
@@ -937,7 +1179,10 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                 avoid_karana_names=avoid_karana_names,
                 horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
                 janma_lagnas=janma_lagnas,
-                prefer_lagna_class=prefer_lagna_class
+                prefer_lagna_class=prefer_lagna_class,
+                prefer_bhadra_puchha=prefer_bhadra_puchha,
+                simha_stha_shukra_penalty=_shukra_penalty,
+                prefer_nakshatra_mukha=prefer_nakshatra_mukha,
             )
             if slot_dict is not None:
                 slots.append(slot_dict)
