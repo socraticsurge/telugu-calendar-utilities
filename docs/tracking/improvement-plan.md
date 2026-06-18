@@ -195,21 +195,29 @@ All 5 PRs merged. Suite: 825 → 846 (+21 new tests). Zero behaviour regressions
 - Eclipse precision audit (decade scope vs USNO/NASA) — no devotee complaints
 - Public Python library API — defer until a Python user actually asks
 
-### Phase 3 — Vite + TypeScript migration (L)  ← **NEXT (planning complete)**
+### Phase 3 — Vite + TypeScript migration (L)  ← **NEXT (plan refreshed 2026-06-18 against master @ 1.10.4)**
 
-**📋 Migration plan: [`docs/plans/phase-3-vite-typescript-migration.md`](../plans/phase-3-vite-typescript-migration.md)** — drafted 2026-06-16 via Ultracode planning workflow (689 lines; 21 agents; 5 open decisions for owner). Adversarial Verify caught 6 concrete pre-cutover risks that the synth plan now absorbs explicitly.
+**📋 Migration plan: [`docs/plans/phase-3-vite-typescript-migration.md`](../plans/phase-3-vite-typescript-migration.md)** — drafted 2026-06-16; **refreshed 2026-06-18** with a dated addendum that corrects ~204 commits of drift (file:line anchors, Node-24/SHA-pinned deploy diffs) and enlarges the TS-scorer-port scope to mirror the 1.9.0 round. Strategy is LOCKED and unchanged; only staleness and scope were corrected.
 
-**Headline shape:** 5 required PRs + 3 optional follow-ups. Phase 3 closes after PR 5 (the deploy cutover). PRs 6-8 are component-refactor backlog that doesn't gate PWA (Phase 5).
+**Headline shape:** still 5 required PRs + 3 optional. Phase 3 closes after PR 5 (deploy cutover). PRs 6–8 are component-refactor backlog that doesn't gate PWA (Phase 5).
 
-**Parity strategy locked in by the planner:** codegen, not re-typing. `tools/export_activity_rules.py` reads Python `ACTIVITY_RULES` → emits `src/data/activity-rules.generated.json`. Both Python tests and TS scorer consume the same JSON. CI fails on stale fixture.
+**Why the refresh:** since the plan was drafted the project shipped 1.9.0 → 1.10.4. The 1.9.0 round (`218d981`) grew `ACTIVITY_RULES` from 24→30 activities (7→17 per-row keys) and added a whole tier of day-skips + slot signals to `muhurta.py` — **without updating the website mirror**. The TS scorer port (PR 2) is therefore ~2–3× bigger than first estimated and must be mirrored from `telugu_panchangam/personal/muhurta.py` (+ ~544 lines of helpers), NOT from the pre-1.9.0 `docs/muhurta-scorer.js` sidecar (which is deleted, not ported). The parity fixture expands to cover Mrityu −3, Panchaka, Anandadi, Nakshatra Mukha, Bhadra Puchha, Simha-Stha, dual-lagna (Lagna Shuddhi) and day-skip/dropped-day cases.
 
-**Deploy strategy locked in:** `keep_files: false` on the landing deploy + explicit feeds rsync-back into `dist/` before publish. `keep_files: true` preserved on the three monthly-cron workflows (feeds/gochara/lagna). CNAME pin survives all four workflows per the guard test.
+**Engines-before-Vite gate:** Phase 9 transit work (1.10.0–1.10.3) is shipped and independent — does NOT block. Master's scorer surface is quiescent (all Group-A `feat/*` branches `behind=204`, already merged via 1.9.0). The real precondition is now *"website scorer caught up to Python (or gap frozen) + codegen parity bridge in place"* — the bridge does not exist yet and is the FIRST step of PR 2.
 
-One sustained workstream. The structural step that unblocks Phases 4, 5, 7, 8.
+**Open decision for owner (BIGGEST):** whether the website muhurta-scorer is brought to full parity with current master's scorer (1.10.4) AS PART of the migration (recommended — the codegen path makes it nearly free and eliminates the drift permanently) or ported as-is and left lagging until a later Phase-8 pass. (NB: the scorer *feature surface* originated in the 1.9.0 round; nothing since 1.10.0 changed it — Phase-9 transit tools + ayanamsa are independent. Target = current master, not a stale version.) See plan §Refresh / New open decisions.
 
-- [ ] **[P1, L, I]** **Adopt Vite + TS**. Migrate `docs/index.html` into modular `src/` (sections as components). Move `muhurta-scorer.js` → TypeScript with shared types. Eliminate the `ACTIVITY_RULES` + scoring-weight duplication via generated TS types (or a JSON fixture both sides import). Update `deploy-landing.yml` and the three deploy workflows: add `npm ci && npm run build`, publish `dist/` instead of `public/`.
+**Parity strategy (unchanged, locked):** codegen not re-typing — `tools/export_activity_rules.py` → `src/data/activity-rules.generated.json`, consumed by both Python tests and the TS scorer; CI fails on stale fixture.
+
+**Deploy strategy (unchanged, locked):** `keep_files:false` on the landing deploy + feeds rsync-back into `dist/`; `keep_files:true` on the three monthly-cron workflows; CNAME pin survives all four. **Correction:** new Set-up-Node step must pin `actions/setup-node@…#v6.4.0` / Node 24 (matching ci.yml), NOT `@v4`/Node 20.
+
+One sustained workstream. The structural step that unblocks Phases 4, 5, 8.
+
+- [ ] **[P1, L, I]** **Adopt Vite + TS** (5 PRs). See refreshed plan + addendum.
 - [ ] **[P1, S, I]** Self-host fonts (or preload with `crossorigin`) as part of the build setup
-- [ ] **[P1, S, T]** **Python ↔ JS parity test** for `ACTIVITY_RULES` + scoring weights — trivial once the duplication is eliminated, but lock it down so the new architecture stays correct
+- [ ] **[P1, S, T]** **Python ↔ JS parity test** for `ACTIVITY_RULES` (30 activities, 17 keys) + the 1.9.0 scoring signals — locked down by the codegen bridge so the architecture stays correct
+
+_(Test baseline note: master now collects 1032 tests, not 846; current version 1.10.4.)_
 
 ### Phase 4 — Weeks 15–16: UI/UX harvest (post-Vite)
 
