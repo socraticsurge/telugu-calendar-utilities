@@ -1,0 +1,23 @@
+{
+  "name": "telugu-calendar-utilities-site",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "parity:export": "python tools/export_activity_rules.py && python tools/export_parity_fixture.py",
+    "parity:check": "python tools/export_activity_rules.py --check && python tools/export_parity_fixture.py --check"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0",
+    "typescript": "^5.5.0",
+    "@types/node": "^20.14.0",
+    "jsdom": "^24.0.0"
+  }
+}
