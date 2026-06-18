@@ -686,4 +686,148 @@ Each PR is on a feature branch off master, merges to master only when tests pass
 
 ## 9. Open decisions
 
-See `open_decisions` field.
+See `open_decisions` field (original draft). **Superseded by the refresh's "New open decisions" subsection below** — read that first.
+
+---
+
+## Refresh against current master — 2026-06-18
+
+> This section supersedes the stale parts of §1, §2, §3, §4, §6, §7 above. The **strategy is unchanged** (vanilla TS, codegen `ACTIVITY_RULES`→JSON parity, landing deploy `keep_files:false` + feeds rsync-back, CNAME pin across all four workflows, `docs/index.html` removed only at the very end). What changed is the *surface*: the 1.9.0 round (commit `218d981`) roughly doubled the muhurta-scorer the TS port must mirror, and the page/workflows/tests have drifted ~14–18 lines and one Node-version generation since the plan was drafted. Verified against master at version **1.10.4** (`pyproject.toml`), **1032 tests collected** (plan baseline of 846 is ~186 stale). Produced via a 5-facet parallel audit workflow; every anchor below was re-derived with `grep -n` on master.
+
+> **Terminology — read once.** Wherever this addendum says "the 1.9.0 round," it names the *release that introduced* these scorer features; **the parity target is always current `master` (1.10.4).** Nothing changed the scorer between 1.9.0 and 1.10.4 except a dead-code cleanup (#100 `c10fe65`, no behaviour change). 1.10.0–1.10.4 added Phase-9 transit tools + ayanamsa, all independent of the website scorer. So "1.9.0 scorer surface" and "1.10.4 scorer surface" denote the **same logic** — the TS port mirrors whatever is on master now.
+
+### A. Corrected file totals and top-level anchors
+
+| Plan claim | Current master | Note |
+|---|---|---|
+| `docs/index.html` 4,356 lines | **4,370 lines** | grew via #86/#97/#99 |
+| `docs/muhurta-scorer.js` 182 lines | **182 lines** (still) | line count holds; **currency does NOT** — see §D |
+| `muhurta.py` "scorer runs past 1079" | **1,194 lines total** | `_evaluate_slot` ends 1017; `day_slots` 1019–1194; no separate scorer "past 1079" |
+| 846 tests / 1 skipped | **1032 collected** | baseline ~186 stale |
+
+**Every §2 line-range below ~line 1000 has drifted +13 to +18 lines.** Re-anchor the §2 table to these (verified):
+
+`<style>` 53–1014 · `</head>` 1015 · `#m-topbar` 1019 · `#m-bottomnav` 1036 · `#m-more-drawer` 1063 · `#m-help-sheet` 1085 · `#today-help-src` 1099 · `#panel-tarabalam` 1234 · `#mu-section` 1316 (still nested inside panel-tarabalam — Verify point 11 holds) · `#panel-gochara` 1384 · `#special-days-card` 1439 · `#subscribe` 1445 · `#card-system` 1503 · `#card-mcp` 1568 · `<script src=muhurta-scorer.js>` 1636 · inline `<script>` opens 1637 · `FEED_BASE_URL` 1638 · `CITY_GROUPS` 1640–1644 (still 22 cities × 3 groups) · `SYSTEMS` 1645 · `parseDescription` 2013 · `renderPreview` 2135 · `renderUpcoming` 2309 · `loadFeed` 2341 · `calcTarabalam` 2571 · `renderTarabalam` 2675 · `switchTool` 2881 · `loadGochara` 2914 · `renderGochara` 3030 · `muAssignTiers` 3343 · `muFactsAt` 3516 · `MU_ACTIVITY` 3573–3676 · `htmlEsc` 3680 · `findMuhurta` 3686 · `renderMuhurta` 4093 · `mobileShell` IIFE 4220–4351 · GoatCounter 4353 · analytics 4355–4370.
+
+Eclipse cross-cut re-anchored: parse 2070–2092 · `eclipseChip` 2127 · `renderUpcoming` chip 2322–2324 · muhurta day-skip 3711/3723–3726.
+
+PR 3 help-source hoist targets re-anchored: `#tb-help` 1239 (plan said 1226) · `#go-help` 1389 (plan said 1376) · `#today-help-src` 1099 (plan said 1089).
+
+### B. Corrected Python anchors (§2 / §3 / §4)
+
+- `ACTIVITY_RULES` is at **`telugu_panchangam/personal/muhurta.py:115`**, closed by `ACTIVITIES = tuple(...)` at **:291** — **30 activities, 17 distinct per-row keys** (plan said `107–225`, ~25 rows, 7 keys).
+- `_evaluate_slot` **:794–1017** · `day_slots` **:1019–1194** · `assign_tiers` **:83–101** (the dosha→tier cap is at **:97–99**) · `_score_lagna` **:421–536** · `_anandadi_day_modifier` **:778–791** · `diagnose_day` **:658–746**.
+- **`find_muhurta()` does not live in `muhurta.py`.** It is the MCP wrapper at `telugu_panchangam/mcp/server.py:239` → `tool_find_muhurta` at `telugu_panchangam/mcp/tools.py:968`, which calls `day_slots()` per day and re-tiers across the whole search via `assign_tiers` at `tools.py:1010`. **`tools/export_parity_fixture.py` must import `day_slots` and/or `tool_find_muhurta` explicitly** — the §4/§5 "runs find_muhurta()" sketch is wrong. Tier is a *batch* property (per-day in `day_slots`, whole-search ceiling/floor in `tool_find_muhurta`), so the fixture must pin which seam it captures or TS tiers will not reproduce.
+
+### C. The 17 ACTIVITY_RULES keys (was 7) — `types.ts` ActivityRule must model all
+
+`label`, `skip_on_yoga`, `prefer_choghadiya`, `avoid_karana`, `prefer_tithi_class`, `prefer_vara`, `prefer_lagna_class` (the original 7), **plus the 10 added in 1.9.0**: `skip_on_sankramana`, `skip_on_khar_maasa`, `skip_on_adhika`, `skip_on_pitru_paksha`, `skip_on_simha_stha_guru`, `penalty_on_simha_stha_shukra`, `skip_on_combust`, `prefer_nakshatra_mukha`, `skip_on_panchaka_nakshatra`, `prefer_bhadra_puchha`. The `ActivityKey` union is now **30 members**. `export_activity_rules.py` serializes whatever keys exist, so the codegen is automatic — the work is the TS reader + `evaluateSlot` honoring each key.
+
+**The inline `MU_ACTIVITY` (24 keys) has DIVERGED from Python (30).** The 6 Python-only activities the website has never scored: `construction_roof`, `coronation`, `cremation`, `litigation`, `well_digging`, `wood_cutting`. This is a devotee-visible behaviour change the plan does not acknowledge — see New Open Decision 1.
+
+### D. The TS scorer port (PR 2) is ~2–3× bigger than the plan assumed
+
+**Stop treating `docs/muhurta-scorer.js` as the port source.** It is a pre-1.9.0 snapshot: it contains only rashi/lagna/chandra sets, `score_tier`/`relative_tier`, `computePersonalDosha` (5-branch) and `computeDayDosha` (4-branch). It has **none** of the 1.9.0 logic. The inline `findMuhurta()` (3686–4060) is also pre-1.9.0 and additionally its inline `day_dosha` cascade (3995–4011) is **missing the `amavasya` branch** Python has (`muhurta.py:1004`) — i.e. it is a duplicate that is already *wrong*. **The TS scorer must be mirrored from `telugu_panchangam/personal/muhurta.py`, not from the sidecar; delete the sidecar, do not port it.**
+
+Surface to mirror: ~1,080 lines of `muhurta.py` (line 34 down) **plus ~544 lines of imported helpers** — `nitya_yoga.py` (63), `lagna_position.py` (112), `panchaka.py` (110), `lagna_hora.py` (127), `tithi_class.py` (70), parts of `special_yogas.py` (132). The plan's implicit ~182 (sidecar) + ~250 (inline loop) is replaced by roughly 2–3× that. **PR 2's "~1,500 lines of new TS" estimate should rise to ~2,500–3,500.**
+
+**Updated `src/scorer/` module inventory** (additions to §3 in **bold**):
+
+- `tiers.ts` — `scoreTier` (≥7/≥4/≥1) + `relativeTier` (bands 0.75/0.5/0.25) + `assignTiers`. **`assignTiers` must re-apply the Excellent→Good cap when `personal_dosha` OR `day_dosha` is set (muhurta.py:97-99).** These two functions are unchanged from the sidecar and the §3 port target is correct.
+- `lagna.ts` — kendra {1,4,7,10}/trikona {1,5,9}/ashtama 8 + class sets (correct as far as they go). **Must add the dual-lens evaluation:** `_score_lagna` (muhurta.py:421–536) scores position-from-janma-**rashi** AND position-from-janma-**lagna** (Lagna Shuddhi), +1 each, emitting symmetric neutral audit lines. Needs a **`janma_lagnas` profile dimension** the sidecar's single `muLagnaPosition` does not have.
+- `dosha.ts` — `computePersonalDosha` (5-branch: ashtama_chandra > chandra_avoid > ashtama_lagna > chandra_remedial > tara_dosha, muhurta.py:981–996) + `computeDayDosha` (rikta > amavasya > visha_dagdha > vyatipata_vaidhriti, muhurta.py:1002–1011). The sidecar's versions match Python; the *inline* copy is the broken one (no amavasya).
+- `ephemeris.ts`, `special-yogas.ts`, `facts.ts`, `nitya.ts` — unchanged. `nitya_yoga.py` (63 lines) is still the source of truth, imported at muhurta.py:26–30; `NITYA_PARTIAL_DOSHA_WINDOW` is a `timedelta` dict (the minute-unit drift fix in §4 is still right).
+- **`panchaka.ts` (NEW)** — mirrors `panchaka.py` (110 lines): mod-9 Panchaka Rahita dosha computed per-slot from the slot's rising lagna (muhurta.py:919–958), with the **Mrityu Panchaka hard cap −3** (936–937) and the **activity-matched non-Rahita penalty −2** (951–955). These are *score caps*, distinct from the dosha→tier cap.
+- **`anandadi.ts` (NEW)** — the Anandadi day modifier +1/−1 (`_anandadi_day_modifier`, muhurta.py:778–791) using `ANANDADI_AUSPICIOUS`/`ANANDADI_INAUSPICIOUS` from `special_yogas.py:114–126`.
+- **`hora.ts` (NEW)** — the hora→vaaram +1 bonus: when `prefer_vara` is set, a slot earns +1 if the planetary hora it starts in maps to a preferred weekday lord (muhurta.py:885–898, `lagna_hora.get_horas`).
+- **`day-skips.ts` (NEW)** — the 10 day-level hard-skip gates in `day_slots` (muhurta.py:1082–1131): sankramana, khar-maasa, adhika, pitru-paksha, simha-stha-guru, combust-loop (Guru/Shukra Maudhya), panchaka-nakshatra, plus the existing eclipse/disha-shoola. Returns `[]` + a dropped-day reason for the day.
+- **`evaluate-slot.ts` (EXPANDED)** — beyond the legacy per-slot loop body, must reproduce: Panchaka Rahita slot recompute, hora→vaaram +1, Nakshatra Mukha bonus (871–878), Bhadra Puchha bonus (867–870), Simha-Stha Shukra −2 (846–849), Anandadi ±1. The pure-slot body is muhurta.py:794–1017 (~224 lines), not the ~250-line guess.
+- **`diagnose-day.ts` (CONDITIONAL)** — only if the UI surfaces dropped-day reasons (mirrors `diagnose_day`, 89 lines). Otherwise mark out of scope so PR 8 reviewers know. See New Open Decision 3.
+
+**The slot's rising sign comes from a Swiss-Ephemeris Lahiri bisection in Python** (`lagna_hora.get_lagna_transitions`, lagna_hora.py:58–127). In TS it is supplied by the precomputed `lagna.json` (the sidecar's `muLagnaAtMin` reads `lagnaDayData`). **The parity fixture must pin the lagna transitions** so the TS side does not re-derive ascendants — `lagna.ts` is a reader of precomputed data, not an ephemeris port.
+
+### E. Expanded parity fixture (§4 Artefact B)
+
+The "4 representative activities (travel/wedding/vehicle/gruhapravesha) × 2 profile shapes" matrix under-samples the 1.9.0 surface. Keep those 4 as the score-stacking cases and **add coverage-driven cases**:
+
+- `cremation` OR `construction_roof` — exercises `skip_on_panchaka_nakshatra`.
+- `litigation` — exercises `prefer_bhadra_puchha`.
+- `well_digging` or `coronation` — exercises `prefer_nakshatra_mukha`.
+- at least one samskara (wedding/upanayana) on a **sankramana / khar-maasa / adhika / pitru-paksha / simha-stha-guru / combust** day, with expected output = **empty slots + dropped_days reason** (none of these is reachable by random dates).
+- hand-picked dates/profiles forcing `day_dosha=amavasya` (muhurta.py:1004) and `personal_dosha=ashtama_lagna` (988) — neither is guaranteed by 5 random dates, and amavasya is the exact regression the inline JS already has.
+- a **`janma_lagnas` profile dimension** to exercise the dual lagna / Lagna-Shuddhi audit trail.
+
+Expected tuple must capture the new **score-cap interactions**: Mrityu Panchaka −3, non-Rahita Panchaka −2, Anandadi ±1, Nakshatra Mukha bonus, Bhadra Puchha bonus, Simha-Stha Shukra −2 — in addition to `(score, tier, personal_dosha, day_dosha, reasons[])`.
+
+**Three known drifts → "three legacy drifts PLUS the 1.9.0 surface gap."** The legacy three still hold: yoga-name spellings (Priti/Shula/Variyana vs Preeti/Shoola/Variyan, docs/index.html:3416–3418 vs nitya_yoga.py — `test_yoga_name_parity.py` set-equality is the right fix); `MU_NITYA_PARTIAL_WINDOW_MIN` unit (values match numerically, drift is representation only); the inline personal-dosha cascade (now at 3995–4011, not ~4025–4026). The dominant *new* drifts: (a) 6 missing activities + 10 missing rule fields in MU_ACTIVITY; (b) all 1.9.0 day-skips absent from inline `findMuhurta`; (c) all 1.9.0 slot signals absent. Also reconcile the JS-internal inconsistency: `MU_YOGA_NAMES_27` spells "Shula" (3417) but `MU_NITYA_PARTIAL_WINDOW_MIN` keys "Shoola" (3361) — port to Python's "Shoola" or the window lookup key-misses in TS.
+
+### F. Corrected §6 deploy diffs (re-pin to current workflow contents)
+
+The §6 "before" states still apply cleanly (every `-`/context line exists verbatim: deploy-landing.yml push paths 7–11, Stage step 31–32, publish_dir 40, keep_files 43, cname 42; checkout pinned `@df4cb1c…#v6.0.3`, gh-pages `@84c30a8…#v4` in all four). **But the §6.1 `+` lines are wrong on two counts** and would *regress* the repo:
+
+1. **Node version + action pin.** The plan adds `actions/setup-node@v4` / `node-version: '20'`. master pins by SHA at `actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0` running **Node 24** (ci.yml:54,56 — its own comment notes "Node 20 hit EOL in April 2026"). **Change the `+` block to:**
+
+   ```yaml
+   - name: Set up Node
+     uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+     with:
+       node-version: '24'
+       cache: 'npm'        # only if package-lock.json is committed (PR 2); else drop it
+   ```
+
+2. **`generate.yml` has no `keep_files` line today** (it relies on the peaceiris default). The §6.2 diff adds `keep_files: true` as a brand-new line — correct, but call it out so a reviewer does not look for a pre-existing line to diff against. `gochara.yml:44` and `lagna.yml:44` already carry `keep_files: true` + cname (45) — they need only the `publish_dir` rename, as the plan says.
+
+**§6.4 scope is incomplete.** `tests/test_deploy_drift.py` defines `BUILD_SCRIPT = REPO_ROOT/'scripts'/'build_landing_page.py'` at **line 29** and consumes it in **two functions** the plan does not mention: `test_sidecar_listed_in_build_landing_page_script` (lines 104–114) and `test_seo_asset_staged_in_build_landing_page_script` (lines 141–151). Replacing only lines 26–30 leaves a `NameError`. PR 5 must delete/rewrite both functions when `build_landing_page.py` is deleted. The CNAME pin test `test_deploy_workflow_pins_cname` (154–175) and `INDEX_HTML` constant (line 27) are accurate and stay.
+
+**Give `ci.yml` (PR 4) the same exact-diff treatment** §6.1/§6.2 give the deploy workflows: slot the `vite-build` job in after the existing "Run JS scorer tests" step (ci.yml:58–72), reusing the v6.4.0 SHA / Node 24. The plan currently gives no ci.yml diff.
+
+**Ordering note (PR 5 depends on PR 2–4):** §6's diffs reference `index.html` (root), `package.json`, `package-lock.json`, `vite.config.ts`, `tsconfig.json`, `src/` — **none exist on master yet**; PR 2/PR 3 create them. State this dependency explicitly.
+
+**Stale untracked artifacts on disk:** `dist/main.js` (gitignored stub) and `public/` (feeds + gochara.json, gitignored) already exist. The §6.5 smoke fixture's "build if dist/ empty" check must `rm -rf dist` for a clean build rather than trusting a non-empty `dist/`.
+
+### G. §2 / §6.5 window-globals framing is inaccurate
+
+`docs/index.html` does **NOT** re-export `window.findMuhurta` or `window.muLagnaPosition`. Its only own window assignment is **`window.renderAll` (line 2365)** — which the plan never inventories and PR 7 must remove/replace. `findMuhurta` is a plain function reached via `onclick="findMuhurta()"` (1366). `window.muLagnaPosition` exists only because `docs/muhurta-scorer.js:180` does `Object.assign(root, api)`. So the `test_browser_smoke.py` assertions (`typeof window.findMuhurta` line 160; `muLagnaPosition`-family loop 124–128) pass *via the scorer module*, and **deleting the scorer's `window.assign` is what actually breaks them** — not anything in index.html.
+
+The inline `onclick=` surface is also ~2× the plan's footnote. Full set to budget for PRs 6–8: `switchTool` 1219/1221/1223, `setTimeFmt` 1212/1213, `muToggleMobile` 1317, `findMuhurta` 1366, `toggleReadMore` 1238/1388/1511/1520/1537/1553/1579, plus **`tbResetProfiles` 1278, `tbAddRow` 1281, `calcTarabalam` 1308, `copyUrl` 1460, `showAppTab` 1465–1467, `tbRemoveRow` 2537, `tbExtendTo` 2710, `shareTodayOnWhatsApp` 2258, `shareTarabalamOnWhatsApp` 2689, `shareGocharaOnWhatsApp` 3189, `shareMuhurtaOnWhatsApp` 4115** (~20+ handlers).
+
+### H. "Engines before Vite" gate — status
+
+The gate is **effectively satisfied, but its precondition was misstated.** Phase 9 (transit modules: `maudhya_calendar.py`, `graha_yuddha.py`, `ingress.py`, `panchanga_shuddhi.py` + 5 MCP tools) shipped in 1.10.0–1.10.3 and is **genuinely independent** of the scorer — none import `ACTIVITY_RULES` or `find_muhurta` (only a docstring mention in `panchanga_shuddhi.py`). It does **not** block the TS port. Phase 6 (narrowed) and Phase 7 are shipped; the full EngineCore refactor stays parked per CLAUDE.md/ARCHITECTURE.md.
+
+**However:** the real scorer-surface churn came from the **1.9.0 round (Phase-8 Group A/B/C material), not Phase 6** — and the website mirror was never re-synced. So the true precondition is now *"website scorer caught up to Python (or the gap consciously frozen) + codegen parity bridge in place"*, not merely "engines shipped". The Group-A `feat/*` branches are all `behind=204` and already merged via 1.9.0, so **master's scorer surface is quiescent — this is the moment to lock it with the parity test before TS porting begins.** No live branch is poised to mutate `muhurta.py`/`ACTIVITY_RULES`. The codegen bridge the plan assumes exists (`tools/export_activity_rules.py`, generated JSON, parity test) does **not** exist on master yet — building it must be the *first* step of PR 2, not an assumed artifact.
+
+### I. Refreshed PR breakdown (still 5 required + 3 optional)
+
+| PR | Title | Scope delta vs original §7 | Risk |
+|---|---|---|---|
+| **PR 1** | Move tracking docs out of `docs/`; doc-sweep | Essentially unchanged. Verify `ARCHITECTURE.md`/`MAINTENANCE_RUNBOOK.md` anchors before editing rather than trusting 139/175/124. No subscriber impact. | none |
+| **PR 2** | Vite scaffold + **codegen parity bridge** + **full current-master (1.10.4) TS scorer port** | MUCH BIGGER. (1) Build the codegen bridge FIRST (`tools/export_activity_rules.py` → `src/data/activity-rules.generated.json` + CI parity test) — it does not exist on master and the hand-mirror is what caused the 24-vs-30 drift. (2) Mirror the TS scorer from `muhurta.py` + ~544 lines of helpers, **NOT** the pre-1.9.0 sidecar (delete it). (3) Add `panchaka.ts`, `anandadi.ts`, `hora.ts`, `day-skips.ts`; expand `evaluate-slot.ts`; dual-lens `lagna.ts`; `assignTiers` dosha cap. (4) `types.ts` ActivityRule = 17 keys, `ActivityKey` = 30. (5) Parity fixture imports `day_slots`/`tool_find_muhurta`, pins lagna transitions, covers panchaka-skip/nakshatra-mukha/bhadra-puchha/samskara-on-skip-day/amavasya/ashtama_lagna. ~2,500–3,500 new TS, not ~1,500. | medium |
+| **PR 3** | Hoist help-source templates + selection-store + parse-description module | Same intent; re-anchor hoists to `#tb-help` 1239, `#go-help` 1389, `#today-help-src` 1099. `parseDescription` 2013–2112; eclipse cross-cut 2070–2092/2127/2322/3711–3726. Onclick rewiring surface ~2× the footnote (~20 handlers). | medium |
+| **PR 4** | Vite build in CI shipping equivalent bytes; deploy still uses `docs/` | Add the missing `ci.yml` exact diff: slot a `vite-build` job after the existing "Run JS scorer tests" step (ci.yml:58–72), reusing `setup-node@…#v6.4.0` / Node 24. `rm -rf dist` so the stale `dist/main.js` stub can't mask a build failure. | medium |
+| **PR 5** | Cut over deploy to Vite `dist/`; smoke test gates the deploy | §6.1 `+` block must pin `setup-node@48b55a0…#v6.4.0` / Node 24 (NOT `@v4`/Node 20 — EOL + unpinned). `generate.yml keep_files:true` is a NEW line. `test_deploy_drift.py` rewrite must also delete/rewrite `test_sidecar_listed_in_build_landing_page_script` (104–114) and `test_seo_asset_staged_in_build_landing_page_script` (141–151) which reference the deleted `BUILD_SCRIPT` (line 29). `test_browser_smoke.py` window assertions break when the sidecar's `window.assign` is removed; also remove index.html's own `window.renderAll` (2365). CNAME pin test 154–175 preserved verbatim. | **highest** |
+| PR 6 | Per-component refactor (presentational) | Unchanged intent; re-anchor `toggleReadMore` onclicks. Optional; does not gate Phase 5. | low |
+| PR 7 | TodayPanel + MobileShell (conditional rendering) | `renderPreview` 2135; `mobileShell` IIFE 4220–4351; also remove `window.renderAll` (2365); `switchTool` 1219/1221/1223; `setTimeFmt` 1212/1213. Optional. | medium |
+| PR 8 (optional) | Tarabalam + MuhurtaSearch + Gochara; delete `docs/` + `src/legacy.ts` | `findMuhurta` 3686–4060; `renderMuhurta` 4093 — deepest entanglement. If UI surfaces dropped-day reasons, add `diagnose-day.ts` (muhurta.py:658–746); else mark out of scope. `docs/` deleted only at the very end. PR 2's parity fixture is the safety net. | medium |
+
+### J. New open decisions (supersede §9)
+
+1. **BIGGEST — website scorer parity timing.** The website scorer is pre-1.9.0: it lacks all Group-A day-skips and slot signals, scores only 24 of Python's 30 activities, and its inline `day_dosha` cascade is already missing the `amavasya` branch. Choose:
+   - **(A) RECOMMENDED — bring the TS scorer to full parity with current master's scorer (1.10.4) as part of the migration.** Because PR 2 builds the codegen bridge and mirrors `muhurta.py` directly, picking up all 30 activities + the new signals is nearly free and permanently eliminates the hand-mirror drift. Cost: a bigger PR 2 and 6 new activities + new day signals become devotee-visible.
+   - **(B) Port as-is** (freeze today's stale 24-activity surface into TS) — faster PR 2, but the TS scorer intentionally lags Python until a later Phase-8 Group-A pass, reintroducing exactly the rebuild the "engines first" gate was meant to prevent.
+2. **Do the 6 Python-only activities** (`construction_roof`, `coronation`, `cremation`, `litigation`, `well_digging`, `wood_cutting`) and the new day-level signals appear in the public muhurta dropdown at cutover, or stay hidden? Devotee-visible either way; a divergence-guard test must encode whichever is chosen. (Coupled to Decision 1 — choosing (A) implies surfacing them unless explicitly filtered.)
+3. **Does the TS UI surface dropped-day reasons** (the `diagnose_day` explainer, muhurta.py:658–746, 89 lines)? If yes, `diagnose-day.ts` joins PR 8; if no, mark it explicitly out of scope.
+4. **Which scoring seam does the parity fixture capture** — `day_slots()` (per-day tiering, the unit `evaluateSlot` ports) or `tool_find_muhurta()` (whole-search re-tier + `slots[:12]` truncation + `dropped_days`)? They tier differently, so the fixture must declare the batch composition or TS tiers won't reproduce.
+5. **Confirm the no-PyPI-bump decision still holds:** Phase 3 adds only read-only export scripts and does not touch engines/MCP, so no `mcp-server-panchangam` version bump is needed. (Per CLAUDE.md, engine/MCP changes bump the version; these scripts are neither.)
+
+### K. Biggest risks (append to §8)
+
+| PR | New/changed risk | Mitigation |
+|---|---|---|
+| PR 2 | TS scorer ports the **stale sidecar** instead of 1.9.0 `muhurta.py`, silently freezing the pre-1.9.0 scorer (incl. the known `amavasya`-missing `day_dosha` bug) into TypeScript | Mirror from `muhurta.py` + helpers; delete the sidecar; parity fixture must hit every 1.9.0 differentiator. |
+| PR 2 | The codegen parity bridge the whole plan leans on **does not exist on master** — until it lands (first step of PR 2), "Python is stable" is not even observable | Land `export_activity_rules.py` + generated JSON + CI parity gate first. |
+| PR 2 | Codegen surfaces 30 activities → dropdown gains 6 unseen activities (devotee-visible) | Conscious decision (Decision 1/2) + divergence-guard test. |
+| PR 5 | §6.1 `+` block as written reintroduces **EOL Node 20 + unpinned `@v4`** | Pin `setup-node@…#v6.4.0` / Node 24 to match ci.yml. |
+| PR 5 | `test_deploy_drift.py` `NameError` from orphaned `BUILD_SCRIPT` references (104–114, 141–151) | Delete/rewrite both functions, not just lines 26–30. |
+| PR 5 | Stale untracked `dist/main.js` masks a real build failure | `rm -rf dist` before the smoke build. |
+| ALL | Hand-mirror rot (the very cause of the 24-vs-30 drift) | Codegen bridge + CI parity gate is the first thing PR 2 lands; it makes "Python is stable" observable. |
