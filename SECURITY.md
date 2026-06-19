@@ -21,3 +21,17 @@ You will get an acknowledgement within 72 hours. Once a fix ships, the issue can
 
 - The published feeds and landing page are static files on GitHub Pages; there is no server-side code or user data anywhere in this project.
 - The MCP server runs locally on the user's machine and makes no network calls at runtime; its inputs are date/city strings validated at the tool layer. Input-validation bypasses there are still welcome reports.
+
+## Past findings
+
+**2024-06-14 — DOM XSS in static landing page (fixed)**
+
+The landing page renders UI dynamically via client-side JS. User-controlled inputs
+(birth star profile names, dates) were being concatenated into template literals and
+assigned directly to `innerHTML`, enabling Self-XSS even though there is no
+server-side persistence or query-parameter reflection.
+
+Fix: a generic `htmlEsc()` helper (renamed from the narrower `muEsc`) is now applied
+to all user-controlled values before DOM insertion. Ensure any future client-side
+templating follows the same pattern — never concatenate untrusted input into
+`innerHTML` without escaping.
