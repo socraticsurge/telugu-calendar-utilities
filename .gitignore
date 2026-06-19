@@ -22,3 +22,4 @@ build/
 # Generated lagna/feed data lives on gh-pages, not master.
 docs/feeds/
 
+.impeccable/
