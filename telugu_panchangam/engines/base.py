@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date, datetime, timezone
+from telugu_panchangam.engines.utils import jd_to_utc
 from telugu_panchangam.models.panchangam_day import (
     Location, PanchangamDay, SlotFacts, Span, Window,
 )
@@ -241,6 +242,18 @@ _NISHITA_MONTHLY_FESTIVALS: list[tuple[int, str, str | None]] = [
 ]
 
 
+# Day Choghadiya sequence (8 per day from sunrise), weekday 0=Sunday
+_DAY_CHOGHADIYA = {
+    0: ['Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg'],
+    1: ['Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit'],
+    2: ['Rog','Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog'],
+    3: ['Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh'],
+    4: ['Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal','Shubh'],
+    5: ['Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char'],
+    6: ['Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal'],
+}
+
+
 class PanchangamEngine(ABC):
     @abstractmethod
     def calculate(self, d: date, location: Location, include_eclipse: bool = True) -> PanchangamDay:
@@ -476,3 +489,103 @@ class PanchangamEngine(ABC):
     def _build_ghati_clock(self, sunrise_dt, next_sunrise_dt):
         from telugu_panchangam.ghati import make_clock
         return make_clock(sunrise_dt, next_sunrise_dt)
+
+    # -----------------------------------------------------------------------
+    # Muhurta window helpers — shared across all three engines.
+    # -----------------------------------------------------------------------
+
+    def _day_part_window(self, part: int, jd_sr: float,
+                         jd_ss: float, name: str) -> Window:
+        """Nth 1-indexed equal part of the 8-part day."""
+        sz = (jd_ss - jd_sr) / 8.0
+        s  = jd_sr + (part - 1) * sz
+        return Window(name=name, start=jd_to_utc(s), end=jd_to_utc(s + sz))
+
+    def _rahu_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
+        return self._day_part_window(RAHU_PART[weekday], jd_sr, jd_ss, 'Rahu Kalam')
+
+    def _gulika_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
+        return self._day_part_window(GULIKA_PART[weekday], jd_sr, jd_ss, 'Gulika Kalam')
+
+    def _yamagandam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
+        return self._day_part_window(YAMAG_PART[weekday], jd_sr, jd_ss, 'Yamagandam')
+
+    def _brahma_muhurta(self, jd_sunrise: float) -> Window:
+        m = 1.0 / 30.0
+        return Window(name='Brahma Muhurta',
+                      start=jd_to_utc(jd_sunrise - 2 * m),
+                      end=jd_to_utc(jd_sunrise - m))
+
+    def _abhijit_muhurta(self, jd_sr: float, jd_ss: float,
+                         weekday: int) -> Window | None:
+        if weekday == 3:  # Wednesday — no Abhijit
+            return None
+        mid = (jd_sr + jd_ss) / 2.0
+        hm  = (jd_ss - jd_sr) / 30.0
+        return Window(name='Abhijit Muhurta',
+                      start=jd_to_utc(mid - hm), end=jd_to_utc(mid + hm))
+
+    def _choghadiya(self, weekday: int, jd_sr: float, jd_ss: float) -> list[Window]:
+        names = _DAY_CHOGHADIYA[weekday]
+        blk   = (jd_ss - jd_sr) / 8.0
+        return [Window(name=names[i],
+                       start=jd_to_utc(jd_sr + i * blk),
+                       end=jd_to_utc(jd_sr + (i + 1) * blk))
+                for i in range(8)]
+
+    def _durmuhurtham(self, weekday: int, jd_sr: float, jd_ss: float,
+                      jd_next_sr: float) -> list[Window]:
+        out = []
+        m  = (jd_ss - jd_sr) / 15.0
+        out += [Window(name='Durmuhurtham',
+                       start=jd_to_utc(jd_sr + (p - 1) * m),
+                       end=jd_to_utc(jd_sr + p * m))
+                for p in DURMUHURTA_DAY_MUHURTAS[weekday]]
+        nm = (jd_next_sr - jd_ss) / 15.0
+        out += [Window(name='Durmuhurtham',
+                       start=jd_to_utc(jd_ss + (p - 1) * nm),
+                       end=jd_to_utc(jd_ss + p * nm))
+                for p in DURMUHURTA_NIGHT_MUHURTAS.get(weekday, ())]
+        return out
+
+    def _finalize_day(self, day: PanchangamDay, nak_spans: list,
+                      moon_lon: float, jd_sunrise: float,
+                      jd_sunset: float, jd_next_sunrise: float) -> None:
+        """Apply all engine-neutral post-calculation flags and windows to `day`."""
+        day.ghati_clock = self._build_ghati_clock(day.sunrise, jd_to_utc(jd_next_sunrise))
+        day.nakshatra_pada = int((moon_lon / (360.0 / 27.0)) * 4) % 4 + 1
+        from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
+        day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
+        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(day.karana, day.ghati_clock)
+        from telugu_panchangam.sankramana import compute_sankramana_window
+        _, sankranti_jd = self._sankramanam_name_and_jd(jd_sunrise, jd_sunset)
+        sankranti_dt = jd_to_utc(sankranti_jd) if sankranti_jd is not None else None
+        day.sankramana_avoidance = compute_sankramana_window(sankranti_dt, day.ghati_clock)
+        from telugu_panchangam.nakshatra_filters import is_panchaka_nakshatra
+        day.in_panchaka_nakshatra = is_panchaka_nakshatra(day.nakshatra.name)
+        from telugu_panchangam.maasa_filters import khar_maasa_name
+        day.khar_maasa_name = khar_maasa_name(day.solar_sign)
+        day.is_khar_maasa = day.khar_maasa_name is not None
+        from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
+        day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
+        from telugu_panchangam.special_yogas import compute_anandadi_yoga
+        day.anandadi_yoga = compute_anandadi_yoga(day.vaaram, day.nakshatra.name)
+        from telugu_panchangam.disha_shoola import disha_shoola
+        day.disha_shoola_direction = disha_shoola(day.vaaram)
+        from telugu_panchangam.nakshatra_filters import nakshatra_mukha
+        day.nakshatra_mukha = nakshatra_mukha(day.nakshatra.name)
+        from telugu_panchangam.panchaka import evaluate_panchaka
+        from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
+        _lagnas = get_lagna_transitions(day)
+        _sunrise_lagna = next(
+            (w.name.replace(' Lagna', '') for w in _lagnas
+             if w.start <= day.sunrise < w.end),
+            _lagnas[0].name.replace(' Lagna', '') if _lagnas else None,
+        )
+        if _sunrise_lagna is not None:
+            day.panchaka_rahita = evaluate_panchaka(
+                tithi_name=day.tithi.name,
+                vaaram_name=day.vaaram,
+                nakshatra_name=day.nakshatra.name,
+                lagna_name=_sunrise_lagna,
+            )
