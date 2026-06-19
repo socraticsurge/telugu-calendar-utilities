@@ -1,5 +1,3 @@
-from telugu_panchangam.engines.base import TITHI_NAMES
-
 # Weekday -> set of nakshatras forming Sarvartha Siddhi Yoga.
 _SARVARTHA_SIDDHI: dict[str, set[str]] = {
     'Adivaram':    {'Hasta', 'Mula', 'Pushya', 'Ashvini', 'Punarvasu', 'Anuradha', 'Shravana', 'Revati'},
@@ -48,6 +46,7 @@ _TRIPUSHKARA_NAKSHATRAS: set[str] = {
 
 def _tithi_number(tithi_name: str) -> int:
     """1-15 tithi number within either paksha (Pratipat=1 ... Pournami/Amavasya=15)."""
+    from telugu_panchangam.panchangam_names import TITHI_NAMES
     return (TITHI_NAMES.index(tithi_name) % 15) + 1
 
 

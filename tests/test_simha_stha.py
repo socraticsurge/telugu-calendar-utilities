@@ -108,8 +108,8 @@ def test_jupiter_in_simha_dec_2026():
     assert isinstance(day.simha_stha_guru, bool)
     # Jupiter is known to be in Simha in this period.
     assert day.simha_stha_guru is True, (
-        f'Expected simha_stha_guru=True on 2026-12-01; '
-        f'got False — verify Jupiter rasi in ephemeris'
+        'Expected simha_stha_guru=True on 2026-12-01; '
+        'got False — verify Jupiter rasi in ephemeris'
     )
 
 
@@ -145,7 +145,6 @@ def test_wedding_activity_skips_simha_stha_guru():
 def test_wedding_diagnose_simha_stha_guru():
     """diagnose_day explains the Simha-Stha Guru skip for weddings."""
     from telugu_panchangam.personal.muhurta import diagnose_day
-    from telugu_panchangam.models.panchangam_day import PanchangamDay
     # Use a known Simha-Stha Guru date
     eng = DrikEngine()
     day = eng.calculate(date(2026, 12, 1), _hyderabad())
@@ -162,7 +161,7 @@ def test_wedding_diagnose_simha_stha_guru():
 
 def test_simha_stha_shukra_penalty_in_reasons():
     """When simha_stha_shukra is True for wedding, penalty appears in reasons."""
-    from telugu_panchangam.personal.muhurta import day_slots, ACTIVITY_RULES
+    from telugu_panchangam.personal.muhurta import day_slots
     eng = DrikEngine()
     city = _hyderabad()
     found = False
