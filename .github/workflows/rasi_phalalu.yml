@@ -29,12 +29,14 @@ jobs:
       - name: Generate Rasi Phalalu
         env:
           rasiphalalu: ${{ secrets.rasiphalalu }}
+          PHALALU_OUT: ./public/rasi_phalalu
         run: python scripts/generate_llm_phalalu.py
 
-      - name: Commit generated file
-        run: |
-          git config user.name "Socraticsurge"
-          git config user.email "cvk.atreya@gmail.com"
-          git add data/llm_phalalu/
-          git diff --cached --quiet || git commit -m "chore: rasi phalalu $(date -u +%Y-%m-%d)"
-          git push
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: true
+          cname: panchangam.astrochaganti.com
