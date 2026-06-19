@@ -1,20 +1,18 @@
-"""Guards against the v1.8.0 hotfix regression class.
+"""Guards against the v1.8.0 hotfix regression class, updated for Vite.
 
 The deployed static site is served from gh-pages by two paths:
 
-  1. `.github/workflows/deploy-landing.yml` — copies docs files into
-     public/ on every push that touches them, then publishes.
+  1. `.github/workflows/deploy-landing.yml` — runs `npm run build`
+     (Vite), then publishes dist/ to gh-pages.
   2. `scripts/build_landing_page.py` — invoked by the monthly
      `generate.yml` regeneration; copies the same docs files
      alongside the freshly built ICS feeds.
 
-If `docs/index.html` references a sidecar via `<script src=…>` but
-either deploy path forgets to copy it, the deployed page 404s on
-the sidecar and every helper call from the inline script throws
-ReferenceError. That's exactly what happened with
-`muhurta-scorer.js` between PR 65 (added) and the v1.8.0 hotfix
-(staged). These tests fail loudly when a new sidecar is missed in
-either deploy path.
+Pre-Vite: if `docs/index.html` referenced a sidecar via `<script src=…>`
+but the deploy path forgot to copy it, the page would 404 on the sidecar.
+Post-Vite: Vite bundles everything from src/ — no manually-staged sidecars.
+The new regression class is: the workflow forgets to run `npm run build`,
+or SEO assets are missing from public/ (Vite's static asset dir).
 """
 from __future__ import annotations
 
@@ -24,7 +22,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-INDEX_HTML = REPO_ROOT / 'docs' / 'index.html'
+INDEX_HTML = REPO_ROOT / 'index.html'
 DEPLOY_WORKFLOW = REPO_ROOT / '.github' / 'workflows' / 'deploy-landing.yml'
 BUILD_SCRIPT = REPO_ROOT / 'scripts' / 'build_landing_page.py'
 
@@ -42,99 +40,75 @@ CNAME_PINNED_WORKFLOWS = [
     '.github/workflows/lagna.yml',
 ]
 
-# Search-engine static assets at docs/ root. Unlike .js sidecars,
-# these are never referenced from <script src=...> in index.html —
-# search engines pick them up by convention (robots.txt at /, then
-# sitemap.xml as declared in robots.txt). Dropping either from the
-# deploy steps silently de-indexes the site over time.
+# Search-engine static assets. Pre-Vite these lived in docs/; now
+# they live in public/ (Vite's static asset dir, copied verbatim to dist/).
+# Dropping either from public/ means the Vite build won't include them,
+# silently de-indexing the site over time.
 SEO_STATIC_ASSETS = ['sitemap.xml', 'robots.txt']
+SEO_ASSETS_DIR = REPO_ROOT / 'public'
 
-# Matches <script src="…"> / <script src='…'> with a relative path
-# (no http://, no leading slash — those are external resources, not
-# files we need to stage).
-SCRIPT_SRC_RE = re.compile(
-    r"""<script\s+[^>]*\bsrc=["']([^"'/][^"']*?\.js)["']""",
+# Matches <script type="module" src="…"> — the Vite entry point.
+MODULE_ENTRY_RE = re.compile(
+    r"""<script\s+[^>]*type=["']module["'][^>]*\bsrc=["']([^"']+)["']""",
     re.IGNORECASE,
 )
 
 
-def _sidecars_in_index() -> list[str]:
-    """List relative .js paths referenced by docs/index.html."""
+def test_index_html_has_module_entry_point():
+    """Root index.html must have a <script type="module" src="...">
+    entry point. If this fails, Vite has nothing to bundle."""
     html = INDEX_HTML.read_text(encoding='utf-8')
-    return sorted(set(SCRIPT_SRC_RE.findall(html)))
-
-
-def test_index_html_has_at_least_one_sidecar():
-    """If this fails the regex has stopped matching — fix the regex
-    before relaxing this assertion."""
-    sidecars = _sidecars_in_index()
-    assert sidecars, (
-        'No relative <script src="*.js"> references found in '
-        'docs/index.html. The drift guard regex may have broken.'
+    entries = MODULE_ENTRY_RE.findall(html)
+    assert entries, (
+        'No <script type="module" src="..."> found in index.html. '
+        'Vite requires a module entry point to build the site.'
     )
 
 
-@pytest.mark.parametrize('sidecar', _sidecars_in_index())
-def test_sidecar_file_exists_in_repo(sidecar: str):
-    """The referenced file must exist next to docs/index.html. If
-    you renamed it, update both the <script src=…> and your deploy
-    paths together."""
-    path = (REPO_ROOT / 'docs' / sidecar)
-    assert path.is_file(), (
-        f'docs/index.html references {sidecar!r} but '
-        f'{path} does not exist.'
-    )
-
-
-@pytest.mark.parametrize('sidecar', _sidecars_in_index())
-def test_sidecar_listed_in_deploy_landing_workflow(sidecar: str):
-    """deploy-landing.yml must (a) include the sidecar in its push
-    `paths:` filter so saves redeploy automatically, and (b) include
-    it in the staging cp so it actually lands on gh-pages."""
+def test_deploy_workflow_runs_vite_build():
+    """deploy-landing.yml must run `npm run build` so the Vite
+    bundle is produced before deploying. Without it, dist/ is
+    missing or stale and the deployed site breaks."""
     yml = DEPLOY_WORKFLOW.read_text(encoding='utf-8')
-    # path trigger — present anywhere in the file is enough; the
-    # nuance of which trigger block doesn't matter for this guard.
-    assert f"docs/{sidecar}" in yml, (
-        f'.github/workflows/deploy-landing.yml does not mention '
-        f'"docs/{sidecar}". Saves to that file will not redeploy '
-        f'the site. Add it to the paths filter AND the cp step.'
+    assert 'npm run build' in yml, (
+        '.github/workflows/deploy-landing.yml does not contain '
+        '"npm run build". The Vite bundle will not be produced '
+        'before deploy — add the build step.'
     )
 
 
-@pytest.mark.parametrize('sidecar', _sidecars_in_index())
-def test_sidecar_listed_in_build_landing_page_script(sidecar: str):
-    """build_landing_page.py is invoked by the monthly generate.yml
-    regeneration. If it doesn't shutil.copy the sidecar, the next
-    monthly cron will silently 404 it back."""
-    src = BUILD_SCRIPT.read_text(encoding='utf-8')
-    assert f"docs/{sidecar}" in src, (
-        f'scripts/build_landing_page.py does not copy '
-        f'docs/{sidecar}. The next monthly generate.yml run will '
-        f'remove it from gh-pages.'
+def test_deploy_workflow_deploys_dist():
+    """deploy-landing.yml must deploy from dist/ (Vite output),
+    not from public/ or docs/."""
+    yml = DEPLOY_WORKFLOW.read_text(encoding='utf-8')
+    assert 'publish_dir: ./dist' in yml, (
+        '.github/workflows/deploy-landing.yml does not deploy from '
+        './dist. After switching to Vite, dist/ is the built output.'
     )
 
 
 @pytest.mark.parametrize('asset', SEO_STATIC_ASSETS)
 def test_seo_asset_exists_in_repo(asset: str):
-    """docs/sitemap.xml and docs/robots.txt must exist on disk.
-    They're the search-engine surface; dropping either de-indexes
-    the site over time."""
-    path = REPO_ROOT / 'docs' / asset
+    """public/sitemap.xml and public/robots.txt must exist on disk.
+    Vite copies public/ verbatim to dist/; dropping either means
+    they won't appear in the built output and the site de-indexes."""
+    path = SEO_ASSETS_DIR / asset
     assert path.is_file(), (
-        f'docs/{asset} is missing. The SEO surface depends on it; '
-        f'restore it before any other deploy fires.'
+        f'public/{asset} is missing. Vite copies public/ to dist/ '
+        f'verbatim — without it the SEO asset won\'t be deployed. '
+        f'Restore it before any other deploy fires.'
     )
 
 
 @pytest.mark.parametrize('asset', SEO_STATIC_ASSETS)
 def test_seo_asset_staged_in_deploy_landing_workflow(asset: str):
-    """deploy-landing.yml must include the SEO asset in both the
-    push `paths:` filter and the staging cp."""
+    """deploy-landing.yml must include the SEO asset in the push
+    `paths:` filter so saves redeploy automatically."""
     yml = DEPLOY_WORKFLOW.read_text(encoding='utf-8')
-    assert f"docs/{asset}" in yml, (
+    assert f"public/{asset}" in yml, (
         f'.github/workflows/deploy-landing.yml does not mention '
-        f'docs/{asset}. Saves to that file will not redeploy the '
-        f'SEO surface. Add it to the paths filter AND the cp step.'
+        f'public/{asset}. Saves to that file will not trigger a '
+        f'redeploy. Add it to the paths filter.'
     )
 
 
