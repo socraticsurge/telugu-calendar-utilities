@@ -196,7 +196,13 @@ def _structure(client, model: str, format_prompt: str) -> list[dict]:
             temperature=TEMPERATURE,
         ),
     ).text)
-    return json.loads(text)
+    # Extract the outermost JSON array robustly — models occasionally
+    # append trailing text or wrap the array in extra prose.
+    start = text.find('[')
+    end = text.rfind(']')
+    if start == -1 or end == -1:
+        raise ValueError(f'No JSON array found in model response: {text[:200]!r}')
+    return json.loads(text[start:end + 1])
 
 
 def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
