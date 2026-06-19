@@ -11,7 +11,7 @@ import json
 import os
 from datetime import date, timedelta
 
-from telugu_panchangam.engines.base import RASHI_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd
 from telugu_panchangam.gochara.positions import graha_positions, GRAHA_NAMES
 

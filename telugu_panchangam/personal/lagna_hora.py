@@ -2,7 +2,7 @@ import swisseph as swe
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 from telugu_panchangam.engines.utils import datetime_to_jd, jd_to_utc, get_sunrise
-from telugu_panchangam.engines.base import RASHI_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 _HORA_LORDS = ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars']
 

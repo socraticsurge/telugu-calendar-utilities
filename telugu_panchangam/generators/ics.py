@@ -4,7 +4,8 @@ import pytz
 from icalendar import Calendar, Event, vText
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
-from telugu_panchangam.engines.base import ekadashi_name, GANDA_MOOLA_NAKSHATRAS
+from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
+from telugu_panchangam.engines.base import ekadashi_name
 
 
 SYSTEM_LABELS = {

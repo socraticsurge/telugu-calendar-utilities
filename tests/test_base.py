@@ -1,7 +1,5 @@
-from telugu_panchangam.engines.base import (
-    TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, RASHI_NAMES,
-    PanchangamEngine,
-)
+from telugu_panchangam.panchangam_names import TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, RASHI_NAMES
+from telugu_panchangam.engines.base import PanchangamEngine
 
 def test_tithi_names_count():
     assert len(TITHI_NAMES) == 30

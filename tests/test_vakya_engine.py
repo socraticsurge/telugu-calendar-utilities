@@ -17,7 +17,7 @@ def test_sunrise_is_datetime():
     assert result.sunrise.tzinfo is not None
 
 def test_tithi_valid():
-    from telugu_panchangam.engines.base import TITHI_NAMES
+    from telugu_panchangam.panchangam_names import TITHI_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.tithi.name in TITHI_NAMES
 
@@ -26,12 +26,12 @@ def test_tithi_start_end():
     assert result.tithi.start < result.tithi.end
 
 def test_nakshatra_valid():
-    from telugu_panchangam.engines.base import NAKSHATRA_NAMES
+    from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.nakshatra.name in NAKSHATRA_NAMES
 
 def test_yoga_valid():
-    from telugu_panchangam.engines.base import YOGA_NAMES
+    from telugu_panchangam.panchangam_names import YOGA_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.yoga.name in YOGA_NAMES
 
@@ -66,7 +66,7 @@ def test_samvatsara_nonempty():
     assert result.samvatsara != ''
 
 def test_maasam_valid():
-    from telugu_panchangam.engines.base import MAASAM_NAMES
+    from telugu_panchangam.panchangam_names import MAASAM_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.maasam in MAASAM_NAMES
 

@@ -107,7 +107,7 @@ def test_rasi_derivation():
 
 def test_exactly_nine_stars_straddle():
     from telugu_panchangam.personal.chandrabalam import rasi_from_nakshatra
-    from telugu_panchangam.engines.base import NAKSHATRA_NAMES
+    from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES
     straddlers = [n for n in NAKSHATRA_NAMES if rasi_from_nakshatra(n) is None]
     assert straddlers == ['Krittika', 'Mrigashira', 'Punarvasu', 'Uttara Phalguni',
                           'Chitra', 'Vishakha', 'Uttara Ashadha', 'Dhanishtha',

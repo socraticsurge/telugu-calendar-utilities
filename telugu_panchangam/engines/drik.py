@@ -1,11 +1,12 @@
 # src/engines/drik.py
 from datetime import date
 
+from telugu_panchangam.panchangam_names import (
+    RASHI_NAMES, TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
+    VAARAM_NAMES, KARANA_REPEATING, KARANA_FIXED,
+)
 from telugu_panchangam.engines.base import (
-    PanchangamEngine, RASHI_NAMES, rituvu_name, ayanam_name,
-    TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
-    VAARAM_NAMES,
-    KARANA_REPEATING, KARANA_FIXED, samvatsara_name, maasam_name,
+    PanchangamEngine, rituvu_name, ayanam_name, samvatsara_name, maasam_name,
     RAHU_PART, GULIKA_PART, YAMAG_PART,
     DURMUHURTA_DAY_MUHURTAS, DURMUHURTA_NIGHT_MUHURTAS,
     VARJYAM_GHATIS, AMRITA_GHATIS,

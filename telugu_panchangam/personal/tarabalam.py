@@ -4,7 +4,7 @@
 # then reduce modulo 9. The nine taras repeat in fixed order; taras
 # 2, 4, 6, 8, 9 are auspicious and 1, 3, 5, 7 are to be avoided
 # (Janma is treated as avoid, per the common Telugu convention).
-from telugu_panchangam.engines.base import NAKSHATRA_NAMES
+from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES
 
 TARA_NAMES: list[str] = [
     'Janma', 'Sampat', 'Vipat', 'Kshema', 'Pratyak',

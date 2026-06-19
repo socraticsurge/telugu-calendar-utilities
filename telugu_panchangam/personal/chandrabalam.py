@@ -3,7 +3,7 @@
 # inclusive (1..12). Verified against drikpanchang.com chandrabalam
 # timings: positions 1, 3, 6, 7, 10, 11 are good; 2, 5, 9 are workable
 # with remedial puja; 4, 8, 12 are avoided (8 is Ashtama Chandra).
-from telugu_panchangam.engines.base import RASHI_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 CHANDRA_GOOD: frozenset[int] = frozenset({1, 3, 6, 7, 10, 11})
 CHANDRA_PUJA: frozenset[int] = frozenset({2, 5, 9})
@@ -43,7 +43,7 @@ def rasi_from_nakshatra(nakshatra: str, pada: int | None = None) -> str | None:
     one rashi, nine straddle two. For a straddler with no padam, returns
     None — the rashi genuinely cannot be known from the star alone.
     """
-    from telugu_panchangam.engines.base import NAKSHATRA_NAMES
+    from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES
     try:
         k = NAKSHATRA_NAMES.index(nakshatra)
     except ValueError:

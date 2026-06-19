@@ -17,7 +17,7 @@ Day-level uses lagna at sunrise. Slot-level recomputes lagna at the
 slot's start moment.
 """
 from telugu_panchangam.models.panchangam_day import PanchakaInfo
-from telugu_panchangam.engines.base import TITHI_NAMES, NAKSHATRA_NAMES, VAARAM_NAMES, RASHI_NAMES
+from telugu_panchangam.panchangam_names import TITHI_NAMES, NAKSHATRA_NAMES, VAARAM_NAMES, RASHI_NAMES
 
 
 _PANCHAKA_INFO: dict[int, tuple[str, bool, list[str]]] = {
