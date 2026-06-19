@@ -114,14 +114,14 @@ def test_seo_asset_staged_in_deploy_landing_workflow(asset: str):
 
 @pytest.mark.parametrize('asset', SEO_STATIC_ASSETS)
 def test_seo_asset_staged_in_build_landing_page_script(asset: str):
-    """build_landing_page.py (invoked monthly by generate.yml) must
-    copy the SEO asset alongside the other landing assets — else
-    the monthly cron wipes it from gh-pages."""
+    """build_landing_page.py runs `npm run build` which calls Vite.
+    Vite copies public/ verbatim to dist/, so SEO assets in public/
+    reach dist/ automatically — no explicit copy needed here."""
     src = BUILD_SCRIPT.read_text(encoding='utf-8')
-    assert f"docs/{asset}" in src, (
-        f'scripts/build_landing_page.py does not copy '
-        f'docs/{asset}. The next monthly generate.yml run will '
-        f'wipe it from gh-pages.'
+    assert 'npm run build' in src, (
+        f'scripts/build_landing_page.py does not run "npm run build". '
+        f'Without the Vite build, {asset} will not reach dist/ and '
+        f'the monthly generate.yml run will wipe it from gh-pages.'
     )
 
 
