@@ -14,8 +14,8 @@
     "parity:check": "python tools/export_activity_rules.py --check && python tools/export_parity_fixture.py --check"
   },
   "devDependencies": {
-    "vite": "^5.4.0",
-    "vitest": "^2.1.0",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9",
     "typescript": "^5.5.0",
     "@types/node": "^20.14.0",
     "jsdom": "^24.0.0"
