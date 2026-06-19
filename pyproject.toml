@@ -33,10 +33,6 @@ test = [
 browser-test = [
     "playwright>=1.40",
 ]
-# LLM-generated Rasi Phalalu. Install with: pip install -e .[llm]
-llm = [
-    "google-genai>=1.0",
-]
 
 [project.urls]
 Homepage = "https://panchangam.astrochaganti.com"
