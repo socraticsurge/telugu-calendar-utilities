@@ -51,7 +51,9 @@ _SYSTEM_FORMAT = (
     "Return a JSON array with one entry per rasi. "
     "For transits_cited, list every graha that was meaningfully discussed in that rasi's "
     "paragraph. Copy position (house number 1–12) and verdict exactly from the input transit "
-    "data — do not infer or alter them."
+    "data — do not infer or alter them. "
+    "IMPORTANT: verdict must be exactly one of 'favourable', 'blocked', or 'adverse' — "
+    "no other text, no qualifiers, no extra words."
 )
 
 _SCHEMA = {
@@ -68,7 +70,7 @@ _SCHEMA = {
                     'properties': {
                         'graha': {'type': 'string'},
                         'position': {'type': 'integer'},
-                        'verdict': {'type': 'string'},
+                        'verdict': {'type': 'string', 'enum': ['favourable', 'blocked', 'adverse']},
                     },
                     'required': ['graha', 'position', 'verdict'],
                 },
@@ -161,7 +163,8 @@ def _verify(items: list[dict], all_rashis: dict) -> None:
                 raise VerificationError(
                     f"{rasi}/{graha}: position mismatch — "
                     f"computed {c['position']}, cited {cited['position']}")
-            if c['verdict'] != cited['verdict']:
+            cited_verdict = cited['verdict'].split()[0].rstrip(',')
+            if c['verdict'] != cited_verdict:
                 raise VerificationError(
                     f"{rasi}/{graha}: verdict mismatch — "
                     f"computed {c['verdict']!r}, cited {cited['verdict']!r}")
