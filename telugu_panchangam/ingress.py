@@ -16,7 +16,7 @@ from datetime import date, datetime
 
 import swisseph as swe
 
-from telugu_panchangam.engines.base import RASHI_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.engines.utils import AYANAMSA_MODES, jd_to_utc
 
 INGRESS_PLANETS: list[str] = [

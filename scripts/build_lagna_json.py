@@ -43,7 +43,7 @@ from datetime import date, timedelta
 from zoneinfo import ZoneInfo
 
 from telugu_panchangam.cities import CITIES
-from telugu_panchangam.engines.base import RASHI_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
 

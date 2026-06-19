@@ -16,7 +16,7 @@ from telugu_panchangam.ingress import rashi_ingresses, INGRESS_PLANETS
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
-from telugu_panchangam.engines.base import GANDA_MOOLA_NAKSHATRAS
+from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
 from telugu_panchangam.gochara.positions import graha_positions

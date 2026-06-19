@@ -10,7 +10,7 @@
 from datetime import datetime, timedelta
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
-from telugu_panchangam.engines.base import VAARAM_NAMES
+from telugu_panchangam.panchangam_names import VAARAM_NAMES
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.lagna_position import (
     lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,

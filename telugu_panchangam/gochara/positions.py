@@ -5,7 +5,7 @@ from datetime import date
 
 import swisseph as swe
 
-from telugu_panchangam.engines.base import RASHI_NAMES, NAKSHATRA_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES, NAKSHATRA_NAMES
 from telugu_panchangam.engines.utils import AYANAMSA_MODES
 
 GRAHA_NAMES: list[str] = [

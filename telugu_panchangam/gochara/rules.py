@@ -5,7 +5,7 @@
 # except between Surya and Shani, and between Chandra and Budha
 # (the father-son exemptions). Rahu and Ketu follow the Shani house
 # convention and neither cause nor receive vedha.
-from telugu_panchangam.engines.base import RASHI_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 GOCHARA_FAVOURABLE: dict[str, frozenset[int]] = {
     'Surya':   frozenset({3, 6, 10, 11}),

@@ -10,10 +10,12 @@ from telugu_panchangam.engines.utils import (
     jd_to_utc, local_midnight_jd, find_crossing,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
+from telugu_panchangam.panchangam_names import (
+    RASHI_NAMES, VAARAM_NAMES, TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
+    KARANA_REPEATING, KARANA_FIXED,
+)
 from telugu_panchangam.engines.base import (
-    RASHI_NAMES, rituvu_name, ayanam_name, VAARAM_NAMES,
-    TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, KARANA_REPEATING, KARANA_FIXED,
-    maasam_name,
+    rituvu_name, ayanam_name, maasam_name,
     VARJYAM_GHATIS, AMRITA_GHATIS, nakshatra_day_windows, next_nakshatra_span,
 )
 from telugu_panchangam.models.panchangam_day import Location, Span, PanchangamDay

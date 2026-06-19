@@ -8,7 +8,7 @@
 # and trikona doctrines); modern commentaries on muhurta selection
 # (Muhurta Chintamani, ch. on Lagna-shuddhi); drikpanchang.com lagna
 # muhurta tables.
-from telugu_panchangam.engines.base import RASHI_NAMES
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 # Kendra (angular houses) — 1, 4, 7, 10 from janma rashi. Structural
 # strength; favoured for any new beginning.

@@ -20,12 +20,12 @@ def test_sunrise_hour_hyderabad():
     assert utc_hour in (0, 1)  # 00:xx or 01:xx UTC
 
 def test_solar_sign_is_rashi():
-    from telugu_panchangam.engines.base import RASHI_NAMES
+    from telugu_panchangam.panchangam_names import RASHI_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.solar_sign in RASHI_NAMES
 
 def test_lunar_sign_is_rashi():
-    from telugu_panchangam.engines.base import RASHI_NAMES
+    from telugu_panchangam.panchangam_names import RASHI_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.lunar_sign in RASHI_NAMES
 
@@ -55,7 +55,7 @@ def test_ayanam_august_is_dakshinayanam():
     assert result.ayanam == 'Dakshinayanam'
 
 def test_tithi_name_is_valid():
-    from telugu_panchangam.engines.base import TITHI_NAMES
+    from telugu_panchangam.panchangam_names import TITHI_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.tithi.name in TITHI_NAMES
 
@@ -69,12 +69,12 @@ def test_tithi_has_start_end():
     assert result.tithi.start < result.tithi.end
 
 def test_nakshatra_name_is_valid():
-    from telugu_panchangam.engines.base import NAKSHATRA_NAMES
+    from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.nakshatra.name in NAKSHATRA_NAMES
 
 def test_yoga_name_is_valid():
-    from telugu_panchangam.engines.base import YOGA_NAMES
+    from telugu_panchangam.panchangam_names import YOGA_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.yoga.name in YOGA_NAMES
 
@@ -104,7 +104,7 @@ def test_choghadiya_count_is_eight():
     assert len(result.choghadiya) == 8
 
 def test_vaaram_is_valid():
-    from telugu_panchangam.engines.base import VAARAM_NAMES
+    from telugu_panchangam.panchangam_names import VAARAM_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.vaaram in VAARAM_NAMES
 
@@ -117,7 +117,7 @@ def test_samvatsara_is_string():
     assert isinstance(result.samvatsara, str) and result.samvatsara != ''
 
 def test_maasam_is_valid():
-    from telugu_panchangam.engines.base import MAASAM_NAMES
+    from telugu_panchangam.panchangam_names import MAASAM_NAMES
     result = ENGINE.calculate(REF_DATE, HYD)
     assert result.maasam in MAASAM_NAMES
 
