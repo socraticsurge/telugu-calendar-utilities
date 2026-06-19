@@ -57,9 +57,10 @@ jobs:
 
       - name: Run JS scorer tests
         # Zero-dependency: tests/js/*.js use node:test + node:assert
-        # built-ins, so no npm install step is needed. nullglob means
-        # an empty tests/js/ directory exits cleanly instead of running
-        # the literal pattern as a filename.
+        # built-ins, so no npm install step is needed. tests/js/package.json
+        # sets "type":"commonjs" so these files run as CJS even though the
+        # root package.json sets "type":"module" for Vite.
+        # nullglob means an empty tests/js/ directory exits cleanly.
         run: |
           shopt -s nullglob
           files=(tests/js/*.js)
