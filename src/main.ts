@@ -2724,6 +2724,18 @@ import {
     window.addEventListener('resize', schedule);
 
     applyMode();
+
+    // Expose functions referenced by inline HTML onclick/onchange handlers.
+    // Modules are scoped; inline event attributes look up names on window.
+    Object.assign(window, {
+      switchTool, showAppTab, setTimeFmt, toggleReadMore,
+      calcTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
+      tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
+      findMuhurta, muToggleMobile,
+      renderGochara, copyUrl,
+      shareTodayOnWhatsApp, shareGocharaOnWhatsApp,
+      shareTarabalamOnWhatsApp, shareMuhurtaOnWhatsApp,
+    });
   })();
   // lightweight event tracking; no-ops if the counter is blocked or offline
   function gcEvent(name) {
