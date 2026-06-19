@@ -83,13 +83,17 @@ class VerificationError(Exception):
     pass
 
 
+def _is_rate_limit(e: genai_errors.ClientError) -> bool:
+    return '429' in str(e)
+
+
 def _call_with_retry(fn):
     """Call fn(), retrying up to _MAX_RETRIES times on 429 with exponential backoff."""
     for attempt in range(_MAX_RETRIES):
         try:
             return fn()
         except genai_errors.ClientError as e:
-            if e.status_code == 429 and attempt < _MAX_RETRIES - 1:
+            if _is_rate_limit(e) and attempt < _MAX_RETRIES - 1:
                 delay = _BASE_DELAY * (2 ** attempt)
                 print(f'429 rate limit, retrying in {delay:.0f}s (attempt {attempt + 1}/{_MAX_RETRIES})')
                 time.sleep(delay)
@@ -240,7 +244,7 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
         print(f'Call 2: structuring with {PRIMARY_MODEL}')
         items = _structure(client, PRIMARY_MODEL, format_prompt_template.format(enriched=enriched))
     except genai_errors.ClientError as e:
-        if e.status_code != 429:
+        if not _is_rate_limit(e):
             raise
         print(f'Primary model exhausted after retries — falling back to {FALLBACK_MODEL}')
         model_used = FALLBACK_MODEL
