@@ -7,21 +7,31 @@ Two-call approach:
             JSON. Every cited transit is checked against the computed
             gochara before the result is accepted.
 
+Retry strategy:
+  Each call is retried up to 3 times with exponential backoff on 429.
+  If the primary model (gemini-3.1-flash-lite) is exhausted after retries,
+  the fallback model (gemma-4-31b) is used without grounding.
+
 Raises VerificationError if the model cites a position or verdict that
 does not match the engine output.
 """
 import json
 import os
+import time
 
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict
 
-MODEL = 'gemini-3.1-flash-lite'
+PRIMARY_MODEL = 'gemini-3.1-flash-lite'
+FALLBACK_MODEL = 'gemma-4-31b'
 TEMPERATURE = 0.65
+_MAX_RETRIES = 3
+_BASE_DELAY = 2.0  # seconds; doubles each attempt
 
 _SYSTEM_ENRICH = (
     "You are an experienced Jyotish astrologer writing daily Rasi Phalalu for Telugu readers. "
@@ -44,7 +54,6 @@ _SYSTEM_FORMAT = (
     "data — do not infer or alter them."
 )
 
-# Array schema: more portable than a dict with 12 named property keys
 _SCHEMA = {
     'type': 'array',
     'items': {
@@ -72,6 +81,20 @@ _SCHEMA = {
 
 class VerificationError(Exception):
     pass
+
+
+def _call_with_retry(fn):
+    """Call fn(), retrying up to _MAX_RETRIES times on 429 with exponential backoff."""
+    for attempt in range(_MAX_RETRIES):
+        try:
+            return fn()
+        except genai_errors.ClientError as e:
+            if e.status_code == 429 and attempt < _MAX_RETRIES - 1:
+                delay = _BASE_DELAY * (2 ** attempt)
+                print(f'429 rate limit, retrying in {delay:.0f}s (attempt {attempt + 1}/{_MAX_RETRIES})')
+                time.sleep(delay)
+                continue
+            raise
 
 
 def _compute_all_rashis(sky: dict[str, str]) -> dict:
@@ -140,6 +163,35 @@ def _verify(items: list[dict], all_rashis: dict) -> None:
                     f"computed {c['verdict']!r}, cited {cited['verdict']!r}")
 
 
+def _enrich(client, model: str, user_prompt: str, use_grounding: bool) -> str:
+    config_kwargs = dict(
+        system_instruction=_SYSTEM_ENRICH,
+        temperature=TEMPERATURE,
+    )
+    if use_grounding:
+        config_kwargs['tools'] = [types.Tool(google_search=types.GoogleSearch())]
+
+    return _call_with_retry(lambda: client.models.generate_content(
+        model=model,
+        contents=user_prompt,
+        config=types.GenerateContentConfig(**config_kwargs),
+    ).text)
+
+
+def _structure(client, model: str, format_prompt: str) -> list[dict]:
+    text = _call_with_retry(lambda: client.models.generate_content(
+        model=model,
+        contents=format_prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=_SYSTEM_FORMAT,
+            response_mime_type='application/json',
+            response_schema=_SCHEMA,
+            temperature=TEMPERATURE,
+        ),
+    ).text)
+    return json.loads(text)
+
+
 def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
     """Generate and verify LLM-written Rasi Phalalu for all 12 rashis.
 
@@ -153,7 +205,7 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
     Returns
     -------
     dict
-        {'date': str, 'rashis': {rasi: {'text': str, 'transits_cited': [...]}}}
+        {'date': str, 'model_used': str, 'rashis': {rasi: {'text': str, 'transits_cited': [...]}}}
 
     Raises
     ------
@@ -173,43 +225,33 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
         "Write the daily Rasi Phalalu for all 12 rashis."
     )
 
-    client = genai.Client(api_key=os.environ['rasiphalalu'])
-
-    # Call 1: grounding — enrich with classical Jyotish depth
-    enrich_resp = client.models.generate_content(
-        model=MODEL,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=_SYSTEM_ENRICH,
-            tools=[types.Tool(google_search=types.GoogleSearch())],
-            temperature=TEMPERATURE,
-        ),
-    )
-    enriched_text = enrich_resp.text
-
-    # Call 2: schema enforcement — structure and lock down for verification
-    format_prompt = (
+    format_prompt_template = (
         f"Transit data for {date_str} (use these exact positions and verdicts):\n"
         f"{verdicts_text}\n\n"
-        f"Astrological paragraphs to format:\n{enriched_text}"
+        "Astrological paragraphs to format:\n{enriched}"
     )
 
-    structured_resp = client.models.generate_content(
-        model=MODEL,
-        contents=format_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=_SYSTEM_FORMAT,
-            response_mime_type='application/json',
-            response_schema=_SCHEMA,
-            temperature=TEMPERATURE,
-        ),
-    )
+    client = genai.Client(api_key=os.environ['rasiphalalu'])
+    model_used = PRIMARY_MODEL
 
-    items: list[dict] = json.loads(structured_resp.text)
+    try:
+        print(f'Call 1: enriching with {PRIMARY_MODEL} (grounding enabled)')
+        enriched = _enrich(client, PRIMARY_MODEL, user_prompt, use_grounding=True)
+        print(f'Call 2: structuring with {PRIMARY_MODEL}')
+        items = _structure(client, PRIMARY_MODEL, format_prompt_template.format(enriched=enriched))
+    except genai_errors.ClientError as e:
+        if e.status_code != 429:
+            raise
+        print(f'Primary model exhausted after retries — falling back to {FALLBACK_MODEL}')
+        model_used = FALLBACK_MODEL
+        enriched = _enrich(client, FALLBACK_MODEL, user_prompt, use_grounding=False)
+        items = _structure(client, FALLBACK_MODEL, format_prompt_template.format(enriched=enriched))
+
     _verify(items, all_rashis)
 
     return {
         'date': date_str,
+        'model_used': model_used,
         'rashis': {item['rasi']: {'text': item['text'],
                                    'transits_cited': item['transits_cited']}
                    for item in items},
