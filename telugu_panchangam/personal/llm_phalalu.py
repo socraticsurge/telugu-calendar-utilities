@@ -28,10 +28,10 @@ from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict
 
 PRIMARY_MODEL = 'gemini-3.1-flash-lite'
-FALLBACK_MODEL = 'gemma-4-31b'
+FALLBACK_MODEL = 'gemma-4-31b-it'
 TEMPERATURE = 0.65
 _MAX_RETRIES = 3
-_BASE_DELAY = 2.0  # seconds; doubles each attempt
+_BASE_DELAY = 10.0  # seconds; doubles each attempt (429 here is quota, not per-minute)
 
 _SYSTEM_ENRICH = (
     "You are an experienced Jyotish astrologer writing daily Rasi Phalalu for Telugu readers. "
