@@ -7,8 +7,6 @@ from telugu_panchangam.panchangam_names import (
 )
 from telugu_panchangam.engines.base import (
     PanchangamEngine, rituvu_name, ayanam_name, samvatsara_name, maasam_name,
-    RAHU_PART, GULIKA_PART, YAMAG_PART,
-    DURMUHURTA_DAY_MUHURTAS, DURMUHURTA_NIGHT_MUHURTAS,
     VARJYAM_GHATIS, AMRITA_GHATIS,
     nakshatra_day_windows, next_nakshatra_span,
 )
@@ -20,17 +18,6 @@ from telugu_panchangam.engines.utils import (
 from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
 from telugu_panchangam.eclipses import get_eclipse_for_date
 from telugu_panchangam.special_yogas import get_special_yogas
-
-# Day Choghadiya sequence (8 per day from sunrise), weekday 0=Sunday
-_DAY_CHOGHADIYA = {
-    0: ['Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg'],
-    1: ['Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit'],
-    2: ['Rog','Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog'],
-    3: ['Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh'],
-    4: ['Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal','Shubh'],
-    5: ['Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char'],
-    6: ['Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal'],
-}
 
 class DrikGanitaEngine(PanchangamEngine):
 
@@ -135,68 +122,6 @@ class DrikGanitaEngine(PanchangamEngine):
             start=jd_to_utc(jd_yoga_start),
             end=jd_to_utc(jd_yoga_end),
         )
-
-    def _day_part_window(self, part: int, jd_sunrise: float,
-                          jd_sunset: float, name: str) -> Window:
-        """Return Window for the Nth 1-indexed equal part of the day (8 parts)."""
-        day_duration = jd_sunset - jd_sunrise
-        part_size = day_duration / 8.0
-        start = jd_sunrise + (part - 1) * part_size
-        end = start + part_size
-        return Window(name=name, start=jd_to_utc(start), end=jd_to_utc(end))
-
-    def _rahu_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
-        return self._day_part_window(RAHU_PART[weekday], jd_sr, jd_ss, 'Rahu Kalam')
-
-    def _gulika_kalam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
-        return self._day_part_window(GULIKA_PART[weekday], jd_sr, jd_ss, 'Gulika Kalam')
-
-    def _yamagandam(self, weekday: int, jd_sr: float, jd_ss: float) -> Window:
-        return self._day_part_window(YAMAG_PART[weekday], jd_sr, jd_ss, 'Yamagandam')
-
-    def _brahma_muhurta(self, jd_sunrise: float) -> Window:
-        # 2 muhurtas (96 min) before sunrise; 1 muhurta = 48 min = 1/30 day
-        muhurta = 1.0 / 30.0
-        start = jd_sunrise - 2 * muhurta
-        end = jd_sunrise - muhurta
-        return Window(name='Brahma Muhurta', start=jd_to_utc(start), end=jd_to_utc(end))
-
-    def _abhijit_muhurta(self, jd_sunrise: float, jd_sunset: float,
-                          weekday: int) -> Window | None:
-        if weekday == 3:  # Wednesday — no Abhijit
-            return None
-        midday = (jd_sunrise + jd_sunset) / 2.0
-        half_muhurta = (jd_sunset - jd_sunrise) / 30.0  # half of a day/15 muhurta
-        return Window(name='Abhijit Muhurta',
-                      start=jd_to_utc(midday - half_muhurta),
-                      end=jd_to_utc(midday + half_muhurta))
-
-    def _choghadiya(self, weekday: int, jd_sr: float, jd_ss: float) -> list[Window]:
-        names = _DAY_CHOGHADIYA[weekday]
-        block = (jd_ss - jd_sr) / 8.0
-        return [
-            Window(name=names[i],
-                   start=jd_to_utc(jd_sr + i * block),
-                   end=jd_to_utc(jd_sr + (i + 1) * block))
-            for i in range(8)
-        ]
-
-    def _durmuhurtham(self, weekday: int, jd_sr: float, jd_ss: float,
-                       jd_next_sr: float) -> list[Window]:
-        results = []
-        day_muhurta = (jd_ss - jd_sr) / 15.0
-        for p in DURMUHURTA_DAY_MUHURTAS[weekday]:
-            start = jd_sr + (p - 1) * day_muhurta
-            results.append(Window(name='Durmuhurtham',
-                                  start=jd_to_utc(start),
-                                  end=jd_to_utc(start + day_muhurta)))
-        night_muhurta = (jd_next_sr - jd_ss) / 15.0
-        for p in DURMUHURTA_NIGHT_MUHURTAS.get(weekday, ()):
-            start = jd_ss + (p - 1) * night_muhurta
-            results.append(Window(name='Durmuhurtham',
-                                  start=jd_to_utc(start),
-                                  end=jd_to_utc(start + night_muhurta)))
-        return results
 
     def _samvatsara(self, jd_sunrise: float, maasam: str) -> str:
         """60-year Samvatsara cycle (Telugu solar reckoning, flips at Ugadi)."""
@@ -363,45 +288,7 @@ class DrikGanitaEngine(PanchangamEngine):
                                       jd_next_sunrise, jd_moonrise),
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
         )
-        day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
-        nak_arc = 360.0 / 27.0
-        nak_pos = moon_lon_sr / nak_arc
-        day.nakshatra_pada = int(nak_pos * 4) % 4 + 1
-        from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
-        day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
-        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(day.karana, day.ghati_clock)
-        from telugu_panchangam.sankramana import compute_sankramana_window
-        _, sankranti_jd = self._sankramanam_name_and_jd(jd_sunrise, jd_sunset)
-        sankranti_dt = jd_to_utc(sankranti_jd) if sankranti_jd is not None else None
-        day.sankramana_avoidance = compute_sankramana_window(sankranti_dt, day.ghati_clock)
-        from telugu_panchangam.nakshatra_filters import is_panchaka_nakshatra
-        day.in_panchaka_nakshatra = is_panchaka_nakshatra(day.nakshatra.name)
-        from telugu_panchangam.maasa_filters import khar_maasa_name
-        day.khar_maasa_name = khar_maasa_name(day.solar_sign)
-        day.is_khar_maasa = day.khar_maasa_name is not None
-        from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
-        day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
-        from telugu_panchangam.special_yogas import compute_anandadi_yoga
-        day.anandadi_yoga = compute_anandadi_yoga(day.vaaram, day.nakshatra.name)
-        from telugu_panchangam.disha_shoola import disha_shoola
-        day.disha_shoola_direction = disha_shoola(day.vaaram)
-        from telugu_panchangam.nakshatra_filters import nakshatra_mukha
-        day.nakshatra_mukha = nakshatra_mukha(day.nakshatra.name)
-        from telugu_panchangam.panchaka import evaluate_panchaka
-        from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
-        _lagnas = get_lagna_transitions(day)
-        _sunrise_lagna = next(
-            (w.name.replace(' Lagna', '') for w in _lagnas
-             if w.start <= day.sunrise < w.end),
-            _lagnas[0].name.replace(' Lagna', '') if _lagnas else None,
-        )
-        if _sunrise_lagna is not None:
-            day.panchaka_rahita = evaluate_panchaka(
-                tithi_name=day.tithi.name,
-                vaaram_name=day.vaaram,
-                nakshatra_name=day.nakshatra.name,
-                lagna_name=_sunrise_lagna,
-            )
+        self._finalize_day(day, nak_spans, moon_lon_sr, jd_sunrise, jd_sunset, jd_next_sunrise)
         # Simha-Stha Guru / Shukra — Jupiter/Venus rasis from sidereal
         # longitudes at sunrise. Drik uses Swiss Ephemeris outer planets;
         # SS and Vakya don't model them so those engines leave defaults (False).

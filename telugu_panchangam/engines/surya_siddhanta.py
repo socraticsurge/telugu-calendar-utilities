@@ -8,8 +8,6 @@ from telugu_panchangam.panchangam_names import (
 )
 from telugu_panchangam.engines.base import (
     PanchangamEngine, rituvu_name, ayanam_name, samvatsara_name, maasam_name,
-    RAHU_PART, GULIKA_PART, YAMAG_PART,
-    DURMUHURTA_DAY_MUHURTAS, DURMUHURTA_NIGHT_MUHURTAS,
     VARJYAM_GHATIS, AMRITA_GHATIS,
     nakshatra_day_windows, next_nakshatra_span,
 )
@@ -29,15 +27,6 @@ _MOON_REVS        = 57_753_336
 _MOON_APOGEE_REVS = 488_219
 _MOON_APOGEE_AT_EPOCH = 90.0   # SS places the moon's mandocca at 90 deg at Kali epoch
 _SUN_APOGEE_DEG   = 77.333
-_DAY_CHOGHADIYA = {
-    0: ['Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg'],
-    1: ['Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit'],
-    2: ['Rog','Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog'],
-    3: ['Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char','Labh'],
-    4: ['Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal','Shubh'],
-    5: ['Char','Labh','Amrit','Kaal','Shubh','Rog','Udveg','Char'],
-    6: ['Kaal','Shubh','Rog','Udveg','Char','Labh','Amrit','Kaal'],
-}
 
 
 def _mean_longitude(ka: float, revs: int) -> float:
@@ -154,45 +143,7 @@ class SuryaSiddhantaEngine(PanchangamEngine):
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
             **special,
         )
-        day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
-        nak_arc = 360.0 / 27.0
-        nak_pos = moon_lon / nak_arc
-        day.nakshatra_pada = int(nak_pos * 4) % 4 + 1
-        from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
-        day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
-        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(day.karana, day.ghati_clock)
-        from telugu_panchangam.sankramana import compute_sankramana_window
-        _, sankranti_jd = self._sankramanam_name_and_jd(jd_sunrise, jd_sunset)
-        sankranti_dt = jd_to_utc(sankranti_jd) if sankranti_jd is not None else None
-        day.sankramana_avoidance = compute_sankramana_window(sankranti_dt, day.ghati_clock)
-        from telugu_panchangam.nakshatra_filters import is_panchaka_nakshatra
-        day.in_panchaka_nakshatra = is_panchaka_nakshatra(day.nakshatra.name)
-        from telugu_panchangam.maasa_filters import khar_maasa_name
-        day.khar_maasa_name = khar_maasa_name(day.solar_sign)
-        day.is_khar_maasa = day.khar_maasa_name is not None
-        from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
-        day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
-        from telugu_panchangam.special_yogas import compute_anandadi_yoga
-        day.anandadi_yoga = compute_anandadi_yoga(day.vaaram, day.nakshatra.name)
-        from telugu_panchangam.disha_shoola import disha_shoola
-        day.disha_shoola_direction = disha_shoola(day.vaaram)
-        from telugu_panchangam.nakshatra_filters import nakshatra_mukha
-        day.nakshatra_mukha = nakshatra_mukha(day.nakshatra.name)
-        from telugu_panchangam.panchaka import evaluate_panchaka
-        from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
-        _lagnas = get_lagna_transitions(day)
-        _sunrise_lagna = next(
-            (w.name.replace(' Lagna', '') for w in _lagnas
-             if w.start <= day.sunrise < w.end),
-            _lagnas[0].name.replace(' Lagna', '') if _lagnas else None,
-        )
-        if _sunrise_lagna is not None:
-            day.panchaka_rahita = evaluate_panchaka(
-                tithi_name=day.tithi.name,
-                vaaram_name=day.vaaram,
-                nakshatra_name=day.nakshatra.name,
-                lagna_name=_sunrise_lagna,
-            )
+        self._finalize_day(day, nak_spans, moon_lon, jd_sunrise, jd_sunset, jd_next_sunrise)
         # simha_stha_guru / simha_stha_shukra: SS does not model outer planets
         # (Jupiter, Venus) — both flags remain False (PanchangamDay defaults).
         return day
@@ -272,46 +223,6 @@ class SuryaSiddhantaEngine(PanchangamEngine):
             'is_soma_pradosham':  is_pradosham and weekday == 1,
             'is_sankranti': sun_sr != sun_ss or sun_sr != prev,
         }
-
-    def _day_part_window(self, part, jd_sr, jd_ss, name):
-        sz = (jd_ss - jd_sr) / 8.0
-        s  = jd_sr + (part - 1) * sz
-        return Window(name=name, start=jd_to_utc(s), end=jd_to_utc(s + sz))
-
-    def _rahu_kalam(self, wd, jd_sr, jd_ss):
-        return self._day_part_window(RAHU_PART[wd], jd_sr, jd_ss, 'Rahu Kalam')
-
-    def _gulika_kalam(self, wd, jd_sr, jd_ss):
-        return self._day_part_window(GULIKA_PART[wd], jd_sr, jd_ss, 'Gulika Kalam')
-
-    def _yamagandam(self, wd, jd_sr, jd_ss):
-        return self._day_part_window(YAMAG_PART[wd], jd_sr, jd_ss, 'Yamagandam')
-
-    def _brahma_muhurta(self, jd_sunrise):
-        m = 1.0 / 30.0
-        return Window('Brahma Muhurta', start=jd_to_utc(jd_sunrise - 2*m), end=jd_to_utc(jd_sunrise - m))
-
-    def _abhijit_muhurta(self, jd_sr, jd_ss, wd):
-        if wd == 3:
-            return None
-        mid = (jd_sr + jd_ss) / 2.0
-        hm  = (jd_ss - jd_sr) / 30.0  # half of a day/15 muhurta
-        return Window('Abhijit Muhurta', start=jd_to_utc(mid - hm), end=jd_to_utc(mid + hm))
-
-    def _choghadiya(self, wd, jd_sr, jd_ss):
-        names = _DAY_CHOGHADIYA[wd]
-        blk   = (jd_ss - jd_sr) / 8.0
-        return [Window(names[i], jd_to_utc(jd_sr + i*blk), jd_to_utc(jd_sr + (i+1)*blk)) for i in range(8)]
-
-    def _durmuhurtham(self, wd, jd_sr, jd_ss, jd_next_sr):
-        out = []
-        m = (jd_ss - jd_sr) / 15.0
-        out += [Window('Durmuhurtham', jd_to_utc(jd_sr + (p-1)*m), jd_to_utc(jd_sr + p*m))
-                for p in DURMUHURTA_DAY_MUHURTAS[wd]]
-        nm = (jd_next_sr - jd_ss) / 15.0
-        out += [Window('Durmuhurtham', jd_to_utc(jd_ss + (p-1)*nm), jd_to_utc(jd_ss + p*nm))
-                for p in DURMUHURTA_NIGHT_MUHURTAS.get(wd, ())]
-        return out
 
     def _moon_longitude_func(self):
         """Moon-longitude model used for nakshatra boundaries (vakya overrides)."""

@@ -117,45 +117,7 @@ class VakyaEngine(SuryaSiddhantaEngine):
             sankramanam=self._sankramanam_name(jd_sunrise, jd_sunset),
             **special,
         )
-        day.ghati_clock = self._build_ghati_clock(sunrise, jd_to_utc(jd_next_sunrise))
-        nak_arc = 360.0 / 27.0
-        nak_pos = moon_lon / nak_arc
-        day.nakshatra_pada = int(nak_pos * 4) % 4 + 1
-        from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
-        day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
-        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(day.karana, day.ghati_clock)
-        from telugu_panchangam.sankramana import compute_sankramana_window
-        _, sankranti_jd = self._sankramanam_name_and_jd(jd_sunrise, jd_sunset)
-        sankranti_dt = jd_to_utc(sankranti_jd) if sankranti_jd is not None else None
-        day.sankramana_avoidance = compute_sankramana_window(sankranti_dt, day.ghati_clock)
-        from telugu_panchangam.nakshatra_filters import is_panchaka_nakshatra
-        day.in_panchaka_nakshatra = is_panchaka_nakshatra(day.nakshatra.name)
-        from telugu_panchangam.maasa_filters import khar_maasa_name
-        day.khar_maasa_name = khar_maasa_name(day.solar_sign)
-        day.is_khar_maasa = day.khar_maasa_name is not None
-        from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
-        day.is_pitru_paksha = is_pitru_paksha_day(day.maasam, day.paksham)
-        from telugu_panchangam.special_yogas import compute_anandadi_yoga
-        day.anandadi_yoga = compute_anandadi_yoga(day.vaaram, day.nakshatra.name)
-        from telugu_panchangam.disha_shoola import disha_shoola
-        day.disha_shoola_direction = disha_shoola(day.vaaram)
-        from telugu_panchangam.nakshatra_filters import nakshatra_mukha
-        day.nakshatra_mukha = nakshatra_mukha(day.nakshatra.name)
-        from telugu_panchangam.panchaka import evaluate_panchaka
-        from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
-        _lagnas = get_lagna_transitions(day)
-        _sunrise_lagna = next(
-            (w.name.replace(' Lagna', '') for w in _lagnas
-             if w.start <= day.sunrise < w.end),
-            _lagnas[0].name.replace(' Lagna', '') if _lagnas else None,
-        )
-        if _sunrise_lagna is not None:
-            day.panchaka_rahita = evaluate_panchaka(
-                tithi_name=day.tithi.name,
-                vaaram_name=day.vaaram,
-                nakshatra_name=day.nakshatra.name,
-                lagna_name=_sunrise_lagna,
-            )
+        self._finalize_day(day, nak_spans, moon_lon, jd_sunrise, jd_sunset, jd_next_sunrise)
         # simha_stha_guru / simha_stha_shukra: Vakya does not model outer planets
         # (Jupiter, Venus) — both flags remain False (PanchangamDay defaults).
         return day
