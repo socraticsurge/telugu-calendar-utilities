@@ -81,7 +81,6 @@ def test_vakya_moon_differs_from_ss():
 def test_all_22_cities_vakya():
     from telugu_panchangam.cities import CITIES
     from telugu_panchangam.generators.ics import ICSGenerator
-    from icalendar import Calendar
     gen = ICSGenerator()
     for loc in CITIES:
         days = [ENGINE.calculate(REF_DATE, loc)]

@@ -34,8 +34,8 @@ def test_next_nakshatra_span():
     mock_moon_func = MagicMock()
 
     with patch('telugu_panchangam.engines.utils.find_crossing', return_value=2459947.5) as mock_find, \
-         patch('telugu_panchangam.engines.utils.jd_to_utc', return_value=datetime(2023, 1, 2, 12, 0, tzinfo=timezone.utc)) as mock_jd_to_utc, \
-         patch('telugu_panchangam.engines.utils.datetime_to_jd', return_value=2459946.5) as mock_dt_to_jd:
+         patch('telugu_panchangam.engines.utils.jd_to_utc', return_value=datetime(2023, 1, 2, 12, 0, tzinfo=timezone.utc)), \
+         patch('telugu_panchangam.engines.utils.datetime_to_jd', return_value=2459946.5):
 
         result = next_nakshatra_span(span, mock_moon_func)
 
@@ -269,7 +269,7 @@ def test_maasam_name_nija():
 
 def test_nakshatra_ghati_window_calculation():
     from datetime import datetime, timedelta, timezone
-    from telugu_panchangam.models.panchangam_day import Span, Window
+    from telugu_panchangam.models.panchangam_day import Span
     from telugu_panchangam.engines.base import nakshatra_ghati_window
 
     # Create a 60-hour span to make calculations straightforward (1 hour = 1 ghati proportion)

@@ -189,7 +189,7 @@ def test_samskara_activities_skip_khar_maasa():
 
 def test_non_samskara_not_skipped_during_khar_maasa():
     """Generic/travel activities are NOT blocked by Khar-Maasa."""
-    from telugu_panchangam.personal.muhurta import day_slots
+    from telugu_panchangam.personal.muhurta import diagnose_day
     eng = DrikEngine()
     city = _hyderabad()
     day = eng.calculate(date(2026, 12, 20), city)
@@ -198,7 +198,6 @@ def test_non_samskara_not_skipped_during_khar_maasa():
     # 'any' and 'travel' have no skip_on_khar_maasa — should still produce slots
     # (eclipse or all-bad-choghadiya could theoretically give 0, but Dec 2026
     # is an ordinary day; we just assert the Khar-Maasa rule is NOT the cause).
-    from telugu_panchangam.personal.muhurta import diagnose_day
     reason = diagnose_day(day, activity='any')
     assert reason is None or 'Khar-Maasa' not in reason
 

@@ -739,9 +739,9 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
             elif pos in CHANDRA_PUJA:
                 has_remedial = True
         if chandra_mode == 'strict' and (has_avoid or has_remedial):
-            return f'chandra_mode=strict — Moon at sunrise fails for at least one person'
+            return 'chandra_mode=strict — Moon at sunrise fails for at least one person'
         if chandra_mode == 'puja_ok' and has_avoid:
-            return f'chandra_mode=puja_ok — someone has Moon-avoid (4/8/12)'
+            return 'chandra_mode=puja_ok — someone has Moon-avoid (4/8/12)'
 
     return None
 
@@ -920,7 +920,6 @@ def _evaluate_slot(s, e, day, block, base, facts, skip_yogas, janma_nakshatras,
     # rising lagna. Uses slot-time tithi/nakshatra (from facts) and day-level
     # vaaram (sunrise-anchored by convention). `slot_lagna_name` is already
     # computed above from the lagnas list.
-    panchaka_dosha = None
     if slot_lagna_name is not None:
         try:
             _panchaka = evaluate_panchaka(
@@ -1139,10 +1138,6 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     # Ephemeris bisection per day and isn't free, so generic muhurta
     # queries (no personal reference AND no activity preference) stay
     # on the fast path.
-    _has_personal_ref = (
-        (janma_rasis and any(r is not None for r in janma_rasis))
-        or (janma_lagnas and any(l is not None for l in janma_lagnas))
-    )
     # Lagnas are needed for: personal kendra/trikona, activity lagna class,
     # and Panchaka Rahita slot-level recompute. Always compute — one bisection
     # pass per day (not per slot), so cost is O(1) per call regardless of slot
