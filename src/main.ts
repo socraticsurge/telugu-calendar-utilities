@@ -1234,6 +1234,10 @@ import {
     today:     ["Today's Panchangam", 'What is the day?'],
     gochara:   ['Gochara · Rasi Phalalu', 'What does it mean for me?'],
     tarabalam: ['Tarabalam · Muhurtam', 'When should we act?'],
+    festivals: ['Festivals', 'Special days — next 30 days'],
+    subscribe: ['Subscribe', 'Get panchangam in your calendar'],
+    useinai:   ['Use in AI', 'MCP server for AI assistants'],
+    about:     ['About', 'What this is and how it works'],
   };
   function openHelpSheet() {
     const active = document.querySelector('#m-bottomnav .m-tab.active');
@@ -1254,21 +1258,29 @@ import {
     document.querySelectorAll('.m-page-help-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
   }
 
+  const TOOL_PANELS = ['today', 'tarabalam', 'gochara'];
+
   function switchTool(which) {
-    for (const t of ['today', 'tarabalam', 'gochara']) {
+    // Tool panels: show/hide the three original panels
+    for (const t of TOOL_PANELS) {
       document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
       document.getElementById('tab-' + t).classList.toggle('active', t === which);
       document.getElementById('tab-' + t).setAttribute('aria-selected', t === which ? 'true' : 'false');
     }
     document.body.dataset.tool = which;
-    // mobile bottom-nav stays in sync with the desktop tab state
+    // sidebar stays in sync on desktop
+    document.querySelectorAll('#sidebar .sidebar-item[id]').forEach(b => {
+      b.classList.toggle('active', b.id === 'sidebar-' + which);
+    });
+    // mobile bottom-nav stays in sync (only meaningful for the 3 tool panels)
     document.querySelectorAll('#m-bottomnav .m-tab').forEach(b => {
       const on = b.dataset.tab === which;
       b.classList.toggle('active', on);
       b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-    document.getElementById('m-page-title-main').textContent = PAGE_TITLES[which][0];
-    document.getElementById('m-page-title-sub').textContent = PAGE_TITLES[which][1];
+    const titles = PAGE_TITLES[which];
+    document.getElementById('m-page-title-main').textContent = titles ? titles[0] : '';
+    document.getElementById('m-page-title-sub').textContent = titles ? titles[1] : '';
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
     if (typeof gcEvent === 'function') gcEvent('tab-' + which);
     if (which === 'gochara') loadGochara();
@@ -2589,6 +2601,10 @@ import {
   if (location.hash === '#tarabalam') switchTool('tarabalam');
   if (location.hash === '#gochara') switchTool('gochara');
   if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
+  if (location.hash === '#festivals') switchTool('festivals');
+  if (location.hash === '#subscribe') switchTool('subscribe');
+  if (location.hash === '#useinai') switchTool('useinai');
+  if (location.hash === '#about') switchTool('about');
   updateSubscribeUrl();
   loadPreview();
 
