@@ -5,11 +5,12 @@ every PanchangamDay becomes one all-day event with the full panchangam
 in its description. Devotees who only care about specific anga events
 have asked repeatedly for slim per-anga feeds.
 
-This module provides three filters that compose with `ICSGenerator`:
+This module provides four filters that compose with `ICSGenerator`:
 
-  - `generate_ekadashi_feed(days, system)`     — Ekadashi days only
-  - `generate_festivals_feed(days, system)`    — Festival days only
-  - `generate_moon_cycles_feed(days, system)`  — Pournami + Amavasya only
+  - `generate_ekadashi_feed(days, system)`          — Ekadashi days only
+  - `generate_festivals_feed(days, system)`         — Festival days only
+  - `generate_moon_cycles_feed(days, system)`       — Pournami + Amavasya only
+  - `generate_tithi_observances_feed(days, system)` — Ekadashi + Pournami + Amavasya + Pradosham
 
 Each filters the input `days` list and emits an ICS through the existing
 `ICSGenerator`, so the per-event content matches what subscribers
@@ -80,6 +81,23 @@ def generate_moon_cycles_feed(days: list[PanchangamDay], system: str) -> bytes:
     if not filtered:
         return _empty_feed(days, system, 'Moon Cycles')
     return ICSGenerator().generate(filtered, system, variant_label='Moon Cycles')
+
+
+def filter_tithi_observances(days: list[PanchangamDay]) -> list[PanchangamDay]:
+    """Ekadashi, Pournami, Amavasya, and Pradosham days — the four
+    monthly observances that devotees track most for vrats and rituals."""
+    return [d for d in days if (d.is_ekadashi or d.is_pournami
+                                or d.is_amavasya or d.is_pradosham)]
+
+
+def generate_tithi_observances_feed(days: list[PanchangamDay], system: str) -> bytes:
+    """Slim ICS feed containing Ekadashi, Pournami, Amavasya, and
+    Pradosham days. Useful for devotees tracking monthly vrats without
+    the full daily-feed noise."""
+    filtered = filter_tithi_observances(days)
+    if not filtered:
+        return _empty_feed(days, system, 'Tithi Observances')
+    return ICSGenerator().generate(filtered, system, variant_label='Tithi Observances')
 
 
 def _empty_feed(days: list[PanchangamDay], system: str, variant_label: str) -> bytes:
