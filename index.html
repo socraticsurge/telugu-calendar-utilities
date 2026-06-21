@@ -1196,8 +1196,8 @@
     <span class="m-tab-sub">rasi phalalu</span>
   </button>
   <button class="m-tab" data-tab="tarabalam" role="tab" aria-selected="false">
-    <span class="m-tab-emoji">✦</span>
-    <span class="m-tab-label">Tarabalam</span>
+    <span class="m-tab-emoji">⏰</span>
+    <span class="m-tab-label">Muhurtam</span>
     <span class="m-tab-sub">muhurtam</span>
   </button>
   <button class="m-tab" id="m-more-btn" aria-controls="m-more-drawer" aria-expanded="false">
@@ -1261,7 +1261,7 @@
     </div>
   </div>
   <div class="help-card">
-    <div class="help-card-icon">✦</div>
+    <div class="help-card-icon">⏰</div>
     <div class="help-card-body">
       <div class="help-card-title">Nakshatra</div>
       <p class="help-card-text">Lunar mansion. Influences the mental and emotional tone of the day.</p>
@@ -1347,8 +1347,8 @@
     </li>
     <li>
       <button class="sidebar-item" id="sidebar-tarabalam" onclick="switchTool('tarabalam')">
-        <span class="sidebar-icon">✦</span>
-        <span class="sidebar-label">Tarabalam · Muhurtam</span>
+        <span class="sidebar-icon">⏰</span>
+        <span class="sidebar-label">Muhurtam</span>
       </button>
     </li>
     <li>
@@ -1447,7 +1447,7 @@
       <button id="tab-gochara" class="tool-tab" role="tab" onclick="switchTool('gochara')">
         <span class="tt">🪐 Daily Horoscope</span><span class="ts">What does it mean for me?</span></button>
       <button id="tab-tarabalam" class="tool-tab" role="tab" onclick="switchTool('tarabalam')">
-        <span class="tt">✦ Tarabalam · Muhurtam</span><span class="ts">When should we act?</span></button>
+        <span class="tt">⏰ Muhurtam</span><span class="ts">When should we act?</span></button>
     </div>
     <div class="m-page-title" id="m-page-title"><span class="m-page-title-main" id="m-page-title-main">Today's Panchangam</span><span class="m-page-title-sub" id="m-page-title-sub">What is the day?</span></div>
     <div id="panel-today" role="tabpanel">
@@ -1459,47 +1459,70 @@
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
-      <h2 class="panel-heading">✦ Tarabalam · Muhurtam</h2>
-      <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
-      Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
-      <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
-      <button class="read-more" style="color: var(--indigo);" data-more="New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('tb-help', this)">New to Tarabalam, Chandrabalam &amp; Muhurtam? How to use this ▾</button>
-      <div class="expanded" id="tb-help">
-        <strong>Tarabalam — strength from your star.</strong> Each day the Moon occupies one of the 27 nakshatras.
-        Counting from your <strong>janma nakshatra</strong> (birth star) to the day's nakshatra gives one of nine
-        repeating <strong>taras</strong>: five favourable — Sampat (wealth), Kshema (well-being), Sadhana
-        (accomplishment), Mitra and Parama Mitra (friendly) — and four avoided: Janma, Vipat, Pratyak, Naidhana.
-        <br/><br/>
-        <strong>Chandrabalam — strength from your rashi.</strong> The Moon also moves through the 12 rashis.
-        Its position counted from your <strong>janma rashi</strong> is good at 1 · 3 · 6 · 7 · 10 · 11, workable
-        after a small remedial puja at 2 · 5 · 9, and avoided at 4 · 8 · 12 (the 8th is Ashtama Chandra).
-        Your rashi is worked out automatically from your star — add your <strong>padam</strong> (quarter) only if
-        asked; it's needed for the nine stars that span two rashis.
-        <br/><br/>
-        <strong>How to use this tool.</strong> Add up to four people (stars are remembered on this device, and
-        never leave it), pick a date range, and choose your <strong>✦ standard</strong>: <em>Stars only</em>
-        matches classic tarabalam tables, with the Moon shown as ° and ☾ marks; the stricter standards also
-        require the Moon's support. Green days favour that person; for anything done together — travel,
-        purchases, ceremonies — prefer the <span class="tb-star">✦</span> days. Don't know your star or padam?
-        Create your birth chart at <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a> —
-        it lists your janma nakshatra, padam and rashi. These are daily favourability checks, one factor among
-        several; for major events check the day's muhurtas and consult your purohit.
-        <br/><br/>
-        <strong>Chandrabalam — the Moon check.</strong> Once the rashi is known, the Moon's position from it is
-        checked automatically: positions 1 · 3 · 6 · 7 · 10 · 11 are good, 2 · 5 · 9 are workable after a small
-        remedial puja (marked °), and 4 · 8 · 12 are avoided (marked ☾). The <strong>✦ standard</strong> selector
-        sets how this affects good days: <em>Stars only</em> matches classic tarabalam tables (the Moon still
-        annotates each chip), <em>puja ok</em> drops Moon-avoid days, and <em>strict</em> demands a clean Moon —
-        some star combinations have no strict days at all, so relax the standard if the list comes up empty.
-        <br/><br/>
-        <strong>Muhurtam — finding the time slot.</strong> With your people and date range set, the
-        <em>Find a time slot</em> section searches the same days for ranked slots: good choghadiya blocks
-        (Amrit · Shubh · Labh · Char) with Rahu Kalam, Gulika, Yamagandam, Varjyam and Durmuhurtham cut out,
-        scored higher when they overlap Abhijit Muhurta or Amrita Kalam or fall on Sarvartha/Amrita Siddhi
-        days. The activity tunes the rules — travel avoids Vishti karana, ceremonies skip Visha and Dagdha
-        days, purchases favour Labh, beginnings favour Amrit. Every slot lists its reasons.
-      </div>
+      <h2 class="panel-heading">⏰ Muhurtam</h2>
       <div class="tb-controls">
+        <!-- Strip 1: date range + moon filter + activity -->
+        <div class="selector-row tb-row-dates" style="flex-wrap:wrap;">
+          <div class="selector">
+            <label for="tb-from">From</label>
+            <input type="date" id="tb-from" class="tb-date">
+          </div>
+          <div class="selector">
+            <label for="tb-to">To</label>
+            <input type="date" id="tb-to" class="tb-date">
+          </div>
+          <div class="selector tb-sel-mode">
+            <label for="tb-mode" title="How strictly the Moon (Chandrabalam) filters time slots">Moon filter</label>
+            <select id="tb-mode" class="tb-date" onchange="tbSetMode(this.value)">
+              <option value="stars">Stars only (classic)</option>
+              <option value="puja_ok">Stars + Moon, puja ok</option>
+              <option value="strict">Stars + Moon, strict</option>
+            </select>
+          </div>
+          <div class="selector">
+            <label for="mu-activity">Activity</label>
+            <select id="mu-activity" class="tb-date" aria-label="Activity">
+              <option value="any">Anything auspicious</option>
+              <optgroup label="Samskaras">
+                <option value="wedding">Wedding (Vivaha)</option>
+                <option value="engagement">Engagement (Nischayam)</option>
+                <option value="naming">Naming (Namakaranam)</option>
+                <option value="annaprasana">Annaprasana (First feeding)</option>
+                <option value="karnavedha">Karnavedha (Ear-piercing)</option>
+                <option value="mundana">Mundana / Chaula (First head-shave)</option>
+                <option value="upanayana">Upanayana (Sacred thread)</option>
+                <option value="vidyarambha">Education start (Vidyarambha)</option>
+                <option value="gruhapravesha">Gruhapravesha (Home entry)</option>
+              </optgroup>
+              <optgroup label="Acquisitions">
+                <option value="vehicle">Vehicle purchase</option>
+                <option value="property">Property / Land purchase</option>
+                <option value="gold">Gold / Jewelry purchase</option>
+                <option value="purchase">Purchase (general)</option>
+              </optgroup>
+              <optgroup label="Construction &amp; ventures">
+                <option value="bhumi_puja">Bhumi Puja / Foundation laying</option>
+                <option value="business">Business launch</option>
+                <option value="job">Job start / Contract signing</option>
+              </optgroup>
+              <optgroup label="Spiritual">
+                <option value="yajna">Yajna / Homam</option>
+                <option value="pilgrimage">Pilgrimage (Tirtha Yatra)</option>
+                <option value="ceremony">Ceremony / puja (general)</option>
+              </optgroup>
+              <optgroup label="Civil &amp; medical">
+                <option value="court">Court / legal matter</option>
+                <option value="surgery">Surgery / medical procedure</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="travel">Travel / journey</option>
+                <option value="beginning">New beginning (general)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <!-- Strip 2: who is this for -->
         <div class="tb-section">
           <div class="tb-section-head">
             <span class="tb-section-label">Who is this for?</span>
@@ -1509,95 +1532,19 @@
           <button class="tb-add" id="tb-add-btn" onclick="tbAddRow()">+ Add a family member</button>
         </div>
 
-        <div class="tb-section">
-          <div class="tb-section-head">
-            <span class="tb-section-label">Date range &amp; standard</span>
-          </div>
-          <div class="selector-row tb-row-dates">
-            <div class="selector">
-              <label for="tb-from">From</label>
-              <input type="date" id="tb-from" class="tb-date">
-            </div>
-            <div class="selector">
-              <label for="tb-to">To</label>
-              <input type="date" id="tb-to" class="tb-date">
-            </div>
-            <div class="selector tb-sel-mode">
-              <label for="tb-mode" title="How strictly the Moon (Chandrabalam) is applied when deciding good days">✦ Standard</label>
-              <select id="tb-mode" class="tb-date" onchange="tbSetMode(this.value)">
-                <option value="stars">Stars only (classic)</option>
-                <option value="puja_ok">Stars + Moon, puja ok</option>
-                <option value="strict">Stars + Moon, strict</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn tb-cta" onclick="calcTarabalam()">Find good days</button>
+        <button class="btn tb-cta" onclick="findMuhurta()">Show Slots</button>
+        <p class="preview-note" style="margin-top:0.5rem;" id="mu-context"></p>
       </div><!-- /tb-controls -->
+
+      <!-- kept for JS compat (muToggleMobile references this id) -->
+      <div id="mu-section"></div>
+      <!-- TARABALAM HIDDEN: tb-summary, tb-result
       <div id="tb-summary"></div>
       <div id="tb-result"></div>
-      <p class="preview-note"><strong style="color:#166534;">Favourable taras:</strong> 2 Sampat · 4 Kshema · 6 Sadhana · 8 Mitra · 9 Parama Mitra.<br/>
-      <strong style="color:#b91c1c;">Avoid:</strong> 1 Janma · 3 Vipat · 5 Pratyak · 7 Naidhana.<br/>
-      Days are labelled by their sunrise nakshatra — the "till" time shows when it changes.</p>
-
-      <div class="tb-controls" id="mu-section" style="margin-top:1rem;">
-        <div class="tb-controls-title" onclick="muToggleMobile()" role="button" tabindex="0"
-             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();muToggleMobile();}">Find a time slot (Muhurtam)</div>
-        <div class="tb-section">
-          <div class="tb-section-head">
-            <span class="tb-section-label">Activity</span>
-          </div>
-          <div class="selector-row tb-row-activity">
-            <div class="selector">
-              <select id="mu-activity" class="tb-date" aria-label="Activity">
-                <option value="any">Anything auspicious</option>
-                <optgroup label="Samskaras">
-                  <option value="wedding">Wedding (Vivaha)</option>
-                  <option value="engagement">Engagement (Nischayam)</option>
-                  <option value="naming">Naming (Namakaranam)</option>
-                  <option value="annaprasana">Annaprasana (First feeding)</option>
-                  <option value="karnavedha">Karnavedha (Ear-piercing)</option>
-                  <option value="mundana">Mundana / Chaula (First head-shave)</option>
-                  <option value="upanayana">Upanayana (Sacred thread)</option>
-                  <option value="vidyarambha">Education start (Vidyarambha)</option>
-                  <option value="gruhapravesha">Gruhapravesha (Home entry)</option>
-                </optgroup>
-                <optgroup label="Acquisitions">
-                  <option value="vehicle">Vehicle purchase</option>
-                  <option value="property">Property / Land purchase</option>
-                  <option value="gold">Gold / Jewelry purchase</option>
-                  <option value="purchase">Purchase (general)</option>
-                </optgroup>
-                <optgroup label="Construction &amp; ventures">
-                  <option value="bhumi_puja">Bhumi Puja / Foundation laying</option>
-                  <option value="business">Business launch</option>
-                  <option value="job">Job start / Contract signing</option>
-                </optgroup>
-                <optgroup label="Spiritual">
-                  <option value="yajna">Yajna / Homam</option>
-                  <option value="pilgrimage">Pilgrimage (Tirtha Yatra)</option>
-                  <option value="ceremony">Ceremony / puja (general)</option>
-                </optgroup>
-                <optgroup label="Civil &amp; medical">
-                  <option value="court">Court / legal matter</option>
-                  <option value="surgery">Surgery / medical procedure</option>
-                </optgroup>
-                <optgroup label="Other">
-                  <option value="travel">Travel / journey</option>
-                  <option value="beginning">New beginning (general)</option>
-                </optgroup>
-              </select>
-            </div>
-          </div>
-        </div>
-        <button class="btn tb-cta" onclick="findMuhurta()">Find slots</button>
-        <p class="preview-note" style="margin-top:0.5rem;" id="mu-context"></p>
-      </div>
+      END TARABALAM HIDDEN -->
       <div id="mu-result"></div>
       <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
-      <strong>Please note:</strong> Tarabalam and Chandrabalam are daily favourability checks, and the slot
-      finder is guidance for everyday timing — none of it is how formal muhurtams are fixed.
+      <strong>Please note:</strong> The slot finder is guidance for everyday timing — not how formal muhurtams are fixed.
       Tiers (Excellent/Good/Fair/Avoid) rank slots relative to each other within this search —
       "Excellent" means the best of what turned up for these dates, not a universal guarantee, and
       "Good" or "Fair" slots without a caution noted below them can be perfectly fine choices.
@@ -1611,6 +1558,7 @@
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
       <h2 class="panel-heading">🪐 Daily Horoscope</h2>
+      <!-- HELP TEXT HIDDEN: intro + read-more guide removed per owner request (other tabs don't show it)
       <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
       <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
       coloured by its gochara verdict for them.</p>
@@ -1630,6 +1578,7 @@
         verdicts — the Moon's position sets the day's tone, each graha contributes one sentence, and nothing is
         invented. Share it with the green button; it sends the full reading.
       </div>
+      END HELP TEXT HIDDEN -->
       <div class="tb-controls">
         <div class="selector-row" style="margin:0;">
           <div class="selector">
