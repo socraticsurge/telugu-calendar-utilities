@@ -664,16 +664,15 @@
     body[data-mode="mobile"] #panel-gochara .tb-controls .selector-row { gap: 0.4rem; }
     body[data-mode="mobile"] #panel-gochara .tb-controls .selector { flex: 1 1 48%; }
     body[data-mode="mobile"] #panel-gochara .tb-controls .selector label { font-size: 0.68rem; }
-    /* Chart first, then the Sade Sati banner + Coming up below it — keeps the
-       12-house grid visible without scrolling past the conditions banner. */
+    /* Phalalu prose first, then chart + legend, then Coming up */
     body[data-mode="mobile"] #panel-gochara { display: flex; flex-direction: column; }
     body[data-mode="mobile"] #panel-gochara > .tb-controls { order: 1; }
-    body[data-mode="mobile"] #panel-gochara > #go-chart { order: 2; }
-    body[data-mode="mobile"] #panel-gochara > #go-conditions { order: 3; }
-    body[data-mode="mobile"] #panel-gochara > #go-note { order: 4; }
-    body[data-mode="mobile"] #panel-gochara > #go-moves { order: 5; }
-    body[data-mode="mobile"] #panel-gochara > #go-phalalu { order: 6; }
-    body[data-mode="mobile"] #panel-gochara > #go-legend { order: 7; }
+    body[data-mode="mobile"] #panel-gochara > #go-phalalu { order: 2; }
+    body[data-mode="mobile"] #panel-gochara > #go-chart { order: 3; }
+    body[data-mode="mobile"] #panel-gochara > #go-legend { order: 4; }
+    body[data-mode="mobile"] #panel-gochara > #go-note { order: 5; }
+    body[data-mode="mobile"] #panel-gochara > #go-moves { order: 6; }
+    body[data-mode="mobile"] #panel-gochara > #go-conditions { order: 7; }
     body[data-mode="mobile"] #panel-gochara > .preview-note { order: 8; }
     /* Sade Sati / Ashtama Shani banner, now below the chart */
     body[data-mode="mobile"] #go-conditions .go-cond {
@@ -1641,13 +1640,13 @@
           </div>
         </div>
       </div>
-      <div id="go-conditions"></div>
+      <div id="go-phalalu"></div>
       <div id="go-chart" class="go-chart"><p class="preview-error">Loading…</p></div>
+      <div id="go-legend"></div>
       <div id="go-note"></div>
       <div id="go-moves"></div>
-      <div id="go-phalalu"></div>
-      <div id="go-legend"></div>
-      <p class="preview-note">Positions are the sky <strong>at sunrise</strong> on the chosen date — the chart's
+      <div id="go-conditions"></div>
+      <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">Positions are the sky <strong>at sunrise</strong> on the chosen date — the chart's
       snapshot convention, like the rest of this site. The Moon changes rashi every 2–2½ days, so by evening it
       may already be in the next rashi (the "Coming up" line shows when); the slower grahas are unaffected.</p>
       <p class="preview-note">Chart data covers about 18 months ahead and is refreshed monthly. The
