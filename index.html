@@ -426,7 +426,7 @@
     .upcoming-month-body { display: none; padding: 0.5rem 0.6rem 0.6rem; }
     .upcoming-month.open .upcoming-month-body { display: block; }
     .upcoming-list { display: flex; flex-direction: column; gap: 0.3rem; }
-    .upcoming-row { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.4rem 0.5rem; border: 1px solid #E7DECC; border-radius: 6px; background: #FFFFFF; flex-wrap: wrap; }
+    .upcoming-row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: start; gap: 0.25rem 0.6rem; padding: 0.4rem 0.5rem; border: 1px solid #E7DECC; border-radius: 6px; background: #FFFFFF; }
     .upcoming-row.upcoming-festival { background: var(--indigo-bg); border-color: var(--indigo-border); }
     .upcoming-row.upcoming-today { border-color: var(--amber); background: #FFFBF4; }
     .upcoming-today-badge { font-size: 0.65rem; font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; margin-left: 0.4rem; }
@@ -1063,10 +1063,10 @@
     .sidebar-shloka-lines {
       display: flex; flex-direction: column; gap: 0.05rem;
       font-family: var(--brand-display); font-style: italic;
-      font-size: 0.68rem; line-height: 1.55; color: rgba(31,26,23,0.35);
+      font-size: 0.71rem; line-height: 1.55; color: rgba(31,26,23,0.55);
     }
     .sidebar-shloka-gist {
-      margin-top: 0.45rem; font-size: 0.65rem; color: rgba(31,26,23,0.28);
+      margin-top: 0.45rem; font-size: 0.68rem; color: rgba(31,26,23,0.5);
       letter-spacing: 0.01em;
     }
     .sidebar-footer {
