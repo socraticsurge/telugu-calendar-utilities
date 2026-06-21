@@ -405,20 +405,39 @@
                             padding: 0.45rem 0; margin-bottom: 0.25rem; }
     #global-controls-bar .selector { gap: 0; }
     #global-controls-bar .selector label { display: none; }
+    #global-controls-bar .sel-wrap { display: flex; align-items: center; gap: 0.3rem; }
+    #global-controls-bar .sel-icon { color: var(--indigo); opacity: 0.7; flex: none; }
     #global-controls-bar #sel-fmt-toggle { margin-left: auto; }
     body[data-mode="mobile"] #global-controls-bar { display: none; }
     .preview-head .date { cursor: pointer; }
     .preview-head .date:hover { opacity: 0.85; }
 
-    .upcoming-list { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.75rem; }
-    .upcoming-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.45rem 0.6rem; border: 1px solid #E7DECC; border-radius: 8px; background: #FFFFFF; flex-wrap: wrap; }
-    .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1F1A17; min-width: 7.5rem; white-space: nowrap; }
+    .upcoming-month { margin-bottom: 0.5rem; border: 1px solid #E7DECC; border-radius: 8px; overflow: hidden; }
+    .upcoming-month-header {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+      background: #F7F2E8; border: none; cursor: pointer; font-family: inherit;
+      font-size: 0.72rem; font-weight: 700; color: #58504A;
+      text-transform: uppercase; letter-spacing: 0.07em; padding: 0.55rem 0.75rem; text-align: left;
+    }
+    .upcoming-month-header:hover { background: #EFE9DA; }
+    .upcoming-month.open > .upcoming-month-header { color: var(--indigo); background: var(--indigo-bg); border-bottom: 1px solid var(--indigo-border); }
+    .upcoming-chevron::after { content: '▸'; font-size: 0.7rem; color: #B5AC9C; }
+    .upcoming-month.open .upcoming-chevron::after { content: '▾'; }
+    .upcoming-month-body { display: none; padding: 0.5rem 0.6rem 0.6rem; }
+    .upcoming-month.open .upcoming-month-body { display: block; }
+    .upcoming-list { display: flex; flex-direction: column; gap: 0.3rem; }
+    .upcoming-row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: start; gap: 0.25rem 0.6rem; padding: 0.4rem 0.5rem; border: 1px solid #E7DECC; border-radius: 6px; background: #FFFFFF; }
+    .upcoming-row.upcoming-festival { background: var(--indigo-bg); border-color: var(--indigo-border); }
+    .upcoming-row.upcoming-today { border-color: var(--amber); background: #FFFBF4; }
+    .upcoming-today-badge { font-size: 0.65rem; font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; margin-left: 0.4rem; }
+    .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1F1A17; min-width: 6rem; white-space: nowrap; padding-top: 0.1rem; }
     .upcoming-date .dow { color: #B5AC9C; font-weight: 600; }
     .upcoming-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; flex: 1 1 auto; min-width: 0; }
     .upcoming-in { font-size: 0.72rem; color: #B5AC9C; margin-left: auto; white-space: nowrap; }
+    .upcoming-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-top: 0.9rem; font-size: 0.72rem; color: #8B8377; }
     @media (max-width: 620px) {
       .upcoming-row { flex-direction: column; align-items: flex-start; gap: 0.3rem; padding: 0.5rem 0.65rem; }
-      .upcoming-date { display: flex; justify-content: space-between; width: 100%; min-width: 0; font-size: 0.78rem; }
+      .upcoming-date { display: flex; justify-content: flex-start; gap: 0.35rem; align-items: baseline; width: 100%; min-width: 0; font-size: 0.78rem; }
       .upcoming-date .dow { font-size: 0.7rem; }
       .upcoming-chips { width: 100%; }
       .upcoming-in { display: none; }
@@ -933,6 +952,128 @@
     /* Mobile-only: the standalone "Special days — next 30 days" card belongs
        to the Today tab. Hide it when Gochara or Tarabalam is the active screen. */
     body[data-mode="mobile"]:not([data-tool="today"]) #special-days-card { display: none; }
+
+    h2.panel-heading { display: none; }
+    /* ══ Vertical sidebar — desktop only (≥ 621 px) ══ */
+    #sidebar { display: none; }
+
+    @media (min-width: 621px) {
+      body { padding: 0 0 2rem 228px; }
+      #sidebar {
+        display: flex; flex-direction: column;
+        position: fixed; left: 0; top: 0; bottom: 0; width: 228px;
+        background: #fff; border-right: 1px solid #DDD2BC;
+        z-index: 10; overflow-y: auto;
+      }
+      .page { max-width: 820px; margin: 0; padding: 0 1.5rem 2rem; }
+      .hero { display: none; }
+      .tool-tabs { display: none; }
+      h2.panel-heading { display: flex; }
+      #global-controls-bar {
+        margin-top: 0; height: 60px; box-sizing: border-box;
+        border-bottom: 1px solid #E7DECC; margin-bottom: 1rem;
+        flex-wrap: nowrap; padding: 0;
+      }
+
+      /* Section switching: hide secondary cards when a tool panel is active */
+      body[data-tool="today"] #special-days-card,
+      body[data-tool="today"] #subscribe,
+      body[data-tool="today"] #card-mcp,
+      body[data-tool="today"] #card-system,
+      body[data-tool="today"] #card-about,
+      body[data-tool="gochara"] #special-days-card,
+      body[data-tool="gochara"] #subscribe,
+      body[data-tool="gochara"] #card-mcp,
+      body[data-tool="gochara"] #card-system,
+      body[data-tool="gochara"] #card-about,
+      body[data-tool="tarabalam"] #special-days-card,
+      body[data-tool="tarabalam"] #subscribe,
+      body[data-tool="tarabalam"] #card-mcp,
+      body[data-tool="tarabalam"] #card-system,
+      body[data-tool="tarabalam"] #card-about { display: none; }
+
+      /* Hide tool card when a secondary section is active */
+      body[data-tool="festivals"] #card-tools,
+      body[data-tool="subscribe"] #card-tools,
+      body[data-tool="useinai"] #card-tools,
+      body[data-tool="about"] #card-tools { display: none; }
+
+      /* Festivals: show only special-days-card */
+      body[data-tool="festivals"] #subscribe,
+      body[data-tool="festivals"] #card-mcp,
+      body[data-tool="festivals"] #card-system,
+      body[data-tool="festivals"] #card-about { display: none; }
+
+      /* Subscribe: show subscribe + card-system (system choice affects feed URL) */
+      body[data-tool="subscribe"] #special-days-card,
+      body[data-tool="subscribe"] #card-mcp,
+      body[data-tool="subscribe"] #card-about { display: none; }
+
+      /* Use in AI: show only card-mcp */
+      body[data-tool="useinai"] #special-days-card,
+      body[data-tool="useinai"] #subscribe,
+      body[data-tool="useinai"] #card-system,
+      body[data-tool="useinai"] #card-about { display: none; }
+
+      /* About: show only card-about */
+      body[data-tool="about"] #special-days-card,
+      body[data-tool="about"] #subscribe,
+      body[data-tool="about"] #card-mcp,
+      body[data-tool="about"] #card-system { display: none; }
+
+      /* Footer: only show on tool panels */
+      body[data-tool="festivals"] footer,
+      body[data-tool="subscribe"] footer,
+      body[data-tool="useinai"] footer,
+      body[data-tool="about"] footer { display: none; }
+    }
+
+    /* Sidebar chrome */
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 0.6rem;
+      height: 60px; padding: 0 1rem; box-sizing: border-box;
+      border-bottom: 1px solid #E7DECC; flex: none;
+    }
+    .sidebar-brand-name {
+      font-family: var(--brand-display); font-size: 1rem; font-weight: 400;
+      color: #1F1A17; line-height: 1.2;
+    }
+    .sidebar-brand-name em { color: var(--brand); font-style: italic; }
+    .sidebar-nav { list-style: none; padding: 1rem 0 0.5rem; margin: 0; flex: 1 1 auto; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 0.65rem; width: 100%;
+      padding: 0.58rem 1rem; border: none; border-left: 2px solid transparent;
+      background: none; cursor: pointer; font-family: inherit; font-size: 0.88rem;
+      color: #58504A; text-align: left; text-decoration: none;
+      transition: background 0.12s;
+    }
+    .sidebar-item:hover { background: #F2ECDF; color: #1F1A17; }
+    .sidebar-item.active {
+      background: var(--indigo-bg); color: var(--indigo);
+      font-weight: 600; border-left-color: var(--indigo);
+    }
+    .sidebar-icon {
+      font-size: 1rem; line-height: 1; flex: none;
+      width: 1.2rem; text-align: center;
+    }
+    .sidebar-label { flex: 1; min-width: 0; line-height: 1.3; }
+    .sidebar-shloka {
+      padding: 1rem 1rem 0.75rem; border-top: 1px solid #E7DECC; flex: none;
+    }
+    .sidebar-shloka-lines {
+      display: flex; flex-direction: column; gap: 0.05rem;
+      font-family: var(--brand-display); font-style: italic;
+      font-size: 0.71rem; line-height: 1.55; color: rgba(31,26,23,0.55);
+    }
+    .sidebar-shloka-gist {
+      margin-top: 0.45rem; font-size: 0.68rem; color: rgba(31,26,23,0.5);
+      letter-spacing: 0.01em;
+    }
+    .sidebar-footer {
+      padding: 0.6rem 1rem 0.9rem; border-top: 1px solid #E7DECC;
+      font-size: 0.72rem; color: #B5AC9C; line-height: 1.5; flex: none;
+    }
+    .sidebar-footer a { color: var(--indigo); }
     body[data-mode="mobile"] #special-days-card .preview-note { display: none; }
 
     /* ---------- Mobile Stitch aesthetic — Today screen ---------- */
@@ -1170,6 +1311,75 @@
   </p>
 </div>
 
+<nav id="sidebar" aria-label="Main navigation">
+  <div class="sidebar-brand">
+    <svg class="sunmoon" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="width:32px;height:32px;flex:none;">
+      <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
+      <ellipse cx="24" cy="24" rx="12" ry="19" transform="rotate(22 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.3" stroke-opacity="0.6"/>
+      <circle cx="13.5" cy="16" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+      <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+      <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
+    </svg>
+    <span class="sidebar-brand-name">Astro <em>Chaganti</em></span>
+  </div>
+  <ul class="sidebar-nav" role="list">
+    <li>
+      <button class="sidebar-item active" id="sidebar-today" onclick="switchTool('today')">
+        <span class="sidebar-icon">🔆</span>
+        <span class="sidebar-label">Panchangam</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-item" id="sidebar-gochara" onclick="switchTool('gochara')">
+        <span class="sidebar-icon">🪐</span>
+        <span class="sidebar-label">Gochara · Rasi Phalalu</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-item" id="sidebar-tarabalam" onclick="switchTool('tarabalam')">
+        <span class="sidebar-icon">✦</span>
+        <span class="sidebar-label">Tarabalam · Muhurtam</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-item" id="sidebar-festivals" onclick="switchTool('festivals')">
+        <span class="sidebar-icon">🪔</span>
+        <span class="sidebar-label">Festivals</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-item" id="sidebar-subscribe" onclick="switchTool('subscribe')">
+        <span class="sidebar-icon">📅</span>
+        <span class="sidebar-label">Subscribe</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-item" id="sidebar-useinai" onclick="switchTool('useinai')">
+        <span class="sidebar-icon">🤖</span>
+        <span class="sidebar-label">Use in AI</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-item" id="sidebar-about" onclick="switchTool('about')">
+        <span class="sidebar-icon">ℹ️</span>
+        <span class="sidebar-label">About</span>
+      </button>
+    </li>
+  </ul>
+  <div class="sidebar-shloka">
+    <div class="sidebar-shloka-lines">
+      <span>satyaṃ brūyāt priyaṃ brūyān</span>
+      <span>na brūyāt satyam apriyam</span>
+      <span>priyaṃ ca nānṛtaṃ brūyād</span>
+      <span>eṣa dharmaḥ sanātanaḥ</span>
+    </div>
+    <div class="sidebar-shloka-gist">Be truthful. Be kind.</div>
+  </div>
+  <div class="sidebar-footer">
+    <a href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
+  </div>
+</nav>
+
 <div class="page">
 
   <div class="hero">
@@ -1200,11 +1410,17 @@
   <div id="global-controls-bar">
     <div class="selector" id="sel-tp-city">
       <label for="tp-city">City</label>
-      <select id="tp-city"></select>
+      <div class="sel-wrap">
+        <svg class="sel-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <select id="tp-city"></select>
+      </div>
     </div>
     <div class="selector" id="sel-tp-system">
       <label for="tp-system">System</label>
-      <select id="tp-system"></select>
+      <div class="sel-wrap">
+        <svg class="sel-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        <select id="tp-system"></select>
+      </div>
     </div>
     <div class="selector" id="sel-fmt-toggle">
       <label id="fmt-label">Time format</label>
@@ -1214,7 +1430,7 @@
       </div>
     </div>
   </div>
-  <div class="card">
+  <div class="card" id="card-tools">
     <div class="tool-tabs" role="tablist">
       <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">
         <span class="tt">🔆 Today's Panchangam</span><span class="ts">What is the day?</span></button>
@@ -1225,6 +1441,7 @@
     </div>
     <div class="m-page-title" id="m-page-title"><span class="m-page-title-main" id="m-page-title-main">Today's Panchangam</span><span class="m-page-title-sub" id="m-page-title-sub">What is the day?</span></div>
     <div id="panel-today" role="tabpanel">
+    <h2 class="panel-heading">🔆 Panchangam</h2>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
     <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
     Times marked <sup class="plus1" style="color:#A56B1E;">+1</sup> fall after midnight on the next day;
@@ -1232,6 +1449,7 @@
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
+      <h2 class="panel-heading">✦ Tarabalam · Muhurtam</h2>
       <p class="tb-intro">Pick your birth star — and up to three more for family — then choose a date range.
       Each day is checked against every person's star (Tarabalam) and rashi (Chandrabalam);
       <span class="tb-star">✦</span> marks days favourable for everyone together.</p>
@@ -1382,6 +1600,7 @@
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
+      <h2 class="panel-heading">🪐 Gochara · Rasi Phalalu</h2>
       <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
       <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
       coloured by its gochara verdict for them.</p>
@@ -1437,9 +1656,15 @@
   </div>
 
   <div class="card" id="special-days-card">
-    <h2>⚡ Special days — next 30 days</h2>
+    <h2>🪔 Festivals</h2>
     <div id="upcoming-result"><p class="preview-error">Loading…</p></div>
-    <p class="preview-note">Follows the city and system selected above. Subscribe below to get every special day in your calendar with a reminder.</p>
+    <div class="upcoming-legend">
+      <span>🪔 Named festival</span>
+      <span>⚡ Tithi observance (Ekadashi, Pournami, Amavasya, Pradosham)</span>
+      <span>⚠️ Ganda Moola</span>
+      <span>🌕 Eclipse</span>
+    </div>
+    <p class="preview-note" style="margin-top:0.5rem;">Follows the city and system selected above.</p>
   </div>
 
   <div class="card" id="subscribe">
@@ -1620,6 +1845,42 @@
     </div>
 
     </div><!-- /mcp-more -->
+  </div>
+
+  <div class="card" id="card-about">
+    <h2>ℹ️ About</h2>
+    <p style="font-size:0.9rem;color:#58504A;margin:0 0 1rem;line-height:1.65;">
+      <strong>Astro Chaganti's Panchangam</strong> is a free Telugu/Vedic panchangam built for the
+      Telugu-speaking community. It delivers daily almanac data as subscribable calendar feeds, a daily
+      at-a-glance view, family timing tools (Tarabalam, Muhurtam), planetary transits (Gochara), and
+      an MCP server for AI assistants. Free, open source, no account needed.
+    </p>
+
+    <h3 class="sub">Accuracy</h3>
+    <p style="font-size:0.85rem;color:#58504A;margin:0 0 1rem;line-height:1.6;">
+      All timings are verified against <a href="https://drikpanchang.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">drikpanchang.com</a>
+      across multiple cities and dates before each release. Three calculation systems are supported:
+      <strong>Drik Ganita</strong> (modern default, matches drikpanchang.com),
+      <strong>Surya Siddhanta</strong> (classical siddhantic method), and
+      <strong>Vakya</strong> (traditional printed panchangam method).
+    </p>
+
+    <h3 class="sub">Coverage</h3>
+    <p style="font-size:0.85rem;color:#58504A;margin:0 0 1rem;line-height:1.6;">
+      22 pre-configured cities across India and the diaspora. Calendar feeds regenerated monthly,
+      18 months ahead. The MCP server computes live for any city and any date, past or future.
+    </p>
+
+    <h3 class="sub">Links</h3>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.5rem;">
+      <a class="btn" style="text-decoration:none;font-size:0.82rem;" href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
+      <a class="btn" style="text-decoration:none;font-size:0.82rem;background:#58504A;" href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener">MCP server on PyPI</a>
+      <a class="btn" style="text-decoration:none;font-size:0.82rem;background:#4F6B2C;" href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>
+    </div>
+    <p style="font-size:0.78rem;color:#B5AC9C;margin-top:1rem;">
+      For professional consultations and personal birth chart readings, visit
+      <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a>.
+    </p>
   </div>
 
   <footer>
