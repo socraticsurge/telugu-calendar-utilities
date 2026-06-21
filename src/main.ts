@@ -680,35 +680,78 @@ import {
     }
   }
 
-  // --- Upcoming special days (next 30 days, same city/system as preview) ---
+  // --- Festivals & observances — full calendar year, accordion by month ---
 
   function renderUpcoming(events) {
     const container = document.getElementById('upcoming-result');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const rows = [];
-    for (let i = 1; i <= 30; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() + i);
+    const year = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    const MONTH_NAMES = ['January','February','March','April','May','June',
+                         'July','August','September','October','November','December'];
+
+    const buckets: Map<number, string[]> = new Map();
+
+    const d = new Date(year, 0, 1);
+    const yearEnd = new Date(year, 11, 31);
+    while (d <= yearEnd) {
       const ev = events.get(stampOf(d));
-      if (!ev || !(ev.summary.includes('⚡') || ev.summary.includes('🪔'))) continue;
-      const data = parseDescription(ev.description);
-      let chips = '';
-      data.special
-        .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-        .forEach(s => { chips += `<span class="special-chip">${chipEmoji(s, ev.summary)} ${specialLabel(s, data)}</span>`; });
-      if (data.eclipse) chips += eclipseChip(data.eclipse);
-      if (!chips) continue;
-      const dow = d.toLocaleDateString('en-US', { weekday: 'short' });
-      const md = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      rows.push(`<div class="upcoming-row">
-        <span class="upcoming-date"><span class="dow">${dow}</span> ${md}<span class="upcoming-in"> · in ${i} day${i > 1 ? 's' : ''}</span></span>
-        <span class="upcoming-chips">${chips}</span>
-      </div>`);
+      if (ev && (ev.summary.includes('⚡') || ev.summary.includes('🪔'))) {
+        const data = parseDescription(ev.description);
+        let chips = '';
+        data.special
+          .filter(s => !(data.eclipse && /Eclipse/.test(s)))
+          .forEach(s => { chips += `<span class="special-chip">${chipEmoji(s, ev.summary)} ${specialLabel(s, data)}</span>`; });
+        if (data.eclipse) chips += eclipseChip(data.eclipse);
+        if (chips) {
+          const m = d.getMonth();
+          if (!buckets.has(m)) buckets.set(m, []);
+          const isToday = d.getTime() === today.getTime();
+          const isFestival = ev.summary.includes('🪔');
+          const dow = d.toLocaleDateString('en-US', { weekday: 'short' });
+          const day = d.getDate();
+          const monthAbbr = MONTH_NAMES[m].slice(0, 3);
+          let cls = 'upcoming-row';
+          if (isFestival) cls += ' upcoming-festival';
+          if (isToday)   cls += ' upcoming-today';
+          buckets.get(m).push(
+            `<div class="${cls}">
+              <span class="upcoming-date"><span class="dow">${dow}</span> ${monthAbbr} ${day}${isToday ? '<span class="upcoming-today-badge">today</span>' : ''}</span>
+              <span class="upcoming-chips">${chips}</span>
+            </div>`
+          );
+        }
+      }
+      d.setDate(d.getDate() + 1);
     }
-    container.innerHTML = rows.length
-      ? `<div class="upcoming-list">${rows.join('')}</div>`
-      : '<p class="preview-note">No special days in the next 30 days.</p>';
+
+    if (!buckets.size) {
+      container.innerHTML = `<p class="preview-note">No festivals found for ${year}.</p>`;
+      return;
+    }
+
+    let html = '';
+    for (const [m, rows] of buckets) {
+      const isOpen = m === currentMonth;
+      html += `<div class="upcoming-month${isOpen ? ' open' : ''}">
+        <button class="upcoming-month-header" onclick="toggleFestivalMonth(this)" aria-expanded="${isOpen}">
+          <span>${MONTH_NAMES[m]} ${year}</span>
+          <span class="upcoming-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="upcoming-month-body">
+          <div class="upcoming-list">${rows.join('')}</div>
+        </div>
+      </div>`;
+    }
+    container.innerHTML = html;
+  }
+
+  function toggleFestivalMonth(btn) {
+    const month = btn.closest('.upcoming-month');
+    const isOpen = month.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   }
 
   const FEED_CACHE = new Map();
@@ -2744,7 +2787,7 @@ import {
     // Expose functions referenced by inline HTML onclick/onchange handlers.
     // Modules are scoped; inline event attributes look up names on window.
     Object.assign(window, {
-      switchTool, showAppTab, setTimeFmt, toggleReadMore,
+      switchTool, showAppTab, setTimeFmt, toggleReadMore, toggleFestivalMonth,
       calcTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
       tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
       findMuhurta, muToggleMobile,
