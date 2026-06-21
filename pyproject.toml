@@ -35,7 +35,7 @@ browser-test = [
 ]
 # LLM-generated Rasi Phalalu. Install with: pip install -e .[llm]
 llm = [
-    "google-genai>=1.0",
+    "requests>=2.28",
 ]
 
 [project.urls]
