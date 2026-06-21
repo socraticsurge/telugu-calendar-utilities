@@ -2186,10 +2186,25 @@ import {
         const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
         const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
-        for (const c of data.choghadiya) {
+        const MUHURTA_MINS = 48;
+        const srMin = muMin(data.sunrise);
+        const ssMin = muMin(data.sunset);
+        const chogAtMin = t => {
+          for (const blk of data.choghadiya) {
+            const bs = muMin(blk.start);
+            const be = muMin(blk.end);
+            if (bs <= t && t < be) return blk;
+          }
+          return null;
+        };
+        let winStart = srMin;
+        while (winStart < ssMin) {
+          const winEnd = Math.min(winStart + MUHURTA_MINS, ssMin);
+          const c = chogAtMin(winStart);
+          if (!c) { winStart += MUHURTA_MINS; continue; }
           const base = MU_GOOD_CHOG[c.name];
-          if (base === undefined) continue;
-          for (const [s0, e0] of muSubtract(muMin(c.start), muMin(c.end), bad)) {
+          if (base === undefined) { winStart += MUHURTA_MINS; continue; }
+          for (const [s0, e0] of muSubtract(winStart, winEnd, bad)) {
             if (e0 - s0 < 24) continue;
 
             // Compute slot-time facts via Meeus Sun/Moon longitudes.
@@ -2445,6 +2460,7 @@ import {
             slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha });
             slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
           }
+          winStart += MUHURTA_MINS;
         }
         // Diagnose: if the day produced no slots and it wasn't an eclipse,
         // record the most likely reason (samskara skip, mode filter, etc.).
