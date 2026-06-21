@@ -32,7 +32,8 @@ from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSP
 from telugu_panchangam.panchaka import evaluate_panchaka
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
-MIN_SLOT_MINUTES = 24  # one ghati
+MIN_SLOT_MINUTES = 24   # one ghati — minimum piece after bad-window subtraction
+MUHURTA_MINUTES = 48    # one classical muhurta (2 ghati) — the slot window size
 
 # Night choghadiya sequence (8 blocks sunset→next sunrise), weekday 0=Sunday.
 # Matches _NIGHT_CHOGHADIYA in generators/ics.py — both must stay in sync.
@@ -301,6 +302,17 @@ ACTIVITY_RULES: dict[str, dict] = {
 }
 
 ACTIVITIES = tuple(ACTIVITY_RULES.keys())
+
+
+_MUHURTA_DUR = timedelta(minutes=MUHURTA_MINUTES)
+
+
+def _chog_at_time(t: datetime, choghadiya: list) -> 'Window | None':
+    """Return the choghadiya block active at time t, or None if t is outside all blocks."""
+    for block in choghadiya:
+        if block.start <= t < block.end:
+            return block
+    return None
 
 
 def _subtract(start: datetime, end: datetime, blocks: list[tuple[datetime, datetime]]):
@@ -1180,33 +1192,37 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
     slots = []
-    for block in day.choghadiya:
-        base = GOOD_CHOGHADIYA.get(block.name)
-        if base is None:
-            continue
-        for s, e in _subtract(block.start, block.end, bad):
-            if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
-                continue
-            facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
-                    if use_engine else snapshot
+    t = day.sunrise
+    while t < day.sunset:
+        win_end = min(t + _MUHURTA_DUR, day.sunset)
+        block = _chog_at_time(t, day.choghadiya)
+        if block is not None:
+            base = GOOD_CHOGHADIYA.get(block.name)
+            if base is not None:
+                for s, e in _subtract(t, win_end, bad):
+                    if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
+                        continue
+                    facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                            if use_engine else snapshot
 
-            slot_dict = _evaluate_slot(
-                s=s, e=e, day=day, block=block, base=base, facts=facts,
-                skip_yogas=skip_yogas, janma_nakshatras=janma_nakshatras,
-                janma_rasis=janma_rasis, chandra_mode=chandra_mode,
-                prefer_tithi_class=prefer_tithi_class, label=label,
-                vara_bonus=vara_bonus, vara_reason=vara_reason,
-                abhijit=abhijit, amrita=amrita, prefer_chog=prefer_chog,
-                avoid_karana_names=avoid_karana_names,
-                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
-                janma_lagnas=janma_lagnas,
-                prefer_lagna_class=prefer_lagna_class,
-                prefer_bhadra_puchha=prefer_bhadra_puchha,
-                simha_stha_shukra_penalty=_shukra_penalty,
-                prefer_nakshatra_mukha=prefer_nakshatra_mukha,
-            )
-            if slot_dict is not None:
-                slots.append(slot_dict)
+                    slot_dict = _evaluate_slot(
+                        s=s, e=e, day=day, block=block, base=base, facts=facts,
+                        skip_yogas=skip_yogas, janma_nakshatras=janma_nakshatras,
+                        janma_rasis=janma_rasis, chandra_mode=chandra_mode,
+                        prefer_tithi_class=prefer_tithi_class, label=label,
+                        vara_bonus=vara_bonus, vara_reason=vara_reason,
+                        abhijit=abhijit, amrita=amrita, prefer_chog=prefer_chog,
+                        avoid_karana_names=avoid_karana_names,
+                        horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
+                        janma_lagnas=janma_lagnas,
+                        prefer_lagna_class=prefer_lagna_class,
+                        prefer_bhadra_puchha=prefer_bhadra_puchha,
+                        simha_stha_shukra_penalty=_shukra_penalty,
+                        prefer_nakshatra_mukha=prefer_nakshatra_mukha,
+                    )
+                    if slot_dict is not None:
+                        slots.append(slot_dict)
+        t += _MUHURTA_DUR
 
     # Tier each slot relative to the scores found on this day, then sort
     # tier-first (Excellent > Good > Fair > Avoid), then by score, then
@@ -1326,48 +1342,52 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
     slots = []
-    for block in night_blocks:
-        base = GOOD_CHOGHADIYA.get(block.name)
-        if base is None:
-            continue
-        for s, e in _subtract(block.start, block.end, bad):
-            if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
-                continue
-            facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
-                    if use_engine else snapshot
+    t = day.sunset
+    while t < next_day.sunrise:
+        win_end = min(t + _MUHURTA_DUR, next_day.sunrise)
+        block = _chog_at_time(t, night_blocks)
+        if block is not None:
+            base = GOOD_CHOGHADIYA.get(block.name)
+            if base is not None:
+                for s, e in _subtract(t, win_end, bad):
+                    if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
+                        continue
+                    facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                            if use_engine else snapshot
 
-            slot_dict = _evaluate_slot(
-                s=s, e=e, day=day, block=block, base=base, facts=facts,
-                skip_yogas=skip_yogas, janma_nakshatras=janma_nakshatras,
-                janma_rasis=janma_rasis, chandra_mode=chandra_mode,
-                prefer_tithi_class=prefer_tithi_class, label=label,
-                vara_bonus=vara_bonus, vara_reason=vara_reason,
-                abhijit=None,   # no Abhijit at night
-                amrita=amrita, prefer_chog=prefer_chog,
-                avoid_karana_names=avoid_karana_names,
-                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
-                janma_lagnas=janma_lagnas,
-                prefer_lagna_class=prefer_lagna_class,
-                prefer_bhadra_puchha=prefer_bhadra_puchha,
-                simha_stha_shukra_penalty=_shukra_penalty,
-                prefer_nakshatra_mukha=prefer_nakshatra_mukha,
-            )
-            if slot_dict is None:
-                continue
+                    slot_dict = _evaluate_slot(
+                        s=s, e=e, day=day, block=block, base=base, facts=facts,
+                        skip_yogas=skip_yogas, janma_nakshatras=janma_nakshatras,
+                        janma_rasis=janma_rasis, chandra_mode=chandra_mode,
+                        prefer_tithi_class=prefer_tithi_class, label=label,
+                        vara_bonus=vara_bonus, vara_reason=vara_reason,
+                        abhijit=None,   # no Abhijit at night
+                        amrita=amrita, prefer_chog=prefer_chog,
+                        avoid_karana_names=avoid_karana_names,
+                        horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
+                        janma_lagnas=janma_lagnas,
+                        prefer_lagna_class=prefer_lagna_class,
+                        prefer_bhadra_puchha=prefer_bhadra_puchha,
+                        simha_stha_shukra_penalty=_shukra_penalty,
+                        prefer_nakshatra_mukha=prefer_nakshatra_mukha,
+                    )
+                    if slot_dict is None:
+                        continue
 
-            # Night-specific bonuses applied after _evaluate_slot().
-            night_bonuses: list[str] = []
-            if brahma is not None and _overlaps(s, e, brahma.start, brahma.end):
-                slot_dict['score'] += 2
-                night_bonuses.append('overlaps Brahma Muhurta (+2)')
-            if _overlaps(s, e, nishita_start, nishita_end):
-                slot_dict['score'] += 2
-                night_bonuses.append('overlaps Nishita Kala (+2)')
-            if night_bonuses:
-                slot_dict['reason_groups']['slot_quality'].extend(night_bonuses)
-                slot_dict['reasons'].extend(night_bonuses)
+                    # Night-specific bonuses applied after _evaluate_slot().
+                    night_bonuses: list[str] = []
+                    if brahma is not None and _overlaps(s, e, brahma.start, brahma.end):
+                        slot_dict['score'] += 2
+                        night_bonuses.append('overlaps Brahma Muhurta (+2)')
+                    if _overlaps(s, e, nishita_start, nishita_end):
+                        slot_dict['score'] += 2
+                        night_bonuses.append('overlaps Nishita Kala (+2)')
+                    if night_bonuses:
+                        slot_dict['reason_groups']['slot_quality'].extend(night_bonuses)
+                        slot_dict['reasons'].extend(night_bonuses)
 
-            slots.append(slot_dict)
+                    slots.append(slot_dict)
+        t += _MUHURTA_DUR
 
     assign_tiers(slots)
     slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
