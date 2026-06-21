@@ -34,6 +34,18 @@ from telugu_panchangam.panchaka import evaluate_panchaka
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MIN_SLOT_MINUTES = 24  # one ghati
 
+# Night choghadiya sequence (8 blocks sunset→next sunrise), weekday 0=Sunday.
+# Matches _NIGHT_CHOGHADIYA in generators/ics.py — both must stay in sync.
+_NIGHT_CHOGHADIYA = {
+    0: ['Shubh', 'Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh'],
+    1: ['Char',  'Rog',   'Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char'],
+    2: ['Kaal',  'Labh',  'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog',  'Kaal'],
+    3: ['Udveg', 'Shubh', 'Amrit', 'Char', 'Rog',   'Kaal', 'Labh', 'Udveg'],
+    4: ['Amrit', 'Char',  'Rog',  'Kaal', 'Labh',  'Udveg', 'Shubh', 'Amrit'],
+    5: ['Rog',   'Kaal',  'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog'],
+    6: ['Labh',  'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog',   'Kaal', 'Labh'],
+}
+
 CHANDRA_MODES = ('stars', 'puja_ok', 'strict')
 
 # Tier thresholds — score → human-anchor label.
@@ -775,6 +787,24 @@ def _get_bad_windows(day, avoid_karana_names):
     return bad
 
 
+def _get_bad_windows_night(day, avoid_karana_names):
+    """Bad windows for night scoring — same as day but without Rahu/Gulika/Yamagandam.
+
+    Rahu Kalam, Gulika Kalam, and Yamagandam are calculated from the daytime
+    interval (sunrise→sunset) and have no night equivalents in standard practice.
+    Varjyam and Durmuhurtham are nakshatra-based / 15-muhurta-based respectively
+    and can genuinely fall at night.
+    """
+    bad = [(w.start, w.end) for w in
+           list(day.varjyam) + list(day.durmuhurtham)
+           + list(day.vishaghati)]
+    if day.bhadra_mukha is not None:
+        bad.append((day.bhadra_mukha.start, day.bhadra_mukha.end))
+    if avoid_karana_names:
+        bad += [(k.start, k.end) for k in day.karana if k.name in avoid_karana_names]
+    return bad
+
+
 def _anandadi_day_modifier(day) -> tuple[int, str | None]:
     """Return (score_delta, reason_chip) for the day's Anandadi yoga.
 
@@ -1183,6 +1213,162 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     # the personal-dosha tiebreaker, then chronological. This keeps the
     # visible tier pill consistent with rank order — a "Good" slot never
     # sits above an "Excellent" one just because its raw score is higher.
+    assign_tiers(slots)
+    slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
+                              x['personal_dosha'] is not None, x['start']))
+    return slots
+
+
+def night_slots(day: PanchangamDay, next_day: PanchangamDay,
+                activity: str = 'any',
+                janma_nakshatras: list[str] | None = None,
+                janma_rasis: list[str | None] | None = None,
+                janma_lagnas: list[str | None] | None = None,
+                chandra_mode: str = 'stars',
+                travel_direction: str | None = None,
+                *, engine=None) -> list[dict]:
+    """Ranked auspicious slots for one night (today's sunset to tomorrow's sunrise).
+
+    Mirrors day_slots() with the following night-specific differences:
+    - Uses night choghadiya blocks (8 equal parts of sunset→next sunrise)
+    - Omits Rahu Kalam / Gulika Kalam / Yamagandam (daytime-only in standard practice)
+    - Omits Abhijit Muhurta bonus (anchored to solar noon; no night equivalent)
+    - Adds Brahma Muhurta bonus (+2) from next_day.brahma_muhurta
+    - Adds Nishita Kala bonus (+2) at the midpoint of the night (±1 ghati)
+
+    `next_day` must be the PanchangamDay for the calendar day after `day`.
+    Its sunrise time defines the end of the night, and its brahma_muhurta
+    gives the pre-dawn auspicious window.
+    """
+    if activity not in ACTIVITIES:
+        raise ValueError(f'activity must be one of {ACTIVITIES}')
+    if chandra_mode not in CHANDRA_MODES:
+        raise ValueError(f'chandra_mode must be one of {CHANDRA_MODES}')
+    if janma_rasis is not None and janma_nakshatras is not None:
+        if len(janma_rasis) != len(janma_nakshatras):
+            raise ValueError('janma_rasis must align with janma_nakshatras '
+                             '(use None for people whose rashi is unknown).')
+
+    # Same day-level hard skips as day_slots().
+    if day.eclipse is not None:
+        return []
+    if activity == 'travel' and travel_direction is not None:
+        blocked = getattr(day, 'disha_shoola_direction', None)
+        if blocked is not None and travel_direction == blocked:
+            return []
+
+    rules = ACTIVITY_RULES[activity]
+
+    if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
+        return []
+    if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
+        return []
+    if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
+        return []
+    if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
+        return []
+    if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
+        return []
+    for g in rules.get('skip_on_combust', []):
+        info = getattr(day, f'{g.lower()}_maudhya', None)
+        if info is not None and info.combust:
+            return []
+
+    skip_yogas = set(rules.get('skip_on_yoga', ()))
+    prefer_chog = rules.get('prefer_choghadiya')
+    avoid_karana_names = set(rules.get('avoid_karana', ()))
+    prefer_tithi_class = rules.get('prefer_tithi_class')
+    prefer_varas = set(rules.get('prefer_vara', ()))
+    prefer_lagna_class = rules.get('prefer_lagna_class')
+    prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
+    prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
+    label = rules['label']
+
+    _shukra_penalty = rules.get('penalty_on_simha_stha_shukra', 0) \
+        if day.simha_stha_shukra else 0
+
+    # Vara is sunrise-anchored — carries through the night following that sunrise.
+    vara_bonus = 1 if day.vaaram in prefer_varas else 0
+    vara_reason = (f'{day.vaaram} favoured for {label} (+1)' if vara_bonus else None)
+
+    bad = _get_bad_windows_night(day, avoid_karana_names)
+    if rules.get('skip_on_sankramana') and day.sankramana_avoidance is not None:
+        bad.append((day.sankramana_avoidance.start, day.sankramana_avoidance.end))
+
+    amrita = list(day.amrita_kalam)  # absolute datetimes; night-spanning ones included
+
+    # Brahma Muhurta: from next_day (the 48-min window before tomorrow's sunrise).
+    brahma = next_day.brahma_muhurta
+
+    # Nishita Kala: midpoint of night ± 1 ghati (24 min).
+    _ONE_GHATI = timedelta(minutes=24)
+    nishita_mid = day.sunset + (next_day.sunrise - day.sunset) / 2
+    nishita_start = nishita_mid - _ONE_GHATI
+    nishita_end = nishita_mid + _ONE_GHATI
+
+    # Night choghadiya blocks (engine convention: Sunday=0).
+    weekday = (day.date.weekday() + 1) % 7
+    _block_dur = (next_day.sunrise - day.sunset) / 8
+    night_blocks = [
+        Window(name=_NIGHT_CHOGHADIYA[weekday][i],
+               start=day.sunset + i * _block_dur,
+               end=day.sunset + (i + 1) * _block_dur)
+        for i in range(8)
+    ]
+
+    # get_horas() returns 24 horas covering the full day+night from today's sunrise.
+    # get_lagna_transitions() covers sunrise to next sunrise.
+    # Both are already night-aware — no special handling needed.
+    horas = get_horas(day)
+    lagnas = get_lagna_transitions(day)
+
+    use_engine = engine is not None and hasattr(engine, 'facts_at')
+    snapshot = _day_snapshot_facts(day) if not use_engine else None
+
+    slots = []
+    for block in night_blocks:
+        base = GOOD_CHOGHADIYA.get(block.name)
+        if base is None:
+            continue
+        for s, e in _subtract(block.start, block.end, bad):
+            if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
+                continue
+            facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                    if use_engine else snapshot
+
+            slot_dict = _evaluate_slot(
+                s=s, e=e, day=day, block=block, base=base, facts=facts,
+                skip_yogas=skip_yogas, janma_nakshatras=janma_nakshatras,
+                janma_rasis=janma_rasis, chandra_mode=chandra_mode,
+                prefer_tithi_class=prefer_tithi_class, label=label,
+                vara_bonus=vara_bonus, vara_reason=vara_reason,
+                abhijit=None,   # no Abhijit at night
+                amrita=amrita, prefer_chog=prefer_chog,
+                avoid_karana_names=avoid_karana_names,
+                horas=horas, prefer_varas=prefer_varas, lagnas=lagnas,
+                janma_lagnas=janma_lagnas,
+                prefer_lagna_class=prefer_lagna_class,
+                prefer_bhadra_puchha=prefer_bhadra_puchha,
+                simha_stha_shukra_penalty=_shukra_penalty,
+                prefer_nakshatra_mukha=prefer_nakshatra_mukha,
+            )
+            if slot_dict is None:
+                continue
+
+            # Night-specific bonuses applied after _evaluate_slot().
+            night_bonuses: list[str] = []
+            if brahma is not None and _overlaps(s, e, brahma.start, brahma.end):
+                slot_dict['score'] += 2
+                night_bonuses.append('overlaps Brahma Muhurta (+2)')
+            if _overlaps(s, e, nishita_start, nishita_end):
+                slot_dict['score'] += 2
+                night_bonuses.append('overlaps Nishita Kala (+2)')
+            if night_bonuses:
+                slot_dict['reason_groups']['slot_quality'].extend(night_bonuses)
+                slot_dict['reasons'].extend(night_bonuses)
+
+            slots.append(slot_dict)
+
     assign_tiers(slots)
     slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
                               x['personal_dosha'] is not None, x['start']))

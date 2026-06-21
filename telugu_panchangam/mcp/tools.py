@@ -22,7 +22,7 @@ from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_ve
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.phalalu import rasi_phalalu
-from telugu_panchangam.personal.muhurta import day_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
+from telugu_panchangam.personal.muhurta import day_slots, night_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -930,20 +930,30 @@ def _gather_muhurta_slots(
     chandra_mode: str,
     janma_lagnas: Optional[list] = None,
     travel_direction: Optional[str] = None,
+    include_night: bool = False,
 ) -> tuple[list, list]:
     slots = []
     dropped_days = []
     tz = loc.timezone
 
+    # When include_night=True we need the day after the last requested day
+    # to get next_sunrise for the final night's blocks.
+    extra = 1 if include_night else 0
     end_date = start + timedelta(days=days - 1)
     jd_start_range = local_midnight_jd(start, loc.timezone)
-    jd_end_range = local_midnight_jd(end_date + timedelta(days=1), loc.timezone)
+    jd_end_range = local_midnight_jd(end_date + timedelta(days=1 + extra), loc.timezone)
     eclipses_in_range = list_eclipses_in_range(jd_start_range, jd_end_range)
 
+    # Pre-calculate all needed days (+ one extra when include_night=True)
+    calculated_days = {}
+    for i in range(days + extra):
+        d = start + timedelta(days=i)
+        pd = engine.calculate(d, loc, include_eclipse=False)
+        pd.eclipse = get_eclipse_from_precomputed(d, eclipses_in_range, loc)
+        calculated_days[i] = pd
+
     for i in range(days):
-        d_curr = start + timedelta(days=i)
-        day = engine.calculate(d_curr, loc, include_eclipse=False)
-        day.eclipse = get_eclipse_from_precomputed(d_curr, eclipses_in_range, loc)
+        day = calculated_days[i]
         day_results = day_slots(day, activity=activity,
                                 janma_nakshatras=janma_nakshatras,
                                 janma_rasis=janma_rasis,
@@ -951,7 +961,17 @@ def _gather_muhurta_slots(
                                 chandra_mode=chandra_mode,
                                 travel_direction=travel_direction,
                                 engine=engine)
-        if not day_results:
+        night_results = []
+        if include_night:
+            next_pd = calculated_days[i + 1]
+            night_results = night_slots(day, next_pd, activity=activity,
+                                        janma_nakshatras=janma_nakshatras,
+                                        janma_rasis=janma_rasis,
+                                        janma_lagnas=janma_lagnas,
+                                        chandra_mode=chandra_mode,
+                                        travel_direction=travel_direction,
+                                        engine=engine)
+        if not day_results and not night_results:
             reason = diagnose_day(day, activity=activity,
                                   janma_nakshatras=janma_nakshatras,
                                   janma_rasis=janma_rasis,
@@ -959,7 +979,7 @@ def _gather_muhurta_slots(
                                   travel_direction=travel_direction)
             if reason:
                 dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
-        for s in day_results:
+        for s in day_results + night_results:
             slots.append({**s, 'start': _fmt_time(s['start'], tz),
                           'end': _fmt_time(s['end'], tz)})
     return slots, dropped_days
@@ -980,6 +1000,7 @@ def tool_find_muhurta(
     timezone: Optional[str] = None,
     ayanamsa: str = 'lahiri',
     travel_direction: Optional[str] = None,
+    include_night: bool = False,
 ) -> str:
     """When janma_lagnas[i] is provided, strict Lagna Shuddhi is used
     for that person — kendra/trikona/Ashtama count from the natal
@@ -989,6 +1010,13 @@ def tool_find_muhurta(
     travel_direction: optional cardinal direction ('North', 'South',
     'East', 'West'). When activity='travel' and this is supplied, days
     whose Disha Shoola blocks that direction are excluded entirely.
+
+    include_night: when True, night choghadiya slots (sunset→next sunrise)
+    are scored and included alongside daytime slots. Night slots use the
+    same panchangam factors (tithi, nakshatra, yoga, tarabalam, chandrabalam)
+    but exclude Rahu Kalam / Gulika Kalam / Yamagandam (daytime-only) and
+    Abhijit Muhurta. Brahma Muhurta (+2) and Nishita Kala (+2) are added
+    as night-specific bonuses.
     """
     try:
         _validate_muhurta_inputs(days, activity, chandra_mode,
@@ -1003,6 +1031,7 @@ def tool_find_muhurta(
             start, days, loc, engine, activity, janma_nakshatras, janma_rasis, chandra_mode,
             janma_lagnas=janma_lagnas,
             travel_direction=travel_direction,
+            include_night=include_night,
         )
 
         # Re-tier across the whole search, not just one day — "Excellent"
