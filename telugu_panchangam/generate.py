@@ -11,6 +11,10 @@ from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.engines.utils import local_midnight_jd
 from telugu_panchangam.generators.ics import ICSGenerator
+from telugu_panchangam.generators.anga_variants import (
+    generate_festivals_feed,
+    generate_tithi_observances_feed,
+)
 
 ENGINES = {
     'drik': DrikGanitaEngine,
@@ -56,11 +60,17 @@ def generate_feeds(
                 days.append(day)
                 d += timedelta(days=1)
 
+            base = f'{city_slug(location.name)}-{system.replace("_", "-")}'
+
             raw = generator.generate(days, system)
-            filename = f'{city_slug(location.name)}-{system.replace("_", "-")}.ics'
-            path = os.path.join(output_dir, filename)
-            with open(path, 'wb') as f:
+            with open(os.path.join(output_dir, f'{base}.ics'), 'wb') as f:
                 f.write(raw)
+
+            with open(os.path.join(output_dir, f'{base}-festivals.ics'), 'wb') as f:
+                f.write(generate_festivals_feed(days, system))
+
+            with open(os.path.join(output_dir, f'{base}-observances.ics'), 'wb') as f:
+                f.write(generate_tithi_observances_feed(days, system))
 
 
 def default_feed_window(today: date) -> tuple[date, date]:

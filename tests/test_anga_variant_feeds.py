@@ -15,9 +15,11 @@ from telugu_panchangam.generators.anga_variants import (
     filter_ekadashi_days,
     filter_festival_days,
     filter_moon_cycle_days,
+    filter_tithi_observances,
     generate_ekadashi_feed,
     generate_festivals_feed,
     generate_moon_cycles_feed,
+    generate_tithi_observances_feed,
 )
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
@@ -109,6 +111,37 @@ def test_generate_moon_cycles_feed_is_valid_ical_and_only_contains_pournami_amav
         )
 
 
+def test_filter_tithi_observances_keeps_ekadashi_pournami_amavasya_pradosham():
+    days = _june_2026(30)
+    out = filter_tithi_observances(days)
+    assert out, 'expected at least one observance day in June 2026'
+    for d in out:
+        assert d.is_ekadashi or d.is_pournami or d.is_amavasya or d.is_pradosham, (
+            f'{d.date}: filter let through a non-observance day'
+        )
+    expected = [d.date for d in days
+                if d.is_ekadashi or d.is_pournami or d.is_amavasya or d.is_pradosham]
+    assert [d.date for d in out] == expected
+
+
+def test_tithi_observances_feed_is_valid_ical():
+    days = _june_2026(30)
+    raw = generate_tithi_observances_feed(days, 'drik')
+    cal = Calendar.from_ical(raw)
+    events = [c for c in cal.walk() if c.name == 'VEVENT']
+    assert events, 'expected at least one observance event in June 2026'
+    assert b'Tithi Observances' in raw
+
+
+def test_tithi_observances_is_superset_of_ekadashi_and_moon_cycles():
+    days = _june_2026(30)
+    obs_dates = {d.date for d in filter_tithi_observances(days)}
+    ek_dates = {d.date for d in filter_ekadashi_days(days)}
+    moon_dates = {d.date for d in filter_moon_cycle_days(days)}
+    assert ek_dates.issubset(obs_dates), 'observances should include all Ekadashi days'
+    assert moon_dates.issubset(obs_dates), 'observances should include all moon-cycle days'
+
+
 # --- Calendar metadata + labeling ------------------------------------------
 
 def test_each_variant_calendar_name_is_distinct():
@@ -117,13 +150,13 @@ def test_each_variant_calendar_name_is_distinct():
     days = _june_2026()
     names = set()
     for gen in (generate_ekadashi_feed, generate_festivals_feed,
-                generate_moon_cycles_feed):
+                generate_moon_cycles_feed, generate_tithi_observances_feed):
         raw = gen(days, 'drik')
         cal = Calendar.from_ical(raw)
         names.add(str(cal.get('x-wr-calname')))
-    # Three variants → three distinct calendar names. Dense feed not
+    # Four variants → four distinct calendar names. Dense feed not
     # included here but its name format also differs.
-    assert len(names) == 3, f'expected 3 distinct calendar names, got {names}'
+    assert len(names) == 4, f'expected 4 distinct calendar names, got {names}'
 
 
 def test_variants_preserve_refresh_interval_and_branding():
@@ -132,7 +165,7 @@ def test_variants_preserve_refresh_interval_and_branding():
     """
     days = _june_2026()
     for gen in (generate_ekadashi_feed, generate_festivals_feed,
-                generate_moon_cycles_feed):
+                generate_moon_cycles_feed, generate_tithi_observances_feed):
         raw = gen(days, 'drik')
         # REFRESH-INTERVAL appears literally in the raw bytes
         assert b'REFRESH-INTERVAL;VALUE=DURATION:PT12H' in raw
