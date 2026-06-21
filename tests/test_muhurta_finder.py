@@ -1067,7 +1067,7 @@ def test_night_slots_sorted_by_tier_then_score():
         a, b = slots[i], slots[i + 1]
         rank_a = TIER_NAMES.index(a['tier'])
         rank_b = TIER_NAMES.index(b['tier'])
-        assert rank_a >= rank_b or (rank_a == rank_b and a['score'] >= b['score'])
+        assert rank_a > rank_b or (rank_a == rank_b and a['score'] >= b['score'])
 
 
 def test_night_slots_eclipse_returns_empty():
