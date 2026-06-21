@@ -1356,12 +1356,7 @@ import {
           '<p class="preview-error">Sky data unavailable — try again later.</p>';
         return;
       }
-      const di = document.getElementById('go-date');
-      di.min = GO_DATA.start;
-      const last = new Date(GO_DATA.start + 'T00:00:00');
-      last.setDate(last.getDate() + GO_DATA.days.length - 1);
-      di.max = `${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`;
-      di.value = todayISO;
+      // date input removed — always show today
 
       // Fetch today's LLM-generated phalalu — silently skip if unavailable
       try {
@@ -1384,9 +1379,8 @@ import {
 
   function goDateIndex() {
     const start = new Date(GO_DATA.start + 'T00:00:00');
-    const val = document.getElementById('go-date').value;
-    const chosen = val ? new Date(val + 'T00:00:00') : new Date(new Date().setHours(0,0,0,0));
-    const i = Math.round((chosen - start) / 86400000);
+    const today = new Date(new Date().setHours(0,0,0,0));
+    const i = Math.round((today.getTime() - start.getTime()) / 86400000);
     return Math.max(0, Math.min(i, GO_DATA.days.length - 1));
   }
 
@@ -1602,12 +1596,7 @@ import {
       boxes += `<div class="${classes.join(' ')}" style="grid-row:${gr};grid-column:${gc};">
         <span class="rname">${GO_DATA.rasis[r]}${label}</span>${house}<br>${grahas}</div>`;
     }
-    const typed = document.getElementById('go-date').value;
-    const shownISO = `${dateShown.getFullYear()}-${String(dateShown.getMonth()+1).padStart(2,'0')}-${String(dateShown.getDate()).padStart(2,'0')}`;
-    document.getElementById('go-note').innerHTML = typed && typed !== shownISO
-      ? `<p class="preview-note" style="color:#8A5518;">That date is outside this chart's data window
-         (${GO_DATA.start} to ${document.getElementById('go-date').max}) — showing the nearest covered day,
-         ${fmtD(dateShown)}. For any date, past or future, ask via the MCP server below.</p>` : '';
+    document.getElementById('go-note').innerHTML = '';
     const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
       <div class="d2">${fmtD(dateShown)}</div>
       <div class="d2">${jr !== null ? 'from ' + htmlEsc(view.label) : 'transits — choose a person or rashi above to personalise'}</div></div>`;
@@ -1630,7 +1619,7 @@ import {
       const phShare = `<button class="wa-share-mini" style="position:static;width:26px;height:26px;margin-left:auto;flex:none;" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
       const llmRasiKey = view.label.replace(/ (rashi|lagna)$/i, '').trim();
       const llmEntry = LLM_PHALALU?.rashis?.[llmRasiKey];
-      const llmForToday = llmEntry && document.getElementById('go-date').value === todayISO;
+      const llmForToday = !!llmEntry;
       const adviceBlock = llmForToday && llmEntry.advice
         ? `<div style="margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;">` +
           `<span style="font-size:0.68rem;color:#8B7355;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;">Today's guidance</span>` +
