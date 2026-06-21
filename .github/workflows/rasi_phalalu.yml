@@ -2,7 +2,7 @@ name: Generate Rasi Phalalu
 
 on:
   schedule:
-    - cron: '30 1 * * *'  # 01:30 UTC daily (~07:00 IST, after sunrise)
+    - cron: '30 19 * * *'  # 19:30 UTC daily (01:00 IST next day)
   workflow_dispatch:       # allow manual trigger from Actions tab
 
 concurrency:
