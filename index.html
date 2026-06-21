@@ -140,7 +140,7 @@
     .sub-variant-title { font-size: 0.85rem; font-weight: 600; color: #1F1A17; }
     .sub-variant-option:has(input:checked) .sub-variant-title { color: var(--indigo); }
     .sub-variant-desc { font-size: 0.75rem; color: #8B8377; line-height: 1.4; }
-    .sub-reminder-note { font-size: 0.78rem; color: #58504A; line-height: 1.5; margin: 0 0 0.6rem; }
+    .sub-step-divider { font-size: 0.72rem; font-weight: 700; color: #8B8377; text-transform: uppercase; letter-spacing: 0.06em; margin: 1rem 0 0.4rem; padding-top: 0.75rem; border-top: 1px solid #E7DECC; }
     .btn { background: var(--indigo); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
     .btn:hover { background: #6d1f16; }
     .copy-confirm { margin-left: 0.75rem; color: #16a34a; display: none; font-size: 0.8rem; }
@@ -1734,6 +1734,14 @@
         <li>Paste the subscription URL above</li>
         <li>Click <strong>Add calendar</strong></li>
       </ol>
+      <p class="sub-step-divider">4 · Set up reminders</p>
+      <ol>
+        <li>In the left sidebar, click <strong>⋮</strong> next to this calendar's name</li>
+        <li>Select <strong>Settings and sharing</strong></li>
+        <li>Scroll to <strong>Event notifications</strong> → click <strong>Add notification</strong></li>
+        <li>Choose <strong>Push</strong> or <strong>Email</strong>, set to <strong>1 day</strong></li>
+        <li>Scroll to the bottom and click <strong>Save</strong></li>
+      </ol>
     </div>
     <div class="app-panel" data-app="apple">
       <ol>
@@ -1743,6 +1751,12 @@
         <li>Click <strong>Subscribe</strong></li>
         <li>Choose how often to refresh (Daily recommended)</li>
         <li>Click <strong>OK</strong></li>
+      </ol>
+      <p class="sub-step-divider">4 · Set up reminders</p>
+      <ol>
+        <li><strong>iPhone/iPad:</strong> Settings app → <strong>Calendar → Default Alert Times</strong> → All-Day Events → <strong>1 day before</strong></li>
+        <li><strong>Mac:</strong> Calendar → <strong>Settings</strong> (⌘,) → <strong>Alerts</strong> tab → All Day Events → <strong>1 day before</strong></li>
+        <li>Applies to all your subscribed calendars — no per-event setup needed</li>
       </ol>
     </div>
     <div class="app-panel" data-app="outlook">
@@ -1754,31 +1768,11 @@
         <li>Click <strong>Import</strong></li>
         <li>It refreshes automatically every few hours</li>
       </ol>
-    </div>
-
-    <h3 class="sub" style="margin-top:1.25rem;">4 · Set up reminders</h3>
-    <p class="sub-reminder-note">These are all-day events, so set your calendar's default all-day event alert — that way you get notified the evening before an Ekadashi, festival, or any observance without setting reminders one by one.</p>
-    <div class="app-panel active" data-app="google">
+      <p class="sub-step-divider">4 · Set up reminders</p>
       <ol>
-        <li>In the left sidebar, click the <strong>⋮</strong> next to this calendar's name</li>
-        <li>Select <strong>Settings and sharing</strong></li>
-        <li>Scroll to <strong>Event notifications</strong> → click <strong>Add notification</strong></li>
-        <li>Choose <strong>Push</strong> or <strong>Email</strong>, set to <strong>1 day</strong> (or your preference)</li>
-        <li>Scroll to the bottom and click <strong>Save</strong></li>
-      </ol>
-    </div>
-    <div class="app-panel" data-app="apple">
-      <ol>
-        <li><strong>iPhone/iPad:</strong> Open the Settings app → <strong>Calendar → Default Alert Times</strong> → All-Day Events → <strong>1 day before</strong></li>
-        <li><strong>Mac:</strong> Open Calendar → <strong>Settings</strong> (⌘,) → <strong>Alerts</strong> tab → All Day Events → <strong>1 day before</strong></li>
-        <li>This applies across all your subscribed calendars — no per-event setup needed</li>
-      </ol>
-    </div>
-    <div class="app-panel" data-app="outlook">
-      <ol>
-        <li><strong>Outlook desktop:</strong> File → Options → Calendar → Default reminders → set to <strong>1 Day</strong></li>
+        <li><strong>Outlook desktop:</strong> File → Options → Calendar → Default reminders → <strong>1 Day</strong></li>
         <li><strong>Outlook web:</strong> Settings (⚙) → Calendar → Events and invitations → Default reminder time → <strong>1 day</strong></li>
-        <li>Note: Outlook applies one default reminder across all calendars — subscribed feeds cannot have per-calendar alert settings</li>
+        <li>Note: Outlook applies one default reminder across all calendars</li>
       </ol>
     </div>
 
