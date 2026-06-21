@@ -1093,3 +1093,79 @@ def test_mcp_find_muhurta_include_night():
     # We just check that all slots have the required keys.
     for s in result['slots']:
         assert {'date', 'vaaram', 'start', 'end', 'score', 'reasons'} <= set(s)
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 — 48-minute classical muhurta windows
+# ---------------------------------------------------------------------------
+
+def test_day_slots_are_at_most_48_minutes():
+    """Every slot's window is ≤ 48 minutes (classical muhurta upper bound).
+
+    Bad windows can cut a slot shorter than 48 min; the window itself is
+    never wider than one classical muhurta.
+    """
+    from datetime import timedelta
+    from telugu_panchangam.personal.muhurta import MUHURTA_MINUTES
+    limit = timedelta(minutes=MUHURTA_MINUTES)
+    for date_args in [(2026, 6, 16), (2026, 6, 17), (2026, 6, 25)]:
+        day = _day(*date_args)
+        for s in day_slots(day, engine=ENGINE):
+            duration = s['end'] - s['start']
+            assert duration <= limit, (
+                f"{date_args}: slot {s['start']}–{s['end']} is {duration}, "
+                f"exceeds {MUHURTA_MINUTES} min"
+            )
+
+
+def test_night_slots_are_at_most_48_minutes():
+    """Night slot windows are also ≤ 48 minutes."""
+    from datetime import timedelta
+    from telugu_panchangam.personal.muhurta import night_slots, MUHURTA_MINUTES
+    limit = timedelta(minutes=MUHURTA_MINUTES)
+    for date_args in [(2026, 6, 16), (2026, 6, 25)]:
+        day, next_day = _two_days(*date_args)
+        for s in night_slots(day, next_day, engine=ENGINE):
+            duration = s['end'] - s['start']
+            assert duration <= limit, (
+                f"{date_args}: night slot {s['start']}–{s['end']} is {duration}"
+            )
+
+
+def test_day_slots_start_on_48_minute_boundaries():
+    """Each slot's start is either at a sunrise + N×48-min boundary, or
+    immediately after a bad window (which pushed it forward within that
+    48-min window). Verified by checking the offset from sunrise is a
+    multiple of 48 min, OR the start coincides with the end of some
+    inauspicious window on that day.
+    """
+    from datetime import timedelta
+    from telugu_panchangam.personal.muhurta import MUHURTA_MINUTES
+    muhurta = timedelta(minutes=MUHURTA_MINUTES)
+    day = _day(2026, 6, 17)
+    bad_ends = {w.end for w in
+                [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
+                + list(day.varjyam) + list(day.durmuhurtham)}
+    for s in day_slots(day, engine=ENGINE):
+        offset = s['start'] - day.sunrise
+        on_boundary = (offset.total_seconds() % muhurta.total_seconds()) == 0.0
+        after_bad = s['start'] in bad_ends
+        assert on_boundary or after_bad, (
+            f"slot start {s['start']} is neither a 48-min sunrise boundary "
+            f"nor the end of a bad window"
+        )
+
+
+def test_clean_choghadiya_block_produces_two_slots():
+    """A good choghadiya block ~98 min long with no bad-window overlap spans
+    two 48-min windows, producing ≥ 2 slots.
+
+    2026-06-25: the Char block (05:09–06:48 UTC) is entirely free of all
+    inauspicious windows and contains two sunrise-aligned 48-min windows.
+    """
+    day = _day(2026, 6, 25)
+    slots = day_slots(day, engine=ENGINE)
+    char_slots = [s for s in slots if s['reasons'][0].startswith('Char ')]
+    assert len(char_slots) >= 2, (
+        f"expected ≥2 slots from the clean Char block; got {len(char_slots)}"
+    )
