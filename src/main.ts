@@ -1343,6 +1343,7 @@ import {
   const GO_EXEMPT = new Set(['Surya|Shani','Shani|Surya','Chandra|Budha','Budha|Chandra']);
   const GO_NODES = new Set(['Rahu','Ketu']);
   let GO_DATA = null;
+  let LLM_PHALALU = null;
 
   async function loadGochara() {
     const firstLoad = !GO_DATA;
@@ -1361,6 +1362,12 @@ import {
       last.setDate(last.getDate() + GO_DATA.days.length - 1);
       di.max = `${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`;
       di.value = todayISO;
+
+      // Fetch today's LLM-generated phalalu — silently skip if unavailable
+      try {
+        const pr = await fetch(`rasi_phalalu/${todayISO}.json`, { cache: 'no-cache' });
+        if (pr.ok) LLM_PHALALU = await pr.json();
+      } catch (_) { /* no LLM phalalu today — computed fallback will be used */ }
     }
     // people may have changed in the Tarabalam tab — rebuild, keep selection
     const sel = document.getElementById('go-view');
@@ -1606,24 +1613,36 @@ import {
       <div class="d2">${jr !== null ? 'from ' + htmlEsc(view.label) : 'transits — choose a person or rashi above to personalise'}</div></div>`;
     document.getElementById('go-chart').innerHTML = boxes + center;
 
-    // upcoming moves, soonest first
+    // upcoming moves — fast planets only (Moon, Mercury, Sun change frequently enough to matter)
+    const GO_FAST = new Set(['Chandra', 'Budha', 'Surya']);
     const moves = GO_DATA.grahas.map((g, gi) => ({ g, t: goTill(idx, gi) }))
-      .filter(m => m.t).sort((a, b) => a.t.date - b.t.date).slice(0, 5);
+      .filter(m => m.t && GO_FAST.has(m.g)).sort((a, b) => a.t.date - b.t.date);
     document.getElementById('go-moves').innerHTML = moves.length
       ? `<div class="go-moves"><b>Coming up:</b> ` + moves.map(m =>
           `<span class="go-move">${m.g} → ${m.t.next} <b>${m.t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</b></span>`)
           .join('<span class="go-move-sep"> &nbsp;·&nbsp; </span>') + `</div>` : '';
 
-    // rasi phalalu (daily reading from the same computed verdicts)
+    // rasi phalalu
     const phBox = document.getElementById('go-phalalu');
     if (jr === null) { phBox.innerHTML = ''; }
     else {
       const ph = buildPhalalu(jr, jl, row, view, idx);
       const phShare = `<button class="wa-share-mini" style="position:static;width:26px;height:26px;margin-left:auto;flex:none;" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
+      const llmRasiKey = view.label.replace(/ (rashi|lagna)$/i, '').trim();
+      const llmEntry = LLM_PHALALU?.rashis?.[llmRasiKey];
+      const llmForToday = llmEntry && document.getElementById('go-date').value === todayISO;
+      const adviceBlock = llmForToday && llmEntry.advice
+        ? `<div style="margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;">` +
+          `<span style="font-size:0.68rem;color:#8B7355;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;">Today's guidance</span>` +
+          `<span style="font-size:0.84rem;color:#44403c;line-height:1.5;">${htmlEsc(llmEntry.advice)}</span></div>`
+        : '';
       phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:0.4rem;">Rasi Phalalu — ${htmlEsc(view.label)}
         <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
-        ph.lines.map(l => `<p>${l}</p>`).join('') +
-        `<p style="font-size:0.72rem;color:#B5AC9C;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p></div>`;
+        (llmForToday
+          ? `<p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}`
+          : ph.lines.map(l => `<p>${l}</p>`).join('') +
+            `<p style="font-size:0.72rem;color:#B5AC9C;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p>`) +
+        `</div>`;
     }
 
     // legend

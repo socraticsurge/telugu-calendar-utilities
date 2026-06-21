@@ -1,0 +1,42 @@
+name: Generate Rasi Phalalu
+
+on:
+  schedule:
+    - cron: '30 19 * * *'  # 19:30 UTC daily (01:00 IST next day)
+  workflow_dispatch:       # allow manual trigger from Actions tab
+
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e .[llm]
+
+      - name: Generate Rasi Phalalu
+        env:
+          rasiphalalu: ${{ secrets.rasiphalalu }}
+          PHALALU_OUT: ./public/rasi_phalalu
+        run: python scripts/generate_llm_phalalu.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: true
+          cname: panchangam.astrochaganti.com
