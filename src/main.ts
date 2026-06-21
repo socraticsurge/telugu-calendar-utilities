@@ -2193,7 +2193,7 @@ import {
         const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
         const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
-        for (const c of data.choghadiya) {
+        for (const c of [...data.choghadiya, ...data.nightChoghadiya]) {
           const base = MU_GOOD_CHOG[c.name];
           if (base === undefined) continue;
           for (const [s0, e0] of muSubtract(muMin(c.start), muMin(c.end), bad)) {
