@@ -14,7 +14,9 @@ Exits non-zero on verification failure so CI/cron alerts loudly.
 import json
 import os
 import sys
-from datetime import date
+from datetime import datetime
+
+import pytz
 
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd
 from telugu_panchangam.gochara.positions import graha_positions
@@ -27,7 +29,7 @@ if __name__ == '__main__':
         print('Error: rasiphalalu environment variable not set.', file=sys.stderr)
         sys.exit(1)
 
-    today = date.today()
+    today = datetime.now(pytz.timezone('Asia/Kolkata')).date()
     jd = get_sunrise(local_midnight_jd(today, 'Asia/Kolkata'), HYD_GEO)
     positions = graha_positions(jd)
 
