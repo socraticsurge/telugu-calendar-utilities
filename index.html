@@ -960,6 +960,8 @@
     /* Mobile-only: the standalone "Special days — next 30 days" card belongs
        to the Today tab. Hide it when Gochara or Tarabalam is the active screen. */
     body[data-mode="mobile"]:not([data-tool="today"]) #special-days-card { display: none; }
+    /* About card is only relevant on the About tab — hide it everywhere else on mobile */
+    body[data-mode="mobile"]:not([data-tool="about"]) #card-about { display: none; }
 
     h2.panel-heading { display: none; }
     /* ══ Vertical sidebar — desktop only (≥ 621 px) ══ */
