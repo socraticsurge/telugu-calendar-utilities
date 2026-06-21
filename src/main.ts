@@ -24,8 +24,9 @@ import {
     return name.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '');
   }
 
-  function feedFilename(city, system) {
-    return `${slug(city)}-${system}.ics`;
+  function feedFilename(city, system, variant = '') {
+    const suffix = variant ? `-${variant}` : '';
+    return `${slug(city)}-${system}${suffix}.ics`;
   }
 
   function populateCitySelect(select) {
@@ -56,7 +57,8 @@ import {
   function updateSubscribeUrl() {
     const city = document.getElementById('sub-city').value;
     const system = document.getElementById('sub-system').value;
-    const url = `webcal://${FEED_BASE_URL.replace('https://', '')}${feedFilename(city, system)}`;
+    const variant = (document.querySelector('input[name="sub-variant"]:checked') as HTMLInputElement)?.value ?? '';
+    const url = `webcal://${FEED_BASE_URL.replace('https://', '')}${feedFilename(city, system, variant)}`;
     document.getElementById('sub-url').textContent = url;
   }
 
@@ -2791,7 +2793,7 @@ import {
       calcTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
       tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
       findMuhurta, muToggleMobile,
-      renderGochara, copyUrl,
+      renderGochara, copyUrl, updateSubscribeUrl,
       shareTodayOnWhatsApp, shareGocharaOnWhatsApp,
       shareTarabalamOnWhatsApp, shareMuhurtaOnWhatsApp,
     });

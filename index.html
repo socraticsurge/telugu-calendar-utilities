@@ -132,6 +132,15 @@
     .selector select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--indigo-border); background: var(--indigo-bg); color: var(--indigo); font-weight: 600; min-width: 160px; }
 
     .url-box { background: #F2ECDF; border: 1px solid #DDD2BC; border-radius: 8px; padding: 0.6rem 0.9rem; font-family: monospace; font-size: 0.8rem; margin: 0.5rem 0; word-break: break-all; }
+    .sub-variants { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 0.75rem; }
+    .sub-variant-option { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.55rem 0.7rem; border: 1px solid #E7DECC; border-radius: 8px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .sub-variant-option:has(input:checked) { border-color: var(--indigo-border); background: var(--indigo-bg); }
+    .sub-variant-option input[type="radio"] { margin-top: 0.2rem; accent-color: var(--indigo); flex: none; }
+    .sub-variant-body { display: flex; flex-direction: column; gap: 0.15rem; }
+    .sub-variant-title { font-size: 0.85rem; font-weight: 600; color: #1F1A17; }
+    .sub-variant-option:has(input:checked) .sub-variant-title { color: var(--indigo); }
+    .sub-variant-desc { font-size: 0.75rem; color: #8B8377; line-height: 1.4; }
+    .sub-step-divider { font-size: 0.72rem; font-weight: 700; color: #8B8377; text-transform: uppercase; letter-spacing: 0.06em; margin: 1rem 0 0.4rem; padding-top: 0.75rem; border-top: 1px solid #E7DECC; }
     .btn { background: var(--indigo); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
     .btn:hover { background: #6d1f16; }
     .copy-confirm { margin-left: 0.75rem; color: #16a34a; display: none; font-size: 0.8rem; }
@@ -1680,12 +1689,37 @@
       </div>
     </div>
 
-    <h3 class="sub">1 · Your subscription URL</h3>
+    <h3 class="sub">1 · Choose your feed</h3>
+    <div class="sub-variants">
+      <label class="sub-variant-option">
+        <input type="radio" name="sub-variant" value="" checked onchange="updateSubscribeUrl()">
+        <span class="sub-variant-body">
+          <span class="sub-variant-title">Full daily feed</span>
+          <span class="sub-variant-desc">Every day — Tithi, Nakshatra, Muhurtas, all festivals and observances</span>
+        </span>
+      </label>
+      <label class="sub-variant-option">
+        <input type="radio" name="sub-variant" value="festivals" onchange="updateSubscribeUrl()">
+        <span class="sub-variant-body">
+          <span class="sub-variant-title">🪔 Festivals only</span>
+          <span class="sub-variant-desc">Named festivals — Ugadi, Deepavali, Vinayaka Chavithi, Maha Shivaratri…</span>
+        </span>
+      </label>
+      <label class="sub-variant-option">
+        <input type="radio" name="sub-variant" value="observances" onchange="updateSubscribeUrl()">
+        <span class="sub-variant-body">
+          <span class="sub-variant-title">⚡ Tithi observances</span>
+          <span class="sub-variant-desc">Ekadashi, Pournami, Amavasya, and Pradosham — monthly vrat days</span>
+        </span>
+      </label>
+    </div>
+
+    <h3 class="sub">2 · Your subscription URL</h3>
     <div class="url-box" id="sub-url">—</div>
     <button class="btn" onclick="copyUrl()">Copy URL</button>
     <span class="copy-confirm" id="copy-confirm">Copied!</span>
 
-    <h3 class="sub" style="margin-top:1.25rem;">2 · Add it to your calendar</h3>
+    <h3 class="sub" style="margin-top:1.25rem;">3 · Add it to your calendar</h3>
     <div class="app-tabs">
       <button class="app-tab active" data-app="google" onclick="showAppTab('google')">Google</button>
       <button class="app-tab" data-app="apple" onclick="showAppTab('apple')">Apple</button>
@@ -1700,6 +1734,14 @@
         <li>Paste the subscription URL above</li>
         <li>Click <strong>Add calendar</strong></li>
       </ol>
+      <p class="sub-step-divider">4 · Set up reminders</p>
+      <ol>
+        <li>In the left sidebar, click <strong>⋮</strong> next to this calendar's name</li>
+        <li>Select <strong>Settings and sharing</strong></li>
+        <li>Scroll to <strong>Event notifications</strong> → click <strong>Add notification</strong></li>
+        <li>Choose <strong>Push</strong> or <strong>Email</strong>, set to <strong>1 day</strong></li>
+        <li>Scroll to the bottom and click <strong>Save</strong></li>
+      </ol>
     </div>
     <div class="app-panel" data-app="apple">
       <ol>
@@ -1710,6 +1752,12 @@
         <li>Choose how often to refresh (Daily recommended)</li>
         <li>Click <strong>OK</strong></li>
       </ol>
+      <p class="sub-step-divider">4 · Set up reminders</p>
+      <ol>
+        <li><strong>iPhone/iPad:</strong> Settings app → <strong>Calendar → Default Alert Times</strong> → All-Day Events → <strong>1 day before</strong></li>
+        <li><strong>Mac:</strong> Calendar → <strong>Settings</strong> (⌘,) → <strong>Alerts</strong> tab → All Day Events → <strong>1 day before</strong></li>
+        <li>Applies to all your subscribed calendars — no per-event setup needed</li>
+      </ol>
     </div>
     <div class="app-panel" data-app="outlook">
       <ol>
@@ -1719,6 +1767,12 @@
         <li>Give the calendar a name</li>
         <li>Click <strong>Import</strong></li>
         <li>It refreshes automatically every few hours</li>
+      </ol>
+      <p class="sub-step-divider">4 · Set up reminders</p>
+      <ol>
+        <li><strong>Outlook desktop:</strong> File → Options → Calendar → Default reminders → <strong>1 Day</strong></li>
+        <li><strong>Outlook web:</strong> Settings (⚙) → Calendar → Events and invitations → Default reminder time → <strong>1 day</strong></li>
+        <li>Note: Outlook applies one default reminder across all calendars</li>
       </ol>
     </div>
 
