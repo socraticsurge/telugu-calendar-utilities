@@ -1260,13 +1260,6 @@ import {
     window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
 
-  // mobile: expand / collapse the "Find a time slot" section. Desktop CSS
-  // ignores the .expanded toggle, so this is a no-op there.
-  function muToggleMobile() {
-    const sec = document.getElementById('mu-section');
-    if (sec) sec.classList.toggle('mu-open');
-  }
-
   // mobile: contextual help bottom-sheet. Pulls in the guide for the active
   // tab — Today has its own hidden source; Gochara and Tarabalam reuse the
   // existing #go-help and #tb-help guides verbatim.
@@ -2800,7 +2793,7 @@ import {
       switchTool, showAppTab, setTimeFmt, toggleReadMore, toggleFestivalMonth,
       calcTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
       tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
-      findMuhurta, muToggleMobile,
+      findMuhurta,
       renderGochara, copyUrl, updateSubscribeUrl,
       shareTodayOnWhatsApp, shareGocharaOnWhatsApp,
       shareTarabalamOnWhatsApp, shareMuhurtaOnWhatsApp,
