@@ -725,18 +725,6 @@
     body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector label { font-size: 0.68rem; }
     body[data-mode="mobile"] #panel-tarabalam > .preview-note { font-size: 0.74rem; }
 
-    /* Find a time slot: collapse on mobile, expand on tap. Always open on desktop. */
-    body[data-mode="mobile"] #mu-section .tb-controls-title {
-      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-      gap: 0.5rem; user-select: none;
-    }
-    body[data-mode="mobile"] #mu-section .tb-controls-title::after {
-      content: '▾'; color: #B5AC9C; font-size: 0.8rem;
-      transition: transform 0.18s ease;
-    }
-    body[data-mode="mobile"] #mu-section.mu-open .tb-controls-title::after { transform: rotate(180deg); }
-    body[data-mode="mobile"] #mu-section:not(.mu-open) > *:not(.tb-controls-title) { display: none; }
-    body[data-mode="mobile"] #mu-section:not(.mu-open) ~ #mu-result { display: none; }
 
     /* ---------- Mobile contextual help — topbar hint + bottom sheet ---------- */
 
@@ -946,15 +934,6 @@
     }
     body[data-mode="mobile"] #panel-tarabalam .tb-cta:active {
       background: #6d1f16; box-shadow: none;
-    }
-
-    /* Muhurtam section header keeps the chevron, sits in the same card style.
-       The chevron rotates on .mu-open. */
-    body[data-mode="mobile"] #mu-section.tb-controls .tb-controls-title {
-      margin-bottom: 0; font-size: 0.74rem; color: #1F1A17; letter-spacing: 0.08em;
-    }
-    body[data-mode="mobile"] #mu-section.mu-open .tb-controls-title {
-      margin-bottom: 0.75rem;
     }
 
     /* Mobile-only: the standalone "Special days — next 30 days" card belongs
@@ -1536,8 +1515,6 @@
         <p class="preview-note" style="margin-top:0.5rem;" id="mu-context"></p>
       </div><!-- /tb-controls -->
 
-      <!-- kept for JS compat (muToggleMobile references this id) -->
-      <div id="mu-section"></div>
       <!-- TARABALAM HIDDEN: tb-summary, tb-result
       <div id="tb-summary"></div>
       <div id="tb-result"></div>
