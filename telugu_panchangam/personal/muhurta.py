@@ -639,6 +639,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     prefer_chog = rules.get('prefer_choghadiya')
     avoid_karana_names = set(rules.get('avoid_karana', ()))
     prefer_tithi_class = rules.get('prefer_tithi_class')
+    avoid_tithi_class = list(rules.get('avoid_tithi_class', []))
     prefer_varas = set(rules.get('prefer_vara', ()))
     prefer_lagna_class = rules.get('prefer_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
@@ -705,6 +706,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         prefer_bhadra_puchha=prefer_bhadra_puchha,
         simha_stha_shukra_penalty=_shukra_penalty,
         prefer_nakshatra_mukha=prefer_nakshatra_mukha,
+        avoid_tithi_class=avoid_tithi_class,
     )
 
     use_engine = engine is not None and hasattr(engine, 'facts_at')
