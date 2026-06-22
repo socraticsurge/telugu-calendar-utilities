@@ -24,6 +24,51 @@ ICS-feed behaviour changes; all code trees byte-identical.
   appears in the contributor list. Author/committer metadata only — every
   tree SHA is unchanged, so released artifacts are byte-identical.
 
+## [1.11.0] — 2026-06-22
+
+The theme: **muhurta scorer enhancements** — cognitive split of the
+scorer into three files, Siddha Yoga detection, Rikta dosha neutralization,
+and activity-aware tithi-avoid scoring. No frozen-core or ICS-feed changes.
+**1055 tests passing.**
+
+### Added
+- **Siddha Yoga detection** (`special_yogas.py`) — all five classical
+  Tithi×Vara combinations from Muhurta Chintamani now detected:
+  Nanda+Friday, Bhadra+Wednesday, Jaya+Tuesday, **Rikta+Saturday**,
+  Purna+Thursday. Scores +1 per slot. The earlier implementation was
+  missing Rikta+Saturday; the incorrect comment ("Rikta has no auspicious
+  Vara partner") is removed.
+- **Rikta dosha neutralization** — classical conditions reduce the Rikta
+  penalty inside `score_tithi_class()`: Pushya nakshatra fully cancels
+  (−2 → 0); Sarvartha or Amrita Siddhi Yoga partially offsets (−2 → −1).
+  Both conditions surface as explicit reason notes.
+- **Activity-aware tithi-avoid scoring** — `score_tithi_class()` extended
+  with `avoid_tithi_class`: activities declare tithi families whose energy
+  is classically mismatched, scoring −1 instead of the previous flat zero.
+  Jaya (combat/victory energy) avoided by: ceremony, wedding, engagement,
+  naming, annaprasana, karnavedha, mundana, upanayana, vidyarambha,
+  gruhapravesha, yajna. Purna (completion energy) avoided by: court,
+  litigation.
+
+### Changed
+- **Muhurta scorer split** — `personal/muhurta.py` (~1,200 lines) split
+  into three focused files:
+  - `personal/activity_rules.py` — declarative per-activity config
+    (`ACTIVITY_RULES` dict, 28 activities); pure data, no logic.
+  - `personal/slot_scorers.py` — atomic scoring functions + `_DayContext`
+    dataclass; `score_tithi_class`, `score_tara`, `score_chandra`,
+    `score_lagna`, `score_special_yogas`, `score_nitya_yoga`, etc.
+  - `personal/muhurta.py` — orchestrator (~530 lines); public API
+    (`day_slots`, `diagnose_day`, `assign_tiers`) unchanged.
+- **`_DayContext` dataclass** — bundles 21 day-constant parameters so
+  `_evaluate_slot()` takes `(s, e, block, base, facts, ctx)` instead of
+  20+ positional arguments.
+- **`_day_skip_reason()` helper** — day-skip logic extracted and shared
+  between `day_slots()` and `diagnose_day()`, eliminating duplication.
+- **MCP disclaimer updated** — `_MUHURTA_DISCLAIMER` in `tools.py` now
+  reflects Siddha Yoga +1, symmetric tithi scoring (+1/−1/−2), and
+  Pushya/Siddhi neutralization.
+
 ## [1.10.4] — 2026-06-17
 
 The theme: **ayanamsa full support across gochara, ingress, and phalalu tools**.
