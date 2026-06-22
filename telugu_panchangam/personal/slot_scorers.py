@@ -37,7 +37,8 @@ if TYPE_CHECKING:
     from telugu_panchangam.models.panchangam_day import PanchangamDay
 
 _YOGA_BONUS = {'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,
-               'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1}
+               'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1,
+               'Siddha Yoga': 1}
 _YOGA_PENALTY = {'Visha Yoga': -2, 'Dagdha Yoga': -2}
 
 
@@ -267,8 +268,15 @@ def score_lagna(janma_nakshatras, janma_rasis, slot_lagna, janma_lagnas=None):
 # Calendar-quality scorers  (tithi, yoga, nitya yoga, anandadi)
 # ---------------------------------------------------------------------------
 
-def score_tithi_class(tithi_name, prefer_tithi_class, activity_label):
+def score_tithi_class(tithi_name, prefer_tithi_class, activity_label,
+                      nakshatra=None, special_yogas=()):
     """Universal Rikta -2; activity-preferred class +1.
+
+    Classical neutralization (Muhurta Chintamani / B.V. Raman Muhurtha):
+      - Pushya nakshatra: cancels Rikta dosha entirely (0 instead of -2).
+      - Sarvartha/Amrita Siddhi Yoga: partially offsets Rikta (-1 instead of -2).
+    Both conditions surface a reason note so the user sees why the penalty
+    is reduced. When both apply, Pushya takes precedence (full cancellation).
 
     Returns (bonus, day_reason, activity_reason, family).
     """
@@ -276,8 +284,19 @@ def score_tithi_class(tithi_name, prefer_tithi_class, activity_label):
         fam = tithi_family(tithi_name)
     except ValueError:
         return 0, None, None, None
+
     if fam == 'Rikta':
+        if nakshatra == 'Pushya':
+            return 0, (f'{tithi_name} (Rikta tithi) neutralised by Pushya '
+                       f'nakshatra (0)'), None, fam
+        siddhi = [y for y in special_yogas
+                  if y in ('Sarvartha Siddhi Yoga', 'Amrita Siddhi Yoga')]
+        if siddhi:
+            label = ' + '.join(siddhi)
+            return -1, (f'{tithi_name} (Rikta tithi) partially offset by '
+                        f'{label} (-1)'), None, fam
         return -2, f'{tithi_name} (Rikta tithi) (-2)', None, fam
+
     if 'Amavasya' in tithi_name:
         return -2, f'{tithi_name} (-2)', None, 'Amavasya'
     if prefer_tithi_class and fam == prefer_tithi_class:

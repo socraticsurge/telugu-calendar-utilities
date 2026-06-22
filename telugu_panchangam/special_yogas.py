@@ -32,6 +32,15 @@ _DAGDHA_YOGA: dict[str, set[int]] = {
     'Guruvaram': {6}, 'Shukravaram': {8}, 'Shanivaram': {9},
 }
 
+# Tithi family -> vaaram forming Siddha Yoga (Muhurta Chintamani).
+# Rikta has no auspicious Vara partner and is excluded.
+_SIDDHA_YOGA: dict[str, str] = {
+    'Nanda': 'Shukravaram',     # 1/6/11 + Friday
+    'Bhadra': 'Budhavaram',     # 2/7/12 + Wednesday
+    'Jaya': 'Mangalavaram',     # 3/8/13 + Tuesday
+    'Purna': 'Guruvaram',       # 5/10/15 + Thursday
+}
+
 _PUSHKARA_VARAS: set[str] = {'Adivaram', 'Mangalavaram', 'Shanivaram'}
 
 _DVIPUSHKARA_TITHIS: set[int] = {2, 7, 12}
@@ -67,6 +76,15 @@ def get_special_yogas(vaaram: str, tithi_name: str, nakshatra_name: str) -> list
 
     if tithi_number in _DAGDHA_YOGA.get(vaaram, set()):
         yogas.append('Dagdha Yoga')
+
+    # Siddha Yoga: auspicious Tithi family + its classical Vara partner.
+    from telugu_panchangam.personal.tithi_class import tithi_family
+    try:
+        fam = tithi_family(tithi_name)
+        if _SIDDHA_YOGA.get(fam) == vaaram:
+            yogas.append('Siddha Yoga')
+    except ValueError:
+        pass
 
     if vaaram in _PUSHKARA_VARAS:
         if tithi_number in _DVIPUSHKARA_TITHIS and nakshatra_name in _DVIPUSHKARA_NAKSHATRAS:
