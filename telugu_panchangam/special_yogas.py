@@ -32,12 +32,12 @@ _DAGDHA_YOGA: dict[str, set[int]] = {
     'Guruvaram': {6}, 'Shukravaram': {8}, 'Shanivaram': {9},
 }
 
-# Tithi family -> vaaram forming Siddha Yoga (Muhurta Chintamani).
-# Rikta has no auspicious Vara partner and is excluded.
+# Tithi family -> vaaram forming Siddha Yoga (Muhurta Chintamani, B.V. Raman).
 _SIDDHA_YOGA: dict[str, str] = {
     'Nanda': 'Shukravaram',     # 1/6/11 + Friday
     'Bhadra': 'Budhavaram',     # 2/7/12 + Wednesday
     'Jaya': 'Mangalavaram',     # 3/8/13 + Tuesday
+    'Rikta': 'Shanivaram',      # 4/9/14 + Saturday
     'Purna': 'Guruvaram',       # 5/10/15 + Thursday
 }
 
