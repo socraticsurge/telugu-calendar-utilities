@@ -30,7 +30,7 @@ Several filters are only expressible on this scale.
 
 | Module | Computes | Source | Surfaces as |
 |---|---|---|---|
-| `special_yogas.py` | **Anandadi 28 yogas** (vaaram×nakshatra → Ananda…Vardhamana, 16 auspicious / 12 not); **Sarvartha Siddhi**, **Amrita Siddhi**; **Visha** & **Dagdha** (avoid); **Dvipushkara/Tripushkara** | Muhurta Chintamani | `anandadi_yoga`, `special_yogas[]`; scorer ±1/±2 |
+| `special_yogas.py` | **Anandadi 28 yogas** (vaaram×nakshatra → Ananda…Vardhamana, 16 auspicious / 12 not); **Sarvartha Siddhi**, **Amrita Siddhi**; **Siddha Yoga** (all five Tithi×Vara pairs: Nanda+Fri, Bhadra+Wed, Jaya+Tue, Rikta+Sat, Purna+Thu); **Visha** & **Dagdha** (avoid); **Dvipushkara/Tripushkara** | Muhurta Chintamani, B.V. Raman Muhurtha | `anandadi_yoga`, `special_yogas[]`; scorer ±1/±2 |
 | `nakshatra_filters.py` | **5 Panchaka nakshatras** (Dhanishtha…Revati — cremation/roof/wood avoid); **Mukha direction** (Adho/Urdhva/Tiryan → foundations / coronation / travel) | classical samskara texts | `in_panchaka_nakshatra`, `nakshatra_mukha` |
 | `panchaka.py` | **Panchaka Rahita** — mod-9 dosha on (tithi+vaaram+nakshatra+lagna): remainder → Rahita (good) / Mrityu / Agni / Raja / Chora / Roga, each with an `avoid_for` activity list | Muhurta Chintamani, Dharmasindhu | `panchaka_rahita` (needs sunrise lagna); recomputed per slot |
 | `panchanga_shuddhi.py` | **Five-limb purity** — grades each of Tithi/Vaara/Nakshatra/Yoga/Karana shuddha/ashuddha/mixed → verdict Sarva Shuddha … Sarva Ashuddha (0–5 count) | Muhurta Chintamani, Dharma Sindhu | MCP `get_panchanga_shuddhi` |
