@@ -56,6 +56,7 @@ class _DayContext:
     janma_lagnas: list[str | None] | None
     chandra_mode: str
     prefer_tithi_class: str | None
+    avoid_tithi_class: list
     label: str
     vara_bonus: int
     vara_reason: str | None
@@ -269,8 +270,8 @@ def score_lagna(janma_nakshatras, janma_rasis, slot_lagna, janma_lagnas=None):
 # ---------------------------------------------------------------------------
 
 def score_tithi_class(tithi_name, prefer_tithi_class, activity_label,
-                      nakshatra=None, special_yogas=()):
-    """Universal Rikta -2; activity-preferred class +1.
+                      nakshatra=None, special_yogas=(), avoid_tithi_class=()):
+    """Tithi-family scoring: Rikta -2; activity-preferred +1; activity-avoided -1.
 
     Classical neutralization (Muhurta Chintamani / B.V. Raman Muhurtha):
       - Pushya nakshatra: cancels Rikta dosha entirely (0 instead of -2).
@@ -300,7 +301,11 @@ def score_tithi_class(tithi_name, prefer_tithi_class, activity_label,
     if 'Amavasya' in tithi_name:
         return -2, f'{tithi_name} (-2)', None, 'Amavasya'
     if prefer_tithi_class and fam == prefer_tithi_class:
-        return 1, None, f'{tithi_name} ({prefer_tithi_class}) favoured for {activity_label} (+1)', fam
+        return 1, None, (f'{tithi_name} ({prefer_tithi_class} tithi) '
+                         f'favoured for {activity_label} (+1)'), fam
+    if fam in avoid_tithi_class:
+        return -1, None, (f'{tithi_name} ({fam} tithi) '
+                          f'inauspicious for {activity_label} (-1)'), fam
     return 0, None, None, fam
 
 

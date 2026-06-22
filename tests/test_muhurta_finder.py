@@ -865,6 +865,89 @@ def test_sarvartha_active_for_early_slot():
     assert any('Sarvartha Siddhi Yoga' in r for s in early for r in s['reasons'])
 
 
+# ---------------------------------------------------------------------------
+# Tithi avoid scoring (score_tithi_class — avoid_tithi_class param)
+# ---------------------------------------------------------------------------
+
+def test_score_tithi_class_avoid_gives_minus_one():
+    from telugu_panchangam.personal.slot_scorers import score_tithi_class
+    # Jaya tithi avoided for wedding: should return -1 with an activity reason
+    bonus, day_r, act_r, fam = score_tithi_class(
+        'Shukla Tritiya', 'Purna', 'Wedding (Vivaha)',
+        avoid_tithi_class=['Jaya'])
+    assert bonus == -1
+    assert day_r is None
+    assert act_r is not None and 'inauspicious' in act_r and 'Jaya' in act_r
+    assert fam == 'Jaya'
+
+
+def test_score_tithi_class_avoid_no_effect_on_non_matching():
+    from telugu_panchangam.personal.slot_scorers import score_tithi_class
+    # Bhadra tithi not in avoid list → neutral
+    bonus, _, act_r, _ = score_tithi_class(
+        'Shukla Dwitiya', 'Purna', 'Wedding (Vivaha)',
+        avoid_tithi_class=['Jaya'])
+    assert bonus == 0
+    assert act_r is None
+
+
+def test_score_tithi_class_prefer_wins_over_neutral_avoid_list():
+    from telugu_panchangam.personal.slot_scorers import score_tithi_class
+    # Purna tithi matches prefer_tithi_class — +1 even if avoid list is empty
+    bonus, _, act_r, fam = score_tithi_class(
+        'Shukla Panchami', 'Purna', 'Wedding (Vivaha)',
+        avoid_tithi_class=['Jaya'])
+    assert bonus == 1
+    assert act_r is not None and 'favoured' in act_r
+
+
+def test_score_tithi_class_rikta_unaffected_by_avoid():
+    from telugu_panchangam.personal.slot_scorers import score_tithi_class
+    # Rikta path still returns -2 regardless of avoid list contents
+    bonus, day_r, _, fam = score_tithi_class(
+        'Shukla Chaturthi', 'Purna', 'Wedding (Vivaha)',
+        avoid_tithi_class=['Jaya', 'Rikta'])
+    assert bonus == -2
+    assert fam == 'Rikta'
+
+
+def test_jaya_tithi_penalised_for_wedding_integration():
+    # 2026-07-03 = Krishna Tritiya (Jaya tithi). Wedding searches should
+    # surface the -1 avoid reason in every slot's activity_match reasons.
+    from telugu_panchangam.personal.tithi_class import tithi_family
+    day = _day(2026, 7, 3)
+    assert tithi_family(day.tithi.name) == 'Jaya', f'fixture: expected Jaya tithi, got {day.tithi.name}'
+    slots = day_slots(day, activity='wedding')
+    assert slots, 'expected wedding slots on a non-skip day'
+    for s in slots:
+        act_reasons = s['reason_groups']['activity_match']
+        assert any('inauspicious' in r and 'Jaya' in r for r in act_reasons), \
+            f'slot {s["start"]}: expected Jaya inauspicious reason, got {act_reasons}'
+
+
+def test_purna_tithi_penalised_for_litigation_integration():
+    # 2026-07-05 = Krishna Panchami (Purna tithi). Litigation should -1 avoid.
+    from telugu_panchangam.personal.tithi_class import tithi_family
+    day = _day(2026, 7, 5)
+    assert tithi_family(day.tithi.name) == 'Purna', f'fixture: expected Purna, got {day.tithi.name}'
+    slots = day_slots(day, activity='litigation')
+    assert slots, 'expected litigation slots'
+    for s in slots:
+        act_reasons = s['reason_groups']['activity_match']
+        assert any('inauspicious' in r and 'Purna' in r for r in act_reasons), \
+            f'slot {s["start"]}: expected Purna inauspicious reason, got {act_reasons}'
+
+
+def test_jaya_tithi_no_penalty_for_court_itself():
+    # Jaya is court's PREFERRED class — should get +1, not -1
+    from telugu_panchangam.personal.slot_scorers import score_tithi_class
+    bonus, _, act_r, _ = score_tithi_class(
+        'Shukla Tritiya', 'Jaya', 'Court / legal matter',
+        avoid_tithi_class=['Purna'])
+    assert bonus == 1
+    assert act_r is not None and 'favoured' in act_r
+
+
 def test_engine_kwarg_does_not_break_mcp_path():
     """Through the MCP tool — verify it still produces results."""
     import json
