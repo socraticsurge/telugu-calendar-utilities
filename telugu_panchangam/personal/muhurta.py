@@ -286,9 +286,11 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext) -> dict | None:
     if dropped:
         return None
 
-    # Tithi class
+    # Tithi class (nakshatra + special_yogas enable dosha neutralization)
     tithi_bonus, tithi_day_reason, tithi_activity_reason, tithi_fam = \
-        score_tithi_class(facts.tithi, ctx.prefer_tithi_class, ctx.label)
+        score_tithi_class(facts.tithi, ctx.prefer_tithi_class, ctx.label,
+                          nakshatra=facts.nakshatra,
+                          special_yogas=facts.special_yogas)
 
     # Nitya yoga
     skip_on_nitya_hard = bool(ctx.skip_yogas)

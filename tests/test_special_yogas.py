@@ -44,8 +44,10 @@ def test_multiple_yogas_same_day():
 
 
 def test_no_yoga():
-    # Mangalavaram + Chitra + tithi number 3 matches none of the four tables.
-    result = get_special_yogas('Mangalavaram', 'Shukla Tritiya', 'Chitra')
+    # Somavaram (Monday) + Tritiya (Jaya) + Chitra: Chitra is not in Monday's
+    # Sarvartha/Amrita tables, tithi 3 is not Monday's Visha/Dagdha, and
+    # Jaya's Siddha Yoga partner is Tuesday not Monday.
+    result = get_special_yogas('Somavaram', 'Shukla Tritiya', 'Chitra')
     assert result == []
 
 
@@ -80,6 +82,46 @@ def test_tripushkara_yoga_no_match_wrong_tithi():
     # Tritiya (tithi 3) is NOT a Tripushkara tithi
     result = get_special_yogas('Mangalavaram', 'Shukla Tritiya', 'Krittika')
     assert 'Tripushkara Yoga' not in result
+
+
+def test_siddha_yoga_nanda_friday():
+    result = get_special_yogas('Shukravaram', 'Shukla Pratipat', 'Chitra')
+    assert 'Siddha Yoga' in result
+
+
+def test_siddha_yoga_bhadra_wednesday():
+    result = get_special_yogas('Budhavaram', 'Shukla Dwitiya', 'Hasta')
+    assert 'Siddha Yoga' in result
+
+
+def test_siddha_yoga_jaya_tuesday():
+    result = get_special_yogas('Mangalavaram', 'Shukla Tritiya', 'Chitra')
+    assert 'Siddha Yoga' in result
+
+
+def test_siddha_yoga_purna_thursday():
+    result = get_special_yogas('Guruvaram', 'Shukla Panchami', 'Hasta')
+    assert 'Siddha Yoga' in result
+
+
+def test_siddha_yoga_purna_pournami_thursday():
+    # Pournami is also Purna family — Siddha Yoga still fires.
+    result = get_special_yogas('Guruvaram', 'Pournami', 'Hasta')
+    assert 'Siddha Yoga' in result
+
+
+def test_siddha_yoga_rikta_no_match():
+    # Rikta has no Siddha Yoga partner on any weekday.
+    for vara in ('Adivaram', 'Somavaram', 'Mangalavaram', 'Budhavaram',
+                 'Guruvaram', 'Shukravaram', 'Shanivaram'):
+        result = get_special_yogas(vara, 'Shukla Chaturthi', 'Chitra')
+        assert 'Siddha Yoga' not in result, f'unexpected Siddha Yoga on {vara} + Rikta'
+
+
+def test_siddha_yoga_wrong_vara_no_match():
+    # Nanda tithi on Thursday should NOT give Siddha Yoga (needs Friday).
+    result = get_special_yogas('Guruvaram', 'Shukla Pratipat', 'Chitra')
+    assert 'Siddha Yoga' not in result
 
 
 def test_dvipushkara_and_tripushkara_not_both_on_same_day():

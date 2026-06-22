@@ -908,8 +908,12 @@ def test_mcp_find_muhurta():
     assert result['slots'], 'expected at least one slot in 5 days'
     top = result['slots'][0]
     assert {'date', 'vaaram', 'start', 'end', 'score', 'reasons'} <= set(top)
-    scores = [s['score'] for s in result['slots']]
-    assert scores == sorted(scores, reverse=True)
+    # Sorted by (tier desc, score desc) — tier takes priority, so a lower-score
+    # slot in a higher tier may appear before a higher-score slot capped to a
+    # lower tier by day_dosha.  Check the actual sort key, not score alone.
+    from telugu_panchangam.personal.muhurta import TIER_NAMES
+    sort_key = lambda s: (-TIER_NAMES.index(s['tier']), -s['score'])
+    assert result['slots'] == sorted(result['slots'], key=sort_key)
     assert 'disclaimer' in result
     assert result['chandra_mode'] == 'stars'
 
