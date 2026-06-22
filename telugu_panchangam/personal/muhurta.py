@@ -290,7 +290,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext) -> dict | None:
     tithi_bonus, tithi_day_reason, tithi_activity_reason, tithi_fam = \
         score_tithi_class(facts.tithi, ctx.prefer_tithi_class, ctx.label,
                           nakshatra=facts.nakshatra,
-                          special_yogas=facts.special_yogas)
+                          special_yogas=facts.special_yogas,
+                          avoid_tithi_class=ctx.avoid_tithi_class)
 
     # Nitya yoga
     skip_on_nitya_hard = bool(ctx.skip_yogas)
@@ -509,6 +510,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     prefer_chog = rules.get('prefer_choghadiya')
     avoid_karana_names = frozenset(rules.get('avoid_karana', ()))
     prefer_tithi_class = rules.get('prefer_tithi_class')
+    avoid_tithi_class = list(rules.get('avoid_tithi_class', []))
     prefer_varas = frozenset(rules.get('prefer_vara', ()))
     prefer_lagna_class = rules.get('prefer_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
@@ -534,6 +536,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         janma_lagnas=janma_lagnas,
         chandra_mode=chandra_mode,
         prefer_tithi_class=prefer_tithi_class,
+        avoid_tithi_class=avoid_tithi_class,
         label=label,
         vara_bonus=vara_bonus,
         vara_reason=vara_reason,
