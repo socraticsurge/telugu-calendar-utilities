@@ -110,10 +110,16 @@ def test_siddha_yoga_purna_pournami_thursday():
     assert 'Siddha Yoga' in result
 
 
-def test_siddha_yoga_rikta_no_match():
-    # Rikta has no Siddha Yoga partner on any weekday.
+def test_siddha_yoga_rikta_saturday():
+    # Rikta (4/9/14) + Saturday is the fifth classical Siddha Yoga combination.
+    result = get_special_yogas('Shanivaram', 'Shukla Chaturthi', 'Chitra')
+    assert 'Siddha Yoga' in result
+
+
+def test_siddha_yoga_rikta_non_saturday_no_match():
+    # Rikta on any weekday other than Saturday does NOT give Siddha Yoga.
     for vara in ('Adivaram', 'Somavaram', 'Mangalavaram', 'Budhavaram',
-                 'Guruvaram', 'Shukravaram', 'Shanivaram'):
+                 'Guruvaram', 'Shukravaram'):
         result = get_special_yogas(vara, 'Shukla Chaturthi', 'Chitra')
         assert 'Siddha Yoga' not in result, f'unexpected Siddha Yoga on {vara} + Rikta'
 
