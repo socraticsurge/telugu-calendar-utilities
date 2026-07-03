@@ -4,6 +4,8 @@ Subscribable Telugu Panchangam feeds for 22 cities — delivered as `.ics` files
 
 Every day appears as an all-day event (no calendar blocking) with full Panchangam details in the description. Festival days — Ugadi, Vinayaka Chavithi, Deepavali, Maha Shivaratri, the Sankranti cluster, and 30+ more — are marked with 🪔 in the title; other special days (Ekadashi, Amavasya, Pournami, Pradosham, Sankranti, Eclipses) with ⚡.
 
+![Today's Panchangam at panchangam.astrochaganti.com](docs/screenshots/01-panchangam.png)
+
 ## Subscribe
 
 Visit the landing page to pick your city and calculation system and copy your `webcal://` URL:
@@ -14,6 +16,13 @@ The site is also a daily toolkit: **Today's Panchangam** (any date, any city), *
 (good days and ranked time slots for up to four people by birth star, with Chandrabalam), and the
 **Gochara chart with Rasi Phalalu** (South Indian chart, transit verdicts and a computed daily reading).
 Everything is shareable to WhatsApp.
+
+<details>
+<summary>What subscribing looks like</summary>
+
+![Subscribe flow — pick a feed, copy the webcal URL, add to your calendar](docs/screenshots/02-subscribe.png)
+
+</details>
 
 ## What's in each day's event
 
