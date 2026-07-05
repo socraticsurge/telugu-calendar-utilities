@@ -1,0 +1,92 @@
+name: Pages Self-Heal
+
+# Why this exists:
+# GitHub's managed Pages deploy intermittently fails with
+# "Deployment failed, try again later" at the syncing_files stage. It's a
+# backend flake unrelated to repo content (the build succeeds and the artifact
+# uploads fine), and the managed deploy never retries — so a flake leaves the
+# site serving stale content until the next push.
+#
+# This workflow watches the latest Pages build and, if it errored or is wedged,
+# forces a fresh deploy by pushing an empty commit to gh-pages (a new build
+# version is what actually breaks a stuck deploy loose), retrying a few times.
+# On a healthy deploy it does nothing — no empty commit, no history churn.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 21 * * *'   # daily, after the Rasi Phalalu job (19:30 UTC + cron drift)
+    - cron: '30 3 1 * *'   # 1st of month, after the monthly feed/gochara/lagna jobs
+  workflow_run:
+    workflows:
+      - "Generate Rasi Phalalu"
+      - "Generate Panchangam Feeds"
+      - "Generate Gochara Data"
+      - "Generate Lagna Data"
+      - "Deploy Landing Page"
+    types: [completed]
+
+# Share the deploy lock with the content workflows so we never push to
+# gh-pages while one of them is mid-deploy.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # push the empty commit to gh-pages
+  pages: read       # read Pages build status
+
+jobs:
+  heal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Pages deploy and heal if needed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # Give a just-triggered managed deploy time to register before we
+          # read its status (avoids reading the previous, already-built one).
+          sleep 30
+
+          wait_terminal() {
+            # Poll the latest Pages build until it reaches a terminal state.
+            # Echoes: built | errored | timeout  (timeout => wedged in building)
+            for _ in $(seq 1 40); do   # ~10 min max (40 x 15s)
+              status=$(gh api "repos/$REPO/pages/builds/latest" --jq '.status' 2>/dev/null || echo unknown)
+              case "$status" in
+                built)   echo built;   return 0 ;;
+                errored) echo errored; return 0 ;;
+              esac
+              sleep 15
+            done
+            echo timeout
+          }
+
+          force_fresh_deploy() {
+            # Empty commit on gh-pages via the git API (no 80+ MB checkout).
+            local msg="$1" sha tree new
+            sha=$(gh api "repos/$REPO/git/ref/heads/gh-pages" --jq '.object.sha')
+            tree=$(gh api "repos/$REPO/git/commits/$sha" --jq '.tree.sha')
+            new=$(gh api -X POST "repos/$REPO/git/commits" \
+                    -f message="$msg" -f tree="$tree" -f "parents[]=$sha" --jq '.sha')
+            gh api -X PATCH "repos/$REPO/git/refs/heads/gh-pages" -f sha="$new" >/dev/null
+            echo "Pushed empty commit $new to gh-pages to force a fresh build."
+          }
+
+          for attempt in 1 2 3; do
+            status=$(wait_terminal)
+            echo "Attempt $attempt: latest Pages build = $status"
+            if [ "$status" = "built" ]; then
+              echo "Pages is healthy — nothing to heal."
+              exit 0
+            fi
+            echo "Pages deploy is '$status' — forcing a fresh deploy."
+            force_fresh_deploy "chore: self-heal Pages deploy (attempt $attempt)"
+            sleep 20
+          done
+
+          echo "::error::Pages deploy still not healthy after 3 heal attempts."
+          exit 1
