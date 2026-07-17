@@ -24,3 +24,4 @@ build/
 docs/feeds/
 
 .impeccable/
+.claude/
