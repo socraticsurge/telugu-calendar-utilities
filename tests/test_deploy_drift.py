@@ -147,3 +147,34 @@ def test_deploy_workflow_pins_cname(workflow_path: str):
         f'{CNAME_VALUE} stops serving the site after the next '
         f'deploy. See CLAUDE.md.'
     )
+
+
+# ── Runtime JSON sidecars survive every deploy (Phase 4 guard) ─────────
+#
+# gochara.json (daily), <city>-lagna.json and rasi_phalalu/ (daily) live
+# on gh-pages next to the bundle. Four workflows publish to that branch;
+# any one of them switching to keep_files: false (or a full wipe) would
+# delete the sidecars the SPA fetches at runtime — the exact regression
+# class of the "keep_files=true in generate.yml so gochara.json survives
+# feed regeneration" fix (7962dca).
+
+SIDEBAND_WORKFLOWS = [
+    '.github/workflows/deploy-landing.yml',
+    '.github/workflows/generate.yml',
+    '.github/workflows/gochara.yml',
+    '.github/workflows/lagna.yml',
+    '.github/workflows/rasi_phalalu.yml',
+]
+
+
+@pytest.mark.parametrize('workflow_path', SIDEBAND_WORKFLOWS)
+def test_deploy_workflow_keeps_sideband_files(workflow_path: str):
+    """Every gh-pages publisher must carry `keep_files: true` so the
+    other publishers' artifacts (feeds/, gochara.json, *-lagna.json,
+    rasi_phalalu/) survive its deploy."""
+    yml = (REPO_ROOT / workflow_path).read_text(encoding='utf-8')
+    assert 'keep_files: true' in yml, (
+        f'{workflow_path} publishes to gh-pages without keep_files: true '
+        f'— its next run would wipe the runtime JSON sidecars the site '
+        f'fetches (gochara.json, lagna, rasi phalalu).'
+    )

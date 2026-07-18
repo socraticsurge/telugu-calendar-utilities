@@ -222,6 +222,14 @@ def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browse
             'block in findMuhurta(). Console events: '
             f'{[m for _, m in captured][:5]}'
         )
+        # Stronger: a successful search must render a tier badge (or the
+        # legitimate no-slots message) — a blank-but-no-error result is
+        # exactly how a silent render bug would present.
+        import re as _re
+        assert _re.search(r'Excellent|Good|Fair|Avoid|[Nn]o .*slots', result_html), (
+            'muhurta search rendered neither tier badges nor a no-slots '
+            f'message. First 300 chars: {result_html[:300]!r}'
+        )
     finally:
         page.close()
     ref_errors = [

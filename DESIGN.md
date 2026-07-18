@@ -13,12 +13,14 @@ Light, warm, print-like. The feel of a well-made almanac page: cream paper groun
 | `--brand` / `--indigo` | `#8E2A1F` | Deep maroon — brand, links, inauspicious markers, primary emphasis |
 | `--indigo-bg` | `rgba(142,42,31,0.08)` | Maroon tint surfaces |
 | `--indigo-border` | `rgba(142,42,31,0.22)` | Maroon tint borders |
-| `--amber` | `#A56B1E` | Caution / neutral-special (Ekadashi, observances) |
-| `--amber-bg` / `--amber-border` | `rgba(165,107,30,0.09/0.30)` | Amber tints |
+| `--amber` | `#8F5C18` | Caution / neutral-special (Ekadashi, observances) — darkened from `#A56B1E` for AA on cream (4.81:1) |
+| `--amber-bg` / `--amber-border` | `rgba(143,92,24,0.09/0.30)` | Amber tints |
 | `--green` | `#4F6B2C` | Auspicious windows, favourable verdicts |
 | `--green-bg` / `--green-border` | `rgba(79,107,44,0.09/0.30)` | Green tints |
-| Ink | `#1F1A17` | Body text |
-| Muted ink | `#58504A` | Secondary text (Phase 4: darken sub-AA usages) |
+| Ink | `#1F1A17` | Body text (14.6:1 on cream) |
+| Muted ink | `#58504A` | Secondary text (6.7:1 on cream — passes AA; earlier worry was miscalibrated) |
+| Hint | `#6B6357` | Labels, hints, help chrome — darkened from `#8B8377` (3.18 → 5.03 on cream) |
+| Faint | `#746B5E` | Footer, source lines — darkened from `#B5AC9C` (1.91 → 4.45 on cream) |
 | Ground | `#F2ECDF` | Page background (warm cream) |
 
 Semantic tone triple (green/amber/maroon) carries jyotisha meaning — auspicious/mixed/avoid — and must stay consistent everywhere times are shown.
@@ -48,5 +50,13 @@ Minimal and calm: smooth scroll, no entrance theatrics. Any added motion must be
 
 ## Known debts (do not copy into new work)
 
-- Hero `em` uses gradient `background-clip: text` — legacy; new work uses solid `--brand`.
-- Muted ink `#58504A` fails AA in small sizes on cream in some uses — darken when touched.
+- Hero `em` uses gradient `background-clip: text` — legacy (the hero is currently
+  hidden at every width post-one-shell; markup removal is pending cleanup).
+
+## Resolved (2026-07-18 Phase 4 polish)
+
+- Sub-AA grays darkened site-wide (see Colors); amber deepened for small-chip AA.
+- Sidebar active state is a tinted pill (bg + 1px border, radius), not a left-stripe.
+- Drawer + help sheet get `role="dialog"`/`aria-modal` + focus trap while open.
+- `<main>` landmark + skip-to-content link.
+- "All times shown in <city> local time" note bound to the SelectionStore.

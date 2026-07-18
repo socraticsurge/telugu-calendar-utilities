@@ -306,7 +306,7 @@ function renderGochara() {
       (llmForToday
         ? `<p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}`
         : ph.lines.map(l => `<p>${l}</p>`).join('') +
-          `<p style="font-size:0.72rem;color:#B5AC9C;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p>`) +
+          `<p style="font-size:0.72rem;color:#746B5E;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p>`) +
       `</div>`;
   }
 

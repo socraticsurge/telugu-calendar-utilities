@@ -113,6 +113,39 @@ import { stampOf } from './lib/format';
     useinai:   ['Use in AI', 'MCP server for AI assistants'],
     about:     ['About', 'What this is and how it works'],
   };
+  // --- Modal a11y: dialog semantics + focus containment (Phase 4) ---
+  // Applied to the two overlay surfaces (nav drawer, help sheet):
+  // role="dialog"/aria-modal while open, focus moved in on open and
+  // restored on close, Tab cycling contained within the surface.
+  let _modalRestoreFocus = null;
+  function _focusables(container) {
+    return [...container.querySelectorAll(
+      'button, [href], select, input, textarea, [tabindex]:not([tabindex="-1"])'
+    )].filter(el => el.offsetParent !== null);
+  }
+  function modalOpen(container, focusTarget) {
+    _modalRestoreFocus = document.activeElement;
+    container.setAttribute('role', 'dialog');
+    container.setAttribute('aria-modal', 'true');
+    (focusTarget || _focusables(container)[0])?.focus();
+    container.addEventListener('keydown', _modalTrapTab);
+  }
+  function modalClose(container) {
+    container.removeAttribute('role');
+    container.removeAttribute('aria-modal');
+    container.removeEventListener('keydown', _modalTrapTab);
+    if (_modalRestoreFocus && _modalRestoreFocus.focus) _modalRestoreFocus.focus();
+    _modalRestoreFocus = null;
+  }
+  function _modalTrapTab(e) {
+    if (e.key !== 'Tab') return;
+    const f = _focusables(e.currentTarget);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+    else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+  }
+
   function openHelpSheet() {
     // Help content exists for the three tool panels; other sections get Today's.
     const cur = document.body.dataset.tool;
@@ -123,13 +156,18 @@ import { stampOf } from './lib/format';
     document.getElementById('m-help-title').textContent = HELP_TITLES[tab];
     document.getElementById('m-help-body').innerHTML = src ? src.innerHTML : '';
     document.body.classList.add('m-help-open');
-    document.getElementById('m-help-sheet').setAttribute('aria-hidden', 'false');
+    const sheet = document.getElementById('m-help-sheet');
+    sheet.setAttribute('aria-hidden', 'false');
+    modalOpen(sheet, document.getElementById('m-help-close'));
     document.querySelectorAll('.m-page-help-btn').forEach(b => b.setAttribute('aria-expanded', 'true'));
     if (typeof gcEvent === 'function') gcEvent('help-' + tab);
   }
   function closeHelpSheet() {
+    if (!document.body.classList.contains('m-help-open')) return;
     document.body.classList.remove('m-help-open');
-    document.getElementById('m-help-sheet').setAttribute('aria-hidden', 'true');
+    const sheet = document.getElementById('m-help-sheet');
+    sheet.setAttribute('aria-hidden', 'true');
+    modalClose(sheet);
     document.querySelectorAll('.m-page-help-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
   }
 
@@ -156,6 +194,13 @@ import { stampOf } from './lib/format';
   }
 
 
+  // "Times shown in <city> local time" — the one line that saves a
+  // diaspora user from reading Rahu Kalam in the wrong timezone.
+  function updateTzNote() {
+    const el = document.getElementById('tz-note');
+    if (el) el.textContent = `All times shown in ${getSelection().city} local time.`;
+  }
+
   // --- Init ---
 
   populateCitySelect(document.getElementById('tp-city'));
@@ -179,12 +224,14 @@ import { stampOf } from './lib/format';
     if (changed.includes('timeFmt')) {
       localStorage.setItem('tc-time-fmt', sel.timeFmt);
       applyTimeFmtUI();
+  updateTzNote();
       renderAll();
       if (tbHasDays()) renderTarabalam();
       if (goHasData()) renderGochara();
       if (muHasLast()) renderMuhurta();
     }
     if (changed.includes('city') || changed.includes('system')) {
+      updateTzNote();
       const citySel = document.getElementById('tp-city') as HTMLSelectElement;
       const sysSel = document.getElementById('tp-system') as HTMLSelectElement;
       if (citySel.value !== sel.city) citySel.value = sel.city;
@@ -228,12 +275,15 @@ import { stampOf } from './lib/format';
       closeHelpSheet();
       document.body.classList.add('m-nav-open');
       navBtn.setAttribute('aria-expanded', 'true');
+      modalOpen(document.getElementById('sidebar'),
+                document.querySelector('#sidebar .sidebar-item.active') || undefined);
       if (typeof gcEvent === 'function') gcEvent('nav-open');
     }
     function closeNav() {
       if (!document.body.classList.contains('m-nav-open')) return;
       document.body.classList.remove('m-nav-open');
       navBtn.setAttribute('aria-expanded', 'false');
+      modalClose(document.getElementById('sidebar'));
     }
     navBtn.addEventListener('click', () => {
       if (document.body.classList.contains('m-nav-open')) closeNav(); else openNav();
