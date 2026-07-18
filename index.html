@@ -417,7 +417,11 @@
     #global-controls-bar .sel-wrap { display: flex; align-items: center; gap: 0.3rem; }
     #global-controls-bar .sel-icon { color: var(--indigo); opacity: 0.7; flex: none; }
     #global-controls-bar #sel-fmt-toggle { margin-left: auto; }
-    body[data-mode="mobile"] #global-controls-bar { display: none; }
+    /* One shell: the pickers stay in the flow on mobile (no More drawer). */
+    body[data-mode="mobile"] #global-controls-bar {
+      margin-top: 0.75rem; padding: 0 0.85rem; row-gap: 0.4rem;
+    }
+    body[data-mode="mobile"] #global-controls-bar select { max-width: 42vw; }
     .preview-head .date { cursor: pointer; }
     .preview-head .date:hover { opacity: 0.85; }
 
@@ -486,11 +490,11 @@
     footer a { color: var(--indigo); }
 
     /* ---------- Mobile shell — only active under 620px via body[data-mode] ---------- */
-    #m-topbar, #m-bottomnav, .m-drawer, #m-drawer-scrim, #m-help-sheet { display: none; }
+    #m-topbar, #m-drawer-scrim, #m-help-sheet { display: none; }
 
     body[data-mode="mobile"] {
       padding-top: 52px;
-      padding-bottom: 76px;
+      padding-bottom: 1.5rem;
     }
     body[data-mode="mobile"] .page { padding-top: 0; }
     body[data-mode="mobile"] .hero,
@@ -518,13 +522,17 @@
       background: linear-gradient(90deg, var(--brand), #b83a2a);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    #m-topbar .m-spacer, #m-topbar .m-page-help-btn {
+    #m-topbar #m-nav-btn, #m-topbar .m-page-help-btn {
       flex: none; width: 30px; height: 30px;
     }
-    #m-topbar .m-page-help-btn {
+    #m-topbar #m-nav-btn, #m-topbar .m-page-help-btn {
       border: 0; background: transparent; padding: 0; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
     }
+    #m-topbar #m-nav-btn .m-nav-icon {
+      font-size: 1.15rem; line-height: 1; color: #1F1A17;
+    }
+    #m-topbar #m-nav-btn:active { background: #E7DECC; border-radius: 8px; }
     #m-topbar .m-page-help-btn .m-help-icon {
       display: inline-flex; width: 22px; height: 22px;
       border: 1.5px solid #B5AC9C; border-radius: 50%;
@@ -547,99 +555,34 @@
       font-family: var(--brand-sans); font-size: 0.78rem; color: #8B8377;
     }
 
-    body[data-mode="mobile"] #m-bottomnav {
-      display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: 64px;
-      background: rgba(255,255,255,0.96); backdrop-filter: saturate(180%) blur(10px);
-      -webkit-backdrop-filter: saturate(180%) blur(10px);
-      border-top: 1px solid #E7DECC; z-index: 50;
-      padding-bottom: env(safe-area-inset-bottom, 0);
-    }
-    #m-bottomnav .m-tab {
-      flex: 1 1 0; min-width: 0; background: transparent; border: 0; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 1px; padding: 0.3rem 0.2rem; color: #B5AC9C; font-family: inherit;
-      font-size: 0.78rem; font-weight: 600;
-    }
-    #m-bottomnav .m-tab .m-tab-emoji { font-size: 1.15rem; line-height: 1; }
-    #m-bottomnav .m-tab .m-tab-sub { font-size: 0.62rem; font-weight: 500; color: #DDD2BC; line-height: 1.1; }
-    #m-bottomnav .m-tab.active { color: var(--indigo); }
-    #m-bottomnav .m-tab.active .m-tab-sub { color: #b83a2a; }
-
     body[data-mode="mobile"] #m-drawer-scrim {
       display: block; position: fixed; inset: 0; background: rgba(31,26,23,0.4);
       z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
     }
-    body[data-mode="mobile"].m-more-open #m-drawer-scrim {
+    body[data-mode="mobile"].m-nav-open #m-drawer-scrim {
       opacity: 1; pointer-events: auto;
     }
 
-    body[data-mode="mobile"] .m-drawer {
-      display: block; position: fixed; top: 0; bottom: 0;
-      width: min(86vw, 380px); background: #fff; z-index: 70;
-      transition: transform 0.22s ease;
+    /* One nav: on mobile the desktop sidebar becomes a left drawer. */
+    body[data-mode="mobile"] #sidebar {
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; bottom: 0; left: 0; width: min(78vw, 300px);
+      background: #fff; border-right: 1px solid #DDD2BC; z-index: 70;
       overflow-y: auto; -webkit-overflow-scrolling: touch;
+      box-shadow: 8px 0 24px rgba(31,26,23,0.18);
+      transform: translateX(-102%); transition: transform 0.22s cubic-bezier(0.16,1,0.3,1);
     }
-    body[data-mode="mobile"] .m-drawer-left {
-      left: 0; box-shadow: 8px 0 24px rgba(31,26,23,0.18);
-      transform: translateX(-100%);
+    body[data-mode="mobile"].m-nav-open #sidebar { transform: translateX(0); }
+    @media (prefers-reduced-motion: reduce) {
+      body[data-mode="mobile"] #sidebar { transition: none; }
     }
-    body[data-mode="mobile"] .m-drawer-right {
-      right: 0; box-shadow: -8px 0 24px rgba(31,26,23,0.18);
-      transform: translateX(100%);
-    }
-    body[data-mode="mobile"].m-more-open #m-more-drawer { transform: translateX(0); }
 
-    .m-drawer .m-drawer-head {
-      position: sticky; top: 0; display: flex; align-items: center;
-      padding: 1rem 1rem 0.9rem; border-bottom: 1px solid #E7DECC; background: #fff;
-      font-family: var(--brand-display); font-size: 1.18rem; font-weight: 700;
-      color: #1F1A17; z-index: 1; letter-spacing: 0.005em;
-    }
-    .m-drawer .m-drawer-head .m-drawer-close {
-      margin-left: auto; width: 36px; height: 36px; border-radius: 8px;
-      border: 0; background: transparent; font-size: 1rem; color: #8B8377; cursor: pointer;
-    }
-    .m-drawer .m-drawer-body { padding: 0.5rem 0.85rem 2rem; }
-    .m-drawer .m-drawer-body .card { margin: 0.75rem 0; box-shadow: none; border: 1px solid #E7DECC; }
-    .m-drawer .m-drawer-hint {
-      font-size: 0.78rem; color: #8B8377; line-height: 1.5;
-      margin: 0.5rem 0.1rem 0.6rem; padding: 0;
-    }
-    .m-drawer .m-about {
-      padding: 0.75rem; font-size: 0.85rem; color: #58504A; line-height: 1.5;
-      border: 1px solid #E7DECC; border-radius: 8px; background: #FFFFFF; margin: 0.75rem 0;
-    }
-    .m-drawer .m-about strong { color: #1F1A17; }
-    .m-drawer .m-about a { color: var(--indigo); font-weight: 600; }
-    .m-drawer .m-source { padding: 0.6rem 0.4rem 0; font-size: 0.78rem; color: #B5AC9C; text-align: center; }
-    .m-drawer .m-source a { color: var(--indigo); }
-
-    /* Condense the More drawer: smaller headings, tighter spacing, trim
-       explanatory copy that's redundant once a choice has been made. */
-    .m-drawer .m-drawer-body h2 { font-size: 0.95rem; margin: 0 0 0.5rem; }
-    .m-drawer .m-drawer-body h3.sub { font-size: 0.8rem; margin: 0.85rem 0 0.4rem; }
-    .m-drawer .m-drawer-body .card > p,
-    .m-drawer .m-drawer-body .card .preview-note { font-size: 0.78rem; line-height: 1.45; }
-    .m-drawer #card-system > p,
-    .m-drawer #card-mcp .mcp-tagline,
-    .m-drawer #card-mcp > div > span { display: none; }
-    .m-drawer #card-mcp .btn { font-size: 0.82rem; }
 
     @media (max-width: 340px) {
       #m-topbar .m-brand { font-size: 0.92rem; }
       #m-topbar .m-brand .m-brand-mark { width: 26px; height: 26px; }
     }
 
-
-    /* Drawer placement for relocated selectors — sit them as discrete rows */
-    .m-drawer .selector { display: flex; flex-direction: column; gap: 0.3rem;
-                         padding: 0.6rem 0.75rem; border: 1px solid #E7DECC;
-                         border-radius: 8px; background: #FFFFFF; margin: 0.5rem 0; }
-    .m-drawer .selector > label { font-size: 0.72rem; color: #8B8377;
-                                  text-transform: uppercase; letter-spacing: 0.04em;
-                                  font-weight: 700; }
-    .m-drawer .selector select { width: 100%; }
-    .m-drawer .selector .fmt-toggle { align-self: flex-start; }
 
     /* Special days row: weekday + date stay together (no space-between split),
        chips on a second line. The "in N days" hint folds into the same line as
@@ -964,58 +907,60 @@
         flex-wrap: nowrap; padding: 0;
       }
 
-      /* Section switching: hide secondary cards when a tool panel is active */
-      body[data-tool="today"] #special-days-card,
-      body[data-tool="today"] #subscribe,
-      body[data-tool="today"] #card-mcp,
-      body[data-tool="today"] #card-system,
-      body[data-tool="today"] #card-about,
-      body[data-tool="gochara"] #special-days-card,
-      body[data-tool="gochara"] #subscribe,
-      body[data-tool="gochara"] #card-mcp,
-      body[data-tool="gochara"] #card-system,
-      body[data-tool="gochara"] #card-about,
-      body[data-tool="tarabalam"] #special-days-card,
-      body[data-tool="tarabalam"] #subscribe,
-      body[data-tool="tarabalam"] #card-mcp,
-      body[data-tool="tarabalam"] #card-system,
-      body[data-tool="tarabalam"] #card-about { display: none; }
-
-      /* Hide tool card when a secondary section is active */
-      body[data-tool="festivals"] #card-tools,
-      body[data-tool="subscribe"] #card-tools,
-      body[data-tool="useinai"] #card-tools,
-      body[data-tool="about"] #card-tools { display: none; }
-
-      /* Festivals: show only special-days-card */
-      body[data-tool="festivals"] #subscribe,
-      body[data-tool="festivals"] #card-mcp,
-      body[data-tool="festivals"] #card-system,
-      body[data-tool="festivals"] #card-about { display: none; }
-
-      /* Subscribe: show subscribe + card-system (system choice affects feed URL) */
-      body[data-tool="subscribe"] #special-days-card,
-      body[data-tool="subscribe"] #card-mcp,
-      body[data-tool="subscribe"] #card-about { display: none; }
-
-      /* Use in AI: show only card-mcp */
-      body[data-tool="useinai"] #special-days-card,
-      body[data-tool="useinai"] #subscribe,
-      body[data-tool="useinai"] #card-system,
-      body[data-tool="useinai"] #card-about { display: none; }
-
-      /* About: show only card-about */
-      body[data-tool="about"] #special-days-card,
-      body[data-tool="about"] #subscribe,
-      body[data-tool="about"] #card-mcp,
-      body[data-tool="about"] #card-system { display: none; }
-
-      /* Footer: only show on tool panels */
-      body[data-tool="festivals"] footer,
-      body[data-tool="subscribe"] footer,
-      body[data-tool="useinai"] footer,
-      body[data-tool="about"] footer { display: none; }
     }
+
+    /* Section switching (all widths): one shell, one data-tool matrix */
+    /* Section switching: hide secondary cards when a tool panel is active */
+    body[data-tool="today"] #special-days-card,
+    body[data-tool="today"] #subscribe,
+    body[data-tool="today"] #card-mcp,
+    body[data-tool="today"] #card-system,
+    body[data-tool="today"] #card-about,
+    body[data-tool="gochara"] #special-days-card,
+    body[data-tool="gochara"] #subscribe,
+    body[data-tool="gochara"] #card-mcp,
+    body[data-tool="gochara"] #card-system,
+    body[data-tool="gochara"] #card-about,
+    body[data-tool="tarabalam"] #special-days-card,
+    body[data-tool="tarabalam"] #subscribe,
+    body[data-tool="tarabalam"] #card-mcp,
+    body[data-tool="tarabalam"] #card-system,
+    body[data-tool="tarabalam"] #card-about { display: none; }
+
+    /* Hide tool card when a secondary section is active */
+    body[data-tool="festivals"] #card-tools,
+    body[data-tool="subscribe"] #card-tools,
+    body[data-tool="useinai"] #card-tools,
+    body[data-tool="about"] #card-tools { display: none; }
+
+    /* Festivals: show only special-days-card */
+    body[data-tool="festivals"] #subscribe,
+    body[data-tool="festivals"] #card-mcp,
+    body[data-tool="festivals"] #card-system,
+    body[data-tool="festivals"] #card-about { display: none; }
+
+    /* Subscribe: show subscribe + card-system (system choice affects feed URL) */
+    body[data-tool="subscribe"] #special-days-card,
+    body[data-tool="subscribe"] #card-mcp,
+    body[data-tool="subscribe"] #card-about { display: none; }
+
+    /* Use in AI: show only card-mcp */
+    body[data-tool="useinai"] #special-days-card,
+    body[data-tool="useinai"] #subscribe,
+    body[data-tool="useinai"] #card-system,
+    body[data-tool="useinai"] #card-about { display: none; }
+
+    /* About: show only card-about */
+    body[data-tool="about"] #special-days-card,
+    body[data-tool="about"] #subscribe,
+    body[data-tool="about"] #card-mcp,
+    body[data-tool="about"] #card-system { display: none; }
+
+    /* Footer: only show on tool panels */
+    body[data-tool="festivals"] footer,
+    body[data-tool="subscribe"] footer,
+    body[data-tool="useinai"] footer,
+    body[data-tool="about"] footer { display: none; }
 
     /* Sidebar chrome */
     .sidebar-brand {
@@ -1147,7 +1092,9 @@
 
 <!-- Mobile shell — visible only when body[data-mode="mobile"] -->
 <header id="m-topbar" role="banner">
-  <span class="m-spacer" aria-hidden="true"></span>
+  <button id="m-nav-btn" aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">
+    <span class="m-nav-icon" aria-hidden="true">☰</span>
+  </button>
   <span class="m-brand">
     <svg class="m-brand-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
       <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
@@ -1163,53 +1110,9 @@
   </button>
 </header>
 
-<nav id="m-bottomnav" role="tablist" aria-label="Sections">
-  <button class="m-tab active" data-tab="today" role="tab" aria-selected="true">
-    <span class="m-tab-emoji">🔆</span>
-    <span class="m-tab-label">Today</span>
-    <span class="m-tab-sub">the day</span>
-  </button>
-  <button class="m-tab" data-tab="gochara" role="tab" aria-selected="false">
-    <span class="m-tab-emoji">🪐</span>
-    <span class="m-tab-label">Daily Horoscope</span>
-    <span class="m-tab-sub">rasi phalalu</span>
-  </button>
-  <button class="m-tab" data-tab="tarabalam" role="tab" aria-selected="false">
-    <span class="m-tab-emoji">⏰</span>
-    <span class="m-tab-label">Muhurtam</span>
-    <span class="m-tab-sub">muhurtam</span>
-  </button>
-  <button class="m-tab" id="m-more-btn" aria-controls="m-more-drawer" aria-expanded="false">
-    <span class="m-tab-emoji">⋯</span>
-    <span class="m-tab-label">More</span>
-    <span class="m-tab-sub">settings &amp; info</span>
-  </button>
-</nav>
 
 <div id="m-drawer-scrim" aria-hidden="true"></div>
 
-<!-- "More" drawer: settings (city / system / time format), subscribe &
-     connect, MCP/AI assistants and about — everything secondary lives here. -->
-<aside id="m-more-drawer" class="m-drawer m-drawer-right" aria-hidden="true" aria-label="More">
-  <div class="m-drawer-head">
-    More
-    <button class="m-drawer-close" data-close="more" aria-label="Close">✕</button>
-  </div>
-  <div class="m-drawer-body" id="m-more-body">
-    <p class="m-drawer-hint">City and system apply everywhere, including the calendar feed below.</p>
-    <!-- City, System (with explanation card), Time format, Subscribe and MCP cards relocate here -->
-    <div class="m-about" id="m-about">
-      <strong>Astro Chaganti's Panchangam</strong> is a free Telugu panchangam — a calendar feed,
-      a daily glance, and a family timing tool. It's open source, runs without an account,
-      and updates automatically. For personal readings and consultations, visit
-      <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>.
-    </div>
-    <div class="m-source" id="m-source-line">
-      A free service from AstroChaganti — feeds regenerated monthly, 18 months ahead.
-      <br/><a href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
-    </div>
-  </div>
-</aside>
 
 <!-- Bottom-sheet help: contextual to the active screen -->
 <aside id="m-help-sheet" aria-hidden="true" aria-label="Help">

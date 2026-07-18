@@ -1278,8 +1278,9 @@ import {
     about:     ['About', 'What this is and how it works'],
   };
   function openHelpSheet() {
-    const active = document.querySelector('#m-bottomnav .m-tab.active');
-    const tab = active ? active.dataset.tab : 'today';
+    // Help content exists for the three tool panels; other sections get Today's.
+    const cur = document.body.dataset.tool;
+    const tab = (cur === 'gochara' || cur === 'tarabalam') ? cur : 'today';
     const src = tab === 'today'   ? document.getElementById('today-help-src')
               : tab === 'gochara' ? document.getElementById('go-help')
               :                     document.getElementById('tb-help');
@@ -1309,12 +1310,6 @@ import {
     // sidebar stays in sync on desktop
     document.querySelectorAll('#sidebar .sidebar-item[id]').forEach(b => {
       b.classList.toggle('active', b.id === 'sidebar-' + which);
-    });
-    // mobile bottom-nav stays in sync (only meaningful for the 3 tool panels)
-    document.querySelectorAll('#m-bottomnav .m-tab').forEach(b => {
-      const on = b.dataset.tab === which;
-      b.classList.toggle('active', on);
-      b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
     const titles = PAGE_TITLES[which];
     document.getElementById('m-page-title-main').textContent = titles ? titles[0] : '';
@@ -2668,83 +2663,40 @@ import {
   updateSubscribeUrl();
   loadPreview();
 
-  // ---------- Mobile shell — matchMedia, two drawers, swipe, card relocation ----------
+  // ---------- Mobile shell — one nav: width flag + sidebar drawer + help sheet ----------
   (function mobileShell() {
     const mq = window.matchMedia('(max-width: 620px)');
-
-    // Each drawer has its own body and its own list of elements to host.
-    // On mobile, those elements move into the drawer body in array order.
-    // On resize back to desktop, they return to their original DOM position.
-    const MORE = {
-      bodyEl: document.getElementById('m-more-body'),
-      drawerEl: document.getElementById('m-more-drawer'),
-      btnEl: document.getElementById('m-more-btn'),
-      anchorBefore: document.getElementById('m-about'),  // insert before the about blurb
-      moveIds: ['sel-tp-city', 'sel-tp-system', 'sel-fmt-toggle', 'card-system', 'subscribe', 'card-mcp'],
-      openClass: 'm-more-open',
-      openEvt: 'more-open', closeEvt: 'more-close',
-    };
-    const DRAWERS = [MORE];
-    const placeholders = {};
-
-    function moveAllToDrawers() {
-      for (const d of DRAWERS) {
-        for (const id of d.moveIds) {
-          const el = document.getElementById(id);
-          if (!el || el.parentNode === d.bodyEl) continue;
-          const ph = document.createComment('m-drawer-slot-' + id);
-          placeholders[id] = ph;
-          el.parentNode.insertBefore(ph, el);
-          if (d.anchorBefore) d.bodyEl.insertBefore(el, d.anchorBefore);
-          else d.bodyEl.appendChild(el);
-        }
-      }
-    }
-    function restoreAll() {
-      for (const d of DRAWERS) {
-        for (const id of d.moveIds) {
-          const el = document.getElementById(id);
-          const ph = placeholders[id];
-          if (el && ph && ph.parentNode) {
-            ph.parentNode.insertBefore(el, ph);
-            ph.parentNode.removeChild(ph);
-            delete placeholders[id];
-          }
-        }
-      }
-    }
-
-    function openDrawer(d) {
-      // exclusive: tapping one closes the other
-      DRAWERS.filter(x => x !== d).forEach(closeDrawer);
-      document.body.classList.add(d.openClass);
-      d.drawerEl.setAttribute('aria-hidden', 'false');
-      d.btnEl.setAttribute('aria-expanded', 'true');
-      if (typeof gcEvent === 'function') gcEvent(d.openEvt);
-    }
-    function closeDrawer(d) {
-      if (!document.body.classList.contains(d.openClass)) return;
-      document.body.classList.remove(d.openClass);
-      d.drawerEl.setAttribute('aria-hidden', 'true');
-      d.btnEl.setAttribute('aria-expanded', 'false');
-      if (typeof gcEvent === 'function') gcEvent(d.closeEvt);
-    }
-    function closeAllDrawers() { DRAWERS.forEach(closeDrawer); }
 
     function applyMode() {
       const mobile = mq.matches;
       document.body.dataset.mode = mobile ? 'mobile' : 'desktop';
-      if (mobile) moveAllToDrawers();
-      else { restoreAll(); closeAllDrawers(); }
+      if (!mobile) closeNav();
     }
 
-    MORE.btnEl.addEventListener('click', () => { closeHelpSheet(); openDrawer(MORE); });
-    document.querySelectorAll('.m-drawer-close').forEach(btn => {
-      btn.addEventListener('click', () => closeDrawer(MORE));
+    // --- sidebar drawer: the SAME #sidebar element as desktop, slid in ---
+    const navBtn = document.getElementById('m-nav-btn');
+    function openNav() {
+      closeHelpSheet();
+      document.body.classList.add('m-nav-open');
+      navBtn.setAttribute('aria-expanded', 'true');
+      if (typeof gcEvent === 'function') gcEvent('nav-open');
+    }
+    function closeNav() {
+      if (!document.body.classList.contains('m-nav-open')) return;
+      document.body.classList.remove('m-nav-open');
+      navBtn.setAttribute('aria-expanded', 'false');
+    }
+    navBtn.addEventListener('click', () => {
+      if (document.body.classList.contains('m-nav-open')) closeNav(); else openNav();
     });
+    // choosing a section closes the drawer
+    document.querySelectorAll('#sidebar .sidebar-item').forEach(b => {
+      b.addEventListener('click', closeNav);
+    });
+
     document.querySelectorAll('.m-page-help-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        closeAllDrawers();
+        closeNav();
         // toggle: tapping again closes the sheet
         if (document.body.classList.contains('m-help-open')) closeHelpSheet();
         else openHelpSheet();
@@ -2753,45 +2705,11 @@ import {
     document.getElementById('m-help-close').addEventListener('click', closeHelpSheet);
     document.getElementById('m-help-cta').addEventListener('click', closeHelpSheet);
     document.getElementById('m-drawer-scrim').addEventListener('click', () => {
-      closeAllDrawers(); closeHelpSheet();
+      closeNav(); closeHelpSheet();
     });
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeAllDrawers(); closeHelpSheet(); }
+      if (e.key === 'Escape') { closeNav(); closeHelpSheet(); }
     });
-
-    // --- bottom-nav tap ---
-    document.querySelectorAll('#m-bottomnav .m-tab[data-tab]').forEach(b => {
-      b.addEventListener('click', () => switchTool(b.dataset.tab));
-    });
-
-    // --- swipe between tabs ---
-    const ORDER = ['today', 'gochara', 'tarabalam'];
-    function currentTab() {
-      const active = document.querySelector('#m-bottomnav .m-tab.active');
-      return active ? active.dataset.tab : 'today';
-    }
-    let touchX = null, touchY = null, touchT = 0;
-    document.addEventListener('touchstart', e => {
-      if (!mq.matches) return;
-      // suppress while a drawer or help sheet is open
-      if (document.body.classList.contains('m-more-open') ||
-          document.body.classList.contains('m-help-open')) return;
-      const t = e.touches[0]; touchX = t.clientX; touchY = t.clientY; touchT = Date.now();
-    }, { passive: true });
-    document.addEventListener('touchend', e => {
-      if (!mq.matches || touchX === null) return;
-      const t = e.changedTouches[0];
-      const dx = t.clientX - touchX, dy = t.clientY - touchY;
-      const ax = Math.abs(dx), ay = Math.abs(dy);
-      touchX = null; touchY = null;
-      if (Date.now() - touchT > 600) return;
-      if (ax < 60 || ax < ay * 1.5) return;
-      const startTarget = e.target.closest && e.target.closest('input, select, textarea, .tb-table-wrap, .url-box');
-      if (startTarget) return;
-      const i = ORDER.indexOf(currentTab());
-      const next = dx < 0 ? Math.min(ORDER.length - 1, i + 1) : Math.max(0, i - 1);
-      if (next !== i) switchTool(ORDER[next]);
-    }, { passive: true });
 
     // --- resize: debounced re-apply, don't thrash on edge widths ---
     let rt;
