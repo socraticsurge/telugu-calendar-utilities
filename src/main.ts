@@ -10,6 +10,7 @@ import {
   muScoreTier, muRelativeTier,
   computePersonalDosha, computeDayDosha,
 } from './muhurta-scorer';
+import { getSelection, setSelection, initSelection, subscribeSelection } from './selection-store';
 
   const FEED_BASE_URL = 'https://panchangam.astrochaganti.com/feeds/';
 
@@ -130,7 +131,11 @@ import {
 
   // --- Time formatting (12h/24h toggle) ---
 
-  let TIME_FMT = localStorage.getItem('tc-time-fmt') || '12';
+  // Seed the store from persistence; TIME_FMT stays as the hot-path read
+  // (fmtT runs hundreds of times per render) and is kept in sync by the
+  // store subscription wired up in Init.
+  initSelection({ timeFmt: localStorage.getItem('tc-time-fmt') === '24' ? '24' : '12' });
+  let TIME_FMT = getSelection().timeFmt;
 
   function fmtT(t) {
     if (TIME_FMT === '24') return t;
@@ -154,14 +159,13 @@ import {
   }
 
   function setTimeFmt(f) {
-    TIME_FMT = f;
-    localStorage.setItem('tc-time-fmt', f);
+    setSelection({ timeFmt: f });
+    applyTimeFmtUI();  // no-op patches don't notify; keep buttons right at boot
+  }
+  function applyTimeFmtUI() {
+    const f = getSelection().timeFmt;
     document.getElementById('fmt-12').classList.toggle('active', f === '12');
     document.getElementById('fmt-24').classList.toggle('active', f === '24');
-    renderAll();
-    if (typeof TB_DAYS !== 'undefined' && TB_DAYS) renderTarabalam();
-    if (typeof GO_DATA !== 'undefined' && GO_DATA) renderGochara();
-    if (typeof MU_LAST !== 'undefined' && MU_LAST) renderMuhurta();
   }
 
   // --- Ekadashi naming (Amanta maasam + paksham) ---
@@ -651,7 +655,7 @@ import {
 
     // Async lagna fetch — guarded by the strip's data-iso so a quick
     // date change before the fetch resolves doesn't paint stale data.
-    const cityForLagna = document.getElementById('tp-city')?.value;
+    const cityForLagna = getSelection().city;
     if (cityForLagna) {
       loadLagna(cityForLagna).then(d => {
         const ribbon = document.getElementById('lagna-ribbon');
@@ -786,8 +790,8 @@ import {
   window.renderAll = renderAll;
 
   async function loadPreview() {
-    const city = document.getElementById('tp-city').value;
-    const system = document.getElementById('tp-system').value;
+    const city = getSelection().city;
+    const system = getSelection().system;
     document.getElementById('tp-result').innerHTML = '<p class="preview-error">Loading…</p>';
     try {
       LAST_EVENTS = await loadFeed(city, system);
@@ -1005,8 +1009,8 @@ import {
     }
     resBox.innerHTML = '<p class="preview-error">Calculating…</p>';
     try {
-      const city = document.getElementById('tp-city').value;
-      const system = document.getElementById('tp-system').value;
+      const city = getSelection().city;
+      const system = getSelection().system;
       const events = LAST_EVENTS || await loadFeed(city, system);
       TB_EVENTS = events;
       TB_DAYS = [];
@@ -2123,8 +2127,8 @@ import {
       ? `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => htmlEsc(p.name)).join(', ')}</strong> (set above).`
       : `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong> — no people set above, so no star screening.`;
     try {
-      const city = document.getElementById('tp-city').value;
-      const system = document.getElementById('tp-system').value;
+      const city = getSelection().city;
+      const system = getSelection().system;
       const events = LAST_EVENTS || await loadFeed(city, system);
       // Lagna data is needed when (a) people are set — for the
       // per-person kendra/trikona/Ashtama check — OR (b) the chosen
@@ -2635,8 +2639,36 @@ import {
   populateCitySelect(document.getElementById('sub-city'));
   populateSystemSelect(document.getElementById('sub-system'));
 
-  document.getElementById('tp-city').addEventListener('change', loadPreview);
-  document.getElementById('tp-system').addEventListener('change', loadPreview);
+  // SelectionStore wiring: user input flows select → store; everything
+  // downstream (renders, share text, muhurta search) reads the store.
+  // Programmatic changes (e.g. future deep-links) flow store → select
+  // through the subscription below.
+  initSelection({
+    city: (document.getElementById('tp-city') as HTMLSelectElement).value,
+    system: (document.getElementById('tp-system') as HTMLSelectElement).value,
+  });
+  document.getElementById('tp-city').addEventListener('change', e =>
+    setSelection({ city: (e.target as HTMLSelectElement).value }));
+  document.getElementById('tp-system').addEventListener('change', e =>
+    setSelection({ system: (e.target as HTMLSelectElement).value }));
+  subscribeSelection((sel, changed) => {
+    if (changed.includes('timeFmt')) {
+      TIME_FMT = sel.timeFmt;
+      localStorage.setItem('tc-time-fmt', sel.timeFmt);
+      applyTimeFmtUI();
+      renderAll();
+      if (typeof TB_DAYS !== 'undefined' && TB_DAYS) renderTarabalam();
+      if (typeof GO_DATA !== 'undefined' && GO_DATA) renderGochara();
+      if (typeof MU_LAST !== 'undefined' && MU_LAST) renderMuhurta();
+    }
+    if (changed.includes('city') || changed.includes('system')) {
+      const citySel = document.getElementById('tp-city') as HTMLSelectElement;
+      const sysSel = document.getElementById('tp-system') as HTMLSelectElement;
+      if (citySel.value !== sel.city) citySel.value = sel.city;
+      if (sysSel.value !== sel.system) sysSel.value = sel.system;
+      loadPreview();
+    }
+  });
   const _d = new Date();
   const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   _tpDateVal = todayISO;
