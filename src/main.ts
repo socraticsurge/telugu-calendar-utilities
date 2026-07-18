@@ -11,24 +11,10 @@ import {
   computePersonalDosha, computeDayDosha,
 } from './muhurta-scorer';
 import { getSelection, setSelection, initSelection, subscribeSelection } from './selection-store';
-
-  const FEED_BASE_URL = 'https://panchangam.astrochaganti.com/feeds/';
-
-  const CITY_GROUPS = [
-    ['Telugu Heartland', ['Hyderabad', 'Vijayawada', 'Visakhapatnam', 'Tirupati', 'Warangal', 'Guntur', 'Nizamabad', 'Rajahmundry', 'Kurnool', 'Nellore']],
-    ['Major Indian Metros', ['Bengaluru', 'Chennai', 'Mumbai', 'Delhi']],
-    ['International', ['Dallas', 'San Jose', 'San Francisco', 'Edison', 'New York', 'London', 'Sydney', 'Dubai']],
-  ];
-  const SYSTEMS = [['drik', 'Drik Ganita'], ['surya-siddhanta', 'Surya Siddhanta'], ['vakya', 'Vakya']];
-
-  function slug(name) {
-    return name.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '');
-  }
-
-  function feedFilename(city, system, variant = '') {
-    const suffix = variant ? `-${variant}` : '';
-    return `${slug(city)}-${system}${suffix}.ics`;
-  }
+import { parseDescription, TIME_PART } from './lib/parse-description';
+import { FEED_BASE_URL, feedFilename, loadFeed, slug } from './lib/feed-loader';
+import { CITY_GROUPS } from './data/cities';
+import { SYSTEMS } from './data/systems';
 
   function populateCitySelect(select) {
     CITY_GROUPS.forEach(([label, cities]) => {
@@ -88,46 +74,6 @@ import { getSelection, setSelection, initSelection, subscribeSelection } from '.
 
   // --- Today's Panchangam preview ---
 
-  function unfoldICS(text) {
-    return text.replace(/\r\n/g, '\n').split('\n').reduce((lines, line) => {
-      if (line.startsWith(' ') && lines.length) {
-        lines[lines.length - 1] += line.slice(1);
-      } else {
-        lines.push(line);
-      }
-      return lines;
-    }, []);
-  }
-
-  // Parse every VEVENT into a Map keyed by YYYYMMDD — the preview, night
-  // choghadiya (needs tomorrow's sunrise) and upcoming list all read from it.
-  function parseEvents(text) {
-    const lines = unfoldICS(text);
-    const events = new Map();
-    let current = null;
-    for (const line of lines) {
-      if (line === 'BEGIN:VEVENT') { current = []; continue; }
-      if (line === 'END:VEVENT') {
-        if (current) {
-          const dtstart = current.find(l => l.startsWith('DTSTART;VALUE=DATE:'));
-          if (dtstart) {
-            const summary = (current.find(l => l.startsWith('SUMMARY:')) || '').slice('SUMMARY:'.length);
-            const descLine = current.find(l => l.startsWith('DESCRIPTION:')) || '';
-            const description = descLine.slice('DESCRIPTION:'.length)
-              .replace(/\\n/g, '\n')
-              .replace(/\\,/g, ',')
-              .replace(/\\;/g, ';')
-              .replace(/\\\\/g, '\\');
-            events.set(dtstart.slice('DTSTART;VALUE=DATE:'.length), { summary, description });
-          }
-        }
-        current = null;
-        continue;
-      }
-      if (current) current.push(line);
-    }
-    return events;
-  }
 
   // --- Time formatting (12h/24h toggle) ---
 
@@ -384,114 +330,6 @@ import { getSelection, setSelection, initSelection, subscribeSelection } from '.
 
   // (Removed: site/classical palette toggle. Classical-only now —
   // see the CSS block above for the rationale.)
-
-  // A time plus optional (+1)/(-1) relative-day marker, as emitted by the feed.
-  const TIME_PART = '(\\d{2}:\\d{2})(?:\\s*\\(([+-]1)\\))?';
-  // \s+ not \s{2,}: long names (Krishna Chaturdashi, named Ekadashis) overflow the column padding
-  const ANGA_RE = new RegExp(`^(Tithi|Nakshatra|Yoga):\\s+(.+?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`);
-  const WINDOW_RE = new RegExp(`^\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s*$`);
-  const CHOG_RE = new RegExp(`^\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s+(.+)$`);
-
-  function parseDescription(description) {
-    const data = {
-      meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
-      sunrise: null, sunset: null, moonrise: null, moonset: null,
-      auspicious: [], inauspicious: [], choghadiya: [], nightChoghadiya: [],
-      eclipse: null, yogas: [], ayanam: null, rituvu: null, special: [],
-    };
-    let section = null;
-    for (const raw of description.split('\n')) {
-      const line = raw.trimEnd();
-      if (!line.trim()) { section = null; continue; }
-
-      let m;
-      // Header: "<year> [Nama Samvatsara]  ·  Maasam  ·  Paksham  ·  Vaaram".
-      // The " Nama Samvatsara" suffix is the new (devotee-preferred)
-      // form; older deployed feeds still have just "<year>" — strip
-      // whichever shows up so data.samvatsara is always the bare year.
-      if ((m = line.match(/^(.+?)\s+·\s+(.+?) Maasam\s+·\s+(.+?) Paksham\s+·\s+(.+)$/))) {
-        const yearRaw = m[1].trim().replace(/\s+Nama Samvatsara$/i, '').replace(/\s+Samvatsara$/i, '');
-        data.samvatsara = yearRaw;
-        data.maasam = m[2].trim();
-        data.paksham = m[3].trim();
-        data.vaaram = m[4].trim();
-        data.meta = `${yearRaw} Nama Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4].trim()}`;
-        continue;
-      }
-      // Sky: "Sunrise HH:MM  ·  Sunset HH:MM  ·  Moonrise HH:MM  ·  Moonset HH:MM"
-      if ((m = line.match(/^Sunrise (\d{2}:\d{2})\s+·\s+Sunset (\d{2}:\d{2})\s+·\s+Moonrise (\d{2}:\d{2})\s+·\s+Moonset (\d{2}:\d{2})$/))) {
-        [, data.sunrise, data.sunset, data.moonrise, data.moonset] = m;
-        continue;
-      }
-      // Ayanam / Rituvu: "Ayanam: X  ·  Rituvu: Y"
-      if ((m = line.match(/^Ayanam:\s+(.+?)\s+·\s+Rituvu:\s+(.+)$/))) {
-        data.ayanam = m[1].trim();
-        data.rituvu = m[2].trim();
-        continue;
-      }
-      // Signs: "Solar sign: X  ·  Lunar sign: Y" (solar sign drives Vaikunta Ekadashi naming)
-      if ((m = line.match(/^Solar sign:\s+(.+?)\s+·\s+Lunar sign:\s+(.+)$/))) {
-        data.solarSign = m[1].trim();
-        data.lunarSign = m[2].trim();
-        continue;
-      }
-      // Pancha anga rows
-      if ((m = line.match(ANGA_RE))) {
-        data[m[1].toLowerCase()] = { name: m[2].trim(), start: m[3], sflag: m[4] || null, end: m[5], eflag: m[6] || null };
-        continue;
-      }
-      if ((m = line.match(/^Karana:\s+(.+)$/))) {
-        data.karana = m[1].trim();
-        continue;
-      }
-      // Section headers
-      if (line === '─ Auspicious ─') { section = 'auspicious'; continue; }
-      if (line === '─ Inauspicious ─') { section = 'inauspicious'; continue; }
-      if (line === '─ Choghadiya ─') { section = 'choghadiya'; continue; }
-      if (line === '─ Night Choghadiya ─') { section = 'nightChoghadiya'; continue; }
-      if (line === '─ Eclipse ─') { section = 'eclipse'; continue; }
-      if (line === '─ Special Yogas ─') { section = 'specialyogas'; continue; }
-      // Auspicious / inauspicious entries: "  Name           HH:MM – HH:MM (+1)"
-      if ((section === 'auspicious' || section === 'inauspicious') && (m = line.match(WINDOW_RE))) {
-        data[section].push({ name: m[1].trim(), start: m[2], sflag: m[3] || null, end: m[4], eflag: m[5] || null });
-        continue;
-      }
-      // Choghadiya entries: "  HH:MM – HH:MM  Name"
-      if ((section === 'choghadiya' || section === 'nightChoghadiya') && (m = line.match(CHOG_RE))) {
-        data[section].push({ start: m[1], end: m[3], name: m[5].trim() });
-        continue;
-      }
-      // Eclipse detail line: "  🌒 Solar Eclipse (Total) — visible/not visible..."
-      if (section === 'eclipse' && (m = line.match(/^\s*\S+\s+(Solar|Lunar) Eclipse \((.+?)\)\s*[—-]\s*(.+)$/))) {
-        data.eclipse = { kind: m[1], subtype: m[2], visible: !m[3].includes('not visible'), window: null, sutak: null };
-        continue;
-      }
-      if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Window:\s+(.+?)\s*[–-]\s*(.+)$/))) {
-        data.eclipse.window = { start: m[1].trim(), end: m[2].trim() };
-        continue;
-      }
-      if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Sutak:\s+(.+?)\s*[–-]\s*(.+)$/))) {
-        data.eclipse.sutak = { start: m[1].trim(), end: m[2].trim() };
-        continue;
-      }
-      // Special yoga entries: "  Yoga Name" (new format)
-      if (section === 'specialyogas' && (m = line.match(/^\s+(.+)$/))) {
-        data.yogas.push(m[1].trim());
-        continue;
-      }
-      // Backward compat: old "Yogas: X, Y" single-line format
-      if ((m = line.match(/^Yogas:\s+(.+)$/))) {
-        data.yogas = m[1].trim().split(/,\s*/);
-        continue;
-      }
-      // Trailing special-day line: "⚡ Ekadashi — fasting day  ·  Pradosham"
-      if ((m = line.match(/^⚡\s*(.+)$/))) {
-        data.special = m[1].split(/\s+·\s+/).map(s => s.trim());
-        continue;
-      }
-    }
-    return data;
-  }
 
   let _tpDateVal = null;
   function selectedDate() {
@@ -760,21 +598,7 @@ import { getSelection, setSelection, initSelection, subscribeSelection } from '.
     btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   }
 
-  const FEED_CACHE = new Map();
   let LAST_EVENTS = null;
-
-  async function loadFeed(city, system) {
-    const key = `${city}|${system}`;
-    if (FEED_CACHE.has(key)) return FEED_CACHE.get(key);
-    // Relative path on the deployed site; fall back to the live feed URL
-    // so the page also works when previewed locally without a feeds/ dir.
-    let res = await fetch(`feeds/${feedFilename(city, system)}`).catch(() => null);
-    if (!res || !res.ok) res = await fetch(`${FEED_BASE_URL}${feedFilename(city, system)}`);
-    if (!res.ok) throw new Error('fetch failed');
-    const events = parseEvents(await res.text());
-    FEED_CACHE.set(key, events);
-    return events;
-  }
 
   function renderAll() {
     if (!LAST_EVENTS) return;
@@ -797,6 +621,9 @@ import { getSelection, setSelection, initSelection, subscribeSelection } from '.
       LAST_EVENTS = await loadFeed(city, system);
       renderAll();
     } catch (e) {
+      // Surface the real failure: this catch also swallows render bugs,
+      // not just fetch errors, and a silent one masks regressions.
+      console.error('loadPreview failed:', e);
       LAST_EVENTS = null;
       document.getElementById('tp-result').innerHTML = '<p class="preview-error">Preview unavailable — try the subscription link below.</p>';
       document.getElementById('upcoming-result').innerHTML = '<p class="preview-error">Unavailable — try the subscription link below.</p>';
