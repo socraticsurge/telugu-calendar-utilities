@@ -23,13 +23,13 @@ import { fmtT, dayMark, fmtRange, fmtPlain, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
-import { RASI_NAMES } from '../data/rasis';
+import { RASI_NAMES, NAKSHATRA_NAMES, rasiFromStar } from '../data/rasis';
 import { goHasData, goBuildViewSelect, renderGochara } from './gochara';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
 // --- Tarabalam tool ---
 
-const TB_NAKSHATRAS = ['Ashvini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+const TB_NAKSHATRAS = NAKSHATRA_NAMES;
 const TARA_NAMES = ['Janma','Sampat','Vipat','Kshema','Pratyak','Sadhana','Naidhana','Mitra','Parama Mitra'];
 const TARA_GOOD = new Set([2,4,6,8,9]);
 const TB_RASIS = RASI_NAMES;
@@ -42,14 +42,6 @@ function taraOf(janmaName, dayName) {
   const j = TB_NAKSHATRAS.indexOf(janmaName), d = TB_NAKSHATRAS.indexOf(dayName);
   if (j < 0 || d < 0) return null;
   return ((d - j + 27) % 27) % 9 + 1;
-}
-
-function rasiFromStar(nakName, pada) {
-  const k = TB_NAKSHATRAS.indexOf(nakName);
-  if (k < 0) return null;
-  if (pada) return TB_RASIS[Math.floor((k * 4 + pada - 1) / 9)];
-  const first = Math.floor((k * 4) / 9), last = Math.floor((k * 4 + 3) / 9);
-  return first === last ? TB_RASIS[first] : null;  // straddler needs padam
 }
 
 function chandraOf(janmaRasi, dayRasi) {

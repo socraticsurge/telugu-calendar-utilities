@@ -7,7 +7,12 @@
 import { fmtT, fmtRange } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
-import { RASI_NAMES } from '../data/rasis';
+import { RASI_NAMES, rasiFromStar } from '../data/rasis';
+import { MU_CHANDRA_GOOD, MU_CHANDRA_PUJA } from '../muhurta-scorer';
+
+// Chandrabalam house sets — same classical table the muhurta scorer pins.
+const CHANDRA_GOOD = MU_CHANDRA_GOOD;
+const CHANDRA_PUJA = MU_CHANDRA_PUJA;
 
 const GO_FAV = { Surya:[3,6,10,11], Chandra:[1,3,6,7,10,11], Kuja:[3,6,11],
   Budha:[2,4,6,8,10,11], Guru:[2,5,7,9,11], Shukra:[1,2,3,4,5,8,9,11,12],
@@ -36,6 +41,8 @@ async function loadGochara() {
 
     // Fetch today's LLM-generated phalalu — silently skip if unavailable
     try {
+      const d = new Date();
+      const todayISO = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const pr = await fetch(`rasi_phalalu/${todayISO}.json`, { cache: 'no-cache' });
       if (pr.ok) LLM_PHALALU = await pr.json();
     } catch (_) { /* no LLM phalalu today — computed fallback will be used */ }

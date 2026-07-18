@@ -239,3 +239,57 @@ def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browse
     assert not ref_errors, (
         f'muhurta search surfaced ReferenceError(s): {ref_errors[:3]}'
     )
+
+
+def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build, browser):
+    """The regression class this guards: a module-scoped constant left
+    behind by the panel extraction turns the gochara RASI view into a
+    silent no-op (ReferenceError swallowed by the inline onchange), while
+    the default whole-sky view keeps working — exactly what shipped on
+    2026-07-18 (CHANDRA_GOOD/rasiFromStar/todayISO undefined in
+    panels/gochara.ts). Drives the lazy path: load gochara, choose a
+    rasi, and require the phalalu box to render actual content.
+
+    gochara.json isn't part of the Vite build (it lives on gh-pages), so
+    stage the production copy into dist/; skip — not fail — when that
+    network fetch is unavailable.
+    """
+    import urllib.request
+    dst = vite_build / 'gochara.json'
+    if not dst.exists():
+        try:
+            with urllib.request.urlopen(
+                    'https://panchangam.astrochaganti.com/gochara.json',
+                    timeout=15) as r:
+                dst.write_bytes(r.read())
+        except OSError:
+            pytest.skip('gochara.json unavailable (offline?) — cannot stage sky data')
+
+    page = browser.new_page()
+    captured = _capture_console(page)
+    try:
+        page.goto(docs_server, wait_until='networkidle', timeout=15000)
+        page.evaluate("window.switchTool('gochara')")
+        page.wait_for_function(
+            "document.getElementById('go-view') && "
+            "document.getElementById('go-view').options.length > 1",
+            timeout=15000,
+        )
+        page.select_option('#go-view', '0')  # Mesha — the lazy path
+        page.wait_for_function(
+            "document.getElementById('go-phalalu') && "
+            "document.getElementById('go-phalalu').textContent.trim().length > 0",
+            timeout=10000,
+        )
+        # inner_text() reflects CSS text-transform (headings render
+        # uppercased) — compare case-insensitively.
+        ph = page.locator('#go-phalalu').inner_text()
+        assert 'rasi phalalu' in ph.lower(), (
+            f'phalalu box rendered but without a reading: {ph[:200]!r}')
+        legend = page.locator('#go-legend').inner_text()
+        assert 'favourable' in legend, 'verdict legend missing for a rasi view'
+    finally:
+        page.close()
+    ref_errors = [m for kind, m in captured
+                  if 'ReferenceError' in m or 'is not defined' in m]
+    assert not ref_errors, f'rasi view surfaced ReferenceError(s): {ref_errors[:3]}'
