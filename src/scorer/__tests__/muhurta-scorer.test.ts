@@ -1,16 +1,18 @@
 // Unit tests for the pure muhurta scoring helpers in
-// docs/muhurta-scorer.js. Run with: node --test tests/js/
+// src/muhurta-scorer.ts. Run with: npm test (Vitest).
 //
-// These are JS-only tests: they verify the JS port matches the
-// behaviour the Python suite already pins for telugu_panchangam/
-// personal/{muhurta,lagna_position,chandrabalam}.py. Any drift
-// between Python and JS must be caught by a failure HERE — that's
-// the regression the tara_dosha JS-parity bug (PR 63) slipped
+// Ported from tests/js/test_muhurta_scorer.js when the pre-Vite
+// docs/muhurta-scorer.js sidecar was deleted — same cases, same
+// assertion style. They verify the TS port matches the behaviour
+// the Python suite already pins for telugu_panchangam/personal/
+// {muhurta,lagna_position,chandrabalam}.py. Any drift between
+// Python and TS must be caught by a failure HERE — that's the
+// regression the tara_dosha JS-parity bug (PR 63) slipped
 // through for months.
 
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const M = require('../../docs/muhurta-scorer.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as M from '../../muhurta-scorer';
 
 // ── Lagna position math ─────────────────────────────────────────
 

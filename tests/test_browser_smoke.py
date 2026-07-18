@@ -1,14 +1,19 @@
-"""End-to-end browser smoke against docs/index.html.
+"""End-to-end browser smoke against the built Vite site (dist/).
 
 This is the regression net the v1.8.0 hotfix would have benefited
 from: even when every endpoint returns 200, the deployed page can
-still fail at runtime if a referenced script defines functions the
-inline code expects. A real browser load surfaces those errors
-immediately as `ReferenceError` in the JS console.
+still fail at runtime if the bundle omits functions the page
+expects. A real browser load surfaces those errors immediately as
+`ReferenceError` in the JS console.
 
-This test is conditionally skipped when Playwright is not
+The fixture runs `npm run build` (tsc --noEmit + vite build) so the
+tests exercise the exact bytes deploy-landing.yml publishes — NOT a
+source checkout. Pre-Vite this file served the old docs/index.html
+mega-page; that page is deleted and this net now watches dist/.
+
+This test is conditionally skipped when Playwright or npm is not
 installed locally — keep `pytest` runnable for dev environments
-without the browser dependency. CI installs Playwright explicitly.
+without the browser/Node dependency. CI installs both explicitly.
 
 Install (one-time, ~120 MB):
 
@@ -18,8 +23,10 @@ Install (one-time, ~120 MB):
 from __future__ import annotations
 
 import http.server
+import shutil
 import socket
 import socketserver
+import subprocess
 import threading
 import time
 from pathlib import Path
@@ -34,7 +41,33 @@ playwright_sync = pytest.importorskip(
 sync_playwright = playwright_sync.sync_playwright
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DOCS_DIR = REPO_ROOT / 'docs'
+DIST_DIR = REPO_ROOT / 'dist'
+
+
+@pytest.fixture(scope='module')
+def vite_build():
+    """Build the site into dist/ with the same command the deploy
+    workflows use. Skips (not fails) when npm is unavailable so
+    Python-only dev environments keep a green `pytest`; a FAILING
+    build, however, fails loudly — that's a real regression."""
+    npm = shutil.which('npm')
+    if npm is None:
+        pytest.skip('npm not installed; browser smoke needs the Vite build.')
+    if not (REPO_ROOT / 'node_modules').is_dir():
+        subprocess.run([npm, 'ci'], cwd=REPO_ROOT, check=True,
+                       capture_output=True, text=True)
+    proc = subprocess.run([npm, 'run', 'build'], cwd=REPO_ROOT,
+                          capture_output=True, text=True)
+    assert proc.returncode == 0, (
+        f'`npm run build` failed (exit {proc.returncode}) — the smoke '
+        f'tests exercise dist/, so a broken build is a broken site.\n'
+        f'stdout: {proc.stdout[-2000:]}\nstderr: {proc.stderr[-2000:]}'
+    )
+    assert (DIST_DIR / 'index.html').is_file(), (
+        'npm run build succeeded but dist/index.html is missing — '
+        'check vite.config.ts build.outDir.'
+    )
+    return DIST_DIR
 
 
 def _pick_free_port() -> int:
@@ -52,11 +85,13 @@ class _QuietHandler(http.server.SimpleHTTPRequestHandler):
 
 
 @pytest.fixture(scope='module')
-def docs_server():
-    """Serve docs/ on a free localhost port for the duration of the
-    module. Yields the base URL (http://127.0.0.1:PORT)."""
+def docs_server(vite_build):
+    """Serve the freshly built dist/ on a free localhost port for the
+    duration of the module. Yields the base URL (http://127.0.0.1:PORT).
+    (Fixture name kept from the docs/-serving era so the test diff
+    stays reviewable; it now serves the deploy artifact.)"""
     port = _pick_free_port()
-    handler = lambda *a, **kw: _QuietHandler(*a, directory=str(DOCS_DIR), **kw)
+    handler = lambda *a, **kw: _QuietHandler(*a, directory=str(vite_build), **kw)
     httpd = socketserver.TCPServer(('127.0.0.1', port), handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
@@ -112,22 +147,27 @@ def test_index_loads_without_referenceerror(docs_server, browser):
     )
 
 
-def test_muhurta_scorer_module_loads(docs_server, browser):
-    """Stronger guard: assert the scorer module's exports are on
-    window after page load. If the sidecar 404s OR the file silently
-    fails to assign to window (browser parse error, syntax bug, etc.)
-    this test catches it independently of any inline-script call."""
+def test_inline_onclick_surface_is_on_window(docs_server, browser):
+    """Stronger guard: every function referenced by an inline
+    onclick/onchange attribute in index.html MUST be assigned to
+    window by the bundle (modules are scoped; inline handlers look
+    names up on window). If the Object.assign(window, {...}) block
+    in src/main.ts drops one — or the bundle fails to evaluate —
+    the matching button dies silently in production. Scorer-module
+    internals are separately covered by the Vitest suite
+    (src/scorer/__tests__/muhurta-scorer.test.ts)."""
     page = browser.new_page()
     try:
         page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
-        # Wait until the scorer module had time to evaluate.
-        for marker in ('muLagnaPosition', 'muLagnasInClass', 'muScoreTier',
-                       'computePersonalDosha'):
+        # Wait until the bundle had time to evaluate.
+        for marker in ('switchTool', 'setTimeFmt', 'calcTarabalam',
+                       'findMuhurta', 'renderGochara',
+                       'shareTodayOnWhatsApp'):
             kind = page.evaluate(f"typeof window.{marker}")
             assert kind == 'function', (
                 f'window.{marker} is {kind!r}, expected "function". '
-                f'Check that muhurta-scorer.js is reachable and '
-                f'exports the symbol.'
+                f'Check the Object.assign(window, {{...}}) block in '
+                f'src/main.ts — inline onclick handlers depend on it.'
             )
     finally:
         page.close()
@@ -160,7 +200,7 @@ def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browse
         kind = page.evaluate("typeof window.findMuhurta")
         assert kind == 'function', (
             f'window.findMuhurta should be the muhurta search entry-point '
-            f'(see docs/index.html "Find slots" button onclick); got {kind!r}. '
+            f'(see the "Find slots" button onclick in index.html); got {kind!r}. '
             f'If the function was renamed, update this test in lockstep.'
         )
         page.evaluate('window.findMuhurta()')

@@ -1767,10 +1767,9 @@ import {
                           'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1 };
   const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
 
-  // MU_TIER_NAMES, muScoreTier, muRelativeTier — moved to
-  // docs/muhurta-scorer.js (loaded via <script> below the existing
-  // tarabalam panel). The script tag assigns them to window so
-  // existing references in this file keep working unchanged.
+  // MU_TIER_NAMES, muScoreTier, muRelativeTier — imported from
+  // src/muhurta-scorer.ts (see the import block at the top of this
+  // file).
   // Tier each slot relative to the min/max score in this batch — mirror
   // telugu_panchangam/personal/muhurta.assign_tiers. "Excellent" means
   // the best of what turned up in this search, not a fixed bar.
@@ -1971,9 +1970,8 @@ import {
 
   // MU_CHANDRA_GOOD/MU_CHANDRA_PUJA, MU_LAGNA_KENDRA/MU_LAGNA_TRIKONA,
   // MU_RASHI_NAMES, muLagnaPosition, muLagnaVerdict, muIsFavourableLagna,
-  // muLagnaAtMin — all moved to docs/muhurta-scorer.js so they can be
-  // unit-tested under Node. Loaded via <script src> below; assigned to
-  // window so the inline references in this file still resolve.
+  // muLagnaAtMin — all live in src/muhurta-scorer.ts (imported at the
+  // top of this file) so they can be unit-tested under Vitest.
   // CHANDRA bad = {4, 8, 12} (the complement).
 
   // Tithi family — mirror telugu_panchangam/personal/tithi_class.py
