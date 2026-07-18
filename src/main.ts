@@ -194,11 +194,23 @@ import { stampOf } from './lib/format';
   }
 
 
-  // "Times shown in <city> local time" — the one line that saves a
-  // diaspora user from reading Rahu Kalam in the wrong timezone.
-  function updateTzNote() {
-    const el = document.getElementById('tz-note');
-    if (el) el.textContent = `All times shown in ${getSelection().city} local time.`;
+  // Quiet settings summary — the controls live behind it. The city
+  // callout doubles as the timezone affordance that saves a diaspora
+  // user from reading Rahu Kalam in the wrong timezone.
+  function updateSettingsSummary() {
+    const el = document.getElementById('settings-summary');
+    if (!el) return;
+    const sel = getSelection();
+    const sysLabel = (SYSTEMS.find(([v]) => v === sel.system) || [])[1] || sel.system;
+    el.textContent = `All times in ${sel.city} local time · ${sysLabel} · ${sel.timeFmt}h`;
+  }
+  function toggleSettings(open) {
+    const bar = document.getElementById('global-controls-bar');
+    const btn = document.getElementById('settings-toggle');
+    const show = open !== undefined ? open : bar.hidden;
+    bar.hidden = !show;
+    btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+    btn.textContent = show ? 'Done' : 'Change';
   }
 
   // --- Init ---
@@ -212,6 +224,16 @@ import { stampOf } from './lib/format';
   // downstream (renders, share text, muhurta search) reads the store.
   // Programmatic changes (e.g. future deep-links) flow store → select
   // through the subscription below.
+  // Restore the remembered selection (set once, forget) — the reason
+  // the settings can recede behind the summary line at all.
+  {
+    const citySel = document.getElementById('tp-city') as HTMLSelectElement;
+    const sysSel = document.getElementById('tp-system') as HTMLSelectElement;
+    const savedCity = localStorage.getItem('tc-city');
+    const savedSystem = localStorage.getItem('tc-system');
+    if (savedCity && [...citySel.options].some(o => o.value === savedCity)) citySel.value = savedCity;
+    if (savedSystem && [...sysSel.options].some(o => o.value === savedSystem)) sysSel.value = savedSystem;
+  }
   initSelection({
     city: (document.getElementById('tp-city') as HTMLSelectElement).value,
     system: (document.getElementById('tp-system') as HTMLSelectElement).value,
@@ -224,14 +246,16 @@ import { stampOf } from './lib/format';
     if (changed.includes('timeFmt')) {
       localStorage.setItem('tc-time-fmt', sel.timeFmt);
       applyTimeFmtUI();
-  updateTzNote();
+      updateSettingsSummary();
       renderAll();
       if (tbHasDays()) renderTarabalam();
       if (goHasData()) renderGochara();
       if (muHasLast()) renderMuhurta();
     }
     if (changed.includes('city') || changed.includes('system')) {
-      updateTzNote();
+      localStorage.setItem('tc-city', sel.city);
+      localStorage.setItem('tc-system', sel.system);
+      updateSettingsSummary();
       const citySel = document.getElementById('tp-city') as HTMLSelectElement;
       const sysSel = document.getElementById('tp-system') as HTMLSelectElement;
       if (citySel.value !== sel.city) citySel.value = sel.city;
@@ -242,10 +266,12 @@ import { stampOf } from './lib/format';
   const _d = new Date();
   const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   initTodayPanel(todayISO);
+  document.getElementById('settings-toggle').addEventListener('click', () => toggleSettings());
   document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
   document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
 
   applyTimeFmtUI();
+  updateSettingsSummary();
 
   initTarabalamPanel(todayISO);
   document.body.dataset.tool = 'today';

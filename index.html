@@ -59,11 +59,18 @@
       --brand-display: 'Libre Baskerville', 'Fraunces', Georgia, serif;
       --brand-sans: 'Inter', system-ui, sans-serif;
     }
-    #tz-note {
-      font-size: 0.78rem; color: #6B6357; margin: 0.4rem 0 0.9rem;
-      padding: 0 0.15rem;
+    #settings-line {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: 0.8rem; color: #6B6357; padding: 0.45rem 0.15rem;
     }
-    body[data-mode="mobile"] #tz-note { padding: 0 0.95rem; }
+    #settings-line #settings-summary { min-width: 0; }
+    #settings-line #settings-toggle {
+      flex: none; margin-left: auto; font: 600 0.76rem 'Inter', system-ui, sans-serif;
+      color: var(--indigo); background: none; border: 1px solid var(--indigo-border);
+      border-radius: 99px; padding: 0.18rem 0.7rem; cursor: pointer;
+    }
+    #settings-line #settings-toggle:hover { background: var(--indigo-bg); }
+    body[data-mode="mobile"] #settings-line { padding: 0.65rem 0.95rem 0.15rem; }
     .skip-link {
       position: absolute; left: -9999px; top: 0; z-index: 100;
       background: var(--indigo); color: #FBF3EA; font-weight: 600;
@@ -421,6 +428,7 @@
     .fmt-toggle button { border: none; background: #fff; color: #6B6357; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
     .fmt-toggle button.active { background: var(--indigo-bg); color: var(--indigo); }
 
+    #global-controls-bar[hidden] { display: none; }
     #global-controls-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
                             padding: 0.45rem 0; margin-bottom: 0.25rem; }
     #global-controls-bar .selector { gap: 0; }
@@ -429,8 +437,9 @@
     #global-controls-bar .sel-icon { color: var(--indigo); opacity: 0.7; flex: none; }
     #global-controls-bar #sel-fmt-toggle { margin-left: auto; }
     /* One shell: the pickers stay in the flow on mobile (no More drawer). */
-    body[data-mode="mobile"] #global-controls-bar {
-      margin-top: 0.75rem; padding: 0 0.85rem; row-gap: 0.4rem;
+    body[data-mode="mobile"] #global-controls-bar:not([hidden]) {
+      margin-top: 0.35rem; padding: 0 0.85rem 0.65rem; row-gap: 0.4rem;
+      border-bottom: 1px solid #E7DECC;
     }
     body[data-mode="mobile"] #global-controls-bar select { max-width: 42vw; }
     .preview-head .date { cursor: pointer; }
@@ -911,11 +920,12 @@
       .hero { display: none; }
       .tool-tabs { display: none; }
       h2.panel-heading { display: flex; }
-      #global-controls-bar {
+      #settings-line {
         margin-top: 0; height: 60px; box-sizing: border-box;
-        border-bottom: 1px solid #E7DECC; margin-bottom: 1rem;
-        flex-wrap: nowrap; padding: 0;
+        border-bottom: 1px solid #E7DECC;
       }
+      #global-controls-bar:not([hidden]) { padding: 0.55rem 0 0.7rem; border-bottom: 1px solid #E7DECC; margin-bottom: 1rem; }
+      #settings-line:has(+ #global-controls-bar:not([hidden])) { border-bottom: none; }
 
     }
 
@@ -1310,7 +1320,11 @@
     </div>
   </div>
 
-  <div id="global-controls-bar">
+  <div id="settings-line">
+    <span id="settings-summary" aria-live="polite">All times in Hyderabad local time · Drik Ganita · 12h</span>
+    <button id="settings-toggle" aria-expanded="false" aria-controls="global-controls-bar">Change</button>
+  </div>
+  <div id="global-controls-bar" hidden>
     <div class="selector" id="sel-tp-city">
       <label for="tp-city">City</label>
       <div class="sel-wrap">
@@ -1333,7 +1347,6 @@
       </div>
     </div>
   </div>
-  <p id="tz-note" aria-live="polite">All times shown in Hyderabad local time.</p>
   <div class="card" id="card-tools">
     <div class="tool-tabs" role="tablist">
       <button id="tab-today" class="tool-tab active" role="tab" onclick="switchTool('today')">

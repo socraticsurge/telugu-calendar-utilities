@@ -59,4 +59,6 @@ Minimal and calm: smooth scroll, no entrance theatrics. Any added motion must be
 - Sidebar active state is a tinted pill (bg + 1px border, radius), not a left-stripe.
 - Drawer + help sheet get `role="dialog"`/`aria-modal` + focus trap while open.
 - `<main>` landmark + skip-to-content link.
-- "All times shown in <city> local time" note bound to the SelectionStore.
+- Settings recede behind a one-line summary ("All times in <city> local
+  time · <system> · <fmt>h" + Change chip); pickers expand on demand.
+  City/system persist in localStorage — set once, forget.
