@@ -60,16 +60,22 @@
       --brand-sans: 'Inter', system-ui, sans-serif;
     }
     #settings-line {
-      display: flex; align-items: center; gap: 0.75rem;
+      display: flex; align-items: center; gap: 0.45rem;
       font-size: 0.8rem; color: #6B6357; padding: 0.45rem 0.15rem;
     }
-    #settings-line #settings-summary { min-width: 0; }
-    #settings-line #settings-toggle {
-      flex: none; margin-left: auto; font: 600 0.76rem 'Inter', system-ui, sans-serif;
-      color: var(--indigo); background: none; border: 1px solid var(--indigo-border);
-      border-radius: 99px; padding: 0.18rem 0.7rem; cursor: pointer;
+    #settings-line .sel-icon { color: var(--indigo); opacity: 0.7; flex: none; }
+    #settings-line #settings-summary {
+      min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    #settings-line #settings-toggle:hover { background: var(--indigo-bg); }
+    #settings-line #settings-toggle {
+      flex: none; display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; color: var(--indigo); background: none;
+      border: none; border-radius: 6px; padding: 0; cursor: pointer; opacity: 0.75;
+    }
+    #settings-line #settings-toggle:hover { background: var(--indigo-bg); opacity: 1; }
+    #settings-line #settings-toggle[aria-expanded="true"] {
+      background: var(--indigo-bg); border: 1px solid var(--indigo-border); opacity: 1;
+    }
     body[data-mode="mobile"] #settings-line { padding: 0.65rem 0.95rem 0.15rem; }
     .skip-link {
       position: absolute; left: -9999px; top: 0; z-index: 100;
@@ -1321,8 +1327,11 @@
   </div>
 
   <div id="settings-line">
-    <span id="settings-summary" aria-live="polite">All times in Hyderabad local time · Drik Ganita · 12h</span>
-    <button id="settings-toggle" aria-expanded="false" aria-controls="global-controls-bar">Change</button>
+    <svg class="sel-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span id="settings-summary" aria-live="polite">Hyderabad · Drik Ganita · 12h</span>
+    <button id="settings-toggle" aria-expanded="false" aria-controls="global-controls-bar" aria-label="Change city, system or time format" title="Change settings">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+    </button>
   </div>
   <div id="global-controls-bar" hidden>
     <div class="selector" id="sel-tp-city">

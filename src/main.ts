@@ -202,7 +202,7 @@ import { stampOf } from './lib/format';
     if (!el) return;
     const sel = getSelection();
     const sysLabel = (SYSTEMS.find(([v]) => v === sel.system) || [])[1] || sel.system;
-    el.textContent = `All times in ${sel.city} local time · ${sysLabel} · ${sel.timeFmt}h`;
+    el.textContent = `${sel.city} · ${sysLabel} · ${sel.timeFmt}h`;
   }
   function toggleSettings(open) {
     const bar = document.getElementById('global-controls-bar');
@@ -210,7 +210,6 @@ import { stampOf } from './lib/format';
     const show = open !== undefined ? open : bar.hidden;
     bar.hidden = !show;
     btn.setAttribute('aria-expanded', show ? 'true' : 'false');
-    btn.textContent = show ? 'Done' : 'Change';
   }
 
   // --- Init ---
