@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One-shell prototype — Astro Chaganti Panchangam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #8E2A1F;
+    --brand-bg: rgba(142,42,31,0.08);
+    --brand-border: rgba(142,42,31,0.22);
+    --amber: #A56B1E;
+    --amber-bg: rgba(165,107,30,0.09);
+    --amber-border: rgba(165,107,30,0.30);
+    --green: #4F6B2C;
+    --green-bg: rgba(79,107,44,0.09);
+    --green-border: rgba(79,107,44,0.30);
+    --ink: #1F1A17;
+    --ink-soft: #4A423C;          /* darkened from #58504A for AA */
+    --ground: #F2ECDF;
+    --surface: #FBF8F1;
+    --line: rgba(31,26,23,0.12);
+    --display: 'Libre Baskerville', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --r: 10px;
+    --z-drawer: 40; --z-scrim: 30; --z-topbar: 20;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans); color: var(--ink); background: var(--ground);
+    line-height: 1.55; font-size: 15px;
+  }
+
+  /* ── Shell: one grid, sidebar column collapses away on mobile ── */
+  .shell { display: grid; grid-template-columns: 232px minmax(0,1fr); min-height: 100vh; }
+  .content { padding: 0 clamp(1rem, 4vw, 2.5rem) 4rem; }
+  .content-inner { max-width: 760px; margin: 0 auto; }
+
+  /* ── SideNav ── */
+  .sidenav {
+    border-right: 1px solid var(--line);
+    padding: 1.5rem 0.9rem;
+    display: flex; flex-direction: column; gap: 0.15rem;
+    background: transparent;
+  }
+  .brand {
+    font-family: var(--display); font-size: 1.12rem; color: var(--ink);
+    padding: 0.25rem 0.75rem 1.1rem; letter-spacing: 0.01em;
+  }
+  .brand em { font-style: italic; color: var(--brand); }
+  .navitem {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.5rem 0.75rem; border-radius: 8px;
+    color: var(--ink-soft); text-decoration: none; font-weight: 500; font-size: 0.92rem;
+    border: 1px solid transparent;
+  }
+  .navitem:hover { background: rgba(31,26,23,0.045); color: var(--ink); }
+  .navitem[aria-current="page"] {
+    background: var(--brand-bg); border-color: var(--brand-border);
+    color: var(--brand); font-weight: 600;
+  }
+  .navitem .glyph { width: 1.15rem; text-align: center; opacity: 0.85; }
+  .nav-foot {
+    margin-top: auto; padding: 1rem 0.75rem 0;
+    font-family: var(--display); font-style: italic; font-size: 0.72rem;
+    color: var(--ink-soft); line-height: 1.5;
+  }
+
+  /* ── Context bar: the SelectionStore, visible ── */
+  .contextbar {
+    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+    padding: 1.1rem 0 1.3rem;
+  }
+  .ctx-select {
+    appearance: none; font: 500 0.9rem var(--sans); color: var(--ink);
+    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%234A423C' fill='none' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 0.7rem center;
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.42rem 1.9rem 0.42rem 0.7rem; cursor: pointer;
+  }
+  .ctx-select:hover { border-color: var(--brand-border); }
+  .datenav { display: flex; align-items: center; gap: 0.15rem; margin-left: auto; }
+  .datenav button {
+    font: 500 0.95rem var(--sans); color: var(--ink-soft);
+    background: var(--surface); border: 1px solid var(--line);
+    width: 2rem; height: 2.1rem; border-radius: 8px; cursor: pointer;
+  }
+  .datenav button:hover { color: var(--brand); border-color: var(--brand-border); }
+  .datenav .today-btn { width: auto; padding: 0 0.7rem; font-size: 0.85rem; }
+
+  /* ── DayHeaderCard ── */
+  .dayheader {
+    background: var(--brand); color: #FBF3EA;
+    border-radius: var(--r); padding: 1.35rem 1.5rem 1.25rem;
+  }
+  .dayheader h1 {
+    font-family: var(--display); font-weight: 400; font-size: 1.7rem;
+    margin: 0 0 0.35rem; letter-spacing: 0.005em; line-height: 1.2; text-wrap: balance;
+  }
+  .dayheader .festival-chip {
+    display: inline-block; font-size: 0.78rem; font-weight: 600;
+    background: rgba(251,243,234,0.16); border: 1px solid rgba(251,243,234,0.35);
+    border-radius: 99px; padding: 0.12rem 0.65rem; margin-left: 0.5rem; vertical-align: 0.22em;
+  }
+  .dayheader .samvatsara { font-size: 0.86rem; color: rgba(251,243,234,0.85); margin: 0 0 0.15rem; }
+  .dayheader .skyrow {
+    display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: 0.75rem;
+    font-size: 0.86rem; color: rgba(251,243,234,0.92);
+  }
+  .dayheader .skyrow b { font-weight: 600; color: #fff; }
+
+  /* ── The ONE pop: Right-now strip (Von Restorff) ── */
+  .nowstrip {
+    display: flex; align-items: baseline; gap: 0.65rem; flex-wrap: wrap;
+    background: var(--green-bg); border: 1px solid var(--green-border);
+    border-radius: var(--r); padding: 0.7rem 1.1rem; margin-top: 0.8rem;
+  }
+  .nowstrip .pulse {
+    align-self: center; width: 0.55rem; height: 0.55rem; border-radius: 50%;
+    background: var(--green); flex: none;
+  }
+  .nowstrip .now-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; color: var(--green); }
+  .nowstrip .now-main { font-weight: 600; color: var(--ink); }
+  .nowstrip .now-next { font-size: 0.85rem; color: var(--ink-soft); margin-left: auto; }
+
+  /* ── AngaGrid ── */
+  .angagrid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.7rem; margin-top: 1.6rem;
+  }
+  .anga {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 0.8rem 0.95rem;
+  }
+  .anga .k { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; color: var(--ink-soft); text-transform: uppercase; }
+  .anga .v { font-size: 1.04rem; font-weight: 600; margin: 0.15rem 0 0.1rem; }
+  .anga .t { font-size: 0.82rem; color: var(--ink-soft); }
+  .anga .t sup { font-size: 0.65em; }
+
+  /* ── Section headings ── */
+  h2.sect {
+    font-family: var(--display); font-weight: 400; font-size: 1.15rem;
+    margin: 2.2rem 0 0.9rem; letter-spacing: 0.01em;
+  }
+  h2.sect small { font-family: var(--sans); font-size: 0.8rem; color: var(--ink-soft); margin-left: 0.6rem; }
+
+  /* ── WindowList: two tone bands side-by-side on wide ── */
+  .windows { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; align-items: start; margin-top: 1.9rem; }
+  .windowlist { border-radius: var(--r); border: 1px solid; padding: 0.35rem 0; }
+  .windowlist.good { background: var(--green-bg); border-color: var(--green-border); }
+  .windowlist.bad  { background: var(--brand-bg); border-color: var(--brand-border); }
+  .windowlist h3 {
+    font: 700 0.76rem var(--sans); letter-spacing: 0.04em; text-transform: uppercase;
+    margin: 0.45rem 1rem 0.2rem;
+  }
+  .windowlist.good h3 { color: var(--green); }
+  .windowlist.bad h3 { color: var(--brand); }
+  .windowlist ul { list-style: none; margin: 0; padding: 0.2rem 0 0.45rem; }
+  .windowlist li {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+    padding: 0.34rem 1rem; font-size: 0.92rem;
+  }
+  .windowlist li + li { border-top: 1px solid rgba(31,26,23,0.06); }
+  .windowlist .name { font-weight: 500; }
+  .windowlist .range { font-variant-numeric: tabular-nums; color: var(--ink-soft); white-space: nowrap; }
+  .windowlist .range sup { font-size: 0.65em; }
+
+  /* ── ChoghadiyaStrip: full-width timeline ── */
+  .chogha { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; }
+  .chogha .cell {
+    background: var(--surface); border: 1px solid var(--line);
+    padding: 0.5rem 0.4rem 0.45rem; text-align: center; min-width: 0;
+  }
+  .chogha .cell:first-child { border-radius: var(--r) 0 0 var(--r); }
+  .chogha .cell:last-child { border-radius: 0 var(--r) var(--r) 0; }
+  .chogha .cname { font-size: 0.8rem; font-weight: 600; }
+  .chogha .ctime { font-size: 0.7rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .chogha .cell.good { background: var(--green-bg); border-color: var(--green-border); }
+  .chogha .cell.good .cname { color: var(--green); }
+  .chogha .cell.bad { background: var(--brand-bg); border-color: var(--brand-border); }
+  .chogha .cell.bad .cname { color: var(--brand); }
+  .chogha .cell.now { outline: 2px solid var(--green); outline-offset: -2px; position: relative; }
+  .chogha .cell.now::after {
+    content: "now"; position: absolute; top: -0.65rem; left: 50%; transform: translateX(-50%);
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em; color: var(--green);
+    background: var(--ground); padding: 0 0.3rem;
+  }
+
+  /* ── Muhurtam panel ── */
+  .mu-form {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 1.1rem 1.2rem 1.2rem; display: grid; gap: 0.9rem;
+    grid-template-columns: 1fr 1fr;
+  }
+  .mu-form .field { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+  .mu-form label { font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); }
+  .mu-form select, .mu-form input {
+    font: 500 0.92rem var(--sans); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; background: #fff;
+    padding: 0.45rem 0.6rem; width: 100%;
+  }
+  .mu-form .people { grid-column: 1 / -1; }
+  .chips { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.84rem; font-weight: 500;
+    background: var(--brand-bg); border: 1px solid var(--brand-border);
+    color: var(--ink); border-radius: 99px; padding: 0.22rem 0.75rem;
+  }
+  .chip small { color: var(--ink-soft); font-size: 0.78em; }
+  .chip.add { background: transparent; border-style: dashed; color: var(--ink-soft); cursor: pointer; }
+  .mu-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 1rem; }
+  .btn-primary {
+    font: 600 0.95rem var(--sans); color: #FBF3EA; background: var(--brand);
+    border: 1px solid var(--brand); border-radius: 8px; padding: 0.55rem 1.3rem; cursor: pointer;
+  }
+  .btn-primary:hover { background: #7C2318; }
+  .mu-note { font-size: 0.82rem; color: var(--ink-soft); }
+
+  /* ── SlotResults ── */
+  .dayGroup { margin-top: 1.5rem; }
+  .dayGroup h3 {
+    font-family: var(--display); font-weight: 400; font-size: 1rem; margin: 0 0 0.5rem;
+  }
+  .dayGroup h3 small { font-family: var(--sans); color: var(--ink-soft); font-size: 0.8rem; margin-left: 0.5rem; }
+  .slot {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 0.65rem 1rem; display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+  }
+  .slot + .slot { margin-top: 0.5rem; }
+  .slot .range { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 9.5rem; }
+  .slot .why { font-size: 0.84rem; color: var(--ink-soft); flex: 1 1 12rem; }
+  .tier {
+    font-size: 0.74rem; font-weight: 700; letter-spacing: 0.03em;
+    border-radius: 99px; padding: 0.16rem 0.65rem; white-space: nowrap;
+  }
+  .tier.excellent { color: #fff; background: var(--green); }
+  .tier.good { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+  .tier.fair { color: var(--amber); background: var(--amber-bg); border: 1px solid var(--amber-border); }
+
+  /* ── Panels & topbar ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .topbar { display: none; }
+  .scrim { display: none; }
+
+  /* ── Mobile: same shell, sidebar becomes drawer ── */
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; }
+    .topbar {
+      display: flex; align-items: center; gap: 0.75rem;
+      position: sticky; top: 0; z-index: var(--z-topbar);
+      background: var(--ground); border-bottom: 1px solid var(--line);
+      padding: 0.65rem 1rem;
+    }
+    .topbar .brand { padding: 0; font-size: 1.02rem; }
+    .hamburger {
+      font-size: 1.1rem; background: none; border: 1px solid var(--line);
+      border-radius: 8px; width: 2.2rem; height: 2.2rem; cursor: pointer; color: var(--ink);
+    }
+    .sidenav {
+      position: fixed; inset: 0 30% 0 0; z-index: var(--z-drawer);
+      background: var(--ground); border-right: 1px solid var(--line);
+      transform: translateX(-102%); transition: transform 0.22s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: 0 0 40px rgba(31,26,23,0.0);
+    }
+    .shell.drawer-open .sidenav { transform: translateX(0); box-shadow: 0 0 40px rgba(31,26,23,0.25); }
+    .shell.drawer-open .scrim {
+      display: block; position: fixed; inset: 0; z-index: var(--z-scrim);
+      background: rgba(31,26,23,0.35); border: 0;
+    }
+    @media (prefers-reduced-motion: reduce) { .sidenav { transition: none; } }
+    .contextbar { padding-top: 0.9rem; }
+    .ctx-select { flex: 1 1 8rem; }
+    .datenav { margin-left: 0; width: 100%; justify-content: flex-end; }
+    .dayheader { padding: 1.1rem 1.15rem 1rem; }
+    .dayheader h1 { font-size: 1.35rem; }
+    .dayheader .samvatsara { font-size: 0.8rem; }
+    .windows { grid-template-columns: 1fr; }
+    .chogha { grid-template-columns: repeat(4, 1fr); gap: 3px; }
+    .chogha .cell:nth-child(4) { border-radius: 0 var(--r) 0 0; }
+    .chogha .cell:nth-child(5) { border-radius: 0 0 0 var(--r); }
+    .chogha .cell:first-child { border-radius: var(--r) 0 0 0; }
+    .chogha .cell:last-child { border-radius: 0 0 var(--r) 0; }
+    .mu-form { grid-template-columns: 1fr; }
+    .nowstrip .now-next { margin-left: 1.2rem; flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+
+  <!-- Mobile topbar (hidden on desktop) -->
+  <header class="topbar">
+    <button class="hamburger" aria-label="Open navigation" onclick="document.getElementById('shell').classList.add('drawer-open')">☰</button>
+    <div class="brand">Astro <em>Chaganti</em></div>
+  </header>
+
+  <!-- ONE nav: sidebar on desktop, drawer on mobile -->
+  <nav class="sidenav" aria-label="Main">
+    <div class="brand">Astro <em>Chaganti</em></div>
+    <a class="navitem" href="#today" aria-current="page" onclick="return show('today', this)"><span class="glyph">☀</span> Panchangam</a>
+    <a class="navitem" href="#horoscope" onclick="return show(null, this)"><span class="glyph">♄</span> Daily Horoscope</a>
+    <a class="navitem" href="#muhurtam" onclick="return show('muhurtam', this)"><span class="glyph">⏱</span> Muhurtam</a>
+    <a class="navitem" href="#festivals" onclick="return show(null, this)"><span class="glyph">🪔</span> Festivals</a>
+    <a class="navitem" href="#subscribe" onclick="return show(null, this)"><span class="glyph">📅</span> Subscribe</a>
+    <a class="navitem" href="#ai" onclick="return show(null, this)"><span class="glyph">✦</span> Use in AI</a>
+    <a class="navitem" href="#about" onclick="return show(null, this)"><span class="glyph">ⓘ</span> About</a>
+    <div class="nav-foot">satyaṃ brūyāt priyaṃ brūyāt —<br>be truthful, be kind.</div>
+  </nav>
+  <button class="scrim" aria-label="Close navigation" onclick="document.getElementById('shell').classList.remove('drawer-open')"></button>
+
+  <main class="content">
+    <div class="content-inner">
+
+      <!-- Context bar = SelectionStore made visible -->
+      <div class="contextbar">
+        <select class="ctx-select" aria-label="City"><option>Hyderabad</option><option>Vijayawada</option><option>Dallas</option></select>
+        <select class="ctx-select" aria-label="Calculation system"><option>Drik Ganita</option><option>Surya Siddhanta</option><option>Vakya</option></select>
+        <div class="datenav">
+          <button aria-label="Previous day">‹</button>
+          <button class="today-btn">Today</button>
+          <button aria-label="Next day">›</button>
+        </div>
+      </div>
+
+      <!-- ═══ TODAY PANEL ═══ -->
+      <section class="panel active" id="panel-today">
+
+        <div class="dayheader">
+          <h1>Saturday, July 18, 2026</h1>
+          <p class="samvatsara">Parabhava Nama Samvatsara · Dakshinayanam · Varsha Rituvu<br>
+          Ashadha Maasam · Shukla Paksham · Shanivaram</p>
+          <div class="skyrow">
+            <span>☀ <b>5:50 am – 6:53 pm</b></span>
+            <span>☾ <b>9:34 am – 10:02 pm</b></span>
+          </div>
+        </div>
+
+        <div class="nowstrip">
+          <span class="pulse" aria-hidden="true"></span>
+          <span class="now-label">RIGHT NOW</span>
+          <span class="now-main">Amrita Kalam · until 1:19 pm</span>
+          <span class="now-next">next: Abhijit Muhurta ends 12:48 pm · Yamagandam 1:55 pm</span>
+        </div>
+
+        <div class="angagrid">
+          <div class="anga"><div class="k">Tithi</div><div class="v">Shukla Panchami</div><div class="t">4:43 am – 3:43 am<sup>+1</sup></div></div>
+          <div class="anga"><div class="k">Nakshatra</div><div class="v">Purva Phalguni</div><div class="t">6:35 pm<sup>−1</sup> – 6:00 pm</div></div>
+          <div class="anga"><div class="k">Nitya Yoga</div><div class="v">Variyan</div><div class="t">10:46 pm<sup>−1</sup> – 8:45 pm</div></div>
+          <div class="anga"><div class="k">Karana</div><div class="v">Bava · Balava</div><div class="t">4:43 am – 4:07 pm – 3:43 am<sup>+1</sup></div></div>
+        </div>
+
+        <div class="windows">
+          <div class="windowlist good">
+            <h3>Auspicious</h3>
+            <ul>
+              <li><span class="name">Brahma Muhurta</span><span class="range">4:14 – 5:02 am</span></li>
+              <li><span class="name">Abhijit Muhurta</span><span class="range">11:56 am – 12:48 pm</span></li>
+              <li><span class="name">Amrita Kalam</span><span class="range">11:45 am – 1:19 pm</span></li>
+            </ul>
+          </div>
+          <div class="windowlist bad">
+            <h3>Inauspicious</h3>
+            <ul>
+              <li><span class="name">Rahu Kalam</span><span class="range">9:04 – 10:41 am</span></li>
+              <li><span class="name">Yamagandam</span><span class="range">1:55 – 3:32 pm</span></li>
+              <li><span class="name">Gulika Kalam</span><span class="range">5:50 – 7:27 am</span></li>
+              <li><span class="name">Varjyam</span><span class="range">2:32 – 4:06 am<sup>+1</sup></span></li>
+              <li><span class="name">Durmuhurtham</span><span class="range">5:50 – 6:42 am · 6:01 – 6:53 pm</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <h2 class="sect">Choghadiya <small>day blocks, sunrise to sunset</small></h2>
+        <div class="chogha">
+          <div class="cell bad"><div class="cname">Kala</div><div class="ctime">5:50–7:27</div></div>
+          <div class="cell good"><div class="cname">Shubha</div><div class="ctime">7:27–9:04</div></div>
+          <div class="cell bad"><div class="cname">Roga</div><div class="ctime">9:04–10:41</div></div>
+          <div class="cell bad"><div class="cname">Udvega</div><div class="ctime">10:41–12:18</div></div>
+          <div class="cell good now"><div class="cname">Chara</div><div class="ctime">12:18–13:55</div></div>
+          <div class="cell good"><div class="cname">Labha</div><div class="ctime">13:55–15:32</div></div>
+          <div class="cell good"><div class="cname">Amrita</div><div class="ctime">15:32–17:09</div></div>
+          <div class="cell bad"><div class="cname">Kala</div><div class="ctime">17:09–18:53</div></div>
+        </div>
+
+      </section>
+
+      <!-- ═══ MUHURTAM PANEL ═══ -->
+      <section class="panel" id="panel-muhurtam">
+
+        <h2 class="sect" style="margin-top:0.5rem">Find a Muhurtam</h2>
+        <form class="mu-form" onsubmit="return false">
+          <div class="field">
+            <label for="mu-activity">Activity</label>
+            <select id="mu-activity"><option>Gruhapravesham</option><option>Wedding</option><option>Travel</option><option>Surgery</option></select>
+          </div>
+          <div class="field">
+            <label for="mu-range">Search window</label>
+            <select id="mu-range"><option>Next 14 days</option><option>Next 30 days</option><option>Custom range…</option></select>
+          </div>
+          <div class="field people">
+            <label>For whom <small>(birth star · rasi)</small></label>
+            <div class="chips">
+              <span class="chip">Sarath <small>Bharani · Mesha</small></span>
+              <span class="chip">Meghana <small>Vishakha · Tula</small></span>
+              <button class="chip add" type="button">+ Add person</button>
+            </div>
+          </div>
+          <div class="mu-actions">
+            <button class="btn-primary" type="submit">Find slots</button>
+            <span class="mu-note">Scores Tarabalam, Chandrabalam, lagna, choghadiya &amp; doshas for everyone listed.</span>
+          </div>
+        </form>
+
+        <div class="dayGroup">
+          <h3>Thursday, July 23 <small>Shukla Dashami · Guruvaram</small></h3>
+          <div class="slot">
+            <span class="tier excellent">Excellent</span>
+            <span class="range">12:59 – 1:47 pm</span>
+            <span class="why">Labha choghadiya · Tula lagna favourable for both · clear of all doshas</span>
+          </div>
+          <div class="slot">
+            <span class="tier good">Good</span>
+            <span class="range">3:36 – 4:24 pm</span>
+            <span class="why">Chara choghadiya · Tarabalam favourable · Varjyam clears 3:31 pm</span>
+          </div>
+        </div>
+        <div class="dayGroup">
+          <h3>Friday, July 24 <small>Shukla Ekadashi · Shukravaram</small></h3>
+          <div class="slot">
+            <span class="tier good">Good</span>
+            <span class="range">10:12 – 11:00 am</span>
+            <span class="why">Amrita choghadiya · Chandrabalam strong · Ekadashi suits this activity</span>
+          </div>
+          <div class="slot">
+            <span class="tier fair">Fair</span>
+            <span class="range">6:05 – 6:53 am</span>
+            <span class="why">Early Shubha block · Tarabalam mixed for Meghana (remedial)</span>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  function show(panel, link) {
+    if (!panel) return false; // stub sections in this prototype
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + panel).classList.add('active');
+    document.querySelectorAll('.navitem').forEach(n => n.removeAttribute('aria-current'));
+    link.setAttribute('aria-current', 'page');
+    document.getElementById('shell').classList.remove('drawer-open');
+    return false;
+  }
+</script>
+</body>
+</html>
