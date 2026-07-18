@@ -3,7 +3,7 @@
 // Consumed by the Today panel's lagna strip and the muhurta finder's
 // lagna scoring.
 
-import { slug } from './feed-loader';
+import { slug, FEED_BASE_URL } from './feed-loader';
 
 // --- Lagna data layer: cached per-session, per-city fetch ---
 const LAGNA_CACHE = new Map();

@@ -7,7 +7,7 @@
 
 import { getSelection } from '../selection-store';
 import { parseDescription, TIME_PART } from '../lib/parse-description';
-import { loadFeed } from '../lib/feed-loader';
+import { loadFeed, slug } from '../lib/feed-loader';
 import { fmtT, dayMark, fmtRange, fmtPlain, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
