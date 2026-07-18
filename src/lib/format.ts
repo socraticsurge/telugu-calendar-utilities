@@ -29,3 +29,8 @@ export function fmtRange(start: string, end: string, sep?: string, sflag?: strin
 export function fmtPlain(t: string, flag?: string | null): string {
   return fmtT(t) + (flag === '+1' ? ' (next day)' : flag === '-1' ? ' (prev day)' : '');
 }
+
+// Date → feed key (YYYYMMDD)
+export function stampOf(d: Date): string {
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+}
