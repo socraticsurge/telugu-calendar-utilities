@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { getSelection, setSelection, initSelection, subscribeSelection } from './selection-store';
+import { selEl } from './lib/dom';
 import { parseDescription, TIME_PART } from './lib/parse-description';
 import { FEED_BASE_URL, feedFilename, loadFeed, slug } from './lib/feed-loader';
 import { CITY_GROUPS } from './data/cities';
@@ -45,8 +45,8 @@ import { stampOf } from './lib/format';
   // --- Subscribe card ---
 
   function updateSubscribeUrl() {
-    const city = document.getElementById('sub-city').value;
-    const system = document.getElementById('sub-system').value;
+    const city = selEl('sub-city').value;
+    const system = selEl('sub-system').value;
     const variant = (document.querySelector('input[name="sub-variant"]:checked') as HTMLInputElement)?.value ?? '';
     const url = `webcal://${FEED_BASE_URL.replace('https://', '')}${feedFilename(city, system, variant)}`;
     document.getElementById('sub-url').textContent = url;
@@ -63,8 +63,8 @@ import { stampOf } from './lib/format';
   }
 
   function showAppTab(name) {
-    document.querySelectorAll('.app-tab').forEach(t => t.classList.toggle('active', t.dataset.app === name));
-    document.querySelectorAll('.app-panel').forEach(p => p.classList.toggle('active', p.dataset.app === name));
+    document.querySelectorAll<HTMLElement>('.app-tab').forEach(t => t.classList.toggle('active', t.dataset.app === name));
+    document.querySelectorAll<HTMLElement>('.app-panel').forEach(p => p.classList.toggle('active', p.dataset.app === name));
   }
 
   // --- Choosing a system card ---
@@ -204,7 +204,7 @@ import { stampOf } from './lib/format';
     const sysLabel = (SYSTEMS.find(([v]) => v === sel.system) || [])[1] || sel.system;
     el.textContent = `${sel.city} · ${sysLabel} · ${sel.timeFmt}h`;
   }
-  function toggleSettings(open) {
+  function toggleSettings(open?) {
     const bar = document.getElementById('global-controls-bar');
     const btn = document.getElementById('settings-toggle');
     const show = open !== undefined ? open : bar.hidden;
@@ -214,10 +214,10 @@ import { stampOf } from './lib/format';
 
   // --- Init ---
 
-  populateCitySelect(document.getElementById('tp-city'));
-  populateSystemSelect(document.getElementById('tp-system'));
-  populateCitySelect(document.getElementById('sub-city'));
-  populateSystemSelect(document.getElementById('sub-system'));
+  populateCitySelect(selEl('tp-city'));
+  populateSystemSelect(selEl('tp-system'));
+  populateCitySelect(selEl('sub-city'));
+  populateSystemSelect(selEl('sub-system'));
 
   // SelectionStore wiring: user input flows select → store; everything
   // downstream (renders, share text, muhurta search) reads the store.
@@ -226,20 +226,20 @@ import { stampOf } from './lib/format';
   // Restore the remembered selection (set once, forget) — the reason
   // the settings can recede behind the summary line at all.
   {
-    const citySel = document.getElementById('tp-city') as HTMLSelectElement;
-    const sysSel = document.getElementById('tp-system') as HTMLSelectElement;
+    const citySel = selEl('tp-city') as HTMLSelectElement;
+    const sysSel = selEl('tp-system') as HTMLSelectElement;
     const savedCity = localStorage.getItem('tc-city');
     const savedSystem = localStorage.getItem('tc-system');
     if (savedCity && [...citySel.options].some(o => o.value === savedCity)) citySel.value = savedCity;
     if (savedSystem && [...sysSel.options].some(o => o.value === savedSystem)) sysSel.value = savedSystem;
   }
   initSelection({
-    city: (document.getElementById('tp-city') as HTMLSelectElement).value,
-    system: (document.getElementById('tp-system') as HTMLSelectElement).value,
+    city: (selEl('tp-city') as HTMLSelectElement).value,
+    system: (selEl('tp-system') as HTMLSelectElement).value,
   });
-  document.getElementById('tp-city').addEventListener('change', e =>
+  selEl('tp-city').addEventListener('change', e =>
     setSelection({ city: (e.target as HTMLSelectElement).value }));
-  document.getElementById('tp-system').addEventListener('change', e =>
+  selEl('tp-system').addEventListener('change', e =>
     setSelection({ system: (e.target as HTMLSelectElement).value }));
   subscribeSelection((sel, changed) => {
     if (changed.includes('timeFmt')) {
@@ -255,8 +255,8 @@ import { stampOf } from './lib/format';
       localStorage.setItem('tc-city', sel.city);
       localStorage.setItem('tc-system', sel.system);
       updateSettingsSummary();
-      const citySel = document.getElementById('tp-city') as HTMLSelectElement;
-      const sysSel = document.getElementById('tp-system') as HTMLSelectElement;
+      const citySel = selEl('tp-city') as HTMLSelectElement;
+      const sysSel = selEl('tp-system') as HTMLSelectElement;
       if (citySel.value !== sel.city) citySel.value = sel.city;
       if (sysSel.value !== sel.system) sysSel.value = sel.system;
       loadPreview();
@@ -266,8 +266,8 @@ import { stampOf } from './lib/format';
   const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   initTodayPanel(todayISO);
   document.getElementById('settings-toggle').addEventListener('click', () => toggleSettings());
-  document.getElementById('sub-city').addEventListener('change', updateSubscribeUrl);
-  document.getElementById('sub-system').addEventListener('change', updateSubscribeUrl);
+  selEl('sub-city').addEventListener('change', updateSubscribeUrl);
+  selEl('sub-system').addEventListener('change', updateSubscribeUrl);
 
   applyTimeFmtUI();
   updateSettingsSummary();
@@ -356,7 +356,8 @@ import { stampOf } from './lib/format';
     });
   })();
   document.addEventListener('click', function (e) {
-    const a = e.target.closest && e.target.closest('a');
+    const t = e.target as Element;
+    const a = t.closest && t.closest('a');
     if (!a) return;
     if (a.href.includes('astrochaganti.com') && !a.href.includes('panchangam.')) gcEvent('consult-click');
     if (a.href.includes('pypi.org')) gcEvent('pypi-click');

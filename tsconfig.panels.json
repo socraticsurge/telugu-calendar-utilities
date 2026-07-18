@@ -1,0 +1,20 @@
+{
+  // Bug-class tier for the DOM-heavy panels (verbatim-moved from the
+  // pre-decomposition main.ts). Full strict:true would demand ~470 lines
+  // of null-guard / implicit-any ceremony on working code without catching
+  // the bug that motivated this — an orphaned module reference. These
+  // relaxed settings still report the dangerous family at build time:
+  //   TS2304 cannot find name · TS2339 bad property/typo ·
+  //   TS2554 wrong arg count · TS2307 bad import · arithmetic-type errors.
+  // The strict core (store, scorer, lib/, data/) stays under tsconfig.json.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["src/main.ts", "src/panels"],
+  "exclude": []
+}
