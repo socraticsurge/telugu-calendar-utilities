@@ -1,4 +1,3 @@
-// @ts-nocheck — verbatim lift from main.ts (one-shell decomposition);
 // typing lands with the component rewrite, not the move.
 //
 // Today panel: the daily panchangam preview (day header, anga rows,
@@ -6,6 +5,7 @@
 // accordion, and the WhatsApp share.
 
 import { getSelection } from '../selection-store';
+import { selEl } from '../lib/dom';
 import { parseDescription, TIME_PART } from '../lib/parse-description';
 import { loadFeed, slug } from '../lib/feed-loader';
 import { fmtT, dayMark, fmtRange, fmtPlain, stampOf } from '../lib/format';
@@ -484,7 +484,7 @@ function renderAll() {
   }
   renderUpcoming(LAST_EVENTS);
 }
-window.renderAll = renderAll;
+(window as any).renderAll = renderAll;
 
 async function loadPreview() {
   const city = getSelection().city;
@@ -509,8 +509,8 @@ function buildShareText(event) {
   const data = parseDescription(event.description);
   const d = selectedDate();
   const dateLabel = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-  const citySel = document.getElementById('tp-city');
-  const sysSel = document.getElementById('tp-system');
+  const citySel = selEl('tp-city');
+  const sysSel = selEl('tp-system');
   const cityLabel = citySel.options[citySel.selectedIndex].textContent;
   const sysLabel = sysSel.options[sysSel.selectedIndex].textContent;
   const lines = [];
@@ -585,6 +585,7 @@ export function getLoadedEvents() { return LAST_EVENTS; }
 export function initTodayPanel(todayISO) {
   _tpDateVal = todayISO;
   document.getElementById('tp-result').addEventListener('change', function (e) {
-    if (e.target.matches('input.tp-date-input')) { _tpDateVal = e.target.value; loadPreview(); }
+    const tgt = e.target as HTMLInputElement;
+    if (tgt.matches('input.tp-date-input')) { _tpDateVal = tgt.value; loadPreview(); }
   });
 }

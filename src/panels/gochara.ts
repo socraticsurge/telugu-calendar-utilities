@@ -1,4 +1,3 @@
-// @ts-nocheck — verbatim lift from main.ts (one-shell decomposition);
 // typing lands with the component rewrite, not the move.
 //
 // Gochara panel: transit chart, vedha screening, and the daily
@@ -9,6 +8,7 @@ import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { RASI_NAMES, rasiFromStar } from '../data/rasis';
 import { MU_CHANDRA_GOOD, MU_CHANDRA_PUJA } from '../muhurta-scorer';
+import { selEl } from '../lib/dom';
 
 // Chandrabalam house sets — same classical table the muhurta scorer pins.
 const CHANDRA_GOOD = MU_CHANDRA_GOOD;
@@ -48,7 +48,7 @@ async function loadGochara() {
     } catch (_) { /* no LLM phalalu today — computed fallback will be used */ }
   }
   // people may have changed in the Tarabalam tab — rebuild, keep selection
-  const sel = document.getElementById('go-view');
+  const sel = selEl('go-view');
   let keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
   // An earlier iteration of this PR had separate 'p<i>r' / 'p<i>l'
   // options; we collapsed those into a single 'p<i>' combined
@@ -97,7 +97,7 @@ function goSavedPeople() {
 }
 
 function goBuildViewSelect() {
-  const sel = document.getElementById('go-view');
+  const sel = selEl('go-view');
   const people = goSavedPeople();
   let html = '<option value="">Transits only — whole sky</option>';
   if (people.length) {
@@ -119,7 +119,7 @@ function goBuildViewSelect() {
 }
 
 function goCurrentView() {
-  const val = document.getElementById('go-view').value;
+  const val = selEl('go-view').value;
   if (val === '') return { jr: null, jl: null, label: null };
   // 'p<i>' — profile-keyed combined view. We carry BOTH the rashi
   // index (jr, used to lay out the chart and number houses) AND the
@@ -151,7 +151,7 @@ function renderGochara() {
   const view = goCurrentView();
   const jr = view.jr;
   const jl = (typeof view.jl === 'number') ? view.jl : null;
-  localStorage.setItem('tc-go-view', document.getElementById('go-view').value);
+  localStorage.setItem('tc-go-view', selEl('go-view').value);
 
   const dateShown = new Date(GO_DATA.start + 'T00:00:00');
   dateShown.setDate(dateShown.getDate() + idx);

@@ -1,4 +1,3 @@
-// @ts-nocheck — verbatim lift from main.ts (one-shell decomposition);
 // typing lands with the component rewrite, not the move.
 //
 // Tarabalam panel + the nested Muhurta finder: profiles, good-day
@@ -16,6 +15,7 @@ import {
   muScoreTier, muRelativeTier,
   computePersonalDosha, computeDayDosha,
 } from '../muhurta-scorer';
+import { selEl, inpEl } from '../lib/dom';
 import { getSelection } from '../selection-store';
 import { loadFeed } from '../lib/feed-loader';
 import { parseDescription, TIME_PART } from '../lib/parse-description';
@@ -54,11 +54,11 @@ function chandraOf(janmaRasi, dayRasi) {
 function tbProfiles() {
   const out = [];
   for (let i = 0; i < TB_ROWS; i++) {
-    const nak = document.getElementById(`tb-nak-${i}`).value;
+    const nak = selEl(`tb-nak-${i}`).value;
     if (!nak) continue;
-    const name = document.getElementById(`tb-name-${i}`).value.trim() || (i === 0 ? 'You' : `Person ${i+1}`);
-    const pada = Number(document.getElementById(`tb-pada-${i}`).value) || null;
-    const lagnaInput = document.getElementById(`tb-lagna-${i}`);
+    const name = inpEl(`tb-name-${i}`).value.trim() || (i === 0 ? 'You' : `Person ${i+1}`);
+    const pada = Number(selEl(`tb-pada-${i}`).value) || null;
+    const lagnaInput = selEl(`tb-lagna-${i}`);
     const lagna = (lagnaInput && lagnaInput.value) ? lagnaInput.value : null;
     out.push({ name, nak, pada, rasi: rasiFromStar(nak, pada), lagna });
   }
@@ -68,10 +68,10 @@ function tbProfiles() {
 function tbSaveProfiles() {
   const raw = [];
   for (let i = 0; i < TB_ROWS; i++) {
-    const lagnaInput = document.getElementById(`tb-lagna-${i}`);
-    raw.push({ name: document.getElementById(`tb-name-${i}`).value,
-               nak: document.getElementById(`tb-nak-${i}`).value,
-               pada: document.getElementById(`tb-pada-${i}`).value,
+    const lagnaInput = selEl(`tb-lagna-${i}`);
+    raw.push({ name: inpEl(`tb-name-${i}`).value,
+               nak: selEl(`tb-nak-${i}`).value,
+               pada: selEl(`tb-pada-${i}`).value,
                lagna: lagnaInput ? lagnaInput.value : '' });
   }
   localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
@@ -143,9 +143,9 @@ async function calcTarabalam() {
     resBox.innerHTML = '<p class="preview-error">Pick at least one birth star.</p>';
     return;
   }
-  const from = new Date(document.getElementById('tb-from').value + 'T00:00:00');
-  const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
-  const span = Math.round((to - from) / 86400000) + 1;
+  const from = new Date(inpEl('tb-from').value + 'T00:00:00');
+  const to = new Date(inpEl('tb-to').value + 'T00:00:00');
+  const span = Math.round((to.getTime() - from.getTime()) / 86400000) + 1;
   if (!(span >= 1 && span <= 60)) {
     resBox.innerHTML = '<p class="preview-error">Pick a range of 1 to 60 days.</p>';
     return;
@@ -166,7 +166,8 @@ async function calcTarabalam() {
       if (!nak) continue;
       const taras = profiles.map(pr => {
         const t = taraOf(pr.nak, nak);
-        const entry = { who: pr.name, tara: t, label: TARA_NAMES[t-1], good: TARA_GOOD.has(t) };
+        const entry: { who: any; tara: number; label: string; good: boolean; chandra?: any } =
+          { who: pr.name, tara: t, label: TARA_NAMES[t-1], good: TARA_GOOD.has(t) };
         if (pr.rasi && data.lunarSign) entry.chandra = chandraOf(pr.rasi, data.lunarSign);
         return entry;
       });
@@ -197,7 +198,7 @@ function tbPersonGood(t) {
 }
 
 function tbToggleShowAll() {
-  TB_SHOW_ALL = document.getElementById('tb-show-all').checked;
+  TB_SHOW_ALL = inpEl('tb-show-all').checked;
   renderTarabalam();
 }
 
@@ -236,16 +237,16 @@ function tbNextGoodBeyondRange(profiles) {
 }
 
 function tbExtendTo(iso) {
-  document.getElementById('tb-to').value = iso;
+  inpEl('tb-to').value = iso;
   calcTarabalam();
 }
 
-function renderTarabalam(profiles) {
+function renderTarabalam(profiles?) {
   if (!TB_DAYS) return;
   profiles = profiles || tbProfiles();
   const group = profiles.length > 1;
   TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
-  document.getElementById('tb-mode').value = TB_MODE;
+  selEl('tb-mode').value = TB_MODE;
   const goodDays = TB_DAYS.filter(r => r.allGood);
   const next = goodDays[0];
   const who = group ? 'everyone' : (profiles[0] ? profiles[0].name : 'you');
@@ -385,11 +386,11 @@ function shareTarabalamOnWhatsApp() {
   const profiles = tbProfiles();
   const group = profiles.length > 1;
   TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
-  document.getElementById('tb-mode').value = TB_MODE;
+  selEl('tb-mode').value = TB_MODE;
   TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
   const goodDays = TB_DAYS.filter(r => r.allGood);
   if (!goodDays.length) return;
-  const citySel = document.getElementById('tp-city');
+  const citySel = selEl('tp-city');
   const cityLabel = citySel.options[citySel.selectedIndex].textContent;
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const lines = [];
@@ -453,7 +454,7 @@ const MU_NITYA_AUSPICIOUS = new Set([
 ]);
 const MU_NITYA_AUSPICIOUS_BONUS = 1;
 
-function muMin(t, flag) {
+function muMin(t, flag?) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m + (flag === '+1' ? 1440 : flag === '-1' ? -1440 : 0);
 }
@@ -760,15 +761,15 @@ const MU_ACTIVITY = {
 async function findMuhurta() {
   const box = document.getElementById('mu-result');
   box.innerHTML = '<p class="preview-error">Searching…</p>';
-  const activity = document.getElementById('mu-activity').value;
-  const from = new Date(document.getElementById('tb-from').value + 'T00:00:00');
-  const to = new Date(document.getElementById('tb-to').value + 'T00:00:00');
-  const nDays = Math.min(60, Math.max(1, Math.round((to - from) / 86400000) + 1));
+  const activity = selEl('mu-activity').value;
+  const from = new Date(inpEl('tb-from').value + 'T00:00:00');
+  const to = new Date(inpEl('tb-to').value + 'T00:00:00');
+  const nDays = Math.min(60, Math.max(1, Math.round((to.getTime() - from.getTime()) / 86400000) + 1));
   const people = tbProfiles();
   const chandraMode = TB_MODE;  // 'stars' | 'puja_ok' | 'strict' — filters only, never scores
   document.getElementById('mu-context').innerHTML = people.length
-    ? `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => htmlEsc(p.name)).join(', ')}</strong> (set above).`
-    : `Searching <strong>${document.getElementById('tb-from').value}</strong> to <strong>${document.getElementById('tb-to').value}</strong> — no people set above, so no star screening.`;
+    ? `Searching <strong>${inpEl('tb-from').value}</strong> to <strong>${inpEl('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => htmlEsc(p.name)).join(', ')}</strong> (set above).`
+    : `Searching <strong>${inpEl('tb-from').value}</strong> to <strong>${inpEl('tb-to').value}</strong> — no people set above, so no star screening.`;
   try {
     const city = getSelection().city;
     const system = getSelection().system;
@@ -1142,7 +1143,7 @@ async function findMuhurta() {
     muAssignTiers(slots);
     slots.sort((a, b) => MU_TIER_NAMES.indexOf(b.tier) - MU_TIER_NAMES.indexOf(a.tier)
       || b.score - a.score
-      || (!!a.personalDosha - !!b.personalDosha) || a.d - b.d || a.s0 - b.s0);
+      || (Number(!!a.personalDosha) - Number(!!b.personalDosha)) || a.d - b.d || a.s0 - b.s0);
     MU_LAST = { top: slots.slice(0, 10), droppedEclipseDays, droppedModeDays, droppedDays, activity, people, chandraMode };
     renderMuhurta();
   } catch (e) {
@@ -1256,12 +1257,12 @@ function renderMuhurta() {
 function shareMuhurtaOnWhatsApp() {
   if (!MU_LAST || !MU_LAST.top.length) return;
   const { top, activity, people } = MU_LAST;
-  const citySel = document.getElementById('tp-city');
+  const citySel = selEl('tp-city');
   const cityLabel = citySel.options[citySel.selectedIndex].textContent;
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const lines = [];
   lines.push(`⏱ *Good time slots — ${MU_ACT_LABEL[activity]}*`);
-  lines.push(`📍 ${cityLabel} · ${document.getElementById('tb-from').value} to ${document.getElementById('tb-to').value}`);
+  lines.push(`📍 ${cityLabel} · ${inpEl('tb-from').value} to ${inpEl('tb-to').value}`);
   if (people.length) lines.push(`Screened for: ${people.map(p => `${p.name} (${p.nak})`).join(' · ')}`);
   lines.push('');
   top.slice(0, 5).forEach(s => {
@@ -1290,8 +1291,8 @@ export function muHasLast() { return typeof MU_LAST !== 'undefined' && !!MU_LAST
 /** Wire panel-internal seeds; called once from Init. */
 export function initTarabalamPanel(todayISO) {
   tbRenderProfileInputs();
-  document.getElementById('tb-from').value = todayISO;
+  inpEl('tb-from').value = todayISO;
   const t2 = new Date(); t2.setDate(t2.getDate() + 13);
-  document.getElementById('tb-to').value =
+  inpEl('tb-to').value =
     `${t2.getFullYear()}-${String(t2.getMonth() + 1).padStart(2, '0')}-${String(t2.getDate()).padStart(2, '0')}`;
 }
