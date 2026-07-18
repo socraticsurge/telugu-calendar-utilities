@@ -139,7 +139,7 @@ engine output but render to different audiences.
 
 | Surface | Form | Built by |
 |---|---|---|
-| `panchangam.astrochaganti.com` (landing page) | static HTML + JS, served by GitHub Pages | `docs/index.html` (hand-edited until Phase 3 Vite migration); deployed by `.github/workflows/deploy-landing.yml` |
+| `panchangam.astrochaganti.com` (landing page) | static HTML + JS, served by GitHub Pages | Vite + TypeScript build from root `index.html` + `src/` (Phase 3 migration); deployed by `.github/workflows/deploy-landing.yml` |
 | `webcal://` subscriber feeds (22 cities × 3 systems) | static `.ics` files in `public/feeds/` | `python -m telugu_panchangam.generate` (monthly, via `.github/workflows/generate.yml`) |
 | `mcp-server-panchangam` on PyPI | Python package, stdio MCP server | `pyproject.toml` + `telugu_panchangam/mcp/`; published by `.github/workflows/publish.yml` on tag push |
 
@@ -175,7 +175,7 @@ three engines.
 | A new MCP tool | `telugu_panchangam/mcp/tools.py` (logic) + `mcp/server.py` (signature) | Both need to stay in sync; the audit caught a drift case in Phase 7 |
 | A new ICS feed shape | `telugu_panchangam/generators/<name>.py` | The existing `ics.py` is the dense daily; new shapes (weekly digest, Ekadashi-only) belong as siblings |
 | A new city | `telugu_panchangam/cities.py` (or wherever the 22-city table lives) + a test | Verify timezone, lat/long, and at least one DP cross-check |
-| A landing-page change | `docs/index.html` until Phase 3, then `src/` under Vite | Anything visible needs sign-off per the project's UI review rule |
+| A landing-page change | Root `index.html` + `src/main.ts` (Vite) | Anything visible needs sign-off per the project's UI review rule |
 
 ## See also
 

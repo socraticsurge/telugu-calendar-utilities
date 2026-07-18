@@ -1,6 +1,7 @@
-// Muhurta scoring helpers — ES module version of docs/muhurta-scorer.js.
-// docs/muhurta-scorer.js is kept as-is for the Node tests in tests/js/.
-// Logic must stay in sync between the two files.
+// Muhurta scoring helpers — pure functions, no DOM.
+// Unit-tested by src/scorer/__tests__/muhurta-scorer.test.ts (Vitest);
+// behaviour is pinned to the Python originals in telugu_panchangam/
+// personal/{muhurta,lagna_position,chandrabalam}.py.
 
 export const MU_RASHI_NAMES = ['Mesha','Vrishabha','Mithuna','Karka','Simha',
                         'Kanya','Tula','Vrischika','Dhanu','Makara',

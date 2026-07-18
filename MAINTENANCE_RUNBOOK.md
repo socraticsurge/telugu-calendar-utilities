@@ -121,7 +121,7 @@ before the deploy step runs.
 2. Add an entry to the `CITIES` table (search `cities.py` or
    `telugu_panchangam/mcp/cities.py` — whichever holds the 22-city
    list).
-3. Add an entry to `CITY_GROUPS` in `docs/index.html` so it appears in
+3. Add an entry to `CITY_GROUPS` in `src/main.ts` so it appears in
    the city selector and the Subscribe card.
 4. Add a test: pick the city, run `engine.calculate(date, city)` for a
    recent date, eyeball the output. Cross-check at least sunrise/sunset
