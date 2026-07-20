@@ -150,6 +150,7 @@ def _call_with_retry(model: str, body: dict) -> str:
                 time.sleep(delay)
                 continue
             raise
+    raise RuntimeError('unreachable: retry loop exited without return or raise')
 
 
 def _generate(model: str, user_prompt: str) -> list[dict]:
