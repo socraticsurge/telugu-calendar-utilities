@@ -84,7 +84,7 @@ def get_special_yogas(vaaram: str, tithi_name: str, nakshatra_name: str) -> list
         if _SIDDHA_YOGA.get(fam) == vaaram:
             yogas.append('Siddha Yoga')
     except ValueError:
-        pass
+        pass  # tithi outside the Siddha table → no Siddha Yoga, as intended
 
     if vaaram in _PUSHKARA_VARAS:
         if tithi_number in _DVIPUSHKARA_TITHIS and nakshatra_name in _DVIPUSHKARA_NAKSHATRAS:

@@ -9,12 +9,8 @@
 # positional arguments.
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import timedelta
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
 
-from telugu_panchangam.models.panchangam_day import Window
-from telugu_panchangam.panchangam_names import VAARAM_NAMES
 from telugu_panchangam.personal.lagna_position import (
     lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,
     lagnas_in_class,
@@ -32,9 +28,6 @@ from telugu_panchangam.personal.nitya_yoga import (
     NITYA_AUSPICIOUS, NITYA_AUSPICIOUS_BONUS,
 )
 from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS
-
-if TYPE_CHECKING:
-    from telugu_panchangam.models.panchangam_day import PanchangamDay
 
 _YOGA_BONUS = {'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,
                'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1,

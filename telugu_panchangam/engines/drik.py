@@ -15,7 +15,7 @@ from telugu_panchangam.engines.utils import (
     sun_longitude, moon_longitude, moon_sun_elongation,
     get_sunrise, get_sunset, get_moonrise, get_moonset,
 )
-from telugu_panchangam.models.panchangam_day import Location, Span, Window, PanchangamDay
+from telugu_panchangam.models.panchangam_day import Location, Span, PanchangamDay
 from telugu_panchangam.eclipses import get_eclipse_for_date
 from telugu_panchangam.special_yogas import get_special_yogas
 

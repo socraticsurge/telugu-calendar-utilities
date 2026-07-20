@@ -410,7 +410,7 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext) -> dict | None:
                         f'{_panchaka.name} Panchaka conflicts with {ctx.label} (-2)')
                     score -= 2
         except (ValueError, KeyError):
-            pass
+            pass  # panchaka data unavailable for this day → skip the penalty
 
     notes = doctrinal_notes(
         special_yogas=facts.special_yogas,
