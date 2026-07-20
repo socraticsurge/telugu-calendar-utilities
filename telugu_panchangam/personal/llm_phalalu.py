@@ -20,8 +20,6 @@ import json
 import os
 import time
 
-import requests
-
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict
@@ -120,6 +118,7 @@ class VerificationError(Exception):
 
 def _post(model: str, body: dict) -> str:
     """POST to the Gemini REST API and return the text of the first candidate."""
+    import requests  # lazy: only the network path needs the [llm] extra
     api_key = os.environ['rasiphalalu']
     url = f'{_API_BASE}/{model}:generateContent'
     resp = requests.post(
@@ -140,6 +139,7 @@ _RETRYABLE = {429, 500, 502, 503, 504}
 
 def _call_with_retry(model: str, body: dict) -> str:
     """Call _post(), retrying up to _MAX_RETRIES times on transient errors."""
+    import requests  # lazy: only the network path needs the [llm] extra
     for attempt in range(_MAX_RETRIES):
         try:
             return _post(model, body)
@@ -258,6 +258,7 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
     VerificationError
         If any cited transit position or verdict doesn't match the engine output.
     """
+    import requests  # lazy: only the network path needs the [llm] extra
     sky = {p['graha']: p['rasi'] for p in positions}
     all_rashis = _compute_all_rashis(sky)
 
