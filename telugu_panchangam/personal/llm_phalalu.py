@@ -20,8 +20,6 @@ import json
 import os
 import time
 
-import requests
-
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict
@@ -32,6 +30,27 @@ FALLBACK_MODEL = 'gemini-2.0-flash'
 TEMPERATURE = 1.0
 _MAX_RETRIES = 3
 _BASE_DELAY = 10.0
+
+# The engine names grahas in Sanskrit; the model occasionally labels one
+# in English (or a Sanskrit synonym) in transits_cited — e.g. "Sun" for
+# "Surya". That's a naming drift, not an astronomy error, so verification
+# normalizes the label before the membership check. Position and verdict
+# are still verified exactly against the engine.
+_GRAHA_ALIASES = {
+    'sun': 'Surya', 'moon': 'Chandra',
+    'mars': 'Kuja', 'mangala': 'Kuja',
+    'mercury': 'Budha', 'budh': 'Budha',
+    'jupiter': 'Guru', 'brihaspati': 'Guru', 'bruhaspati': 'Guru',
+    'venus': 'Shukra', 'saturn': 'Shani', 'sani': 'Shani',
+    'north node': 'Rahu', 'south node': 'Ketu',
+}
+
+
+def _canonical_graha(name: str) -> str:
+    """Map an English or synonym graha label to the engine's Sanskrit
+    name; pass unknown names through unchanged so genuinely invented
+    grahas are still rejected by _verify."""
+    return _GRAHA_ALIASES.get(name.strip().lower(), name)
 
 _SYSTEM = (
     "You are a wise Jyotish astrologer writing a daily column for Telugu readers. "
@@ -99,6 +118,7 @@ class VerificationError(Exception):
 
 def _post(model: str, body: dict) -> str:
     """POST to the Gemini REST API and return the text of the first candidate."""
+    import requests  # lazy: only the network path needs the [llm] extra
     api_key = os.environ['rasiphalalu']
     url = f'{_API_BASE}/{model}:generateContent'
     resp = requests.post(
@@ -119,6 +139,7 @@ _RETRYABLE = {429, 500, 502, 503, 504}
 
 def _call_with_retry(model: str, body: dict) -> str:
     """Call _post(), retrying up to _MAX_RETRIES times on transient errors."""
+    import requests  # lazy: only the network path needs the [llm] extra
     for attempt in range(_MAX_RETRIES):
         try:
             return _post(model, body)
@@ -201,10 +222,10 @@ def _verify(items: list[dict], all_rashis: dict) -> None:
             raise VerificationError(f"Unknown rasi in response: {rasi!r}")
         computed = all_rashis[rasi]['verdicts']
         for cited in item['transits_cited']:
-            graha = cited['graha']
+            graha = _canonical_graha(cited['graha'])
             if graha not in computed:
                 raise VerificationError(
-                    f"{rasi}: unknown graha {graha!r} in transits_cited")
+                    f"{rasi}: unknown graha {cited['graha']!r} in transits_cited")
             c = computed[graha]
             if c['position'] != cited['position']:
                 raise VerificationError(
@@ -237,6 +258,7 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
     VerificationError
         If any cited transit position or verdict doesn't match the engine output.
     """
+    import requests  # lazy: only the network path needs the [llm] extra
     sky = {p['graha']: p['rasi'] for p in positions}
     all_rashis = _compute_all_rashis(sky)
 
