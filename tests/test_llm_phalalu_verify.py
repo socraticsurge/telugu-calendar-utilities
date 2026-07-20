@@ -1,0 +1,86 @@
+"""Regression tests for the LLM Rasi Phalalu verifier's graha-name
+tolerance.
+
+The 2026-07-20 daily run failed with:
+    Verification failed: Mesha: unknown graha 'Sun' in transits_cited
+The model had labelled Surya in English. That's a naming drift, not an
+astronomy error, so _verify normalizes the label before the membership
+check while still verifying position and verdict exactly.
+"""
+import pytest
+
+from telugu_panchangam.personal.llm_phalalu import (
+    _canonical_graha, _verify, _compute_all_rashis, VerificationError,
+)
+from telugu_panchangam.panchangam_names import RASHI_NAMES
+
+
+def test_canonical_graha_maps_english_and_synonyms():
+    assert _canonical_graha('Sun') == 'Surya'
+    assert _canonical_graha('moon') == 'Chandra'
+    assert _canonical_graha('MARS') == 'Kuja'
+    assert _canonical_graha('Jupiter') == 'Guru'
+    assert _canonical_graha('Saturn') == 'Shani'
+    # Already-canonical names pass through.
+    assert _canonical_graha('Surya') == 'Surya'
+    assert _canonical_graha('Rahu') == 'Rahu'
+    # Genuinely unknown names pass through unchanged (still caught by _verify).
+    assert _canonical_graha('Nibiru') == 'Nibiru'
+
+
+# A plausible sky: every graha placed in some rasi. Values need only be
+# internally consistent for _compute_all_rashis to produce verdicts.
+_SKY = {
+    'Surya': 'Karka', 'Chandra': 'Simha', 'Kuja': 'Vrishabha',
+    'Budha': 'Mithuna', 'Guru': 'Karka', 'Shukra': 'Simha',
+    'Shani': 'Meena', 'Rahu': 'Kumbha', 'Ketu': 'Simha',
+}
+
+
+def _all_rashis():
+    return _compute_all_rashis(_SKY)
+
+
+def _base_items():
+    """Minimal valid response: all 12 rashis present, no citations."""
+    return [{'rasi': r, 'text': '', 'advice': '', 'transits_cited': []}
+            for r in RASHI_NAMES]
+
+
+def test_verify_accepts_english_graha_label():
+    all_rashis = _all_rashis()
+    surya = all_rashis['Mesha']['verdicts']['Surya']
+    items = _base_items()
+    # Cite Surya under its English name, with the correct position/verdict.
+    for it in items:
+        if it['rasi'] == 'Mesha':
+            it['transits_cited'] = [{
+                'graha': 'Sun',
+                'position': surya['position'],
+                'verdict': surya['verdict'],
+            }]
+    _verify(items, all_rashis)  # must not raise
+
+
+def test_verify_still_rejects_invented_graha():
+    all_rashis = _all_rashis()
+    items = _base_items()
+    for it in items:
+        if it['rasi'] == 'Mesha':
+            it['transits_cited'] = [{'graha': 'Nibiru', 'position': 1, 'verdict': 'good'}]
+    with pytest.raises(VerificationError, match="unknown graha 'Nibiru'"):
+        _verify(items, all_rashis)
+
+
+def test_verify_still_catches_position_mismatch_under_alias():
+    all_rashis = _all_rashis()
+    surya = all_rashis['Mesha']['verdicts']['Surya']
+    wrong = (surya['position'] % 12) + 1
+    items = _base_items()
+    for it in items:
+        if it['rasi'] == 'Mesha':
+            it['transits_cited'] = [{
+                'graha': 'Sun', 'position': wrong, 'verdict': surya['verdict'],
+            }]
+    with pytest.raises(VerificationError, match="position mismatch"):
+        _verify(items, all_rashis)

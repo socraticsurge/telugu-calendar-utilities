@@ -33,6 +33,27 @@ TEMPERATURE = 1.0
 _MAX_RETRIES = 3
 _BASE_DELAY = 10.0
 
+# The engine names grahas in Sanskrit; the model occasionally labels one
+# in English (or a Sanskrit synonym) in transits_cited — e.g. "Sun" for
+# "Surya". That's a naming drift, not an astronomy error, so verification
+# normalizes the label before the membership check. Position and verdict
+# are still verified exactly against the engine.
+_GRAHA_ALIASES = {
+    'sun': 'Surya', 'moon': 'Chandra',
+    'mars': 'Kuja', 'mangala': 'Kuja',
+    'mercury': 'Budha', 'budh': 'Budha',
+    'jupiter': 'Guru', 'brihaspati': 'Guru', 'bruhaspati': 'Guru',
+    'venus': 'Shukra', 'saturn': 'Shani', 'sani': 'Shani',
+    'north node': 'Rahu', 'south node': 'Ketu',
+}
+
+
+def _canonical_graha(name: str) -> str:
+    """Map an English or synonym graha label to the engine's Sanskrit
+    name; pass unknown names through unchanged so genuinely invented
+    grahas are still rejected by _verify."""
+    return _GRAHA_ALIASES.get(name.strip().lower(), name)
+
 _SYSTEM = (
     "You are a wise Jyotish astrologer writing a daily column for Telugu readers. "
     "Write ONLY in English — do not use Telugu script. "
@@ -201,10 +222,10 @@ def _verify(items: list[dict], all_rashis: dict) -> None:
             raise VerificationError(f"Unknown rasi in response: {rasi!r}")
         computed = all_rashis[rasi]['verdicts']
         for cited in item['transits_cited']:
-            graha = cited['graha']
+            graha = _canonical_graha(cited['graha'])
             if graha not in computed:
                 raise VerificationError(
-                    f"{rasi}: unknown graha {graha!r} in transits_cited")
+                    f"{rasi}: unknown graha {cited['graha']!r} in transits_cited")
             c = computed[graha]
             if c['position'] != cited['position']:
                 raise VerificationError(
