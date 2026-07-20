@@ -827,25 +827,18 @@ async function findMuhurta() {
       const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
       const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
-      const MUHURTA_MINS = 48;
-      const srMin = muMin(data.sunrise);
-      const ssMin = muMin(data.sunset);
-      const chogAtMin = t => {
-        for (const blk of data.choghadiya) {
-          const bs = muMin(blk.start);
-          const be = muMin(blk.end);
-          if (bs <= t && t < be) return blk;
-        }
-        return null;
-      };
-      let winStart = srMin;
-      while (winStart < ssMin) {
-        const winEnd = Math.min(winStart + MUHURTA_MINS, ssMin);
-        const c = chogAtMin(winStart);
-        if (!c) { winStart += MUHURTA_MINS; continue; }
-        const base = MU_GOOD_CHOG[c.name];
-        if (base === undefined) { winStart += MUHURTA_MINS; continue; }
-        for (const [s0, e0] of muSubtract(winStart, winEnd, bad)) {
+      // Iterate the day's choghadiya blocks directly (mirrors the Python
+      // day_slots): for each good block, the auspicious slots are its parts
+      // left after subtracting the inauspicious windows — so every slot lies
+      // wholly within one good choghadiya and is labelled by it. (The old
+      // fixed 48-min grid took the choghadiya from the window start, so a
+      // bad-window subtraction could push a slot into the next, worse block
+      // while keeping the stale label — a Kaal slot scored as Amrit.)
+      for (const blk of data.choghadiya) {
+        const c = blk;
+        const base = MU_GOOD_CHOG[blk.name];
+        if (base === undefined) continue;
+        for (const [s0, e0] of muSubtract(muMin(blk.start), muMin(blk.end), bad)) {
           if (e0 - s0 < 24) continue;
 
           // Compute slot-time facts via Meeus Sun/Moon longitudes.
@@ -1101,7 +1094,6 @@ async function findMuhurta() {
           slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha });
           slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
         }
-        winStart += MUHURTA_MINS;
       }
       // Diagnose: if the day produced no slots and it wasn't an eclipse,
       // record the most likely reason (samskara skip, mode filter, etc.).

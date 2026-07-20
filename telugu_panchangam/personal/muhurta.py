@@ -556,23 +556,27 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     use_engine = engine is not None and hasattr(engine, 'facts_at')
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
+    # Iterate the day's choghadiya blocks directly, rather than a fixed
+    # 48-min grid from sunrise. For each *good* block, the auspicious slots
+    # are the parts of that block left after subtracting the inauspicious
+    # windows. This guarantees every emitted slot lies wholly within one
+    # good choghadiya and is labelled by it. (The old grid computed the
+    # choghadiya from the window's start, so a bad-window subtraction that
+    # pushed a slot's real start into the next, worse choghadiya left it
+    # mislabelled — e.g. a Kaal slot scored as Amrit.)
     slots = []
-    t = day.sunrise
-    while t < day.sunset:
-        win_end = min(t + _MUHURTA_DUR, day.sunset)
-        block = _chog_at_time(t, day.choghadiya)
-        if block is not None:
-            base = GOOD_CHOGHADIYA.get(block.name)
-            if base is not None:
-                for s, e in _subtract(t, win_end, bad):
-                    if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
-                        continue
-                    facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
-                            if use_engine else snapshot
-                    slot_dict = _evaluate_slot(s, e, block, base, facts, ctx)
-                    if slot_dict is not None:
-                        slots.append(slot_dict)
-        t += _MUHURTA_DUR
+    for block in day.choghadiya:
+        base = GOOD_CHOGHADIYA.get(block.name)
+        if base is None:
+            continue
+        for s, e in _subtract(block.start, block.end, bad):
+            if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
+                continue
+            facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                    if use_engine else snapshot
+            slot_dict = _evaluate_slot(s, e, block, base, facts, ctx)
+            if slot_dict is not None:
+                slots.append(slot_dict)
 
     assign_tiers(slots)
     slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
@@ -712,37 +716,37 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     use_engine = engine is not None and hasattr(engine, 'facts_at')
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
+    # Iterate the night's choghadiya blocks directly (see day_slots for the
+    # rationale): each good block's auspicious slots are its parts left after
+    # subtracting the inauspicious windows, so every slot lies wholly within
+    # one good choghadiya and is labelled by it.
     slots = []
-    t = day.sunset
-    while t < next_day.sunrise:
-        win_end = min(t + _MUHURTA_DUR, next_day.sunrise)
-        block = _chog_at_time(t, night_blocks)
-        if block is not None:
-            base = GOOD_CHOGHADIYA.get(block.name)
-            if base is not None:
-                for s, e in _subtract(t, win_end, bad):
-                    if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
-                        continue
-                    facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
-                            if use_engine else snapshot
-                    slot_dict = _evaluate_slot(s, e, block, base, facts, ctx)
-                    if slot_dict is None:
-                        continue
+    for block in night_blocks:
+        base = GOOD_CHOGHADIYA.get(block.name)
+        if base is None:
+            continue
+        for s, e in _subtract(block.start, block.end, bad):
+            if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
+                continue
+            facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                    if use_engine else snapshot
+            slot_dict = _evaluate_slot(s, e, block, base, facts, ctx)
+            if slot_dict is None:
+                continue
 
-                    # Night-specific bonuses applied after _evaluate_slot().
-                    night_bonuses: list[str] = []
-                    if brahma is not None and _overlaps(s, e, brahma.start, brahma.end):
-                        slot_dict['score'] += 2
-                        night_bonuses.append('overlaps Brahma Muhurta (+2)')
-                    if _overlaps(s, e, nishita_start, nishita_end):
-                        slot_dict['score'] += 2
-                        night_bonuses.append('overlaps Nishita Kala (+2)')
-                    if night_bonuses:
-                        slot_dict['reason_groups']['slot_quality'].extend(night_bonuses)
-                        slot_dict['reasons'].extend(night_bonuses)
+            # Night-specific bonuses applied after _evaluate_slot().
+            night_bonuses: list[str] = []
+            if brahma is not None and _overlaps(s, e, brahma.start, brahma.end):
+                slot_dict['score'] += 2
+                night_bonuses.append('overlaps Brahma Muhurta (+2)')
+            if _overlaps(s, e, nishita_start, nishita_end):
+                slot_dict['score'] += 2
+                night_bonuses.append('overlaps Nishita Kala (+2)')
+            if night_bonuses:
+                slot_dict['reason_groups']['slot_quality'].extend(night_bonuses)
+                slot_dict['reasons'].extend(night_bonuses)
 
-                    slots.append(slot_dict)
-        t += _MUHURTA_DUR
+            slots.append(slot_dict)
 
     assign_tiers(slots)
     slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],

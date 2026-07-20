@@ -24,6 +24,26 @@ ICS-feed behaviour changes; all code trees byte-identical.
   appears in the contributor list. Author/committer metadata only — every
   tree SHA is unchanged, so released artifacts are byte-identical.
 
+## [1.11.1] — 2026-07-20
+
+A muhurta correctness fix. **1075 tests passing.**
+
+### Fixed
+- **Muhurta slots could be labelled with the wrong choghadiya** (and so
+  mis-scored). The slot generator walked a fixed 48-minute grid from
+  sunrise and read the choghadiya once from each window's start; when a
+  bad-window subtraction pushed a slot's real start across a choghadiya
+  boundary, the slot kept the window's stale label — e.g. a **Kaal** slot
+  scored as **Amrit** and offered as "Excellent" (observed 2026-07-21,
+  Hyderabad, 2:00–2:39pm). `day_slots`/`night_slots` now iterate the
+  choghadiya blocks directly: each good block's slots are its parts left
+  after subtracting the inauspicious windows, so every slot lies wholly
+  within one good choghadiya and is labelled by it. The website's
+  client-side finder (`src/panels/tarabalam.ts`) is fixed in lockstep. A
+  new invariant test asserts, across several dates, that every slot's
+  label matches the actual choghadiya at both its start and end. Affected
+  both `tool_find_muhurta` (MCP) and the website.
+
 ## [1.11.0] — 2026-06-22
 
 The theme: **muhurta scorer enhancements** — cognitive split of the
@@ -783,7 +803,8 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.4...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.11.1...HEAD
+[1.11.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.11.0...v1.11.1
 [1.10.4]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.3...v1.10.4
 [1.10.3]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.9.0...v1.10.3
 [1.9.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.8.0...v1.9.0
