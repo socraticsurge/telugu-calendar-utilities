@@ -24,6 +24,7 @@ import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
 import { RASI_NAMES, NAKSHATRA_NAMES, rasiFromStar } from '../data/rasis';
+import { MUHURTA_DAY } from '../data/muhurtas';
 import { goHasData, goBuildViewSelect, renderGochara } from './gochara';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
@@ -827,26 +828,36 @@ async function findMuhurta() {
       const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
       const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
-      const MUHURTA_MINS = 48;
       const srMin = muMin(data.sunrise);
       const ssMin = muMin(data.sunset);
-      const chogAtMin = t => {
+      const muLen = (ssMin - srMin) / 15;
+      // Dominant choghadiya by overlap — a scoring attribute, not a gate;
+      // straddle disclosed. Mirrors Python _dominant_choghadiya.
+      const dominantChog = (s, e) => {
+        let best = null, bestOv = 0; const touched = [];
         for (const blk of data.choghadiya) {
-          const bs = muMin(blk.start);
-          const be = muMin(blk.end);
-          if (bs <= t && t < be) return blk;
+          const bs = muMin(blk.start), be = muMin(blk.end);
+          const ov = Math.min(e, be) - Math.max(s, bs);
+          if (ov > 0) { touched.push(blk.name); if (ov > bestOv) { best = blk; bestOv = ov; } }
         }
-        return null;
+        return { block: best, straddle: best ? (touched.find(n => n !== best.name) || null) : null };
       };
-      let winStart = srMin;
-      while (winStart < ssMin) {
-        const winEnd = Math.min(winStart + MUHURTA_MINS, ssMin);
-        const c = chogAtMin(winStart);
-        if (!c) { winStart += MUHURTA_MINS; continue; }
-        const base = MU_GOOD_CHOG[c.name];
-        if (base === undefined) { winStart += MUHURTA_MINS; continue; }
-        for (const [s0, e0] of muSubtract(winStart, winEnd, bad)) {
-          if (e0 - s0 < 24) continue;
+      // Iterate the 15 named daytime muhurtas (sunrise->sunset /15). Mirrors
+      // Python day_slots: exclude a muhurta overlapping any inauspicious
+      // window, else score it by nature + dominant choghadiya + all factors.
+      for (let mi = 0; mi < 15; mi++) {
+          // Round muhurta bounds to whole minutes (display + integer-minute
+          // math); contiguous because both edges round the same expression.
+          const s0 = Math.round(srMin + mi * muLen);
+          const e0 = Math.round(srMin + (mi + 1) * muLen);
+          if (bad.some(([b0, b1]) => s0 < b1 && b0 < e0)) continue;  // decision 1
+          const dom = dominantChog(s0, e0);
+          const c = dom.block;
+          if (!c) continue;
+          const base = MU_GOOD_CHOG[c.name] || 0;
+          const muRow = MUHURTA_DAY[mi];
+          const isAbhijit = mi === 7 && !!abhijit;   // no Abhijit on Wednesday (feed omits it)
+          const natureBonus = isAbhijit ? 2 : (muRow[2] === 'auspicious' ? 1 : -2);
 
           // Compute slot-time facts via Meeus Sun/Moon longitudes.
           // s0 is minutes from local midnight of `d`. Convert to a Date
@@ -858,9 +869,16 @@ async function findMuhurta() {
           // Build reason groups as we score — slot_quality, day_quality,
           // group_fit, activity_match, notes — mirroring Python's
           // day_slots() reason_groups field.
-          let score = base;
-          const slotQuality = [`${c.name} choghadiya (+${base})`,
-                                'clear of all inauspicious windows'];
+          let score = base + natureBonus;
+          const muLabel = muRow[0] + (isAbhijit ? ' (Abhijit)' : '');
+          const muDeity = muRow[1] ? ` · ${muRow[1]}` : '';
+          let chogDesc = `${c.name} choghadiya`;
+          if (dom.straddle) chogDesc += ` (spans ${dom.straddle})`;
+          const chogLine = base ? `${chogDesc} (+${base})` : chogDesc;
+          const slotQuality = [
+            `${muLabel} muhurta${muDeity} — ${muRow[2]} (${natureBonus >= 0 ? '+' : ''}${natureBonus})`,
+            chogLine,
+            'clear of all inauspicious windows'];
           const dayQuality = [];
           const groupFit = [];
           const activityMatch = [];
@@ -1041,10 +1059,8 @@ async function findMuhurta() {
           // Vara — activity_match (day-level)
           if (varaReason) { score += 1; activityMatch.push(varaReason); }
 
-          // Slot-overlap bonuses → slot_quality
-          if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
-            score += 2; slotQuality.push('overlaps Abhijit Muhurta (+2)');
-          }
+          // Slot-overlap bonuses → slot_quality (Abhijit is now scored as
+          // the 8th muhurta's nature above).
           if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
             score += 2; slotQuality.push('overlaps Amrita Kalam (+2)');
           }
@@ -1100,8 +1116,6 @@ async function findMuhurta() {
 
           slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha });
           slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
-        }
-        winStart += MUHURTA_MINS;
       }
       // Diagnose: if the day produced no slots and it wasn't an eclipse,
       // record the most likely reason (samskara skip, mode filter, etc.).

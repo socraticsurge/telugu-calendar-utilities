@@ -24,6 +24,35 @@ ICS-feed behaviour changes; all code trees byte-identical.
   appears in the contributor list. Author/committer metadata only — every
   tree SHA is unchanged, so released artifacts are byte-identical.
 
+## [1.12.0] — 2026-07-21
+
+Muhurta finder rebuilt on the named 30-muhurta grid. **1082 tests passing.**
+
+### Changed
+- **Muhurta slots are now the named muhurtas**, not choghadiya-derived
+  windows. `day_slots`/`night_slots` iterate the 30 muhurtas of the
+  ahoratra — 15 daytime (sunrise→sunset ÷15) + 15 night (sunset→next
+  sunrise ÷15), each an indivisible ~48-min unit carrying its name,
+  presiding deity, and intrinsic nature. New module
+  `telugu_panchangam/muhurtas.py`; owner-verified reference table at
+  `docs/reference/07-muhurta-table.md`.
+- **Additive, disclosed scoring.** A slot's score layers: intrinsic
+  muhurta nature (Abhijit/Brahma +2, other auspicious +1, inauspicious −2)
+  + dominant choghadiya (a scoring attribute — straddle disclosed, not a
+  gate) + weekday Durmuhurtam / hard-window exclusion + the existing
+  tarabalam, chandrabalam, lagna, tithi-class and special-yoga factors.
+  Abhijit and Brahma are now scored as the 8th-day / 14th-night muhurta
+  natures (the old "overlaps Abhijit/Brahma" bonuses are retired; Abhijit
+  is correctly absent on Wednesday). This **supersedes the interim
+  block-iteration fix (PR #135)** and fully resolves the 2026-07-21
+  choghadiya mislabel (a Kaal slot scored as Amrit).
+- Each slot now leads with its muhurta identity, e.g.
+  `Vidhi (Abhijit) muhurta · Brahma — auspicious (+2)`. The website finder
+  (`src/panels/tarabalam.ts`) mirrors the Python source of truth; the slot
+  card layout is unchanged (one added signal line).
+
+Affects `tool_find_muhurta` (MCP) and the website muhurta finder.
+
 ## [1.11.0] — 2026-06-22
 
 The theme: **muhurta scorer enhancements** — cognitive split of the
@@ -783,7 +812,8 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.4...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.11.0...v1.12.0
 [1.10.4]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.3...v1.10.4
 [1.10.3]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.9.0...v1.10.3
 [1.9.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.8.0...v1.9.0

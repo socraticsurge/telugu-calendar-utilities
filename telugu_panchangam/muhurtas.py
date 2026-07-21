@@ -82,11 +82,17 @@ def named_muhurtas(day, next_day=None) -> list[dict]:
     sunrise/sunset carry (engine emits UTC).
     """
     out = []
+    # The 8th daytime muhurta is Abhijit — except when the engine reports no
+    # Abhijit for the day (Wednesday), where it is an ordinary muhurta.
+    abhijit_present = getattr(day, 'abhijit_muhurta', None) is not None
     day_len = (day.sunset - day.sunrise) / 15
     for i, row in enumerate(DAY_MUHURTAS):
         start = day.sunrise + i * day_len
         end = day.sunrise + (i + 1) * day_len
-        out.append(_entry(i + 1, 'day', row, start, end))
+        entry = _entry(i + 1, 'day', row, start, end)
+        if entry['is_abhijit'] and not abhijit_present:
+            entry['is_abhijit'] = False
+        out.append(entry)
 
     if next_day is not None:
         night_len = (next_day.sunrise - day.sunset) / 15
