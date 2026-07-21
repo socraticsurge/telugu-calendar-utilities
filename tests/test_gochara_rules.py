@@ -149,7 +149,8 @@ def test_mcp_get_gochara():
     assert '104.4 supports' in result['convention']
     assert 'Phaladeepika 26.3-8 supports' in result['convention']
     assert 'conflict with Phaladeepika 26.2' in result['convention']
-    assert 'open source-locator debt' in result['convention']
+    assert '26.1 and 26.22-23 support the Moon-sign reference' in result['convention']
+    assert 'not the conventional condition names' in result['convention']
 
 
 def test_mcp_get_gochara_validates():

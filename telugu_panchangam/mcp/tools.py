@@ -753,8 +753,10 @@ def tool_get_gochara(
                           'the Vedha pairs and classical exemptions. The configured '
                           'Rahu/Ketu houses (3, 6, 11) conflict with Phaladeepika '
                           '26.2, which treats both like Surya and therefore includes '
-                          'the 10th; node Vedha remains unverified. Named Shani '
-                          'conditions have open source-locator debt. '
+                          'the 10th; node Vedha remains unverified. Phaladeepika '
+                          '26.1 and 26.22-23 support the Moon-sign reference and '
+                          'underlying Shani-house effects, not the conventional '
+                          'condition names, phase labels or advice. '
                           'Positions are at sunrise. Gochara is one factor — not a muhurta.',
             'provenance': GOCHARA_PROVENANCE,
             'conditions': named_conditions(janma_rasi, sky),

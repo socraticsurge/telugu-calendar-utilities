@@ -59,11 +59,21 @@ Changing the node calculation would alter an existing tested assertion. Under
 the frozen-contract working agreement, this audit records the conflict and
 leaves behavior unchanged pending explicit owner approval.
 
-## Layer still requiring a locator
+## Partially verified named-Shani layer
 
 | Layer | Claim | State | Boundary |
 |---|---|---|---|
-| Named Shani conditions | `gochara.named_shani_conditions` | `needs_locator` | Chapter 104 describes house effects but does not name the configured Sade Sati phases, Ashtama Shani or Ardhastama Shani |
+| Named Shani conditions | `gochara.named_shani_conditions` | `partially_verified` | Phaladeepika XXVI.1 establishes Janma Chandra as the reference; XXVI.22–23 describes adverse effects in houses 1, 2, 4, 8 and 12. It does not supply the configured grouping, names, phase labels or advice. |
+
+This distinction corrects a former frontend error: when users supplied both a
+Moon sign and lagna, the browser generated named Shani flags independently from
+both. Named conditions are now calculated only from the Moon sign. Lagna remains
+available as a secondary lens for ordinary house-by-house gochara verdicts.
+
+The terms “Sade Sati,” “Ashtama Shani,” and “Ardhastama Shani” remain useful
+conventional shorthand, but the product does not call them verbatim classical
+labels. Likewise, “rising,” “peak,” and “setting” are presentation labels rather
+than claims found in the cited slokas.
 
 The MCP response publishes all four claim IDs and explains the split. Product
 copy must not describe the entire verdict system as “the Brihat Samhita table,”

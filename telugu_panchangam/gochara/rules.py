@@ -2,7 +2,8 @@
 # favourable houses for the seven classical Grahas. Phaladeepika 26.3-8
 # supplies the Vedha mappings and exemptions. Node treatment and named Shani
 # conditions are separate configured traditions. The node houses have a known
-# conflict with Phaladeepika 26.2; named Shani conditions have open locator debt.
+# conflict with Phaladeepika 26.2. Named-Shani houses are partially verified;
+# their grouping names, phase labels and advice remain conventional presentation.
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 GOCHARA_PROVENANCE = {
