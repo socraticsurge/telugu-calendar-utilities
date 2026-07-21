@@ -1064,6 +1064,7 @@ def tool_find_muhurta(
             'dropped_days': dropped_days,
             'activity_profile': {
                 'source_claim': rules.get('source_claim'),
+                'audit_claim': rules.get('audit_claim'),
                 'automated_constraints': {
                     field: rules[field]
                     for field in constraint_fields if field in rules

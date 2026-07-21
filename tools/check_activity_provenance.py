@@ -19,10 +19,35 @@ def audit() -> dict:
     ledger = json.loads(LEDGER.read_text(encoding='utf-8'))
     claims = {claim['id']: claim for claim in ledger['claims']}
     linked: dict[str, str] = {}
+    audited: dict[str, dict[str, str]] = {}
     errors: list[str] = []
 
     for activity, rules in ACTIVITY_RULES.items():
+        audit_id = rules.get('audit_claim')
         claim_id = rules.get('source_claim')
+        if audit_id and claim_id:
+            errors.append(
+                f'{activity}: source_claim and audit_claim are mutually exclusive')
+        if audit_id:
+            if any(item['claim'] == audit_id for item in audited.values()):
+                errors.append(f'{activity}: duplicate activity audit claim {audit_id!r}')
+                claim = None
+            else:
+                claim = claims.get(audit_id)
+            if claim is None and not any(
+                    item['claim'] == audit_id for item in audited.values()):
+                errors.append(f'{activity}: unknown audit claim {audit_id!r}')
+            elif claim['surface'] != 'muhurtam':
+                errors.append(f'{activity}: audit claim {audit_id!r} is not a muhurtam claim')
+            elif claim['verification_state'] != 'contradicted':
+                errors.append(
+                    f'{activity}: audit claim {audit_id!r} is '
+                    f'{claim["verification_state"]!r}, not contradicted')
+            else:
+                audited[activity] = {
+                    'claim': audit_id,
+                    'state': claim['verification_state'],
+                }
         if not claim_id:
             continue
         if claim_id in linked.values():
@@ -44,11 +69,12 @@ def audit() -> dict:
         if valid:
             linked[activity] = claim_id
 
-    unlinked = sorted(set(ACTIVITY_RULES) - set(linked))
+    unlinked = sorted(set(ACTIVITY_RULES) - set(linked) - set(audited))
     return {
         'activity_count': len(ACTIVITY_RULES),
         'verified_profile_count': len(linked),
         'verified_profiles': linked,
+        'known_conflicts': audited,
         'needs_rule_locators': unlinked,
         'errors': errors,
     }
@@ -65,6 +91,7 @@ def main() -> int:
         print(
             f'{result["verified_profile_count"]}/{result["activity_count"]} '
             'activities have verified rule-level profiles; '
+            f'{len(result["known_conflicts"])} have known conflicts; '
             f'{len(result["needs_rule_locators"])} need locators.')
         for error in result['errors']:
             print(f'ERROR: {error}', file=sys.stderr)

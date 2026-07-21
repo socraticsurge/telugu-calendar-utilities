@@ -32,6 +32,13 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'travel': 'muhurta.travel',
         'well_digging': 'muhurta.well_digging',
     }
+    assert result['known_conflicts'] == {
+        'wedding': {
+            'claim': 'muhurta.wedding.profile_conflict',
+            'state': 'contradicted',
+        },
+    }
+    assert 'wedding' not in result['needs_rule_locators']
 
 
 def test_generated_browser_contract_keeps_source_claims():
@@ -41,3 +48,12 @@ def test_generated_browser_contract_keeps_source_claims():
         if activity not in browser['rules'] or 'source_claim' not in rules:
             continue
         assert browser['rules'][activity]['source_claim'] == rules['source_claim']
+
+
+def test_generated_browser_contract_keeps_audit_claims():
+    browser = json.loads(
+        (ROOT / 'src/data/activity-rules.generated.json').read_text(encoding='utf-8'))
+    for activity, rules in ACTIVITY_RULES.items():
+        if activity not in browser['rules'] or 'audit_claim' not in rules:
+            continue
+        assert browser['rules'][activity]['audit_claim'] == rules['audit_claim']

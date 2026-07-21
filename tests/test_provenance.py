@@ -36,6 +36,17 @@ def test_verified_textual_claims_require_precise_locators():
             assert claim['locator'] and claim['locator'].strip()
 
 
+def test_contradicted_claims_require_inspected_evidence():
+    ledger = _load(LEDGER_PATH)
+    for claim in ledger['claims']:
+        if claim['verification_state'] != 'contradicted':
+            continue
+        assert claim['evidence_class'] == 'textual'
+        assert claim['source_ids']
+        assert claim['locator'] and claim['locator'].strip()
+        assert claim.get('last_reviewed')
+
+
 def test_forward_festival_fixture_discloses_verification_per_cell():
     fixture = _load(FESTIVAL_FIXTURE)
     statuses = [cell['verification']['status'] for cell in fixture['cells']]

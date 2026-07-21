@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "evidence_classes": ["astronomical", "textual", "published_panchangam", "regional_convention", "project_heuristic"],
-  "verification_states": ["verified", "partially_verified", "engine_pinned", "needs_locator", "heuristic"],
+  "verification_states": ["verified", "partially_verified", "engine_pinned", "needs_locator", "heuristic", "contradicted"],
   "sources": [
     {
       "id": "BS-IYER-1884",
@@ -84,6 +84,17 @@
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": null,
       "scope": "Each activity needs rule-level locators; shared defaults must not imply universal textual agreement."
+    },
+    {
+      "id": "muhurta.wedding.profile_conflict",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter IX, 'Electing a time for marriage,' printed p. 41 (PDF p. 45), especially the Tithi, Vara, Nakshatra and Rasi rules",
+      "scope": "The inspected passage contradicts the configured wedding Tithi-family scoring. The project penalizes every Jaya Tithi, but Raman names Shukla Tritiya and Trayodashi among the best while rejecting Ashtami. The project rewards every Purna Tithi, which can reward Pournami and Amavasya even though the passage rejects both. Raman also supplies exact weekday, Nakshatra and rising-Rasi lists that the current broad preferences do not represent. This audit claim records evidence debt only and must never be presented as a verified profile.",
+      "last_reviewed": "2026-07-21"
     },
     {
       "id": "muhurta.bhumi_puja.foundation",

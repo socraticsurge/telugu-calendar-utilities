@@ -56,6 +56,7 @@ PyPI MCP package.
 | 28 | [Gold / jewelry source profile](28-gold-jewelry-profile.md) | Chapter X's limited chart instruction and explicit separation from project ranking heuristics |
 | 29 | [Pilgrimage source profile](29-pilgrimage-profile.md) | Chapter XIV's incorporated journey rules, Guru conditions, and heuristic boundary |
 | 30 | [Travel source profile](30-travel-profile.md) | Chapter XIV's hard exclusions, preferred stars, chart checks, and isolated Disha Shoola debt |
+| 31 | [Wedding evidence audit](31-wedding-evidence-audit.md) | Machine-readable contradiction between current wedding scoring and the inspected source |
 
 ## How to read the diagrams
 

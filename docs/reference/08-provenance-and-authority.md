@@ -27,6 +27,7 @@ validate its vocabulary, identifiers, source references, and evidence gaps.
 | `engine_pinned` | A regression test preserves current output; it is not independent verification |
 | `needs_locator` | A plausible authority is known, but chapter/verse/page is not yet recorded |
 | `heuristic` | Intentionally a product judgment, not a textual claim |
+| `contradicted` | Inspected evidence materially conflicts with configured behavior; the profile must not be called verified |
 
 ## Source editions
 
@@ -99,10 +100,11 @@ edition and locator are recorded, their claims remain `needs_locator`.
 
 Activity-level coverage is tracked separately in
 [Muhurtam Activity Provenance Coverage](16-activity-provenance-coverage.md).
-It is currently **10 of 30 profiles**; the remaining profiles retain
-`needs_locator` status and do not inherit verified status from a general
-title-level citation. `tools/check_activity_provenance.py` enforces every
-activity-to-claim link against the ledger.
+It is currently **17 of 30 profiles**. Wedding has a separately machine-checked
+`contradicted` audit claim, and the remaining 12 profiles retain
+`needs_locator` status. None inherits verified status from a general title-level
+citation. `tools/check_activity_provenance.py` enforces both verified links and
+known-conflict links against the ledger.
 
 ## Citation acceptance rule
 

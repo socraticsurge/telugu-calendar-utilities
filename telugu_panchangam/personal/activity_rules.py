@@ -30,6 +30,8 @@
 #   allowed_lagnas          slot omitted unless its active Lagna is listed
 #   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
+#   audit_claim             provenance claim recording a known evidence conflict;
+#                           never grants verified status
 #   source_claim            stable verified claim ID in provenance.json
 #   daytime_only            night_slots returns no candidates for the activity
 #   forenoon_only           candidate must end by local solar noon
@@ -80,6 +82,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Budhavaram', 'Guruvaram']},
     # — Samskaras —
     'wedding':       {'label': 'Wedding (Vivaha)',
+                      'audit_claim': 'muhurta.wedding.profile_conflict',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
