@@ -722,6 +722,7 @@ async function findMuhurta() {
       const allowedLagnas = new Set(rules.allowed_lagnas || []);
       const cautionLagnaSolar = !!rules.caution_lagna_solar;
       const allowedNakshatras = new Set(rules.allowed_nakshatras || []);
+      const avoidNakshatras = new Set(rules.avoid_nakshatras || []);
       const preferNakshatras = new Set(rules.prefer_nakshatras || []);
       const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
       const allowedTithiNames = new Set(rules.allowed_tithi_names || []);
@@ -854,6 +855,7 @@ async function findMuhurta() {
           const slotStart = new Date(d.getTime() + s0 * 60000);
           const facts = muFactsAt(slotStart, data.vaaram);
           if (allowedNakshatras.size && !allowedNakshatras.has(facts.nakshatra)) continue;
+          if (avoidNakshatras.has(facts.nakshatra)) continue;
           if (allowedTithiNumbers.size &&
               !allowedTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
           if (allowedTithiNames.size && !allowedTithiNames.has(facts.tithi)) continue;

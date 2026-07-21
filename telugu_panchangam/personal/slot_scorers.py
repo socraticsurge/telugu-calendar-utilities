@@ -66,6 +66,7 @@ class _DayContext:
     simha_stha_shukra_penalty: int
     prefer_nakshatra_mukha: tuple | None    # ([classes], bonus) | None
     allowed_nakshatras: frozenset
+    avoid_nakshatras: frozenset
     prefer_nakshatras: frozenset
     allowed_tithi_numbers: frozenset
     allowed_tithi_names: frozenset

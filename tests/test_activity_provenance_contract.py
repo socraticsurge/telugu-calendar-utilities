@@ -29,6 +29,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'surgery': 'muhurta.surgery',
         'gold': 'muhurta.gold_jewelry.purchase',
         'pilgrimage': 'muhurta.pilgrimage',
+        'travel': 'muhurta.travel',
         'well_digging': 'muhurta.well_digging',
     }
 

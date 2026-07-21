@@ -251,6 +251,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.travel",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XIV, 'Journeys' and 'Long-distance Journeys,' printed pp. 60-61 (PDF pp. 64-65)",
+      "scope": "Supports configured hard rejection of Bharani/Krittika, preference for the ten named journey Nakshatras, and the disclosed Lagna, Guru/Shukra, waxing-Chandra, Mangala and 7th-house chart checks. Vishti rejection follows the separately cited general Panchanga-Suddhi rule. Chara-Lagna and Tiryan-Mukha bonuses are separately attributed project rules. Two source corrections remain outside the configured claim because existing tests pin contrary behavior: Chaturdashi/Full/New Chandra rejection, and time-of-day exceptions to Disha Shoola. Both require explicit owner approval.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

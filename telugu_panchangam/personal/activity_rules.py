@@ -23,6 +23,7 @@
 #   avoid_vara_paksha       (Vara, Paksha) pairs that omit a day
 #   allowed_solar_classes   day omitted unless Surya's Rasi is in one of these classes
 #   allowed_nakshatras      slot omitted unless its active Nakshatra is listed
+#   avoid_nakshatras        slot omitted when its active Nakshatra is listed
 #   prefer_nakshatras       active Nakshatra names receiving +1
 #   allowed_tithi_numbers   slot omitted unless its active Tithi number is listed
 #   avoid_tithi_numbers     slot omitted when its active Tithi number is listed
@@ -45,9 +46,24 @@ ACTIVITY_RULES: dict[str, dict] = {
     # — Generic —
     'any':           {'label': 'Anything auspicious'},
     'travel':        {'label': 'Travel / journey',
+                      'source_claim': 'muhurta.travel',
                       'avoid_karana': ['Vishti'],
+                      'avoid_nakshatras': ['Bharani', 'Krittika'],
+                      'prefer_nakshatras': [
+                          'Mrigashira', 'Ashwini', 'Pushya', 'Punarvasu',
+                          'Hasta', 'Anuradha', 'Shravana', 'Moola',
+                          'Dhanishtha', 'Revati',
+                      ],
                       'prefer_lagna_class': 'Chara',
-                      'prefer_nakshatra_mukha': (['Tiryan'], 1)},
+                      'prefer_nakshatra_mukha': (['Tiryan'], 1),
+                      'manual_checks': [
+                          'Election chart: fortify Lagna; Guru or Shukra '
+                          'well placed in Lagna is stated to support a '
+                          'successful journey.',
+                          'For long-distance journeys, prefer waxing '
+                          'Chandra, avoid Mangala in the 8th and avoid '
+                          'malefics in the 7th.',
+                      ]},
     'purchase':      {'label': 'Purchase (general)',
                       'prefer_choghadiya': ('Labh', 1)},
     'ceremony':      {'label': 'Ceremony / puja (general)',

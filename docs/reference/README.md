@@ -55,6 +55,7 @@ PyPI MCP package.
 | 27 | [Surgery source profile](27-surgery-profile.md) | Chapter XV's exact election, chart cautions, and non-negotiable clinical safety boundary |
 | 28 | [Gold / jewelry source profile](28-gold-jewelry-profile.md) | Chapter X's limited chart instruction and explicit separation from project ranking heuristics |
 | 29 | [Pilgrimage source profile](29-pilgrimage-profile.md) | Chapter XIV's incorporated journey rules, Guru conditions, and heuristic boundary |
+| 30 | [Travel source profile](30-travel-profile.md) | Chapter XIV's hard exclusions, preferred stars, chart checks, and isolated Disha Shoola debt |
 
 ## How to read the diagrams
 

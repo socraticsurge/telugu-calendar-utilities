@@ -291,6 +291,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
 
     if ctx.allowed_nakshatras and facts.nakshatra not in ctx.allowed_nakshatras:
         return None
+    if facts.nakshatra in ctx.avoid_nakshatras:
+        return None
     try:
         active_tithi_number = tithi_number(facts.tithi)
     except ValueError:
@@ -592,6 +594,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
+    avoid_nakshatras = frozenset(rules.get('avoid_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
@@ -637,6 +640,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         simha_stha_shukra_penalty=_shukra_penalty,
         prefer_nakshatra_mukha=prefer_nakshatra_mukha,
         allowed_nakshatras=allowed_nakshatras,
+        avoid_nakshatras=avoid_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
         allowed_tithi_names=allowed_tithi_names,
@@ -766,6 +770,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
+    avoid_nakshatras = frozenset(rules.get('avoid_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
@@ -834,6 +839,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         simha_stha_shukra_penalty=_shukra_penalty,
         prefer_nakshatra_mukha=prefer_nakshatra_mukha,
         allowed_nakshatras=allowed_nakshatras,
+        avoid_nakshatras=avoid_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
         allowed_tithi_names=allowed_tithi_names,

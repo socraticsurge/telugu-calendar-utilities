@@ -15,6 +15,7 @@
     "avoid_vara_paksha",
     "allowed_solar_classes",
     "allowed_nakshatras",
+    "avoid_nakshatras",
     "prefer_nakshatras",
     "allowed_tithi_numbers",
     "avoid_tithi_numbers",
@@ -802,7 +803,28 @@
       "avoid_karana": [
         "Vishti"
       ],
-      "prefer_lagna_class": "Chara"
+      "prefer_lagna_class": "Chara",
+      "avoid_nakshatras": [
+        "Bharani",
+        "Krittika"
+      ],
+      "prefer_nakshatras": [
+        "Mrigashira",
+        "Ashwini",
+        "Pushya",
+        "Punarvasu",
+        "Hasta",
+        "Anuradha",
+        "Shravana",
+        "Moola",
+        "Dhanishtha",
+        "Revati"
+      ],
+      "manual_checks": [
+        "Election chart: fortify Lagna; Guru or Shukra well placed in Lagna is stated to support a successful journey.",
+        "For long-distance journeys, prefer waxing Chandra, avoid Mangala in the 8th and avoid malefics in the 7th."
+      ],
+      "source_claim": "muhurta.travel"
     },
     "beginning": {
       "label": "New beginning (general)",
