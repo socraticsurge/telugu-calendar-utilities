@@ -32,6 +32,7 @@ python tools/check_activity_provenance.py
 | `gold` | Gold / jewelry purchase | `muhurta.gold_jewelry.purchase` | Verified chart-level instruction; ranking remains heuristic |
 | `pilgrimage` | Pilgrimage (Tirtha Yatra) | `muhurta.pilgrimage` | Verified incorporated journey profile |
 | `travel` | Travel / journey | `muhurta.travel` | Verified Nakshatra profile; Tithi and Disha Shoola corrections approval-gated |
+| `purchase` | Purchase (general) | `muhurta.purchase.general` | Verified buyer-side Nakshatra profile; Labh remains a project heuristic |
 | `wedding` | Wedding (Vivaha) | `muhurta.wedding.profile_conflict` | **Contradicted:** inspected Tithi rules conflict with configured scoring |
 | `engagement` | Engagement (Nischayam) | `muhurta.engagement.profile_conflict` | **Contradicted:** no dedicated passage found; nearest marriage rules conflict with copied scoring |
 | `gruhapravesha` | First entry into a newly built home | `muhurta.gruhapravesha.profile_conflict` | **Contradicted:** current soft family/class preferences conflict with exact source gates |
@@ -39,11 +40,12 @@ python tools/check_activity_provenance.py
 | `litigation` | Litigation / contest | `muhurta.litigation.profile_conflict` | **Contradicted:** repeats the Tuesday reversal; Bhadra Puchha attribution lacks an exact locator |
 | `cremation` | Cremation rites | `muhurta.cremation.profile_conflict` | **Contradicted:** whole-Dhanishtha block overstates the cited 4½-Nakshatra Panchaka |
 | `yajna` | Yajna / Homam | `muhurta.yajna.profile_conflict` | **Contradicted:** family scoring omits and conflicts with Homahuti/Agnivasa formulas |
-| remaining 6 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| remaining 5 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
-Coverage is therefore **17 of 30 profiles**. The verified profiles use
-B. V. Raman's *Muhurtha*, with edition-specific printed and PDF page locators.
-Raman is a modern secondary authority, not scripture; this
+Coverage is therefore **18 of 30 profiles**. The verified profiles use
+B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
+printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
+not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
 

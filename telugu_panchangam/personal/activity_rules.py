@@ -85,7 +85,25 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'malefics in the 7th.',
                       ]},
     'purchase':      {'label': 'Purchase (general)',
-                      'prefer_choghadiya': ('Labh', 1)},
+                      'source_claim': 'muhurta.purchase.general',
+                      'prefer_choghadiya': ('Labh', 1),
+                      'prefer_nakshatras': [
+                          'Revati', 'Shatabhisha', 'Ashwini', 'Swati',
+                          'Shravana', 'Chitra',
+                      ],
+                      'manual_checks': [
+                          'Transaction role: verse 16 distinguishes purchase '
+                          'from sale Muhurtas; this profile evaluates the '
+                          'buyer’s side and must not be reused as a seller '
+                          'election.',
+                          'Marketplace check from verse 17: avoid Rikta '
+                          'Tithis, Tuesday and Kumbha Lagna; prefer Chandra '
+                          'and Shukra in Lagna, no malefics in the 8th or '
+                          '12th, and benefics in the 2nd, 10th or 11th.',
+                          'Use the dedicated vehicle, building-land or gold '
+                          'profile when the object is known; their narrower '
+                          'rules take precedence over generic purchase.',
+                      ]},
     'ceremony':      {'label': 'Ceremony / puja (general)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,

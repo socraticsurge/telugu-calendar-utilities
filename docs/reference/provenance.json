@@ -232,6 +232,17 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.purchase.general",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Nakshatra-prakarana, purchase/sale distinction and purchase Muhurta, verse 16, printed pp. 33-34 (OCR lines 2336-2350); marketplace election, verse 17, printed pp. 34-35 (OCR lines 2351-2374)",
+      "scope": "Verse 16 supports the configured preference for Revati, Shatabhisha, Ashvini, Swati, Shravana and Chitra from the buyer's perspective. Verse 17 supports the disclosed marketplace checks: reject Rikta Tithis, Tuesday and Kumbha Lagna; place Chandra and Shukra in Lagna, keep malefics out of the 8th and 12th, and place benefics in the 2nd, 10th or 11th. The Labh-Choghadiya bonus is a separate project heuristic, not authorized by these verses. Object-specific vehicle, building-land and jewelry profiles remain narrower authorities and take precedence.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.bhumi_puja.foundation",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
