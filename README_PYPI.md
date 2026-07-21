@@ -126,6 +126,8 @@ Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's ho
 
 Deterministic daily reading for a janma rashi, rendered entirely from computed facts: the Moon's Chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati/Ashtama Shani are stated when active, and passing `janma_nakshatra` adds the day's Tarabalam line. Every sentence maps to a calculation.
 
+The website can additionally display a daily AI-written interpretation. This is a separate provenance layer: its declared graha/house/verdict citations are engine-verified, while its prose and guidance remain heuristic model interpretation. Generation rejects structural defects, unsupported precise timing, and selected high-stakes directives; it does not claim semantic or scriptural verification of the prose.
+
 ---
 
 ### Intraday timing

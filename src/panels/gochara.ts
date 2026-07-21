@@ -292,6 +292,9 @@ function renderGochara() {
     const llmRasiKey = view.label.replace(/ (rashi|lagna)$/i, '').trim();
     const llmEntry = LLM_PHALALU?.rashis?.[llmRasiKey];
     const llmForToday = !!llmEntry;
+    const interpretationBoundary = llmForToday
+      ? `<p style="font-size:0.72rem;color:#746B5E;margin-top:0.65rem;">AI-written interpretation: cited transit positions and verdicts are engine-checked; prose and guidance are interpretive, not independently scripturally verified.</p>`
+      : '';
     const adviceBlock = llmForToday && llmEntry.advice
       ? `<div style="margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;">` +
         `<span style="font-size:0.68rem;color:#8B7355;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;">Today's guidance</span>` +
@@ -300,7 +303,7 @@ function renderGochara() {
     phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:0.4rem;">Rasi Phalalu — ${htmlEsc(view.label)}
       <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
       (llmForToday
-        ? `<p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}`
+        ? `<p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}${interpretationBoundary}`
         : ph.lines.map(l => `<p>${l}</p>`).join('') +
           `<p style="font-size:0.72rem;color:#746B5E;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p>`) +
       `</div>`;

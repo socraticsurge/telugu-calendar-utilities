@@ -75,6 +75,26 @@ conventional shorthand, but the product does not call them verbatim classical
 labels. Likewise, “rising,” “peak,” and “setting” are presentation labels rather
 than claims found in the cited slokas.
 
+## Generated interpretation boundary
+
+The website may publish a daily LLM-written interpretation above the computed
+fallback reading. Its `transits_cited` graha, house and verdict triples are
+checked against the engine. That check does not prove every prose sentence or
+piece of advice. Those fields carry the separate
+`daily_horoscope.llm_interpretation` heuristic claim and must not inherit the
+textual authority of the transit table.
+
+The 2026-07-21 published artifact demonstrated the boundary failure that this
+contract fixes: while its declared transit triples were accepted, uncited prose
+introduced a late-afternoon contract window, a 48-hour decision delay, and
+claims about investment returns, health and intraday clarity. None of those
+facts existed in the generator input.
+
+Generation now fails closed on duplicate or missing rashis, empty citations,
+cited Grahas absent from the prose, precise intraday/waiting-period claims, and
+selected medical, legal, investment or contract directives. These controls
+reduce unsupported output; they are not represented as semantic proof.
+
 The MCP response publishes all four claim IDs and explains the split. Product
 copy must not describe the entire verdict system as “the Brihat Samhita table,”
 or imply that verified Vedha evidence also settles the two open layers.

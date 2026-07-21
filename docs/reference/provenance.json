@@ -126,6 +126,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "daily_horoscope.llm_interpretation",
+      "surface": "daily_horoscope",
+      "implementation": "telugu_panchangam/personal/llm_phalalu.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": null,
+      "scope": "The generator verifies the rasi set and every declared graha, house and verdict in transits_cited against computed gochara. The text and advice fields are model interpretation: they are screened for unsupported precision and selected high-stakes directions but are not semantically or scripturally verified. They must never inherit the authority state of their cited transit triples.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.activity_rules",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

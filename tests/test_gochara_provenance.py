@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from telugu_panchangam.gochara.rules import GOCHARA_PROVENANCE
+from telugu_panchangam.personal.llm_phalalu import LLM_PHALALU_PROVENANCE
 
 
 ROOT = Path(__file__).parents[1]
@@ -73,3 +74,18 @@ def test_browser_named_shani_conditions_use_only_the_moon_reference():
     assert 'shaniConditionFromMoonHouse(houseFromRef(shaniIdx, jr))' in frontend
     assert 'shaniConditionFromMoonHouse(houseFrom(shaniIdx, jl))' not in frontend
     assert 'shaniConditionFromMoonHouse(houseFromRef(shaniIdx, jl))' not in frontend
+
+
+def test_llm_prose_cannot_inherit_transit_authority():
+    claim = _claims()[LLM_PHALALU_PROVENANCE]
+    assert claim['surface'] == 'daily_horoscope'
+    assert claim['evidence_class'] == 'project_heuristic'
+    assert claim['verification_state'] == 'heuristic'
+    assert claim['source_ids'] == []
+    assert claim['locator'] is None
+    assert 'not semantically or scripturally verified' in claim['scope']
+
+    html = (ROOT / 'index.html').read_text(encoding='utf-8')
+    frontend = (ROOT / 'src/panels/gochara.ts').read_text(encoding='utf-8')
+    assert 'do not inherit the scriptural authority' in html
+    assert 'prose and guidance are interpretive' in frontend

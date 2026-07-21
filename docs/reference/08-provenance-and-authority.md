@@ -68,6 +68,9 @@ edition and locator are recorded, their claims remain `needs_locator`.
   Phaladeepika 26.2 exposes a known conflict in the configured node houses.
   Its 26.1 and 26.22–23 verify the Moon-sign reference and underlying adverse
   Shani houses, but not the product's conventional names or phase labels.
+- Daily website prose has its own `daily_horoscope.llm_interpretation` claim.
+  Only its declared transit triples are engine-verified; prose and advice stay
+  `heuristic` even when every cited calculation is correct.
 - Muhurtam activity rules, Panchanga Shuddhi, and several dosha/yoga tables
   still have source work recorded at their actual verification state.
 - Bhumi Puja / foundation laying is an activity-level exception: its profile
