@@ -38,7 +38,8 @@ python tools/check_activity_provenance.py
 | `court` | Court / legal matter | `muhurta.court.profile_conflict` | **Contradicted:** configured Tuesday bonus reverses the source's Tuesday exclusion |
 | `litigation` | Litigation / contest | `muhurta.litigation.profile_conflict` | **Contradicted:** repeats the Tuesday reversal; Bhadra Puchha attribution lacks an exact locator |
 | `cremation` | Cremation rites | `muhurta.cremation.profile_conflict` | **Contradicted:** whole-Dhanishtha block overstates the cited 4½-Nakshatra Panchaka |
-| remaining 7 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `yajna` | Yajna / Homam | `muhurta.yajna.profile_conflict` | **Contradicted:** family scoring omits and conflicts with Homahuti/Agnivasa formulas |
+| remaining 6 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
 Coverage is therefore **17 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha*, with edition-specific printed and PDF page locators.
@@ -46,14 +47,15 @@ Raman is a modern secondary authority, not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
 
-Wedding, Engagement, Gruhapravesha, Court, Litigation and Cremation are excluded from the verified count. Their
+Wedding, Engagement, Gruhapravesha, Court, Litigation, Cremation and Yajna are excluded from the verified count. Their
 `audit_claim` fields record known source conflicts without granting authority
 to the current profiles. See the [wedding evidence audit](31-wedding-evidence-audit.md),
 the [Engagement evidence audit](36-engagement-evidence-audit.md),
 the [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md), the
 [Court evidence audit](34-court-evidence-audit.md), and the
 [Litigation evidence audit](35-litigation-evidence-audit.md), and the
-[Cremation evidence audit](37-cremation-evidence-audit.md).
+[Cremation evidence audit](37-cremation-evidence-audit.md), and the
+[Yajna/Homam evidence audit](38-yajna-homam-evidence-audit.md).
 
 The remaining profiles are covered only by the umbrella ledger claim
 `muhurta.activity_rules`, whose state is `needs_locator`. They may be used as

@@ -733,7 +733,13 @@
         "Guruvaram",
         "Somavaram"
       ],
-      "prefer_tithi_class": "Purna"
+      "prefer_tithi_class": "Purna",
+      "manual_checks": [
+        "Homahuti check: count the day’s Nakshatra from Surya’s Nakshatra in three-star groups and reject a group assigned to a malefic Graha, per Muhurta Chintamani verse 35.",
+        "Agnivasa check: apply the Tithi-plus-weekday modulo-four rule in verse 36; only remainders 3 and 0 place Agni on earth and support Homa.",
+        "Ritual scope: a general Yajna is not necessarily equivalent to the cited Homahuti election; follow the officiating priest and the specific Kalpa or Sampradaya requirements."
+      ],
+      "audit_claim": "muhurta.yajna.profile_conflict"
     },
     "pilgrimage": {
       "label": "Pilgrimage (Tirtha Yatra)",

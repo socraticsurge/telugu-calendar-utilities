@@ -63,6 +63,7 @@ PyPI MCP package.
 | 35 | [Litigation evidence audit](35-litigation-evidence-audit.md) | Alias-safe lawsuit crosswalk and the unlocated Bhadra Puchha attribution |
 | 36 | [Engagement evidence audit](36-engagement-evidence-audit.md) | Full-edition scope search and the unsafe marriage-rule inheritance boundary |
 | 37 | [Cremation evidence audit](37-cremation-evidence-audit.md) | Muhurta Chintamani verse 48 and the whole-Dhanishtha precision conflict |
+| 38 | [Yajna / Homam evidence audit](38-yajna-homam-evidence-audit.md) | Homahuti and Agnivasa verses versus the current family scoring |
 
 ## How to read the diagrams
 

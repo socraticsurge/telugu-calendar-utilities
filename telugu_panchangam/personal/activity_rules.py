@@ -463,11 +463,25 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_lagna_class': 'Sthira'},
     # — Spiritual —
     'yajna':         {'label': 'Yajna / Homam',
+                      'audit_claim': 'muhurta.yajna.profile_conflict',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'prefer_tithi_class': 'Purna',
                       'avoid_tithi_class': ['Jaya'],
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Homahuti check: count the day’s Nakshatra from '
+                          'Surya’s Nakshatra in three-star groups and reject '
+                          'a group assigned to a malefic Graha, per Muhurta '
+                          'Chintamani verse 35.',
+                          'Agnivasa check: apply the Tithi-plus-weekday '
+                          'modulo-four rule in verse 36; only remainders 3 '
+                          'and 0 place Agni on earth and support Homa.',
+                          'Ritual scope: a general Yajna is not necessarily '
+                          'equivalent to the cited Homahuti election; follow '
+                          'the officiating priest and the specific Kalpa or '
+                          'Sampradaya requirements.',
+                      ]},
     'pilgrimage':    {'label': 'Pilgrimage (Tirtha Yatra)',
                       'source_claim': 'muhurta.pilgrimage',
                       'avoid_karana': ['Vishti'],
