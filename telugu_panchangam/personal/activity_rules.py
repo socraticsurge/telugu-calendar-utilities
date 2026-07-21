@@ -332,6 +332,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'stated to counteract adverse influences.',
                       ]},
     'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
+                      'audit_claim': 'muhurta.gruhapravesha.profile_conflict',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -340,7 +341,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_tithi_class': 'Bhadra',
                       'avoid_tithi_class': ['Jaya'],
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Known source mismatch: this finder is broader than '
+                          'Raman’s weekday, Tithi, Nakshatra and fixed-Lagna '
+                          'rules; verify the source crosswalk before choosing.',
+                          'Practitioner checks: Uttarayana; strong Guru, '
+                          'Shukra and Chandra; 8th house vacant; malefics in '
+                          'Upachayas; benefics in Kendras; worship and '
+                          'Bhootabali completed; wife not over six months '
+                          'pregnant.',
+                      ]},
     # — Acquisitions —
     'vehicle':       {'label': 'Vehicle purchase',
                       'source_claim': 'muhurta.vehicle.acquisition',

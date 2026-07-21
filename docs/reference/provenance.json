@@ -158,6 +158,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.gruhapravesha.profile_conflict",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XII, 'House building,' section 'Entering a new house,' printed pp. 52-54 (PDF pp. 56-58)",
+      "scope": "The current profile is not equivalent to the inspected Gruhapravesha rules. It penalizes the Jaya Tithi family even though Raman explicitly admits Shukla Tritiya and Trayodashi; accepts weekdays outside Raman's Monday, Wednesday, Thursday and Friday list; omits the exact admitted Nakshatra and Tithi gates; and treats fixed Lagna as a preference instead of the stated default rule. The source's Uttarayana, Graha-strength, 8th-house, ritual and advanced-pregnancy checks are not fully automatable and remain practitioner checks. This audit claim records the conflict and must not be presented as verification of the configured scorer.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.bhumi_puja.foundation",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

@@ -58,6 +58,7 @@ PyPI MCP package.
 | 30 | [Travel source profile](30-travel-profile.md) | Chapter XIV's hard exclusions, preferred stars, chart checks, and isolated Disha Shoola debt |
 | 31 | [Wedding evidence audit](31-wedding-evidence-audit.md) | Machine-readable contradiction between current wedding scoring and the inspected source |
 | 32 | [Gochara source crosswalk](32-gochara-source-crosswalk.md) | Verified favourable houses and Vedha, a known Rahu/Ketu conflict, and a precisely bounded named-Shani evidence layer |
+| 33 | [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md) | Exact Chapter XII crosswalk and approval-gated conflicts in the current home-entry profile |
 
 ## How to read the diagrams
 

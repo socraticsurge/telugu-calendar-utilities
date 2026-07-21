@@ -490,7 +490,12 @@
         "Guruvaram",
         "Somavaram"
       ],
-      "prefer_tithi_class": "Bhadra"
+      "prefer_tithi_class": "Bhadra",
+      "manual_checks": [
+        "Known source mismatch: this finder is broader than Raman’s weekday, Tithi, Nakshatra and fixed-Lagna rules; verify the source crosswalk before choosing.",
+        "Practitioner checks: Uttarayana; strong Guru, Shukra and Chandra; 8th house vacant; malefics in Upachayas; benefics in Kendras; worship and Bhootabali completed; wife not over six months pregnant."
+      ],
+      "audit_claim": "muhurta.gruhapravesha.profile_conflict"
     },
     "vehicle": {
       "label": "Vehicle purchase",
