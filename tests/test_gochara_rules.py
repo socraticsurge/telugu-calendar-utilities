@@ -1,5 +1,5 @@
 # Gochara rules from Janma Rasi. Brihat Samhita 104.4 supports the seven
-# classical favourable-house sets; Vedha, nodes and named Shani conditions
+# classical favourable-house sets and Vedha; nodes and named Shani conditions
 # have separate provenance states.
 from telugu_panchangam.gochara.rules import (
     GOCHARA_FAVOURABLE, GOCHARA_PROVENANCE, VEDHA, gochara_for,
@@ -34,6 +34,19 @@ def test_gochara_layers_have_distinct_provenance_claims():
 def test_vedha_points_cover_every_favourable_house():
     for graha in ('Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani'):
         assert set(VEDHA[graha].keys()) == set(GOCHARA_FAVOURABLE[graha])
+
+
+def test_vedha_pairs_match_phaladeepika_26_3_to_8():
+    assert VEDHA == {
+        'Surya': {3: 9, 6: 12, 10: 4, 11: 5},
+        'Chandra': {1: 5, 3: 9, 6: 12, 7: 2, 10: 4, 11: 8},
+        'Kuja': {3: 12, 6: 9, 11: 5},
+        'Budha': {2: 5, 4: 3, 6: 9, 8: 1, 10: 8, 11: 12},
+        'Guru': {2: 12, 5: 4, 7: 3, 9: 10, 11: 8},
+        'Shukra': {1: 8, 2: 7, 3: 1, 4: 10, 5: 9, 8: 5,
+                   9: 11, 11: 6, 12: 3},
+        'Shani': {3: 12, 6: 9, 11: 5},
+    }
 
 
 # --- Verdicts for a fixed sky (Jun 11 2026 sunrise, DP-verified rasis):
@@ -121,6 +134,7 @@ def test_mcp_get_gochara():
     assert len(result['gochara']) == 9
     assert result['provenance'] == GOCHARA_PROVENANCE
     assert '104.4 supports' in result['convention']
+    assert 'Phaladeepika 26.3-8 supports' in result['convention']
     assert 'open source-locator debt' in result['convention']
 
 

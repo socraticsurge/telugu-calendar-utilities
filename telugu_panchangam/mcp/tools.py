@@ -749,9 +749,10 @@ def tool_get_gochara(
             'date': date_str, 'city': city, 'janma_rasi': janma_rasi,
             'convention': 'Transit houses are counted from the natal Moon sign. '
                           'Brihat Samhita 104.4 supports favourable houses for the '
-                          'seven classical grahas. Vedha, its exemptions, node '
-                          'treatment and named Shani conditions are separately '
-                          'configured traditions with open source-locator debt. '
+                          'seven classical grahas. Phaladeepika 26.3-8 supports '
+                          'the Vedha pairs and classical exemptions. Node treatment '
+                          'and named Shani conditions remain configured traditions '
+                          'with open source-locator debt. '
                           'Positions are at sunrise. Gochara is one factor — not a muhurta.',
             'provenance': GOCHARA_PROVENANCE,
             'conditions': named_conditions(janma_rasi, sky),

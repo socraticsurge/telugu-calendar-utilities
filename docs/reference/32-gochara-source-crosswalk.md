@@ -20,20 +20,43 @@ Janma Chandra and concludes that every Graha is favourable in the 11th.
 The ledger claim is `gochara.favourable_houses`. This verifies the table, not
 every interpretive sentence produced from it.
 
-## Layers not supported by that citation
+## Verified Vedha layer
+
+Mantreswara's *Phaladeepika*, Adhyaya XXVI, slokas 3–8, states the favourable
+houses and their corresponding Vedha houses planet by planet. The same passage
+explicitly exempts Shani from obstructing Surya, Surya from obstructing Shani,
+Budha from obstructing Chandra, and Chandra from obstructing Budha. The
+consolidated table and father–son explanation also appear in *Jataka Parijata*,
+Volume III, Adhyaya XIII, note to sloka 60, printed pages 833–834.
+
+| Graha | Implemented favourable → Vedha pairs | Phaladeepika locator |
+|---|---|---|
+| Surya | 3→9, 6→12, 10→4, 11→5 | XXVI.3 |
+| Chandra | 1→5, 3→9, 6→12, 7→2, 10→4, 11→8 | XXVI.4 |
+| Kuja | 3→12, 6→9, 11→5 | XXVI.5 |
+| Budha | 2→5, 4→3, 6→9, 8→1, 10→8, 11→12 | XXVI.6 |
+| Guru | 2→12, 5→4, 7→3, 9→10, 11→8 | XXVI.7 |
+| Shukra | 1→8, 2→7, 3→1, 4→10, 5→9, 8→5, 9→11, 11→6, 12→3 | XXVI.8 |
+| Shani | 3→12, 6→9, 11→5 | XXVI.5 |
+
+The ledger claim is `gochara.vedha_tables`. This verification stops at the
+seven classical Grahas; it does not silently authorize the project's node
+policy.
+
+## Layers still requiring locators
 
 | Layer | Claim | State | Boundary |
 |---|---|---|---|
-| Vedha table and exemptions | `gochara.vedha_tables` | `needs_locator` | Chapter 104 does not provide the configured obstruction map or father-son exemptions |
 | Rahu/Ketu treatment | `gochara.nodes` | `needs_locator` | Stanza 4 addresses the seven classical Grahas; it does not authorize copying Shani's houses or disabling node Vedha |
 | Named Shani conditions | `gochara.named_shani_conditions` | `needs_locator` | Chapter 104 describes house effects but does not name the configured Sade Sati phases, Ashtama Shani or Ardhastama Shani |
 
 The MCP response publishes all four claim IDs and explains the split. Product
-copy must not describe the entire verdict system as “the Brihat Samhita table.”
+copy must not describe the entire verdict system as “the Brihat Samhita table,”
+or imply that verified Vedha evidence also settles the two open layers.
 
 ## Engineering consequence
 
-No calculation changed in this audit. The change removes authority laundering:
-one verified table can no longer make adjacent conventional rules appear
-verified. Future evidence work can promote each layer independently without
-rewriting the calculation contract.
+No calculation changed in this audit. Exact table tests bind the classical
+source crosswalk to the implementation, while each adjacent conventional layer
+retains its own status and can be promoted without rewriting the calculation
+contract.

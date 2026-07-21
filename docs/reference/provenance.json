@@ -20,6 +20,22 @@
       "authority_type": "primary_text_translation"
     },
     {
+      "id": "PD-SASTRI-1942",
+      "title": "Phaladeepika",
+      "author": "Mantreswara",
+      "edition": "V. Subrahmanya Sastri English translation, 1942",
+      "url": "https://www.wisdomlib.org/hinduism/book/phaladeepika-by-mantreswara-text-and-translation/d/doc1621598.html",
+      "authority_type": "primary_text_translation"
+    },
+    {
+      "id": "JP-SASTRI-1932-V3",
+      "title": "Jataka Parijata, Volume III",
+      "author": "Vaidyanatha Dikshita",
+      "edition": "V. Subrahmanya Sastri English translation, Ranjan reprint of the 1932 edition",
+      "url": "https://storage.yandexcloud.net/j108/library/szvreqmf/Vaidyanatha_Dikshita_-_Jataka_Parijata_%28Vol._III%29.pdf",
+      "authority_type": "primary_text_translation"
+    },
+    {
       "id": "BVR-MUHURTHA-1993",
       "title": "Muhurtha (Electional Astrology)",
       "author": "B. V. Raman",
@@ -81,10 +97,11 @@
       "surface": "daily_horoscope",
       "implementation": "telugu_panchangam/gochara/rules.py",
       "evidence_class": "textual",
-      "verification_state": "needs_locator",
-      "source_ids": [],
-      "locator": null,
-      "scope": "Exact edition and verse/table locators are required for every configured Vedha mapping and for the Surya-Shani and Chandra-Budha exemptions. Brihat Samhita Chapter 104 must not be cited for this layer."
+      "verification_state": "verified",
+      "source_ids": ["PD-SASTRI-1942", "JP-SASTRI-1932-V3"],
+      "locator": "Phaladeepika, Adhyaya XXVI, slokas 3-8 (printed pp. 287-289); Jataka Parijata, Volume III, Adhyaya XIII, note to sloka 60, printed pp. 833-834 (PDF pp. 127-128)",
+      "scope": "Supports every configured favourable-house-to-Vedha-house pair for Surya, Chandra, Kuja, Budha, Guru, Shukra and Shani, plus the Surya-Shani and Chandra-Budha exemptions. It does not support this project's Rahu/Ketu policy or named Shani conditions. Brihat Samhita Chapter 104 is not the authority for this layer.",
+      "last_reviewed": "2026-07-21"
     },
     {
       "id": "gochara.nodes",
