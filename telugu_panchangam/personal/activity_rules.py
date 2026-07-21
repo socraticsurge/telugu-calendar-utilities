@@ -118,6 +118,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Choose a name appropriate to the ruling Nakshatra.',
                       ]},
     'annaprasana':   {'label': 'Annaprasana (First feeding)',
+                      'source_claim': 'muhurta.annaprasana',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -126,8 +127,31 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Bhadra',
                       'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Somavaram', 'Guruvaram'],
-                      'prefer_lagna_class': 'Dvisvabhava'},
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_nakshatras': [
+                          'Ashwini', 'Mrigashira', 'Punarvasu',
+                          'Dhanishtha', 'Pushya', 'Hasta', 'Swati',
+                          'Anuradha', 'Shravana', 'Shatabhisha',
+                          'Uttara Phalguni', 'Chitra',
+                      ],
+                      'avoid_tithi_numbers': [4, 6, 8, 12, 14, 15],
+                      'allowed_lagnas': [
+                          'Vrishabha', 'Mithuna', 'Karka', 'Simha',
+                          'Kanya', 'Tula', 'Dhanu', 'Makara', 'Kumbha',
+                      ],
+                      'manual_checks': [
+                          'Perform first feeding in the child’s 6th, 8th, '
+                          '9th or 12th month; the age-month is the most '
+                          'important criterion.',
+                          'Election chart: leave the 10th house unoccupied.',
+                          'Budha, Mangala and Shukra should not occupy the '
+                          '7th, 8th and 9th houses respectively.',
+                          'Budha, Guru or Shukra in Lagna is highly '
+                          'commended; no malefic should occupy Lagna.',
+                      ]},
     'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,

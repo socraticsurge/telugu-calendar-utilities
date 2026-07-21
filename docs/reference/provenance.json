@@ -108,6 +108,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.annaprasana",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
+      "scope": "Supports the configured Annaprasana Nakshatra and weekday admission lists, rejected general-Panchanga-Suddhi Tithis, excluded rising Rasis, age-month guidance and disclosed election-chart checks. Shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.well_digging",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

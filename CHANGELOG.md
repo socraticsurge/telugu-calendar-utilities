@@ -8,6 +8,11 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed Annaprasana profile.** Raman Chapter VIII, printed pages
+  21–22 (PDF pages 25–26), now supplies the admitted Nakshatras, weekdays and
+  rising Rasis; its general-Tithi reference is resolved to Chapter V's exact
+  Panchanga-Suddhi list. Child-age and election-chart checks remain explicit.
+  Verified activity coverage rises from 4/30 to 5/30.
 - **Source-backed Namakarana profile.** Raman Chapter VIII, printed page 21
   (PDF page 25), now supplies the ceremony's admitted Nakshatras and weekdays,
   rejected Tithi numbers, fixed-Lagna preference, and disclosed birth-day,
