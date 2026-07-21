@@ -68,6 +68,7 @@ PyPI MCP package.
 | 40 | [Job / Contract evidence audit](40-job-contract-evidence-audit.md) | Service-entry verse and the unsupported modern-contract conflation |
 | 41 | [Business-launch evidence audit](41-business-evidence-audit.md) | Capital-deployment verse, movable-Lagna conflict, and scope boundaries |
 | 42 | [Ceremony / Puja evidence audit](42-ceremony-evidence-audit.md) | Shantika/Paushtika verse, Tithi conflict, chart conditions, and emergency boundary |
+| 43 | [New Beginning evidence audit](43-beginning-evidence-audit.md) | Dharma-kriya commencement verse versus generic project-ranking proxies |
 
 ## How to read the diagrams
 

@@ -130,9 +130,24 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'ordinary timing restrictions.',
                       ]},
     'beginning':     {'label': 'New beginning (general)',
+                      'audit_claim': 'muhurta.beginning.profile_conflict',
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Budhavaram', 'Guruvaram']},
+                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
+                      'manual_checks': [
+                          'Dharma-work cross-check: Muhurta Chintamani '
+                          'verse 30 names Anuradha, Ashwini, Pushya, Hasta, '
+                          'Shravana, Dhanishtha, Shatabhisha, Punarvasu, '
+                          'Swati, the three Uttaras and Rohini; Sunday '
+                          'through Friday except Tuesday.',
+                          'Election chart for beginning Dharma-kriya: use '
+                          'Budha or Guru Lagna/varga, place Guru in Lagna '
+                          'and ensure the performer has Guru-bala.',
+                          'Scope warning: the passage begins Dharma-kriya, '
+                          'not every modern project or life change; it does '
+                          'not supply the configured Amrit Choghadiya or '
+                          'Nanda-Tithi rewards.',
+                      ]},
     # — Samskaras —
     'wedding':       {'label': 'Wedding (Vivaha)',
                       'audit_claim': 'muhurta.wedding.profile_conflict',
