@@ -97,6 +97,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.namakarana",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Naming the child (Namakarana),' printed p. 21 (PDF p. 25)",
+      "scope": "Supports the configured Namakarana weekday and Nakshatra admission lists, rejected Tithi numbers, fixed-Lagna preference, timing-after-birth guidance and disclosed election-chart/name checks. Shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.well_digging",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

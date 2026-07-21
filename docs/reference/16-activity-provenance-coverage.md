@@ -18,9 +18,10 @@ python tools/check_activity_provenance.py
 | `bhumi_puja` | Bhumi Puja / foundation laying | `muhurta.bhumi_puja.foundation` | Verified rule-level profile |
 | `well_digging` | Well digging | `muhurta.well_digging` | Verified rule-level profile |
 | `property` | Land purchase for building | `muhurta.land_purchase.building` | Verified rule-level profile |
-| remaining 27 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `naming` | Naming ceremony (Namakarana) | `muhurta.namakarana` | Verified rule-level profile |
+| remaining 26 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
-Coverage is therefore **3 of 30 profiles**. The three verified profiles use
+Coverage is therefore **4 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha*, Chapter XII, with edition-specific printed and PDF
 page locators. Raman is a modern secondary authority, not scripture; this
 status means the implemented criteria match the cited passage, not that every

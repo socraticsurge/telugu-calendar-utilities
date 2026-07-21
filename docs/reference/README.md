@@ -42,6 +42,7 @@ PyPI MCP package.
 | 14 | [Well-digging source profile](14-well-digging-profile.md) | Raman's admitted Nakshatras/Lagnas, hard-rock caution, and manual chart checks |
 | 15 | [Land-purchase source profile](15-land-purchase-profile.md) | Raman's building-land criteria, scope correction, and election-chart checks |
 | 16 | [Muhurtam activity provenance coverage](16-activity-provenance-coverage.md) | Machine-checked verified-profile coverage and the remaining citation debt |
+| 17 | [Namakarana source profile](17-namakarana-profile.md) | Raman Chapter VIII crosswalk, conservative gates, and practitioner checks |
 
 ## How to read the diagrams
 

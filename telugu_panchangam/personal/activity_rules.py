@@ -82,6 +82,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'naming':        {'label': 'Naming (Namakaranam)',
+                      'source_claim': 'muhurta.namakarana',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -90,8 +91,32 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_choghadiya': ('Shubh', 1),
                       'prefer_tithi_class': 'Nanda',
                       'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
-                      'prefer_lagna_class': 'Dvisvabhava'},
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_nakshatras': [
+                          'Anuradha', 'Punarvasu', 'Magha',
+                          'Uttara Phalguni', 'Uttara Ashadha',
+                          'Uttara Bhadrapada', 'Shatabhisha', 'Swati',
+                          'Dhanishtha', 'Shravana', 'Rohini', 'Ashwini',
+                          'Mrigashira', 'Revati', 'Hasta', 'Pushya',
+                      ],
+                      'avoid_tithi_numbers': [4, 6, 8, 9, 12, 14, 15],
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Prefer the 10th, 12th or 16th day after birth; '
+                          'otherwise elect an auspicious day.',
+                          'Election chart: strengthen Lagna and leave the '
+                          '8th house unoccupied.',
+                          'A common Lagna is acceptable only when occupied '
+                          'by benefics.',
+                          'Prefer Guru in a Kendra or Trikona with a malefic '
+                          'in the 11th.',
+                          'Alternative chart: benefic-sign Lagna, malefic in '
+                          'the 3rd, Shukra in the 12th and Chandra dignified.',
+                          'Choose a name appropriate to the ruling Nakshatra.',
+                      ]},
     'annaprasana':   {'label': 'Annaprasana (First feeding)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,

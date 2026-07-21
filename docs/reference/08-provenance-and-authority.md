@@ -74,11 +74,14 @@ edition and locator are recorded, their claims remain `needs_locator`.
   to buying land for building, matching Raman's separate treatment of land and
   completed houses. Its weekday, Nakshatra and Rikta-Tithi rules have a precise
   Chapter XII locator.
+- Namakarana now has a Chapter VIII rule-level profile: its Nakshatra,
+  weekday and rejected-Tithi lists are automated, while birth-day timing and
+  election-chart/name criteria remain visible manual checks.
 - Absolute score thresholds and relative ordering are project heuristics.
 
 Activity-level coverage is tracked separately in
 [Muhurtam Activity Provenance Coverage](16-activity-provenance-coverage.md).
-It is currently **3 of 30 profiles**; the remaining profiles retain
+It is currently **4 of 30 profiles**; the remaining profiles retain
 `needs_locator` status and do not inherit verified status from a general
 title-level citation. `tools/check_activity_provenance.py` enforces every
 activity-to-claim link against the ledger.

@@ -8,6 +8,11 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed Namakarana profile.** Raman Chapter VIII, printed page 21
+  (PDF page 25), now supplies the ceremony's admitted Nakshatras and weekdays,
+  rejected Tithi numbers, fixed-Lagna preference, and disclosed birth-day,
+  election-chart and name-selection checks. Verified activity coverage rises
+  from 3/30 to 4/30.
 - **One-command project verification.** `python tools/verify_project.py` now
   runs provenance-link validation, generated activity-data drift checks, the
   complete Python suite, frontend tests, typecheck, and production build in a
