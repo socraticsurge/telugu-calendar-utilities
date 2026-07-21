@@ -324,6 +324,11 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_lagna_class': 'Sthira'},
     # — Acquisitions —
     'vehicle':       {'label': 'Vehicle purchase',
+                      'source_claim': 'muhurta.vehicle.acquisition',
+                      'prefer_nakshatras': [
+                          'Shravana', 'Dhanishtha', 'Shatabhisha',
+                          'Punarvasu', 'Swati',
+                      ],
                       'prefer_choghadiya': ('Labh', 1),
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Shukravaram'],

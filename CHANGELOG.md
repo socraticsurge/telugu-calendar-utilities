@@ -8,6 +8,12 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Precisely scoped vehicle-acquisition profile.** Raman Chapter IV, printed
+  page 10 (PDF page 14), now supplies a +1 preference for five movable
+  Nakshatras without treating every other star as rejected.
+  Other vehicle ranking preferences remain explicitly uncited project rules;
+  the citation is not presented as a complete vehicle election. Coverage is
+  now 10/30.
 - **Source-backed Upanayana profile.** Raman Chapter VIII, printed pages
   23–24 (PDF pages 27–28), now supplies lunar months, Uttarayana solar Rasis,
   exact Paksha-qualified Tithis, weekdays, Nakshatras, Lagnas and a before-noon

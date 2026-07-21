@@ -24,9 +24,10 @@ python tools/check_activity_provenance.py
 | `mundana` | First head-shave (Mundana / Chaula) | `muhurta.mundana` | Verified rule-level profile |
 | `vidyarambha` | Education commencement (Vidyarambha) | `muhurta.vidyarambha` | Verified rule-level profile |
 | `upanayana` | Sacred-thread ceremony (Upanayana) | `muhurta.upanayana` | Verified rule-level profile |
-| remaining 21 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `vehicle` | Vehicle purchase | `muhurta.vehicle.acquisition` | Verified activity-specific Nakshatra preference |
+| remaining 20 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
-Coverage is therefore **9 of 30 profiles**. The verified profiles use
+Coverage is therefore **10 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha*, Chapter XII, with edition-specific printed and PDF
 page locators. Raman is a modern secondary authority, not scripture; this
 status means the implemented criteria match the cited passage, not that every

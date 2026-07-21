@@ -48,6 +48,7 @@ PyPI MCP package.
 | 20 | [Mundana / Chaula source profile](20-mundana-profile.md) | Chapter VIII Paksha, combustion, forenoon and conservative Lagna contract |
 | 21 | [Vidyarambha source profile](21-vidyarambha-profile.md) | Chapter VIII weekday, Nakshatra and movable/common-Lagna crosswalk |
 | 22 | [Upanayana source profile](22-upanayana-profile.md) | Paksha-exact Tithis, Uttarayana signs, before-noon gate and chart caveats |
+| 23 | [Vehicle-acquisition source profile](23-vehicle-acquisition-profile.md) | Precisely scoped Chapter IV movable-Nakshatra preference and non-inherited heuristics |
 
 ## How to read the diagrams
 

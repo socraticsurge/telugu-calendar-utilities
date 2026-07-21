@@ -163,6 +163,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.vehicle.acquisition",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter IV, 'Influence of Nakshatras,' movable-Nakshatra classification, printed p. 10 (PDF p. 14)",
+      "scope": "Supports only the configured +1 preference for five movable Nakshatras when acquiring vehicles; the passage does not reject every other Nakshatra. The Labh-Choghadiya, Bhadra-Tithi, Friday and fixed-Lagna ranking preferences are disclosed project rules and do not inherit authority from this citation.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.well_digging",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

@@ -92,11 +92,14 @@ edition and locator are recorded, their claims remain `needs_locator`.
 - Upanayana now preserves Paksha-specific Tithis by exact name and enforces
   lunar-month, Uttarayana solar-Rasi, weekday, Nakshatra, Lagna and before-noon
   gates; age, conditional combustion and full chart judgment remain manual.
+- Vehicle purchase has a deliberately narrow verified Chapter IV preference:
+  five movable Nakshatras receive +1. Its other ranking preferences remain
+  uncited project rules rather than inheriting that claim's authority.
 - Absolute score thresholds and relative ordering are project heuristics.
 
 Activity-level coverage is tracked separately in
 [Muhurtam Activity Provenance Coverage](16-activity-provenance-coverage.md).
-It is currently **9 of 30 profiles**; the remaining profiles retain
+It is currently **10 of 30 profiles**; the remaining profiles retain
 `needs_locator` status and do not inherit verified status from a general
 title-level citation. `tools/check_activity_provenance.py` enforces every
 activity-to-claim link against the ledger.

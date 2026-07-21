@@ -490,7 +490,15 @@
       "prefer_vara": [
         "Shukravaram"
       ],
-      "prefer_tithi_class": "Bhadra"
+      "prefer_tithi_class": "Bhadra",
+      "prefer_nakshatras": [
+        "Shravana",
+        "Dhanishtha",
+        "Shatabhisha",
+        "Punarvasu",
+        "Swati"
+      ],
+      "source_claim": "muhurta.vehicle.acquisition"
     },
     "property": {
       "label": "Land purchase (for building)",
