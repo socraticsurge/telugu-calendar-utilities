@@ -20,7 +20,9 @@ from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
 from telugu_panchangam.gochara.positions import graha_positions
-from telugu_panchangam.gochara.rules import gochara_for, named_conditions
+from telugu_panchangam.gochara.rules import (
+    GOCHARA_PROVENANCE, gochara_for, named_conditions,
+)
 from telugu_panchangam.personal.phalalu import rasi_phalalu
 from telugu_panchangam.personal.muhurta import day_slots, night_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
@@ -745,10 +747,13 @@ def tool_get_gochara(
                            'verdict': v['verdict'], 'vedha_by': v['vedha_by']})
         return json.dumps({
             'date': date_str, 'city': city, 'janma_rasi': janma_rasi,
-            'convention': 'Brihat Samhita gochara from the natal Moon sign: favourable '
-                          'houses per graha with vedha obstruction (Surya-Shani and '
-                          'Chandra-Budha exempt; nodes neither cause nor receive vedha). '
-                          'Positions at sunrise. Gochara is one factor — not a muhurta.',
+            'convention': 'Transit houses are counted from the natal Moon sign. '
+                          'Brihat Samhita 104.4 supports favourable houses for the '
+                          'seven classical grahas. Vedha, its exemptions, node '
+                          'treatment and named Shani conditions are separately '
+                          'configured traditions with open source-locator debt. '
+                          'Positions are at sunrise. Gochara is one factor — not a muhurta.',
+            'provenance': GOCHARA_PROVENANCE,
             'conditions': named_conditions(janma_rasi, sky),
             'gochara': merged,
         })

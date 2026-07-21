@@ -159,7 +159,8 @@ function renderGochara() {
 
   // Per-graha verdicts using a chosen reference index (rashi index
   // 0..11). Works for both janma rashi and janma lagna — same
-  // Brihat Samhita rules, different reference frame.
+  // Janma-Chandra transit frame. Brihat Samhita 104.4 supports the seven
+  // classical favourable-house sets; Vedha and node policy are separate.
   const houseFrom = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
   const occupantsFor = (ref) => {
     const o = {};
@@ -191,7 +192,7 @@ function renderGochara() {
   const houseOf = gi => jr === null ? null : houseFrom(gi, jr);
 
   // Chart colour is anchored to the janma RASHI verdict — the
-  // traditional Brihat Samhita gochara frame. The lagna lens is
+  // traditional Janma-Chandra gochara frame. The lagna lens is
   // surfaced separately (tooltip + prose) without judgement;
   // classical texts don't prescribe a single rule for merging the
   // two into one verdict, so we don't invent one.

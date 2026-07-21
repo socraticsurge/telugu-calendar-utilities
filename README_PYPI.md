@@ -120,7 +120,7 @@ Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, naks
 
 #### `get_gochara(date, janma_rasi, city, ayanamsa="lahiri", ...)`
 
-Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position counted from the janma rashi with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse — per classical Brihat Samhita tables. Includes named conditions: Sade Sati (with phase), Ashtama Shani, Ardhastama Shani.
+Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position counted from the janma rashi with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse. Brihat Samhita 104.4 supports the seven classical grahas' favourable-house sets. The response separately identifies open locator debt for Vedha, Rahu/Ketu treatment, and the named Sade Sati / Ashtama / Ardhastama Shani conditions.
 
 #### `get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra=None, ayanamsa="lahiri", ...)`
 

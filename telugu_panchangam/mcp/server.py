@@ -216,7 +216,7 @@ def get_gochara(
     timezone: str | None = None,
     ayanamsa: str = 'lahiri',
 ) -> str:
-    """Gochara (transit) verdicts for a janma rasi (natal Moon sign): each of the nine grahas with its house position counted from the janma rasi, a verdict (favourable | blocked by vedha | adverse) per the classical Brihat Samhita tables, plus named conditions — Sade Sati with phase, Ashtama Shani, Ardhastama Shani. Positions at sunrise of the date. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha' (canonical rashi spellings), city=city name (or latitude+longitude), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
+    """Gochara (transit) verdicts for a janma rasi (natal Moon sign): each of the nine grahas with its house position counted from the janma rasi and a verdict (favourable | blocked by vedha | adverse). Brihat Samhita 104.4 supports the seven classical grahas' favourable houses; the response separately identifies locator debt for Vedha, node treatment and named Shani conditions. Positions are at sunrise. Args: date=YYYY-MM-DD, janma_rasi=e.g. 'Mesha' (canonical rashi spellings), city=city name (or latitude+longitude), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
     return tool_get_gochara(date, janma_rasi, city, latitude, longitude, timezone, ayanamsa)
 
 

@@ -52,7 +52,7 @@ Several filters are only expressible on this scale.
 | Module | Computes | Source | Surfaces as |
 |---|---|---|---|
 | `gochara/positions.py` | Sidereal positions of all **9 grahas** at a JD — longitude, rasi, nakshatra, pada, retrograde, next ingress date; ayanamsa-configurable | Vedic astrology | MCP `get_graha_positions`; basis for gochara & phalalu |
-| `gochara/rules.py` | **Gochara verdicts** from a janma rasi (Brihat Samhita scheme) — favourable / blocked-by-vedha / adverse, plus named conditions (Sade Sati, Ashtama/Ardhastama Shani) | Brihat Samhita | MCP `get_gochara` |
+| `gochara/rules.py` | **Gochara verdicts** from a janma rasi — favourable / blocked-by-vedha / adverse, plus named conditions (Sade Sati, Ashtama/Ardhastama Shani) | Brihat Samhita 104.4 for seven classical favourable-house sets; other layers retain explicit locator debt | MCP `get_gochara` |
 | `gochara/combustion.py` | **Guru/Shukra Maudhya** — combustion thresholds (Jupiter 11°, Venus 10°) | Brihat Samhita, Muhurta Chintamani | `guru_maudhya`, `shukra_maudhya` (Drik) |
 | `gochara/simha_stha.py` | **Simha-stha** — Jupiter or Venus in Simha (wedding restriction; Guru hard, Shukra penalty) | classical samskara tradition | `simha_stha_guru/shukra` (Drik) |
 | `maudhya_calendar.py` | **All-planet Asta/Udaya** — heliacal setting & rising for Mercury/Venus/Mars/Jupiter/Saturn via swisseph `heliacal_ut()`, per-city | BPHS | MCP `get_combustion_calendar` |

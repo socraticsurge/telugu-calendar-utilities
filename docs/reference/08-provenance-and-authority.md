@@ -62,9 +62,11 @@ edition and locator are recorded, their claims remain `needs_locator`.
 - The 2027–2028 forward-festival fixture contains **1 DP-verified cell and 29
   engine-pinned cells**. Engine-pinned means regression-protected, not
   independently verified.
-- Gochara house/vedha tables, Muhurtam activity rules, Panchanga Shuddhi, and
-  several dosha/yoga tables have named authorities but still need precise
-  edition locators.
+- The seven classical Gochara favourable-house sets now have an exact Brihat
+  Samhita 104.4 locator. Vedha mappings/exemptions, node treatment and named
+  Shani conditions remain separately identified locator debt.
+- Muhurtam activity rules, Panchanga Shuddhi, and several dosha/yoga tables
+  still have source work recorded at their actual verification state.
 - Bhumi Puja / foundation laying is an activity-level exception: its profile
   has a page-level locator and criterion-by-criterion implementation crosswalk.
   Full election-chart and site-placement conditions remain visible manual checks.

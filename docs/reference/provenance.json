@@ -66,14 +66,45 @@
       "scope": "Only cells marked DP_VERIFIED are independently verified."
     },
     {
-      "id": "gochara.house_and_vedha_tables",
+      "id": "gochara.favourable_houses",
+      "surface": "daily_horoscope",
+      "implementation": "telugu_panchangam/gochara/rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BS-IYER-1884"],
+      "locator": "Chapter CIV (104), stanza 4, including its concluding all-planets 11th-house statement",
+      "scope": "Supports the configured favourable houses counted from Janma Chandra for Surya, Chandra, Mangala, Budha, Guru, Shukra and Shani. The explicit houses in stanza 4 combine with its concluding statement that all Grahas are benefic in the 11th. It does not support the Vedha table, father-son exemptions, Rahu/Ketu convention, named Shani conditions, or the binary reduction of each transit to one verdict.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
+      "id": "gochara.vedha_tables",
       "surface": "daily_horoscope",
       "implementation": "telugu_panchangam/gochara/rules.py",
       "evidence_class": "textual",
       "verification_state": "needs_locator",
-      "source_ids": ["BS-IYER-1884", "BS-SASTRI-BHAT-1946"],
+      "source_ids": [],
       "locator": null,
-      "scope": "A Brihat Samhita chapter/verse locator must be recorded for every favourable-house and vedha mapping."
+      "scope": "Exact edition and verse/table locators are required for every configured Vedha mapping and for the Surya-Shani and Chandra-Budha exemptions. Brihat Samhita Chapter 104 must not be cited for this layer."
+    },
+    {
+      "id": "gochara.nodes",
+      "surface": "daily_horoscope",
+      "implementation": "telugu_panchangam/gochara/rules.py",
+      "evidence_class": "regional_convention",
+      "verification_state": "needs_locator",
+      "source_ids": [],
+      "locator": null,
+      "scope": "The configured choice to give Rahu and Ketu Shani's favourable houses while making them neither cause nor receive Vedha requires a named tradition and exact source locator. Brihat Samhita 104.4 addresses the seven classical Grahas, not this node policy."
+    },
+    {
+      "id": "gochara.named_shani_conditions",
+      "surface": "daily_horoscope",
+      "implementation": "telugu_panchangam/gochara/rules.py",
+      "evidence_class": "regional_convention",
+      "verification_state": "needs_locator",
+      "source_ids": [],
+      "locator": null,
+      "scope": "The Sade Sati phase labels plus Ashtama and Ardhastama Shani names require a named textual or living-tradition authority. Brihat Samhita Chapter 104 describes Saturn's house effects but does not supply these configured names or phase labels."
     },
     {
       "id": "muhurta.activity_rules",

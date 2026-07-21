@@ -1,8 +1,9 @@
-# Gochara (transit) rules from the janma rasi, per the classical
-# Brihat Samhita scheme: favourable houses per graha, vedha
-# (obstruction) points, and the named Shani conditions.
+# Gochara rules from Janma Rasi. Brihat Samhita 104.4 supports the seven
+# classical favourable-house sets; Vedha, nodes and named Shani conditions
+# have separate provenance states.
 from telugu_panchangam.gochara.rules import (
-    GOCHARA_FAVOURABLE, VEDHA, gochara_for, named_conditions,
+    GOCHARA_FAVOURABLE, GOCHARA_PROVENANCE, VEDHA, gochara_for,
+    named_conditions,
 )
 
 
@@ -19,6 +20,15 @@ def test_favourable_houses_classical():
     # nodes follow the Shani convention
     assert GOCHARA_FAVOURABLE['Rahu'] == frozenset({3, 6, 11})
     assert GOCHARA_FAVOURABLE['Ketu'] == frozenset({3, 6, 11})
+
+
+def test_gochara_layers_have_distinct_provenance_claims():
+    assert GOCHARA_PROVENANCE == {
+        'favourable_houses': 'gochara.favourable_houses',
+        'vedha': 'gochara.vedha_tables',
+        'nodes': 'gochara.nodes',
+        'named_conditions': 'gochara.named_shani_conditions',
+    }
 
 
 def test_vedha_points_cover_every_favourable_house():
@@ -109,6 +119,9 @@ def test_mcp_get_gochara():
     assert v['Rahu']['verdict'] == 'favourable'
     assert v['Shani']['position_from_janma_rasi'] == 12
     assert len(result['gochara']) == 9
+    assert result['provenance'] == GOCHARA_PROVENANCE
+    assert '104.4 supports' in result['convention']
+    assert 'open source-locator debt' in result['convention']
 
 
 def test_mcp_get_gochara_validates():

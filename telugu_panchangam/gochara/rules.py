@@ -1,11 +1,15 @@
-# Gochara: transit verdicts from the janma rasi, per the classical
-# Brihat Samhita scheme. Each graha gives good results only in certain
-# houses counted from the natal Moon sign; a favourable transit is
-# obstructed (vedha) when another graha occupies its vedha point —
-# except between Surya and Shani, and between Chandra and Budha
-# (the father-son exemptions). Rahu and Ketu follow the Shani house
-# convention and neither cause nor receive vedha.
+# Gochara verdicts from Janma Rasi. Brihat Samhita 104.4 supplies the
+# favourable houses for the seven classical Grahas. Vedha mappings,
+# exemptions, node treatment and named Shani conditions are separate
+# configured traditions whose exact textual locators remain open evidence work.
 from telugu_panchangam.panchangam_names import RASHI_NAMES
+
+GOCHARA_PROVENANCE = {
+    'favourable_houses': 'gochara.favourable_houses',
+    'vedha': 'gochara.vedha_tables',
+    'nodes': 'gochara.nodes',
+    'named_conditions': 'gochara.named_shani_conditions',
+}
 
 GOCHARA_FAVOURABLE: dict[str, frozenset[int]] = {
     'Surya':   frozenset({3, 6, 10, 11}),
@@ -19,7 +23,8 @@ GOCHARA_FAVOURABLE: dict[str, frozenset[int]] = {
     'Ketu':    frozenset({3, 6, 11}),
 }
 
-# favourable house -> house whose occupant obstructs it (Brihat Samhita)
+# Configured favourable house -> obstruction house. Do not attribute this table
+# to Brihat Samhita 104: that chapter describes transit effects but not Vedha.
 VEDHA: dict[str, dict[int, int]] = {
     'Surya':   {3: 9, 6: 12, 10: 4, 11: 5},
     'Chandra': {1: 5, 3: 9, 6: 12, 7: 2, 10: 4, 11: 8},
