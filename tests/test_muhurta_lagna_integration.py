@@ -210,12 +210,11 @@ def test_janma_lagna_falls_back_cleanly_when_null():
 
 
 def test_activity_prefer_lagna_class_scores_when_slot_lagna_matches():
-    """travel activity prefers Chara (movable) lagnas. On 2026-06-20
-    Hyderabad, a choghadiya slot starts in Tula lagna (~10:05 IST) —
-    Tula is a Chara rashi, so the slot picks up the +1 with a chip
-    naming the class.
+    """travel activity prefers Chara (movable) lagnas. On 2026-06-15
+    Hyderabad a surviving muhurta rises in Karka lagna — a Chara rashi —
+    so the slot picks up the +1 with a chip naming the class.
     """
-    day = _day(2026, 6, 20)
+    day = _day(2026, 6, 15)
     slots = day_slots(day, activity='travel')
     assert slots
     chara_chips = [
@@ -246,14 +245,11 @@ def test_activity_lagna_independent_of_personal_kendra_trikona():
     """The activity-class chip is an INDEPENDENT scoring signal from
     the per-person kendra/trikona check. Both can fire on the same
     slot — verify the cell counts +2 not +1 when both match."""
-    # 2026-06-20 Hyderabad: a slot in Tula (Chara) lagna.
-    # janma rashi Mesha → Tula is 7th from Mesha (kendra).
-    # So a wedding-scored slot in Tula gets the kendra chip from
-    # the personal check, AND if we had a Chara-activity it'd
-    # double up — but wedding prefers Sthira. Use travel instead
-    # (Chara) for the activity, and Mesha rashi for the personal
-    # kendra check. Tula lagna is 7th from Mesha AND Chara.
-    day = _day(2026, 6, 20)
+    # 2026-06-15 Hyderabad: a surviving muhurta rises in Karka (Chara) lagna.
+    # janma rashi Mesha → Karka is 4th from Mesha (kendra). So a
+    # travel-scored slot in Karka gets the kendra chip from the personal
+    # check AND the Chara chip from the activity check — both fire, +2.
+    day = _day(2026, 6, 15)
     slots = day_slots(day, activity='travel',
                       janma_nakshatras=['Krittika'],
                       janma_rasis=['Mesha'])
@@ -261,12 +257,12 @@ def test_activity_lagna_independent_of_personal_kendra_trikona():
     # Find a slot with both chips firing.
     double = []
     for s in slots:
-        has_personal = any('Tula lagna favourable' in r for r in s['reasons'])
+        has_personal = any('Karka lagna favourable' in r for r in s['reasons'])
         has_activity = any('lagna (Chara) favoured for Travel' in r for r in s['reasons'])
         if has_personal and has_activity:
             double.append(s)
     assert double, \
-        'expected at least one Tula slot to fire both personal kendra AND activity Chara chips'
+        'expected at least one Karka slot to fire both personal kendra AND activity Chara chips'
 
 
 def test_ashtama_chandra_takes_precedence_over_ashtama_lagna():

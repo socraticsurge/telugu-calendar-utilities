@@ -24,6 +24,7 @@ import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
 import { RASI_NAMES, NAKSHATRA_NAMES, rasiFromStar } from '../data/rasis';
+import { MUHURTA_DAY } from '../data/muhurtas';
 import { goHasData, goBuildViewSelect, renderGochara } from './gochara';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
@@ -86,7 +87,7 @@ function tbRenderProfileInputs() {
   let html = '';
   for (let i = 0; i < TB_ROWS; i++) {
     const v = saved[i] || { name: '', nak: '', pada: '', lagna: '' };
-    const opts = ['<option value="">— birth star —</option>']
+    const opts = ['<option value="">birth star</option>']
       .concat(TB_NAKSHATRAS.map(n => `<option value="${n}" ${n === v.nak ? 'selected' : ''}>${n}</option>`)).join('');
     const padaOpts = ['<option value="">padam?</option>']
       .concat([1,2,3,4].map(q => `<option value="${q}" ${String(q) === String(v.pada) ? 'selected' : ''}>${q}</option>`)).join('');
@@ -99,8 +100,8 @@ function tbRenderProfileInputs() {
     html += `<div class="tb-profile-row">
       <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
       <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
-      <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star — needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
-      <select id="tb-lagna-${i}" style="min-width:130px;" title="Janma Lagna — the rising sign at the moment of birth. Leave blank if you don't know it; we'll use your janma rashi instead for muhurta scoring." onchange="tbSaveProfiles();">${lagnaOpts}</select>
+      <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star, needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
+      <select id="tb-lagna-${i}" style="min-width:130px;" title="Janma Lagna: the rising sign at the moment of birth. Leave blank if you don't know it; we'll use your janma rashi instead for muhurta scoring." onchange="tbSaveProfiles();">${lagnaOpts}</select>
       ${rasiNote}
       ${i === 0 ? '' : `<button class="tb-remove" title="Remove" onclick="tbRemoveRow(${i})">✕</button>`}
     </div>`;
@@ -176,7 +177,7 @@ async function calcTarabalam() {
     }
     renderTarabalam(profiles);
   } catch (e) {
-    resBox.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
+    resBox.innerHTML = '<p class="preview-error">Could not load the feed. Try again.</p>';
   }
 }
 
@@ -252,7 +253,7 @@ function renderTarabalam(profiles?) {
   const who = group ? 'everyone' : (profiles[0] ? profiles[0].name : 'you');
   let summary = `<span class="count">${goodDays.length} of ${TB_DAYS.length}</span>&nbsp;days are favourable for ${who}`;
   if (next) {
-    summary += ` — next: <span class="count">${next.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>`;
+    summary += ` · next: <span class="count">${next.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>`;
   }
   const share = goodDays.length
     ? `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;" title="Share these good days on WhatsApp" aria-label="Share on WhatsApp" onclick="shareTarabalamOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`
@@ -264,7 +265,7 @@ function renderTarabalam(profiles?) {
   if (!rows.length) {
     if (!tbCycleHasGoodDay(profiles)) {
       document.getElementById('tb-result').innerHTML =
-        `<p class="preview-error">This combination of birth stars never aligns — tarabalam repeats over the
+        `<p class="preview-error">This combination of birth stars never aligns; tarabalam repeats over the
          27 nakshatras, and no day is favourable for ${group ? 'all ' + profiles.length + ' people' : htmlEsc(who)} at once.
          Tick "show all days" to plan by individual taras, or consult your purohit.</p>`;
       return;
@@ -275,13 +276,13 @@ function renderTarabalam(profiles?) {
       const label = nextGood.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
       document.getElementById('tb-result').innerHTML =
         `<p class="preview-error">No favourable days for ${htmlEsc(who)} in this range.
-         The next one is <strong>${label}</strong> —
+         The next one is <strong>${label}</strong>:
          <button class="read-more" style="color:var(--indigo);" onclick="tbExtendTo('${iso}')">extend the range to include it</button>,
          or tick "show all days".</p>`;
     } else {
       document.getElementById('tb-result').innerHTML =
-        `<p class="preview-error">No favourable days for ${who} in this range, and none found in the months ahead
-         — tick "show all days" to plan by individual taras.</p>`;
+        `<p class="preview-error">No favourable days for ${who} in this range, and none found in the months ahead.
+         Tick "show all days" to plan by individual taras.</p>`;
     }
     return;
   }
@@ -331,7 +332,7 @@ function renderTarabalam(profiles?) {
     <div><span class="tara-chip good">green</span> a good day for that person, under your standard (<em>${modeLabel}</em>).</div>
     <div><span class="tara-chip bad">red</span> not suitable for that person.</div>`;
   if (TB_MODE === 'puja_ok' && hasPuja) {
-    legend += `<div><span class="tara-chip puja">amber</span> good — a small remedial puja is advised (°).</div>`;
+    legend += `<div><span class="tara-chip puja">amber</span> good: a small remedial puja is advised (°).</div>`;
   } else if (hasPuja) {
     legend += `<div><strong>°</strong> a small remedial puja is advised for the Moon's position.</div>`;
   }
@@ -396,11 +397,11 @@ function shareTarabalamOnWhatsApp() {
   const lines = [];
   const anyRasi = profiles.some(pr => pr.rasi);
   lines.push(`✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`);
-  lines.push(`📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} – ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`);
+  lines.push(`📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} to ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`);
   lines.push(profiles.map(pr => `${pr.name}: ${pr.nak}`).join(' · '));
   lines.push(`Standard: ${{ stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE]}`);
   lines.push('');
-  goodDays.forEach(r => lines.push(`✅ ${fmtD(r.date)} — ${r.nak} · ${r.tithi}`));
+  goodDays.forEach(r => lines.push(`✅ ${fmtD(r.date)} · ${r.nak} · ${r.tithi}`));
   lines.push('');
   lines.push('Check your own birth star:');
   lines.push('https://panchangam.astrochaganti.com/?src=share-tarabalam#tarabalam');
@@ -769,7 +770,7 @@ async function findMuhurta() {
   const chandraMode = TB_MODE;  // 'stars' | 'puja_ok' | 'strict' — filters only, never scores
   document.getElementById('mu-context').innerHTML = people.length
     ? `Searching <strong>${inpEl('tb-from').value}</strong> to <strong>${inpEl('tb-to').value}</strong>, screened by the stars of <strong>${people.map(p => htmlEsc(p.name)).join(', ')}</strong> (set above).`
-    : `Searching <strong>${inpEl('tb-from').value}</strong> to <strong>${inpEl('tb-to').value}</strong> — no people set above, so no star screening.`;
+    : `Searching <strong>${inpEl('tb-from').value}</strong> to <strong>${inpEl('tb-to').value}</strong> · no people set above, so no star screening.`;
   try {
     const city = getSelection().city;
     const system = getSelection().system;
@@ -799,7 +800,7 @@ async function findMuhurta() {
       if (data.eclipse) {
         droppedEclipseDays++;
         const kind = data.eclipse.kind || 'Eclipse';
-        droppedDays.push({ date: isoDate, reason: `${kind} — auspicious activities deferred` });
+        droppedDays.push({ date: isoDate, reason: `${kind} · auspicious activities deferred` });
         continue;
       }
 
@@ -827,26 +828,64 @@ async function findMuhurta() {
       const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
       const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
-      const MUHURTA_MINS = 48;
+      // Day-context strip shown on every slot card for this day: the
+      // sunrise-anchored anga (matches the Panchangam tab), a visible teaser
+      // of the timings people cross-check most (Sunrise, Abhijit, Rahu
+      // Kalam), and the full Panchangam auspicious/avoid window lists behind
+      // an expand. Display only; computed once per day, shared by its slots.
+      const fmtRange = (w) => `${muToT(muMin(w.start, w.sflag))} to ${muToT(muMin(w.end, w.eflag))}`;
+      // Group by window name so multi-segment windows (e.g. two Durmuhurtham
+      // spells) read as one entry with both ranges.
+      const groupWins = (arr) => {
+        const m = new Map();
+        for (const w of arr) {
+          if (!m.has(w.name)) m.set(w.name, []);
+          m.get(w.name).push(fmtRange(w));
+        }
+        return [...m.entries()].map(([name, ranges]) => ({ name, ranges }));
+      };
+      const rahuWin = data.inauspicious.find(w => /Rahu/i.test(w.name));
+      const dayCtx = {
+        tithi: data.tithi?.name || null,
+        nakshatra: data.nakshatra?.name || null,
+        yoga: data.yoga?.name || null,
+        sunrise: data.sunrise ? muToT(muMin(data.sunrise)) : null,
+        abhijit: abhijit ? fmtRange(abhijit) : null,
+        rahu: rahuWin ? fmtRange(rahuWin) : null,
+        auspicious: groupWins(data.auspicious),
+        avoid: groupWins(data.inauspicious),
+      };
+
       const srMin = muMin(data.sunrise);
       const ssMin = muMin(data.sunset);
-      const chogAtMin = t => {
+      const muLen = (ssMin - srMin) / 15;
+      // Dominant choghadiya by overlap — a scoring attribute, not a gate;
+      // straddle disclosed. Mirrors Python _dominant_choghadiya.
+      const dominantChog = (s, e) => {
+        let best = null, bestOv = 0; const touched = [];
         for (const blk of data.choghadiya) {
-          const bs = muMin(blk.start);
-          const be = muMin(blk.end);
-          if (bs <= t && t < be) return blk;
+          const bs = muMin(blk.start), be = muMin(blk.end);
+          const ov = Math.min(e, be) - Math.max(s, bs);
+          if (ov > 0) { touched.push(blk.name); if (ov > bestOv) { best = blk; bestOv = ov; } }
         }
-        return null;
+        return { block: best, straddle: best ? (touched.find(n => n !== best.name) || null) : null };
       };
-      let winStart = srMin;
-      while (winStart < ssMin) {
-        const winEnd = Math.min(winStart + MUHURTA_MINS, ssMin);
-        const c = chogAtMin(winStart);
-        if (!c) { winStart += MUHURTA_MINS; continue; }
-        const base = MU_GOOD_CHOG[c.name];
-        if (base === undefined) { winStart += MUHURTA_MINS; continue; }
-        for (const [s0, e0] of muSubtract(winStart, winEnd, bad)) {
-          if (e0 - s0 < 24) continue;
+      // Iterate the 15 named daytime muhurtas (sunrise->sunset /15). Mirrors
+      // Python day_slots: exclude a muhurta overlapping any inauspicious
+      // window, else score it by nature + dominant choghadiya + all factors.
+      for (let mi = 0; mi < 15; mi++) {
+          // Round muhurta bounds to whole minutes (display + integer-minute
+          // math); contiguous because both edges round the same expression.
+          const s0 = Math.round(srMin + mi * muLen);
+          const e0 = Math.round(srMin + (mi + 1) * muLen);
+          if (bad.some(([b0, b1]) => s0 < b1 && b0 < e0)) continue;  // decision 1
+          const dom = dominantChog(s0, e0);
+          const c = dom.block;
+          if (!c) continue;
+          const base = MU_GOOD_CHOG[c.name] || 0;
+          const muRow = MUHURTA_DAY[mi];
+          const isAbhijit = mi === 7 && !!abhijit;   // no Abhijit on Wednesday (feed omits it)
+          const natureBonus = isAbhijit ? 2 : (muRow[2] === 'auspicious' ? 1 : -2);
 
           // Compute slot-time facts via Meeus Sun/Moon longitudes.
           // s0 is minutes from local midnight of `d`. Convert to a Date
@@ -858,9 +897,17 @@ async function findMuhurta() {
           // Build reason groups as we score — slot_quality, day_quality,
           // group_fit, activity_match, notes — mirroring Python's
           // day_slots() reason_groups field.
-          let score = base;
-          const slotQuality = [`${c.name} choghadiya (+${base})`,
-                                'clear of all inauspicious windows'];
+          let score = base + natureBonus;
+          const muLabel = muRow[0] + (isAbhijit ? ' (Abhijit)' : '');
+          const muDeity = muRow[1] ? ` · ${muRow[1]}` : '';
+          let chogDesc = `${c.name} choghadiya`;
+          if (dom.straddle) chogDesc += ` (spans ${dom.straddle})`;
+          const chogLine = base ? `${chogDesc} (+${base})` : chogDesc;
+          // Middot separators (no em-dash); no "clear of inauspicious
+          // windows" line — every surviving muhurta is clear by construction.
+          const slotQuality = [
+            `${muLabel} muhurta${muDeity} · ${muRow[2]} (${natureBonus >= 0 ? '+' : ''}${natureBonus})`,
+            chogLine];
           const dayQuality = [];
           const groupFit = [];
           const activityMatch = [];
@@ -1041,10 +1088,8 @@ async function findMuhurta() {
           // Vara — activity_match (day-level)
           if (varaReason) { score += 1; activityMatch.push(varaReason); }
 
-          // Slot-overlap bonuses → slot_quality
-          if (abhijit && s0 < muMin(abhijit.end, abhijit.eflag) && muMin(abhijit.start, abhijit.sflag) < e0) {
-            score += 2; slotQuality.push('overlaps Abhijit Muhurta (+2)');
-          }
+          // Slot-overlap bonuses → slot_quality (Abhijit is now scored as
+          // the 8th muhurta's nature above).
           if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
             score += 2; slotQuality.push('overlaps Amrita Kalam (+2)');
           }
@@ -1062,10 +1107,10 @@ async function findMuhurta() {
             y === 'Dvipushkara Yoga' || y === 'Tripushkara Yoga');
           if (siddhiYogas.length && taraUnfavNames.length) {
             notes.push(`${siddhiYogas.join(' + ')} traditionally rectifies tara dosha ` +
-                       `(Muhurta Chintamani) — ${taraUnfavNames.join(', ')} mitigated.`);
+                       `(Muhurta Chintamani) · ${taraUnfavNames.join(', ')} mitigated.`);
           }
           if (siddhiYogas.length && chandraAvoidNames.length) {
-            notes.push(`Chandra dosha is not rectified by Siddhi yogas — ` +
+            notes.push(`Chandra dosha is not rectified by Siddhi yogas · ` +
                        `${chandraAvoidNames.join(', ')} remains a personal caution.`);
           }
           if (hasPushkara && tFam === 'Rikta') {
@@ -1098,10 +1143,8 @@ async function findMuhurta() {
           else if (facts.specialYogas.some(y => MU_YOGA_PENALTY[y] !== undefined)) dayDosha = 'visha_dagdha_yoga';
           else if (MU_NITYA_HARD_AVOID.has(ny)) dayDosha = 'vyatipata_vaidhriti';
 
-          slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha });
+          slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha, dayCtx });
           slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
-        }
-        winStart += MUHURTA_MINS;
       }
       // Diagnose: if the day produced no slots and it wasn't an eclipse,
       // record the most likely reason (samskara skip, mode filter, etc.).
@@ -1110,13 +1153,13 @@ async function findMuhurta() {
         // Samskara skip on Visha/Dagdha
         for (const y of data.yogas) {
           if (skipYogas.has(y)) {
-            reason = `${y} — ${activityLabel} traditionally avoids this day`;
+            reason = `${y} · ${activityLabel} traditionally avoids this day`;
             break;
           }
         }
         // Samskara skip on Vyatipata/Vaidhriti (Nitya yoga at sunrise)
         if (!reason && skipYogas.size && data.yoga && MU_NITYA_HARD_AVOID.has(data.yoga.name)) {
-          reason = `${data.yoga.name} yoga — samskaras traditionally defer`;
+          reason = `${data.yoga.name} yoga · samskaras traditionally defer`;
         }
         // chandra_mode filter at the day level
         if (!reason && people.length && chandraMode !== 'stars' && data.lunarSign) {
@@ -1129,9 +1172,9 @@ async function findMuhurta() {
             else if (MU_CHANDRA_PUJA.has(c2.pos)) hasRemedial = true;
           }
           if (chandraMode === 'strict' && (hasAvoid || hasRemedial)) {
-            reason = 'chandra_mode=strict — Moon at sunrise fails for at least one person';
+            reason = 'chandra_mode=strict · Moon at sunrise fails for at least one person';
           } else if (chandraMode === 'puja_ok' && hasAvoid) {
-            reason = 'chandra_mode=puja_ok — someone has Moon-avoid (4/8/12)';
+            reason = 'chandra_mode=puja_ok · someone has Moon-avoid (4/8/12)';
           }
         }
         if (reason) droppedDays.push({ date: isoDate, reason });
@@ -1147,7 +1190,7 @@ async function findMuhurta() {
     MU_LAST = { top: slots.slice(0, 10), droppedEclipseDays, droppedModeDays, droppedDays, activity, people, chandraMode };
     renderMuhurta();
   } catch (e) {
-    box.innerHTML = '<p class="preview-error">Could not load the feed — try again.</p>';
+    box.innerHTML = '<p class="preview-error">Could not load the feed. Try again.</p>';
   }
 }
 
@@ -1191,15 +1234,15 @@ function renderMuhurta() {
     return new Date(y, mo - 1, da).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
   const droppedHtml = droppedDays.length
-    ? `<details class="mu-dropped"><summary>${droppedDays.length} day${droppedDays.length>1?'s':''} filtered — see why</summary>
-         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> — ${htmlEsc(dd.reason)}</li>`).join('')}</ul>
+    ? `<details class="mu-dropped"><summary>${droppedDays.length} day${droppedDays.length>1?'s':''} filtered · see why</summary>
+         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}</li>`).join('')}</ul>
        </details>`
     : '';
   if (!top.length) {
     const notes = [];
     if (droppedEclipseDays) notes.push(`${droppedEclipseDays} eclipse day(s) deferred`);
     if (droppedModeDays) notes.push(`${droppedModeDays} slot(s) filtered by chandra mode`);
-    const suffix = notes.length ? ` — ${notes.join(', ')}` : '';
+    const suffix = notes.length ? ` · ${notes.join(', ')}` : '';
     box.innerHTML = `<p class="preview-error">No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.</p>${droppedHtml}`;
     return;
   }
@@ -1233,22 +1276,49 @@ function renderMuhurta() {
       : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
     const tier = s.tier || muScoreTier(s.score);
     const tierClass = `mu-tier-${tier.toLowerCase()}`;
+    const dc = s.dayCtx;
+    const winList = (wins) => wins.map(w =>
+      `<span class="mu-tim"><b>${w.name}</b> ${w.ranges.join(', ')}</span>`).join('');
+    const dayCtxHtml = dc ? `<div class="mu-dayctx">
+              <div class="mu-anga">
+                ${dc.tithi ? `<span class="mu-angachip">🌙 ${dc.tithi}</span>` : ''}
+                ${dc.nakshatra ? `<span class="mu-angachip">⭐ ${dc.nakshatra}</span>` : ''}
+                ${dc.yoga ? `<span class="mu-angachip">🧘 ${dc.yoga} yoga</span>` : ''}
+              </div>
+              <details class="mu-timings-d">
+                <summary class="mu-timings">
+                  ${dc.sunrise ? `<span>🌅 Sunrise ${dc.sunrise}</span>` : ''}
+                  ${dc.abhijit ? `<span class="mu-t-aus">✨ Abhijit ${dc.abhijit}</span>` : ''}
+                  ${dc.rahu ? `<span class="mu-t-warn">⛔ Rahu Kalam ${dc.rahu}</span>` : ''}
+                  <span class="mu-tim-toggle">all timings</span>
+                </summary>
+                <div class="mu-timings-full">
+                  ${dc.auspicious.length ? `<div class="mu-tim-row">
+                    <span class="mu-tim-lbl mu-t-aus">🟢 Auspicious</span>
+                    <span class="mu-tim-wins mu-t-aus">${winList(dc.auspicious)}</span></div>` : ''}
+                  ${dc.avoid.length ? `<div class="mu-tim-row">
+                    <span class="mu-tim-lbl mu-t-warn">🔴 Avoid</span>
+                    <span class="mu-tim-wins mu-t-warn">${winList(dc.avoid)}</span></div>` : ''}
+                </div>
+              </details>
+            </div>` : '';
     return `<div class="mu-slot">
-              <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}</span>
+              <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}</span>
               <span class="mu-tier ${tierClass}">${tier}</span>
               <span class="mu-score">score ${s.score}</span>
+              ${dayCtxHtml}
               ${groupsHtml}
             </div>`;
   };
   box.innerHTML =
-    `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found — best first${share}</div>`
+    `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found · best first${share}</div>`
     + top.map(renderSlot).join('')
     + droppedHtml
     + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across
        Slot quality (choghadiya, Abhijit/Amrita overlap), Day quality (Siddhi yogas, Nitya yoga, Rikta tithi),
        Group fit (per-person tarabalam and chandrabalam), and Activity match (preferred tithi class / vara).
        Being clear of every inauspicious window is a requirement, not a bonus. The tier reflects this score's
-       rank within this search, capped below Excellent whenever a named dosha is present — check that slot's
+       rank within this search, capped below Excellent whenever a named dosha is present; check that slot's
        notes either way, since a capped "Good" can carry a caution worth knowing about even if it's otherwise
        a workable time. Notes carry classical-doctrine context (e.g. Sarvartha Siddhi traditionally rectifies
        tara dosha) without changing the score.</p>`;
@@ -1261,12 +1331,12 @@ function shareMuhurtaOnWhatsApp() {
   const cityLabel = citySel.options[citySel.selectedIndex].textContent;
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const lines = [];
-  lines.push(`⏱ *Good time slots — ${MU_ACT_LABEL[activity]}*`);
+  lines.push(`⏱ *Good time slots · ${MU_ACT_LABEL[activity]}*`);
   lines.push(`📍 ${cityLabel} · ${inpEl('tb-from').value} to ${inpEl('tb-to').value}`);
   if (people.length) lines.push(`Screened for: ${people.map(p => `${p.name} (${p.nak})`).join(' · ')}`);
   lines.push('');
   top.slice(0, 5).forEach(s => {
-    lines.push(`✅ ${fmtD(s.d)} · ${muToT(s.s0)} – ${muToT(s.e0)}`);
+    lines.push(`✅ ${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}`);
     lines.push(`   ${s.reasons.filter(r => r !== 'clear of all inauspicious windows').slice(0, 3).join(' · ')}`);
   });
   lines.push('');

@@ -390,6 +390,33 @@
     .mu-dropped li { margin: 0.2rem 0; }
     .mu-dropped .dd-date { font-weight: 700; color: #1e1b4b; }
     .mu-reasons { font-size: 0.74rem; color: #6B6357; width: 100%; }
+    /* Day-context strip: sunrise anga + Abhijit/Rahu timings, so the day's
+       quality is legible on the slot card without switching to Panchangam. */
+    .mu-dayctx { width: 100%; display: flex; flex-direction: column; gap: 0.3rem;
+                 margin-top: 0.1rem; padding-bottom: 0.4rem; border-bottom: 1px dashed #E4DAC6; }
+    .mu-anga { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .mu-angachip { font-size: 0.72rem; font-weight: 700; color: #1F1A17;
+                   background: #FBF6EB; border: 1px solid #E4DAC6; border-radius: 6px;
+                   padding: 0.06rem 0.45rem; white-space: nowrap; }
+    .mu-timings-d { width: 100%; }
+    .mu-timings { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.8rem;
+                  font-size: 0.72rem; color: #6B6357; cursor: pointer; list-style: none; }
+    .mu-timings::-webkit-details-marker { display: none; }
+    .mu-timings .mu-t-aus { color: #166534; font-weight: 600; }
+    .mu-timings .mu-t-warn { color: #b45309; font-weight: 600; }
+    .mu-tim-toggle { font-size: 0.68rem; font-weight: 700; color: #94a3b8;
+                     text-transform: uppercase; letter-spacing: 0.05em; margin-left: auto; }
+    .mu-tim-toggle::before { content: '▸ '; }
+    .mu-timings-d[open] .mu-tim-toggle::before { content: '▾ '; }
+    .mu-timings-full { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.35rem;
+                       padding-left: 0.1rem; font-size: 0.72rem; }
+    .mu-tim-row { display: flex; gap: 0.5rem; align-items: baseline; }
+    .mu-tim-lbl { flex: none; width: 5.4rem; font-size: 0.62rem; font-weight: 700;
+                  text-transform: uppercase; letter-spacing: 0.05em; padding-top: 0.05rem; }
+    .mu-tim-wins { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 0.1rem 0.7rem; }
+    .mu-tim-wins .mu-tim b { font-weight: 700; }
+    .mu-tim-wins.mu-t-aus { color: #166534; }
+    .mu-tim-wins.mu-t-warn { color: #b45309; }
     /* Grouped reason categories — Batch C #16 */
     .mu-rgroups { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem; }
     .mu-rg { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.74rem; line-height: 1.45; }
@@ -1458,15 +1485,15 @@
       END TARABALAM HIDDEN -->
       <div id="mu-result"></div>
       <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
-      <strong>Please note:</strong> The slot finder is guidance for everyday timing — not how formal muhurtams are fixed.
-      Tiers (Excellent/Good/Fair/Avoid) rank slots relative to each other within this search —
+      <strong>Please note:</strong> The slot finder is guidance for everyday timing, not how formal muhurtams are fixed.
+      Tiers (Excellent/Good/Fair/Avoid) rank slots relative to each other within this search:
       "Excellent" means the best of what turned up for these dates, not a universal guarantee, and
       "Good" or "Fair" slots without a caution noted below them can be perfectly fine choices.
       A slot carrying a named caution (Rikta tithi, Ashtama Chandra, Visha/Dagdha yoga, etc.) is
-      capped below Excellent and explained in its notes — read those regardless of tier.
+      capped below Excellent and explained in its notes; read those regardless of tier.
       Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
       For weddings, gruhapravesham, upanayanam and other major events, or if a slot's notes raise a
-      caution you're unsure about, please consult your purohit —
+      caution you're unsure about, please consult your purohit,
       or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
     </div><!-- /panel-tarabalam -->
 
