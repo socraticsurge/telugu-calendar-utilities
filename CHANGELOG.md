@@ -8,6 +8,11 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed Upanayana profile.** Raman Chapter VIII, printed pages
+  23–24 (PDF pages 27–28), now supplies lunar months, Uttarayana solar Rasis,
+  exact Paksha-qualified Tithis, weekdays, Nakshatras, Lagnas and a before-noon
+  gate. Age, conditional Budha combustion and chart checks remain explicit.
+  Verified activity coverage reaches 9/30.
 - **Source-backed Vidyarambha profile.** Raman Chapter VIII, printed page 23
   (PDF page 27), now supplies exact weekday, Nakshatra and movable-or-common
   Lagna gates; age, forenoon/noon preference and chart checks remain explicit.

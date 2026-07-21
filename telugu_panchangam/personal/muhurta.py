@@ -200,6 +200,10 @@ def _day_skip_reason(day, rules, activity, travel_direction,
             lagna_class_of(day.solar_sign) not in allowed_solar_classes):
         return (f'Surya in {day.solar_sign} ({lagna_class_of(day.solar_sign)}) · '
                 f'{rules["label"]} source profile does not admit this Rasi class')
+    allowed_solar_signs = rules.get('allowed_solar_signs')
+    if allowed_solar_signs and day.solar_sign not in allowed_solar_signs:
+        return (f'Surya in {day.solar_sign} · {rules["label"]} source profile '
+                'does not admit this solar Rasi')
 
     if activity == 'travel' and travel_direction is not None:
         blocked = getattr(day, 'disha_shoola_direction', None)
@@ -293,6 +297,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
         active_tithi_number = None
     if (ctx.allowed_tithi_numbers and
             active_tithi_number not in ctx.allowed_tithi_numbers):
+        return None
+    if ctx.allowed_tithi_names and facts.tithi not in ctx.allowed_tithi_names:
         return None
     if active_tithi_number in ctx.avoid_tithi_numbers:
         return None
@@ -588,6 +594,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
@@ -632,6 +639,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         allowed_nakshatras=allowed_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
         caution_lagna_solar=caution_lagna_solar,
@@ -728,6 +736,9 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     if (allowed_solar_classes and
             lagna_class_of(day.solar_sign) not in allowed_solar_classes):
         return []
+    allowed_solar_signs = rules.get('allowed_solar_signs')
+    if allowed_solar_signs and day.solar_sign not in allowed_solar_signs:
+        return []
 
     if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
         return []
@@ -757,6 +768,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
@@ -824,6 +836,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         allowed_nakshatras=allowed_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
         caution_lagna_solar=caution_lagna_solar,

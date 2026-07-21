@@ -18,6 +18,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'karnavedha': 'muhurta.karnavedha',
         'mundana': 'muhurta.mundana',
         'vidyarambha': 'muhurta.vidyarambha',
+        'upanayana': 'muhurta.upanayana',
         'naming': 'muhurta.namakarana',
         'property': 'muhurta.land_purchase.building',
         'bhumi_puja': 'muhurta.bhumi_puja.foundation',

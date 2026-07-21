@@ -724,6 +724,7 @@ async function findMuhurta() {
       const allowedNakshatras = new Set(rules.allowed_nakshatras || []);
       const preferNakshatras = new Set(rules.prefer_nakshatras || []);
       const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
+      const allowedTithiNames = new Set(rules.allowed_tithi_names || []);
       const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);
       const manualChecks = rules.manual_checks || [];
       const activityLabel = rules.label;
@@ -755,6 +756,12 @@ async function findMuhurta() {
           (!solarClass || !rules.allowed_solar_classes.includes(solarClass))) {
         droppedDays.push({ date: isoDate,
           reason: `Surya in ${data.solarSign} (${solarClass}) · ${activityLabel} source profile does not admit this Rasi class` });
+        continue;
+      }
+      if (rules.allowed_solar_signs?.length &&
+          !rules.allowed_solar_signs.includes(data.solarSign)) {
+        droppedDays.push({ date: isoDate,
+          reason: `Surya in ${data.solarSign} · ${activityLabel} source profile does not admit this solar Rasi` });
         continue;
       }
 
@@ -842,6 +849,7 @@ async function findMuhurta() {
           if (allowedNakshatras.size && !allowedNakshatras.has(facts.nakshatra)) continue;
           if (allowedTithiNumbers.size &&
               !allowedTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
+          if (allowedTithiNames.size && !allowedTithiNames.has(facts.tithi)) continue;
           if (avoidTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
 
           // Build reason groups as we score — slot_quality, day_quality,

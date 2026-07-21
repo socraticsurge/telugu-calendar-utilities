@@ -33,6 +33,8 @@
 #   daytime_only            night_slots returns no candidates for the activity
 #   forenoon_only           candidate must end by local solar noon
 #   allowed_pakshams        day omitted unless its Paksha is listed
+#   allowed_solar_signs     day omitted unless Surya's Rasi is listed
+#   allowed_tithi_names     exact Paksha-qualified Tithis admitted at slot time
 #   prefer_bhadra_puchha    bonus when slot overlaps Bhadra Puchha
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
@@ -228,16 +230,58 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Mangala or preferably any malefic in the 7th.',
                       ]},
     'upanayana':     {'label': 'Upanayana (Sacred thread)',
+                      'source_claim': 'muhurta.upanayana',
+                      'forenoon_only': True,
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
                       'skip_on_pitru_paksha': True,
-                      'skip_on_combust': ['Guru', 'Shukra'],
                       'prefer_tithi_class': 'Nanda',
                       'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
-                      'prefer_lagna_class': 'Dvisvabhava'},
+                      'allowed_maasams': [
+                          'Magha', 'Phalguna', 'Chaitra', 'Vaishakha',
+                      ],
+                      'allowed_solar_signs': [
+                          'Makara', 'Kumbha', 'Meena', 'Mesha',
+                          'Vrishabha', 'Mithuna',
+                      ],
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_tithi_names': [
+                          'Shukla Dwitiya', 'Shukla Tritiya',
+                          'Shukla Panchami', 'Shukla Saptami',
+                          'Shukla Dashami', 'Shukla Trayodashi',
+                          'Krishna Pratipat', 'Krishna Dwitiya',
+                          'Krishna Tritiya',
+                      ],
+                      'allowed_nakshatras': [
+                          'Anuradha', 'Hasta', 'Chitra', 'Swati',
+                          'Shravana', 'Dhanishtha', 'Shatabhisha',
+                          'Uttara Phalguni', 'Uttara Ashadha',
+                          'Uttara Bhadrapada', 'Revati', 'Rohini',
+                          'Mrigashira', 'Ashwini', 'Punarvasu', 'Pushya',
+                      ],
+                      'allowed_lagnas': [
+                          'Mesha', 'Vrishabha', 'Mithuna', 'Karka',
+                          'Kanya', 'Tula', 'Kumbha',
+                      ],
+                      'manual_checks': [
+                          'Perform in the 5th or 8th year; if delayed, '
+                          'apply the source’s age limits and exception rules.',
+                          'Reject Wednesday when Budha is combust.',
+                          'Chandra must not occupy the 6th, 8th or 12th from '
+                          'Lagna; avoid malefics in Kendras.',
+                          'Leave the 8th house unoccupied; fortify the 3rd '
+                          'and keep the 6th free of a benefic.',
+                          'Avoid Mangala and Shani in the 2nd, 5th or 12th.',
+                          'Avoid Chandra in Lagna except the source’s stated '
+                          'Karka-Lagna Guru conjunction exception.',
+                          'Review the named adverse and favorable election '
+                          'Yogas listed in the remainder of the passage.',
+                      ]},
     'vidyarambha':   {'label': 'Education start (Vidyarambha)',
                       'source_claim': 'muhurta.vidyarambha',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),

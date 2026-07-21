@@ -152,6 +152,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.upanayana",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Investiture of sacred thread (Upanayanam),' printed pp. 23-24 (PDF pp. 27-28)",
+      "scope": "Supports the configured Upanayana lunar months, Uttarayana solar Rasis, exact Paksha-qualified Tithis, weekdays, Nakshatras, admitted rising Rasis and before-noon rule plus disclosed age, conditional Budha combustion and election-chart checks. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.well_digging",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

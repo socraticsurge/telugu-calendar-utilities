@@ -22,6 +22,7 @@ CONSUMED_FIELDS = (
     'prefer_nakshatras', 'allowed_tithi_numbers', 'avoid_tithi_numbers',
     'manual_checks', 'allowed_lagnas', 'caution_lagna_solar',
     'source_claim', 'daytime_only', 'forenoon_only', 'allowed_pakshams',
+    'allowed_solar_signs', 'allowed_tithi_names',
 )
 
 

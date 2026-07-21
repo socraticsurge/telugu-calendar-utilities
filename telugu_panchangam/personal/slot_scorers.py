@@ -68,6 +68,7 @@ class _DayContext:
     allowed_nakshatras: frozenset
     prefer_nakshatras: frozenset
     allowed_tithi_numbers: frozenset
+    allowed_tithi_names: frozenset
     avoid_tithi_numbers: frozenset
     allowed_lagnas: frozenset
     caution_lagna_solar: bool

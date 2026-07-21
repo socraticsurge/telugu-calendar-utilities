@@ -47,6 +47,7 @@ PyPI MCP package.
 | 19 | [Karnavedha source profile](19-karnavedha-profile.md) | Daytime-only Chapter VIII profile with exact weekday, Tithi and Lagna gates |
 | 20 | [Mundana / Chaula source profile](20-mundana-profile.md) | Chapter VIII Paksha, combustion, forenoon and conservative Lagna contract |
 | 21 | [Vidyarambha source profile](21-vidyarambha-profile.md) | Chapter VIII weekday, Nakshatra and movable/common-Lagna crosswalk |
+| 22 | [Upanayana source profile](22-upanayana-profile.md) | Paksha-exact Tithis, Uttarayana signs, before-noon gate and chart caveats |
 
 ## How to read the diagrams
 

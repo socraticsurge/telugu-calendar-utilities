@@ -24,7 +24,9 @@
     "source_claim",
     "daytime_only",
     "forenoon_only",
-    "allowed_pakshams"
+    "allowed_pakshams",
+    "allowed_solar_signs",
+    "allowed_tithi_names"
   ],
   "groups": [
     {
@@ -345,16 +347,80 @@
     },
     "upanayana": {
       "label": "Upanayana (Sacred thread)",
-      "prefer_lagna_class": "Dvisvabhava",
       "skip_on_yoga": [
         "Visha Yoga",
         "Dagdha Yoga"
       ],
-      "prefer_vara": [
-        "Budhavaram",
-        "Guruvaram"
+      "prefer_tithi_class": "Nanda",
+      "allowed_maasams": [
+        "Magha",
+        "Phalguna",
+        "Chaitra",
+        "Vaishakha"
       ],
-      "prefer_tithi_class": "Nanda"
+      "allowed_varas": [
+        "Somavaram",
+        "Budhavaram",
+        "Guruvaram",
+        "Shukravaram"
+      ],
+      "allowed_nakshatras": [
+        "Anuradha",
+        "Hasta",
+        "Chitra",
+        "Swati",
+        "Shravana",
+        "Dhanishtha",
+        "Shatabhisha",
+        "Uttara Phalguni",
+        "Uttara Ashadha",
+        "Uttara Bhadrapada",
+        "Revati",
+        "Rohini",
+        "Mrigashira",
+        "Ashwini",
+        "Punarvasu",
+        "Pushya"
+      ],
+      "manual_checks": [
+        "Perform in the 5th or 8th year; if delayed, apply the source’s age limits and exception rules.",
+        "Reject Wednesday when Budha is combust.",
+        "Chandra must not occupy the 6th, 8th or 12th from Lagna; avoid malefics in Kendras.",
+        "Leave the 8th house unoccupied; fortify the 3rd and keep the 6th free of a benefic.",
+        "Avoid Mangala and Shani in the 2nd, 5th or 12th.",
+        "Avoid Chandra in Lagna except the source’s stated Karka-Lagna Guru conjunction exception.",
+        "Review the named adverse and favorable election Yogas listed in the remainder of the passage."
+      ],
+      "allowed_lagnas": [
+        "Mesha",
+        "Vrishabha",
+        "Mithuna",
+        "Karka",
+        "Kanya",
+        "Tula",
+        "Kumbha"
+      ],
+      "source_claim": "muhurta.upanayana",
+      "forenoon_only": true,
+      "allowed_solar_signs": [
+        "Makara",
+        "Kumbha",
+        "Meena",
+        "Mesha",
+        "Vrishabha",
+        "Mithuna"
+      ],
+      "allowed_tithi_names": [
+        "Shukla Dwitiya",
+        "Shukla Tritiya",
+        "Shukla Panchami",
+        "Shukla Saptami",
+        "Shukla Dashami",
+        "Shukla Trayodashi",
+        "Krishna Pratipat",
+        "Krishna Dwitiya",
+        "Krishna Tritiya"
+      ]
     },
     "vidyarambha": {
       "label": "Education start (Vidyarambha)",
