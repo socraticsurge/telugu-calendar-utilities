@@ -70,6 +70,7 @@ PyPI MCP package.
 | 42 | [Ceremony / Puja evidence audit](42-ceremony-evidence-audit.md) | Shantika/Paushtika verse, Tithi conflict, chart conditions, and emergency boundary |
 | 43 | [New Beginning evidence audit](43-beginning-evidence-audit.md) | Dharma-kriya commencement verse versus generic project-ranking proxies |
 | 44 | [Activity provenance states](44-activity-provenance-states.md) | Enforced verified, contradicted and heuristic claim contract across Python, MCP and browser |
+| 45 | [Muhurtam activity coverage roadmap](45-muhurta-activity-coverage-roadmap.md) | Source-backed gap inventory, priorities, safety boundaries, and one-feature-at-a-time expansion order |
 
 ## How to read the diagrams
 
