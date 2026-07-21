@@ -490,10 +490,20 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'and 6th lords separated; Mesha Lagna or Navamsa.',
                       ]},
     'litigation':    {'label': 'Litigation / contest',
+                      'audit_claim': 'muhurta.litigation.profile_conflict',
                       'prefer_tithi_class': 'Jaya',
                       'avoid_tithi_class': ['Purna'],
                       'prefer_vara': ['Mangalavaram'],
-                      'prefer_bhadra_puchha': 2},
+                      'prefer_bhadra_puchha': 2,
+                      'manual_checks': [
+                          'Known source mismatch: this profile rewards '
+                          'Tuesday, but Raman rejects Tuesday and Saturday '
+                          'for filing lawsuits; verify the exact Nakshatra '
+                          'and weekday gates before acting.',
+                          'The Bhadra Puchha contest bonus is attributed to '
+                          'Muhurta Chintamani and Dharma Sindhu but still '
+                          'needs an edition-specific verse/page locator.',
+                      ]},
     'surgery':       {'label': 'Surgery / medical procedure',
                       'source_claim': 'muhurta.surgery',
                       'avoid_karana': ['Vishti'],
