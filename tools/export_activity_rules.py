@@ -20,6 +20,7 @@ CONSUMED_FIELDS = (
     'required_lagna_class', 'allowed_maasams', 'allowed_varas',
     'avoid_vara_paksha', 'allowed_solar_classes', 'allowed_nakshatras',
     'prefer_nakshatras', 'allowed_tithi_numbers', 'manual_checks',
+    'allowed_lagnas', 'caution_lagna_solar',
 )
 
 

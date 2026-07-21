@@ -685,7 +685,8 @@ async function findMuhurta() {
     // Cached per session, shared with the day-card's lagna ribbon.
     const activityRules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
     const activityNeedsLagna = !!(
-      activityRules.prefer_lagna_class || activityRules.required_lagna_class);
+      activityRules.prefer_lagna_class || activityRules.required_lagna_class ||
+      activityRules.allowed_lagnas?.length);
     const lagnaCityData = (people.length || activityNeedsLagna)
       ? await loadLagna(city) : null;
     const slots = [];
@@ -717,6 +718,8 @@ async function findMuhurta() {
       const preferVaras = new Set(rules.prefer_vara || []);
       const preferLagnaClass = rules.prefer_lagna_class || null;
       const requiredLagnaClass = rules.required_lagna_class || null;
+      const allowedLagnas = new Set(rules.allowed_lagnas || []);
+      const cautionLagnaSolar = !!rules.caution_lagna_solar;
       const allowedNakshatras = new Set(rules.allowed_nakshatras || []);
       const preferNakshatras = new Set(rules.prefer_nakshatras || []);
       const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
@@ -973,6 +976,12 @@ async function findMuhurta() {
             activityMatch.push(
               `${slotLagna} lagna satisfies required ${requiredLagnaClass} class`);
           }
+          if (allowedLagnas.size) {
+            const lagnaDay = lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null;
+            const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+            if (!slotLagna || !allowedLagnas.has(slotLagna)) continue;
+            activityMatch.push(`${slotLagna} lagna is admitted for ${activityLabel}`);
+          }
 
           // Activity-class lagna preference (Muhurta Chintamani):
           // independent of any personal kendra/trikona check —
@@ -1053,6 +1062,14 @@ async function findMuhurta() {
           // Doctrinal notes — explanatory, no score effect
           const notes = [];
           for (const item of manualChecks) notes.push(`Manual check required · ${item}`);
+          if (cautionLagnaSolar && lagnaCityData) {
+            const lagnaDay = lagnaDayFor(lagnaCityData, isoDate);
+            const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+            if (slotLagna && slotLagna === data.solarSign) {
+              notes.push(`Source caution · ${slotLagna} Lagna is occupied by Surya; ` +
+                         `Raman associates this with delay from hard rock.`);
+            }
+          }
           const siddhiYogas = facts.specialYogas.filter(y =>
             y === 'Sarvartha Siddhi Yoga' || y === 'Amrita Siddhi Yoga');
           const hasPushkara = facts.specialYogas.some(y =>
@@ -1166,6 +1183,7 @@ const MU_ACT_LABEL = {
   vehicle: 'a vehicle purchase', property: 'a property purchase',
   gold: 'a gold / jewelry purchase',
   bhumi_puja: 'bhumi puja (foundation laying)',
+  well_digging: 'well digging',
   business: 'a business launch', job: 'a job start / contract',
   yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
   court: 'a court / legal matter', surgery: 'a surgery / medical procedure',

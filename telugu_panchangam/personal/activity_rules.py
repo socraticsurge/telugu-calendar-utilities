@@ -25,6 +25,8 @@
 #   allowed_nakshatras      slot omitted unless its active Nakshatra is listed
 #   prefer_nakshatras       active Nakshatra names receiving +1
 #   allowed_tithi_numbers   slot omitted unless its active Tithi number is listed
+#   allowed_lagnas          slot omitted unless its active Lagna is listed
+#   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
 #   prefer_bhadra_puchha    bonus when slot overlaps Bhadra Puchha
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
@@ -243,9 +245,23 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'skip_on_panchaka_nakshatra': True},
     'wood_cutting':      {'label': 'Wood-cutting',
                           'skip_on_panchaka_nakshatra': True},
-    # — Nakshatra Mukha (mouth-direction) activity rules —
-    'well_digging':      {'label': 'Well / foundation digging',
-                          'prefer_nakshatra_mukha': (['Adho'], 1)},
+    # — Specialized activities —
+    'well_digging':      {'label': 'Well digging',
+                          'allowed_nakshatras': [
+                              'Revati', 'Uttara Bhadrapada', 'Hasta',
+                              'Anuradha', 'Magha', 'Shravana', 'Rohini',
+                              'Pushya',
+                          ],
+                          'allowed_lagnas': [
+                              'Meena', 'Karkataka', 'Makara',
+                          ],
+                          'caution_lagna_solar': True,
+                          'manual_checks': [
+                              'Election chart: Shukra and Chandra should '
+                              'occupy Kendras.',
+                              'For abundant sweet water, Chandra or Shukra '
+                              'should occupy a Kendra in a full watery Rasi.',
+                          ]},
     'coronation':        {'label': 'Coronation / title ceremony',
                           'skip_on_yoga': list(_SAMSKARA_SKIP),
                           'prefer_nakshatra_mukha': (['Urdhva'], 1)},

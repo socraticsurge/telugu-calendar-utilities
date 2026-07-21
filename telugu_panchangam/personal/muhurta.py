@@ -447,12 +447,16 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
 
     # Lagna scoring
     cur_lagna = slot_lagna_name(ctx.lagnas, s)
+    if ctx.allowed_lagnas and cur_lagna not in ctx.allowed_lagnas:
+        return None
     if (ctx.required_lagna_class and
             cur_lagna not in lagnas_in_class(ctx.required_lagna_class)):
         return None
     if ctx.required_lagna_class:
         activity_match.append(
             f'{cur_lagna} lagna satisfies required {ctx.required_lagna_class} class')
+    if ctx.allowed_lagnas:
+        activity_match.append(f'{cur_lagna} lagna is admitted for {ctx.label}')
     lagna_bonus, lagna_reasons, lagna_ashtama_names = score_lagna(
         ctx.janma_nakshatras, ctx.janma_rasis, cur_lagna,
         janma_lagnas=ctx.janma_lagnas)
@@ -501,6 +505,10 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
         tithi_fam=tithi_fam,
     )
     notes.extend(f'Manual check required · {item}' for item in ctx.manual_checks)
+    if ctx.caution_lagna_solar and cur_lagna == day.solar_sign:
+        notes.append(
+            f'Source caution · {cur_lagna} Lagna is occupied by Surya; '
+            'Raman associates this with delay from hard rock.')
 
     reason_groups = {
         'slot_quality': slot_quality,
@@ -602,6 +610,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
+    caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
     manual_checks = tuple(rules.get('manual_checks', ()))
     label = rules['label']
 
@@ -643,6 +653,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         allowed_nakshatras=allowed_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        allowed_lagnas=allowed_lagnas,
+        caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
     )
 
@@ -759,6 +771,8 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
+    caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
     manual_checks = tuple(rules.get('manual_checks', ()))
     label = rules['label']
 
@@ -826,6 +840,8 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         allowed_nakshatras=allowed_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        allowed_lagnas=allowed_lagnas,
+        caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
         avoid_tithi_class=avoid_tithi_class,
     )

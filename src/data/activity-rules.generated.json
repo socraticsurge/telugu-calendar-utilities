@@ -17,7 +17,9 @@
     "allowed_nakshatras",
     "prefer_nakshatras",
     "allowed_tithi_numbers",
-    "manual_checks"
+    "manual_checks",
+    "allowed_lagnas",
+    "caution_lagna_solar"
   ],
   "groups": [
     {
@@ -53,6 +55,7 @@
       "label": "Construction & ventures",
       "activities": [
         "bhumi_puja",
+        "well_digging",
         "business",
         "job"
       ]
@@ -337,6 +340,29 @@
         "Election chart: malefics should occupy 3rd, 6th or 11th; benefics should fortify Kendras and Trikonas.",
         "Site ritual: after Puja, the first foundation stone is placed at the north-eastern corner."
       ]
+    },
+    "well_digging": {
+      "label": "Well digging",
+      "allowed_nakshatras": [
+        "Revati",
+        "Uttara Bhadrapada",
+        "Hasta",
+        "Anuradha",
+        "Magha",
+        "Shravana",
+        "Rohini",
+        "Pushya"
+      ],
+      "manual_checks": [
+        "Election chart: Shukra and Chandra should occupy Kendras.",
+        "For abundant sweet water, Chandra or Shukra should occupy a Kendra in a full watery Rasi."
+      ],
+      "allowed_lagnas": [
+        "Meena",
+        "Karkataka",
+        "Makara"
+      ],
+      "caution_lagna_solar": true
     },
     "business": {
       "label": "Business launch",

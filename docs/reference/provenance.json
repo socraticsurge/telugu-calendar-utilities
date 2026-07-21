@@ -97,6 +97,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.well_digging",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XII, 'Digging Wells,' printed p. 51 (PDF p. 55)",
+      "scope": "Supports the configured well-digging Nakshatra and rising-Rasi admission lists plus the disclosed Surya-in-Lagna hard-rock caution. Shukra/Chandra Kendra placement and the abundant-sweet-water condition remain manual chart checks. Shared ranking and personal factors require separate authority.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.relative_tiers",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/muhurta.py",

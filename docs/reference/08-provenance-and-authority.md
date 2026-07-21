@@ -67,6 +67,9 @@ edition and locator are recorded, their claims remain `needs_locator`.
 - Bhumi Puja / foundation laying is an activity-level exception: its profile
   has a page-level locator and criterion-by-criterion implementation crosswalk.
   Full election-chart and site-placement conditions remain visible manual checks.
+- Well digging has the same activity-level treatment: the admitted Nakshatras
+  and rising Rasis are automated from Chapter XII, while planetary Kendra and
+  water-quality conditions remain explicit practitioner checks.
 - Absolute score thresholds and relative ordering are project heuristics.
 
 ## Citation acceptance rule

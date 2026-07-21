@@ -1050,6 +1050,7 @@ def tool_find_muhurta(
             'allowed_maasams', 'allowed_varas', 'avoid_vara_paksha',
             'allowed_solar_classes', 'allowed_nakshatras',
             'allowed_tithi_numbers', 'required_lagna_class',
+            'allowed_lagnas', 'caution_lagna_solar',
         )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
@@ -1058,10 +1059,10 @@ def tool_find_muhurta(
             'slots': slots[:12],
             'dropped_days': dropped_days,
             'activity_profile': {
-                'source_claim': (
-                    'muhurta.bhumi_puja.foundation'
-                    if activity == 'bhumi_puja' else None
-                ),
+                'source_claim': {
+                    'bhumi_puja': 'muhurta.bhumi_puja.foundation',
+                    'well_digging': 'muhurta.well_digging',
+                }.get(activity),
                 'automated_constraints': {
                     field: rules[field]
                     for field in constraint_fields if field in rules

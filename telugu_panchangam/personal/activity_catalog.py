@@ -14,7 +14,9 @@ BROWSER_ACTIVITY_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
         'mundana', 'upanayana', 'vidyarambha', 'gruhapravesha',
     )),
     ('Acquisitions', ('vehicle', 'property', 'gold', 'purchase')),
-    ('Construction & ventures', ('bhumi_puja', 'business', 'job')),
+    ('Construction & ventures', (
+        'bhumi_puja', 'well_digging', 'business', 'job',
+    )),
     ('Spiritual', ('yajna', 'pilgrimage', 'ceremony')),
     ('Civil & medical', ('court', 'surgery')),
     ('Other', ('travel', 'beginning')),
@@ -25,4 +27,3 @@ BROWSER_ACTIVITIES: tuple[str, ...] = tuple(
     for _group, activities in BROWSER_ACTIVITY_GROUPS
     for activity in activities
 )
-

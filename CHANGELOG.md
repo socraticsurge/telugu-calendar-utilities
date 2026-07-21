@@ -8,6 +8,11 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed well-digging activity.** Raman, *Muhurtha*, Chapter XII,
+  printed page 51 (PDF page 55), now supplies the eight admitted Nakshatras,
+  three admitted rising Rasis, the Surya-in-Lagna hard-rock caution, and
+  explicit manual Shukra/Chandra chart checks. The activity is now selectable
+  on the website and exposed through the same generated contract as Python.
 - **Source-backed Bhumi Puja / house-foundation profile.** B. V. Raman,
   *Muhurtha*, Chapter XII, printed page 50 (PDF page 54), now governs the
   activity's admitted lunar months, solar-Rasi classes, exact Tithi numbers,
