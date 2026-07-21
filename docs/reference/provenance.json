@@ -155,6 +155,17 @@
       "scope": "Each activity needs rule-level locators; shared defaults must not imply universal textual agreement."
     },
     {
+      "id": "muhurta.any.shared_scoring",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "ACTIVITY_RULES['any']; shared scoring pipeline in personal/muhurta.py",
+      "scope": "The 'Anything auspicious' selector deliberately adds no activity-specific rule. It exposes the finder's shared Panchanga, Choghadiya, Lagna, personal-strength and relative-tier calculations as a source-neutral exploratory ranking. It is not a classical election for an unspecified act, must not be described as scripturally verified, and should yield to every purpose-specific profile when the intended act is known.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.wedding.profile_conflict",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

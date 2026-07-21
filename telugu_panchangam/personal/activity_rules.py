@@ -32,6 +32,8 @@
 #   manual_checks           source-required criteria not computed by the finder
 #   audit_claim             provenance claim recording a known evidence conflict;
 #                           never grants verified status
+#   heuristic_claim         provenance claim recording intentionally project-defined
+#                           or source-neutral behavior; never grants verified status
 #   source_claim            stable verified claim ID in provenance.json
 #   daytime_only            night_slots returns no candidates for the activity
 #   forenoon_only           candidate must end by local solar noon
@@ -64,7 +66,8 @@ def canonical_activity_nakshatras(names) -> frozenset[str]:
 
 ACTIVITY_RULES: dict[str, dict] = {
     # — Generic —
-    'any':           {'label': 'Anything auspicious'},
+    'any':           {'label': 'Anything auspicious',
+                      'heuristic_claim': 'muhurta.any.shared_scoring'},
     'travel':        {'label': 'Travel / journey',
                       'source_claim': 'muhurta.travel',
                       'avoid_karana': ['Vishti'],

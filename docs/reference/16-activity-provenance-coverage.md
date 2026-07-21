@@ -44,7 +44,7 @@ python tools/check_activity_provenance.py
 | `business` | Business launch | `muhurta.business.profile_conflict` | **Contradicted:** nearest capital-deployment verse requires Chara, not configured Sthira, Lagna |
 | `ceremony` | Ceremony / puja (general) | `muhurta.ceremony.profile_conflict` | **Contradicted:** narrow Shantika/Paushtika passage rejects Rikta, not configured Jaya, Tithis |
 | `beginning` | New beginning (general) | `muhurta.beginning.profile_conflict` | **Contradicted:** nearest Dharma-kriya verse is narrower and does not support generic ranking proxies |
-| remaining 1 key | See `ACTIVITY_RULES` | — | Exact rule locator still required |
+| `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
 Coverage is therefore **18 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
@@ -69,22 +69,22 @@ the [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md), the
 [Ceremony evidence audit](42-ceremony-evidence-audit.md), and the
 [New Beginning evidence audit](43-beginning-evidence-audit.md).
 
-The remaining profiles are covered only by the umbrella ledger claim
-`muhurta.activity_rules`, whose state is `needs_locator`. They may be used as
-configured project rules, but must not be described as textually verified
-until each receives its own claim ID, inspected edition, exact locator, scope
-note, and review date.
+Every activity key now has an explicit disposition: verified source profile,
+known textual conflict, or intentional project heuristic. The umbrella ledger
+claim `muhurta.activity_rules` remains `needs_locator` as a warning that shared
+defaults never confer textual authority on a newly added profile.
 
 ## Enforcement
 
-An activity opts into verified status by declaring `source_claim` beside its
-rules in `telugu_panchangam/personal/activity_rules.py`. Tests require that the
-claim exists in `docs/reference/provenance.json`, belongs to the `muhurtam`
-surface, and has state `verified`. The same field is exported to the browser
-contract and returned by MCP, so provenance cannot be maintained in a
-surface-specific hard-coded map.
+An activity declares exactly one of `source_claim`, `audit_claim`, or
+`heuristic_claim` beside its rules in
+`telugu_panchangam/personal/activity_rules.py`. Tests require that the claim
+exists in `docs/reference/provenance.json`, belongs to the `muhurtam` surface,
+and has the matching `verified`, `contradicted`, or `heuristic` state. These
+fields are exported to the browser contract and returned by MCP, so provenance
+cannot be maintained in a surface-specific hard-coded map.
 
 `tools/check_activity_provenance.py --json` supplies machine-readable lists of
-verified profiles, known conflicts and unlinked profiles. Adding a
-`source_claim` or `audit_claim` without the required ledger state makes the test
-suite fail.
+verified profiles, known conflicts, explicit heuristics and unlinked profiles.
+Adding any claim field without the required ledger state makes the test suite
+fail.

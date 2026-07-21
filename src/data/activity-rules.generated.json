@@ -25,6 +25,7 @@
     "caution_lagna_solar",
     "source_claim",
     "audit_claim",
+    "heuristic_claim",
     "daytime_only",
     "forenoon_only",
     "allowed_pakshams",
@@ -96,7 +97,8 @@
   ],
   "rules": {
     "any": {
-      "label": "Anything auspicious"
+      "label": "Anything auspicious",
+      "heuristic_claim": "muhurta.any.shared_scoring"
     },
     "wedding": {
       "label": "Wedding (Vivaha)",

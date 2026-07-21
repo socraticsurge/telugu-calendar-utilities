@@ -20,14 +20,24 @@ def audit() -> dict:
     claims = {claim['id']: claim for claim in ledger['claims']}
     linked: dict[str, str] = {}
     audited: dict[str, dict[str, str]] = {}
+    heuristic: dict[str, dict[str, str]] = {}
     errors: list[str] = []
 
     for activity, rules in ACTIVITY_RULES.items():
         audit_id = rules.get('audit_claim')
+        heuristic_id = rules.get('heuristic_claim')
         claim_id = rules.get('source_claim')
-        if audit_id and claim_id:
+        claim_fields = [
+            field for field, value in (
+                ('source_claim', claim_id),
+                ('audit_claim', audit_id),
+                ('heuristic_claim', heuristic_id),
+            ) if value
+        ]
+        if len(claim_fields) > 1:
             errors.append(
-                f'{activity}: source_claim and audit_claim are mutually exclusive')
+                f'{activity}: provenance claim fields are mutually exclusive: '
+                f'{", ".join(claim_fields)}')
         if audit_id:
             if any(item['claim'] == audit_id for item in audited.values()):
                 errors.append(f'{activity}: duplicate activity audit claim {audit_id!r}')
@@ -47,6 +57,32 @@ def audit() -> dict:
                 audited[activity] = {
                     'claim': audit_id,
                     'state': claim['verification_state'],
+                }
+        if heuristic_id:
+            if any(item['claim'] == heuristic_id for item in heuristic.values()):
+                errors.append(
+                    f'{activity}: duplicate heuristic claim {heuristic_id!r}')
+                heuristic_claim = None
+            else:
+                heuristic_claim = claims.get(heuristic_id)
+            if heuristic_claim is None:
+                if not any(
+                        item['claim'] == heuristic_id
+                        for item in heuristic.values()):
+                    errors.append(
+                        f'{activity}: unknown heuristic claim {heuristic_id!r}')
+            elif heuristic_claim['surface'] != 'muhurtam':
+                errors.append(
+                    f'{activity}: heuristic claim {heuristic_id!r} is not a '
+                    'muhurtam claim')
+            elif heuristic_claim['verification_state'] != 'heuristic':
+                errors.append(
+                    f'{activity}: heuristic claim {heuristic_id!r} is '
+                    f'{heuristic_claim["verification_state"]!r}, not heuristic')
+            else:
+                heuristic[activity] = {
+                    'claim': heuristic_id,
+                    'state': heuristic_claim['verification_state'],
                 }
         if not claim_id:
             continue
@@ -69,12 +105,14 @@ def audit() -> dict:
         if valid:
             linked[activity] = claim_id
 
-    unlinked = sorted(set(ACTIVITY_RULES) - set(linked) - set(audited))
+    unlinked = sorted(
+        set(ACTIVITY_RULES) - set(linked) - set(audited) - set(heuristic))
     return {
         'activity_count': len(ACTIVITY_RULES),
         'verified_profile_count': len(linked),
         'verified_profiles': linked,
         'known_conflicts': audited,
+        'heuristic_profiles': heuristic,
         'needs_rule_locators': unlinked,
         'errors': errors,
     }
@@ -88,10 +126,15 @@ def main() -> int:
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))
     else:
+        heuristic_count = len(result['heuristic_profiles'])
+        heuristic_label = (
+            'explicit heuristic' if heuristic_count == 1
+            else 'explicit heuristics')
         print(
             f'{result["verified_profile_count"]}/{result["activity_count"]} '
             'activities have verified rule-level profiles; '
             f'{len(result["known_conflicts"])} have known conflicts; '
+            f'{heuristic_count} {heuristic_label}; '
             f'{len(result["needs_rule_locators"])} need locators.')
         for error in result['errors']:
             print(f'ERROR: {error}', file=sys.stderr)

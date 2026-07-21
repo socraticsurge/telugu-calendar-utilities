@@ -69,6 +69,7 @@ PyPI MCP package.
 | 41 | [Business-launch evidence audit](41-business-evidence-audit.md) | Capital-deployment verse, movable-Lagna conflict, and scope boundaries |
 | 42 | [Ceremony / Puja evidence audit](42-ceremony-evidence-audit.md) | Shantika/Paushtika verse, Tithi conflict, chart conditions, and emergency boundary |
 | 43 | [New Beginning evidence audit](43-beginning-evidence-audit.md) | Dharma-kriya commencement verse versus generic project-ranking proxies |
+| 44 | [Activity provenance states](44-activity-provenance-states.md) | Enforced verified, contradicted and heuristic claim contract across Python, MCP and browser |
 
 ## How to read the diagrams
 
