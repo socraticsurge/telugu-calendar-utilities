@@ -1049,7 +1049,8 @@ def tool_find_muhurta(
         constraint_fields = (
             'allowed_maasams', 'allowed_varas', 'avoid_vara_paksha',
             'allowed_solar_classes', 'allowed_nakshatras',
-            'allowed_tithi_numbers', 'required_lagna_class',
+            'allowed_tithi_numbers', 'avoid_tithi_numbers',
+            'required_lagna_class',
             'allowed_lagnas', 'caution_lagna_solar',
         )
         return json.dumps({
@@ -1062,6 +1063,7 @@ def tool_find_muhurta(
                 'source_claim': {
                     'bhumi_puja': 'muhurta.bhumi_puja.foundation',
                     'well_digging': 'muhurta.well_digging',
+                    'property': 'muhurta.land_purchase.building',
                 }.get(activity),
                 'automated_constraints': {
                     field: rules[field]

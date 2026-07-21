@@ -723,6 +723,7 @@ async function findMuhurta() {
       const allowedNakshatras = new Set(rules.allowed_nakshatras || []);
       const preferNakshatras = new Set(rules.prefer_nakshatras || []);
       const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
+      const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);
       const manualChecks = rules.manual_checks || [];
       const activityLabel = rules.label;
 
@@ -834,6 +835,7 @@ async function findMuhurta() {
           if (allowedNakshatras.size && !allowedNakshatras.has(facts.nakshatra)) continue;
           if (allowedTithiNumbers.size &&
               !allowedTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
+          if (avoidTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
 
           // Build reason groups as we score — slot_quality, day_quality,
           // group_fit, activity_match, notes — mirroring Python's
@@ -1180,7 +1182,7 @@ const MU_ACT_LABEL = {
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
   upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',
   gruhapravesha: 'gruhapravesha (home entry)',
-  vehicle: 'a vehicle purchase', property: 'a property purchase',
+  vehicle: 'a vehicle purchase', property: 'a land purchase for building',
   gold: 'a gold / jewelry purchase',
   bhumi_puja: 'bhumi puja (foundation laying)',
   well_digging: 'well digging',

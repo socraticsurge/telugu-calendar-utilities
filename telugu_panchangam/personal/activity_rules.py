@@ -25,6 +25,7 @@
 #   allowed_nakshatras      slot omitted unless its active Nakshatra is listed
 #   prefer_nakshatras       active Nakshatra names receiving +1
 #   allowed_tithi_numbers   slot omitted unless its active Tithi number is listed
+#   avoid_tithi_numbers     slot omitted when its active Tithi number is listed
 #   allowed_lagnas          slot omitted unless its active Lagna is listed
 #   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
@@ -159,11 +160,34 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Shukravaram'],
                       'prefer_lagna_class': 'Sthira'},
-    'property':      {'label': 'Property / Land purchase',
-                      'prefer_choghadiya': ('Labh', 1),
-                      'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Guruvaram', 'Shukravaram'],
-                      'prefer_lagna_class': 'Sthira'},
+    'property':      {'label': 'Land purchase (for building)',
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shanivaram',
+                      ],
+                      'allowed_nakshatras': [
+                          'Ashwini', 'Rohini', 'Mrigashira', 'Punarvasu',
+                          'Pushya', 'Uttara Phalguni', 'Hasta', 'Swati',
+                          'Anuradha', 'Uttara Ashadha', 'Shravana',
+                          'Dhanishtha', 'Shatabhisha',
+                          'Uttara Bhadrapada',
+                      ],
+                      'avoid_tithi_numbers': [4, 9, 14],
+                      'prefer_vara': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shanivaram',
+                      ],
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Election chart: the weekday lord should '
+                          'preferably occupy Lagna.',
+                          'Election chart: Guru should occupy a Kendra '
+                          'or Trikona.',
+                          'Election chart: Mangala should occupy the 11th '
+                          'and not Lagna.',
+                          'Election chart: Lagna and 7th lords should be '
+                          'harmonious; avoid the 11th lord in the 12th.',
+                      ]},
     'gold':          {'label': 'Gold / Jewelry purchase',
                       'prefer_choghadiya': ('Labh', 1),
                       'prefer_tithi_class': 'Bhadra',

@@ -319,6 +319,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
     if (ctx.allowed_tithi_numbers and
             active_tithi_number not in ctx.allowed_tithi_numbers):
         return None
+    if active_tithi_number in ctx.avoid_tithi_numbers:
+        return None
 
     # Special yogas
     yoga_bonus, yoga_reasons, defer = score_special_yogas(
@@ -610,6 +612,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
     manual_checks = tuple(rules.get('manual_checks', ()))
@@ -653,6 +656,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         allowed_nakshatras=allowed_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
@@ -771,6 +775,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
     prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
     manual_checks = tuple(rules.get('manual_checks', ()))
@@ -840,6 +845,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         allowed_nakshatras=allowed_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,

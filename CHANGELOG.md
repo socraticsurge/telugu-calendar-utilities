@@ -8,6 +8,12 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed land-purchase profile.** The former generic Property / Land
+  option is now accurately scoped to buying land for building, following
+  Raman Chapter XII, printed page 53 (PDF page 57): fourteen Nakshatras, four
+  weekdays, hard Rikta-Tithi rejection, fixed-Lagna preference, and disclosed
+  manual election-chart checks. Buying a completed house is explicitly outside
+  this profile rather than silently conflated with land purchase.
 - **Source-backed well-digging activity.** Raman, *Muhurtha*, Chapter XII,
   printed page 51 (PDF page 55), now supplies the eight admitted Nakshatras,
   three admitted rising Rasis, the Surya-in-Lagna hard-rock caution, and

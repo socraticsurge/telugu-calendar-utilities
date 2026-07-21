@@ -70,6 +70,10 @@ edition and locator are recorded, their claims remain `needs_locator`.
 - Well digging has the same activity-level treatment: the admitted Nakshatras
   and rising Rasis are automated from Chapter XII, while planetary Kendra and
   water-quality conditions remain explicit practitioner checks.
+- The former generic “Property / Land purchase” option is now scoped narrowly
+  to buying land for building, matching Raman's separate treatment of land and
+  completed houses. Its weekday, Nakshatra and Rikta-Tithi rules have a precise
+  Chapter XII locator.
 - Absolute score thresholds and relative ordering are project heuristics.
 
 ## Citation acceptance rule

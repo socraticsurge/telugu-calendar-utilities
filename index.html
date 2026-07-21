@@ -904,6 +904,9 @@
     body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .tb-sel-mode {
       grid-column: 1 / -1;
     }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .tb-sel-activity {
+      grid-column: 1 / -1;
+    }
     body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .selector {
       flex: none; min-width: 0;
     }
@@ -1422,7 +1425,7 @@
               <option value="strict">Stars + Moon, strict</option>
             </select>
           </div>
-          <div class="selector">
+          <div class="selector tb-sel-activity">
             <label for="mu-activity">Activity</label>
             <select id="mu-activity" class="tb-date" aria-label="Activity">
               <option value="any">Anything auspicious</option>
@@ -1439,7 +1442,7 @@
               </optgroup>
               <optgroup label="Acquisitions">
                 <option value="vehicle">Vehicle purchase</option>
-                <option value="property">Property / Land purchase</option>
+                <option value="property">Land purchase (for building)</option>
                 <option value="gold">Gold / Jewelry purchase</option>
                 <option value="purchase">Purchase (general)</option>
               </optgroup>

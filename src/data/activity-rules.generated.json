@@ -17,6 +17,7 @@
     "allowed_nakshatras",
     "prefer_nakshatras",
     "allowed_tithi_numbers",
+    "avoid_tithi_numbers",
     "manual_checks",
     "allowed_lagnas",
     "caution_lagna_solar"
@@ -228,17 +229,47 @@
       "prefer_tithi_class": "Bhadra"
     },
     "property": {
-      "label": "Property / Land purchase",
+      "label": "Land purchase (for building)",
       "prefer_lagna_class": "Sthira",
-      "prefer_choghadiya": [
-        "Labh",
-        1
-      ],
       "prefer_vara": [
+        "Somavaram",
+        "Budhavaram",
         "Guruvaram",
-        "Shukravaram"
+        "Shanivaram"
       ],
-      "prefer_tithi_class": "Bhadra"
+      "allowed_varas": [
+        "Somavaram",
+        "Budhavaram",
+        "Guruvaram",
+        "Shanivaram"
+      ],
+      "allowed_nakshatras": [
+        "Ashwini",
+        "Rohini",
+        "Mrigashira",
+        "Punarvasu",
+        "Pushya",
+        "Uttara Phalguni",
+        "Hasta",
+        "Swati",
+        "Anuradha",
+        "Uttara Ashadha",
+        "Shravana",
+        "Dhanishtha",
+        "Shatabhisha",
+        "Uttara Bhadrapada"
+      ],
+      "avoid_tithi_numbers": [
+        4,
+        9,
+        14
+      ],
+      "manual_checks": [
+        "Election chart: the weekday lord should preferably occupy Lagna.",
+        "Election chart: Guru should occupy a Kendra or Trikona.",
+        "Election chart: Mangala should occupy the 11th and not Lagna.",
+        "Election chart: Lagna and 7th lords should be harmonious; avoid the 11th lord in the 12th."
+      ]
     },
     "gold": {
       "label": "Gold / Jewelry purchase",

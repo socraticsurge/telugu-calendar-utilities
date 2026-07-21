@@ -108,6 +108,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.land_purchase.building",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+      "scope": "Supports the configured building-land purchase weekday and Nakshatra admission lists, hard Rikta-Tithi rejection and fixed-Lagna preference. Weekday-lord, Guru, Mangala and house-lord placement conditions remain manual checks. It does not support elections for purchasing a completed house, which Raman treats separately.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.relative_tiers",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/muhurta.py",

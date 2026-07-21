@@ -19,8 +19,8 @@ CONSUMED_FIELDS = (
     'skip_on_yoga', 'prefer_vara', 'prefer_tithi_class',
     'required_lagna_class', 'allowed_maasams', 'allowed_varas',
     'avoid_vara_paksha', 'allowed_solar_classes', 'allowed_nakshatras',
-    'prefer_nakshatras', 'allowed_tithi_numbers', 'manual_checks',
-    'allowed_lagnas', 'caution_lagna_solar',
+    'prefer_nakshatras', 'allowed_tithi_numbers', 'avoid_tithi_numbers',
+    'manual_checks', 'allowed_lagnas', 'caution_lagna_solar',
 )
 
 
