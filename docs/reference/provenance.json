@@ -243,6 +243,17 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.job_contract.profile_conflict",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Nakshatra-prakarana, 'Entering the service of a master,' verse 26, printed p. 38 (OCR lines 2565-2577); 'Sandhana Muhurta,' verse 42, printed pp. 45-46 (OCR lines 2880-2891)",
+      "scope": "The single label combines entering service with contract signing, but the inspected text treats service entry separately and does not equate Sandhana (peace, alliance or friendship) with a modern employment or commercial contract. Verse 26 names seven Nakshatras, four weekdays, benefic occupation of Lagna, Surya or Mangala in the 10th/11th, and employer/employee Yoni and Rasi-lord friendship. The profile implements none of the activity-specific star or relationship criteria and substitutes Amrit Choghadiya, Nanda Tithi and fixed-Lagna preferences unsupported by these passages. This taxonomy and rule mismatch must not be presented as a verified Job or Contract profile.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.bhumi_puja.foundation",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

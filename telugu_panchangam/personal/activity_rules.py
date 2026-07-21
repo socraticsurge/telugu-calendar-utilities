@@ -493,10 +493,25 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Guruvaram', 'Budhavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'job':           {'label': 'Job start / Contract signing',
+                      'audit_claim': 'muhurta.job_contract.profile_conflict',
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Guruvaram', 'Budhavaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'For entering service, Muhurta Chintamani verse '
+                          '26 names Ashwini, Pushya, Hasta, Chitra, '
+                          'Anuradha, Mrigashira and Revati; Wednesday, '
+                          'Friday, Sunday and Thursday; a benefic in Lagna; '
+                          'and Surya or Mangala in the 10th or 11th.',
+                          'Employer/employee check: compare birth-Nakshatra '
+                          'Yoni friendship and friendship between both '
+                          'Janma-Rasi lords before entering service.',
+                          'Contract warning: verse 42 concerns Sandhana '
+                          '(peace, alliance or friendship), not a modern '
+                          'employment or commercial contract; do not treat '
+                          'it as direct authority for signing.',
+                      ]},
     # — Spiritual —
     'yajna':         {'label': 'Yajna / Homam',
                       'audit_claim': 'muhurta.yajna.profile_conflict',
