@@ -52,7 +52,8 @@ tier (Excellent / Good / Fair / Avoid).
 
 | File | Role |
 |---|---|
-| `personal/activity_rules.py` | Declarative `ACTIVITY_RULES` dict — 28 activities, pure data. |
+| `personal/activity_rules.py` | Declarative `ACTIVITY_RULES` dict — 30 activities, pure data. |
+| `personal/activity_catalog.py` | Ordered browser-supported subset and selector groups. |
 | `personal/slot_scorers.py` | Atomic scoring functions + `_DayContext` dataclass. |
 | `personal/muhurta.py` | Orchestrator (~530 lines) — public API only. |
 
@@ -63,7 +64,10 @@ can carry: `skip_on_yoga`, `skip_on_sankramana / khar_maasa / adhika /
 pitru_paksha / simha_stha_guru / combust`, `prefer_choghadiya`,
 `prefer_tithi_class`, `avoid_tithi_class`, `prefer_vara`, `prefer_lagna_class`,
 `prefer_bhadra_puchha`, `prefer_nakshatra_mukha`, `penalty_on_simha_stha_shukra`.
-28 activities are supported; all are exposed via the MCP `find_muhurta` tool.
+30 activities are supported by Python/MCP. The browser-supported subset is
+declared in `activity_catalog.py`; `tools/export_activity_rules.py` generates
+the exact rule fields consumed by TypeScript. `npm run activity:check` and the
+Python contract tests fail if the committed export or static selector drifts.
 
 ### The pipeline
 
@@ -146,7 +150,8 @@ by `day_slots()` to keep day-skip logic in one place.
 
 | Module | Function | Output |
 |---|---|---|
-| `activity_rules.py` | `ACTIVITY_RULES`, `ACTIVITIES` | Declarative per-activity config for all 28 activities |
+| `activity_rules.py` | `ACTIVITY_RULES`, `ACTIVITIES` | Declarative per-activity config for all 30 activities |
+| `activity_catalog.py` | `BROWSER_ACTIVITY_GROUPS`, `BROWSER_ACTIVITIES` | Explicit browser capability boundary and selector ordering |
 | `slot_scorers.py` | `score_tithi_class`, `score_tara`, `score_chandra`, `score_lagna`, `score_special_yogas`, `score_nitya_yoga`, `anandadi_day_modifier`, `_DayContext` | All atomic scoring functions; `_DayContext` bundles day-constant params |
 | `tarabalam.py` | `tara_number`, `is_auspicious_tara`, `good_for_all` | 9-tara strength from a birth star |
 | `chandrabalam.py` | `chandra_position`, `chandra_verdict`, `rasi_from_nakshatra` | 12-position Moon-sign strength |

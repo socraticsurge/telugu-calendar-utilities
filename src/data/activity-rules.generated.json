@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "source": "telugu_panchangam.personal.activity_rules.ACTIVITY_RULES",
+  "consumed_fields": [
+    "label",
+    "avoid_karana",
+    "prefer_lagna_class",
+    "prefer_choghadiya",
+    "skip_on_yoga",
+    "prefer_vara",
+    "prefer_tithi_class"
+  ],
+  "groups": [
+    {
+      "label": "General",
+      "activities": [
+        "any"
+      ]
+    },
+    {
+      "label": "Samskaras",
+      "activities": [
+        "wedding",
+        "engagement",
+        "naming",
+        "annaprasana",
+        "karnavedha",
+        "mundana",
+        "upanayana",
+        "vidyarambha",
+        "gruhapravesha"
+      ]
+    },
+    {
+      "label": "Acquisitions",
+      "activities": [
+        "vehicle",
+        "property",
+        "gold",
+        "purchase"
+      ]
+    },
+    {
+      "label": "Construction & ventures",
+      "activities": [
+        "bhumi_puja",
+        "business",
+        "job"
+      ]
+    },
+    {
+      "label": "Spiritual",
+      "activities": [
+        "yajna",
+        "pilgrimage",
+        "ceremony"
+      ]
+    },
+    {
+      "label": "Civil & medical",
+      "activities": [
+        "court",
+        "surgery"
+      ]
+    },
+    {
+      "label": "Other",
+      "activities": [
+        "travel",
+        "beginning"
+      ]
+    }
+  ],
+  "rules": {
+    "any": {
+      "label": "Anything auspicious"
+    },
+    "wedding": {
+      "label": "Wedding (Vivaha)",
+      "prefer_lagna_class": "Sthira",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Somavaram"
+      ],
+      "prefer_tithi_class": "Purna"
+    },
+    "engagement": {
+      "label": "Engagement (Nischayam)",
+      "prefer_lagna_class": "Sthira",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Somavaram"
+      ],
+      "prefer_tithi_class": "Purna"
+    },
+    "naming": {
+      "label": "Naming (Namakaranam)",
+      "prefer_lagna_class": "Dvisvabhava",
+      "prefer_choghadiya": [
+        "Shubh",
+        1
+      ],
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Budhavaram",
+        "Guruvaram"
+      ],
+      "prefer_tithi_class": "Nanda"
+    },
+    "annaprasana": {
+      "label": "Annaprasana (First feeding)",
+      "prefer_lagna_class": "Dvisvabhava",
+      "prefer_choghadiya": [
+        "Shubh",
+        1
+      ],
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Somavaram",
+        "Guruvaram"
+      ],
+      "prefer_tithi_class": "Bhadra"
+    },
+    "karnavedha": {
+      "label": "Karnavedha (Ear-piercing)",
+      "prefer_lagna_class": "Dvisvabhava",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Budhavaram",
+        "Shukravaram"
+      ],
+      "prefer_tithi_class": "Bhadra"
+    },
+    "mundana": {
+      "label": "Mundana / Chaula (First head-shave)",
+      "prefer_lagna_class": "Dvisvabhava",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Budhavaram",
+        "Guruvaram"
+      ],
+      "prefer_tithi_class": "Nanda"
+    },
+    "upanayana": {
+      "label": "Upanayana (Sacred thread)",
+      "prefer_lagna_class": "Dvisvabhava",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Budhavaram",
+        "Guruvaram"
+      ],
+      "prefer_tithi_class": "Nanda"
+    },
+    "vidyarambha": {
+      "label": "Education start (Vidyarambha)",
+      "prefer_lagna_class": "Dvisvabhava",
+      "prefer_choghadiya": [
+        "Amrit",
+        1
+      ],
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Budhavaram"
+      ],
+      "prefer_tithi_class": "Nanda"
+    },
+    "gruhapravesha": {
+      "label": "Gruhapravesha (Home entry)",
+      "prefer_lagna_class": "Sthira",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Somavaram"
+      ],
+      "prefer_tithi_class": "Bhadra"
+    },
+    "vehicle": {
+      "label": "Vehicle purchase",
+      "prefer_lagna_class": "Sthira",
+      "prefer_choghadiya": [
+        "Labh",
+        1
+      ],
+      "prefer_vara": [
+        "Shukravaram"
+      ],
+      "prefer_tithi_class": "Bhadra"
+    },
+    "property": {
+      "label": "Property / Land purchase",
+      "prefer_lagna_class": "Sthira",
+      "prefer_choghadiya": [
+        "Labh",
+        1
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Shukravaram"
+      ],
+      "prefer_tithi_class": "Bhadra"
+    },
+    "gold": {
+      "label": "Gold / Jewelry purchase",
+      "prefer_lagna_class": "Sthira",
+      "prefer_choghadiya": [
+        "Labh",
+        1
+      ],
+      "prefer_vara": [
+        "Shukravaram",
+        "Guruvaram"
+      ],
+      "prefer_tithi_class": "Bhadra"
+    },
+    "purchase": {
+      "label": "Purchase (general)",
+      "prefer_choghadiya": [
+        "Labh",
+        1
+      ]
+    },
+    "bhumi_puja": {
+      "label": "Bhumi Puja / Foundation laying",
+      "prefer_lagna_class": "Sthira",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Somavaram"
+      ],
+      "prefer_tithi_class": "Bhadra"
+    },
+    "business": {
+      "label": "Business launch",
+      "prefer_lagna_class": "Sthira",
+      "prefer_choghadiya": [
+        "Amrit",
+        1
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Budhavaram"
+      ],
+      "prefer_tithi_class": "Nanda"
+    },
+    "job": {
+      "label": "Job start / Contract signing",
+      "prefer_lagna_class": "Sthira",
+      "prefer_choghadiya": [
+        "Amrit",
+        1
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Budhavaram"
+      ],
+      "prefer_tithi_class": "Nanda"
+    },
+    "yajna": {
+      "label": "Yajna / Homam",
+      "prefer_lagna_class": "Sthira",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Guruvaram",
+        "Somavaram"
+      ],
+      "prefer_tithi_class": "Purna"
+    },
+    "pilgrimage": {
+      "label": "Pilgrimage (Tirtha Yatra)",
+      "avoid_karana": [
+        "Vishti"
+      ],
+      "prefer_lagna_class": "Chara"
+    },
+    "ceremony": {
+      "label": "Ceremony / puja (general)",
+      "skip_on_yoga": [
+        "Visha Yoga",
+        "Dagdha Yoga"
+      ],
+      "prefer_vara": [
+        "Somavaram",
+        "Guruvaram"
+      ]
+    },
+    "court": {
+      "label": "Court / legal matter",
+      "prefer_vara": [
+        "Mangalavaram"
+      ],
+      "prefer_tithi_class": "Jaya"
+    },
+    "surgery": {
+      "label": "Surgery / medical procedure",
+      "avoid_karana": [
+        "Vishti"
+      ],
+      "prefer_vara": [
+        "Mangalavaram"
+      ]
+    },
+    "travel": {
+      "label": "Travel / journey",
+      "avoid_karana": [
+        "Vishti"
+      ],
+      "prefer_lagna_class": "Chara"
+    },
+    "beginning": {
+      "label": "New beginning (general)",
+      "prefer_choghadiya": [
+        "Amrit",
+        1
+      ],
+      "prefer_vara": [
+        "Budhavaram",
+        "Guruvaram"
+      ],
+      "prefer_tithi_class": "Nanda"
+    }
+  }
+}

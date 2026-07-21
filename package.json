@@ -10,8 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.panels.json --noEmit",
-    "parity:export": "python tools/export_activity_rules.py && python tools/export_parity_fixture.py",
-    "parity:check": "python tools/export_activity_rules.py --check && python tools/export_parity_fixture.py --check"
+    "activity:export": "python3 tools/export_activity_rules.py",
+    "activity:check": "python3 tools/export_activity_rules.py --check"
   },
   "devDependencies": {
     "vite": "^8.0.16",
