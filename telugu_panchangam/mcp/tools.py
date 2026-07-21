@@ -1060,11 +1060,7 @@ def tool_find_muhurta(
             'slots': slots[:12],
             'dropped_days': dropped_days,
             'activity_profile': {
-                'source_claim': {
-                    'bhumi_puja': 'muhurta.bhumi_puja.foundation',
-                    'well_digging': 'muhurta.well_digging',
-                    'property': 'muhurta.land_purchase.building',
-                }.get(activity),
+                'source_claim': rules.get('source_claim'),
                 'automated_constraints': {
                     field: rules[field]
                     for field in constraint_fields if field in rules

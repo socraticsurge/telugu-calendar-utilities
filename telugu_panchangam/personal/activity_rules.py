@@ -29,6 +29,7 @@
 #   allowed_lagnas          slot omitted unless its active Lagna is listed
 #   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
+#   source_claim            stable verified claim ID in provenance.json
 #   prefer_bhadra_puchha    bonus when slot overlaps Bhadra Puchha
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
@@ -161,6 +162,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Shukravaram'],
                       'prefer_lagna_class': 'Sthira'},
     'property':      {'label': 'Land purchase (for building)',
+                      'source_claim': 'muhurta.land_purchase.building',
                       'allowed_varas': [
                           'Somavaram', 'Budhavaram', 'Guruvaram',
                           'Shanivaram',
@@ -195,6 +197,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_lagna_class': 'Sthira'},
     # — Construction & Ventures —
     'bhumi_puja':    {'label': 'Bhumi Puja / Foundation laying',
+                      'source_claim': 'muhurta.bhumi_puja.foundation',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'allowed_maasams': [
                           'Chaitra', 'Vaishakha', 'Shravana', 'Kartika',
@@ -271,6 +274,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'skip_on_panchaka_nakshatra': True},
     # — Specialized activities —
     'well_digging':      {'label': 'Well digging',
+                          'source_claim': 'muhurta.well_digging',
                           'allowed_nakshatras': [
                               'Revati', 'Uttara Bhadrapada', 'Hasta',
                               'Anuradha', 'Magha', 'Shravana', 'Rohini',

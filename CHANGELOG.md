@@ -8,6 +8,11 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Machine-checked activity provenance.** Verified Muhurtam profiles now
+  declare their stable ledger claim beside the Python rules; MCP and the
+  browser consume that shared field. A CI-ready audit rejects missing,
+  non-Muhurtam, non-verified, or duplicate links and reports the honest
+  coverage baseline: 3 of 30 activity profiles have exact rule locators.
 - **Source-backed land-purchase profile.** The former generic Property / Land
   option is now accurately scoped to buying land for building, following
   Raman Chapter XII, printed page 53 (PDF page 57): fourteen Nakshatras, four

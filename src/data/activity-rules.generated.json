@@ -20,7 +20,8 @@
     "avoid_tithi_numbers",
     "manual_checks",
     "allowed_lagnas",
-    "caution_lagna_solar"
+    "caution_lagna_solar",
+    "source_claim"
   ],
   "groups": [
     {
@@ -269,7 +270,8 @@
         "Election chart: Guru should occupy a Kendra or Trikona.",
         "Election chart: Mangala should occupy the 11th and not Lagna.",
         "Election chart: Lagna and 7th lords should be harmonious; avoid the 11th lord in the 12th."
-      ]
+      ],
+      "source_claim": "muhurta.land_purchase.building"
     },
     "gold": {
       "label": "Gold / Jewelry purchase",
@@ -370,7 +372,8 @@
         "Election chart: 8th house from Lagna must be vacant and free of malefic aspect.",
         "Election chart: malefics should occupy 3rd, 6th or 11th; benefics should fortify Kendras and Trikonas.",
         "Site ritual: after Puja, the first foundation stone is placed at the north-eastern corner."
-      ]
+      ],
+      "source_claim": "muhurta.bhumi_puja.foundation"
     },
     "well_digging": {
       "label": "Well digging",
@@ -393,7 +396,8 @@
         "Karkataka",
         "Makara"
       ],
-      "caution_lagna_solar": true
+      "caution_lagna_solar": true,
+      "source_claim": "muhurta.well_digging"
     },
     "business": {
       "label": "Business launch",
