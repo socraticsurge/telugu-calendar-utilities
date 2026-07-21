@@ -47,9 +47,23 @@ Muhurta finder rebuilt on the named 30-muhurta grid. **1082 tests passing.**
   block-iteration fix (PR #135)** and fully resolves the 2026-07-21
   choghadiya mislabel (a Kaal slot scored as Amrit).
 - Each slot now leads with its muhurta identity, e.g.
-  `Vidhi (Abhijit) muhurta · Brahma — auspicious (+2)`. The website finder
-  (`src/panels/tarabalam.ts`) mirrors the Python source of truth; the slot
-  card layout is unchanged (one added signal line).
+  `Vidhi (Abhijit) muhurta · Brahma · auspicious (+2)`. The website finder
+  (`src/panels/tarabalam.ts`) mirrors the Python source of truth.
+- **Card wording cleaned up.** User-facing muhurta reasons, skip
+  diagnostics and doctrinal notes now use middots and plain punctuation
+  instead of em-dashes; time and date ranges read "to". The redundant
+  "clear of all inauspicious windows" line is removed: it was a tautology
+  (a slot is only kept when it clears the hard windows) that also
+  contradicted any muhurta of inauspicious nature. An adversarial sweep
+  over 160 date/city/activity/profile combinations confirms zero dashes,
+  zero contradictions, and each score equal to the sum of its (+n)/(−n)
+  bonuses.
+- **Day context on every slot card (website).** Each card carries the
+  day's sunrise anga (Tithi, Nakshatra, Nitya Yoga) plus a timings row.
+  Sunrise, Abhijit and Rahu Kalam show by default; the complete Panchangam
+  auspicious and avoid window lists sit behind an "all timings" expand, so
+  a slot's day quality is legible without switching to the Panchangam tab.
+  Display only.
 
 Affects `tool_find_muhurta` (MCP) and the website muhurta finder.
 
