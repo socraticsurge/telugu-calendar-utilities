@@ -538,7 +538,18 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ]},
     # — Panchaka-restricted activities —
     'cremation':         {'label': 'Cremation rites',
-                          'skip_on_panchaka_nakshatra': True},
+                          'audit_claim': 'muhurta.cremation.profile_conflict',
+                          'skip_on_panchaka_nakshatra': True,
+                          'manual_checks': [
+                              'Known precision mismatch: Muhurta Chintamani '
+                              'starts the cremation Panchaka restriction in '
+                              'the latter half of Dhanishtha; this profile '
+                              'currently rejects all of Dhanishtha.',
+                              'Antyeshti is not a generic auspicious venture: '
+                              'legal and medical requirements, timely rites, '
+                              'family Sampradaya and the officiating priest’s '
+                              'guidance override this project ranking.',
+                          ]},
     'construction_roof': {'label': 'Roof-laying / construction milestone',
                           'source_claim': 'muhurta.construction_roof',
                           'skip_on_panchaka_nakshatra': True,

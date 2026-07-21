@@ -44,6 +44,14 @@
       "authority_type": "modern_synthesis"
     },
     {
+      "id": "MC-HINDI-IA",
+      "title": "Muhurta Chintamani",
+      "author": "Rama Daivajna",
+      "edition": "Undated Sanskrit text with Hindi commentary, Internet Archive identifier muhurta-chintamani-hindi",
+      "url": "https://archive.org/details/muhurta-chintamani-hindi",
+      "authority_type": "primary_text_hindi_commentary"
+    },
+    {
       "id": "DP-DAY-PAGE",
       "title": "Drik Panchang day and festival pages",
       "author": "Drik Panchang",
@@ -199,6 +207,17 @@
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
       "scope": "The configured Litigation / contest profile prefers Mangalavaram, while Raman explicitly directs that Tuesday and Saturday be avoided for filing lawsuits. Its Jaya-family reward and Purna-family penalty are not authorized by this passage, and the ten admitted Nakshatras and election-chart requirements are absent. The separate Bhadra Puchha bonus is attributed in code to Muhurta Chintamani and Dharma Sindhu, but those attributions still lack edition-specific verse or page locators and do not cure the weekday contradiction. This audit claim records the conflict and must not be presented as verification.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "muhurta.cremation.profile_conflict",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Nakshatra-prakarana, 'Pretakriya ka muhurta,' verse 48, printed pp. 47-48 (OCR lines 2956-2971 in the Internet Archive full text)",
+      "scope": "Verse 48 and its Hindi commentary forbid cremation during the latter half of Dhanishtha plus Shatabhisha, Purva Bhadrapada, Uttara Bhadrapada and Revati: the traditional four-and-a-half Nakshatras. The implementation deliberately marks all of Dhanishtha as Panchaka, so it over-rejects the first half and is not textually exact. The passage also treats Pretakriya after a rite could not be performed at death; it does not authorize ranking Antyeshti as a generic auspicious Choghadiya venture. The profile must remain contradicted until Pada/half-Nakshatra precision and the ritual scope are resolved.",
       "last_reviewed": "2026-07-22"
     },
     {

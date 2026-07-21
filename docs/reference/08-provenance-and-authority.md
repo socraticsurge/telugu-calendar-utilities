@@ -45,6 +45,10 @@ must always be interpreted against the named edition.
   synthesis and secondary authority, not scripture. The Bhumi Puja / house-
   foundation profile uses Chapter XII, printed page 50 (PDF page 54), from
   the inspected public scan linked in the machine-readable register.
+- **MC-HINDI-IA** — Rama Daivajna, *Muhurta Chintamani*, Sanskrit text with
+  Hindi commentary, undated public scan. Verse numbers and printed pages are
+  stable in the registered Internet Archive object, but the scan does not
+  expose publisher/date metadata; citations disclose that limitation.
 - **DP-DAY-PAGE** — Drik Panchang day/festival pages for a recorded city and
   date. This is an external published-panchangam comparison surface, not a
   textual authority for every project rule.
