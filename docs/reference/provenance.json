@@ -218,6 +218,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.surgery",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XV, 'Surgical Operations,' printed pp. 64-65 (PDF pp. 68-69)",
+      "scope": "Supports the configured Tuesday-or-Saturday, waxing Chaturthi/Navami/Chaturdashi and Ardra/Jyeshtha/Ashlesha/Moola admission rules plus the disclosed natal-Chandra, operated-body-part, Mangala, 8th-house, relevant-house and Mangala-Shani chart checks. The Vishti-Karana rejection is a separately implemented project rule and does not inherit authority from this citation. Medical urgency and clinician instructions always override electional timing.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

@@ -52,6 +52,7 @@ PyPI MCP package.
 | 24 | [Roof-laying source profile](24-construction-roof-profile.md) | Chapter XII's stage-specific Vrishabha-or-Tula Lagna gate and explicit scope boundary |
 | 25 | [Coronation source profile](25-coronation-profile.md) | Chapter XVI's incorporated head-of-state rules, exact gates, and chart-level alternatives |
 | 26 | [Wood-cutting source profile](26-wood-cutting-profile.md) | Chapter XIII's last-quarter rule, dry-sign manual check, and separate Panchaka provenance |
+| 27 | [Surgery source profile](27-surgery-profile.md) | Chapter XV's exact election, chart cautions, and non-negotiable clinical safety boundary |
 
 ## How to read the diagrams
 

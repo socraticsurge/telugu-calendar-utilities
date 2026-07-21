@@ -26,6 +26,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'construction_roof': 'muhurta.construction_roof',
         'coronation': 'muhurta.coronation',
         'wood_cutting': 'muhurta.wood_cutting',
+        'surgery': 'muhurta.surgery',
         'well_digging': 'muhurta.well_digging',
     }
 

@@ -739,8 +739,26 @@
       "avoid_karana": [
         "Vishti"
       ],
-      "prefer_vara": [
-        "Mangalavaram"
+      "allowed_varas": [
+        "Mangalavaram",
+        "Shanivaram"
+      ],
+      "allowed_nakshatras": [
+        "Ardra",
+        "Jyeshtha",
+        "Ashlesha",
+        "Moola"
+      ],
+      "manual_checks": [
+        "Medical urgency and the treating clinician’s instructions always override Muhurtam; never delay necessary care for an astrological window.",
+        "Avoid Chandra in the patient’s natal Rasi and in the Rasi governing the body part being operated on, especially when afflicted by malefics.",
+        "Strengthen Mangala and the house governing the body part; leave the 8th house unoccupied and avoid mutual aspects between Mangala and Shani."
+      ],
+      "source_claim": "muhurta.surgery",
+      "allowed_tithi_names": [
+        "Shukla Chaturthi",
+        "Shukla Navami",
+        "Shukla Chaturdashi"
       ]
     },
     "travel": {

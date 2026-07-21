@@ -435,8 +435,27 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Mangalavaram'],
                       'prefer_bhadra_puchha': 2},
     'surgery':       {'label': 'Surgery / medical procedure',
+                      'source_claim': 'muhurta.surgery',
                       'avoid_karana': ['Vishti'],
-                      'prefer_vara': ['Mangalavaram']},
+                      'allowed_varas': ['Mangalavaram', 'Shanivaram'],
+                      'allowed_tithi_names': [
+                          'Shukla Chaturthi', 'Shukla Navami',
+                          'Shukla Chaturdashi',
+                      ],
+                      'allowed_nakshatras': [
+                          'Ardra', 'Jyeshtha', 'Ashlesha', 'Moola',
+                      ],
+                      'manual_checks': [
+                          'Medical urgency and the treating clinician’s '
+                          'instructions always override Muhurtam; never '
+                          'delay necessary care for an astrological window.',
+                          'Avoid Chandra in the patient’s natal Rasi and in '
+                          'the Rasi governing the body part being operated '
+                          'on, especially when afflicted by malefics.',
+                          'Strengthen Mangala and the house governing the '
+                          'body part; leave the 8th house unoccupied and '
+                          'avoid mutual aspects between Mangala and Shani.',
+                      ]},
     # — Panchaka-restricted activities —
     'cremation':         {'label': 'Cremation rites',
                           'skip_on_panchaka_nakshatra': True},
