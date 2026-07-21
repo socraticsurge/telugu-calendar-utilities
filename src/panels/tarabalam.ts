@@ -829,10 +829,21 @@ async function findMuhurta() {
       const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
       // Day-context strip shown on every slot card for this day: the
-      // sunrise-anchored anga (matches the Panchangam tab) plus the two
-      // timings people cross-check before committing — Abhijit and Rahu
-      // Kalam. Display only; computed once per day and shared by its slots.
+      // sunrise-anchored anga (matches the Panchangam tab), a visible teaser
+      // of the timings people cross-check most (Sunrise, Abhijit, Rahu
+      // Kalam), and the full Panchangam auspicious/avoid window lists behind
+      // an expand. Display only; computed once per day, shared by its slots.
       const fmtRange = (w) => `${muToT(muMin(w.start, w.sflag))} to ${muToT(muMin(w.end, w.eflag))}`;
+      // Group by window name so multi-segment windows (e.g. two Durmuhurtham
+      // spells) read as one entry with both ranges.
+      const groupWins = (arr) => {
+        const m = new Map();
+        for (const w of arr) {
+          if (!m.has(w.name)) m.set(w.name, []);
+          m.get(w.name).push(fmtRange(w));
+        }
+        return [...m.entries()].map(([name, ranges]) => ({ name, ranges }));
+      };
       const rahuWin = data.inauspicious.find(w => /Rahu/i.test(w.name));
       const dayCtx = {
         tithi: data.tithi?.name || null,
@@ -841,6 +852,8 @@ async function findMuhurta() {
         sunrise: data.sunrise ? muToT(muMin(data.sunrise)) : null,
         abhijit: abhijit ? fmtRange(abhijit) : null,
         rahu: rahuWin ? fmtRange(rahuWin) : null,
+        auspicious: groupWins(data.auspicious),
+        avoid: groupWins(data.inauspicious),
       };
 
       const srMin = muMin(data.sunrise);
@@ -1264,17 +1277,30 @@ function renderMuhurta() {
     const tier = s.tier || muScoreTier(s.score);
     const tierClass = `mu-tier-${tier.toLowerCase()}`;
     const dc = s.dayCtx;
+    const winList = (wins) => wins.map(w =>
+      `<span class="mu-tim"><b>${w.name}</b> ${w.ranges.join(', ')}</span>`).join('');
     const dayCtxHtml = dc ? `<div class="mu-dayctx">
               <div class="mu-anga">
                 ${dc.tithi ? `<span class="mu-angachip">🌙 ${dc.tithi}</span>` : ''}
                 ${dc.nakshatra ? `<span class="mu-angachip">⭐ ${dc.nakshatra}</span>` : ''}
                 ${dc.yoga ? `<span class="mu-angachip">🧘 ${dc.yoga} yoga</span>` : ''}
               </div>
-              <div class="mu-timings">
-                ${dc.sunrise ? `<span>🌅 Sunrise ${dc.sunrise}</span>` : ''}
-                ${dc.abhijit ? `<span class="mu-t-aus">✨ Abhijit ${dc.abhijit}</span>` : ''}
-                ${dc.rahu ? `<span class="mu-t-warn">⛔ Rahu Kalam ${dc.rahu}</span>` : ''}
-              </div>
+              <details class="mu-timings-d">
+                <summary class="mu-timings">
+                  ${dc.sunrise ? `<span>🌅 Sunrise ${dc.sunrise}</span>` : ''}
+                  ${dc.abhijit ? `<span class="mu-t-aus">✨ Abhijit ${dc.abhijit}</span>` : ''}
+                  ${dc.rahu ? `<span class="mu-t-warn">⛔ Rahu Kalam ${dc.rahu}</span>` : ''}
+                  <span class="mu-tim-toggle">all timings</span>
+                </summary>
+                <div class="mu-timings-full">
+                  ${dc.auspicious.length ? `<div class="mu-tim-row">
+                    <span class="mu-tim-lbl mu-t-aus">🟢 Auspicious</span>
+                    <span class="mu-tim-wins mu-t-aus">${winList(dc.auspicious)}</span></div>` : ''}
+                  ${dc.avoid.length ? `<div class="mu-tim-row">
+                    <span class="mu-tim-lbl mu-t-warn">🔴 Avoid</span>
+                    <span class="mu-tim-wins mu-t-warn">${winList(dc.avoid)}</span></div>` : ''}
+                </div>
+              </details>
             </div>` : '';
     return `<div class="mu-slot">
               <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}</span>

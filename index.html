@@ -398,10 +398,25 @@
     .mu-angachip { font-size: 0.72rem; font-weight: 700; color: #1F1A17;
                    background: #FBF6EB; border: 1px solid #E4DAC6; border-radius: 6px;
                    padding: 0.06rem 0.45rem; white-space: nowrap; }
-    .mu-timings { display: flex; flex-wrap: wrap; gap: 0.1rem 0.8rem;
-                  font-size: 0.72rem; color: #6B6357; }
+    .mu-timings-d { width: 100%; }
+    .mu-timings { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.8rem;
+                  font-size: 0.72rem; color: #6B6357; cursor: pointer; list-style: none; }
+    .mu-timings::-webkit-details-marker { display: none; }
     .mu-timings .mu-t-aus { color: #166534; font-weight: 600; }
     .mu-timings .mu-t-warn { color: #b45309; font-weight: 600; }
+    .mu-tim-toggle { font-size: 0.68rem; font-weight: 700; color: #94a3b8;
+                     text-transform: uppercase; letter-spacing: 0.05em; margin-left: auto; }
+    .mu-tim-toggle::before { content: '▸ '; }
+    .mu-timings-d[open] .mu-tim-toggle::before { content: '▾ '; }
+    .mu-timings-full { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.35rem;
+                       padding-left: 0.1rem; font-size: 0.72rem; }
+    .mu-tim-row { display: flex; gap: 0.5rem; align-items: baseline; }
+    .mu-tim-lbl { flex: none; width: 5.4rem; font-size: 0.62rem; font-weight: 700;
+                  text-transform: uppercase; letter-spacing: 0.05em; padding-top: 0.05rem; }
+    .mu-tim-wins { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 0.1rem 0.7rem; }
+    .mu-tim-wins .mu-tim b { font-weight: 700; }
+    .mu-tim-wins.mu-t-aus { color: #166534; }
+    .mu-tim-wins.mu-t-warn { color: #b45309; }
     /* Grouped reason categories — Batch C #16 */
     .mu-rgroups { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem; }
     .mu-rg { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.74rem; line-height: 1.45; }
