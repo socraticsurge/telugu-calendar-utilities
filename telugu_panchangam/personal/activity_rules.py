@@ -239,6 +239,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Budhavaram', 'Guruvaram'],
                       'prefer_lagna_class': 'Dvisvabhava'},
     'vidyarambha':   {'label': 'Education start (Vidyarambha)',
+                      'source_claim': 'muhurta.vidyarambha',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -247,8 +248,26 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
                       'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Budhavaram'],
-                      'prefer_lagna_class': 'Dvisvabhava'},
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_nakshatras': [
+                          'Ashwini', 'Punarvasu', 'Ardra', 'Hasta',
+                          'Chitra', 'Swati', 'Shravana', 'Revati',
+                      ],
+                      'allowed_lagnas': [
+                          'Mesha', 'Karka', 'Tula', 'Makara',
+                          'Mithuna', 'Kanya', 'Dhanu', 'Meena',
+                      ],
+                      'manual_checks': [
+                          'The source’s most propitious age marker is the '
+                          '5th day of the 5th month of the child’s 5th year.',
+                          'Prefer the forenoon or noon for the ceremony.',
+                          'Election chart: leave the 8th house unoccupied.',
+                          'Budha, Shukra and Guru together in the 9th are '
+                          'stated to counteract adverse influences.',
+                      ]},
     'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,

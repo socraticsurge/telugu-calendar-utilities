@@ -8,6 +8,10 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed Vidyarambha profile.** Raman Chapter VIII, printed page 23
+  (PDF page 27), now supplies exact weekday, Nakshatra and movable-or-common
+  Lagna gates; age, forenoon/noon preference and chart checks remain explicit.
+  Verified activity coverage reaches 8/30.
 - **Source-backed Mundana / Chaula profile.** Raman Chapter VIII, printed
   pages 22–23 (PDF pages 26–27), now supplies Shukla-Paksha, combustion,
   Tithi, Nakshatra, weekday, conservative Lagna and forenoon constraints.

@@ -141,6 +141,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.vidyarambha",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Commencing education (Aksharabhyasa),' printed p. 23 (PDF p. 27)",
+      "scope": "Supports the configured Vidyarambha weekday, Nakshatra and movable-or-common rising-Rasi admission lists plus disclosed age, forenoon/noon and election-chart guidance. Shared samskara filters, Choghadiya and Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.well_digging",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

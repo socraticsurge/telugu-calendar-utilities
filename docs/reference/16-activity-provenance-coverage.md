@@ -22,9 +22,10 @@ python tools/check_activity_provenance.py
 | `annaprasana` | First feeding (Annaprasana) | `muhurta.annaprasana` | Verified rule-level profile |
 | `karnavedha` | Ear piercing (Karnavedha) | `muhurta.karnavedha` | Verified rule-level profile |
 | `mundana` | First head-shave (Mundana / Chaula) | `muhurta.mundana` | Verified rule-level profile |
-| remaining 23 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `vidyarambha` | Education commencement (Vidyarambha) | `muhurta.vidyarambha` | Verified rule-level profile |
+| remaining 22 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
-Coverage is therefore **7 of 30 profiles**. The verified profiles use
+Coverage is therefore **8 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha*, Chapter XII, with edition-specific printed and PDF
 page locators. Raman is a modern secondary authority, not scripture; this
 status means the implemented criteria match the cited passage, not that every

@@ -46,6 +46,7 @@ PyPI MCP package.
 | 18 | [Annaprasana source profile](18-annaprasana-profile.md) | Raman Chapter VIII and Panchanga-Suddhi crosswalk with explicit limitations |
 | 19 | [Karnavedha source profile](19-karnavedha-profile.md) | Daytime-only Chapter VIII profile with exact weekday, Tithi and Lagna gates |
 | 20 | [Mundana / Chaula source profile](20-mundana-profile.md) | Chapter VIII Paksha, combustion, forenoon and conservative Lagna contract |
+| 21 | [Vidyarambha source profile](21-vidyarambha-profile.md) | Chapter VIII weekday, Nakshatra and movable/common-Lagna crosswalk |
 
 ## How to read the diagrams
 

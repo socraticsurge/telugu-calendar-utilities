@@ -358,7 +358,6 @@
     },
     "vidyarambha": {
       "label": "Education start (Vidyarambha)",
-      "prefer_lagna_class": "Dvisvabhava",
       "prefer_choghadiya": [
         "Amrit",
         1
@@ -367,10 +366,40 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
-      "prefer_vara": [
-        "Budhavaram"
+      "prefer_tithi_class": "Nanda",
+      "allowed_varas": [
+        "Somavaram",
+        "Budhavaram",
+        "Guruvaram",
+        "Shukravaram"
       ],
-      "prefer_tithi_class": "Nanda"
+      "allowed_nakshatras": [
+        "Ashwini",
+        "Punarvasu",
+        "Ardra",
+        "Hasta",
+        "Chitra",
+        "Swati",
+        "Shravana",
+        "Revati"
+      ],
+      "manual_checks": [
+        "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+        "Prefer the forenoon or noon for the ceremony.",
+        "Election chart: leave the 8th house unoccupied.",
+        "Budha, Shukra and Guru together in the 9th are stated to counteract adverse influences."
+      ],
+      "allowed_lagnas": [
+        "Mesha",
+        "Karka",
+        "Tula",
+        "Makara",
+        "Mithuna",
+        "Kanya",
+        "Dhanu",
+        "Meena"
+      ],
+      "source_claim": "muhurta.vidyarambha"
     },
     "gruhapravesha": {
       "label": "Gruhapravesha (Home entry)",

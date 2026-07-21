@@ -86,11 +86,14 @@ edition and locator are recorded, their claims remain `needs_locator`.
 - Mundana/Chaula now enforces Shukla Paksha, non-combust Guru/Shukra, exact
   Tithi/Nakshatra/weekday/Lagna criteria and a cross-surface solar-noon cutoff;
   age, pregnancy, seasonal wording and chart placements remain manual.
+- Vidyarambha/Aksharabhyasa now has exact weekday, Nakshatra and
+  movable-or-common Lagna gates; age, time preference and chart requirements
+  remain visible manual checks.
 - Absolute score thresholds and relative ordering are project heuristics.
 
 Activity-level coverage is tracked separately in
 [Muhurtam Activity Provenance Coverage](16-activity-provenance-coverage.md).
-It is currently **7 of 30 profiles**; the remaining profiles retain
+It is currently **8 of 30 profiles**; the remaining profiles retain
 `needs_locator` status and do not inherit verified status from a general
 title-level citation. `tools/check_activity_provenance.py` enforces every
 activity-to-claim link against the ledger.
