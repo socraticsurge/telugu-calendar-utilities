@@ -390,6 +390,18 @@
     .mu-dropped li { margin: 0.2rem 0; }
     .mu-dropped .dd-date { font-weight: 700; color: #1e1b4b; }
     .mu-reasons { font-size: 0.74rem; color: #6B6357; width: 100%; }
+    /* Day-context strip: sunrise anga + Abhijit/Rahu timings, so the day's
+       quality is legible on the slot card without switching to Panchangam. */
+    .mu-dayctx { width: 100%; display: flex; flex-direction: column; gap: 0.3rem;
+                 margin-top: 0.1rem; padding-bottom: 0.4rem; border-bottom: 1px dashed #E4DAC6; }
+    .mu-anga { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .mu-angachip { font-size: 0.72rem; font-weight: 700; color: #1F1A17;
+                   background: #FBF6EB; border: 1px solid #E4DAC6; border-radius: 6px;
+                   padding: 0.06rem 0.45rem; white-space: nowrap; }
+    .mu-timings { display: flex; flex-wrap: wrap; gap: 0.1rem 0.8rem;
+                  font-size: 0.72rem; color: #6B6357; }
+    .mu-timings .mu-t-aus { color: #166534; font-weight: 600; }
+    .mu-timings .mu-t-warn { color: #b45309; font-weight: 600; }
     /* Grouped reason categories — Batch C #16 */
     .mu-rgroups { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem; }
     .mu-rg { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.74rem; line-height: 1.45; }

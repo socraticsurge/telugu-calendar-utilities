@@ -828,6 +828,21 @@ async function findMuhurta() {
       const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
       const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
+      // Day-context strip shown on every slot card for this day: the
+      // sunrise-anchored anga (matches the Panchangam tab) plus the two
+      // timings people cross-check before committing — Abhijit and Rahu
+      // Kalam. Display only; computed once per day and shared by its slots.
+      const fmtRange = (w) => `${muToT(muMin(w.start, w.sflag))} to ${muToT(muMin(w.end, w.eflag))}`;
+      const rahuWin = data.inauspicious.find(w => /Rahu/i.test(w.name));
+      const dayCtx = {
+        tithi: data.tithi?.name || null,
+        nakshatra: data.nakshatra?.name || null,
+        yoga: data.yoga?.name || null,
+        sunrise: data.sunrise ? muToT(muMin(data.sunrise)) : null,
+        abhijit: abhijit ? fmtRange(abhijit) : null,
+        rahu: rahuWin ? fmtRange(rahuWin) : null,
+      };
+
       const srMin = muMin(data.sunrise);
       const ssMin = muMin(data.sunset);
       const muLen = (ssMin - srMin) / 15;
@@ -1115,7 +1130,7 @@ async function findMuhurta() {
           else if (facts.specialYogas.some(y => MU_YOGA_PENALTY[y] !== undefined)) dayDosha = 'visha_dagdha_yoga';
           else if (MU_NITYA_HARD_AVOID.has(ny)) dayDosha = 'vyatipata_vaidhriti';
 
-          slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha });
+          slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha, dayCtx });
           slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
       }
       // Diagnose: if the day produced no slots and it wasn't an eclipse,
@@ -1248,10 +1263,24 @@ function renderMuhurta() {
       : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
     const tier = s.tier || muScoreTier(s.score);
     const tierClass = `mu-tier-${tier.toLowerCase()}`;
+    const dc = s.dayCtx;
+    const dayCtxHtml = dc ? `<div class="mu-dayctx">
+              <div class="mu-anga">
+                ${dc.tithi ? `<span class="mu-angachip">🌙 ${dc.tithi}</span>` : ''}
+                ${dc.nakshatra ? `<span class="mu-angachip">⭐ ${dc.nakshatra}</span>` : ''}
+                ${dc.yoga ? `<span class="mu-angachip">🧘 ${dc.yoga} yoga</span>` : ''}
+              </div>
+              <div class="mu-timings">
+                ${dc.sunrise ? `<span>🌅 Sunrise ${dc.sunrise}</span>` : ''}
+                ${dc.abhijit ? `<span class="mu-t-aus">✨ Abhijit ${dc.abhijit}</span>` : ''}
+                ${dc.rahu ? `<span class="mu-t-warn">⛔ Rahu Kalam ${dc.rahu}</span>` : ''}
+              </div>
+            </div>` : '';
     return `<div class="mu-slot">
               <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}</span>
               <span class="mu-tier ${tierClass}">${tier}</span>
               <span class="mu-score">score ${s.score}</span>
+              ${dayCtxHtml}
               ${groupsHtml}
             </div>`;
   };
