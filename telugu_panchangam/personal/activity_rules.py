@@ -96,6 +96,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'engagement':    {'label': 'Engagement (Nischayam)',
+                      'audit_claim': 'muhurta.engagement.profile_conflict',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -104,7 +105,16 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_tithi_class': 'Purna',
                       'avoid_tithi_class': ['Jaya'],
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Scope warning: the inspected Raman edition has no '
+                          'dedicated Betrothal or Nischayam election; do not '
+                          'silently treat marriage rules as engagement rules.',
+                          'If the marriage passage is used as a conservative '
+                          'cross-check, verify its exact Tithi, weekday, '
+                          'Nakshatra and rising-Rasi gates; this profile does '
+                          'not implement them.',
+                      ]},
     'naming':        {'label': 'Naming (Namakaranam)',
                       'source_claim': 'muhurta.namakarana',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),

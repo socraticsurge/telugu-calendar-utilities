@@ -61,6 +61,7 @@ PyPI MCP package.
 | 33 | [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md) | Exact Chapter XII crosswalk and approval-gated conflicts in the current home-entry profile |
 | 34 | [Court evidence audit](34-court-evidence-audit.md) | Exact lawsuit-election crosswalk and the direct Tuesday contradiction |
 | 35 | [Litigation evidence audit](35-litigation-evidence-audit.md) | Alias-safe lawsuit crosswalk and the unlocated Bhadra Puchha attribution |
+| 36 | [Engagement evidence audit](36-engagement-evidence-audit.md) | Full-edition scope search and the unsafe marriage-rule inheritance boundary |
 
 ## How to read the diagrams
 

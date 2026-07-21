@@ -37,6 +37,10 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
             'claim': 'muhurta.court.profile_conflict',
             'state': 'contradicted',
         },
+        'engagement': {
+            'claim': 'muhurta.engagement.profile_conflict',
+            'state': 'contradicted',
+        },
         'gruhapravesha': {
             'claim': 'muhurta.gruhapravesha.profile_conflict',
             'state': 'contradicted',
@@ -51,6 +55,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         },
     }
     assert 'court' not in result['needs_rule_locators']
+    assert 'engagement' not in result['needs_rule_locators']
     assert 'gruhapravesha' not in result['needs_rule_locators']
     assert 'litigation' not in result['needs_rule_locators']
     assert 'wedding' not in result['needs_rule_locators']

@@ -126,7 +126,12 @@
         "Guruvaram",
         "Somavaram"
       ],
-      "prefer_tithi_class": "Purna"
+      "prefer_tithi_class": "Purna",
+      "manual_checks": [
+        "Scope warning: the inspected Raman edition has no dedicated Betrothal or Nischayam election; do not silently treat marriage rules as engagement rules.",
+        "If the marriage passage is used as a conservative cross-check, verify its exact Tithi, weekday, Nakshatra and rising-Rasi gates; this profile does not implement them."
+      ],
+      "audit_claim": "muhurta.engagement.profile_conflict"
     },
     "naming": {
       "label": "Naming (Namakaranam)",

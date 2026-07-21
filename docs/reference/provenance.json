@@ -158,6 +158,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.engagement.profile_conflict",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Full-text scope search of the registered edition found no 'Betrothal,' 'Engagement,' or 'Nischayam' election; nearest candidate is Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
+      "scope": "The configured Engagement profile has no dedicated passage in the inspected Raman edition and must not inherit marriage authority by label similarity. If the neighboring marriage election was intended as its basis, the configured Tithi-family scoring conflicts with it: the project penalizes every Jaya Tithi although Shukla Tritiya and Trayodashi are admitted, and rewards every Purna Tithi although Pournami and Amavasya are rejected. The profile also omits that passage's exact weekday, Nakshatra and rising-Rasi gates. This audit records both the taxonomy gap and the nearest-source conflict; it does not establish a verified Engagement tradition.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.gruhapravesha.profile_conflict",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
