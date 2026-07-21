@@ -61,9 +61,14 @@ class _DayContext:
     prefer_varas: frozenset
     lagnas: list | None
     prefer_lagna_class: str | None
+    required_lagna_class: str | None
     prefer_bhadra_puchha: int
     simha_stha_shukra_penalty: int
     prefer_nakshatra_mukha: tuple | None    # ([classes], bonus) | None
+    allowed_nakshatras: frozenset
+    prefer_nakshatras: frozenset
+    allowed_tithi_numbers: frozenset
+    manual_checks: tuple[str, ...]
 
 
 # ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.phalalu import rasi_phalalu
 from telugu_panchangam.personal.muhurta import day_slots, night_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
+from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -1044,12 +1045,29 @@ def tool_find_muhurta(
         slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
                                   x['personal_dosha'] is not None,
                                   x['date'], x['start']))
+        rules = ACTIVITY_RULES[activity]
+        constraint_fields = (
+            'allowed_maasams', 'allowed_varas', 'avoid_vara_paksha',
+            'allowed_solar_classes', 'allowed_nakshatras',
+            'allowed_tithi_numbers', 'required_lagna_class',
+        )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
             'city': city, 'system': system, 'chandra_mode': chandra_mode,
             'ayanamsa': ayanamsa,
             'slots': slots[:12],
             'dropped_days': dropped_days,
+            'activity_profile': {
+                'source_claim': (
+                    'muhurta.bhumi_puja.foundation'
+                    if activity == 'bhumi_puja' else None
+                ),
+                'automated_constraints': {
+                    field: rules[field]
+                    for field in constraint_fields if field in rules
+                },
+                'manual_checks': rules.get('manual_checks', []),
+            },
             'disclaimer': _MUHURTA_DISCLAIMER,
         })
     except ValueError as e:

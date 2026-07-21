@@ -41,7 +41,9 @@ must always be interpreted against the named edition.
   Public scan: <https://archive.org/details/Brihatsamhita>.
 - **BVR-MUHURTHA-1993** — B. V. Raman, *Muhurtha (Electional Astrology)*,
   UBS Publishers' Distributors, 1993, ISBN 9788185674681. This is a modern
-  synthesis and secondary authority, not scripture.
+  synthesis and secondary authority, not scripture. The Bhumi Puja / house-
+  foundation profile uses Chapter XII, printed page 50 (PDF page 54), from
+  the inspected public scan linked in the machine-readable register.
 - **DP-DAY-PAGE** — Drik Panchang day/festival pages for a recorded city and
   date. This is an external published-panchangam comparison surface, not a
   textual authority for every project rule.
@@ -62,6 +64,9 @@ edition and locator are recorded, their claims remain `needs_locator`.
 - Gochara house/vedha tables, Muhurtam activity rules, Panchanga Shuddhi, and
   several dosha/yoga tables have named authorities but still need precise
   edition locators.
+- Bhumi Puja / foundation laying is an activity-level exception: its profile
+  has a page-level locator and criterion-by-criterion implementation crosswalk.
+  Full election-chart and site-placement conditions remain visible manual checks.
 - Absolute score thresholds and relative ordering are project heuristics.
 
 ## Citation acceptance rule

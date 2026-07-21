@@ -11,6 +11,8 @@ from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 from telugu_panchangam.muhurtas import named_muhurtas
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES, ACTIVITIES
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
+from telugu_panchangam.personal.lagna_position import lagna_class_of, lagnas_in_class
+from telugu_panchangam.personal.tithi_class import tithi_number
 from telugu_panchangam.personal.nitya_yoga import NITYA_HARD_AVOID
 from telugu_panchangam.personal.slot_scorers import (
     _DayContext,
@@ -204,6 +206,26 @@ def _day_skip_reason(day, rules, activity, travel_direction,
         kind = f'{day.eclipse.kind} eclipse'
         return f'{kind} · auspicious activities deferred'
 
+    allowed_maasams = rules.get('allowed_maasams')
+    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')
+    if allowed_maasams and normalized_maasam not in allowed_maasams:
+        return (f'{day.maasam} Maasa · {rules["label"]} source profile '
+                'does not admit this lunar month')
+
+    allowed_varas = rules.get('allowed_varas')
+    if allowed_varas and day.vaaram not in allowed_varas:
+        return (f'{day.vaaram} · {rules["label"]} source profile '
+                'does not admit this weekday')
+    if (day.vaaram, day.paksham) in map(tuple, rules.get('avoid_vara_paksha', ())):
+        return (f'{day.vaaram} during {day.paksham} Paksha · '
+                f'{rules["label"]} source profile rejects this combination')
+
+    allowed_solar_classes = rules.get('allowed_solar_classes')
+    if (allowed_solar_classes and
+            lagna_class_of(day.solar_sign) not in allowed_solar_classes):
+        return (f'Surya in {day.solar_sign} ({lagna_class_of(day.solar_sign)}) · '
+                f'{rules["label"]} source profile does not admit this Rasi class')
+
     if activity == 'travel' and travel_direction is not None:
         blocked = getattr(day, 'disha_shoola_direction', None)
         if blocked is not None and travel_direction == blocked:
@@ -288,6 +310,16 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
 def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | None:
     day = ctx.day
 
+    if ctx.allowed_nakshatras and facts.nakshatra not in ctx.allowed_nakshatras:
+        return None
+    try:
+        active_tithi_number = tithi_number(facts.tithi)
+    except ValueError:
+        active_tithi_number = None
+    if (ctx.allowed_tithi_numbers and
+            active_tithi_number not in ctx.allowed_tithi_numbers):
+        return None
+
     # Special yogas
     yoga_bonus, yoga_reasons, defer = score_special_yogas(
         facts.special_yogas, ctx.skip_yogas)
@@ -370,6 +402,10 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
         activity_match.append(tithi_activity_reason)
     if ctx.vara_reason:
         activity_match.append(ctx.vara_reason)
+    if facts.nakshatra in ctx.prefer_nakshatras:
+        score += 1
+        activity_match.append(
+            f'{facts.nakshatra} specifically favoured for {ctx.label} (+1)')
 
     # Overlap bonuses (Abhijit is now scored above as a muhurta nature).
     if any(_overlaps(s, e, a.start, a.end) for a in ctx.amrita):
@@ -411,6 +447,12 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
 
     # Lagna scoring
     cur_lagna = slot_lagna_name(ctx.lagnas, s)
+    if (ctx.required_lagna_class and
+            cur_lagna not in lagnas_in_class(ctx.required_lagna_class)):
+        return None
+    if ctx.required_lagna_class:
+        activity_match.append(
+            f'{cur_lagna} lagna satisfies required {ctx.required_lagna_class} class')
     lagna_bonus, lagna_reasons, lagna_ashtama_names = score_lagna(
         ctx.janma_nakshatras, ctx.janma_rasis, cur_lagna,
         janma_lagnas=ctx.janma_lagnas)
@@ -458,6 +500,7 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
         chandra_avoid_names=chandra_avoid_names,
         tithi_fam=tithi_fam,
     )
+    notes.extend(f'Manual check required · {item}' for item in ctx.manual_checks)
 
     reason_groups = {
         'slot_quality': slot_quality,
@@ -553,8 +596,13 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     avoid_tithi_class = list(rules.get('avoid_tithi_class', []))
     prefer_varas = frozenset(rules.get('prefer_vara', ()))
     prefer_lagna_class = rules.get('prefer_lagna_class')
+    required_lagna_class = rules.get('required_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
+    allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
+    prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
+    allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    manual_checks = tuple(rules.get('manual_checks', ()))
     label = rules['label']
 
     _shukra_penalty = rules.get('penalty_on_simha_stha_shukra', 0) \
@@ -588,9 +636,14 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         prefer_varas=prefer_varas,
         lagnas=get_lagna_transitions(day),
         prefer_lagna_class=prefer_lagna_class,
+        required_lagna_class=required_lagna_class,
         prefer_bhadra_puchha=prefer_bhadra_puchha,
         simha_stha_shukra_penalty=_shukra_penalty,
         prefer_nakshatra_mukha=prefer_nakshatra_mukha,
+        allowed_nakshatras=allowed_nakshatras,
+        prefer_nakshatras=prefer_nakshatras,
+        allowed_tithi_numbers=allowed_tithi_numbers,
+        manual_checks=manual_checks,
     )
 
     use_engine = engine is not None and hasattr(engine, 'facts_at')
@@ -664,6 +717,20 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
 
     rules = ACTIVITY_RULES[activity]
 
+    allowed_maasams = rules.get('allowed_maasams')
+    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')
+    if allowed_maasams and normalized_maasam not in allowed_maasams:
+        return []
+    allowed_varas = rules.get('allowed_varas')
+    if allowed_varas and day.vaaram not in allowed_varas:
+        return []
+    if (day.vaaram, day.paksham) in map(tuple, rules.get('avoid_vara_paksha', ())):
+        return []
+    allowed_solar_classes = rules.get('allowed_solar_classes')
+    if (allowed_solar_classes and
+            lagna_class_of(day.solar_sign) not in allowed_solar_classes):
+        return []
+
     if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
         return []
     if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
@@ -686,8 +753,13 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     avoid_tithi_class = list(rules.get('avoid_tithi_class', []))
     prefer_varas = set(rules.get('prefer_vara', ()))
     prefer_lagna_class = rules.get('prefer_lagna_class')
+    required_lagna_class = rules.get('required_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
+    allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
+    prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
+    allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    manual_checks = tuple(rules.get('manual_checks', ()))
     label = rules['label']
 
     _shukra_penalty = rules.get('penalty_on_simha_stha_shukra', 0) \
@@ -747,9 +819,14 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         prefer_varas=frozenset(prefer_varas),
         lagnas=lagnas,
         prefer_lagna_class=prefer_lagna_class,
+        required_lagna_class=required_lagna_class,
         prefer_bhadra_puchha=prefer_bhadra_puchha,
         simha_stha_shukra_penalty=_shukra_penalty,
         prefer_nakshatra_mukha=prefer_nakshatra_mukha,
+        allowed_nakshatras=allowed_nakshatras,
+        prefer_nakshatras=prefer_nakshatras,
+        allowed_tithi_numbers=allowed_tithi_numbers,
+        manual_checks=manual_checks,
         avoid_tithi_class=avoid_tithi_class,
     )
 

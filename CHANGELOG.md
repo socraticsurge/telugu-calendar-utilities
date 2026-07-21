@@ -7,10 +7,24 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
-Documentation and repository housekeeping only — no engine, MCP, or
-ICS-feed behaviour changes; all code trees byte-identical.
+### Added
+- **Source-backed Bhumi Puja / house-foundation profile.** B. V. Raman,
+  *Muhurtha*, Chapter XII, printed page 50 (PDF page 54), now governs the
+  activity's admitted lunar months, solar-Rasi classes, exact Tithi numbers,
+  Nakshatras, weekdays and fixed Lagna. Full election-chart and site-placement
+  conditions remain explicit manual checks.
+- `find_muhurta` now returns an additive `activity_profile` with the automated
+  constraints, manual review requirements, and stable provenance claim ID.
+  The website consumes the same generated Python activity contract.
+
+### Changed
+- Bhumi Puja / foundation candidates use the cited activity profile instead
+  of the former generic Bhadra-tithi/fixed-Lagna preference pair. Shared
+  samskara and ranking rules remain independently disclosed.
 
 ### Documentation
+- Added a criterion-level foundation-laying crosswalk and verified
+  `muhurta.bhumi_puja.foundation` provenance claim.
 - CHANGELOG reconciled against the full git history. The operational-
   maturity round that actually shipped **inside the v1.9.0 tag** is now
   folded into the [1.9.0] entry — it had been stranded under a misplaced

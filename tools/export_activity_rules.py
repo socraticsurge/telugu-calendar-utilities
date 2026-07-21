@@ -17,6 +17,9 @@ OUTPUT = ROOT / 'src' / 'data' / 'activity-rules.generated.json'
 CONSUMED_FIELDS = (
     'label', 'avoid_karana', 'prefer_lagna_class', 'prefer_choghadiya',
     'skip_on_yoga', 'prefer_vara', 'prefer_tithi_class',
+    'required_lagna_class', 'allowed_maasams', 'allowed_varas',
+    'avoid_vara_paksha', 'allowed_solar_classes', 'allowed_nakshatras',
+    'prefer_nakshatras', 'allowed_tithi_numbers', 'manual_checks',
 )
 
 
@@ -79,4 +82,3 @@ def main() -> int:
 
 if __name__ == '__main__':
     raise SystemExit(main())
-

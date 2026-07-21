@@ -24,7 +24,7 @@
       "title": "Muhurtha (Electional Astrology)",
       "author": "B. V. Raman",
       "edition": "UBS Publishers' Distributors, 1993, ISBN 9788185674681",
-      "url": "https://books.google.com/books?id=nHQlAcBkDXIC",
+      "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf",
       "authority_type": "modern_synthesis"
     },
     {
@@ -84,6 +84,17 @@
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": null,
       "scope": "Each activity needs rule-level locators; shared defaults must not imply universal textual agreement."
+    },
+    {
+      "id": "muhurta.bhumi_puja.foundation",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XII, 'House Building' / 'Laying the Foundation,' printed p. 50 (PDF p. 54)",
+      "scope": "Supports the configured house-foundation lunar-month, Tithi-number, Nakshatra, weekday, solar-Rasi and fixed-Lagna criteria. Full election-chart house occupancy/aspects and ritual site placement are disclosed manual checks. Shared samskara filters, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-07-21"
     },
     {
       "id": "muhurta.relative_tiers",

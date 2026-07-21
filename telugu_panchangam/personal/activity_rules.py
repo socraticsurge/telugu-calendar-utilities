@@ -17,6 +17,15 @@
 #   prefer_tithi_class      Nanda|Bhadra|Jaya|Rikta|Purna — +1 when tithi matches
 #   prefer_vara             list of vaaram names — +1 on matching weekday
 #   prefer_lagna_class      Sthira|Chara|Dvisvabhava — +1 when rising sign matches
+#   required_lagna_class    slot omitted unless its active Lagna matches
+#   allowed_maasams         day omitted unless its normalized lunar month is listed
+#   allowed_varas           day omitted unless its sunrise weekday is listed
+#   avoid_vara_paksha       (Vara, Paksha) pairs that omit a day
+#   allowed_solar_classes   day omitted unless Surya's Rasi is in one of these classes
+#   allowed_nakshatras      slot omitted unless its active Nakshatra is listed
+#   prefer_nakshatras       active Nakshatra names receiving +1
+#   allowed_tithi_numbers   slot omitted unless its active Tithi number is listed
+#   manual_checks           source-required criteria not computed by the finder
 #   prefer_bhadra_puchha    bonus when slot overlaps Bhadra Puchha
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
@@ -161,9 +170,39 @@ ACTIVITY_RULES: dict[str, dict] = {
     # — Construction & Ventures —
     'bhumi_puja':    {'label': 'Bhumi Puja / Foundation laying',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
-                      'prefer_tithi_class': 'Bhadra',
-                      'prefer_vara': ['Guruvaram', 'Somavaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'allowed_maasams': [
+                          'Chaitra', 'Vaishakha', 'Shravana', 'Kartika',
+                          'Magha',
+                      ],
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'avoid_vara_paksha': [('Somavaram', 'Krishna')],
+                      'allowed_solar_classes': ['Sthira', 'Chara'],
+                      'allowed_nakshatras': [
+                          'Rohini', 'Mrigashira', 'Chitra', 'Hasta',
+                          'Jyeshtha', 'Uttara Phalguni', 'Uttara Ashadha',
+                          'Shravana', 'Swati', 'Pushya', 'Anuradha',
+                          'Ashwini', 'Shatabhisha', 'Uttara Bhadrapada',
+                          'Revati',
+                      ],
+                      'prefer_nakshatras': [
+                          'Rohini', 'Mrigashira', 'Chitra', 'Hasta',
+                          'Jyeshtha', 'Uttara Phalguni', 'Uttara Ashadha',
+                          'Shravana',
+                      ],
+                      'allowed_tithi_numbers': [1, 2, 3, 5, 6, 7, 10, 11, 13, 15],
+                      'prefer_vara': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'required_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Election chart: 8th house from Lagna must be vacant and free of malefic aspect.',
+                          'Election chart: malefics should occupy 3rd, 6th or 11th; benefics should fortify Kendras and Trikonas.',
+                          'Site ritual: after Puja, the first foundation stone is placed at the north-eastern corner.',
+                      ]},
     'business':      {'label': 'Business launch',
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
