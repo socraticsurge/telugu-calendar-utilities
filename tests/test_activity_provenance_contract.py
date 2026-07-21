@@ -24,6 +24,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'property': 'muhurta.land_purchase.building',
         'bhumi_puja': 'muhurta.bhumi_puja.foundation',
         'construction_roof': 'muhurta.construction_roof',
+        'coronation': 'muhurta.coronation',
         'well_digging': 'muhurta.well_digging',
     }
 

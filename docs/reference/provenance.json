@@ -196,6 +196,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.coronation",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XVI, 'Electing Head of the State' and 'Coronation,' printed p. 66 (PDF p. 70)",
+      "scope": "The coronation paragraph explicitly applies the immediately preceding head-of-state rules. This supports the configured Nakshatra, exact Tithi and admitted rising-Rasi lists plus the disclosed election-chart checks and the traditional-coronation and democratic-government alternatives. Shared samskara exclusions and the Urdhva-Mukha preference are separately implemented project rules and do not inherit authority from this citation.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

@@ -465,8 +465,38 @@ ACTIVITY_RULES: dict[str, dict] = {
                               'should occupy a Kendra in a full watery Rasi.',
                           ]},
     'coronation':        {'label': 'Coronation / title ceremony',
+                          'source_claim': 'muhurta.coronation',
                           'skip_on_yoga': list(_SAMSKARA_SKIP),
-                          'prefer_nakshatra_mukha': (['Urdhva'], 1)},
+                          'prefer_nakshatra_mukha': (['Urdhva'], 1),
+                          'allowed_nakshatras': [
+                              'Ashwini', 'Rohini', 'Mrigashira',
+                              'Punarvasu', 'Pushya', 'Uttara Phalguni',
+                              'Hasta', 'Anuradha', 'Uttara Ashadha',
+                              'Shravana', 'Uttara Bhadrapada', 'Revati',
+                          ],
+                          'allowed_tithi_names': [
+                              'Shukla Pratipat', 'Shukla Dwitiya',
+                              'Shukla Tritiya', 'Shukla Panchami',
+                              'Shukla Saptami', 'Shukla Dashami',
+                              'Shukla Ekadashi', 'Shukla Trayodashi',
+                              'Pournami', 'Krishna Dwitiya',
+                              'Krishna Dashami',
+                          ],
+                          'allowed_lagnas': [
+                              'Mesha', 'Vrishabha', 'Mithuna', 'Karka',
+                              'Simha', 'Dhanu', 'Kumbha', 'Meena',
+                          ],
+                          'manual_checks': [
+                              'Strengthen Surya, Chandra, Lagna, the 10th '
+                              'house and their lords; leave the 8th house '
+                              'vacant and confine malefics to Upachayas.',
+                              'For a traditional coronation, prefer Simha '
+                              'Lagna occupied by Surya and aspected by Guru.',
+                              'For a democratic government beginning, the '
+                              'source instead describes Kumbha rising with '
+                              'Shani in Kumbha or Tula, aspected by Guru or '
+                              'Shukra.',
+                          ]},
 }
 
 ACTIVITIES = tuple(ACTIVITY_RULES.keys())
