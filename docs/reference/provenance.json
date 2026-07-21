@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "evidence_classes": ["astronomical", "textual", "published_panchangam", "regional_convention", "project_heuristic"],
+  "verification_states": ["verified", "partially_verified", "engine_pinned", "needs_locator", "heuristic"],
+  "sources": [
+    {
+      "id": "BS-IYER-1884",
+      "title": "The Brihat Samhita",
+      "author": "Varahamihira",
+      "edition": "N. Chidambaram Iyer translation, South Indian Press, 1884",
+      "url": "https://archive.org/details/b29353130",
+      "authority_type": "primary_text_translation"
+    },
+    {
+      "id": "BS-SASTRI-BHAT-1946",
+      "title": "Brihat Samhita",
+      "author": "Varahamihira",
+      "edition": "V. Subrahmanya Sastri and M. Ramakrishna Bhat translation, 1946",
+      "url": "https://archive.org/details/Brihatsamhita",
+      "authority_type": "primary_text_translation"
+    },
+    {
+      "id": "BVR-MUHURTHA-1993",
+      "title": "Muhurtha (Electional Astrology)",
+      "author": "B. V. Raman",
+      "edition": "UBS Publishers' Distributors, 1993, ISBN 9788185674681",
+      "url": "https://books.google.com/books?id=nHQlAcBkDXIC",
+      "authority_type": "modern_synthesis"
+    },
+    {
+      "id": "DP-DAY-PAGE",
+      "title": "Drik Panchang day and festival pages",
+      "author": "Drik Panchang",
+      "edition": "Location- and date-specific web pages",
+      "url": "https://www.drikpanchang.com/",
+      "authority_type": "published_panchangam"
+    },
+    {
+      "id": "SWISSEPH",
+      "title": "Swiss Ephemeris",
+      "author": "Astrodienst",
+      "edition": "pyswisseph runtime used by the Drik engine",
+      "url": "https://www.astro.com/swisseph/",
+      "authority_type": "astronomical_reference"
+    }
+  ],
+  "claims": [
+    {
+      "id": "drik.sidereal_positions",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/drik.py",
+      "evidence_class": "astronomical",
+      "verification_state": "partially_verified",
+      "source_ids": ["SWISSEPH", "DP-DAY-PAGE"],
+      "locator": "Representative golden dates in tests/test_drik_engine.py and related timing tests",
+      "scope": "Supports computed Drik positions and representative event times; does not establish interpretive doctrine."
+    },
+    {
+      "id": "festivals.forward_year_2027_2028",
+      "surface": "panchangam",
+      "implementation": "tests/fixtures/forward_year_festivals.json",
+      "evidence_class": "published_panchangam",
+      "verification_state": "partially_verified",
+      "source_ids": ["DP-DAY-PAGE"],
+      "locator": "1 DP_VERIFIED cell; 29 ENGINE_PINNED cells in the fixture",
+      "scope": "Only cells marked DP_VERIFIED are independently verified."
+    },
+    {
+      "id": "gochara.house_and_vedha_tables",
+      "surface": "daily_horoscope",
+      "implementation": "telugu_panchangam/gochara/rules.py",
+      "evidence_class": "textual",
+      "verification_state": "needs_locator",
+      "source_ids": ["BS-IYER-1884", "BS-SASTRI-BHAT-1946"],
+      "locator": null,
+      "scope": "A Brihat Samhita chapter/verse locator must be recorded for every favourable-house and vedha mapping."
+    },
+    {
+      "id": "muhurta.activity_rules",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "needs_locator",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": null,
+      "scope": "Each activity needs rule-level locators; shared defaults must not imply universal textual agreement."
+    },
+    {
+      "id": "muhurta.relative_tiers",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/muhurta.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "_RELATIVE_BANDS and assign_tiers",
+      "scope": "Presentation/ranking heuristic only; not a scriptural quality classification."
+    },
+    {
+      "id": "panchanga_shuddhi.five_limb_count",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/panchanga_shuddhi.py",
+      "evidence_class": "textual",
+      "verification_state": "needs_locator",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": null,
+      "scope": "The categorical limb rules and the 0-5 composite labels require separate locators; activity context limits universality."
+    }
+  ]
+}

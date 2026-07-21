@@ -151,7 +151,7 @@ re-enforces this at release time.
 
 ## Test architecture
 
-515+ tests pin behaviour. Three philosophies in use:
+1,000+ tests pin behaviour. Three philosophies are in use:
 
 - **Golden-output**: most engine tests verify against pre-computed
   values cross-checked with [drikpanchang.com](https://drikpanchang.com).

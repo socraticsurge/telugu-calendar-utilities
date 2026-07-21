@@ -37,6 +37,7 @@ PyPI MCP package.
 | 04 | [User-facing features](04-user-facing-features.md) | The 17 MCP tools, the ICS feeds, the landing page — how each works |
 | 05 | [Data flow & the muhurta pipeline](05-data-flow-and-muhurta.md) | End-to-end flow; the muhurta scorer in depth (the crown-jewel consumer) |
 | 06 | [Roadmap & backlog](06-roadmap-and-backlog.md) | Shipped phases, paused/parked work, and one governance inconsistency to reconcile |
+| 08 | [Provenance & authority](08-provenance-and-authority.md) | Evidence classes, source editions, claim-level citation status, and the verification ledger |
 
 ## How to read the diagrams
 
@@ -78,7 +79,11 @@ useful as plain text too.
 
 ## Classical sources cited across the codebase
 
-Muhurta Chintamani · Brihat Samhita · Brihat Parashara Hora Shastra (BPHS) ·
-Dharmasindhu / Dharma Sindhu · Surya Siddhanta · standard panchangam authority,
-all cross-verified against **drikpanchang.com** day-pages (the project's
-verification surface).
+The codebase draws on Muhurta Chintamani, Brihat Samhita, Brihat Parashara
+Hora Shastra (BPHS), Dharmasindhu, Surya Siddhanta, B. V. Raman's *Muhurtha*,
+and modern astronomical references. These sources do different jobs: a text
+may establish a rule, while an ephemeris or published panchangam may verify a
+computed time. They are not interchangeable. Exact editions, locators, and
+the current verification state are recorded in
+[Provenance & authority](08-provenance-and-authority.md); missing locators are
+listed there as open evidence work rather than treated as verified.

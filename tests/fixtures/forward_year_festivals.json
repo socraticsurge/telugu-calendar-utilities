@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generated_on": "2026-06-16",
-  "purpose": "Forward-year DP-verified festival regression \u2014 pins engine output for 2027-2028 across 5 anchor festivals \u00d7 3 cities against drikpanchang.com day-pages. See tests/test_festivals_forward_year.py.",
+  "purpose": "Forward-year festival regression \u2014 one externally verified pilot and 29 engine-pinned cells for 2027-2028 across 5 anchor festivals \u00d7 3 cities. See each cell's verification status and tests/test_festivals_forward_year.py.",
   "dp_geoname_ids": {
     "Hyderabad": 1269843,
     "Bengaluru": 1277333,
@@ -36,6 +36,11 @@
         "day_page": "https://www.drikpanchang.com/panchang/day-panchang.html?date=04/09/2027&geoname-id=1269843",
         "screenshot_dated": "2026-06-16",
         "screenshot_notes": "User-provided DP screenshot confirmed 2027-09-04 + day-page timings."
+      },
+      "verification": {
+        "status": "DP_VERIFIED",
+        "festival_appears_in_engine_output": true,
+        "engine_compare_status": "OK"
       }
     },
     {
