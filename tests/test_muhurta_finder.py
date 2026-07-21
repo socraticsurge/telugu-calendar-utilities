@@ -36,10 +36,20 @@ def test_slots_never_overlap_inauspicious_windows():
                 f"slot {s['start']}-{s['end']} overlaps {w.name}"
 
 
-def test_slots_come_from_good_choghadiya_only():
+def test_every_slot_is_a_named_muhurta():
+    # Slots are the named 48-min muhurtas now; the identity leads the
+    # reasons. Choghadiya is a scoring attribute, not a gate, so a slot
+    # may sit in any choghadiya (bad ones just score 0).
+    from telugu_panchangam.muhurtas import DAY_MUHURTAS
+    day_names = {n for n, _, _ in DAY_MUHURTAS}
     day = _day(2026, 6, 17)
-    for s in day_slots(day):
-        assert s['reasons'][0].split(' ')[0] in GOOD_CHOGHADIYA
+    slots = day_slots(day)
+    assert slots
+    for s in slots:
+        lead = s['reasons'][0]
+        assert ' muhurta' in lead, f'slot lead is not a muhurta identity: {lead!r}'
+        name = lead.split(' muhurta')[0].split(' (')[0]  # strip '(Abhijit)' tag
+        assert name in day_names, f'unknown day muhurta {name!r}'
 
 
 def test_ranked_by_score_and_carries_reasons():
@@ -213,11 +223,15 @@ def test_wedding_skips_dagdha_day():
 
 
 def test_vehicle_applies_labh_bonus():
+    # Vehicle prefers the Labh choghadiya. A muhurta whose dominant
+    # choghadiya is Labh should carry the "Labh favoured for Vehicle" bonus.
     day = _day(2026, 6, 17)
     slots = day_slots(day, activity='vehicle')
-    labh_slots = [s for s in slots if s['reasons'][0].startswith('Labh ')]
-    assert labh_slots, 'expected at least one Labh-block slot'
-    assert any('Labh favoured for Vehicle purchase' in r for r in labh_slots[0]['reasons'])
+    labh_slots = [s for s in slots
+                  if any(r.startswith('Labh choghadiya') for r in s['reasons'])]
+    assert labh_slots, 'expected at least one muhurta in the Labh choghadiya'
+    assert any('Labh favoured for Vehicle purchase' in r
+               for r in labh_slots[0]['reasons'])
 
 
 def test_surgery_avoids_vishti():
@@ -622,16 +636,16 @@ def test_personal_dosha_tara_dosha_caps_tier():
 
 
 def test_personal_dosha_chandra_avoid_caps_tier():
-    # 2026-06-25: Pushya + Karka -> Moon@4 (avoid, non-Ashtama). The
-    # top slot scores 7 (Excellent by raw score: Char+1, Abhijit+2,
-    # Sarvartha+2, Shiva nitya+1, Anandadi Sthira+1, tara+1, chandra-1)
-    # but the unrectified chandra dosha caps it at Good.
+    # 2026-06-25: Pushya + Karka -> Moon@4 (avoid, non-Ashtama). The top
+    # slot scores 8 (Excellent by raw score — now including the +1 for the
+    # muhurta's auspicious nature) but the unrectified chandra_avoid dosha
+    # caps its tier at Good.
     from telugu_panchangam.personal.muhurta import score_tier
     day = _day(2026, 6, 25)
     slots = day_slots(day, janma_nakshatras=['Pushya'], janma_rasis=['Karka'])
     assert slots
     top = slots[0]
-    assert top['score'] == 7
+    assert top['score'] == 8
     assert score_tier(top['score']) == 'Excellent'
     assert top['personal_dosha'] == 'chandra_avoid'
     assert top['tier'] == 'Good'
@@ -1048,15 +1062,18 @@ def test_night_slots_timing_between_sunset_and_next_sunrise():
         assert s['end'] <= next_day.sunrise, 'slot must end at or before next sunrise'
 
 
-def test_night_slots_come_from_night_choghadiya_blocks():
-    from telugu_panchangam.personal.muhurta import night_slots, GOOD_CHOGHADIYA
+def test_night_slots_are_named_night_muhurtas():
+    from telugu_panchangam.personal.muhurta import night_slots
+    from telugu_panchangam.muhurtas import NIGHT_MUHURTAS
+    night_names = {n for n, _, _ in NIGHT_MUHURTAS}
     day, next_day = _two_days(2026, 6, 16)
     slots = night_slots(day, next_day, engine=ENGINE)
     assert slots
     for s in slots:
-        block_name = s['reasons'][0].split(' ')[0]
-        assert block_name in GOOD_CHOGHADIYA, \
-            f'night slot should start from a good choghadiya block; got {block_name!r}'
+        lead = s['reasons'][0]
+        assert ' muhurta' in lead, f'night slot lead is not a muhurta identity: {lead!r}'
+        name = lead.split(' muhurta')[0].split(' (')[0]
+        assert name in night_names, f'unknown night muhurta {name!r}'
 
 
 def test_night_slots_do_not_overlap_varjyam():
@@ -1083,17 +1100,16 @@ def test_night_slots_exclude_rahu_gulika_yamagandam():
 
 
 def test_night_slots_brahma_muhurta_bonus():
-    # 2026-06-01: Brahma Muhurta falls inside an auspicious night block.
+    # Brahma is now the 14th night muhurta, scored +2 via its nature
+    # (it leads the slot's reasons as "Brahma muhurta ... (+2)").
     from telugu_panchangam.personal.muhurta import night_slots
     day, next_day = _two_days(2026, 6, 1)
     slots = night_slots(day, next_day, engine=ENGINE)
-    brahma_slots = [s for s in slots
-                    if any('Brahma Muhurta' in r for r in s['reasons'])]
-    assert brahma_slots, 'expected at least one slot overlapping Brahma Muhurta on 2026-06-01'
+    brahma_slots = [s for s in slots if s['reasons'][0].startswith('Brahma muhurta')]
+    assert brahma_slots, 'expected the Brahma (14th night) muhurta to surface on 2026-06-01'
     for s in brahma_slots:
-        bonus_reasons = [r for r in s['reasons'] if 'Brahma Muhurta' in r]
-        assert any('+2' in r for r in bonus_reasons), \
-            f'Brahma Muhurta should carry +2 bonus; got {bonus_reasons}'
+        assert '(+2)' in s['reasons'][0], \
+            f'Brahma muhurta should carry +2 nature; got {s["reasons"][0]!r}'
 
 
 def test_night_slots_nishita_kala_bonus():
@@ -1186,23 +1202,18 @@ def test_mcp_find_muhurta_include_night():
 # Phase 2 — 48-minute classical muhurta windows
 # ---------------------------------------------------------------------------
 
-def test_day_slots_are_at_most_48_minutes():
-    """Every slot's window is ≤ 48 minutes (classical muhurta upper bound).
-
-    Bad windows can cut a slot shorter than 48 min; the window itself is
-    never wider than one classical muhurta.
+def test_day_slots_are_muhurtas_of_equal_length():
+    """Each day slot is one named muhurta = (sunset-sunrise)/15 — ~48 min,
+    breathing with the season (so it can exceed 48 min in summer). All
+    day slots on a given day share that exact length.
     """
-    from datetime import timedelta
-    from telugu_panchangam.personal.muhurta import MUHURTA_MINUTES
-    limit = timedelta(minutes=MUHURTA_MINUTES)
     for date_args in [(2026, 6, 16), (2026, 6, 17), (2026, 6, 25)]:
         day = _day(*date_args)
+        mu_len = (day.sunset - day.sunrise) / 15
         for s in day_slots(day, engine=ENGINE):
-            duration = s['end'] - s['start']
-            assert duration <= limit, (
-                f"{date_args}: slot {s['start']}–{s['end']} is {duration}, "
-                f"exceeds {MUHURTA_MINUTES} min"
-            )
+            assert abs((s['end'] - s['start'] - mu_len).total_seconds()) < 1, (
+                f"{date_args}: slot {s['start']}–{s['end']} is not one muhurta "
+                f"({mu_len})")
 
 
 def test_night_slots_are_at_most_48_minutes():
@@ -1219,40 +1230,24 @@ def test_night_slots_are_at_most_48_minutes():
             )
 
 
-def test_day_slots_start_on_48_minute_boundaries():
-    """Each slot's start is either at a sunrise + N×48-min boundary, or
-    immediately after a bad window (which pushed it forward within that
-    48-min window). Verified by checking the offset from sunrise is a
-    multiple of 48 min, OR the start coincides with the end of some
-    inauspicious window on that day.
+def test_day_slot_starts_align_to_muhurta_grid():
+    """Every slot starts exactly on a muhurta boundary: sunrise + k*(day/15)
+    for some k in 0..14. Muhurtas are indivisible now — a bad-window overlap
+    excludes the whole muhurta rather than shifting its start.
     """
-    from datetime import timedelta
-    from telugu_panchangam.personal.muhurta import MUHURTA_MINUTES
-    muhurta = timedelta(minutes=MUHURTA_MINUTES)
     day = _day(2026, 6, 17)
-    bad_ends = {w.end for w in
-                [day.rahu_kalam, day.gulika_kalam, day.yamagandam]
-                + list(day.varjyam) + list(day.durmuhurtham)}
+    mu_len = (day.sunset - day.sunrise) / 15
+    grid = {round((day.sunrise + k * mu_len).timestamp()) for k in range(15)}
     for s in day_slots(day, engine=ENGINE):
-        offset = s['start'] - day.sunrise
-        on_boundary = (offset.total_seconds() % muhurta.total_seconds()) == 0.0
-        after_bad = s['start'] in bad_ends
-        assert on_boundary or after_bad, (
-            f"slot start {s['start']} is neither a 48-min sunrise boundary "
-            f"nor the end of a bad window"
-        )
+        assert round(s['start'].timestamp()) in grid, (
+            f"slot start {s['start']} is not on the muhurta grid")
 
 
-def test_clean_choghadiya_block_produces_two_slots():
-    """A good choghadiya block ~98 min long with no bad-window overlap spans
-    two 48-min windows, producing ≥ 2 slots.
-
-    2026-06-25: the Char block (05:09–06:48 UTC) is entirely free of all
-    inauspicious windows and contains two sunrise-aligned 48-min windows.
-    """
+def test_day_produces_at_most_fifteen_distinct_muhurtas():
+    """There are 15 daytime muhurtas; the finder returns a subset of them
+    (those clear of hard windows), never more, never duplicated."""
     day = _day(2026, 6, 25)
     slots = day_slots(day, engine=ENGINE)
-    char_slots = [s for s in slots if s['reasons'][0].startswith('Char ')]
-    assert len(char_slots) >= 2, (
-        f"expected ≥2 slots from the clean Char block; got {len(char_slots)}"
-    )
+    assert 0 < len(slots) <= 15
+    starts = [s['start'] for s in slots]
+    assert len(starts) == len(set(starts)), 'a muhurta was emitted twice'

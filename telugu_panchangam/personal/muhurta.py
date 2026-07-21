@@ -8,6 +8,7 @@
 from datetime import datetime, timedelta
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
+from telugu_panchangam.muhurtas import named_muhurtas
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES, ACTIVITIES
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.nitya_yoga import NITYA_HARD_AVOID
@@ -125,6 +126,24 @@ def _subtract(start: datetime, end: datetime, blocks: list[tuple[datetime, datet
 
 def _overlaps(a0, a1, b0, b1) -> bool:
     return a0 < b1 and b0 < a1
+
+
+def _dominant_choghadiya(s, e, choghadiya):
+    """The choghadiya block covering most of [s, e], and — when the
+    muhurta straddles a boundary — the name of the secondary block it
+    also touches (else None). Choghadiya is a scoring attribute, not a
+    gate, so a straddling muhurta is scored by its dominant block and the
+    straddle is disclosed."""
+    best, best_overlap, touched = None, timedelta(0), []
+    for blk in choghadiya:
+        lo, hi = max(s, blk.start), min(e, blk.end)
+        ov = hi - lo
+        if ov > timedelta(0):
+            touched.append(blk.name)
+            if ov > best_overlap:
+                best, best_overlap = blk, ov
+    other = next((n for n in touched if n != best.name), None) if best else None
+    return best, other
 
 
 def _get_bad_windows(day, avoid_karana_names):
@@ -266,7 +285,7 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
 # Slot evaluation — orchestrates all scorers for one candidate slot
 # ---------------------------------------------------------------------------
 
-def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext) -> dict | None:
+def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | None:
     day = ctx.day
 
     # Special yogas
@@ -303,13 +322,34 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext) -> dict | None:
     # Anandadi
     anandadi_bonus, anandadi_reason = anandadi_day_modifier(day)
 
-    score = (base + ctx.vara_bonus + tara_bonus + chandra_bonus
+    # Muhurta intrinsic nature (additive, disclosed): Abhijit/Brahma +2,
+    # other auspicious +1, inauspicious -2.
+    if mu['is_abhijit'] or mu['is_brahma']:
+        nature_bonus = 2
+    elif mu['nature'] == 'auspicious':
+        nature_bonus = 1
+    else:
+        nature_bonus = -2
+
+    score = (base + nature_bonus + ctx.vara_bonus + tara_bonus + chandra_bonus
              + tithi_bonus + yoga_bonus + nitya_bonus
              + ctx.simha_stha_shukra_penalty + anandadi_bonus)
 
-    # Assemble reason buckets
+    # Assemble reason buckets — the muhurta identity leads the slot quality.
+    mu_label = mu['name']
+    if mu['is_abhijit']:
+        mu_label += ' (Abhijit)'   # the 8th daytime muhurta is named 'Vidhi'
+    # the 14th night muhurta is already named 'Brahma' — no tag needed
+    mu_deity = f" · {mu['deity']}" if mu['deity'] else ''
+    # Keep the (+base) at the end of the line — the score-consistency check
+    # parses a trailing (+N)/(-N); the straddle note goes before it.
+    chog_desc = f'{block.name} choghadiya'
+    if mu.get('chog_straddle'):
+        chog_desc += f" (spans {mu['chog_straddle']})"
+    chog_line = f'{chog_desc} (+{base})' if base else chog_desc
     slot_quality = [
-        f'{block.name} choghadiya (+{base})',
+        f'{mu_label} muhurta{mu_deity} — {mu["nature"]} ({nature_bonus:+d})',
+        chog_line,
         'clear of all inauspicious windows',
     ]
     day_quality = list(yoga_reasons) + list(nitya_reasons)
@@ -328,10 +368,7 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext) -> dict | None:
     if ctx.vara_reason:
         activity_match.append(ctx.vara_reason)
 
-    # Overlap bonuses
-    if ctx.abhijit and _overlaps(s, e, ctx.abhijit.start, ctx.abhijit.end):
-        score += 2
-        slot_quality.append('overlaps Abhijit Muhurta (+2)')
+    # Overlap bonuses (Abhijit is now scored above as a muhurta nature).
     if any(_overlaps(s, e, a.start, a.end) for a in ctx.amrita):
         score += 2
         slot_quality.append('overlaps Amrita Kalam (+2)')
@@ -556,23 +593,27 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     use_engine = engine is not None and hasattr(engine, 'facts_at')
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
+    # Iterate the 15 named daytime muhurtas (sunrise->sunset /15). Each is
+    # an indivisible slot: excluded if it overlaps any inauspicious window
+    # (decision 1), otherwise scored — with its intrinsic nature, its
+    # dominant choghadiya (a scoring attribute, straddle disclosed), and
+    # all the per-slot factors. The muhurta grid coincides with the
+    # engine's Abhijit/Durmuhurtham (see telugu_panchangam/muhurtas.py).
     slots = []
-    t = day.sunrise
-    while t < day.sunset:
-        win_end = min(t + _MUHURTA_DUR, day.sunset)
-        block = _chog_at_time(t, day.choghadiya)
-        if block is not None:
-            base = GOOD_CHOGHADIYA.get(block.name)
-            if base is not None:
-                for s, e in _subtract(t, win_end, bad):
-                    if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
-                        continue
-                    facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
-                            if use_engine else snapshot
-                    slot_dict = _evaluate_slot(s, e, block, base, facts, ctx)
-                    if slot_dict is not None:
-                        slots.append(slot_dict)
-        t += _MUHURTA_DUR
+    for mu in named_muhurtas(day):
+        s, e = mu['start'], mu['end']
+        if any(_overlaps(s, e, b0, b1) for b0, b1 in bad):
+            continue                              # decision 1: hard-window exclude
+        block, straddle = _dominant_choghadiya(s, e, day.choghadiya)
+        if block is None:
+            continue
+        mu = {**mu, 'chog_straddle': straddle}
+        base = GOOD_CHOGHADIYA.get(block.name, 0)  # bad choghadiya scores 0, not gated
+        facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                if use_engine else snapshot
+        slot_dict = _evaluate_slot(s, e, block, base, facts, ctx, mu)
+        if slot_dict is not None:
+            slots.append(slot_dict)
 
     assign_tiers(slots)
     slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
@@ -712,37 +753,30 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     use_engine = engine is not None and hasattr(engine, 'facts_at')
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
+    # The 15 named night muhurtas (sunset->next sunrise /15). Same model as
+    # day_slots: hard-window exclude, dominant night-choghadiya, muhurta
+    # nature. Brahma is now scored as the 14th night muhurta's nature; only
+    # the Nishita Kala overlap remains a night-specific bonus.
     slots = []
-    t = day.sunset
-    while t < next_day.sunrise:
-        win_end = min(t + _MUHURTA_DUR, next_day.sunrise)
-        block = _chog_at_time(t, night_blocks)
-        if block is not None:
-            base = GOOD_CHOGHADIYA.get(block.name)
-            if base is not None:
-                for s, e in _subtract(t, win_end, bad):
-                    if (e - s) < timedelta(minutes=MIN_SLOT_MINUTES):
-                        continue
-                    facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
-                            if use_engine else snapshot
-                    slot_dict = _evaluate_slot(s, e, block, base, facts, ctx)
-                    if slot_dict is None:
-                        continue
-
-                    # Night-specific bonuses applied after _evaluate_slot().
-                    night_bonuses: list[str] = []
-                    if brahma is not None and _overlaps(s, e, brahma.start, brahma.end):
-                        slot_dict['score'] += 2
-                        night_bonuses.append('overlaps Brahma Muhurta (+2)')
-                    if _overlaps(s, e, nishita_start, nishita_end):
-                        slot_dict['score'] += 2
-                        night_bonuses.append('overlaps Nishita Kala (+2)')
-                    if night_bonuses:
-                        slot_dict['reason_groups']['slot_quality'].extend(night_bonuses)
-                        slot_dict['reasons'].extend(night_bonuses)
-
-                    slots.append(slot_dict)
-        t += _MUHURTA_DUR
+    for mu in (m for m in named_muhurtas(day, next_day) if m['period'] == 'night'):
+        s, e = mu['start'], mu['end']
+        if any(_overlaps(s, e, b0, b1) for b0, b1 in bad):
+            continue
+        block, straddle = _dominant_choghadiya(s, e, night_blocks)
+        if block is None:
+            continue
+        mu = {**mu, 'chog_straddle': straddle}
+        base = GOOD_CHOGHADIYA.get(block.name, 0)
+        facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
+                if use_engine else snapshot
+        slot_dict = _evaluate_slot(s, e, block, base, facts, ctx, mu)
+        if slot_dict is None:
+            continue
+        if _overlaps(s, e, nishita_start, nishita_end):
+            slot_dict['score'] += 2
+            slot_dict['reason_groups']['slot_quality'].append('overlaps Nishita Kala (+2)')
+            slot_dict['reasons'].append('overlaps Nishita Kala (+2)')
+        slots.append(slot_dict)
 
     assign_tiers(slots)
     slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
