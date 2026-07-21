@@ -30,9 +30,10 @@ python tools/check_activity_provenance.py
 | `wood_cutting` | Wood-cutting / felling trees | `muhurta.wood_cutting` | Verified last-quarter profile |
 | `surgery` | Surgery / medical procedure | `muhurta.surgery` | Verified rule-level profile with clinical safety boundary |
 | `gold` | Gold / jewelry purchase | `muhurta.gold_jewelry.purchase` | Verified chart-level instruction; ranking remains heuristic |
-| remaining 15 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `pilgrimage` | Pilgrimage (Tirtha Yatra) | `muhurta.pilgrimage` | Verified incorporated journey profile |
+| remaining 14 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
-Coverage is therefore **15 of 30 profiles**. The verified profiles use
+Coverage is therefore **16 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha*, with edition-specific printed and PDF page locators.
 Raman is a modern secondary authority, not scripture; this
 status means the implemented criteria match the cited passage, not that every

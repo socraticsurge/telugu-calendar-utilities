@@ -99,6 +99,27 @@ export function muEndsBySolarNoon(
   return slotEndMin <= sunriseMin + (sunsetMin - sunriseMin) / 2;
 }
 
+export function muCombustionDropReason(
+  lagnaDayData: any,
+  requiredPlanets: string[],
+  activityLabel: string,
+): string | null {
+  if (!requiredPlanets.length) return null;
+  const fields: Record<string, string> = {
+    Guru: 'guruCombust',
+    Shukra: 'shukraCombust',
+  };
+  const unknown = requiredPlanets.filter(planet =>
+    !fields[planet] || typeof lagnaDayData?.[fields[planet]] !== 'boolean');
+  if (unknown.length) {
+    return `${activityLabel} combustion screening unavailable (${unknown.join(', ')})`;
+  }
+  const combust = requiredPlanets.filter(planet => lagnaDayData[fields[planet]]);
+  return combust.length
+    ? `${combust.join(' and ')} Maudhya · ${activityLabel} deferred`
+    : null;
+}
+
 export function computePersonalDosha({
   chandraAvoidNames = [] as string[],
   hasAshtamaChandra = false,

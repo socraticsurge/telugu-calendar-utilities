@@ -429,8 +429,21 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_vara': ['Guruvaram', 'Somavaram'],
                       'prefer_lagna_class': 'Sthira'},
     'pilgrimage':    {'label': 'Pilgrimage (Tirtha Yatra)',
+                      'source_claim': 'muhurta.pilgrimage',
                       'avoid_karana': ['Vishti'],
-                      'prefer_lagna_class': 'Chara'},
+                      'skip_on_combust': ['Guru'],
+                      'avoid_tithi_numbers': [14, 15],
+                      'prefer_nakshatras': [
+                          'Mrigashira', 'Ashwini', 'Pushya', 'Punarvasu',
+                          'Hasta', 'Anuradha', 'Shravana', 'Moola',
+                          'Dhanishtha', 'Revati',
+                      ],
+                      'prefer_lagna_class': 'Chara',
+                      'manual_checks': [
+                          'Election chart: place Guru in Lagna or the 9th '
+                          'house, as required by the pilgrimage-specific '
+                          'passage.',
+                      ]},
     # — Civil & Medical —
     'court':         {'label': 'Court / legal matter',
                       'prefer_tithi_class': 'Jaya',

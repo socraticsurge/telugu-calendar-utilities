@@ -20,6 +20,8 @@ def test_build_shape_and_indices_for_hyderabad():
     for d in data['days']:
         assert 0 <= d['lagna0'] < 12
         assert len(d['sunrise']) == 5 and d['sunrise'][2] == ':'
+        assert isinstance(d['guruCombust'], bool)
+        assert isinstance(d['shukraCombust'], bool)
         # Transitions are minutes from sunrise; should be strictly
         # increasing and stay strictly inside the day cycle.
         offsets = [t[0] for t in d['transitions']]

@@ -13,7 +13,7 @@ import {
   muIsFavourableLagna, muIsAshtamaLagna, muLagnaAtMin,
   muLagnaClassOf, muLagnasInClass,
   muScoreTier, muRelativeTier,
-  muEndsBySolarNoon,
+  muEndsBySolarNoon, muCombustionDropReason,
   computePersonalDosha, computeDayDosha,
 } from '../muhurta-scorer';
 import { selEl, inpEl } from '../lib/dom';
@@ -687,7 +687,7 @@ async function findMuhurta() {
     const activityRules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
     const activityNeedsLagna = !!(
       activityRules.prefer_lagna_class || activityRules.required_lagna_class ||
-      activityRules.allowed_lagnas?.length);
+      activityRules.allowed_lagnas?.length || activityRules.skip_on_combust?.length);
     const lagnaCityData = (people.length || activityNeedsLagna)
       ? await loadLagna(city) : null;
     const slots = [];
@@ -728,6 +728,13 @@ async function findMuhurta() {
       const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);
       const manualChecks = rules.manual_checks || [];
       const activityLabel = rules.label;
+      const combustionReason = muCombustionDropReason(
+        lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null,
+        rules.skip_on_combust || [], activityLabel);
+      if (combustionReason) {
+        droppedDays.push({ date: isoDate, reason: combustionReason });
+        continue;
+      }
 
       const normalizedMaasam = (data.maasam || '').replace(/^(?:Nija|Adhika)\s+/, '');
       if (rules.allowed_maasams?.length && !rules.allowed_maasams.includes(normalizedMaasam)) {

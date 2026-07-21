@@ -83,6 +83,19 @@ test('muLagnaAtMin returns the rashi rising at a slot start', () => {
   assert.equal(M.muLagnaAtMin(SAMPLE_DAY, 341 + 350), 'Simha');
 });
 
+test('muCombustionDropReason enforces and fails closed on Maudhya data', () => {
+  const clear = { guruCombust: false, shukraCombust: false };
+  assert.equal(M.muCombustionDropReason(clear, ['Guru'], 'Pilgrimage (Tirtha Yatra)'), null);
+  assert.equal(
+    M.muCombustionDropReason(
+      { guruCombust: true, shukraCombust: false }, ['Guru'],
+      'Pilgrimage (Tirtha Yatra)'),
+    'Guru Maudhya · Pilgrimage (Tirtha Yatra) deferred');
+  assert.equal(
+    M.muCombustionDropReason(null, ['Guru'], 'Pilgrimage (Tirtha Yatra)'),
+    'Pilgrimage (Tirtha Yatra) combustion screening unavailable (Guru)');
+});
+
 test('muLagnaAtMin returns null before sunrise or outside data', () => {
   assert.equal(M.muLagnaAtMin(SAMPLE_DAY, 0), null);   // before sunrise
   assert.equal(M.muLagnaAtMin(null, 360), null);       // no data

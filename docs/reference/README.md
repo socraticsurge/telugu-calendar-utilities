@@ -54,6 +54,7 @@ PyPI MCP package.
 | 26 | [Wood-cutting source profile](26-wood-cutting-profile.md) | Chapter XIII's last-quarter rule, dry-sign manual check, and separate Panchaka provenance |
 | 27 | [Surgery source profile](27-surgery-profile.md) | Chapter XV's exact election, chart cautions, and non-negotiable clinical safety boundary |
 | 28 | [Gold / jewelry source profile](28-gold-jewelry-profile.md) | Chapter X's limited chart instruction and explicit separation from project ranking heuristics |
+| 29 | [Pilgrimage source profile](29-pilgrimage-profile.md) | Chapter XIV's incorporated journey rules, Guru conditions, and heuristic boundary |
 
 ## How to read the diagrams
 

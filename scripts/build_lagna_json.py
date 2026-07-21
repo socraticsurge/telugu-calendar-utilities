@@ -16,6 +16,7 @@ the rising sign next changes, paired with the new rashi index.
       "days": [
         { "date": "YYYY-MM-DD",
           "sunrise": "HH:MM", "lagna0": 2,
+          "guruCombust": false, "shukraCombust": false,
           "transitions": [[5, 3], [137, 4], ...],
           "cycleEnd": 1440 }
       ]
@@ -94,6 +95,8 @@ def build_for_city(loc, start: date, days: int) -> dict:
         rows.append({
             'date': d.isoformat(),
             'sunrise': sunrise_local.strftime('%H:%M'),
+            'guruCombust': bool(day.guru_maudhya and day.guru_maudhya.combust),
+            'shukraCombust': bool(day.shukra_maudhya and day.shukra_maudhya.combust),
             'lagna0': lagna0,
             'transitions': tx,
             'cycleEnd': cycle_end,
@@ -109,7 +112,9 @@ def build_for_city(loc, start: date, days: int) -> dict:
 def main() -> None:
     out_dir = os.environ.get('LAGNA_OUT', 'public/feeds')
     os.makedirs(out_dir, exist_ok=True)
-    start = date.today().replace(day=1)
+    start_override = os.environ.get('LAGNA_START')
+    start = (date.fromisoformat(start_override) if start_override
+             else date.today().replace(day=1))
     for loc in CITIES:
         data = build_for_city(loc, start, DAYS_AHEAD)
         path = os.path.join(out_dir, f'{_slug(loc.name)}-lagna.json')

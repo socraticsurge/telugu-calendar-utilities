@@ -26,7 +26,8 @@
     "forenoon_only",
     "allowed_pakshams",
     "allowed_solar_signs",
-    "allowed_tithi_names"
+    "allowed_tithi_names",
+    "skip_on_combust"
   ],
   "groups": [
     {
@@ -105,7 +106,11 @@
         "Guruvaram",
         "Somavaram"
       ],
-      "prefer_tithi_class": "Purna"
+      "prefer_tithi_class": "Purna",
+      "skip_on_combust": [
+        "Guru",
+        "Shukra"
+      ]
     },
     "engagement": {
       "label": "Engagement (Nischayam)",
@@ -343,6 +348,10 @@
       "forenoon_only": true,
       "allowed_pakshams": [
         "Shukla"
+      ],
+      "skip_on_combust": [
+        "Guru",
+        "Shukra"
       ]
     },
     "upanayana": {
@@ -718,7 +727,30 @@
       "avoid_karana": [
         "Vishti"
       ],
-      "prefer_lagna_class": "Chara"
+      "prefer_lagna_class": "Chara",
+      "prefer_nakshatras": [
+        "Mrigashira",
+        "Ashwini",
+        "Pushya",
+        "Punarvasu",
+        "Hasta",
+        "Anuradha",
+        "Shravana",
+        "Moola",
+        "Dhanishtha",
+        "Revati"
+      ],
+      "avoid_tithi_numbers": [
+        14,
+        15
+      ],
+      "manual_checks": [
+        "Election chart: place Guru in Lagna or the 9th house, as required by the pilgrimage-specific passage."
+      ],
+      "source_claim": "muhurta.pilgrimage",
+      "skip_on_combust": [
+        "Guru"
+      ]
     },
     "ceremony": {
       "label": "Ceremony / puja (general)",

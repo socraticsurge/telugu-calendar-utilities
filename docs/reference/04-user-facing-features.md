@@ -127,7 +127,11 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
 - **Tarabalam · Muhurtam** — good days & ranked time slots for up to four people
   by birth star, with Chandrabalam. Typed scorer modules consume the generated
   Python activity contract; runtime `lagna.json` / `gochara.json` sidecars
-  supply slot-time data.
+  supply slot-time data. The per-city Lagna sidecar also carries Guru/Shukra
+  combustion flags, allowing browser Muhurtam searches to enforce the same
+  Maudhya exclusions declared by the Python activity profile. If those flags
+  are absent, affected browser searches fail closed instead of returning
+  unscreened dates.
 - **Gochara + Rasi Phalalu** — South Indian chart, transit verdicts, computed
   daily reading.
 

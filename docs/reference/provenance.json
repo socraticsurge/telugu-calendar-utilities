@@ -240,6 +240,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.pilgrimage",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XIV, 'Journeys' and 'Pilgrimage,' printed pp. 60-62 (PDF pp. 64-66)",
+      "scope": "The pilgrimage paragraph explicitly incorporates the earlier journey rules. This supports rejecting Chaturdashi and Full/New Chandra days, preferring the ten named journey Nakshatras, rejecting Guru combustion and disclosing Guru-in-Lagna-or-9th as a chart check. The Vishti-Karana rejection follows the separately cited general Panchanga-Suddhi rule. The configured Chara-Lagna preference is a project heuristic and does not inherit authority from this citation; Raman instead names six individual favorable journey Rasis.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
