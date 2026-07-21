@@ -185,6 +185,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.construction_roof",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XII, 'Laying the Foundation,' roofing-stage instruction, printed p. 50 (PDF p. 54)",
+      "scope": "Supports only the configured Vrishabha-or-Tula rising-Rasi admission rule for roofing. The passage distinguishes roofing from foundation laying but supplies no separate weekday, Tithi or Nakshatra list for this stage. The Panchaka-Nakshatra restriction is a separately implemented project rule and does not inherit authority from this citation.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

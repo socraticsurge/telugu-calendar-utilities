@@ -441,7 +441,9 @@ ACTIVITY_RULES: dict[str, dict] = {
     'cremation':         {'label': 'Cremation rites',
                           'skip_on_panchaka_nakshatra': True},
     'construction_roof': {'label': 'Roof-laying / construction milestone',
-                          'skip_on_panchaka_nakshatra': True},
+                          'source_claim': 'muhurta.construction_roof',
+                          'skip_on_panchaka_nakshatra': True,
+                          'allowed_lagnas': ['Vrishabha', 'Tula']},
     'wood_cutting':      {'label': 'Wood-cutting',
                           'skip_on_panchaka_nakshatra': True},
     # — Specialized activities —
