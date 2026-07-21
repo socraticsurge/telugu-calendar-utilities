@@ -265,6 +265,17 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.ceremony.profile_conflict",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Nakshatra-prakarana, 'Shantika and Paushtika Muhurta,' verse 34, printed pp. 42-43 (OCR lines 2749-2772 in the Internet Archive full text)",
+      "scope": "Verse 34 governs Shantika and Paushtika rites rather than every ceremony or Puja. It rejects Rikta Tithis, Ashtami, Pournami and Amavasya; this does not match the configured whole-Jaya-family penalty, which catches Ashtami but omits the other cited exclusions and additionally penalizes Tritiya and Trayodashi. The passage also rejects Sunday, Tuesday and Saturday rather than merely rewarding Monday and Thursday. It supplies fifteen Nakshatras and chart placements for Surya, Chandra and Guru that the profile does not implement. Its Sankramana exclusion agrees with the profile, but the inspected passage does not establish the profile's other broad month and Yoga filters. The commentary permits relaxation when an ominous event itself requires emergency Shanti. The generic profile must not be presented as verified from this narrower rite passage.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.bhumi_puja.foundation",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

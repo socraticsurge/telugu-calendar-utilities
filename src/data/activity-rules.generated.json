@@ -840,7 +840,13 @@
       ],
       "avoid_tithi_class": [
         "Jaya"
-      ]
+      ],
+      "manual_checks": [
+        "Shantika/Paushtika cross-check: Muhurta Chintamani verse 34 rejects Rikta Tithis, Ashtami, Pournami and Amavasya—not the configured Jaya family.",
+        "For the cited rites, use Ashwini, Pushya, Hasta, the three Uttaras, Rohini, Revati, Shravana, Dhanishtha, Shatabhisha, Punarvasu, Swati, Anuradha or Magha; reject Sunday, Tuesday and Saturday; place Surya in the 10th, Chandra in the 4th and Guru in Lagna.",
+        "Scope warning: verse 34 concerns Shantika and Paushtika rites, not every ceremony or Puja; emergency Shanti for an ominous event may relax ordinary timing restrictions."
+      ],
+      "audit_claim": "muhurta.ceremony.profile_conflict"
     },
     "court": {
       "label": "Court / legal matter",

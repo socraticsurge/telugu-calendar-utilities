@@ -105,13 +105,30 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'rules take precedence over generic purchase.',
                       ]},
     'ceremony':      {'label': 'Ceremony / puja (general)',
+                      'audit_claim': 'muhurta.ceremony.profile_conflict',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
                       'skip_on_pitru_paksha': True,
                       'prefer_vara': ['Somavaram', 'Guruvaram'],
-                      'avoid_tithi_class': ['Jaya']},
+                      'avoid_tithi_class': ['Jaya'],
+                      'manual_checks': [
+                          'Shantika/Paushtika cross-check: Muhurta '
+                          'Chintamani verse 34 rejects Rikta Tithis, '
+                          'Ashtami, Pournami and Amavasya—not the '
+                          'configured Jaya family.',
+                          'For the cited rites, use Ashwini, Pushya, Hasta, '
+                          'the three Uttaras, Rohini, Revati, Shravana, '
+                          'Dhanishtha, Shatabhisha, Punarvasu, Swati, '
+                          'Anuradha or Magha; reject Sunday, Tuesday and '
+                          'Saturday; place Surya in the 10th, Chandra in '
+                          'the 4th and Guru in Lagna.',
+                          'Scope warning: verse 34 concerns Shantika and '
+                          'Paushtika rites, not every ceremony or Puja; '
+                          'emergency Shanti for an ominous event may relax '
+                          'ordinary timing restrictions.',
+                      ]},
     'beginning':     {'label': 'New beginning (general)',
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',

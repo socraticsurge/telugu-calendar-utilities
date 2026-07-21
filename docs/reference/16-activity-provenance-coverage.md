@@ -42,7 +42,8 @@ python tools/check_activity_provenance.py
 | `yajna` | Yajna / Homam | `muhurta.yajna.profile_conflict` | **Contradicted:** family scoring omits and conflicts with Homahuti/Agnivasa formulas |
 | `job` | Job start / Contract signing | `muhurta.job_contract.profile_conflict` | **Contradicted:** combines distinct service-entry and contract scopes under unsupported proxies |
 | `business` | Business launch | `muhurta.business.profile_conflict` | **Contradicted:** nearest capital-deployment verse requires Chara, not configured Sthira, Lagna |
-| remaining 3 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `ceremony` | Ceremony / puja (general) | `muhurta.ceremony.profile_conflict` | **Contradicted:** narrow Shantika/Paushtika passage rejects Rikta, not configured Jaya, Tithis |
+| remaining 2 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
 Coverage is therefore **18 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
@@ -51,7 +52,8 @@ not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
 
-Wedding, Engagement, Gruhapravesha, Court, Litigation, Cremation, Yajna, Job/Contract and Business are excluded from the verified count. Their
+Wedding, Engagement, Gruhapravesha, Court, Litigation, Cremation, Yajna,
+Job/Contract, Business and Ceremony are excluded from the verified count. Their
 `audit_claim` fields record known source conflicts without granting authority
 to the current profiles. See the [wedding evidence audit](31-wedding-evidence-audit.md),
 the [Engagement evidence audit](36-engagement-evidence-audit.md),
@@ -61,7 +63,8 @@ the [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md), the
 [Cremation evidence audit](37-cremation-evidence-audit.md), and the
 [Yajna/Homam evidence audit](38-yajna-homam-evidence-audit.md), and the
 [Job/Contract evidence audit](40-job-contract-evidence-audit.md), and the
-[Business evidence audit](41-business-evidence-audit.md).
+[Business evidence audit](41-business-evidence-audit.md), and the
+[Ceremony evidence audit](42-ceremony-evidence-audit.md).
 
 The remaining profiles are covered only by the umbrella ledger claim
 `muhurta.activity_rules`, whose state is `needs_locator`. They may be used as
