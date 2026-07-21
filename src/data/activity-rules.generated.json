@@ -555,7 +555,11 @@
         "Shukravaram",
         "Guruvaram"
       ],
-      "prefer_tithi_class": "Bhadra"
+      "prefer_tithi_class": "Bhadra",
+      "manual_checks": [
+        "Election chart: Surya and Chandra should be well situated and aspected; the cited passage leaves this as a chart judgment rather than a fixed weekday, Tithi, Nakshatra or Lagna list."
+      ],
+      "source_claim": "muhurta.gold_jewelry.purchase"
     },
     "purchase": {
       "label": "Purchase (general)",

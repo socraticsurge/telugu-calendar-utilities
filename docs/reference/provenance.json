@@ -229,6 +229,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.gold_jewelry.purchase",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+      "scope": "Supports only the disclosed requirement that Surya and Chandra be well situated and aspected, plus the passage's general instruction to avoid unfavorable Tithis and Nakshatras. It does not supply a jewelry-specific weekday, Tithi, Nakshatra, Lagna or Choghadiya list. The configured Labh-Choghadiya, Bhadra-Tithi, Friday/Thursday and fixed-Lagna preferences are disclosed project heuristics and do not inherit authority from this citation.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

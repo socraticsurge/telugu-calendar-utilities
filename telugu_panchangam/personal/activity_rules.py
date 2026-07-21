@@ -363,10 +363,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'harmonious; avoid the 11th lord in the 12th.',
                       ]},
     'gold':          {'label': 'Gold / Jewelry purchase',
+                      'source_claim': 'muhurta.gold_jewelry.purchase',
                       'prefer_choghadiya': ('Labh', 1),
                       'prefer_tithi_class': 'Bhadra',
                       'prefer_vara': ['Shukravaram', 'Guruvaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Election chart: Surya and Chandra should be well '
+                          'situated and aspected; the cited passage leaves '
+                          'this as a chart judgment rather than a fixed '
+                          'weekday, Tithi, Nakshatra or Lagna list.',
+                      ]},
     # — Construction & Ventures —
     'bhumi_puja':    {'label': 'Bhumi Puja / Foundation laying',
                       'source_claim': 'muhurta.bhumi_puja.foundation',
