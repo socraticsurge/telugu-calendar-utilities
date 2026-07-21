@@ -721,7 +721,13 @@
         "Guruvaram",
         "Budhavaram"
       ],
-      "prefer_tithi_class": "Nanda"
+      "prefer_tithi_class": "Nanda",
+      "manual_checks": [
+        "Capital-deployment cross-check: Muhurta Chintamani verse 27 prefers Swati, Punarvasu, Chitra, Anuradha, Mrigashira, Revati, Vishakha, Pushya, Shravana, Dhanishtha, Shatabhisha and Ashwini, with a Chara—not Sthira—Lagna.",
+        "Election chart for deploying funds: benefics in the 5th and 9th and an unoccupied 8th house.",
+        "Scope warning: capital deployment, marketplace trade and inventory purchase are distinct source activities; none inspected is a universal modern business-launch election."
+      ],
+      "audit_claim": "muhurta.business.profile_conflict"
     },
     "job": {
       "label": "Job start / Contract signing",

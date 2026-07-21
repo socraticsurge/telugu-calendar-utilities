@@ -488,10 +488,24 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Site ritual: after Puja, the first foundation stone is placed at the north-eastern corner.',
                       ]},
     'business':      {'label': 'Business launch',
+                      'audit_claim': 'muhurta.business.profile_conflict',
                       'prefer_choghadiya': ('Amrit', 1),
                       'prefer_tithi_class': 'Nanda',
                       'prefer_vara': ['Guruvaram', 'Budhavaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'prefer_lagna_class': 'Sthira',
+                      'manual_checks': [
+                          'Capital-deployment cross-check: Muhurta '
+                          'Chintamani verse 27 prefers Swati, Punarvasu, '
+                          'Chitra, Anuradha, Mrigashira, Revati, Vishakha, '
+                          'Pushya, Shravana, Dhanishtha, Shatabhisha and '
+                          'Ashwini, with a Chara—not Sthira—Lagna.',
+                          'Election chart for deploying funds: benefics in '
+                          'the 5th and 9th and an unoccupied 8th house.',
+                          'Scope warning: capital deployment, marketplace '
+                          'trade and inventory purchase are distinct source '
+                          'activities; none inspected is a universal modern '
+                          'business-launch election.',
+                      ]},
     'job':           {'label': 'Job start / Contract signing',
                       'audit_claim': 'muhurta.job_contract.profile_conflict',
                       'prefer_choghadiya': ('Amrit', 1),

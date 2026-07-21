@@ -66,6 +66,7 @@ PyPI MCP package.
 | 38 | [Yajna / Homam evidence audit](38-yajna-homam-evidence-audit.md) | Homahuti and Agnivasa verses versus the current family scoring |
 | 39 | [General purchase source profile](39-purchase-profile.md) | Buyer-side Kraya verse, marketplace checks, and object-specific boundaries |
 | 40 | [Job / Contract evidence audit](40-job-contract-evidence-audit.md) | Service-entry verse and the unsupported modern-contract conflation |
+| 41 | [Business-launch evidence audit](41-business-evidence-audit.md) | Capital-deployment verse, movable-Lagna conflict, and scope boundaries |
 
 ## How to read the diagrams
 

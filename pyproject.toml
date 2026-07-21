@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-server-panchangam"
-version = "1.12.32"
+version = "1.12.33"
 description = "MCP server for Panchangam calculations — Tithi, Nakshatra, Yoga, Muhurtas for any city"
 readme = "README_PYPI.md"
 requires-python = ">=3.10"
