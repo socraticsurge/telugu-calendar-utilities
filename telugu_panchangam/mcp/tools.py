@@ -26,6 +26,7 @@ from telugu_panchangam.gochara.rules import (
 from telugu_panchangam.personal.phalalu import rasi_phalalu
 from telugu_panchangam.personal.muhurta import day_slots, night_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
+from telugu_panchangam.panchangam_provenance import panchangam_provenance
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -318,6 +319,7 @@ def tool_get_panchangam(
             'disha_shoola_direction': day.disha_shoola_direction,
             'nakshatra_mukha': day.nakshatra_mukha,
             'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
+            'provenance': panchangam_provenance(system),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -380,6 +382,7 @@ def tool_get_muhurta(
             'disha_shoola_direction': day.disha_shoola_direction,
             'nakshatra_mukha': day.nakshatra_mukha,
             'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
+            'provenance': panchangam_provenance(system),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -536,6 +539,7 @@ def tool_get_panchangam_range(
             'system': system,
             'ayanamsa': ayanamsa,
             'days': days,
+            'provenance': panchangam_provenance(system),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})

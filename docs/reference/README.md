@@ -71,6 +71,7 @@ PyPI MCP package.
 | 43 | [New Beginning evidence audit](43-beginning-evidence-audit.md) | Dharma-kriya commencement verse versus generic project-ranking proxies |
 | 44 | [Activity provenance states](44-activity-provenance-states.md) | Enforced verified, contradicted and heuristic claim contract across Python, MCP and browser |
 | 45 | [Muhurtam activity coverage roadmap](45-muhurta-activity-coverage-roadmap.md) | Source-backed gap inventory, priorities, safety boundaries, and one-feature-at-a-time expansion order |
+| 46 | [Panchangam provenance disclosure](46-panchangam-provenance-disclosure.md) | Field-group evidence states in the MCP response and the exact remaining source debt |
 
 ## How to read the diagrams
 

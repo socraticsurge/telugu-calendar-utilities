@@ -90,6 +90,56 @@
       "scope": "Only cells marked DP_VERIFIED are independently verified."
     },
     {
+      "id": "panchangam.non_drik_engine_outputs",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/surya_siddhanta.py",
+      "evidence_class": "astronomical",
+      "verification_state": "engine_pinned",
+      "source_ids": [],
+      "locator": "tests/test_surya_siddhanta_engine.py and tests/test_vakya_engine.py",
+      "scope": "Regression tests preserve the current Surya Siddhanta and Vakya Pancha-Anga and sky-event outputs. No independent published-Panchangam comparison set is registered, so engine-pinned output must not be described as externally verified."
+    },
+    {
+      "id": "panchangam.calendar_semantics",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/base.py",
+      "evidence_class": "textual",
+      "verification_state": "needs_locator",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": null,
+      "scope": "Samvatsara, Ayana, Ritu, lunar-month, Paksha, weekday and Rasi labels combine astronomical calculations with calendar rollover conventions. They require criterion-level locators and regional-scope notes; astronomical correctness alone does not verify the naming convention."
+    },
+    {
+      "id": "panchangam.traditional_windows",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/base.py",
+      "evidence_class": "textual",
+      "verification_state": "needs_locator",
+      "source_ids": ["BVR-MUHURTHA-1993", "MC-HINDI-IA"],
+      "locator": null,
+      "scope": "Brahma Muhurta, Abhijit, Amrita Kalam, Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham, Bhadra divisions, Sankramana avoidance and Choghadiya are regression-tested formulas from different traditions. No single title-level citation verifies this bundle; each table or formula needs an exact locator and scope crosswalk."
+    },
+    {
+      "id": "panchangam.eclipse_events",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/eclipses.py",
+      "evidence_class": "astronomical",
+      "verification_state": "engine_pinned",
+      "source_ids": ["SWISSEPH"],
+      "locator": "tests/test_eclipses.py",
+      "scope": "The eclipse event pipeline is regression-tested against Swiss Ephemeris calculations. The ledger does not yet contain an independent event-by-event comparison fixture, so this is engine-pinned rather than externally verified."
+    },
+    {
+      "id": "panchangam.derived_classifications",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/base.py",
+      "evidence_class": "textual",
+      "verification_state": "needs_locator",
+      "source_ids": ["BVR-MUHURTHA-1993", "MC-HINDI-IA"],
+      "locator": null,
+      "scope": "Special Yogas, Panchaka labels, Khara month, Pitru Paksha, Simha-Stha, Maudhya, Anandadi Yoga, Disha Shoola, Nakshatra Mukha and Panchaka Rahita are separate traditional classifications. The group exists to expose evidence debt and grants no umbrella textual authority; each component needs its own inspected rule table and regional boundary."
+    },
+    {
       "id": "gochara.favourable_houses",
       "surface": "daily_horoscope",
       "implementation": "telugu_panchangam/gochara/rules.py",
