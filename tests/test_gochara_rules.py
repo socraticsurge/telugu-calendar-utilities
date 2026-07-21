@@ -1,6 +1,6 @@
 # Gochara rules from Janma Rasi. Brihat Samhita 104.4 supports the seven
-# classical favourable-house sets and Vedha; nodes and named Shani conditions
-# have separate provenance states.
+# classical favourable-house sets; Phaladeepika 26.3-8 supports Vedha. Nodes
+# and named Shani conditions have separate provenance states.
 from telugu_panchangam.gochara.rules import (
     GOCHARA_FAVOURABLE, GOCHARA_PROVENANCE, VEDHA, gochara_for,
     named_conditions,
@@ -17,7 +17,8 @@ def test_favourable_houses_classical():
     assert GOCHARA_FAVOURABLE['Guru'] == frozenset({2, 5, 7, 9, 11})
     assert GOCHARA_FAVOURABLE['Shukra'] == frozenset({1, 2, 3, 4, 5, 8, 9, 11, 12})
     assert GOCHARA_FAVOURABLE['Shani'] == frozenset({3, 6, 11})
-    # nodes follow the Shani convention
+    # Known conflict: Phaladeepika 26.2 says nodes follow Surya and include 10.
+    # Preserve current behavior until the owner approves changing this contract.
     assert GOCHARA_FAVOURABLE['Rahu'] == frozenset({3, 6, 11})
     assert GOCHARA_FAVOURABLE['Ketu'] == frozenset({3, 6, 11})
 
@@ -47,6 +48,18 @@ def test_vedha_pairs_match_phaladeepika_26_3_to_8():
                    9: 11, 11: 6, 12: 3},
         'Shani': {3: 12, 6: 9, 11: 5},
     }
+
+
+def test_known_node_tenth_house_conflict_is_regression_visible():
+    # Current behavior is deliberately pinned, not endorsed: Phaladeepika 26.2
+    # treats both nodes like Surya, for whom the 10th is favourable.
+    verdicts = {
+        item['graha']: item
+        for item in gochara_for('Mesha', {'Rahu': 'Makara', 'Ketu': 'Makara'})
+    }
+    assert verdicts['Rahu']['position'] == 10
+    assert verdicts['Rahu']['verdict'] == 'adverse'
+    assert verdicts['Ketu']['verdict'] == 'adverse'
 
 
 # --- Verdicts for a fixed sky (Jun 11 2026 sunrise, DP-verified rasis):
@@ -135,6 +148,7 @@ def test_mcp_get_gochara():
     assert result['provenance'] == GOCHARA_PROVENANCE
     assert '104.4 supports' in result['convention']
     assert 'Phaladeepika 26.3-8 supports' in result['convention']
+    assert 'conflict with Phaladeepika 26.2' in result['convention']
     assert 'open source-locator debt' in result['convention']
 
 

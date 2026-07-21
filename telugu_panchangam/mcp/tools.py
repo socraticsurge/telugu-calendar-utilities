@@ -750,9 +750,11 @@ def tool_get_gochara(
             'convention': 'Transit houses are counted from the natal Moon sign. '
                           'Brihat Samhita 104.4 supports favourable houses for the '
                           'seven classical grahas. Phaladeepika 26.3-8 supports '
-                          'the Vedha pairs and classical exemptions. Node treatment '
-                          'and named Shani conditions remain configured traditions '
-                          'with open source-locator debt. '
+                          'the Vedha pairs and classical exemptions. The configured '
+                          'Rahu/Ketu houses (3, 6, 11) conflict with Phaladeepika '
+                          '26.2, which treats both like Surya and therefore includes '
+                          'the 10th; node Vedha remains unverified. Named Shani '
+                          'conditions have open source-locator debt. '
                           'Positions are at sunrise. Gochara is one factor — not a muhurta.',
             'provenance': GOCHARA_PROVENANCE,
             'conditions': named_conditions(janma_rasi, sky),

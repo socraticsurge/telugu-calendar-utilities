@@ -43,11 +43,26 @@ The ledger claim is `gochara.vedha_tables`. This verification stops at the
 seven classical Grahas; it does not silently authorize the project's node
 policy.
 
-## Layers still requiring locators
+## Known node conflict
+
+*Phaladeepika* XXVI.2 concludes that Rahu and Ketu are to be treated like
+Surya. That makes houses 3, 6, 10 and 11 favourable. The implementation instead
+copies Shani's set, 3, 6 and 11, so it incorrectly marks a node in the 10th as
+adverse under this cited authority. The `gochara.nodes` claim is therefore
+`contradicted`, not merely unsupported.
+
+This locator does not say whether Rahu or Ketu causes or receives Vedha. The
+current no-node-Vedha behavior remains an unverified sub-rule and must not be
+presented as disproven by XXVI.2.
+
+Changing the node calculation would alter an existing tested assertion. Under
+the frozen-contract working agreement, this audit records the conflict and
+leaves behavior unchanged pending explicit owner approval.
+
+## Layer still requiring a locator
 
 | Layer | Claim | State | Boundary |
 |---|---|---|---|
-| Rahu/Ketu treatment | `gochara.nodes` | `needs_locator` | Stanza 4 addresses the seven classical Grahas; it does not authorize copying Shani's houses or disabling node Vedha |
 | Named Shani conditions | `gochara.named_shani_conditions` | `needs_locator` | Chapter 104 describes house effects but does not name the configured Sade Sati phases, Ashtama Shani or Ardhastama Shani |
 
 The MCP response publishes all four claim IDs and explains the split. Product

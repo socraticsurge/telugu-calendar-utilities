@@ -1,7 +1,8 @@
 # Gochara verdicts from Janma Rasi. Brihat Samhita 104.4 supplies the
 # favourable houses for the seven classical Grahas. Phaladeepika 26.3-8
 # supplies the Vedha mappings and exemptions. Node treatment and named Shani
-# conditions are separate configured traditions with open locator debt.
+# conditions are separate configured traditions. The node houses have a known
+# conflict with Phaladeepika 26.2; named Shani conditions have open locator debt.
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 GOCHARA_PROVENANCE = {

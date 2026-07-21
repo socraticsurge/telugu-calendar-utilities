@@ -107,11 +107,12 @@
       "id": "gochara.nodes",
       "surface": "daily_horoscope",
       "implementation": "telugu_panchangam/gochara/rules.py",
-      "evidence_class": "regional_convention",
-      "verification_state": "needs_locator",
-      "source_ids": [],
-      "locator": null,
-      "scope": "The configured choice to give Rahu and Ketu Shani's favourable houses while making them neither cause nor receive Vedha requires a named tradition and exact source locator. Brihat Samhita 104.4 addresses the seven classical Grahas, not this node policy."
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["PD-SASTRI-1942"],
+      "locator": "Phaladeepika, Adhyaya XXVI, sloka 2 (printed p. 286), especially the concluding direction that Rahu and Ketu are similar to Surya",
+      "scope": "The implementation gives Rahu and Ketu Shani's favourable houses (3, 6 and 11) and therefore marks the 10th adverse. Phaladeepika 26.2 directs that both nodes be treated like Surya, whose favourable set is 3, 6, 10 and 11. This directly contradicts the implemented favourable-house set. The passage does not establish whether nodes cause or receive Vedha, so the separate no-Vedha policy remains unverified rather than contradicted by this locator.",
+      "last_reviewed": "2026-07-21"
     },
     {
       "id": "gochara.named_shani_conditions",

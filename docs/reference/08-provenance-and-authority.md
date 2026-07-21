@@ -64,8 +64,9 @@ edition and locator are recorded, their claims remain `needs_locator`.
   independently verified.
 - The seven classical Gochara favourable-house sets have an exact Brihat
   Samhita 104.4 locator. Vedha mappings and exemptions are independently
-  verified against Phaladeepika 26.3–8 and Jataka Parijata Volume III;
-  node treatment and named Shani conditions remain separate locator debt.
+  verified against Phaladeepika 26.3–8 and Jataka Parijata Volume III.
+  Phaladeepika 26.2 exposes a known conflict in the configured node houses;
+  named Shani conditions remain separate locator debt.
 - Muhurtam activity rules, Panchanga Shuddhi, and several dosha/yoga tables
   still have source work recorded at their actual verification state.
 - Bhumi Puja / foundation laying is an activity-level exception: its profile
