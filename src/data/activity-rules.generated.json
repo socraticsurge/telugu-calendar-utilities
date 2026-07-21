@@ -776,7 +776,12 @@
       "prefer_vara": [
         "Mangalavaram"
       ],
-      "prefer_tithi_class": "Jaya"
+      "prefer_tithi_class": "Jaya",
+      "manual_checks": [
+        "Known source mismatch: this profile rewards Tuesday, but Raman rejects Tuesday and Saturday for filing lawsuits; verify the exact Nakshatra and weekday gates before acting.",
+        "Practitioner checks: Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; Lagna and 6th lords separated; Mesha Lagna or Navamsa."
+      ],
+      "audit_claim": "muhurta.court.profile_conflict"
     },
     "surgery": {
       "label": "Surgery / medical procedure",

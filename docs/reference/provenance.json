@@ -169,6 +169,17 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.court.profile_conflict",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
+      "scope": "The configured Court profile prefers Mangalavaram, while Raman explicitly directs that Tuesday and Saturday be avoided for filing lawsuits. The project also rewards the entire Jaya Tithi family and penalizes the entire Purna family without support from this passage, and it omits Raman's ten admitted Nakshatras and election-chart requirements. This is a direct weekday contradiction and an incomplete rule profile; the audit claim must not be presented as verification. The separate internal litigation activity remains independently unverified.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.bhumi_puja.foundation",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

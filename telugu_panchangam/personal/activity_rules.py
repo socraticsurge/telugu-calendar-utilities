@@ -476,9 +476,19 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ]},
     # — Civil & Medical —
     'court':         {'label': 'Court / legal matter',
+                      'audit_claim': 'muhurta.court.profile_conflict',
                       'prefer_tithi_class': 'Jaya',
                       'avoid_tithi_class': ['Purna'],
-                      'prefer_vara': ['Mangalavaram']},
+                      'prefer_vara': ['Mangalavaram'],
+                      'manual_checks': [
+                          'Known source mismatch: this profile rewards '
+                          'Tuesday, but Raman rejects Tuesday and Saturday '
+                          'for filing lawsuits; verify the exact Nakshatra '
+                          'and weekday gates before acting.',
+                          'Practitioner checks: Guru in a Trikona from a '
+                          'strengthened Lagna; no malefic in the 6th; Lagna '
+                          'and 6th lords separated; Mesha Lagna or Navamsa.',
+                      ]},
     'litigation':    {'label': 'Litigation / contest',
                       'prefer_tithi_class': 'Jaya',
                       'avoid_tithi_class': ['Purna'],

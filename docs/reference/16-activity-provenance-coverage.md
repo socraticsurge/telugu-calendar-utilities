@@ -34,7 +34,8 @@ python tools/check_activity_provenance.py
 | `travel` | Travel / journey | `muhurta.travel` | Verified Nakshatra profile; Tithi and Disha Shoola corrections approval-gated |
 | `wedding` | Wedding (Vivaha) | `muhurta.wedding.profile_conflict` | **Contradicted:** inspected Tithi rules conflict with configured scoring |
 | `gruhapravesha` | First entry into a newly built home | `muhurta.gruhapravesha.profile_conflict` | **Contradicted:** current soft family/class preferences conflict with exact source gates |
-| remaining 11 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `court` | Court / legal matter | `muhurta.court.profile_conflict` | **Contradicted:** configured Tuesday bonus reverses the source's Tuesday exclusion |
+| remaining 10 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
 Coverage is therefore **17 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha*, with edition-specific printed and PDF page locators.
@@ -42,10 +43,11 @@ Raman is a modern secondary authority, not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
 
-Wedding and Gruhapravesha are excluded from the verified count. Their
+Wedding, Gruhapravesha and Court are excluded from the verified count. Their
 `audit_claim` fields record known source conflicts without granting authority
 to the current profiles. See the [wedding evidence audit](31-wedding-evidence-audit.md)
-and [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md).
+the [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md), and the
+[Court evidence audit](34-court-evidence-audit.md).
 
 The remaining profiles are covered only by the umbrella ledger claim
 `muhurta.activity_rules`, whose state is `needs_locator`. They may be used as

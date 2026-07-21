@@ -59,6 +59,7 @@ PyPI MCP package.
 | 31 | [Wedding evidence audit](31-wedding-evidence-audit.md) | Machine-readable contradiction between current wedding scoring and the inspected source |
 | 32 | [Gochara source crosswalk](32-gochara-source-crosswalk.md) | Verified favourable houses and Vedha, a known Rahu/Ketu conflict, and a precisely bounded named-Shani evidence layer |
 | 33 | [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md) | Exact Chapter XII crosswalk and approval-gated conflicts in the current home-entry profile |
+| 34 | [Court evidence audit](34-court-evidence-audit.md) | Exact lawsuit-election crosswalk and the direct Tuesday contradiction |
 
 ## How to read the diagrams
 

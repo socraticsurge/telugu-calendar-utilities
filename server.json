@@ -6,13 +6,13 @@
     "url": "https://github.com/socraticsurge/telugu-calendar-utilities",
     "source": "github"
   },
-  "version": "1.12.24",
+  "version": "1.12.25",
   "websiteUrl": "https://panchangam.astrochaganti.com",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "mcp-server-panchangam",
-      "version": "1.12.24",
+      "version": "1.12.25",
       "transport": {
         "type": "stdio"
       },
