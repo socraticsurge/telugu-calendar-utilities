@@ -36,7 +36,8 @@ def test_backlog_distinguishes_existing_remediation_from_new_keys():
     assert by_key['gruhapravesha']['disposition'] == 'existing_conflict'
     assert 'gruhapravesha' in ACTIVITY_RULES
     for key, item in by_key.items():
-        if item['disposition'] == 'existing_conflict':
+        if item['disposition'] in {'existing_conflict', 'implemented_verified'}:
+            assert key in ACTIVITY_RULES
             continue
         assert key not in ACTIVITY_RULES
 

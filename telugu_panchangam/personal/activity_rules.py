@@ -30,10 +30,13 @@
 #   allowed_lagnas          slot omitted unless its active Lagna is listed
 #   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
+#   manual_prerequisites    unresolved checks cap relative tier below Excellent
 #   audit_claim             provenance claim recording a known evidence conflict;
 #                           never grants verified status
 #   heuristic_claim         provenance claim recording intentionally project-defined
 #                           or source-neutral behavior; never grants verified status
+#   related_claims          additional provenance claims (including lineage conflicts)
+#                           relevant to the profile but not its implementation authority
 #   source_claim            stable verified claim ID in provenance.json
 #   daytime_only            night_slots returns no candidates for the activity
 #   forenoon_only           candidate must end by local solar noon
@@ -411,6 +414,63 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Election chart: leave the 8th house unoccupied.',
                           'Budha, Shukra and Guru together in the 9th are '
                           'stated to counteract adverse influences.',
+                      ]},
+    'seemantha':     {'label': 'Seemantha (Prenatal ceremony)',
+                      'source_claim': 'muhurta.seemantha',
+                      'related_claims': [
+                          'muhurta.seemantha.chintamani_divergence',
+                      ],
+                      'manual_prerequisites': True,
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_nakshatras': [
+                          'Rohini', 'Mrigashira', 'Punarvasu', 'Pushya',
+                          'Uttara Phalguni', 'Uttara Ashadha', 'Hasta',
+                          'Shravana', 'Revati',
+                      ],
+                      'allowed_tithi_names': [
+                          'Shukla Pratipat', 'Shukla Dwitiya',
+                          'Shukla Tritiya', 'Shukla Panchami',
+                          'Shukla Saptami', 'Shukla Dashami',
+                          'Shukla Ekadashi', 'Shukla Dwadashi',
+                          'Shukla Trayodashi', 'Krishna Pratipat',
+                          'Krishna Dwitiya', 'Krishna Tritiya',
+                          'Krishna Panchami', 'Krishna Saptami',
+                          'Krishna Dashami', 'Krishna Ekadashi',
+                          'Krishna Dwadashi', 'Krishna Trayodashi',
+                      ],
+                      'allowed_lagnas': [
+                          'Mesha', 'Vrishabha', 'Mithuna', 'Karka',
+                          'Kanya', 'Tula', 'Dhanu', 'Makara', 'Kumbha',
+                          'Meena',
+                      ],
+                      'manual_checks': [
+                          'Pregnancy timing: the cited passage ordains '
+                          'Seemantha for the first pregnancy, in the 5th or '
+                          '7th month; if that schedule is missed, perform it '
+                          'before delivery under practitioner guidance. '
+                          'Muhurta Chintamani verse 8 instead specifies the '
+                          '6th or 8th month; choose the family’s tradition '
+                          'with a qualified practitioner.',
+                          'Under unavoidable circumstances, Ashwini, '
+                          'Anuradha or Moola may be considered; the automated '
+                          'profile admits only the primary Nakshatra list.',
+                          'Pournami is admissible only when Chandra is '
+                          'dignified; the automated profile conservatively '
+                          'omits it pending chart judgment.',
+                          'Election chart: leave the 8th house vacant and '
+                          'do not place Chandra in the 8th.',
+                          'Personal star check: avoid the 3rd, 7th, 8th, '
+                          '10th and 22nd Nakshatras counted from the '
+                          'mother’s birth Nakshatra.',
+                          'The source makes the pregnancy month primary and '
+                          'permits Guru or Shukra combustion to be ignored '
+                          'for this rite; no combustion gate is applied.',
+                          'Maternal comfort, clinician instructions and '
+                          'medical care always take precedence over '
+                          'electional timing.',
                       ]},
     'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
                       'audit_claim': 'muhurta.gruhapravesha.profile_conflict',

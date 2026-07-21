@@ -74,6 +74,7 @@ class _DayContext:
     allowed_lagnas: frozenset
     caution_lagna_solar: bool
     manual_checks: tuple[str, ...]
+    manual_prerequisites: bool
 
 
 # ---------------------------------------------------------------------------

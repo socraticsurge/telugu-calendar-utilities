@@ -19,6 +19,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'mundana': 'muhurta.mundana',
         'vidyarambha': 'muhurta.vidyarambha',
         'upanayana': 'muhurta.upanayana',
+        'seemantha': 'muhurta.seemantha',
         'vehicle': 'muhurta.vehicle.acquisition',
         'naming': 'muhurta.namakarana',
         'property': 'muhurta.land_purchase.building',
@@ -124,3 +125,12 @@ def test_generated_browser_contract_keeps_heuristic_claims():
         if activity not in browser['rules'] or 'heuristic_claim' not in rules:
             continue
         assert browser['rules'][activity]['heuristic_claim'] == rules['heuristic_claim']
+
+
+def test_generated_browser_contract_keeps_related_claims():
+    browser = json.loads(
+        (ROOT / 'src/data/activity-rules.generated.json').read_text(encoding='utf-8'))
+    for activity, rules in ACTIVITY_RULES.items():
+        if activity not in browser['rules'] or 'related_claims' not in rules:
+            continue
+        assert browser['rules'][activity]['related_claims'] == rules['related_claims']

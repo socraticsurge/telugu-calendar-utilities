@@ -370,6 +370,28 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.seemantha",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
+      "scope": "Supports the first-pregnancy and 5th/7th-month boundary; the primary nine-Nakshatra list; rejection of Chaturthi, Shashthi, Ashtami, Navami, Chaturdashi and Amavasya; Monday, Wednesday, Thursday and Friday; and rejection of Simha and Vrischika Lagna. The automated profile conservatively omits Pournami because the passage admits it only when Chandra is dignified. Ashwini, Anuradha and Moola are disclosed as unavoidable-circumstance alternatives rather than automated admissions. The empty 8th house, Chandra outside the 8th, relative birth-Nakshatra exclusions and the explicit combustion exception remain manual checks; this unresolved practitioner review caps results below Excellent. Maternal comfort, clinician instructions and medical care always take precedence.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "muhurta.seemantha.chintamani_divergence",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Samskara-prakarana, 'Seemantonnayana Muhurta,' verse 8, printed p. 77 (OCR lines 4157-4180 in the Internet Archive full text)",
+      "scope": "Verse 8 corroborates the implemented rejection of Rikta Tithis, Amavasya, Dwadashi, Shashthi and Ashtami; its primary and alternative Nakshatra lists together include the profile's nine stars; its alternative weekday rule admits Monday, Wednesday, Thursday and Friday; and it likewise reduces the importance of Guru/Shukra combustion. It materially diverges on pregnancy timing by prescribing the 6th or 8th month rather than Raman's 5th or 7th. It also supplies male-planet Lagna/Navamsha and benefic/malefic house-placement rules rather than Raman's ten-Rasi admission set. The product must disclose this lineage choice and must not present one month rule as universal.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.annaprasana",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

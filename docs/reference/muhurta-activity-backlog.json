@@ -18,12 +18,13 @@
       "key": "seemantha",
       "label": "Seemantha (prenatal ceremony)",
       "priority": "P0",
-      "disposition": "missing_candidate",
-      "reason": "A major Telugu household samskara has an explicit timing passage and is absent from the product.",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a source-verified additive profile with conservative chart gates and explicit pregnancy/medical boundaries.",
       "source_candidates": [
-        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)"}
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)"},
+        {"source_id": "MC-HINDI-IA", "locator": "Samskara-prakarana, 'Seemantonnayana Muhurta,' verse 8, printed p. 77 (OCR lines 4157-4180)"}
       ],
-      "boundary": "The passage limits the rite to a first pregnancy and prioritizes the prescribed pregnancy month; medical care always takes precedence."
+      "boundary": "Raman gives the 5th/7th pregnancy month while Muhurta Chintamani gives the 6th/8th; disclose the lineage choice. Medical care always takes precedence."
     },
     {
       "key": "house_purchase",

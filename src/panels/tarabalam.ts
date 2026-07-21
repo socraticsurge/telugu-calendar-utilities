@@ -1126,6 +1126,7 @@ async function findMuhurta() {
           if (tFam === 'Rikta') dayDosha = 'rikta_tithi';
           else if (facts.specialYogas.some(y => MU_YOGA_PENALTY[y] !== undefined)) dayDosha = 'visha_dagdha_yoga';
           else if (MU_NITYA_HARD_AVOID.has(ny)) dayDosha = 'vyatipata_vaidhriti';
+          else if (rules.manual_prerequisites) dayDosha = 'practitioner_review';
 
           slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha, dayCtx });
           slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
@@ -1194,6 +1195,7 @@ const MU_ACT_LABEL = {
   naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
   upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',
+  seemantha: 'seemantha (prenatal ceremony)',
   gruhapravesha: 'gruhapravesha (home entry)',
   vehicle: 'a vehicle purchase', property: 'a land purchase for building',
   gold: 'a gold / jewelry purchase',

@@ -112,8 +112,8 @@ edition and locator are recorded, their claims remain `needs_locator`.
 
 Activity-level coverage is tracked separately in
 [Muhurtam Activity Provenance Coverage](16-activity-provenance-coverage.md).
-It currently records **18 verified profiles, 11 known textual conflicts and 1
-explicit project heuristic across all 30 activity keys**. No activity remains
+It currently records **19 verified profiles, 11 known textual conflicts and 1
+explicit project heuristic across all 31 activity keys**. No activity remains
 implicitly covered by a title-level citation. `tools/check_activity_provenance.py`
 enforces verified, contradicted and heuristic links against the ledger and
 fails if a profile has no explicit disposition.

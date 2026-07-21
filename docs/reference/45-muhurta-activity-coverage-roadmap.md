@@ -19,16 +19,16 @@ not silently share one profile.
 
 | Order | Activity | Why it comes next |
 |---|---|---|
-| 1 | Seemantha | Major Telugu household samskara; explicit passage; absent today |
+| 1 | Seemantha | **Implemented:** source-verified profile with pregnancy and medical boundaries |
 | 2 | Completed-house purchase | Common need currently liable to be misrouted to land purchase |
 | 3 | Home repair / renovation start | Common need, exact passage, distinct from foundation and roof work |
 | 4 | Buying inventory for trade | Replaces one concrete slice of the unsupported Business launch catch-all |
 | 5 | Borrowing and lending | Source explicitly distinguishes the two transaction roles |
 
-Seemantha is the best first additive feature: it fills a culturally meaningful
-gap without modifying an existing profile. Its implementation must preserve
-the source's first-pregnancy and pregnancy-month boundary and include a clear
-medical-care precedence statement.
+Seemantha was the first additive feature from this roadmap. Its implementation
+preserves the source's first-pregnancy and pregnancy-month boundary and includes
+a clear medical-care precedence statement. Completed-house purchase is now the
+highest-priority missing profile.
 
 ## Important holds and splits
 

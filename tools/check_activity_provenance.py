@@ -27,6 +27,15 @@ def audit() -> dict:
         audit_id = rules.get('audit_claim')
         heuristic_id = rules.get('heuristic_claim')
         claim_id = rules.get('source_claim')
+        for related_id in rules.get('related_claims', ()):
+            related = claims.get(related_id)
+            if related is None:
+                errors.append(
+                    f'{activity}: unknown related claim {related_id!r}')
+            elif related['surface'] != 'muhurtam':
+                errors.append(
+                    f'{activity}: related claim {related_id!r} is not a '
+                    'muhurtam claim')
         claim_fields = [
             field for field, value in (
                 ('source_claim', claim_id),

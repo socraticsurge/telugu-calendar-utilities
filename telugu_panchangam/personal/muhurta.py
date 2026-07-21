@@ -533,7 +533,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
     elif facts.yoga in NITYA_HARD_AVOID:
         day_dosha = 'vyatipata_vaidhriti'
     else:
-        day_dosha = None
+        day_dosha = ('practitioner_review'
+                     if ctx.manual_prerequisites else None)
 
     return {'date': day.date.isoformat(), 'vaaram': day.vaaram,
             'start': s, 'end': e, 'score': score,
@@ -655,6 +656,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         allowed_lagnas=allowed_lagnas,
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
+        manual_prerequisites=bool(rules.get('manual_prerequisites')),
     )
 
     use_engine = engine is not None and hasattr(engine, 'facts_at')
@@ -857,6 +859,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         allowed_lagnas=allowed_lagnas,
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
+        manual_prerequisites=bool(rules.get('manual_prerequisites')),
         avoid_tithi_class=avoid_tithi_class,
     )
 

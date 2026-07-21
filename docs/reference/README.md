@@ -72,6 +72,7 @@ PyPI MCP package.
 | 44 | [Activity provenance states](44-activity-provenance-states.md) | Enforced verified, contradicted and heuristic claim contract across Python, MCP and browser |
 | 45 | [Muhurtam activity coverage roadmap](45-muhurta-activity-coverage-roadmap.md) | Source-backed gap inventory, priorities, safety boundaries, and one-feature-at-a-time expansion order |
 | 46 | [Panchangam provenance disclosure](46-panchangam-provenance-disclosure.md) | Field-group evidence states in the MCP response and the exact remaining source debt |
+| 47 | [Seemantha source profile](47-seemantha-profile.md) | Exact prenatal-rite crosswalk, conservative chart boundaries, and medical precedence |
 
 ## How to read the diagrams
 

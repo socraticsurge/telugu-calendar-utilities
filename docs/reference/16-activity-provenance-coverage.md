@@ -24,6 +24,7 @@ python tools/check_activity_provenance.py
 | `mundana` | First head-shave (Mundana / Chaula) | `muhurta.mundana` | Verified rule-level profile |
 | `vidyarambha` | Education commencement (Vidyarambha) | `muhurta.vidyarambha` | Verified rule-level profile |
 | `upanayana` | Sacred-thread ceremony (Upanayana) | `muhurta.upanayana` | Verified rule-level profile |
+| `seemantha` | Seemantha (prenatal ceremony) | `muhurta.seemantha` | Verified against Raman; related Chintamani claim records the 5th/7th versus 6th/8th-month lineage conflict |
 | `vehicle` | Vehicle purchase | `muhurta.vehicle.acquisition` | Verified activity-specific Nakshatra preference |
 | `construction_roof` | Roof-laying / construction milestone | `muhurta.construction_roof` | Verified activity-specific Lagna gate |
 | `coronation` | Coronation / title ceremony | `muhurta.coronation` | Verified rule-level profile |
@@ -46,7 +47,7 @@ python tools/check_activity_provenance.py
 | `beginning` | New beginning (general) | `muhurta.beginning.profile_conflict` | **Contradicted:** nearest Dharma-kriya verse is narrower and does not support generic ranking proxies |
 | `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
-Coverage is therefore **18 of 30 profiles**. The verified profiles use
+Coverage is therefore **19 of 31 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
 printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
 not scripture; this

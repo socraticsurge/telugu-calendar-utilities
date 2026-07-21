@@ -21,11 +21,13 @@
     "allowed_tithi_numbers",
     "avoid_tithi_numbers",
     "manual_checks",
+    "manual_prerequisites",
     "allowed_lagnas",
     "caution_lagna_solar",
     "source_claim",
     "audit_claim",
     "heuristic_claim",
+    "related_claims",
     "daytime_only",
     "forenoon_only",
     "allowed_pakshams",
@@ -51,6 +53,7 @@
         "mundana",
         "upanayana",
         "vidyarambha",
+        "seemantha",
         "gruhapravesha"
       ]
     },
@@ -510,6 +513,72 @@
         "Meena"
       ],
       "source_claim": "muhurta.vidyarambha"
+    },
+    "seemantha": {
+      "label": "Seemantha (Prenatal ceremony)",
+      "allowed_varas": [
+        "Somavaram",
+        "Budhavaram",
+        "Guruvaram",
+        "Shukravaram"
+      ],
+      "allowed_nakshatras": [
+        "Rohini",
+        "Mrigashira",
+        "Punarvasu",
+        "Pushya",
+        "Uttara Phalguni",
+        "Uttara Ashadha",
+        "Hasta",
+        "Shravana",
+        "Revati"
+      ],
+      "manual_checks": [
+        "Pregnancy timing: the cited passage ordains Seemantha for the first pregnancy, in the 5th or 7th month; if that schedule is missed, perform it before delivery under practitioner guidance. Muhurta Chintamani verse 8 instead specifies the 6th or 8th month; choose the family’s tradition with a qualified practitioner.",
+        "Under unavoidable circumstances, Ashwini, Anuradha or Moola may be considered; the automated profile admits only the primary Nakshatra list.",
+        "Pournami is admissible only when Chandra is dignified; the automated profile conservatively omits it pending chart judgment.",
+        "Election chart: leave the 8th house vacant and do not place Chandra in the 8th.",
+        "Personal star check: avoid the 3rd, 7th, 8th, 10th and 22nd Nakshatras counted from the mother’s birth Nakshatra.",
+        "The source makes the pregnancy month primary and permits Guru or Shukra combustion to be ignored for this rite; no combustion gate is applied.",
+        "Maternal comfort, clinician instructions and medical care always take precedence over electional timing."
+      ],
+      "manual_prerequisites": true,
+      "allowed_lagnas": [
+        "Mesha",
+        "Vrishabha",
+        "Mithuna",
+        "Karka",
+        "Kanya",
+        "Tula",
+        "Dhanu",
+        "Makara",
+        "Kumbha",
+        "Meena"
+      ],
+      "source_claim": "muhurta.seemantha",
+      "related_claims": [
+        "muhurta.seemantha.chintamani_divergence"
+      ],
+      "allowed_tithi_names": [
+        "Shukla Pratipat",
+        "Shukla Dwitiya",
+        "Shukla Tritiya",
+        "Shukla Panchami",
+        "Shukla Saptami",
+        "Shukla Dashami",
+        "Shukla Ekadashi",
+        "Shukla Dwadashi",
+        "Shukla Trayodashi",
+        "Krishna Pratipat",
+        "Krishna Dwitiya",
+        "Krishna Tritiya",
+        "Krishna Panchami",
+        "Krishna Saptami",
+        "Krishna Dashami",
+        "Krishna Ekadashi",
+        "Krishna Dwadashi",
+        "Krishna Trayodashi"
+      ]
     },
     "gruhapravesha": {
       "label": "Gruhapravesha (Home entry)",
