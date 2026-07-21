@@ -31,6 +31,8 @@
 #   manual_checks           source-required criteria not computed by the finder
 #   source_claim            stable verified claim ID in provenance.json
 #   daytime_only            night_slots returns no candidates for the activity
+#   forenoon_only           candidate must end by local solar noon
+#   allowed_pakshams        day omitted unless its Paksha is listed
 #   prefer_bhadra_puchha    bonus when slot overlaps Bhadra Puchha
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
@@ -180,15 +182,51 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Election chart: leave the 8th house unoccupied.',
                       ]},
     'mundana':       {'label': 'Mundana / Chaula (First head-shave)',
+                      'source_claim': 'muhurta.mundana',
+                      'forenoon_only': True,
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
                       'skip_on_pitru_paksha': True,
+                      'skip_on_combust': ['Guru', 'Shukra'],
                       'prefer_tithi_class': 'Nanda',
                       'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
-                      'prefer_lagna_class': 'Dvisvabhava'},
+                      'allowed_pakshams': ['Shukla'],
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_tithi_numbers': [2, 3, 5, 7, 10, 11, 13],
+                      'allowed_nakshatras': [
+                          'Punarvasu', 'Mrigashira', 'Dhanishtha',
+                          'Shravana', 'Revati', 'Pushya', 'Chitra',
+                          'Ashwini', 'Hasta', 'Swati', 'Rohini',
+                          'Shatabhisha', 'Uttara Phalguni',
+                          'Uttara Bhadrapada', 'Uttara Ashadha',
+                      ],
+                      'prefer_nakshatras': [
+                          'Punarvasu', 'Mrigashira', 'Dhanishtha',
+                          'Shravana', 'Revati', 'Pushya', 'Chitra',
+                          'Ashwini', 'Hasta',
+                      ],
+                      'allowed_lagnas': [
+                          'Karka', 'Kanya', 'Mithuna', 'Meena', 'Tula',
+                          'Vrishabha', 'Makara',
+                      ],
+                      'manual_checks': [
+                          'Perform in the child’s 3rd or 5th year, and not '
+                          'while the child’s mother is pregnant.',
+                          'Confirm the source’s stated Surya-in-Karkataka '
+                          'seasonal condition with the officiating astrologer.',
+                          'Other rising Rasis require a strong benefic in '
+                          'Lagna; Kumbha must still be rejected.',
+                          'Election chart: place benefics in the 4th, 5th, '
+                          '7th, 9th, 10th and 11th; malefics in the 3rd, '
+                          '6th and 11th.',
+                          'Leave the 8th house unoccupied and avoid Surya, '
+                          'Mangala or preferably any malefic in the 7th.',
+                      ]},
     'upanayana':     {'label': 'Upanayana (Sacred thread)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,

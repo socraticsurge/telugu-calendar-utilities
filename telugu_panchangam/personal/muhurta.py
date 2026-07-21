@@ -187,6 +187,10 @@ def _day_skip_reason(day, rules, activity, travel_direction,
     if allowed_varas and day.vaaram not in allowed_varas:
         return (f'{day.vaaram} · {rules["label"]} source profile '
                 'does not admit this weekday')
+    allowed_pakshams = rules.get('allowed_pakshams')
+    if allowed_pakshams and day.paksham not in allowed_pakshams:
+        return (f'{day.paksham} Paksha · {rules["label"]} source profile '
+                'does not admit this lunar fortnight')
     if (day.vaaram, day.paksham) in map(tuple, rules.get('avoid_vara_paksha', ())):
         return (f'{day.vaaram} during {day.paksham} Paksha · '
                 f'{rules["label"]} source profile rejects this combination')
@@ -644,8 +648,11 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     # all the per-slot factors. The muhurta grid coincides with the
     # engine's Abhijit/Durmuhurtham (see telugu_panchangam/muhurtas.py).
     slots = []
+    solar_noon = day.sunrise + (day.sunset - day.sunrise) / 2
     for mu in named_muhurtas(day):
         s, e = mu['start'], mu['end']
+        if rules.get('forenoon_only') and e > solar_noon:
+            continue
         if any(_overlaps(s, e, b0, b1) for b0, b1 in bad):
             continue                              # decision 1: hard-window exclude
         block, straddle = _dominant_choghadiya(s, e, day.choghadiya)
@@ -702,7 +709,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
             return []
 
     rules = ACTIVITY_RULES[activity]
-    if rules.get('daytime_only'):
+    if rules.get('daytime_only') or rules.get('forenoon_only'):
         return []
 
     allowed_maasams = rules.get('allowed_maasams')
@@ -711,6 +718,9 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         return []
     allowed_varas = rules.get('allowed_varas')
     if allowed_varas and day.vaaram not in allowed_varas:
+        return []
+    allowed_pakshams = rules.get('allowed_pakshams')
+    if allowed_pakshams and day.paksham not in allowed_pakshams:
         return []
     if (day.vaaram, day.paksham) in map(tuple, rules.get('avoid_vara_paksha', ())):
         return []

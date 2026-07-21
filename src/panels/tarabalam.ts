@@ -13,6 +13,7 @@ import {
   muIsFavourableLagna, muIsAshtamaLagna, muLagnaAtMin,
   muLagnaClassOf, muLagnasInClass,
   muScoreTier, muRelativeTier,
+  muEndsBySolarNoon,
   computePersonalDosha, computeDayDosha,
 } from '../muhurta-scorer';
 import { selEl, inpEl } from '../lib/dom';
@@ -738,6 +739,11 @@ async function findMuhurta() {
           reason: `${data.vaaram} · ${activityLabel} source profile does not admit this weekday` });
         continue;
       }
+      if (rules.allowed_pakshams?.length && !rules.allowed_pakshams.includes(data.paksham)) {
+        droppedDays.push({ date: isoDate,
+          reason: `${data.paksham} Paksha · ${activityLabel} source profile does not admit this lunar fortnight` });
+        continue;
+      }
       if ((rules.avoid_vara_paksha || []).some(pair =>
         pair[0] === data.vaaram && pair[1] === data.paksham)) {
         droppedDays.push({ date: isoDate,
@@ -817,6 +823,7 @@ async function findMuhurta() {
           // math); contiguous because both edges round the same expression.
           const s0 = Math.round(srMin + mi * muLen);
           const e0 = Math.round(srMin + (mi + 1) * muLen);
+          if (rules.forenoon_only && !muEndsBySolarNoon(e0, srMin, ssMin)) continue;
           if (bad.some(([b0, b1]) => s0 < b1 && b0 < e0)) continue;  // decision 1
           const dom = dominantChog(s0, e0);
           const c = dom.block;

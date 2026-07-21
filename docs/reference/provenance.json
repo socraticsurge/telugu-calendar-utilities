@@ -130,6 +130,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.mundana",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Tonsure (Chowlam),' printed pp. 22-23 (PDF pp. 26-27)",
+      "scope": "Supports the configured Shukla-Paksha, forenoon, combustion, Tithi, weekday, Nakshatra and conservative rising-Rasi rules plus disclosed age, pregnancy, solar-season and election-chart checks. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.well_digging",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

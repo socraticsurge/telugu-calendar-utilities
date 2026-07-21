@@ -8,6 +8,10 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed Mundana / Chaula profile.** Raman Chapter VIII, printed
+  pages 22–23 (PDF pages 26–27), now supplies Shukla-Paksha, combustion,
+  Tithi, Nakshatra, weekday, conservative Lagna and forenoon constraints.
+  Python and browser share the solar-noon boundary. Coverage reaches 7/30.
 - **Source-backed Karnavedha profile.** Raman Chapter VIII, printed page 22
   (PDF page 26), now supplies the never-at-night rule, weekdays and rejected
   rising Rasis; its Tithi reference resolves to Chapter V. Age, transition and

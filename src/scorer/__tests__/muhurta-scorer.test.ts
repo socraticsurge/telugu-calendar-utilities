@@ -241,3 +241,11 @@ test('muLagnasInClass returns the right set', () => {
   assert.equal(M.muLagnasInClass('Dvisvabhava'), M.MU_LAGNA_DVISVABHAVA);
   assert.equal(M.muLagnasInClass('Bogus'), null);
 });
+
+test('muEndsBySolarNoon conservatively requires the whole slot before noon', () => {
+  // Sunrise 06:00, sunset 18:00 -> solar noon 12:00 (720 minutes).
+  assert.equal(M.muEndsBySolarNoon(720, 360, 1080), true);
+  assert.equal(M.muEndsBySolarNoon(721, 360, 1080), false);
+  // Seasonal daylight: 05:30 to 18:30 has the same 12:00 midpoint.
+  assert.equal(M.muEndsBySolarNoon(720, 330, 1110), true);
+});

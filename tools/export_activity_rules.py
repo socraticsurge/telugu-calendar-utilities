@@ -21,7 +21,7 @@ CONSUMED_FIELDS = (
     'avoid_vara_paksha', 'allowed_solar_classes', 'allowed_nakshatras',
     'prefer_nakshatras', 'allowed_tithi_numbers', 'avoid_tithi_numbers',
     'manual_checks', 'allowed_lagnas', 'caution_lagna_solar',
-    'source_claim', 'daytime_only',
+    'source_claim', 'daytime_only', 'forenoon_only', 'allowed_pakshams',
 )
 
 

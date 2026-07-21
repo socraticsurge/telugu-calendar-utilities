@@ -91,6 +91,14 @@ export function muRelativeTier(score: number, ceiling: number, floor: number): s
   return 'Avoid';
 }
 
+export function muEndsBySolarNoon(
+  slotEndMin: number,
+  sunriseMin: number,
+  sunsetMin: number,
+): boolean {
+  return slotEndMin <= sunriseMin + (sunsetMin - sunriseMin) / 2;
+}
+
 export function computePersonalDosha({
   chandraAvoidNames = [] as string[],
   hasAshtamaChandra = false,

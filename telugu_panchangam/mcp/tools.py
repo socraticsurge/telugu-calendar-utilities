@@ -1052,7 +1052,7 @@ def tool_find_muhurta(
             'allowed_tithi_numbers', 'avoid_tithi_numbers',
             'required_lagna_class',
             'allowed_lagnas', 'caution_lagna_solar',
-            'daytime_only',
+            'daytime_only', 'forenoon_only', 'allowed_pakshams',
         )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
