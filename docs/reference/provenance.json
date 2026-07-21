@@ -207,6 +207,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.wood_cutting",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XIII, 'Felling Trees,' printed p. 58 (PDF p. 62)",
+      "scope": "Supports felling trees during Chandra's last quarter, represented by Krishna Ashtami through Amavasya, and the disclosed dry-Rasi/dry-Graha chart check. The Panchaka-Nakshatra restriction is a separately implemented project rule and does not inherit authority from this citation.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

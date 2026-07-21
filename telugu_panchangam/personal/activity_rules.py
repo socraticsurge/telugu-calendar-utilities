@@ -445,7 +445,19 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'skip_on_panchaka_nakshatra': True,
                           'allowed_lagnas': ['Vrishabha', 'Tula']},
     'wood_cutting':      {'label': 'Wood-cutting',
-                          'skip_on_panchaka_nakshatra': True},
+                          'source_claim': 'muhurta.wood_cutting',
+                          'skip_on_panchaka_nakshatra': True,
+                          'allowed_tithi_names': [
+                              'Krishna Ashtami', 'Krishna Navami',
+                              'Krishna Dashami', 'Krishna Ekadashi',
+                              'Krishna Dwadashi', 'Krishna Trayodashi',
+                              'Krishna Chaturdashi', 'Amavasya',
+                          ],
+                          'manual_checks': [
+                              'Use a dry rising Rasi, preferably aspected '
+                              'by a dry Graha; the finder does not classify '
+                              'or evaluate this chart condition.',
+                          ]},
     # — Specialized activities —
     'well_digging':      {'label': 'Well digging',
                           'source_claim': 'muhurta.well_digging',

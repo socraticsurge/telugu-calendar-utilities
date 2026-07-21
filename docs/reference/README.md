@@ -51,6 +51,7 @@ PyPI MCP package.
 | 23 | [Vehicle-acquisition source profile](23-vehicle-acquisition-profile.md) | Precisely scoped Chapter IV movable-Nakshatra preference and non-inherited heuristics |
 | 24 | [Roof-laying source profile](24-construction-roof-profile.md) | Chapter XII's stage-specific Vrishabha-or-Tula Lagna gate and explicit scope boundary |
 | 25 | [Coronation source profile](25-coronation-profile.md) | Chapter XVI's incorporated head-of-state rules, exact gates, and chart-level alternatives |
+| 26 | [Wood-cutting source profile](26-wood-cutting-profile.md) | Chapter XIII's last-quarter rule, dry-sign manual check, and separate Panchaka provenance |
 
 ## How to read the diagrams
 

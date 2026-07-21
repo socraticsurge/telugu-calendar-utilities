@@ -25,6 +25,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'bhumi_puja': 'muhurta.bhumi_puja.foundation',
         'construction_roof': 'muhurta.construction_roof',
         'coronation': 'muhurta.coronation',
+        'wood_cutting': 'muhurta.wood_cutting',
         'well_digging': 'muhurta.well_digging',
     }
 

@@ -27,9 +27,10 @@ python tools/check_activity_provenance.py
 | `vehicle` | Vehicle purchase | `muhurta.vehicle.acquisition` | Verified activity-specific Nakshatra preference |
 | `construction_roof` | Roof-laying / construction milestone | `muhurta.construction_roof` | Verified activity-specific Lagna gate |
 | `coronation` | Coronation / title ceremony | `muhurta.coronation` | Verified rule-level profile |
-| remaining 18 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
+| `wood_cutting` | Wood-cutting / felling trees | `muhurta.wood_cutting` | Verified last-quarter profile |
+| remaining 17 keys | See `ACTIVITY_RULES` | — | Exact rule locators still required |
 
-Coverage is therefore **12 of 30 profiles**. The verified profiles use
+Coverage is therefore **13 of 30 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha*, with edition-specific printed and PDF page locators.
 Raman is a modern secondary authority, not scripture; this
 status means the implemented criteria match the cited passage, not that every
