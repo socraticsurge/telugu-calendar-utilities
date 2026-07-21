@@ -320,12 +320,12 @@ def doctrinal_notes(*, special_yogas, tara_unfav_names, chandra_avoid_names,
         names = ', '.join(tara_unfav_names)
         notes.append(
             f'{siddhi_label} traditionally rectifies tara dosha '
-            f'(Muhurta Chintamani) — {names} mitigated.'
+            f'(Muhurta Chintamani) · {names} mitigated.'
         )
     if siddhi_yogas and chandra_avoid_names:
         names = ', '.join(chandra_avoid_names)
         notes.append(
-            'Chandra dosha is not rectified by Siddhi yogas — '
+            'Chandra dosha is not rectified by Siddhi yogas · '
             f'{names} remains a personal caution.'
         )
     if has_pushkara and tithi_fam == 'Rikta':

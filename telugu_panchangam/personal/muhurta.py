@@ -22,8 +22,8 @@ from telugu_panchangam.personal.slot_scorers import (
 from telugu_panchangam.panchaka import evaluate_panchaka
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
-MIN_SLOT_MINUTES = 24   # one ghati — minimum piece after bad-window subtraction
-MUHURTA_MINUTES = 48    # one classical muhurta (2 ghati) — the slot window size
+MIN_SLOT_MINUTES = 24   # one ghati · minimum piece after bad-window subtraction
+MUHURTA_MINUTES = 48    # one classical muhurta (2 ghati) · the slot window size
 
 # Night choghadiya sequence (8 blocks sunset→next sunrise), weekday 0=Sunday.
 # Matches _NIGHT_CHOGHADIYA in generators/ics.py — both must stay in sync.
@@ -129,8 +129,8 @@ def _overlaps(a0, a1, b0, b1) -> bool:
 
 
 def _dominant_choghadiya(s, e, choghadiya):
-    """The choghadiya block covering most of [s, e], and — when the
-    muhurta straddles a boundary — the name of the secondary block it
+    """The choghadiya block covering most of [s, e], and (when the
+    muhurta straddles a boundary) the name of the secondary block it
     also touches (else None). Choghadiya is a scoring attribute, not a
     gate, so a straddling muhurta is scored by its dominant block and the
     straddle is disclosed."""
@@ -202,45 +202,45 @@ def _day_skip_reason(day, rules, activity, travel_direction,
     """
     if day.eclipse is not None:
         kind = f'{day.eclipse.kind} eclipse'
-        return f'{kind} — auspicious activities deferred'
+        return f'{kind} · auspicious activities deferred'
 
     if activity == 'travel' and travel_direction is not None:
         blocked = getattr(day, 'disha_shoola_direction', None)
         if blocked is not None and travel_direction == blocked:
-            return (f'Disha Shoola ({day.vaaram}) — travel toward {blocked} '
+            return (f'Disha Shoola ({day.vaaram}) · travel toward {blocked} '
                     f'is inauspicious on this weekday')
 
     if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
-        return (f'Panchaka Nakshatra ({day.nakshatra.name}) — '
+        return (f'Panchaka Nakshatra ({day.nakshatra.name}) · '
                 f'{rules["label"]} traditionally avoided')
 
     if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
-        return (f'Khar-Maasa ({day.khar_maasa_name} Maasa) — '
+        return (f'Khar-Maasa ({day.khar_maasa_name} Maasa) · '
                 f'{rules["label"]} traditionally avoided')
 
     if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
-        return f'Adhika Maasa — {rules["label"]} traditionally avoided'
+        return f'Adhika Maasa · {rules["label"]} traditionally avoided'
 
     if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
-        return f'Pitru Paksha (Bhadrapada Krishna paksha) — {rules["label"]} traditionally avoided'
+        return f'Pitru Paksha (Bhadrapada Krishna paksha) · {rules["label"]} traditionally avoided'
 
     if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
-        return (f'Simha-Stha Guru — '
+        return (f'Simha-Stha Guru · '
                 f'{rules["label"]} traditionally avoided while Jupiter is in Simha')
 
     for g in rules.get('skip_on_combust', []):
         info = getattr(day, f'{g.lower()}_maudhya', None)
         if info is not None and info.combust:
-            return (f'{g} Maudhya ({info.elongation_deg:.1f}° < {info.threshold_deg}°) — '
+            return (f'{g} Maudhya ({info.elongation_deg:.1f}° < {info.threshold_deg}°) · '
                     f'{rules["label"]} traditionally avoided when {g} is combust')
 
     skip_yogas = set(rules.get('skip_on_yoga', ()))
     if skip_yogas:
         for y in day.special_yogas:
             if y in skip_yogas:
-                return f'{y} — {rules["label"]} traditionally avoids this day'
+                return f'{y} · {rules["label"]} traditionally avoids this day'
         if day.yoga.name in NITYA_HARD_AVOID:
-            return f'{day.yoga.name} yoga — samskaras traditionally defer'
+            return f'{day.yoga.name} yoga · samskaras traditionally defer'
 
     if janma_rasis is not None and chandra_mode != 'stars':
         has_avoid = False
@@ -257,9 +257,9 @@ def _day_skip_reason(day, rules, activity, travel_direction,
             elif pos in CHANDRA_PUJA:
                 has_remedial = True
         if chandra_mode == 'strict' and (has_avoid or has_remedial):
-            return 'chandra_mode=strict — Moon at sunrise fails for at least one person'
+            return 'chandra_mode=strict · Moon at sunrise fails for at least one person'
         if chandra_mode == 'puja_ok' and has_avoid:
-            return 'chandra_mode=puja_ok — someone has Moon-avoid (4/8/12)'
+            return 'chandra_mode=puja_ok · someone has Moon-avoid (4/8/12)'
 
     return None
 
@@ -347,10 +347,13 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
     if mu.get('chog_straddle'):
         chog_desc += f" (spans {mu['chog_straddle']})"
     chog_line = f'{chog_desc} (+{base})' if base else chog_desc
+    # No em-dash (a middot separates the parts); no "clear of inauspicious
+    # windows" line — every surviving muhurta is clear by construction, so
+    # it was a tautology that also read as a contradiction on an
+    # inauspicious muhurta.
     slot_quality = [
-        f'{mu_label} muhurta{mu_deity} — {mu["nature"]} ({nature_bonus:+d})',
+        f'{mu_label} muhurta{mu_deity} · {mu["nature"]} ({nature_bonus:+d})',
         chog_line,
-        'clear of all inauspicious windows',
     ]
     day_quality = list(yoga_reasons) + list(nitya_reasons)
     if ctx.simha_stha_shukra_penalty:
@@ -430,7 +433,7 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
                 lagna_name=cur_lagna,
             )
             if _panchaka.name == 'Mrityu':
-                day_quality.append('Mrityu Panchaka — universal samskara avoidance (-3)')
+                day_quality.append('Mrityu Panchaka · universal samskara avoidance (-3)')
                 score -= 3
             elif _panchaka.name != 'Rahita':
                 _matched_avoid = None

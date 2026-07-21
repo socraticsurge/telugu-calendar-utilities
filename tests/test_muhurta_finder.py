@@ -506,9 +506,13 @@ def test_reason_groups_categorise_correctly():
                       janma_nakshatras=['Krittika'])
     assert slots
     rg = slots[0]['reason_groups']
-    # Slot quality has choghadiya + clearness
+    # Slot quality leads with the named-muhurta identity, then choghadiya.
+    # It must NOT claim "clear of all inauspicious windows" — a slot is only
+    # kept when it clears the hard windows, so the line was a tautology that
+    # also contradicted any muhurta of inauspicious nature.
+    assert any('muhurta' in r for r in rg['slot_quality'])
     assert any('choghadiya' in r for r in rg['slot_quality'])
-    assert 'clear of all inauspicious windows' in rg['slot_quality']
+    assert not any('clear of all inauspicious windows' in r for r in rg['slot_quality'])
     # Day quality contains the Sarvartha yoga reason
     assert any('Sarvartha Siddhi' in r for r in rg['day_quality']) or \
            any('Sarvartha Siddhi' in r for s in slots for r in s['reason_groups']['day_quality'])
