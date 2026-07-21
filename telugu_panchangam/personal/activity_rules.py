@@ -44,6 +44,24 @@
 
 _SAMSKARA_SKIP = ('Visha Yoga', 'Dagdha Yoga')
 
+# Source literature and practitioner-facing labels commonly use Ashwini and
+# Moola, while the engine's canonical name table uses Ashvini and Mula. Keep
+# source-facing rule text stable, but normalize before comparisons.
+_NAKSHATRA_ALIASES = {
+    'Ashwini': 'Ashvini',
+    'Moola': 'Mula',
+}
+
+
+def canonical_activity_nakshatra(name: str) -> str:
+    """Return the engine-canonical spelling for an activity-rule star."""
+    return _NAKSHATRA_ALIASES.get(name, name)
+
+
+def canonical_activity_nakshatras(names) -> frozenset[str]:
+    """Normalize a configured Nakshatra collection for scorer membership."""
+    return frozenset(canonical_activity_nakshatra(name) for name in names)
+
 ACTIVITY_RULES: dict[str, dict] = {
     # — Generic —
     'any':           {'label': 'Anything auspicious'},

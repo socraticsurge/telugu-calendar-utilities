@@ -9,7 +9,11 @@ from datetime import datetime, timedelta
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 from telugu_panchangam.muhurtas import named_muhurtas
-from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES, ACTIVITIES
+from telugu_panchangam.personal.activity_rules import (
+    ACTIVITY_RULES,
+    ACTIVITIES,
+    canonical_activity_nakshatras,
+)
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.lagna_position import lagna_class_of, lagnas_in_class
 from telugu_panchangam.personal.tithi_class import tithi_number
@@ -593,9 +597,12 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     required_lagna_class = rules.get('required_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
-    allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
-    avoid_nakshatras = frozenset(rules.get('avoid_nakshatras', ()))
-    prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
+    allowed_nakshatras = canonical_activity_nakshatras(
+        rules.get('allowed_nakshatras', ()))
+    avoid_nakshatras = canonical_activity_nakshatras(
+        rules.get('avoid_nakshatras', ()))
+    prefer_nakshatras = canonical_activity_nakshatras(
+        rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
@@ -769,9 +776,12 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     required_lagna_class = rules.get('required_lagna_class')
     prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
     prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
-    allowed_nakshatras = frozenset(rules.get('allowed_nakshatras', ()))
-    avoid_nakshatras = frozenset(rules.get('avoid_nakshatras', ()))
-    prefer_nakshatras = frozenset(rules.get('prefer_nakshatras', ()))
+    allowed_nakshatras = canonical_activity_nakshatras(
+        rules.get('allowed_nakshatras', ()))
+    avoid_nakshatras = canonical_activity_nakshatras(
+        rules.get('avoid_nakshatras', ()))
+    prefer_nakshatras = canonical_activity_nakshatras(
+        rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))

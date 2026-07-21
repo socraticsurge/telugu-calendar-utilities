@@ -14,6 +14,12 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import * as M from '../../muhurta-scorer';
 
+test('muCanonicalNakshatra normalizes source spellings', () => {
+  assert.equal(M.muCanonicalNakshatra('Ashwini'), 'Ashvini');
+  assert.equal(M.muCanonicalNakshatra('Moola'), 'Mula');
+  assert.equal(M.muCanonicalNakshatra('Pushya'), 'Pushya');
+});
+
 // ── Lagna position math ─────────────────────────────────────────
 
 test('muLagnaPosition: inclusive count from janma', () => {

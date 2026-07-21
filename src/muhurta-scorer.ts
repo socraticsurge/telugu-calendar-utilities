@@ -25,6 +25,15 @@ export const MU_CHANDRA_PUJA = new Set([2, 5, 9]);
 export const MU_TIER_NAMES = ['Avoid', 'Fair', 'Good', 'Excellent'];
 export const MU_RELATIVE_BANDS = [0.75, 0.5, 0.25];
 
+const MU_NAKSHATRA_ALIASES: Record<string, string> = {
+  Ashwini: 'Ashvini',
+  Moola: 'Mula',
+};
+
+export function muCanonicalNakshatra(name: string): string {
+  return MU_NAKSHATRA_ALIASES[name] || name;
+}
+
 export function muLagnaClassOf(rashi: string): string | null {
   for (const k of Object.keys(MU_LAGNA_CLASSES)) {
     if (MU_LAGNA_CLASSES[k].has(rashi)) return k;

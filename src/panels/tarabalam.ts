@@ -12,7 +12,7 @@ import {
   muLagnaPosition, muLagnaVerdict,
   muIsFavourableLagna, muIsAshtamaLagna, muLagnaAtMin,
   muLagnaClassOf, muLagnasInClass,
-  muScoreTier, muRelativeTier,
+  muScoreTier, muRelativeTier, muCanonicalNakshatra,
   muEndsBySolarNoon, muCombustionDropReason,
   computePersonalDosha, computeDayDosha,
 } from '../muhurta-scorer';
@@ -721,9 +721,12 @@ async function findMuhurta() {
       const requiredLagnaClass = rules.required_lagna_class || null;
       const allowedLagnas = new Set(rules.allowed_lagnas || []);
       const cautionLagnaSolar = !!rules.caution_lagna_solar;
-      const allowedNakshatras = new Set(rules.allowed_nakshatras || []);
-      const avoidNakshatras = new Set(rules.avoid_nakshatras || []);
-      const preferNakshatras = new Set(rules.prefer_nakshatras || []);
+      const allowedNakshatras = new Set(
+        (rules.allowed_nakshatras || []).map(muCanonicalNakshatra));
+      const avoidNakshatras = new Set(
+        (rules.avoid_nakshatras || []).map(muCanonicalNakshatra));
+      const preferNakshatras = new Set(
+        (rules.prefer_nakshatras || []).map(muCanonicalNakshatra));
       const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
       const allowedTithiNames = new Set(rules.allowed_tithi_names || []);
       const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);

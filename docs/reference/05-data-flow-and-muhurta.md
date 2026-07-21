@@ -64,6 +64,10 @@ A declarative dict — **adding an activity is primarily a data change**, plus a
 catalogue/export update and source evidence. Entries carry hard gates,
 preferences, exact admitted Tithis/Nakshatras/Lagnas, manual practitioner
 checks, and (where verified) a stable provenance claim.
+Source-facing Nakshatra spellings are preserved in this declarative contract,
+but Python and TypeScript normalize `Ashwini`→`Ashvini` and `Moola`→`Mula`
+before membership tests. These are the only non-canonical names currently
+present; parity tests require both scorers to apply the same aliases.
 30 activities are supported by Python/MCP. The browser-supported subset is
 declared in `activity_catalog.py`; `tools/export_activity_rules.py` generates
 the exact rule fields consumed by TypeScript. `npm run activity:check` and the
