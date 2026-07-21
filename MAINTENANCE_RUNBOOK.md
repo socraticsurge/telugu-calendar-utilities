@@ -168,10 +168,15 @@ _NISHITA     = [...]   # midnight
 
 ---
 
-## Verify against Drik Panchang
+## Compare Drik calculations against Drik Panchang
 
 Drik Panchang ([drikpanchang.com](https://drikpanchang.com)) is the
-authoritative reference for this project. When in doubt, DP wins.
+project's external comparison reference for the **Drik calculation system**.
+It does not establish scriptural provenance for interpretive or Muhurtam
+rules, and it is not the comparator for intentionally distinct Surya
+Siddhanta or Vakya outputs. Record exact city, date, values, tolerance and URL;
+resolve discrepancies by inspecting both implementations rather than treating
+a website label as textual authority.
 
 ### Manual cross-check
 

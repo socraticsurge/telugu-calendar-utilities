@@ -24,7 +24,6 @@ from telugu_panchangam.personal.slot_scorers import (
 from telugu_panchangam.panchaka import evaluate_panchaka
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
-MIN_SLOT_MINUTES = 24   # one ghati · minimum piece after bad-window subtraction
 MUHURTA_MINUTES = 48    # one classical muhurta (2 ghati) · the slot window size
 
 # Night choghadiya sequence (8 blocks sunset→next sunrise), weekday 0=Sunday.
@@ -97,34 +96,6 @@ def assign_tiers(slots: list[dict]) -> None:
 # ---------------------------------------------------------------------------
 # Day-level utilities
 # ---------------------------------------------------------------------------
-
-_MUHURTA_DUR = timedelta(minutes=MUHURTA_MINUTES)
-
-
-def _chog_at_time(t: datetime, choghadiya: list) -> 'Window | None':
-    """Return the choghadiya block active at time t, or None if t is outside all blocks."""
-    for block in choghadiya:
-        if block.start <= t < block.end:
-            return block
-    return None
-
-
-def _subtract(start: datetime, end: datetime, blocks: list[tuple[datetime, datetime]]):
-    """Pieces of [start, end) not covered by any block."""
-    pieces = [(start, end)]
-    for b0, b1 in blocks:
-        nxt = []
-        for p0, p1 in pieces:
-            if b1 <= p0 or b0 >= p1:
-                nxt.append((p0, p1))
-                continue
-            if p0 < b0:
-                nxt.append((p0, b0))
-            if b1 < p1:
-                nxt.append((b1, p1))
-        pieces = nxt
-    return pieces
-
 
 def _overlaps(a0, a1, b0, b1) -> bool:
     return a0 < b1 and b0 < a1
@@ -578,8 +549,9 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
       Tithi class    -2 for Rikta, +1 for activity match
       Vara           +1 for activity-preferred weekday (day-level)
       Special yogas  Sarvartha/Amrita +2, Dvi/Tripushkara +1, Visha/Dagdha -2
-      Choghadiya     1..3 base, ±1 activity preference
-      Abhijit/Amrita +2 each on slot overlap
+      Muhurta nature +2 Abhijit, +1 auspicious, -2 inauspicious
+      Choghadiya     0..3 base, ±1 activity preference
+      Amrita Kalam   +2 on overlap
 
     chandra_mode controls which slots survive the filter; it does not
     change scores.
@@ -706,13 +678,11 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     Mirrors day_slots() with the following night-specific differences:
     - Uses night choghadiya blocks (8 equal parts of sunset→next sunrise)
     - Omits Rahu Kalam / Gulika Kalam / Yamagandam (daytime-only in standard practice)
-    - Omits Abhijit Muhurta bonus (anchored to solar noon; no night equivalent)
-    - Adds Brahma Muhurta bonus (+2) from next_day.brahma_muhurta
+    - Uses the 14th named night Muhurta, Brahma, as the +2 counterpart to Abhijit
     - Adds Nishita Kala bonus (+2) at the midpoint of the night (±1 ghati)
 
     `next_day` must be the PanchangamDay for the calendar day after `day`.
-    Its sunrise time defines the end of the night, and its brahma_muhurta
-    gives the pre-dawn auspicious window.
+    Its sunrise time defines the end of the night.
     """
     if activity not in ACTIVITIES:
         raise ValueError(f'activity must be one of {ACTIVITIES}')
@@ -793,9 +763,6 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         bad.append((day.sankramana_avoidance.start, day.sankramana_avoidance.end))
 
     amrita = list(day.amrita_kalam)  # absolute datetimes; night-spanning ones included
-
-    # Brahma Muhurta: from next_day (the 48-min window before tomorrow's sunrise).
-    brahma = next_day.brahma_muhurta
 
     # Nishita Kala: midpoint of night ± 1 ghati (24 min).
     _ONE_GHATI = timedelta(minutes=24)

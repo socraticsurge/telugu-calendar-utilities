@@ -8,6 +8,10 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **One-command project verification.** `python tools/verify_project.py` now
+  runs provenance-link validation, generated activity-data drift checks, the
+  complete Python suite, frontend tests, typecheck, and production build in a
+  fixed fail-fast order.
 - **Machine-checked activity provenance.** Verified Muhurtam profiles now
   declare their stable ledger claim beside the Python rules; MCP and the
   browser consume that shared field. A CI-ready audit rejects missing,
@@ -39,6 +43,10 @@ PyPI version tracks this file's most recent release entry.
   samskara and ranking rules remain independently disclosed.
 
 ### Documentation
+- Corrected the Muhurtam architecture guide from the retired
+  Choghadiya-derived slot model to the named, indivisible 30-Muhurta pipeline;
+  narrowed Drik Panchang's role to external Drik-output comparison rather than
+  universal textual authority.
 - Added a criterion-level foundation-laying crosswalk and verified
   `muhurta.bhumi_puja.foundation` provenance claim.
 - CHANGELOG reconciled against the full git history. The operational-

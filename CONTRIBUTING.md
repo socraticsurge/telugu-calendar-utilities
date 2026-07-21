@@ -14,10 +14,13 @@ The most valuable reports are about **wrong panchangam values** (tithi/nakshatra
 
 ```bash
 pip install -r requirements.txt
-python -m pytest tests/
+npm install
+python tools/verify_project.py
 ```
 
-The full suite must pass before any change merges.
+The verifier checks the provenance ledger links, generated browser activity
+data, the full Python suite, frontend tests, typecheck, and production build.
+Every gate must pass before any change merges.
 
 ## Ground rules for changes
 

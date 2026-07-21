@@ -118,21 +118,21 @@ Vakya (Telugu/Tamil printed panchangams).
 
 ## 3. Landing page
 
-`docs/index.html` (hand-edited until the paused Phase 3 Vite/TS migration),
-deployed by `deploy-landing.yml`, served at `panchangam.astrochaganti.com`
+The Vite/TypeScript application under `src/`, built by `deploy-landing.yml`
+and served at `panchangam.astrochaganti.com`
 (the `CNAME` is load-bearing — never drop it). Beyond letting devotees pick a
 city/system and copy a `webcal://` URL, it's a daily toolkit:
 
 - **Today's Panchangam** — any date, any city.
 - **Tarabalam · Muhurtam** — good days & ranked time slots for up to four people
-  by birth star, with Chandrabalam. A JavaScript port of the muhurta scorer
-  (`docs/muhurta-scorer.js`) keeps slot-time accuracy in the browser; runtime
-  `lagna.json` / `gochara.json` sidecars feed it.
+  by birth star, with Chandrabalam. Typed scorer modules consume the generated
+  Python activity contract; runtime `lagna.json` / `gochara.json` sidecars
+  supply slot-time data.
 - **Gochara + Rasi Phalalu** — South Indian chart, transit verdicts, computed
   daily reading.
 
 Everything is shareable to WhatsApp.
 
-> The 1.9.0 timing computations are all reachable via MCP today; bringing them to
-> the static site is parked Phase 8 work (Groups A/B/C in the
-> [roadmap](06-roadmap-and-backlog.md)).
+> MCP remains the complete computational interface. The website intentionally
+> presents a curated devotee-facing subset; its declared activity catalogue and
+> generated rule contract are protected by parity tests.
