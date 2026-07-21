@@ -119,6 +119,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.karnavedha",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
+      "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, age guidance, double-Tithi/double-Nakshatra caution, vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. Age, transition-count and election-house checks remain manual. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-07-21"
+    },
+    {
       "id": "muhurta.well_digging",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

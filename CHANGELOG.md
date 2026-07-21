@@ -8,6 +8,10 @@ PyPI version tracks this file's most recent release entry.
 ## [Unreleased]
 
 ### Added
+- **Source-backed Karnavedha profile.** Raman Chapter VIII, printed page 22
+  (PDF page 26), now supplies the never-at-night rule, weekdays and rejected
+  rising Rasis; its Tithi reference resolves to Chapter V. Age, transition and
+  election-house checks remain explicit. Coverage rises from 5/30 to 6/30.
 - **Source-backed Annaprasana profile.** Raman Chapter VIII, printed pages
   21–22 (PDF pages 25–26), now supplies the admitted Nakshatras, weekdays and
   rising Rasis; its general-Tithi reference is resolved to Chapter V's exact

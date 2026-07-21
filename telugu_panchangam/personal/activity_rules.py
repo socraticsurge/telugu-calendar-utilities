@@ -30,6 +30,7 @@
 #   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
 #   source_claim            stable verified claim ID in provenance.json
+#   daytime_only            night_slots returns no candidates for the activity
 #   prefer_bhadra_puchha    bonus when slot overlaps Bhadra Puchha
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
@@ -153,6 +154,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'commended; no malefic should occupy Lagna.',
                       ]},
     'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
+                      'source_claim': 'muhurta.karnavedha',
+                      'daytime_only': True,
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -160,8 +163,22 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'skip_on_pitru_paksha': True,
                       'prefer_tithi_class': 'Bhadra',
                       'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Budhavaram', 'Shukravaram'],
-                      'prefer_lagna_class': 'Dvisvabhava'},
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'avoid_tithi_numbers': [4, 6, 8, 12, 14, 15],
+                      'allowed_lagnas': [
+                          'Mesha', 'Vrishabha', 'Mithuna', 'Karka',
+                          'Kanya', 'Tula', 'Dhanu', 'Makara', 'Meena',
+                      ],
+                      'manual_checks': [
+                          'Perform on the 12th or 16th day after birth, or '
+                          'in the child’s 6th, 7th or 8th month.',
+                          'Reject a day on which two Nakshatras or two Tithis '
+                          'rule during the ceremony period.',
+                          'Election chart: leave the 8th house unoccupied.',
+                      ]},
     'mundana':       {'label': 'Mundana / Chaula (First head-shave)',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,

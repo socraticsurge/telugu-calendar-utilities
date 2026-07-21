@@ -702,6 +702,8 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
             return []
 
     rules = ACTIVITY_RULES[activity]
+    if rules.get('daytime_only'):
+        return []
 
     allowed_maasams = rules.get('allowed_maasams')
     normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')

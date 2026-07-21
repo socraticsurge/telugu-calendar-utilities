@@ -15,6 +15,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
     assert result['activity_count'] == len(ACTIVITY_RULES)
     assert result['verified_profiles'] == {
         'annaprasana': 'muhurta.annaprasana',
+        'karnavedha': 'muhurta.karnavedha',
         'naming': 'muhurta.namakarana',
         'property': 'muhurta.land_purchase.building',
         'bhumi_puja': 'muhurta.bhumi_puja.foundation',

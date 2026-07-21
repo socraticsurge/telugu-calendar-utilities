@@ -44,6 +44,7 @@ PyPI MCP package.
 | 16 | [Muhurtam activity provenance coverage](16-activity-provenance-coverage.md) | Machine-checked verified-profile coverage and the remaining citation debt |
 | 17 | [Namakarana source profile](17-namakarana-profile.md) | Raman Chapter VIII crosswalk, conservative gates, and practitioner checks |
 | 18 | [Annaprasana source profile](18-annaprasana-profile.md) | Raman Chapter VIII and Panchanga-Suddhi crosswalk with explicit limitations |
+| 19 | [Karnavedha source profile](19-karnavedha-profile.md) | Daytime-only Chapter VIII profile with exact weekday, Tithi and Lagna gates |
 
 ## How to read the diagrams
 
