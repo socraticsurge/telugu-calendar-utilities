@@ -72,6 +72,9 @@ present; parity tests require both scorers to apply the same aliases.
 declared in `activity_catalog.py`; `tools/export_activity_rules.py` generates
 the exact rule fields consumed by TypeScript. `npm run activity:check` and the
 Python contract tests fail if the committed export or static selector drifts.
+Tithi-family scoring is likewise shared as a behavioral contract: the browser
+exports `avoid_tithi_class` and its pure scorer mirrors Python's preferred and
+avoided families, Amavasya precedence, and Pushya/Siddhi Rikta neutralization.
 
 ### The pipeline
 

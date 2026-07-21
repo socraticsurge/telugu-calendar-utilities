@@ -9,6 +9,7 @@
     "skip_on_yoga",
     "prefer_vara",
     "prefer_tithi_class",
+    "avoid_tithi_class",
     "required_lagna_class",
     "allowed_maasams",
     "allowed_varas",
@@ -109,6 +110,9 @@
         "Somavaram"
       ],
       "prefer_tithi_class": "Purna",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "audit_claim": "muhurta.wedding.profile_conflict",
       "skip_on_combust": [
         "Guru",
@@ -127,6 +131,9 @@
         "Somavaram"
       ],
       "prefer_tithi_class": "Purna",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "manual_checks": [
         "Scope warning: the inspected Raman edition has no dedicated Betrothal or Nischayam election; do not silently treat marriage rules as engagement rules.",
         "If the marriage passage is used as a conservative cross-check, verify its exact Tithi, weekday, Nakshatra and rising-Rasi gates; this profile does not implement them."
@@ -145,6 +152,9 @@
         "Dagdha Yoga"
       ],
       "prefer_tithi_class": "Nanda",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "allowed_varas": [
         "Somavaram",
         "Budhavaram",
@@ -199,6 +209,9 @@
         "Dagdha Yoga"
       ],
       "prefer_tithi_class": "Bhadra",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "allowed_varas": [
         "Somavaram",
         "Budhavaram",
@@ -253,6 +266,9 @@
         "Dagdha Yoga"
       ],
       "prefer_tithi_class": "Bhadra",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "allowed_varas": [
         "Somavaram",
         "Budhavaram",
@@ -293,6 +309,9 @@
         "Dagdha Yoga"
       ],
       "prefer_tithi_class": "Nanda",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "allowed_varas": [
         "Somavaram",
         "Budhavaram",
@@ -369,6 +388,9 @@
         "Dagdha Yoga"
       ],
       "prefer_tithi_class": "Nanda",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "allowed_maasams": [
         "Magha",
         "Phalguna",
@@ -450,6 +472,9 @@
         "Dagdha Yoga"
       ],
       "prefer_tithi_class": "Nanda",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "allowed_varas": [
         "Somavaram",
         "Budhavaram",
@@ -496,6 +521,9 @@
         "Somavaram"
       ],
       "prefer_tithi_class": "Bhadra",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "manual_checks": [
         "Known source mismatch: this finder is broader than Raman’s weekday, Tithi, Nakshatra and fixed-Lagna rules; verify the source crosswalk before choosing.",
         "Practitioner checks: Uttarayana; strong Guru, Shukra and Chandra; 8th house vacant; malefics in Upachayas; benefics in Kendras; worship and Bhootabali completed; wife not over six months pregnant."
@@ -760,6 +788,9 @@
         "Somavaram"
       ],
       "prefer_tithi_class": "Purna",
+      "avoid_tithi_class": [
+        "Jaya"
+      ],
       "manual_checks": [
         "Homahuti check: count the day’s Nakshatra from Surya’s Nakshatra in three-star groups and reject a group assigned to a malefic Graha, per Muhurta Chintamani verse 35.",
         "Agnivasa check: apply the Tithi-plus-weekday modulo-four rule in verse 36; only remainders 3 and 0 place Agni on earth and support Homa.",
@@ -806,6 +837,9 @@
       "prefer_vara": [
         "Somavaram",
         "Guruvaram"
+      ],
+      "avoid_tithi_class": [
+        "Jaya"
       ]
     },
     "court": {
@@ -814,6 +848,9 @@
         "Mangalavaram"
       ],
       "prefer_tithi_class": "Jaya",
+      "avoid_tithi_class": [
+        "Purna"
+      ],
       "manual_checks": [
         "Known source mismatch: this profile rewards Tuesday, but Raman rejects Tuesday and Saturday for filing lawsuits; verify the exact Nakshatra and weekday gates before acting.",
         "Practitioner checks: Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; Lagna and 6th lords separated; Mesha Lagna or Navamsa."

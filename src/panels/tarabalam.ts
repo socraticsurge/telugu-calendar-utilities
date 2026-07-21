@@ -12,7 +12,7 @@ import {
   muLagnaPosition, muLagnaVerdict,
   muIsFavourableLagna, muIsAshtamaLagna, muLagnaAtMin,
   muLagnaClassOf, muLagnasInClass,
-  muScoreTier, muRelativeTier, muCanonicalNakshatra,
+  muScoreTier, muRelativeTier, muCanonicalNakshatra, muScoreTithiClass,
   muEndsBySolarNoon, muCombustionDropReason,
   computePersonalDosha, computeDayDosha,
 } from '../muhurta-scorer';
@@ -635,20 +635,6 @@ const TITHI_NAMES_ORDER = [
   'Ekadashi', 'Dwadashi','Trayodashi','Chaturdashi','Pournami',
 ];
 const TITHI_ALIASES = { Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15 };
-const TITHI_NUMBER_FAMILY = {
-  1:'Nanda',  6:'Nanda',  11:'Nanda',
-  2:'Bhadra', 7:'Bhadra', 12:'Bhadra',
-  3:'Jaya',   8:'Jaya',   13:'Jaya',
-  4:'Rikta',  9:'Rikta',  14:'Rikta',
-  5:'Purna', 10:'Purna',  15:'Purna',
-};
-function tithiFamily(name) {
-  if (!name) return null;
-  const last = name.trim().split(/\s+/).pop();
-  if (TITHI_ALIASES[last]) return TITHI_NUMBER_FAMILY[TITHI_ALIASES[last]];
-  const idx = TITHI_NAMES_ORDER.indexOf(last);
-  return idx >= 0 ? TITHI_NUMBER_FAMILY[idx + 1] : null;
-}
 function activityTithiNumber(name) {
   if (!name) return null;
   const last = name.trim().split(/\s+/).pop();
@@ -716,6 +702,7 @@ async function findMuhurta() {
       const preferChog = rules.prefer_choghadiya || null;     // ['Block', bonus]
       const avoidKaranaNames = new Set(rules.avoid_karana || []);
       const preferTithiClass = rules.prefer_tithi_class || null;
+      const avoidTithiClasses = rules.avoid_tithi_class || [];
       const preferVaras = new Set(rules.prefer_vara || []);
       const preferLagnaClass = rules.prefer_lagna_class || null;
       const requiredLagnaClass = rules.required_lagna_class || null;
@@ -1030,14 +1017,13 @@ async function findMuhurta() {
 
           // Tithi family — slot-time tithi (Rikta → day_quality penalty;
           // activity class match → activity_match bonus)
-          const tFam = tithiFamily(facts.tithi);
-          if (tFam === 'Rikta') {
-            score -= 2;
-            dayQuality.push(`${facts.tithi} (Rikta tithi) (-2)`);
-          } else if (tFam && preferTithiClass && tFam === preferTithiClass) {
-            score += 1;
-            activityMatch.push(`${facts.tithi} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
-          }
+          const tithiScore = muScoreTithiClass(
+            facts.tithi, preferTithiClass, activityLabel, facts.nakshatra,
+            facts.specialYogas, avoidTithiClasses);
+          const tFam = tithiScore.family;
+          score += tithiScore.bonus;
+          if (tithiScore.dayReason) dayQuality.push(tithiScore.dayReason);
+          if (tithiScore.activityReason) activityMatch.push(tithiScore.activityReason);
 
           // Special yogas — slot-time
           let yogaSkip = false;

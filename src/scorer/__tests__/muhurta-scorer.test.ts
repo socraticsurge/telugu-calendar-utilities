@@ -20,6 +20,42 @@ test('muCanonicalNakshatra normalizes source spellings', () => {
   assert.equal(M.muCanonicalNakshatra('Pushya'), 'Pushya');
 });
 
+test('muScoreTithiClass mirrors Python prefer and avoid paths', () => {
+  const preferred = M.muScoreTithiClass(
+    'Shukla Panchami', 'Purna', 'Wedding (Vivaha)');
+  assert.equal(preferred.bonus, 1);
+  assert.match(preferred.activityReason || '', /favoured/);
+
+  const avoided = M.muScoreTithiClass(
+    'Shukla Tritiya', 'Purna', 'Wedding (Vivaha)', null, [], ['Jaya']);
+  assert.equal(avoided.bonus, -1);
+  assert.match(avoided.activityReason || '', /Jaya tithi.*inauspicious/);
+});
+
+test('muScoreTithiClass penalizes Amavasya before Purna preference', () => {
+  const result = M.muScoreTithiClass(
+    'Amavasya', 'Purna', 'Wedding (Vivaha)');
+  assert.equal(result.bonus, -2);
+  assert.equal(result.family, 'Amavasya');
+  assert.equal(result.activityReason, null);
+});
+
+test('muScoreTithiClass applies Rikta neutralizations', () => {
+  const pushya = M.muScoreTithiClass(
+    'Shukla Chaturthi', null, 'Ceremony', 'Pushya');
+  assert.equal(pushya.bonus, 0);
+  assert.match(pushya.dayReason || '', /neutralised by Pushya/);
+
+  const siddhi = M.muScoreTithiClass(
+    'Shukla Navami', null, 'Ceremony', 'Rohini', ['Sarvartha Siddhi Yoga']);
+  assert.equal(siddhi.bonus, -1);
+  assert.match(siddhi.dayReason || '', /partially offset/);
+
+  const plain = M.muScoreTithiClass(
+    'Shukla Chaturdashi', null, 'Ceremony');
+  assert.equal(plain.bonus, -2);
+});
+
 // ── Lagna position math ─────────────────────────────────────────
 
 test('muLagnaPosition: inclusive count from janma', () => {
