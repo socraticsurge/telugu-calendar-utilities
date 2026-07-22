@@ -7,6 +7,39 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+## [1.13.0] — 2026-07-22
+
+Astrological authority and Muhurtam coverage release. The daily Panchangam,
+Daily Horoscope and Muhurtam surfaces now disclose criterion-level provenance
+instead of treating computed output as uniform textual authority.
+
+### Release highlights
+
+- **Muhurtam coverage:** 34 of 35 distinct purpose-specific profiles now have
+  verified rule-level source claims; `Anything auspicious` remains the sole
+  explicit heuristic. House warming is the narrowly scoped, source-verified
+  Gruhapravesha election, with completed-house purchase and renovation kept
+  separate.
+- **Corrected elections:** wedding, Gruhapravesha, court filing, engagement,
+  Homahuti, deferred Pretakriya, Seemantha, borrowing, lending, inventory
+  purchase, service entry, capital deployment, Shantika/Paushtika and
+  Dharma-kriya rules now follow their inspected passages and disclose manual
+  chart conditions.
+- **Panchangam and horoscope corrections:** Bhadra Mukha/Puchha follows the
+  Tithi-specific Muhurta Chintamani Yamas; Rahu and Ketu transit houses follow
+  Phaladeepika rather than inheriting Shani's set.
+- **MCP trust contract:** `find_muhurta` returns the selected activity's
+  provenance, automated constraints and manual prerequisites. Panchangam
+  responses disclose authority state by output category.
+- **Clearer recommendations:** browser results remove irrelevant weekday
+  guidance, separate computed strengths from chart validation and practical
+  information, and keep specialist Dharma-kriya/Pretakriya activities out of
+  the general public selector while retaining them in Python and MCP.
+- **Engineering:** generated Python-to-browser activity contracts, provenance
+  validation, documentation-drift checks and `tools/verify_project.py` provide
+  one fail-fast verification path across Python, frontend tests, type checking
+  and production build.
+
 ### Added
 - **Precisely scoped vehicle-acquisition profile.** Raman Chapter IV, printed
   page 10 (PDF page 14), now supplies a +1 preference for five movable
@@ -897,7 +930,8 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.12.0...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.13.0...HEAD
+[1.13.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.11.0...v1.12.0
 [1.10.4]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.3...v1.10.4
 [1.10.3]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.9.0...v1.10.3
