@@ -870,25 +870,30 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'and qualified financial or legal advice take '
                           'precedence over electional timing.',
                       ]},
-    'job':           {'label': 'Job start / Contract signing',
-                      'audit_claim': 'muhurta.job_contract.profile_conflict',
-                      'prefer_choghadiya': ('Amrit', 1),
-                      'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Guruvaram', 'Budhavaram'],
-                      'prefer_lagna_class': 'Sthira',
+    'job':           {'label': 'Entering employment / starting service',
+                      'source_claim': 'muhurta.service_entry',
+                      'manual_prerequisites': True,
+                      'allowed_varas': [
+                          'Budhavaram', 'Shukravaram', 'Adivaram',
+                          'Guruvaram',
+                      ],
+                      'allowed_nakshatras': [
+                          'Ashwini', 'Pushya', 'Hasta', 'Chitra',
+                          'Anuradha', 'Mrigashira', 'Revati',
+                      ],
                       'manual_checks': [
-                          'For entering service, Muhurta Chintamani verse '
-                          '26 names Ashwini, Pushya, Hasta, Chitra, '
-                          'Anuradha, Mrigashira and Revati; Wednesday, '
-                          'Friday, Sunday and Thursday; a benefic in Lagna; '
-                          'and Surya or Mangala in the 10th or 11th.',
-                          'Employer/employee check: compare birth-Nakshatra '
-                          'Yoni friendship and friendship between both '
-                          'Janma-Rasi lords before entering service.',
-                          'Contract warning: verse 42 concerns Sandhana '
-                          '(peace, alliance or friendship), not a modern '
-                          'employment or commercial contract; do not treat '
-                          'it as direct authority for signing.',
+                          'Scope: this is the employee-side act of entering '
+                          'service or starting employment; offer acceptance, '
+                          'contract signing, incorporation and hiring staff '
+                          'are separate acts.',
+                          'Election chart: place a benefic in Lagna and '
+                          'place Surya or Mangala in the 10th or 11th house.',
+                          'Employer/employee compatibility: compare both '
+                          'birth-Nakshatra Yonis and the friendship between '
+                          'their Janma-Rasi lords.',
+                          'Employment terms, labour law, compensation, '
+                          'benefits, workplace safety and professional '
+                          'judgment take precedence over timing.',
                       ]},
     # — Spiritual —
     'yajna':         {'label': 'Yajna / Homam',

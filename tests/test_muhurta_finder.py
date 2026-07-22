@@ -477,12 +477,12 @@ def test_reason_groups_present_with_expected_keys():
 
 
 def test_reason_groups_categorise_correctly():
-    """A slot with Sarvartha Siddhi + tarabalam mixed + tithi-class match
+    """A slot with Siddha Yoga + tarabalam mixed + tithi-class match
     routes each reason to its category."""
-    # 2026-06-25 (Thu) — Sarvartha Siddhi at sunrise, Shukla Ekadashi (Nanda).
-    # Legacy Job profile prefers Nanda + Guruvaram, so all categories fire.
-    day = _day(2026, 6, 25)
-    slots = day_slots(day, activity='job',
+    # 2026-02-12 (Thu) — Siddha Yoga, Krishna Dashami (Purna).
+    # Yajna currently prefers Purna + Guruvaram, so all categories fire.
+    day = _day(2026, 2, 12)
+    slots = day_slots(day, activity='yajna',
                       janma_nakshatras=['Krittika'])
     assert slots
     rg = slots[0]['reason_groups']
@@ -493,14 +493,14 @@ def test_reason_groups_categorise_correctly():
     assert any('muhurta' in r for r in rg['slot_quality'])
     assert any('choghadiya' in r for r in rg['slot_quality'])
     assert not any('clear of all inauspicious windows' in r for r in rg['slot_quality'])
-    # Day quality contains the Sarvartha yoga reason
-    assert any('Sarvartha Siddhi' in r for r in rg['day_quality']) or \
-           any('Sarvartha Siddhi' in r for s in slots for r in s['reason_groups']['day_quality'])
+    # Day quality contains the Siddha Yoga reason.
+    assert any('Siddha Yoga' in r for r in rg['day_quality']) or \
+           any('Siddha Yoga' in r for s in slots for r in s['reason_groups']['day_quality'])
     # Group fit contains tarabalam line (favourable or avoid)
     assert any('tarabalam' in r for r in rg['group_fit'])
-    # Activity match contains Nanda + Guruvaram bonuses
-    assert any('Nanda' in r and 'favoured for Job' in r for r in rg['activity_match'])
-    assert any('Guruvaram favoured for Job' in r for r in rg['activity_match'])
+    # Activity match contains Purna + Guruvaram bonuses.
+    assert any('Purna' in r and 'favoured for Yajna' in r for r in rg['activity_match'])
+    assert any('Guruvaram favoured for Yajna' in r for r in rg['activity_match'])
 
 
 def test_doctrinal_note_sarvartha_rectifies_tara():
