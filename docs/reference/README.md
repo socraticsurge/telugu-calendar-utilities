@@ -60,7 +60,7 @@ PyPI MCP package.
 | 32 | [Gochara source crosswalk](32-gochara-source-crosswalk.md) | Verified favourable houses and Vedha, a known Rahu/Ketu conflict, and a precisely bounded named-Shani evidence layer |
 | 33 | [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md) | Exact Chapter XII crosswalk and approval-gated conflicts in the current home-entry profile |
 | 34 | [Lawsuit-filing source profile](34-court-evidence-audit.md) | Exact Raman crosswalk, disclosed Tithi shorthand, conservative Mesha-Lagna automation and legal-safety boundary |
-| 35 | [Litigation alias and Bhadra audit](35-litigation-evidence-audit.md) | Retired duplicate profile, explicit Court alias, exact Chintamani verses and isolated 5:8:3 approximation debt |
+| 35 | [Litigation alias and Bhadra audit](35-litigation-evidence-audit.md) | Retired duplicate profile, explicit Court alias and corrected Chintamani Yama mapping |
 | 36 | [Mutual engagement evidence audit](36-engagement-evidence-audit.md) | Exact Kanyavarana/Varavarana Nakshatra intersection and manual boundary |
 | 37 | [Deferred Pretakriya evidence audit](37-cremation-evidence-audit.md) | Exact nine-star admission and immediate-Antyeshti safety boundary |
 | 38 | [Homa offering evidence audit](38-yajna-homam-evidence-audit.md) | Exact Homahuti and Agnivasa election gates |

@@ -35,13 +35,13 @@ def test_historical_conflict_and_shared_bhadra_debt_have_exact_locators():
     assert 'removed standalone Litigation / contest profile' in \
         historical['scope']
 
-    bhadra = claims['panchangam.bhadra_mukha_puchha.approximation']
-    assert bhadra['verification_state'] == 'contradicted'
+    bhadra = claims['panchangam.bhadra_mukha_puchha']
+    assert bhadra['verification_state'] == 'verified'
     assert bhadra['source_ids'] == ['MC-HINDI-IA']
     assert 'verses 43-45' in bhadra['locator']
     assert 'printed pp. 20-21' in bhadra['locator']
-    assert 'Tithi-specific numbered Yamas' in bhadra['scope']
-    assert 'proportionally as 5:8:3' in bhadra['scope']
+    assert 'Tithi-specific Yama assignments' in bhadra['scope']
+    assert 'Tithi-specific Yama assignments' in bhadra['scope']
 
 
 def test_mcp_discloses_alias_resolution_and_exact_court_profile():

@@ -293,14 +293,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "panchangam.bhadra_mukha_puchha.approximation",
+      "id": "panchangam.bhadra_mukha_puchha",
       "surface": "panchangam",
       "implementation": "telugu_panchangam/karana_windows.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["MC-HINDI-IA"],
       "locator": "Shubhashubha-prakarana, verses 43-45, printed pp. 20-21 (Internet Archive OCR lines 1743-1797)",
-      "scope": "Verse 44 places five-Ghati Bhadra Mukha and three-Ghati Puchha windows in Tithi-specific numbered Yamas for the eight Vishti-bearing Tithis. The implementation instead scales every observed Vishti span proportionally as 5:8:3. It preserves the broad face/body/tail ordering but does not reproduce the text's Tithi-specific clock positions and must be presented as an approximation until a dedicated shared-computation correction is approved and verified.",
+      "scope": "Implements verse 44's Tithi-specific Yama assignments for all eight Vishti-bearing Tithis. The equivalent four-quarter form places Mukha in quarter 1/2/3/4 for Shukla Chaturthi/Ashtami/Ekadashi/Pournami and the paired reverse-order Krishna Tithis, with Puchha in quarter 4/1/2/3 respectively. Mukha occupies five nominal Ghatis and Puchha three; both are scaled from the verse's nominal thirty-Ghati Vishti measure to the observed Karana duration. Verse 45's Bhadra-residence classification is not inferred from these sub-windows.",
       "last_reviewed": "2026-07-22"
     },
     {

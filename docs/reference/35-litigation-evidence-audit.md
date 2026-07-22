@@ -28,20 +28,16 @@ Raman supplies the narrow lawsuit-filing election. Chintamani verse 44 calls
 the specified Puchha periods auspicious generally; it does not name litigation
 or authorize an activity-specific score.
 
-## Newly isolated computational debt
+## Corrected shared computation
 
-The project currently divides every observed Vishti span proportionally into
-5:8:3 and labels the first 5/16 Mukha and final 3/16 Puchha. Chintamani verse 44
-instead locates five-Ghati Mukha and three-Ghati Puchha windows in different
-numbered Yamas for each of eight Vishti-bearing Tithis. The proportional
-implementation is therefore an approximation, not a verified rendering of
-this edition.
+The project now locates five-Ghati Mukha and three-Ghati Puchha in verse 44's
+Tithi-specific numbered Yamas, expressed as quarters of the observed Vishti
+duration. The verified shared claim is
+`panchangam.bhadra_mukha_puchha`.
 
-This branch does not alter that shared Panchangam computation. The debt is now
-recorded as `panchangam.bhadra_mukha_puchha.approximation`; correcting it must
-be a dedicated feature because it changes shared engine outputs and existing
-tests. Until then, the Bhadra sub-window must not be cited as a precise
-scriptural basis for a legal-election bonus.
+That correction does not create a legal-election rule. The Court profile has
+no Bhadra Puchha bonus because Raman's filing passage supplies none and
+Chintamani verse 44 names no litigation activity.
 
 ## Safety
 

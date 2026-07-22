@@ -21,7 +21,7 @@ Several filters are only expressible on this scale.
 | Module | Computes | Source | Surfaces as |
 |---|---|---|---|
 | `ghati.py` | `GhatiClock` / `GhatiWindow` — civil↔ghati conversion, sunrise-anchored | Surya Siddhanta | `PanchangamDay.ghati_clock`; foundation for the two below |
-| `karana_windows.py` | **Vishaghati** ("poison ghatika") — 4-vighati window per nakshatra at a classical offset; **Bhadra Mukha/Puchha** — disclosed proportional 5:8:3 approximation, which does not yet reproduce Chintamani 44's Tithi-specific Yamas | Muhurta Chintamani 43–45; implementation conflict recorded in provenance | `vishaghati`, `bhadra_mukha`, `bhadra_puchha` |
+| `karana_windows.py` | **Vishaghati** ("poison ghatika") — 4-vighati window per Nakshatra at a classical offset; **Bhadra Mukha/Puchha** — verse-44 Tithi-specific Yama quarters with five-/three-Ghati widths scaled to observed Vishti duration | Muhurta Chintamani 43–44; exact locator and mapping in provenance | `vishaghati`, `bhadra_mukha`, `bhadra_puchha` |
 | `sankramana.py` | Sun's rasi-ingress avoidance — ±16 ghatis around the exact crossing (~12h48m) | classical samskara rule | `sankramana_avoidance` |
 
 ---
