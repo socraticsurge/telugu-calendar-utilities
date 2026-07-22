@@ -232,26 +232,24 @@
       ]
     },
     "engagement": {
-      "label": "Engagement (Nischayam)",
-      "prefer_lagna_class": "Sthira",
-      "skip_on_yoga": [
-        "Visha Yoga",
-        "Dagdha Yoga"
-      ],
-      "skip_on_sankramana": true,
-      "prefer_vara": [
-        "Guruvaram",
-        "Somavaram"
-      ],
-      "prefer_tithi_class": "Purna",
-      "avoid_tithi_class": [
-        "Jaya"
+      "label": "Mutual engagement (Kanya-Varavarana)",
+      "allowed_nakshatras": [
+        "Rohini",
+        "Krittika",
+        "Purva Phalguni",
+        "Purva Ashadha",
+        "Purva Bhadrapada",
+        "Uttara Phalguni",
+        "Uttara Ashadha",
+        "Uttara Bhadrapada"
       ],
       "manual_checks": [
-        "Scope warning: the inspected Raman edition has no dedicated Betrothal or Nischayam election; do not silently treat marriage rules as engagement rules.",
-        "If the marriage passage is used as a conservative cross-check, verify its exact Tithi, weekday, Nakshatra and rising-Rasi gates; this profile does not implement them."
+        "Verse 11 additionally requires a Shubha day, Tithi and Lagna for Varavarana but does not enumerate them in this passage; the officiating practitioner must establish those three conditions.",
+        "Scope: automation uses the intersection of the Kanyavarana and Varavarana star lists for a mutual engagement. A one-sided bride- or groom-selection rite may use its own broader verse-specific list.",
+        "Complete consent, family and couple-specific compatibility review; this election cannot assess the relationship or promise a marriage outcome."
       ],
-      "audit_claim": "muhurta.engagement.profile_conflict"
+      "manual_prerequisites": true,
+      "source_claim": "muhurta.kanya_varavarana"
     },
     "naming": {
       "label": "Naming (Namakaranam)",

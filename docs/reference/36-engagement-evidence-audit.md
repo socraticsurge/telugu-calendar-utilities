@@ -1,38 +1,40 @@
-# Engagement / Nischayam Evidence Audit
+# Mutual Engagement (Kanya-Varavarana) Evidence Audit
 
-## Status
+## Verdict
 
-The Engagement / Nischayam profile is **not source-verified**. Its
-`audit_claim`, `muhurta.engagement.profile_conflict`, has state `contradicted`.
+The `engagement` key now implements a source-verified mutual ritual selection,
+using the exact common Nakshatras of Muhurta Chintamani's Kanyavarana and
+Varavarana/Phaladana passages. The former Purna/Jaya, weekday and fixed-Lagna
+proxies have been removed.
 
-## Inspected authority and scope search
+## Source
 
-- B. V. Raman, *Muhurtha (Electional Astrology)*, UBS Publishers'
-  Distributors, 1993.
-- The complete registered PDF edition was searched for “Betrothal,”
-  “Engagement,” and “Nischayam”; no dedicated election was found.
-- The nearest candidate is Chapter IX, “Electing a time for marriage,” printed
-  pages 41–42; PDF pages 45–46.
-- Raman is a modern secondary authority, not scripture.
+- **MC-HINDI-IA** — *Muhurta Chintamani*, Vivaha-prakarana,
+  “Kanyavarana Muhurta” and “Varavarana (Phaladana) Muhurta,” verses 10-11,
+  printed pp. 103-104; Internet Archive OCR lines 5337-5360.
+- Verse 10's `karapidocita-rksha` alternative refers to the marriage stars
+  enumerated in verse 55, printed pp. 125-126; OCR lines 6401-6426.
 
-Absence from this edition does not prove that no classical or regional
-Nischayam tradition exists. It proves only that this project cannot cite Raman
-as a dedicated Engagement authority without silently changing the scope.
+## Exact mutual-election gate
 
-## Nearest-passage crosswalk
+Kanyavarana admits Uttara Ashadha, Swati, Shravana, all three Purvas,
+Anuradha, Dhanishtha and Krittika, or the verse-55 marriage stars. Varavarana
+admits Rohini, all three Uttaras, Krittika and all three Purvas. Every star in
+the latter list occurs in the former list after its marriage-star expansion.
 
-| Criterion | Current Engagement profile | Raman marriage passage | Status |
-|---|---|---|---|
-| Tithi | Rewards every Purna; penalizes every Jaya | Admits Shukla Tritiya and Trayodashi; rejects Pournami and Amavasya | **Direct conflict if inherited** |
-| Vara | Prefers Monday and Thursday | Monday, Wednesday, Thursday and Friday best; Tuesday rejected | Incomplete proxy |
-| Nakshatra | No activity-specific gate | Eleven named stars, with Pada exclusions | Missing |
-| Lagna | Soft fixed-sign preference | Mithuna, Kanya and Tula best; five others middling | Different rule |
-| Scope | Engagement / Nischayam | Marriage ceremony | **Not equivalent** |
+The mutual rite therefore has this exact eight-star intersection:
 
-## Correction boundary
+- Rohini and Krittika
+- Purva Phalguni, Purva Ashadha and Purva Bhadrapada
+- Uttara Phalguni, Uttara Ashadha and Uttara Bhadrapada
 
-The existing behavior contract preserves Engagement's family scoring and broad
-preferences. Replacing it with a regional Nischayam rule set requires a direct,
-edition-specific authority and owner approval. Until then, Python, MCP and the
-browser contract expose the scope warning and the nearest-passage conflict
-instead of claiming that marriage rules automatically govern engagement.
+Automation treats that list as a hard slot-time Nakshatra gate.
+
+## Manual boundary
+
+Verse 11 also requires a Shubha day, Tithi and Lagna, but does not enumerate
+those values in this passage. The result is therefore capped for practitioner
+review until an officiant establishes those three conditions. A one-sided
+Kanyavarana or Varavarana may use its respective broader list; this profile is
+specifically for a mutual engagement and gift exchange, not the wedding,
+compatibility assessment, consent, or a prediction of the relationship.

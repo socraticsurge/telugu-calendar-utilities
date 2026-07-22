@@ -238,14 +238,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.engagement.profile_conflict",
+      "id": "muhurta.kanya_varavarana",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
-      "source_ids": ["BVR-MUHURTHA-1993"],
-      "locator": "Full-text scope search of the registered edition found no 'Betrothal,' 'Engagement,' or 'Nischayam' election; nearest candidate is Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
-      "scope": "The configured Engagement profile has no dedicated passage in the inspected Raman edition and must not inherit marriage authority by label similarity. If the neighboring marriage election was intended as its basis, the configured Tithi-family scoring conflicts with it: the project penalizes every Jaya Tithi although Shukla Tritiya and Trayodashi are admitted, and rewards every Purna Tithi although Pournami and Amavasya are rejected. The profile also omits that passage's exact weekday, Nakshatra and rising-Rasi gates. This audit records both the taxonomy gap and the nearest-source conflict; it does not establish a verified Engagement tradition.",
+      "verification_state": "verified",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Vivaha-prakarana, 'Kanyavarana Muhurta' and 'Varavarana (Phaladana) Muhurta,' verses 10-11, printed pp. 103-104 (Internet Archive OCR lines 5337-5360); marriage-star expansion referenced by verse 10 is verse 55, printed pp. 125-126 (OCR lines 6401-6426)",
+      "scope": "For a mutual engagement, implements the intersection of both sides' directly stated Nakshatra admissions: Rohini, Krittika, the three Purvas and the three Uttaras. Verse 10 admits Kanyavarana under nine named stars or the marriage-election stars in verse 55; verse 11 admits Varavarana/Phaladana under Rohini, all three Uttaras, Krittika and all three Purvas. Every verse-11 star is also admitted by verse 10, so the eight-star intersection is exact. Verse 11 additionally says Shubha day, Tithi and Lagna without enumerating them in this passage; those remain mandatory practitioner prerequisites. This profile governs mutual ritual selection/gift exchange, not relationship compatibility or the wedding ceremony.",
       "last_reviewed": "2026-07-22"
     },
     {

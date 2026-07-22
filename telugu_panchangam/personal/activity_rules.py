@@ -345,25 +345,28 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'This profile follows Raman’s named method rather '
                           'than silently blending published practices.',
                       ]},
-    'engagement':    {'label': 'Engagement (Nischayam)',
-                      'audit_claim': 'muhurta.engagement.profile_conflict',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP),
-                      'skip_on_sankramana': True,
-                      'skip_on_khar_maasa': True,
-                      'skip_on_adhika': True,
-                      'skip_on_pitru_paksha': True,
-                      'prefer_tithi_class': 'Purna',
-                      'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Guruvaram', 'Somavaram'],
-                      'prefer_lagna_class': 'Sthira',
+    'engagement':    {'label': 'Mutual engagement (Kanya-Varavarana)',
+                      'source_claim': 'muhurta.kanya_varavarana',
+                      'manual_prerequisites': True,
+                      'allowed_nakshatras': [
+                          'Rohini', 'Krittika',
+                          'Purva Phalguni', 'Purva Ashadha',
+                          'Purva Bhadrapada',
+                          'Uttara Phalguni', 'Uttara Ashadha',
+                          'Uttara Bhadrapada',
+                      ],
                       'manual_checks': [
-                          'Scope warning: the inspected Raman edition has no '
-                          'dedicated Betrothal or Nischayam election; do not '
-                          'silently treat marriage rules as engagement rules.',
-                          'If the marriage passage is used as a conservative '
-                          'cross-check, verify its exact Tithi, weekday, '
-                          'Nakshatra and rising-Rasi gates; this profile does '
-                          'not implement them.',
+                          'Verse 11 additionally requires a Shubha day, Tithi '
+                          'and Lagna for Varavarana but does not enumerate '
+                          'them in this passage; the officiating practitioner '
+                          'must establish those three conditions.',
+                          'Scope: automation uses the intersection of the '
+                          'Kanyavarana and Varavarana star lists for a mutual '
+                          'engagement. A one-sided bride- or groom-selection '
+                          'rite may use its own broader verse-specific list.',
+                          'Complete consent, family and couple-specific '
+                          'compatibility review; this election cannot assess '
+                          'the relationship or promise a marriage outcome.',
                       ]},
     'naming':        {'label': 'Naming (Namakaranam)',
                       'source_claim': 'muhurta.namakarana',
