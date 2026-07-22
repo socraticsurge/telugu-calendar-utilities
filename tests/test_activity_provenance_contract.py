@@ -34,6 +34,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'pilgrimage': 'muhurta.pilgrimage',
         'purchase': 'muhurta.purchase.general',
         'business_inventory_purchase': 'muhurta.trade_inventory.purchase',
+        'borrowing_money': 'muhurta.borrowing_money',
         'travel': 'muhurta.travel',
         'well_digging': 'muhurta.well_digging',
     }

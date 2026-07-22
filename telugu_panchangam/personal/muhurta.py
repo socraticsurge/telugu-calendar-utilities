@@ -293,6 +293,10 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
 def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | None:
     day = ctx.day
 
+    if (ctx.avoid_janma_nakshatra and ctx.janma_nakshatras and
+            facts.nakshatra in canonical_activity_nakshatras(
+                ctx.janma_nakshatras)):
+        return None
     if ctx.allowed_nakshatras and facts.nakshatra not in ctx.allowed_nakshatras:
         return None
     if facts.nakshatra in ctx.avoid_nakshatras:
@@ -672,6 +676,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
         manual_prerequisites=bool(rules.get('manual_prerequisites')),
+        avoid_janma_nakshatra=bool(rules.get('avoid_janma_nakshatra')),
     )
 
     use_engine = engine is not None and hasattr(engine, 'facts_at')
@@ -879,6 +884,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
         manual_prerequisites=bool(rules.get('manual_prerequisites')),
+        avoid_janma_nakshatra=bool(rules.get('avoid_janma_nakshatra')),
         avoid_tithi_class=avoid_tithi_class,
     )
 

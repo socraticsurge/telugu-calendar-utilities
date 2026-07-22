@@ -1070,6 +1070,7 @@ def tool_find_muhurta(
             'allowed_lagnas', 'prefer_lagnas', 'caution_lagna_solar',
             'daytime_only', 'forenoon_only', 'allowed_pakshams',
             'allowed_solar_signs', 'allowed_tithi_names', 'skip_on_combust',
+            'avoid_janma_nakshatra',
         )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,

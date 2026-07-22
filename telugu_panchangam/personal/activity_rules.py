@@ -33,6 +33,7 @@
 #   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
 #   manual_prerequisites    unresolved checks cap relative tier below Excellent
+#   avoid_janma_nakshatra   slot omitted when its star matches a supplied Janma star
 #   audit_claim             provenance claim recording a known evidence conflict;
 #                           never grants verified status
 #   heuristic_claim         provenance claim recording intentionally project-defined
@@ -138,6 +139,33 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Commercial need, stock quality, supplier terms, '
                           'cash flow, tax and legal advice take precedence '
                           'over electional timing.',
+                      ]},
+    'borrowing_money': {
+                      'label': 'Borrowing money / taking a loan',
+                      'source_claim': 'muhurta.borrowing_money',
+                      'related_claims': [
+                          'muhurta.borrowing.chintamani_divergence'],
+                      'manual_prerequisites': True,
+                      'avoid_nakshatras': [
+                          'Krittika', 'Moola', 'Punarvasu', 'Dhanishtha',
+                      ],
+                      'avoid_janma_nakshatra': True,
+                      'manual_checks': [
+                          'Transaction role: this is the borrower/debtor '
+                          'side only; do not reuse it for lending, receiving '
+                          'repayment or deploying capital.',
+                          'Personal-star gate: supply every borrower’s Janma '
+                          'Nakshatra so the source prohibition can be '
+                          'enforced; without it, review remains incomplete.',
+                          'Election chart: avoid Chandra conjoined with '
+                          'Mangala or Shani.',
+                          'Purpose-specific chart: for quick domestic or '
+                          'personal use, Chandra should favour Lagna; for '
+                          'business use, Chandra should favour Budha and the '
+                          'Lagna lord.',
+                          'Repayment capacity, total borrowing cost, lender '
+                          'terms, collateral risk and qualified financial or '
+                          'legal advice take precedence over timing.',
                       ]},
     'ceremony':      {'label': 'Ceremony / puja (general)',
                       'audit_claim': 'muhurta.ceremony.profile_conflict',

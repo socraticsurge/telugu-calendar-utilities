@@ -14,9 +14,9 @@ BROWSER_ACTIVITY_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
         'mundana', 'upanayana', 'vidyarambha', 'seemantha',
         'gruhapravesha',
     )),
-    ('Acquisitions', (
+    ('Acquisitions & finance', (
         'vehicle', 'property', 'house_purchase', 'gold',
-        'business_inventory_purchase', 'purchase',
+        'business_inventory_purchase', 'purchase', 'borrowing_money',
     )),
     ('Construction & ventures', (
         'bhumi_puja', 'well_digging', 'home_repair', 'business', 'job',

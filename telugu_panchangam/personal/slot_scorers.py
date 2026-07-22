@@ -77,6 +77,7 @@ class _DayContext:
     caution_lagna_solar: bool
     manual_checks: tuple[str, ...]
     manual_prerequisites: bool
+    avoid_janma_nakshatra: bool
 
 
 # ---------------------------------------------------------------------------

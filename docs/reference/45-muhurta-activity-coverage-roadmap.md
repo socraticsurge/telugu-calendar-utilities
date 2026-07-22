@@ -1,6 +1,6 @@
 # Muhurtam Activity Coverage Roadmap
 
-The current selector has 34 activity keys, all with an explicit provenance
+The current selector has 35 activity keys, all with an explicit provenance
 state. That closes attribution ambiguity; it does not mean the activity
 catalogue is complete. The machine-readable gap inventory is
 [`muhurta-activity-backlog.json`](muhurta-activity-backlog.json).
@@ -23,12 +23,13 @@ not silently share one profile.
 | 2 | Completed-house purchase | **Implemented:** dedicated new/old completed-house profile |
 | 3 | Home repair / renovation start | **Implemented:** scoped repair-commencement profile |
 | 4 | Buying inventory for trade | **Implemented:** buyer-side inventory profile distinct from launch |
-| 5 | Borrowing and lending | Source explicitly distinguishes the two transaction roles |
+| 5 | Borrowing and lending | **Borrowing implemented; lending remains:** roles stay separate |
 
 Seemantha, completed-house purchase, home-repair commencement and trade-
 inventory purchase are now implemented as separate, source-verified profiles
-with explicit medical, legal, safety and scope boundaries. Borrowing and
-lending are now the highest-priority missing profiles.
+with explicit medical, legal, safety and scope boundaries. Borrowing is also
+implemented with its Chintamani divergence disclosed. Lending is now the
+highest-priority missing profile.
 
 ## Important holds and splits
 

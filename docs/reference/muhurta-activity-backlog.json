@@ -63,13 +63,13 @@
       "key": "borrowing_money",
       "label": "Borrowing money",
       "priority": "P1",
-      "disposition": "missing_candidate",
-      "reason": "The source explicitly distinguishes debtor-side timing from lending.",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a debtor-side profile distinct from lending, with the Chintamani divergence disclosed.",
       "source_candidates": [
         {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter X, 'Borrowing money,' printed p. 45 (PDF p. 49)"},
         {"source_id": "MC-HINDI-IA", "locator": "Nakshatra-prakarana, Dravyaprayoga and debt-taking, verse 27, printed pp. 38-39"}
       ],
-      "boundary": "This is astrological election guidance, not financial advice; disclose that repayment capacity and legal terms govern the decision."
+      "boundary": "The implementation states that repayment capacity, borrowing cost, collateral, lender terms and qualified advice govern the decision."
     },
     {
       "key": "lending_money",

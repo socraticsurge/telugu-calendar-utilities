@@ -713,6 +713,7 @@ async function findMuhurta() {
         (rules.allowed_nakshatras || []).map(muCanonicalNakshatra));
       const avoidNakshatras = new Set(
         (rules.avoid_nakshatras || []).map(muCanonicalNakshatra));
+      const avoidJanmaNakshatra = !!rules.avoid_janma_nakshatra;
       const preferNakshatras = new Set(
         (rules.prefer_nakshatras || []).map(muCanonicalNakshatra));
       const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
@@ -848,6 +849,8 @@ async function findMuhurta() {
           const facts = muFactsAt(slotStart, data.vaaram);
           if (allowedNakshatras.size && !allowedNakshatras.has(facts.nakshatra)) continue;
           if (avoidNakshatras.has(facts.nakshatra)) continue;
+          if (avoidJanmaNakshatra && people.some(
+              person => muCanonicalNakshatra(person.nak) === facts.nakshatra)) continue;
           if (allowedTithiNumbers.size &&
               !allowedTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
           if (allowedTithiNames.size && !allowedTithiNames.has(facts.tithi)) continue;
@@ -1218,6 +1221,7 @@ const MU_ACT_LABEL = {
   house_purchase: 'a completed house purchase',
   gold: 'a gold / jewelry purchase',
   business_inventory_purchase: 'a trade inventory purchase',
+  borrowing_money: 'borrowing money / taking a loan',
   bhumi_puja: 'bhumi puja (foundation laying)',
   well_digging: 'well digging',
   home_repair: 'a home repair / renovation start',

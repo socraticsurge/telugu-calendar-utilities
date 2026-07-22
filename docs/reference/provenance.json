@@ -293,6 +293,28 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.borrowing_money",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter X, 'Borrowing Money,' printed p. 45 (PDF p. 49)",
+      "scope": "Supports hard exclusion of Krittika, Moola, Punarvasu, Dhanishtha and each borrower's Janma Nakshatra. Chandra-Mangala/Shani conjunction and purpose-specific Chandra relationships remain manual checks. It supplies no weekday, Tithi, Lagna-class or Choghadiya preference. This is debtor-side election guidance only; repayment capacity, borrowing cost, collateral, lender terms and professional advice take precedence.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "muhurta.borrowing.chintamani_divergence",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/51-borrowing-money-profile.md",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Nakshatra-prakarana, 'Dravyaprayoga and taking a loan,' verse 27, printed pp. 38-39 (OCR lines 2578-2599)",
+      "scope": "The inspected commentary joins debt-taking to a broader Dravyaprayoga/capital-deployment election with twelve named Nakshatras, Chara Lagna, benefics in the 5th/9th and an empty 8th. It does not reproduce Raman's Krittika/Moola/Punarvasu/Dhanishtha/Janma exclusion set. This is a disclosed lineage/scope divergence, not authority to merge the formulas.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.trade_inventory.purchase",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

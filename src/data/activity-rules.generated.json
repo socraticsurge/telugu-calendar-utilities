@@ -23,6 +23,7 @@
     "avoid_tithi_numbers",
     "manual_checks",
     "manual_prerequisites",
+    "avoid_janma_nakshatra",
     "allowed_lagnas",
     "prefer_lagnas",
     "caution_lagna_solar",
@@ -60,14 +61,15 @@
       ]
     },
     {
-      "label": "Acquisitions",
+      "label": "Acquisitions & finance",
       "activities": [
         "vehicle",
         "property",
         "house_purchase",
         "gold",
         "business_inventory_purchase",
-        "purchase"
+        "purchase",
+        "borrowing_money"
       ]
     },
     {
@@ -779,6 +781,28 @@
         "Use the dedicated vehicle, building-land or gold profile when the object is known; their narrower rules take precedence over generic purchase."
       ],
       "source_claim": "muhurta.purchase.general"
+    },
+    "borrowing_money": {
+      "label": "Borrowing money / taking a loan",
+      "avoid_nakshatras": [
+        "Krittika",
+        "Moola",
+        "Punarvasu",
+        "Dhanishtha"
+      ],
+      "manual_checks": [
+        "Transaction role: this is the borrower/debtor side only; do not reuse it for lending, receiving repayment or deploying capital.",
+        "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+        "Election chart: avoid Chandra conjoined with Mangala or Shani.",
+        "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
+        "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing."
+      ],
+      "manual_prerequisites": true,
+      "avoid_janma_nakshatra": true,
+      "source_claim": "muhurta.borrowing_money",
+      "related_claims": [
+        "muhurta.borrowing.chintamani_divergence"
+      ]
     },
     "bhumi_puja": {
       "label": "Bhumi Puja / Foundation laying",

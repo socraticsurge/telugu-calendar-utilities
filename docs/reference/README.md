@@ -76,6 +76,7 @@ PyPI MCP package.
 | 48 | [Completed-house purchase source profile](48-completed-house-purchase-profile.md) | House-specific Chapter XII formula, independent buyer-rule comparison, and practical safeguards |
 | 49 | [Home-repair source profile](49-home-repair-profile.md) | Repair-commencement weekday semantics, conditional chart checks, and construction-safety boundary |
 | 50 | [Trade-inventory purchase profile](50-trade-inventory-purchase-profile.md) | Buyer-side inventory scope, exact preference semantics, and commercial safeguards |
+| 51 | [Borrowing-money source profile](51-borrowing-money-profile.md) | Debtor-side Nakshatra gates, Chintamani divergence, and financial-safety boundary |
 
 ## How to read the diagrams
 
