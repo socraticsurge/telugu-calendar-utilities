@@ -567,26 +567,59 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'medical care always take precedence over '
                           'electional timing.',
                       ]},
-    'gruhapravesha': {'label': 'Gruhapravesha (Home entry)',
-                      'audit_claim': 'muhurta.gruhapravesha.profile_conflict',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP),
-                      'skip_on_sankramana': True,
-                      'skip_on_khar_maasa': True,
-                      'skip_on_adhika': True,
-                      'skip_on_pitru_paksha': True,
-                      'prefer_tithi_class': 'Bhadra',
-                      'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Guruvaram', 'Somavaram'],
+    'gruhapravesha': {'label': 'Gruhapravesha (First entry into new home)',
+                      'source_claim': 'muhurta.gruhapravesha',
+                      'related_claims': [
+                          'muhurta.gruhapravesha.drkpanchang_divergence'],
+                      'manual_prerequisites': True,
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_solar_signs': [
+                          'Makara', 'Kumbha', 'Meena', 'Mesha',
+                          'Vrishabha', 'Mithuna',
+                      ],
+                      'allowed_tithi_names': [
+                          'Krishna Pratipat', 'Shukla Dwitiya',
+                          'Shukla Tritiya', 'Shukla Panchami',
+                          'Shukla Saptami', 'Shukla Dashami',
+                          'Shukla Ekadashi', 'Shukla Trayodashi',
+                      ],
+                      'allowed_nakshatras': [
+                          'Rohini', 'Mrigashira', 'Uttara Ashadha',
+                          'Chitra', 'Uttara Bhadrapada', 'Anuradha',
+                          'Revati',
+                      ],
+                      'allowed_lagnas': [
+                          'Vrishabha', 'Simha', 'Vrischika', 'Kumbha',
+                          'Mithuna', 'Kanya', 'Dhanu', 'Meena',
+                      ],
                       'prefer_lagna_class': 'Sthira',
                       'manual_checks': [
-                          'Known source mismatch: this finder is broader than '
-                          'Raman’s weekday, Tithi, Nakshatra and fixed-Lagna '
-                          'rules; verify the source crosswalk before choosing.',
-                          'Practitioner checks: Uttarayana; strong Guru, '
-                          'Shukra and Chandra; 8th house vacant; malefics in '
-                          'Upachayas; benefics in Kendras; worship and '
-                          'Bhootabali completed; wife not over six months '
-                          'pregnant.',
+                          'Ritual scope: first ceremonial entry into a newly '
+                          'built home only; buying a completed house, moving '
+                          'rental, or re-entering after repairs are separate '
+                          'elections.',
+                          'Election chart: Guru, Shukra and Chandra should be '
+                          'strong; leave the 8th house vacant, place malefics '
+                          'in Upachayas and benefics in Kendras, and preferably '
+                          'use a Guru- or Shukra-owned rising Rasi.',
+                          'Lagna lineage: fixed Rasis are preferred and dual '
+                          'Rasis are ordinary. Raman permits a movable Rasi '
+                          'only with Vrishabha Navamsa; the automated profile '
+                          'conservatively omits that uncomputed exception.',
+                          'Personal and ritual checks: the owner’s Janma Rasi, '
+                          'Nakshatra or Lagna may strengthen the election; '
+                          'complete worship and Bhootabali before entry.',
+                          'Pregnancy safety: Raman advises avoiding entry after '
+                          'six months of the wife’s pregnancy. Maternal comfort, '
+                          'clinician instructions and medical care always take '
+                          'precedence over timing.',
+                          'Lineage warning: current Drik Panchang practice also '
+                          'admits some Saturdays and applies additional month '
+                          'filters; this profile follows Raman’s four weekdays '
+                          'rather than silently blending methodologies.',
                       ]},
     # — Acquisitions —
     'vehicle':       {'label': 'Vehicle purchase',

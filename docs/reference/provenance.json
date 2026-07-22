@@ -238,14 +238,25 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.gruhapravesha.profile_conflict",
+      "id": "muhurta.gruhapravesha",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": "Chapter XII, 'House building,' section 'Entering a new house,' printed pp. 52-54 (PDF pp. 56-58)",
-      "scope": "The current profile is not equivalent to the inspected Gruhapravesha rules. It penalizes the Jaya Tithi family even though Raman explicitly admits Shukla Tritiya and Trayodashi; accepts weekdays outside Raman's Monday, Wednesday, Thursday and Friday list; omits the exact admitted Nakshatra and Tithi gates; and treats fixed Lagna as a preference instead of the stated default rule. The source's Uttarayana, Graha-strength, 8th-house, ritual and advanced-pregnancy checks are not fully automatable and remain practitioner checks. This audit claim records the conflict and must not be presented as verification of the configured scorer.",
+      "scope": "Supports the exact Monday/Wednesday/Thursday/Friday gate; Krishna Pratipat and the seven named Shukla Tithis; the five best plus two permissible Nakshatras; Surya in the six traditional Uttarayana Rasis; fixed Rasi preference with dual Rasis admitted as ordinary; and conservative omission of the movable-Rasi/Vrishabha-Navamsa exception. Graha strength, house placements, ritual preparation, personal-chart support and the advanced-pregnancy restriction remain visible manual prerequisites. The scope is first entry into a newly built home, not purchase, rental moving or post-repair re-entry.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "muhurta.gruhapravesha.drkpanchang_divergence",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/33-gruhapravesha-evidence-audit.md",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["DP-DAY-PAGE"],
+      "locator": "Drik Panchang, 2026 Griha Pravesh Dates for Pune, methodology and date table; reviewed 2026-07-22",
+      "scope": "The published Panchang Shuddhi practice rejects Sunday and Tuesday but admits qualifying Saturdays, while Raman's named auspicious list is Monday, Wednesday, Thursday and Friday and reports Saturday only as another-writers' view with a theft caution. Drik Panchang also applies lunar-month and Adhika-month filters beyond this Raman profile. The product follows its named Raman lineage and discloses rather than merges this current-practice divergence.",
       "last_reviewed": "2026-07-22"
     },
     {

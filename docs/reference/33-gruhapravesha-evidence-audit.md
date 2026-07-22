@@ -1,42 +1,51 @@
-# Gruhapravesha Evidence Audit
+# Gruhapravesha source profile
 
-## Status
+## Status and ritual boundary
 
-Gruhapravesha (first entry into a newly built home) is supported as an activity,
-but its current finder profile is **not source-verified**. The machine-readable
-`audit_claim` is `muhurta.gruhapravesha.profile_conflict`, with state
-`contradicted`.
+`gruhapravesha` is a source-verified Raman-lineage profile for the first
+ceremonial entry into a newly built home. It is not the election for buying a
+completed house, moving into a rental, returning after renovation, or laying a
+foundation or roof. Those acts have separate scopes.
 
-## Inspected authority
+The governing claim is `muhurta.gruhapravesha`. B. V. Raman, *Muhurtha
+(Electional Astrology)*, UBS Publishers' Distributors, 1993, Chapter XII,
+“House building,” section “Entering a new house,” printed pages 52–54 (PDF
+pages 56–58), is a modern secondary authority rather than scripture.
 
-- B. V. Raman, *Muhurtha (Electional Astrology)*, UBS Publishers'
-  Distributors, 1993.
-- Chapter XII, “House building,” section “Entering a new house.”
-- Printed pages 52–54; PDF pages 56–58.
-- Raman is a modern secondary authority, not scripture.
+## Automated crosswalk
 
-## Criterion crosswalk
+| Criterion | Raman passage | Product treatment |
+|---|---|---|
+| Tithi | Krishna Pratipat; Shukla Dwitiya, Tritiya, Panchami, Saptami, Dashami, Ekadashi and Trayodashi | Exact Paksha-qualified hard gate |
+| Vara | Monday, Wednesday, Thursday and Friday | Exact sunrise-weekday hard gate |
+| Nakshatra | Rohini, Mrigashira, Uttara Ashadha, Chitra and Uttara Bhadrapada best; Anuradha and Revati permissible | All seven admitted; no invented score difference |
+| Solar state | Surya in Uttarayana | Makara through Mithuna hard gate, the traditional six-Rasi mapping |
+| Lagna | Fixed preferred; dual ordinary; movable generally avoided except with Vrishabha Navamsa | Fixed and dual Rasis admitted, with a fixed-Rasi bonus; movable exception omitted because Navamsa is not computed across every surface |
 
-| Criterion | Current profile | Inspected passage | Status |
-|---|---|---|---|
-| Tithi | Bhadra family receives a bonus; every Jaya Tithi receives a penalty | Krishna Pratipat and Shukla Dvitiya, Tritiya, Panchami, Saptami, Dashami, Ekadashi and Trayodashi are named | **Conflict:** Tritiya and Trayodashi are Jaya Tithis that the profile penalizes |
-| Vara | Monday and Thursday receive a bonus; other weekdays remain admissible | Monday, Wednesday, Thursday and Friday are auspicious; Saturday is reported by some writers with a theft caution | Incomplete and too permissive |
-| Nakshatra | No activity-specific gate | Rohini, Mrigashira, Uttara Ashadha, Chitra and Uttara Bhadrapada are best; Anuradha and Revati permissible; others rejected | Missing |
-| Lagna | Fixed class receives a bonus | Fixed Rasi is the default; common is ordinary; movable generally avoided except with Vrishabha Navamsa | Preference is weaker than the source rule |
-| Solar/Graha state | Broad seasonal and calendar exclusions | Surya in Uttarayana; Guru and Shukra strong; Chandra strong | Only partly represented |
-| Election chart | Not computed across every surface | 8th vacant; malefics in Upachayas; benefics in Kendras; preferably Guru- or Shukra-owned rising Rasi | Manual check |
-| Personal/ritual | Not derivable from date alone | Worship and Bhootabali before entry; own Janma Rasi/Nakshatra/Lagna beneficial; avoid after six months of the wife's pregnancy | Manual check |
+Omitting the movable-Rasi exception is conservative: it can reject a source
+exception, but it cannot admit a time Raman rejects. The UI and MCP response
+state that boundary explicitly.
 
-## Correction boundary
+## Manual prerequisites
 
-An existing test explicitly preserves Sunday as an admissible Gruhapravesha
-day and expects only a soft Bhadra bonus. Applying Raman's weekday and exact
-Tithi/Nakshatra admission rules would change that contract. Under the project's
-working agreement, the finder behavior remains unchanged until the owner gives
-specific approval for that correction.
+The automated result cannot receive `Excellent`. A practitioner must still
+review Guru, Shukra and Chandra strength; an empty 8th; malefics in Upachayas;
+benefics in Kendras; and preferably a Guru- or Shukra-owned rising Rasi. The
+owner's Janma Rasi, Nakshatra or Lagna may strengthen the election. Worship and
+Bhootabali precede entry.
 
-When approved, the implementation should use exact Paksha-aware Tithi names,
-the seven admitted Nakshatras, the four unambiguously auspicious weekdays, and
-a fixed-Lagna gate with the stated Navamsa exception. Chart, ritual and
-pregnancy conditions should remain visible manual checks unless reliable input
-and calculation support is added to every surface.
+Raman advises against the entry after six months of the wife's pregnancy.
+Maternal comfort, clinician instructions and medical care always take
+precedence; the timing profile makes no health or pregnancy-outcome claim.
+
+## Published-practice divergence
+
+Drik Panchang's 2026 Griha Pravesh methodology and date table reject Sunday
+and Tuesday but admit qualifying Saturdays. Raman names Monday, Wednesday,
+Thursday and Friday, mentioning Saturday only as another-writers' view with a
+theft caution. Drik Panchang also applies lunar-month and Adhika-month filters
+not imported into this Raman profile.
+
+The disagreement is recorded as
+`muhurta.gruhapravesha.drkpanchang_divergence`. The application names and
+follows one lineage instead of silently blending both.

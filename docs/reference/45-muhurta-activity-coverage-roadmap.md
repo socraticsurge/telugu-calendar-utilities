@@ -7,13 +7,15 @@ catalogue is complete. The machine-readable gap inventory is
 
 ## Immediate finding about house warming
 
-House warming is already present as `gruhapravesha`, correctly narrowed to the
-first entry into a newly built home. It is not counted as verified: the current
-soft Tithi/Lagna preferences conflict with Raman's exact gates. The existing
-[Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md) records the
-correction required. A completed-house purchase, rental move, post-renovation
-re-entry and first occupation of a newly built home are different acts and must
-not silently share one profile.
+House warming is present as `gruhapravesha`, correctly narrowed to the first
+entry into a newly built home. Its former soft Tithi-family scoring has been
+replaced with Raman's exact weekday, Paksha-qualified Tithi, Nakshatra,
+Uttarayana and Lagna gates. Chart, ritual and pregnancy conditions remain
+visible manual prerequisites, while the current Drik Panchang Saturday/month
+methodology divergence is disclosed. See the
+[Gruhapravesha source profile](33-gruhapravesha-evidence-audit.md). A
+completed-house purchase, rental move, post-renovation re-entry and first
+occupation of a newly built home remain separate acts.
 
 ## Highest-impact additions
 
@@ -24,14 +26,16 @@ not silently share one profile.
 | 3 | Home repair / renovation start | **Implemented:** scoped repair-commencement profile |
 | 4 | Buying inventory for trade | **Implemented:** buyer-side inventory profile distinct from launch |
 | 5 | Borrowing and lending | **Implemented:** separate debtor- and creditor-side profiles |
+| 6 | Gruhapravesha correction | **Implemented:** conflicting soft profile replaced by exact Raman-lineage gates |
 
 Seemantha, completed-house purchase, home-repair commencement and trade-
 inventory purchase, borrowing and lending are now implemented as separate,
 source-verified profiles with explicit medical, legal, safety and scope
 boundaries. Borrowing discloses its Chintamani divergence; lending discloses
-the current Drik Panchang Wednesday divergence. The highest-priority unresolved
-item is deity installation, which remains specialist-only pending a bounded
-product design.
+the current Drik Panchang Wednesday divergence. Gruhapravesha is now corrected
+and verified, with its published-practice divergence visible. The
+highest-priority unresolved item is deity installation, which remains
+specialist-only pending a bounded product design.
 
 ## Important holds and splits
 

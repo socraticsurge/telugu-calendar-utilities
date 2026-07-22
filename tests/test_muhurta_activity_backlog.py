@@ -33,7 +33,7 @@ def test_backlog_distinguishes_existing_remediation_from_new_keys():
     backlog = _load('docs/reference/muhurta-activity-backlog.json')
     by_key = {item['key']: item for item in backlog['items']}
 
-    assert by_key['gruhapravesha']['disposition'] == 'existing_conflict'
+    assert by_key['gruhapravesha']['disposition'] == 'implemented_verified'
     assert 'gruhapravesha' in ACTIVITY_RULES
     for key, item in by_key.items():
         if item['disposition'] in {'existing_conflict', 'implemented_verified'}:

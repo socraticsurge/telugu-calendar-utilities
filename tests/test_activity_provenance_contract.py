@@ -36,6 +36,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'business_inventory_purchase': 'muhurta.trade_inventory.purchase',
         'borrowing_money': 'muhurta.borrowing_money',
         'lending_money': 'muhurta.lending_money',
+        'gruhapravesha': 'muhurta.gruhapravesha',
         'travel': 'muhurta.travel',
         'well_digging': 'muhurta.well_digging',
     }
@@ -62,10 +63,6 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         },
         'engagement': {
             'claim': 'muhurta.engagement.profile_conflict',
-            'state': 'contradicted',
-        },
-        'gruhapravesha': {
-            'claim': 'muhurta.gruhapravesha.profile_conflict',
             'state': 'contradicted',
         },
         'job': {

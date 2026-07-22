@@ -7,12 +7,12 @@
       "key": "gruhapravesha",
       "label": "Gruhapravesha (first entry into a newly built home)",
       "priority": "P0",
-      "disposition": "existing_conflict",
-      "reason": "House warming is already present, but its soft rules conflict with the exact source gates and should not be marketed as verified.",
+      "disposition": "implemented_verified",
+      "reason": "Corrected from a conflicting soft profile to Raman's exact first-entry gates, with chart and ritual prerequisites visible and the current Drik Panchang divergence disclosed.",
       "source_candidates": [
         {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XII, 'Entering a new house,' printed pp. 52-53 (PDF pp. 56-57)"}
       ],
-      "boundary": "Keep first occupation of a newly built home separate from buying a completed house, moving between rentals and re-entry after renovation."
+      "boundary": "The implementation keeps first occupation of a newly built home separate from buying a completed house, moving between rentals and re-entry after renovation; medical and ritual prerequisites remain manual."
     },
     {
       "key": "seemantha",

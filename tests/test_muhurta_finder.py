@@ -349,17 +349,14 @@ def test_jaya_tithi_court_bonus():
                for s in slots for r in s['reasons'])
 
 
-def test_bhadra_tithi_gruhapravesha_bonus():
-    # 2026-06-21 (Sun) = Shukla Saptami (Bhadra). Gruhapravesha prefers
-    # Bhadra. Adivaram is not in gruhapravesha's preferred vara list, so
-    # only the tithi-class +1 should fire — clean isolation.
-    day = _day(2026, 6, 21)
-    slots = day_slots(day, activity='gruhapravesha')
+def test_gruhapravesha_uses_exact_source_gates_not_tithi_family_bonus():
+    # The corrected profile rejects Sunday outright and admits the source's
+    # Jaya-family Shukla Tritiya/Trayodashi instead of penalizing the family.
+    assert day_slots(_day(2026, 6, 21), activity='gruhapravesha') == []
+    slots = day_slots(_day(2026, 4, 20), activity='gruhapravesha')
     assert slots
-    reasons = [r for s in slots for r in s['reasons']]
-    assert any('Bhadra' in r and 'favoured for Gruhapravesha' in r for r in reasons)
-    # Sunday is NOT preferred — no Adivaram vara bonus should appear.
-    assert not any('Adivaram favoured for Gruhapravesha' in r for r in reasons)
+    assert not any('Bhadra' in r or 'Jaya' in r
+                   for slot in slots for r in slot['reasons'])
 
 
 def test_vara_bonus_thursday_wedding():
