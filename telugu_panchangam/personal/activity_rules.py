@@ -207,30 +207,37 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'and qualified financial or legal advice take '
                           'precedence over timing.',
                       ]},
-    'ceremony':      {'label': 'Ceremony / puja (general)',
-                      'audit_claim': 'muhurta.ceremony.profile_conflict',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP),
+    'ceremony':      {'label': 'Shantika / Paushtika rite',
+                      'source_claim': 'muhurta.shantika_paushtika',
+                      'manual_prerequisites': True,
                       'skip_on_sankramana': True,
-                      'skip_on_khar_maasa': True,
-                      'skip_on_adhika': True,
-                      'skip_on_pitru_paksha': True,
-                      'prefer_vara': ['Somavaram', 'Guruvaram'],
-                      'avoid_tithi_class': ['Jaya'],
+                      'allowed_varas': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'avoid_tithi_numbers': [4, 8, 9, 14, 15],
+                      'allowed_nakshatras': [
+                          'Ashwini', 'Pushya', 'Hasta', 'Uttara Phalguni',
+                          'Uttara Ashadha', 'Uttara Bhadrapada', 'Rohini',
+                          'Revati', 'Shravana', 'Dhanishtha', 'Shatabhisha',
+                          'Punarvasu', 'Swati', 'Anuradha', 'Magha',
+                      ],
                       'manual_checks': [
-                          'Shantika/Paushtika cross-check: Muhurta '
-                          'Chintamani verse 34 rejects Rikta Tithis, '
-                          'Ashtami, Pournami and Amavasya—not the '
-                          'configured Jaya family.',
-                          'For the cited rites, use Ashwini, Pushya, Hasta, '
-                          'the three Uttaras, Rohini, Revati, Shravana, '
-                          'Dhanishtha, Shatabhisha, Punarvasu, Swati, '
-                          'Anuradha or Magha; reject Sunday, Tuesday and '
-                          'Saturday; place Surya in the 10th, Chandra in '
-                          'the 4th and Guru in Lagna.',
-                          'Scope warning: verse 34 concerns Shantika and '
-                          'Paushtika rites, not every ceremony or Puja; '
-                          'emergency Shanti for an ominous event may relax '
-                          'ordinary timing restrictions.',
+                          'Scope: this profile covers Shantika rites that '
+                          'pacify an affliction and Paushtika rites for '
+                          'welfare, including the passage’s examples of '
+                          'auspicious Puja, Purashcharana and Mula-shanti; '
+                          'it is not a universal ceremony election.',
+                          'Election chart: place Surya in the 10th from '
+                          'Lagna, Chandra in the 4th and Guru in Lagna.',
+                          'Ideal purity: the commentary prefers avoiding '
+                          'Guru or Shukra combustion and exceptional omens '
+                          'such as Ketu-rise; a practitioner must judge '
+                          'these conditions.',
+                          'Remedial exception: when an ominous event itself '
+                          'creates the need for Shanti, the commentary says '
+                          'ordinary timing defects need not delay the rite; '
+                          'follow the officiating practitioner.',
                       ]},
     'beginning':     {'label': 'New beginning (general)',
                       'audit_claim': 'muhurta.beginning.profile_conflict',

@@ -30,6 +30,7 @@ occupation of a newly built home remain separate acts.
 | 7 | Wedding correction | **Implemented:** contradictory family scoring replaced by the complete Raman election crosswalk |
 | 8 | Lawsuit-filing correction | **Implemented:** generic Court proxies replaced by the exact Raman filing election |
 | 9 | Litigation duplicate correction | **Implemented:** legacy key now resolves to Court; unsupported Bhadra/legal scoring removed |
+| 10 | Ceremony correction | **Implemented:** generic Puja proxies replaced by the exact Shantika/Paushtika election |
 
 Seemantha, completed-house purchase, home-repair commencement and trade-
 inventory purchase, borrowing and lending are now implemented as separate,

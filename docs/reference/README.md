@@ -67,7 +67,7 @@ PyPI MCP package.
 | 39 | [General purchase source profile](39-purchase-profile.md) | Buyer-side Kraya verse, marketplace checks, and object-specific boundaries |
 | 40 | [Job / Contract evidence audit](40-job-contract-evidence-audit.md) | Service-entry verse and the unsupported modern-contract conflation |
 | 41 | [Business-launch evidence audit](41-business-evidence-audit.md) | Capital-deployment verse, movable-Lagna conflict, and scope boundaries |
-| 42 | [Ceremony / Puja evidence audit](42-ceremony-evidence-audit.md) | Shantika/Paushtika verse, Tithi conflict, chart conditions, and emergency boundary |
+| 42 | [Shantika / Paushtika source profile](42-ceremony-evidence-audit.md) | Exact verse-34 gates, chart prerequisites, narrow rite scope and remedial exception |
 | 43 | [New Beginning evidence audit](43-beginning-evidence-audit.md) | Dharma-kriya commencement verse versus generic project-ranking proxies |
 | 44 | [Activity provenance states](44-activity-provenance-states.md) | Enforced verified, contradicted and heuristic claim contract across Python, MCP and browser |
 | 45 | [Muhurtam activity coverage roadmap](45-muhurta-activity-coverage-roadmap.md) | Source-backed gap inventory, priorities, safety boundaries, and one-feature-at-a-time expansion order |

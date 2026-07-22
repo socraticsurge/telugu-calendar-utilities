@@ -414,14 +414,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.ceremony.profile_conflict",
+      "id": "muhurta.shantika_paushtika",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["MC-HINDI-IA"],
       "locator": "Nakshatra-prakarana, 'Shantika and Paushtika Muhurta,' verse 34, printed pp. 42-43 (OCR lines 2749-2772 in the Internet Archive full text)",
-      "scope": "Verse 34 governs Shantika and Paushtika rites rather than every ceremony or Puja. It rejects Rikta Tithis, Ashtami, Pournami and Amavasya; this does not match the configured whole-Jaya-family penalty, which catches Ashtami but omits the other cited exclusions and additionally penalizes Tritiya and Trayodashi. The passage also rejects Sunday, Tuesday and Saturday rather than merely rewarding Monday and Thursday. It supplies fifteen Nakshatras and chart placements for Surya, Chandra and Guru that the profile does not implement. Its Sankramana exclusion agrees with the profile, but the inspected passage does not establish the profile's other broad month and Yoga filters. The commentary permits relaxation when an ominous event itself requires emergency Shanti. The generic profile must not be presented as verified from this narrower rite passage.",
+      "scope": "Supports the exact rejection of Rikta Tithis, Ashtami, Pournami and Amavasya; admission of Monday, Wednesday, Thursday and Friday; fifteen named Nakshatras; and rejection of Sankramana. Surya in the 10th from Lagna, Chandra in the 4th and Guru in Lagna remain mandatory manual chart prerequisites. The commentary prefers avoiding Guru/Shukra combustion and exceptional omens when an ideal election is available, but explicitly relaxes ordinary timing defects when an ominous event itself requires remedial Shanti. The profile is limited to Shantika rites that pacify affliction and Paushtika welfare rites, including the passage's Puja, Purashcharana and Mula-shanti examples; it is not a universal ceremony election.",
       "last_reviewed": "2026-07-22"
     },
     {

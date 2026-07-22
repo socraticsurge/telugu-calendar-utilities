@@ -16,7 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'src' / 'data' / 'activity-rules.generated.json'
 CONSUMED_FIELDS = (
     'label', 'avoid_karana', 'prefer_lagna_class', 'prefer_choghadiya',
-    'skip_on_yoga', 'prefer_vara', 'prefer_tithi_class', 'avoid_tithi_class',
+    'skip_on_yoga', 'skip_on_sankramana', 'prefer_vara',
+    'prefer_tithi_class', 'avoid_tithi_class',
     'required_lagna_class', 'allowed_maasams', 'allowed_maasa_solar_pairs',
     'allowed_varas',
     'avoid_vara_paksha', 'allowed_solar_classes', 'allowed_nakshatras',

@@ -41,6 +41,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'travel': 'muhurta.travel',
         'well_digging': 'muhurta.well_digging',
         'court': 'muhurta.court.filing_lawsuit',
+        'ceremony': 'muhurta.shantika_paushtika',
     }
     assert result['known_conflicts'] == {
         'business': {
@@ -49,10 +50,6 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         },
         'beginning': {
             'claim': 'muhurta.beginning.profile_conflict',
-            'state': 'contradicted',
-        },
-        'ceremony': {
-            'claim': 'muhurta.ceremony.profile_conflict',
             'state': 'contradicted',
         },
         'cremation': {
@@ -82,7 +79,6 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
     assert 'court' not in result['needs_rule_locators']
     assert 'business' not in result['needs_rule_locators']
     assert 'beginning' not in result['needs_rule_locators']
-    assert 'ceremony' not in result['needs_rule_locators']
     assert 'cremation' not in result['needs_rule_locators']
     assert 'engagement' not in result['needs_rule_locators']
     assert 'gruhapravesha' not in result['needs_rule_locators']

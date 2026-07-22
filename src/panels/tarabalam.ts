@@ -725,6 +725,14 @@ async function findMuhurta() {
       const avoidNityaYogas = new Set(rules.avoid_nitya_yogas || []);
       const manualChecks = rules.manual_checks || [];
       const activityLabel = rules.label;
+      if (rules.skip_on_sankramana && data.special.some(
+          item => /Sankraman/i.test(item))) {
+        droppedDays.push({
+          date: isoDate,
+          reason: `Sankramana · ${activityLabel} source profile avoids this day`,
+        });
+        continue;
+      }
       const combustionReason = muCombustionDropReason(
         lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null,
         rules.skip_on_combust || [], activityLabel);
@@ -1218,7 +1226,7 @@ let MU_LAST = null;
 const MU_ACT_LABEL = {
   any: 'anything auspicious',
   travel: 'travel', purchase: 'a purchase',
-  ceremony: 'a ceremony', beginning: 'a new beginning',
+  ceremony: 'a Shantika / Paushtika rite', beginning: 'a new beginning',
   wedding: 'a wedding (Vivaha)', engagement: 'an engagement',
   naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',

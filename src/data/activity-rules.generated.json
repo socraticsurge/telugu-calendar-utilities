@@ -7,6 +7,7 @@
     "prefer_lagna_class",
     "prefer_choghadiya",
     "skip_on_yoga",
+    "skip_on_sankramana",
     "prefer_vara",
     "prefer_tithi_class",
     "avoid_tithi_class",
@@ -123,6 +124,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_vara": [
         "Somavaram",
         "Budhavaram",
@@ -235,6 +237,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_vara": [
         "Guruvaram",
         "Somavaram"
@@ -260,6 +263,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_tithi_class": "Nanda",
       "avoid_tithi_class": [
         "Jaya"
@@ -317,6 +321,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_tithi_class": "Bhadra",
       "avoid_tithi_class": [
         "Jaya"
@@ -374,6 +379,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_tithi_class": "Bhadra",
       "avoid_tithi_class": [
         "Jaya"
@@ -417,6 +423,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_tithi_class": "Nanda",
       "avoid_tithi_class": [
         "Jaya"
@@ -496,6 +503,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_tithi_class": "Nanda",
       "avoid_tithi_class": [
         "Jaya"
@@ -580,6 +588,7 @@
         "Visha Yoga",
         "Dagdha Yoga"
       ],
+      "skip_on_sankramana": true,
       "prefer_tithi_class": "Nanda",
       "avoid_tithi_class": [
         "Jaya"
@@ -1200,24 +1209,46 @@
       ]
     },
     "ceremony": {
-      "label": "Ceremony / puja (general)",
-      "skip_on_yoga": [
-        "Visha Yoga",
-        "Dagdha Yoga"
-      ],
-      "prefer_vara": [
+      "label": "Shantika / Paushtika rite",
+      "skip_on_sankramana": true,
+      "allowed_varas": [
         "Somavaram",
-        "Guruvaram"
+        "Budhavaram",
+        "Guruvaram",
+        "Shukravaram"
       ],
-      "avoid_tithi_class": [
-        "Jaya"
+      "allowed_nakshatras": [
+        "Ashwini",
+        "Pushya",
+        "Hasta",
+        "Uttara Phalguni",
+        "Uttara Ashadha",
+        "Uttara Bhadrapada",
+        "Rohini",
+        "Revati",
+        "Shravana",
+        "Dhanishtha",
+        "Shatabhisha",
+        "Punarvasu",
+        "Swati",
+        "Anuradha",
+        "Magha"
+      ],
+      "avoid_tithi_numbers": [
+        4,
+        8,
+        9,
+        14,
+        15
       ],
       "manual_checks": [
-        "Shantika/Paushtika cross-check: Muhurta Chintamani verse 34 rejects Rikta Tithis, Ashtami, Pournami and Amavasya—not the configured Jaya family.",
-        "For the cited rites, use Ashwini, Pushya, Hasta, the three Uttaras, Rohini, Revati, Shravana, Dhanishtha, Shatabhisha, Punarvasu, Swati, Anuradha or Magha; reject Sunday, Tuesday and Saturday; place Surya in the 10th, Chandra in the 4th and Guru in Lagna.",
-        "Scope warning: verse 34 concerns Shantika and Paushtika rites, not every ceremony or Puja; emergency Shanti for an ominous event may relax ordinary timing restrictions."
+        "Scope: this profile covers Shantika rites that pacify an affliction and Paushtika rites for welfare, including the passage’s examples of auspicious Puja, Purashcharana and Mula-shanti; it is not a universal ceremony election.",
+        "Election chart: place Surya in the 10th from Lagna, Chandra in the 4th and Guru in Lagna.",
+        "Ideal purity: the commentary prefers avoiding Guru or Shukra combustion and exceptional omens such as Ketu-rise; a practitioner must judge these conditions.",
+        "Remedial exception: when an ominous event itself creates the need for Shanti, the commentary says ordinary timing defects need not delay the rite; follow the officiating practitioner."
       ],
-      "audit_claim": "muhurta.ceremony.profile_conflict"
+      "manual_prerequisites": true,
+      "source_claim": "muhurta.shantika_paushtika"
     },
     "court": {
       "label": "Filing a lawsuit / court action",
