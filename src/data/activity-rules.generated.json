@@ -1350,22 +1350,42 @@
       "source_claim": "muhurta.travel"
     },
     "beginning": {
-      "label": "New beginning (general)",
-      "prefer_choghadiya": [
-        "Amrit",
-        1
-      ],
-      "prefer_vara": [
+      "label": "Dharma-kriya commencement",
+      "allowed_varas": [
+        "Adivaram",
+        "Somavaram",
         "Budhavaram",
-        "Guruvaram"
+        "Guruvaram",
+        "Shukravaram"
       ],
-      "prefer_tithi_class": "Nanda",
+      "allowed_nakshatras": [
+        "Anuradha",
+        "Ashwini",
+        "Pushya",
+        "Hasta",
+        "Shravana",
+        "Dhanishtha",
+        "Shatabhisha",
+        "Punarvasu",
+        "Swati",
+        "Uttara Phalguni",
+        "Uttara Ashadha",
+        "Uttara Bhadrapada",
+        "Rohini"
+      ],
       "manual_checks": [
-        "Dharma-work cross-check: Muhurta Chintamani verse 30 names Anuradha, Ashwini, Pushya, Hasta, Shravana, Dhanishtha, Shatabhisha, Punarvasu, Swati, the three Uttaras and Rohini; Sunday through Friday except Tuesday.",
-        "Election chart for beginning Dharma-kriya: use Budha or Guru Lagna/varga, place Guru in Lagna and ensure the performer has Guru-bala.",
-        "Scope warning: the passage begins Dharma-kriya, not every modern project or life change; it does not supply the configured Amrit Choghadiya or Nanda-Tithi rewards."
+        "Scope: Dharma-kriya means beginning religious or meritorious work; this is not a generic election for every project, habit, relationship, move or life change.",
+        "Lagna/Varga: automation admits Budha- or Guru-ruled Lagnas. A practitioner may evaluate the source’s alternative Budha/Guru Varga condition.",
+        "Election chart: Guru should occupy Lagna and the performer should have adequate personal Guru-bala."
       ],
-      "audit_claim": "muhurta.beginning.profile_conflict"
+      "manual_prerequisites": true,
+      "allowed_lagnas": [
+        "Mithuna",
+        "Kanya",
+        "Dhanu",
+        "Meena"
+      ],
+      "source_claim": "muhurta.dharma_kriya.commencement"
     }
   }
 }

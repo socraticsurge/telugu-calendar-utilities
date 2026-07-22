@@ -1226,7 +1226,7 @@ let MU_LAST = null;
 const MU_ACT_LABEL = {
   any: 'anything auspicious',
   travel: 'travel', purchase: 'a purchase',
-  ceremony: 'a Shantika / Paushtika rite', beginning: 'a new beginning',
+  ceremony: 'a Shantika / Paushtika rite', beginning: 'a Dharma-kriya commencement',
   wedding: 'a wedding (Vivaha)', engagement: 'an engagement',
   naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',

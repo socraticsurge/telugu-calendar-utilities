@@ -1,40 +1,23 @@
-# New Beginning Evidence Audit
+# Dharma-kriya Commencement Source Profile
 
-## Status
+The compatibility key `beginning` now means beginning Dharma-kriya: religious
+or meritorious work. It is not a catch-all for a project, habit, relationship,
+relocation or life change; those purposes require distinct elections.
 
-The New beginning (general) profile is **not source-verified**. Its
-`audit_claim`, `muhurta.beginning.profile_conflict`, has state `contradicted`.
+The verified claim `muhurta.dharma_kriya.commencement` uses Rama Daivajna,
+*Muhurta Chintamani*, Nakshatra-prakarana verse 30, printed pages 40–41
+(Internet Archive OCR lines 2685–2700). The source register discloses the
+undated scan's missing publisher metadata.
 
-## Inspected authority
+| Source criterion | Implementation | Boundary |
+|---|---|---|
+| Thirteen named Nakshatras | Exact `allowed_nakshatras` | Hard day gate |
+| Sunday, Monday, Wednesday, Thursday and Friday | Exact `allowed_varas` | Hard day gate |
+| Budha or Guru Lagna or Varga | Mithuna, Kanya, Dhanu and Meena in `allowed_lagnas` | Conservative slot gate; Varga remains manual |
+| Guru in Lagna | Manual check | Mandatory practitioner review |
+| Performer has Guru-bala | Manual check | Requires the personal chart |
 
-- Rama Daivajna, *Muhurta Chintamani*, Sanskrit text with Hindi commentary.
-- Internet Archive identifier `muhurta-chintamani-hindi`; publisher and date
-  are absent from the scan metadata.
-- Nakshatra-prakarana, Dharma-kriya commencement in verse 30, printed pages
-  40–41; OCR lines 2685–2700.
-
-## Scope finding
-
-The closest passage found is for beginning Dharma-kriya—religious or
-meritorious work. It does not establish one election for every modern project,
-habit, relationship, relocation or life change that “New beginning” could
-mean. Those acts need distinct, purpose-specific profiles.
-
-## Nearest-passage crosswalk
-
-| Criterion | Current generic profile | Verse 30 Dharma-kriya | Status |
-|---|---|---|---|
-| Scope | Any new beginning | Beginning Dharma-kriya | **Taxonomy conflict** |
-| Nakshatra | No activity-specific rule | Anuradha, Ashwini, Pushya, Hasta, Shravana, Dhanishtha, Shatabhisha, Punarvasu, Swati, three Uttaras and Rohini | Missing |
-| Vara | Wednesday and Thursday rewarded | Sunday, Monday, Wednesday, Thursday and Friday | Partial proxy |
-| Lagna/chart | No activity-specific rule | Budha or Guru Lagna/varga; Guru in Lagna; performer has Guru-bala | Missing |
-| Tithi | Nanda rewarded | No Nanda-family reward in this verse | Unsupported proxy |
-| Choghadiya | Amrit rewarded | Not supplied by this verse | Project heuristic |
-
-## Correction boundary
-
-A defensible product should remove the catch-all or replace it with narrowly
-named beginnings backed by their own passages. That changes the public
-taxonomy and existing result behavior, so it remains owner-approval work.
-Until then, the finder exposes the narrow source cross-check and unsupported
-proxy warning instead of presenting the profile as classical doctrine.
+`manual_prerequisites = true` caps results below Excellent until the Varga,
+Guru placement and personal Guru-bala conditions are checked. The former Amrit
+Choghadiya, Nanda-family and Wednesday/Thursday bonuses have been removed
+because verse 30 does not supply them.

@@ -68,7 +68,7 @@ PyPI MCP package.
 | 40 | [Job / Contract evidence audit](40-job-contract-evidence-audit.md) | Service-entry verse and the unsupported modern-contract conflation |
 | 41 | [Business-launch evidence audit](41-business-evidence-audit.md) | Capital-deployment verse, movable-Lagna conflict, and scope boundaries |
 | 42 | [Shantika / Paushtika source profile](42-ceremony-evidence-audit.md) | Exact verse-34 gates, chart prerequisites, narrow rite scope and remedial exception |
-| 43 | [New Beginning evidence audit](43-beginning-evidence-audit.md) | Dharma-kriya commencement verse versus generic project-ranking proxies |
+| 43 | [Dharma-kriya commencement profile](43-beginning-evidence-audit.md) | Exact verse-30 gates, meritorious-work scope, Varga and personal Guru-bala boundary |
 | 44 | [Activity provenance states](44-activity-provenance-states.md) | Enforced verified, contradicted and heuristic claim contract across Python, MCP and browser |
 | 45 | [Muhurtam activity coverage roadmap](45-muhurta-activity-coverage-roadmap.md) | Source-backed gap inventory, priorities, safety boundaries, and one-feature-at-a-time expansion order |
 | 46 | [Panchangam provenance disclosure](46-panchangam-provenance-disclosure.md) | Field-group evidence states in the MCP response and the exact remaining source debt |

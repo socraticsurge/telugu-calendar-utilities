@@ -425,14 +425,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.beginning.profile_conflict",
+      "id": "muhurta.dharma_kriya.commencement",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["MC-HINDI-IA"],
       "locator": "Nakshatra-prakarana, Dharma-kriya commencement in verse 30, printed pp. 40-41 (OCR lines 2685-2700 in the Internet Archive full text)",
-      "scope": "The nearest inspected commencement rule is specifically for beginning Dharma-kriya, not a universal modern 'new beginning.' Verse 30 names thirteen Nakshatras, Sunday, Monday, Wednesday, Thursday and Friday, Budha or Guru Lagna/varga, Guru in Lagna and the performer's Guru-bala. The profile implements only Wednesday and Thursday as soft bonuses, omits the activity-specific Nakshatra and chart conditions, and substitutes Amrit Choghadiya and Nanda-Tithi rewards not supplied by the passage. The generic taxonomy and unsupported ranking proxies must not be presented as a verified classical election.",
+      "scope": "Supports the thirteen named Nakshatras; Sunday, Monday, Wednesday, Thursday and Friday; Budha- or Guru-ruled Lagna or Varga; Guru in Lagna; and adequate personal Guru-bala. Automation conservatively admits the four Budha/Guru-ruled Lagnas, while the Varga alternative, Guru occupation and personal Guru strength remain mandatory practitioner checks. The scope is beginning Dharma-kriya—religious or meritorious work—not every modern project, habit, relationship, relocation or life change. The former Amrit Choghadiya and Nanda-Tithi proxies have been removed because verse 30 does not supply them.",
       "last_reviewed": "2026-07-22"
     },
     {

@@ -239,24 +239,31 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'ordinary timing defects need not delay the rite; '
                           'follow the officiating practitioner.',
                       ]},
-    'beginning':     {'label': 'New beginning (general)',
-                      'audit_claim': 'muhurta.beginning.profile_conflict',
-                      'prefer_choghadiya': ('Amrit', 1),
-                      'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Budhavaram', 'Guruvaram'],
+    'beginning':     {'label': 'Dharma-kriya commencement',
+                      'source_claim': 'muhurta.dharma_kriya.commencement',
+                      'manual_prerequisites': True,
+                      'allowed_varas': [
+                          'Adivaram', 'Somavaram', 'Budhavaram',
+                          'Guruvaram', 'Shukravaram',
+                      ],
+                      'allowed_nakshatras': [
+                          'Anuradha', 'Ashwini', 'Pushya', 'Hasta',
+                          'Shravana', 'Dhanishtha', 'Shatabhisha',
+                          'Punarvasu', 'Swati', 'Uttara Phalguni',
+                          'Uttara Ashadha', 'Uttara Bhadrapada', 'Rohini',
+                      ],
+                      'allowed_lagnas': [
+                          'Mithuna', 'Kanya', 'Dhanu', 'Meena'],
                       'manual_checks': [
-                          'Dharma-work cross-check: Muhurta Chintamani '
-                          'verse 30 names Anuradha, Ashwini, Pushya, Hasta, '
-                          'Shravana, Dhanishtha, Shatabhisha, Punarvasu, '
-                          'Swati, the three Uttaras and Rohini; Sunday '
-                          'through Friday except Tuesday.',
-                          'Election chart for beginning Dharma-kriya: use '
-                          'Budha or Guru Lagna/varga, place Guru in Lagna '
-                          'and ensure the performer has Guru-bala.',
-                          'Scope warning: the passage begins Dharma-kriya, '
-                          'not every modern project or life change; it does '
-                          'not supply the configured Amrit Choghadiya or '
-                          'Nanda-Tithi rewards.',
+                          'Scope: Dharma-kriya means beginning religious or '
+                          'meritorious work; this is not a generic election '
+                          'for every project, habit, relationship, move or '
+                          'life change.',
+                          'Lagna/Varga: automation admits Budha- or Guru-'
+                          'ruled Lagnas. A practitioner may evaluate the '
+                          'source’s alternative Budha/Guru Varga condition.',
+                          'Election chart: Guru should occupy Lagna and the '
+                          'performer should have adequate personal Guru-bala.',
                       ]},
     # — Samskaras —
     'wedding':       {'label': 'Wedding (Vivaha)',
