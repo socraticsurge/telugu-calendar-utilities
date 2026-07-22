@@ -52,12 +52,12 @@
       "key": "business_inventory_purchase",
       "label": "Buying inventory for trade",
       "priority": "P1",
-      "disposition": "missing_candidate",
-      "reason": "This is a precise commercial act and a safer replacement for part of the overbroad Business launch profile.",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a precise buyer-side commercial act, distinct from the overbroad Business launch profile.",
       "source_candidates": [
         {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter X, 'Buying for business,' printed p. 45 (PDF p. 49)"}
       ],
-      "boundary": "Keep distinct from founding an enterprise, deploying capital and ordinary consumer purchase."
+      "boundary": "The implementation is distinct from founding an enterprise, deploying capital, selling inventory and ordinary consumer purchase."
     },
     {
       "key": "borrowing_money",

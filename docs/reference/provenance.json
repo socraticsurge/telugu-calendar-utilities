@@ -293,6 +293,17 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.trade_inventory.purchase",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993", "MC-HINDI-IA"],
+      "locator": "B. V. Raman, Chapter X, 'Buying for Business,' printed p. 45 (PDF p. 49); Muhurta Chintamani, Nakshatra-prakarana, purchase/sale distinction, verse 16, printed pp. 33-34 (OCR lines 2336-2350)",
+      "scope": "Raman supports Thursday, Dashami and Pushya as independent preferences, complete rejection of Tuesday, Saturday as passable, and the disclosed Budha/2nd-house/Mangala/Guru chart checks. Muhurta Chintamani independently supports the buyer-versus-seller boundary, not Raman's inventory formula. This is for purchasing stock, raw materials or goods for resale/business use, not selling inventory, launching an enterprise or deploying capital. Commercial, cash-flow, tax and legal judgment take precedence.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.purchase.general",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

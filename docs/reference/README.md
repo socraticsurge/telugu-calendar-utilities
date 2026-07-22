@@ -75,6 +75,7 @@ PyPI MCP package.
 | 47 | [Seemantha source profile](47-seemantha-profile.md) | Exact prenatal-rite crosswalk, conservative chart boundaries, and medical precedence |
 | 48 | [Completed-house purchase source profile](48-completed-house-purchase-profile.md) | House-specific Chapter XII formula, independent buyer-rule comparison, and practical safeguards |
 | 49 | [Home-repair source profile](49-home-repair-profile.md) | Repair-commencement weekday semantics, conditional chart checks, and construction-safety boundary |
+| 50 | [Trade-inventory purchase profile](50-trade-inventory-purchase-profile.md) | Buyer-side inventory scope, exact preference semantics, and commercial safeguards |
 
 ## How to read the diagrams
 

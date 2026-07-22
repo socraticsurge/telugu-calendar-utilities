@@ -69,6 +69,7 @@ class _DayContext:
     avoid_nakshatras: frozenset
     prefer_nakshatras: frozenset
     allowed_tithi_numbers: frozenset
+    prefer_tithi_numbers: frozenset
     allowed_tithi_names: frozenset
     avoid_tithi_numbers: frozenset
     allowed_lagnas: frozenset

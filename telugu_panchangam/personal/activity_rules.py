@@ -26,6 +26,7 @@
 #   avoid_nakshatras        slot omitted when its active Nakshatra is listed
 #   prefer_nakshatras       active Nakshatra names receiving +1
 #   allowed_tithi_numbers   slot omitted unless its active Tithi number is listed
+#   prefer_tithi_numbers    named source-favoured Tithis receive a bonus
 #   avoid_tithi_numbers     slot omitted when its active Tithi number is listed
 #   allowed_lagnas          slot omitted unless its active Lagna is listed
 #   prefer_lagnas           named source-favoured Lagnas receive a bonus
@@ -110,6 +111,33 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Use the dedicated vehicle, building-land or gold '
                           'profile when the object is known; their narrower '
                           'rules take precedence over generic purchase.',
+                      ]},
+    'business_inventory_purchase': {
+                      'label': 'Trade inventory purchase',
+                      'source_claim': 'muhurta.trade_inventory.purchase',
+                      'related_claims': ['muhurta.purchase.general'],
+                      'manual_prerequisites': True,
+                      'allowed_varas': [
+                          'Adivaram', 'Somavaram', 'Budhavaram',
+                          'Guruvaram', 'Shukravaram', 'Shanivaram',
+                      ],
+                      'prefer_vara': ['Guruvaram'],
+                      'prefer_tithi_numbers': [10],
+                      'prefer_nakshatras': ['Pushya'],
+                      'manual_checks': [
+                          'Transaction role: buying stock, raw materials or '
+                          'goods for resale or business use; do not reuse '
+                          'this profile for selling inventory, launching a '
+                          'business or deploying capital.',
+                          'Saturday is described as passable, not preferred.',
+                          'Election chart: Budha, the 2nd lord and the 2nd '
+                          'house should be fortified.',
+                          'Election chart: avoid Budha afflicted by Mangala; '
+                          'Budha and Guru together in Lagna or in mutual '
+                          'aspect are described as highly favourable.',
+                          'Commercial need, stock quality, supplier terms, '
+                          'cash flow, tax and legal advice take precedence '
+                          'over electional timing.',
                       ]},
     'ceremony':      {'label': 'Ceremony / puja (general)',
                       'audit_claim': 'muhurta.ceremony.profile_conflict',

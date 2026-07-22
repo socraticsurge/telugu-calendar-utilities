@@ -19,6 +19,7 @@
     "avoid_nakshatras",
     "prefer_nakshatras",
     "allowed_tithi_numbers",
+    "prefer_tithi_numbers",
     "avoid_tithi_numbers",
     "manual_checks",
     "manual_prerequisites",
@@ -65,6 +66,7 @@
         "property",
         "house_purchase",
         "gold",
+        "business_inventory_purchase",
         "purchase"
       ]
     },
@@ -724,6 +726,38 @@
         "Election chart: Surya and Chandra should be well situated and aspected; the cited passage leaves this as a chart judgment rather than a fixed weekday, Tithi, Nakshatra or Lagna list."
       ],
       "source_claim": "muhurta.gold_jewelry.purchase"
+    },
+    "business_inventory_purchase": {
+      "label": "Trade inventory purchase",
+      "prefer_vara": [
+        "Guruvaram"
+      ],
+      "allowed_varas": [
+        "Adivaram",
+        "Somavaram",
+        "Budhavaram",
+        "Guruvaram",
+        "Shukravaram",
+        "Shanivaram"
+      ],
+      "prefer_nakshatras": [
+        "Pushya"
+      ],
+      "prefer_tithi_numbers": [
+        10
+      ],
+      "manual_checks": [
+        "Transaction role: buying stock, raw materials or goods for resale or business use; do not reuse this profile for selling inventory, launching a business or deploying capital.",
+        "Saturday is described as passable, not preferred.",
+        "Election chart: Budha, the 2nd lord and the 2nd house should be fortified.",
+        "Election chart: avoid Budha afflicted by Mangala; Budha and Guru together in Lagna or in mutual aspect are described as highly favourable.",
+        "Commercial need, stock quality, supplier terms, cash flow, tax and legal advice take precedence over electional timing."
+      ],
+      "manual_prerequisites": true,
+      "source_claim": "muhurta.trade_inventory.purchase",
+      "related_claims": [
+        "muhurta.purchase.general"
+      ]
     },
     "purchase": {
       "label": "Purchase (general)",

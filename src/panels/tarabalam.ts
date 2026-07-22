@@ -716,6 +716,7 @@ async function findMuhurta() {
       const preferNakshatras = new Set(
         (rules.prefer_nakshatras || []).map(muCanonicalNakshatra));
       const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
+      const preferTithiNumbers = new Set(rules.prefer_tithi_numbers || []);
       const allowedTithiNames = new Set(rules.allowed_tithi_names || []);
       const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);
       const manualChecks = rules.manual_checks || [];
@@ -1034,6 +1035,12 @@ async function findMuhurta() {
           score += tithiScore.bonus;
           if (tithiScore.dayReason) dayQuality.push(tithiScore.dayReason);
           if (tithiScore.activityReason) activityMatch.push(tithiScore.activityReason);
+          const activeTithiNumber = activityTithiNumber(facts.tithi);
+          if (activeTithiNumber && preferTithiNumbers.has(activeTithiNumber)) {
+            score += 1;
+            activityMatch.push(
+              `${facts.tithi} specifically favoured for ${activityLabel} (+1)`);
+          }
 
           // Special yogas — slot-time
           let yogaSkip = false;
@@ -1210,6 +1217,7 @@ const MU_ACT_LABEL = {
   vehicle: 'a vehicle purchase', property: 'a land purchase for building',
   house_purchase: 'a completed house purchase',
   gold: 'a gold / jewelry purchase',
+  business_inventory_purchase: 'a trade inventory purchase',
   bhumi_puja: 'bhumi puja (foundation laying)',
   well_digging: 'well digging',
   home_repair: 'a home repair / renovation start',

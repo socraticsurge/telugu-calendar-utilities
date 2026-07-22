@@ -36,6 +36,7 @@ python tools/check_activity_provenance.py
 | `pilgrimage` | Pilgrimage (Tirtha Yatra) | `muhurta.pilgrimage` | Verified incorporated journey profile |
 | `travel` | Travel / journey | `muhurta.travel` | Verified Nakshatra profile; Tithi and Disha Shoola corrections approval-gated |
 | `purchase` | Purchase (general) | `muhurta.purchase.general` | Verified buyer-side Nakshatra profile; Labh remains a project heuristic |
+| `business_inventory_purchase` | Buying inventory for trade | `muhurta.trade_inventory.purchase` | Verified buyer-side inventory profile; chart checks remain manual |
 | `wedding` | Wedding (Vivaha) | `muhurta.wedding.profile_conflict` | **Contradicted:** inspected Tithi rules conflict with configured scoring |
 | `engagement` | Engagement (Nischayam) | `muhurta.engagement.profile_conflict` | **Contradicted:** no dedicated passage found; nearest marriage rules conflict with copied scoring |
 | `gruhapravesha` | First entry into a newly built home | `muhurta.gruhapravesha.profile_conflict` | **Contradicted:** current soft family/class preferences conflict with exact source gates |
@@ -49,7 +50,7 @@ python tools/check_activity_provenance.py
 | `beginning` | New beginning (general) | `muhurta.beginning.profile_conflict` | **Contradicted:** nearest Dharma-kriya verse is narrower and does not support generic ranking proxies |
 | `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
-Coverage is therefore **21 of 33 profiles**. The verified profiles use
+Coverage is therefore **22 of 34 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
 printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
 not scripture; this

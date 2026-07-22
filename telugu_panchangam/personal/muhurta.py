@@ -332,6 +332,11 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
                           nakshatra=facts.nakshatra,
                           special_yogas=facts.special_yogas,
                           avoid_tithi_class=ctx.avoid_tithi_class)
+    preferred_number_tithi_reason = None
+    if active_tithi_number in ctx.prefer_tithi_numbers:
+        tithi_bonus += 1
+        preferred_number_tithi_reason = (
+            f'{facts.tithi} specifically favoured for {ctx.label} (+1)')
 
     # Nitya yoga
     skip_on_nitya_hard = bool(ctx.skip_yogas)
@@ -389,6 +394,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
     activity_match: list[str] = []
     if tithi_activity_reason:
         activity_match.append(tithi_activity_reason)
+    if preferred_number_tithi_reason:
+        activity_match.append(preferred_number_tithi_reason)
     if ctx.vara_reason:
         activity_match.append(ctx.vara_reason)
     if facts.nakshatra in ctx.prefer_nakshatras:
@@ -609,6 +616,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     prefer_nakshatras = canonical_activity_nakshatras(
         rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    prefer_tithi_numbers = frozenset(rules.get('prefer_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
@@ -656,6 +664,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         avoid_nakshatras=avoid_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        prefer_tithi_numbers=prefer_tithi_numbers,
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
@@ -791,6 +800,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     prefer_nakshatras = canonical_activity_nakshatras(
         rules.get('prefer_nakshatras', ()))
     allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
+    prefer_tithi_numbers = frozenset(rules.get('prefer_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
@@ -861,6 +871,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         avoid_nakshatras=avoid_nakshatras,
         prefer_nakshatras=prefer_nakshatras,
         allowed_tithi_numbers=allowed_tithi_numbers,
+        prefer_tithi_numbers=prefer_tithi_numbers,
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
