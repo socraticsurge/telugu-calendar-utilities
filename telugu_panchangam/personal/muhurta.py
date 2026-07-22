@@ -312,6 +312,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
         return None
     if active_tithi_number in ctx.avoid_tithi_numbers:
         return None
+    if (day.vaaram, facts.tithi) in ctx.avoid_vara_tithi_names:
+        return None
 
     # Special yogas
     yoga_bonus, yoga_reasons, defer = score_special_yogas(
@@ -623,6 +625,8 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     prefer_tithi_numbers = frozenset(rules.get('prefer_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
+    avoid_vara_tithi_names = frozenset(
+        tuple(pair) for pair in rules.get('avoid_vara_tithi_names', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
@@ -671,6 +675,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         prefer_tithi_numbers=prefer_tithi_numbers,
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
+        avoid_vara_tithi_names=avoid_vara_tithi_names,
         allowed_lagnas=allowed_lagnas,
         prefer_lagnas=prefer_lagnas,
         caution_lagna_solar=caution_lagna_solar,
@@ -808,6 +813,8 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     prefer_tithi_numbers = frozenset(rules.get('prefer_tithi_numbers', ()))
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
+    avoid_vara_tithi_names = frozenset(
+        tuple(pair) for pair in rules.get('avoid_vara_tithi_names', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
@@ -879,6 +886,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         prefer_tithi_numbers=prefer_tithi_numbers,
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
+        avoid_vara_tithi_names=avoid_vara_tithi_names,
         allowed_lagnas=allowed_lagnas,
         prefer_lagnas=prefer_lagnas,
         caution_lagna_solar=caution_lagna_solar,

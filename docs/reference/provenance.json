@@ -293,6 +293,28 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.lending_money",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter X, 'Lending Money,' printed p. 45 (PDF p. 49)",
+      "scope": "Supports hard exclusion of Krittika, Magha, Moola, Shatabhisha, Uttara Phalguni, Punarvasu and the lender's Janma Nakshatra; Tuesday/Friday exclusion; and the exact Saturday-Amavasya conditional prohibition. Lagna/7th-lord harmony and Chandra outside Vrischika remain manual checks. This is lender-side guidance only and cannot establish creditworthiness, repayment, enforceability or investment safety.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "muhurta.lending.drkpanchang_divergence",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/52-lending-money-profile.md",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["DP-DAY-PAGE"],
+      "locator": "Drik Panchang, Loan Giving Muhurat methodology, example page for 11 June 2026, Chincholi, Karnataka; reviewed 2026-07-22",
+      "scope": "The published methodology says not to give a loan on Wednesday, directly differing from Raman's Tuesday-and-Friday exclusion and implicit Wednesday admission. The configured profile follows the explicitly named Raman lineage and discloses, rather than merges, this current-practice divergence.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.borrowing_money",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

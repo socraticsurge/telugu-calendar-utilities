@@ -23,6 +23,7 @@ CONSUMED_FIELDS = (
     'prefer_tithi_numbers',
     'avoid_tithi_numbers',
     'manual_checks', 'manual_prerequisites', 'avoid_janma_nakshatra',
+    'avoid_vara_tithi_names',
     'allowed_lagnas', 'prefer_lagnas',
     'caution_lagna_solar',
     'source_claim', 'audit_claim', 'heuristic_claim', 'related_claims',

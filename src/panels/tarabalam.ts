@@ -720,6 +720,8 @@ async function findMuhurta() {
       const preferTithiNumbers = new Set(rules.prefer_tithi_numbers || []);
       const allowedTithiNames = new Set(rules.allowed_tithi_names || []);
       const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);
+      const avoidVaraTithiNames = new Set(
+        (rules.avoid_vara_tithi_names || []).map(pair => `${pair[0]}|${pair[1]}`));
       const manualChecks = rules.manual_checks || [];
       const activityLabel = rules.label;
       const combustionReason = muCombustionDropReason(
@@ -855,6 +857,7 @@ async function findMuhurta() {
               !allowedTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
           if (allowedTithiNames.size && !allowedTithiNames.has(facts.tithi)) continue;
           if (avoidTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
+          if (avoidVaraTithiNames.has(`${data.vaaram}|${facts.tithi}`)) continue;
 
           // Build reason groups as we score — slot_quality, day_quality,
           // group_fit, activity_match, notes — mirroring Python's
@@ -1222,6 +1225,7 @@ const MU_ACT_LABEL = {
   gold: 'a gold / jewelry purchase',
   business_inventory_purchase: 'a trade inventory purchase',
   borrowing_money: 'borrowing money / taking a loan',
+  lending_money: 'lending money / giving a loan',
   bhumi_puja: 'bhumi puja (foundation laying)',
   well_digging: 'well digging',
   home_repair: 'a home repair / renovation start',

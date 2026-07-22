@@ -24,6 +24,7 @@
     "manual_checks",
     "manual_prerequisites",
     "avoid_janma_nakshatra",
+    "avoid_vara_tithi_names",
     "allowed_lagnas",
     "prefer_lagnas",
     "caution_lagna_solar",
@@ -69,7 +70,8 @@
         "gold",
         "business_inventory_purchase",
         "purchase",
-        "borrowing_money"
+        "borrowing_money",
+        "lending_money"
       ]
     },
     {
@@ -802,6 +804,44 @@
       "source_claim": "muhurta.borrowing_money",
       "related_claims": [
         "muhurta.borrowing.chintamani_divergence"
+      ]
+    },
+    "lending_money": {
+      "label": "Lending money / giving a loan",
+      "allowed_varas": [
+        "Adivaram",
+        "Somavaram",
+        "Budhavaram",
+        "Guruvaram",
+        "Shanivaram"
+      ],
+      "avoid_nakshatras": [
+        "Krittika",
+        "Magha",
+        "Moola",
+        "Shatabhisha",
+        "Uttara Phalguni",
+        "Punarvasu"
+      ],
+      "manual_checks": [
+        "Transaction role: this is making a loan from the lender/creditor side; receiving repayment and borrowing money are separate elections.",
+        "Personal-star gate: supply the lender’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+        "Election chart: Lagna and 7th lords should be harmoniously disposed.",
+        "Election chart: Chandra in Vrischika is described as adverse for the lender.",
+        "Lineage warning: current Drik Panchang loan-giving practice excludes Wednesday, while this Raman-lineage profile admits it and excludes Tuesday and Friday.",
+        "Credit assessment, affordability, documentation, interest and collateral law, concentration risk and qualified financial or legal advice take precedence over timing."
+      ],
+      "manual_prerequisites": true,
+      "avoid_janma_nakshatra": true,
+      "avoid_vara_tithi_names": [
+        [
+          "Shanivaram",
+          "Amavasya"
+        ]
+      ],
+      "source_claim": "muhurta.lending_money",
+      "related_claims": [
+        "muhurta.lending.drkpanchang_divergence"
       ]
     },
     "bhumi_puja": {

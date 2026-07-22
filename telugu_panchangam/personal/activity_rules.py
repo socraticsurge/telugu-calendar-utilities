@@ -34,6 +34,7 @@
 #   manual_checks           source-required criteria not computed by the finder
 #   manual_prerequisites    unresolved checks cap relative tier below Excellent
 #   avoid_janma_nakshatra   slot omitted when its star matches a supplied Janma star
+#   avoid_vara_tithi_names  slot omitted for exact (Vara, Tithi-name) pairs
 #   audit_claim             provenance claim recording a known evidence conflict;
 #                           never grants verified status
 #   heuristic_claim         provenance claim recording intentionally project-defined
@@ -166,6 +167,43 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Repayment capacity, total borrowing cost, lender '
                           'terms, collateral risk and qualified financial or '
                           'legal advice take precedence over timing.',
+                      ]},
+    'lending_money': {'label': 'Lending money / giving a loan',
+                      'source_claim': 'muhurta.lending_money',
+                      'related_claims': [
+                          'muhurta.lending.drkpanchang_divergence'],
+                      'manual_prerequisites': True,
+                      'allowed_varas': [
+                          'Adivaram', 'Somavaram', 'Budhavaram',
+                          'Guruvaram', 'Shanivaram',
+                      ],
+                      'avoid_nakshatras': [
+                          'Krittika', 'Magha', 'Moola', 'Shatabhisha',
+                          'Uttara Phalguni', 'Punarvasu',
+                      ],
+                      'avoid_janma_nakshatra': True,
+                      'avoid_vara_tithi_names': [
+                          ['Shanivaram', 'Amavasya'],
+                      ],
+                      'manual_checks': [
+                          'Transaction role: this is making a loan from the '
+                          'lender/creditor side; receiving repayment and '
+                          'borrowing money are separate elections.',
+                          'Personal-star gate: supply the lender’s Janma '
+                          'Nakshatra so the source prohibition can be '
+                          'enforced; without it, review remains incomplete.',
+                          'Election chart: Lagna and 7th lords should be '
+                          'harmoniously disposed.',
+                          'Election chart: Chandra in Vrischika is described '
+                          'as adverse for the lender.',
+                          'Lineage warning: current Drik Panchang loan-giving '
+                          'practice excludes Wednesday, while this Raman-'
+                          'lineage profile admits it and excludes Tuesday '
+                          'and Friday.',
+                          'Credit assessment, affordability, documentation, '
+                          'interest and collateral law, concentration risk '
+                          'and qualified financial or legal advice take '
+                          'precedence over timing.',
                       ]},
     'ceremony':      {'label': 'Ceremony / puja (general)',
                       'audit_claim': 'muhurta.ceremony.profile_conflict',

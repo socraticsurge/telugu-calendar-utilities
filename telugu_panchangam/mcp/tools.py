@@ -1071,6 +1071,7 @@ def tool_find_muhurta(
             'daytime_only', 'forenoon_only', 'allowed_pakshams',
             'allowed_solar_signs', 'allowed_tithi_names', 'skip_on_combust',
             'avoid_janma_nakshatra',
+            'avoid_vara_tithi_names',
         )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,

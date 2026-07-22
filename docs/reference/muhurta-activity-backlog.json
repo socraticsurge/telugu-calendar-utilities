@@ -75,12 +75,12 @@
       "key": "lending_money",
       "label": "Lending money",
       "priority": "P1",
-      "disposition": "missing_candidate",
-      "reason": "Creditor-side rules differ materially from borrowing and should not share a profile.",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a creditor-side Raman profile distinct from borrowing; the current Drik Panchang Wednesday divergence is disclosed.",
       "source_candidates": [
         {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter X, 'Lending money,' printed p. 45 (PDF p. 49)"}
       ],
-      "boundary": "Do not imply creditworthiness, repayment probability or investment safety from Muhurtam."
+      "boundary": "The implementation states that creditworthiness, repayment probability, enforceability, legal compliance and investment safety cannot be inferred from Muhurtam."
     },
     {
       "key": "deity_installation",

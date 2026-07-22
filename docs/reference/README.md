@@ -77,6 +77,7 @@ PyPI MCP package.
 | 49 | [Home-repair source profile](49-home-repair-profile.md) | Repair-commencement weekday semantics, conditional chart checks, and construction-safety boundary |
 | 50 | [Trade-inventory purchase profile](50-trade-inventory-purchase-profile.md) | Buyer-side inventory scope, exact preference semantics, and commercial safeguards |
 | 51 | [Borrowing-money source profile](51-borrowing-money-profile.md) | Debtor-side Nakshatra gates, Chintamani divergence, and financial-safety boundary |
+| 52 | [Lending-money source profile](52-lending-money-profile.md) | Creditor-side conditional gates, published-practice conflict, and financial safeguards |
 
 ## How to read the diagrams
 

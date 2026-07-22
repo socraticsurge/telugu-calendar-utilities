@@ -78,6 +78,7 @@ class _DayContext:
     manual_checks: tuple[str, ...]
     manual_prerequisites: bool
     avoid_janma_nakshatra: bool
+    avoid_vara_tithi_names: frozenset
 
 
 # ---------------------------------------------------------------------------
