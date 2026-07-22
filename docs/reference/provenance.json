@@ -304,14 +304,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.cremation.profile_conflict",
+      "id": "muhurta.pretakriya.deferred",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["MC-HINDI-IA"],
       "locator": "Nakshatra-prakarana, 'Pretakriya ka muhurta,' verse 48, printed pp. 47-48 (OCR lines 2956-2971 in the Internet Archive full text)",
-      "scope": "Verse 48 and its Hindi commentary forbid cremation during the latter half of Dhanishtha plus Shatabhisha, Purva Bhadrapada, Uttara Bhadrapada and Revati: the traditional four-and-a-half Nakshatras. The implementation deliberately marks all of Dhanishtha as Panchaka, so it over-rejects the first half and is not textually exact. The passage also treats Pretakriya after a rite could not be performed at death; it does not authorize ranking Antyeshti as a generic auspicious Choghadiya venture. The profile must remain contradicted until Pada/half-Nakshatra precision and the ritual scope are resolved.",
+      "scope": "Implements the verse's nine-star positive admission list for Pretakriya that could not be performed at the time of death: Ashvini, Pushya, Hasta, Ashlesha, Moola, Jyeshtha, Shravana, Ardra and Swati. This narrower deferred-rite scope removes the former generic Antyeshti ranking and does not require approximating the separate four-and-a-half-Nakshatra cremation prohibition, because none of Dhanishtha, Shatabhisha, Purva Bhadrapada, Uttara Bhadrapada or Revati is admitted by the positive list. Immediate legal, medical and ritual duties override the finder; the profile must never be used to delay Antyeshti.",
       "last_reviewed": "2026-07-22"
     },
     {

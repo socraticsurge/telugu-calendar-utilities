@@ -1260,6 +1260,7 @@ const MU_ACT_LABEL = {
   ceremony: 'a Shantika / Paushtika rite', beginning: 'a Dharma-kriya commencement',
   wedding: 'a wedding (Vivaha)',
   engagement: 'a mutual engagement (Kanya-Varavarana)',
+  cremation: 'deferred funeral rites (Pretakriya)',
   naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
   upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',

@@ -107,7 +107,8 @@
       "label": "Other",
       "activities": [
         "travel",
-        "beginning"
+        "beginning",
+        "cremation"
       ]
     }
   ],
@@ -1386,6 +1387,27 @@
         "Meena"
       ],
       "source_claim": "muhurta.dharma_kriya.commencement"
+    },
+    "cremation": {
+      "label": "Deferred funeral rites (Pretakriya)",
+      "allowed_nakshatras": [
+        "Ashvini",
+        "Pushya",
+        "Hasta",
+        "Ashlesha",
+        "Moola",
+        "Jyeshtha",
+        "Shravana",
+        "Ardra",
+        "Swati"
+      ],
+      "manual_checks": [
+        "Scope: verse 48 applies when Pretakriya could not be performed at the time of death. Do not delay immediate Antyeshti to wait for a listed Nakshatra.",
+        "Legal and medical requirements, timely rites, family Sampradaya and the officiating priest’s guidance override every project ranking.",
+        "The same verse separately prohibits cremation during latter-half Dhanishtha through Revati; none of those stars enter this positive Pretakriya admission list."
+      ],
+      "manual_prerequisites": true,
+      "source_claim": "muhurta.pretakriya.deferred"
     }
   }
 }

@@ -44,7 +44,7 @@ python tools/check_activity_provenance.py
 | `gruhapravesha` | First entry into a newly built home | `muhurta.gruhapravesha` | Verified Raman-lineage profile; exact day/anga/Lagna gates and published-practice divergence disclosed |
 | `court` | Filing a lawsuit / court action | `muhurta.court.filing_lawsuit` | Verified Raman-lineage filing profile; exact weekday, Tithi, Nakshatra and conservative Lagna gates, with chart prerequisites disclosed |
 | `litigation` | Legacy API alias for lawsuit filing | Alias of `court` | Compatibility name only; resolves to the verified filing profile and is not counted as a distinct election |
-| `cremation` | Cremation rites | `muhurta.cremation.profile_conflict` | **Contradicted:** whole-Dhanishtha block overstates the cited 4½-Nakshatra Panchaka |
+| `cremation` | Deferred funeral rites (Pretakriya) | `muhurta.pretakriya.deferred` | Verified exact nine-star admission; immediate Antyeshti explicitly excluded |
 | `yajna` | Homa offering (Homahuti) | `muhurta.homahuti` | **Verified:** exact three-Nakshatra Homahuti and modulo-four Agnivasa hard gates |
 | `job` | Entering employment / starting service | `muhurta.service_entry` | Verified verse-26 profile; chart and employer/employee compatibility remain manual |
 | `business` | Deploying capital / business investment | `muhurta.capital_deployment` | Verified verse-27 profile; benefic-house and empty-8th checks remain manual |
@@ -52,7 +52,7 @@ python tools/check_activity_provenance.py
 | `beginning` | Dharma-kriya commencement | `muhurta.dharma_kriya.commencement` | Verified verse-30 profile; Varga, Guru placement and personal Guru-bala remain manual |
 | `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
-Coverage is therefore **33 of 35 distinct profiles**, plus one compatibility
+Coverage is therefore **34 of 35 distinct profiles**, plus one compatibility
 alias. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
 printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
@@ -60,12 +60,9 @@ not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
 
-The Cremation profile is excluded from the
-verified count. Their
-`audit_claim` fields record known source conflicts without granting authority
-to the current profile. See the now-verified
-[Engagement evidence audit](36-engagement-evidence-audit.md), the
-[Cremation evidence audit](37-cremation-evidence-audit.md), and the verified
+No activity profile remains in a contradicted state. See the verified
+[Engagement evidence audit](36-engagement-evidence-audit.md),
+[Deferred Pretakriya evidence audit](37-cremation-evidence-audit.md), and
 [Homa offering evidence audit](38-yajna-homam-evidence-audit.md).
 
 Every activity key now has an explicit disposition: verified source profile,

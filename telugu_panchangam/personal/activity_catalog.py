@@ -24,7 +24,7 @@ BROWSER_ACTIVITY_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     )),
     ('Spiritual', ('yajna', 'pilgrimage', 'ceremony')),
     ('Civil & medical', ('court', 'surgery')),
-    ('Other', ('travel', 'beginning')),
+    ('Other', ('travel', 'beginning', 'cremation')),
 )
 
 BROWSER_ACTIVITIES: tuple[str, ...] = tuple(

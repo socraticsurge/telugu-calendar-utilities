@@ -47,12 +47,9 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'job': 'muhurta.service_entry',
         'yajna': 'muhurta.homahuti',
         'engagement': 'muhurta.kanya_varavarana',
+        'cremation': 'muhurta.pretakriya.deferred',
     }
     assert result['known_conflicts'] == {
-        'cremation': {
-            'claim': 'muhurta.cremation.profile_conflict',
-            'state': 'contradicted',
-        },
     }
     assert result['heuristic_profiles'] == {
         'any': {

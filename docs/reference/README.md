@@ -62,7 +62,7 @@ PyPI MCP package.
 | 34 | [Lawsuit-filing source profile](34-court-evidence-audit.md) | Exact Raman crosswalk, disclosed Tithi shorthand, conservative Mesha-Lagna automation and legal-safety boundary |
 | 35 | [Litigation alias and Bhadra audit](35-litigation-evidence-audit.md) | Retired duplicate profile, explicit Court alias, exact Chintamani verses and isolated 5:8:3 approximation debt |
 | 36 | [Mutual engagement evidence audit](36-engagement-evidence-audit.md) | Exact Kanyavarana/Varavarana Nakshatra intersection and manual boundary |
-| 37 | [Cremation evidence audit](37-cremation-evidence-audit.md) | Muhurta Chintamani verse 48 and the whole-Dhanishtha precision conflict |
+| 37 | [Deferred Pretakriya evidence audit](37-cremation-evidence-audit.md) | Exact nine-star admission and immediate-Antyeshti safety boundary |
 | 38 | [Homa offering evidence audit](38-yajna-homam-evidence-audit.md) | Exact Homahuti and Agnivasa election gates |
 | 39 | [General purchase source profile](39-purchase-profile.md) | Buyer-side Kraya verse, marketplace checks, and object-specific boundaries |
 | 40 | [Service-entry source profile](40-job-contract-evidence-audit.md) | Exact verse-26 gates, chart and employer/employee compatibility boundary |

@@ -990,18 +990,26 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'avoid mutual aspects between Mangala and Shani.',
                       ]},
     # — Panchaka-restricted activities —
-    'cremation':         {'label': 'Cremation rites',
-                          'audit_claim': 'muhurta.cremation.profile_conflict',
-                          'skip_on_panchaka_nakshatra': True,
+    'cremation':         {'label': 'Deferred funeral rites (Pretakriya)',
+                          'source_claim': 'muhurta.pretakriya.deferred',
+                          'manual_prerequisites': True,
+                          'allowed_nakshatras': [
+                              'Ashvini', 'Pushya', 'Hasta', 'Ashlesha',
+                              'Moola', 'Jyeshtha', 'Shravana', 'Ardra',
+                              'Swati',
+                          ],
                           'manual_checks': [
-                              'Known precision mismatch: Muhurta Chintamani '
-                              'starts the cremation Panchaka restriction in '
-                              'the latter half of Dhanishtha; this profile '
-                              'currently rejects all of Dhanishtha.',
-                              'Antyeshti is not a generic auspicious venture: '
-                              'legal and medical requirements, timely rites, '
+                              'Scope: verse 48 applies when Pretakriya could '
+                              'not be performed at the time of death. Do not '
+                              'delay immediate Antyeshti to wait for a listed '
+                              'Nakshatra.',
+                              'Legal and medical requirements, timely rites, '
                               'family Sampradaya and the officiating priest’s '
-                              'guidance override this project ranking.',
+                              'guidance override every project ranking.',
+                              'The same verse separately prohibits cremation '
+                              'during latter-half Dhanishtha through Revati; '
+                              'none of those stars enter this positive '
+                              'Pretakriya admission list.',
                           ]},
     'construction_roof': {'label': 'Roof-laying / construction milestone',
                           'source_claim': 'muhurta.construction_roof',

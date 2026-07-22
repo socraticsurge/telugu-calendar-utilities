@@ -1,42 +1,35 @@
-# Cremation / Antyeshti Evidence Audit
+# Deferred Funeral Rites (Pretakriya) Evidence Audit
 
-## Status
+## Verdict
 
-The Cremation rites profile is **not source-verified**. Its `audit_claim`,
-`muhurta.cremation.profile_conflict`, has state `contradicted`.
+The `cremation` compatibility key is now deliberately narrowed to the
+source-verified election for **deferred Pretakriya**—rites that could not be
+performed at the time of death. It must not be used to postpone immediate
+Antyeshti.
 
-## Inspected authority
+## Source
 
-- Rama Daivajna, *Muhurta Chintamani*, Sanskrit text with Hindi commentary.
-- Internet Archive identifier `muhurta-chintamani-hindi`; the scan does not
-  provide publisher or publication-date metadata.
-- Nakshatra-prakarana, “Pretakriya ka muhurta,” verse 48.
-- Printed pages 47–48; OCR lines 2956–2971.
+- **MC-HINDI-IA** — Rama Daivajna, *Muhurta Chintamani*,
+  Nakshatra-prakarana, “Pretakriya ka muhurta,” verse 48, printed pp. 47-48;
+  Internet Archive OCR lines 2956-2971.
 
-The Sanskrit instruction and Hindi commentary identify the restricted span as
-the latter half of Dhanishtha followed by Shatabhisha, Purva Bhadrapada, Uttara
-Bhadrapada and Revati: four-and-a-half Nakshatras, not five whole Nakshatras.
+## Implemented admission
 
-## Criterion crosswalk
+The verse and Hindi commentary admit deferred Pretakriya under exactly nine
+Nakshatras: Ashvini, Pushya, Hasta, Ashlesha, Moola, Jyeshtha, Shravana,
+Ardra and Swati. Automation applies this as a hard slot-time Nakshatra gate
+on Python, MCP and the browser.
 
-| Criterion | Current profile | Verse 48 | Status |
-|---|---|---|---|
-| Dhanishtha | Entire Nakshatra rejected | Only latter half rejected | **Direct precision conflict** |
-| Remaining Panchaka | Shatabhisha through Revati rejected | Same four complete Nakshatras rejected | Matches |
-| Timing basis | Generic good-Choghadiya slots after shared cut-outs | Passage discusses Pretakriya when it could not be performed at death | Scope not established |
-| Ritual authority | No rite-specific context | Classical ritual-election context | Priest/Sampradaya judgment required |
+## Four-and-a-half-Nakshatra prohibition
 
-## Safety and correction boundary
+The second half of the verse separately forbids cremation during latter-half
+Dhanishtha, Shatabhisha, Purva Bhadrapada, Uttara Bhadrapada and Revati. The
+shared Panchaka flag approximates this by marking all of Dhanishtha, but this
+approximation is not used as authority for the deferred-rite profile: none of
+the five restricted names enters the nine-star positive admission list.
 
-Antyeshti is not analogous to scheduling a purchase or business launch. Legal
-and medical requirements, timely performance, family Sampradaya and the
-officiating priest’s guidance take precedence over this project’s ranking.
+## Non-negotiable boundary
 
-The repository intentionally approximates Dhanishtha’s latter half as the full
-Nakshatra, and existing tests pin that behavior. Correcting it needs a
-Pada/longitude-aware Panchaka boundary and owner approval because the current
-test contract would change. Until then, results expose both the over-broad
-filter and the ritual-scope warning instead of claiming exact textual fidelity.
-
-The activity is available through Python and MCP but not the browser catalogue.
-This audit does not widen the UI without its screenshot and owner-sign-off flow.
+Legal and medical requirements, prompt performance, family Sampradaya and the
+officiating priest take precedence over every result. The profile is capped
+for practitioner review and is not a generic “auspicious venture” ranking.
