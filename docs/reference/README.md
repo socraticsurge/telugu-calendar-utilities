@@ -73,6 +73,7 @@ PyPI MCP package.
 | 45 | [Muhurtam activity coverage roadmap](45-muhurta-activity-coverage-roadmap.md) | Source-backed gap inventory, priorities, safety boundaries, and one-feature-at-a-time expansion order |
 | 46 | [Panchangam provenance disclosure](46-panchangam-provenance-disclosure.md) | Field-group evidence states in the MCP response and the exact remaining source debt |
 | 47 | [Seemantha source profile](47-seemantha-profile.md) | Exact prenatal-rite crosswalk, conservative chart boundaries, and medical precedence |
+| 48 | [Completed-house purchase source profile](48-completed-house-purchase-profile.md) | House-specific Chapter XII formula, independent buyer-rule comparison, and practical safeguards |
 
 ## How to read the diagrams
 

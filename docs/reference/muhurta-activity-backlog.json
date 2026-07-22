@@ -30,12 +30,12 @@
       "key": "house_purchase",
       "label": "Purchase of a completed house",
       "priority": "P0",
-      "disposition": "missing_candidate",
-      "reason": "The existing Property profile is explicitly land-for-building and must not answer completed-house purchases.",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a dedicated source-verified profile; the existing Property profile remains explicitly land-for-building.",
       "source_candidates": [
         {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XII, 'Buying houses,' printed p. 53 (PDF p. 57)"}
       ],
-      "boundary": "Do not reuse the land-purchase profile; the source gives a different Tithi, weekday, Nakshatra and Lagna set."
+      "boundary": "The implementation does not reuse the land-purchase profile; the source's distinct Tithi, weekday, Nakshatra and preferred-Lagna formula is preserved."
     },
     {
       "key": "home_repair",

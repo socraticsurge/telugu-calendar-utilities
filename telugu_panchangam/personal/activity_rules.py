@@ -28,6 +28,7 @@
 #   allowed_tithi_numbers   slot omitted unless its active Tithi number is listed
 #   avoid_tithi_numbers     slot omitted when its active Tithi number is listed
 #   allowed_lagnas          slot omitted unless its active Lagna is listed
+#   prefer_lagnas           named source-favoured Lagnas receive a bonus
 #   caution_lagna_solar     disclose when the active Lagna equals Surya's Rasi
 #   manual_checks           source-required criteria not computed by the finder
 #   manual_prerequisites    unresolved checks cap relative tier below Excellent
@@ -532,6 +533,34 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'and not Lagna.',
                           'Election chart: Lagna and 7th lords should be '
                           'harmonious; avoid the 11th lord in the 12th.',
+                      ]},
+    'house_purchase': {
+                      'label': 'Completed house purchase',
+                      'source_claim': 'muhurta.house_purchase.completed',
+                      'related_claims': ['muhurta.purchase.general'],
+                      'manual_prerequisites': True,
+                      'allowed_varas': ['Guruvaram', 'Shukravaram'],
+                      'allowed_tithi_numbers': [1, 6, 11],
+                      'allowed_nakshatras': [
+                          'Mrigashira', 'Ashlesha', 'Magha',
+                          'Purva Phalguni', 'Vishakha', 'Moola',
+                          'Punarvasu', 'Revati',
+                      ],
+                      'prefer_lagnas': [
+                          'Vrishabha', 'Mithuna', 'Simha', 'Tula',
+                          'Vrischika',
+                      ],
+                      'manual_checks': [
+                          'Scope: use this profile for buying a completed '
+                          'new or old house; it is not land purchase, '
+                          'construction commencement, rental moving or '
+                          'Gruhapravesha.',
+                          'Election chart: keep malefics out of the 7th '
+                          'house.',
+                          'Election chart: do not place Mangala in Lagna.',
+                          'Legal title, structural inspection, financing and '
+                          'contract advice take precedence over electional '
+                          'timing.',
                       ]},
     'gold':          {'label': 'Gold / Jewelry purchase',
                       'source_claim': 'muhurta.gold_jewelry.purchase',

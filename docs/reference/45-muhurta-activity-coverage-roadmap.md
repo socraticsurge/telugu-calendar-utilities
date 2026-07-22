@@ -1,6 +1,6 @@
 # Muhurtam Activity Coverage Roadmap
 
-The current selector has 30 activity keys, all with an explicit provenance
+The current selector has 32 activity keys, all with an explicit provenance
 state. That closes attribution ambiguity; it does not mean the activity
 catalogue is complete. The machine-readable gap inventory is
 [`muhurta-activity-backlog.json`](muhurta-activity-backlog.json).
@@ -20,15 +20,15 @@ not silently share one profile.
 | Order | Activity | Why it comes next |
 |---|---|---|
 | 1 | Seemantha | **Implemented:** source-verified profile with pregnancy and medical boundaries |
-| 2 | Completed-house purchase | Common need currently liable to be misrouted to land purchase |
+| 2 | Completed-house purchase | **Implemented:** dedicated new/old completed-house profile |
 | 3 | Home repair / renovation start | Common need, exact passage, distinct from foundation and roof work |
 | 4 | Buying inventory for trade | Replaces one concrete slice of the unsupported Business launch catch-all |
 | 5 | Borrowing and lending | Source explicitly distinguishes the two transaction roles |
 
-Seemantha was the first additive feature from this roadmap. Its implementation
-preserves the source's first-pregnancy and pregnancy-month boundary and includes
-a clear medical-care precedence statement. Completed-house purchase is now the
-highest-priority missing profile.
+Seemantha and completed-house purchase are now implemented as separate,
+source-verified profiles with explicit medical, legal and scope boundaries.
+Home repair or renovation commencement is now the highest-priority missing
+profile.
 
 ## Important holds and splits
 

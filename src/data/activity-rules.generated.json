@@ -23,6 +23,7 @@
     "manual_checks",
     "manual_prerequisites",
     "allowed_lagnas",
+    "prefer_lagnas",
     "caution_lagna_solar",
     "source_claim",
     "audit_claim",
@@ -62,6 +63,7 @@
       "activities": [
         "vehicle",
         "property",
+        "house_purchase",
         "gold",
         "purchase"
       ]
@@ -664,6 +666,46 @@
         "Election chart: Lagna and 7th lords should be harmonious; avoid the 11th lord in the 12th."
       ],
       "source_claim": "muhurta.land_purchase.building"
+    },
+    "house_purchase": {
+      "label": "Completed house purchase",
+      "allowed_varas": [
+        "Guruvaram",
+        "Shukravaram"
+      ],
+      "allowed_nakshatras": [
+        "Mrigashira",
+        "Ashlesha",
+        "Magha",
+        "Purva Phalguni",
+        "Vishakha",
+        "Moola",
+        "Punarvasu",
+        "Revati"
+      ],
+      "allowed_tithi_numbers": [
+        1,
+        6,
+        11
+      ],
+      "manual_checks": [
+        "Scope: use this profile for buying a completed new or old house; it is not land purchase, construction commencement, rental moving or Gruhapravesha.",
+        "Election chart: keep malefics out of the 7th house.",
+        "Election chart: do not place Mangala in Lagna.",
+        "Legal title, structural inspection, financing and contract advice take precedence over electional timing."
+      ],
+      "manual_prerequisites": true,
+      "prefer_lagnas": [
+        "Vrishabha",
+        "Mithuna",
+        "Simha",
+        "Tula",
+        "Vrischika"
+      ],
+      "source_claim": "muhurta.house_purchase.completed",
+      "related_claims": [
+        "muhurta.purchase.general"
+      ]
     },
     "gold": {
       "label": "Gold / Jewelry purchase",

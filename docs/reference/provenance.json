@@ -546,6 +546,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.house_purchase.completed",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XII, 'Buying Houses,' printed p. 53 (PDF p. 57)",
+      "scope": "Supports Nanda Tithis, Thursday/Friday, the eight configured Nakshatras and a preference for the five named Lagnas when buying a completed new or old house. Because the source calls those Lagnas best rather than exclusive, they receive a bonus instead of acting as a hard gate. Malefics outside the 7th and Mangala outside Lagna remain manual prerequisites. This claim does not cover land purchase, construction, rental moves or Gruhapravesha; legal title, structural inspection, financing and contract advice take precedence.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.land_purchase.building",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

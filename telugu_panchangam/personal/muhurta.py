@@ -446,6 +446,10 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
             f'{cur_lagna} lagna satisfies required {ctx.required_lagna_class} class')
     if ctx.allowed_lagnas:
         activity_match.append(f'{cur_lagna} lagna is admitted for {ctx.label}')
+    if cur_lagna in ctx.prefer_lagnas:
+        score += 1
+        activity_match.append(
+            f'{cur_lagna} lagna specifically favoured for {ctx.label} (+1)')
     lagna_bonus, lagna_reasons, lagna_ashtama_names = score_lagna(
         ctx.janma_nakshatras, ctx.janma_rasis, cur_lagna,
         janma_lagnas=ctx.janma_lagnas)
@@ -608,6 +612,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
+    prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
     manual_checks = tuple(rules.get('manual_checks', ()))
     label = rules['label']
@@ -654,6 +659,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
+        prefer_lagnas=prefer_lagnas,
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
         manual_prerequisites=bool(rules.get('manual_prerequisites')),
@@ -788,6 +794,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
+    prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
     manual_checks = tuple(rules.get('manual_checks', ()))
     label = rules['label']
@@ -857,6 +864,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         allowed_lagnas=allowed_lagnas,
+        prefer_lagnas=prefer_lagnas,
         caution_lagna_solar=caution_lagna_solar,
         manual_checks=manual_checks,
         manual_prerequisites=bool(rules.get('manual_prerequisites')),

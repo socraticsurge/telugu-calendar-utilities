@@ -23,6 +23,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'vehicle': 'muhurta.vehicle.acquisition',
         'naming': 'muhurta.namakarana',
         'property': 'muhurta.land_purchase.building',
+        'house_purchase': 'muhurta.house_purchase.completed',
         'bhumi_puja': 'muhurta.bhumi_puja.foundation',
         'construction_roof': 'muhurta.construction_roof',
         'coronation': 'muhurta.coronation',

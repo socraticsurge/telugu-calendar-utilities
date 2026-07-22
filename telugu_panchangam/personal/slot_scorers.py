@@ -72,6 +72,7 @@ class _DayContext:
     allowed_tithi_names: frozenset
     avoid_tithi_numbers: frozenset
     allowed_lagnas: frozenset
+    prefer_lagnas: frozenset
     caution_lagna_solar: bool
     manual_checks: tuple[str, ...]
     manual_prerequisites: bool

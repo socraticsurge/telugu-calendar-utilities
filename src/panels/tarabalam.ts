@@ -707,6 +707,7 @@ async function findMuhurta() {
       const preferLagnaClass = rules.prefer_lagna_class || null;
       const requiredLagnaClass = rules.required_lagna_class || null;
       const allowedLagnas = new Set(rules.allowed_lagnas || []);
+      const preferLagnas = new Set(rules.prefer_lagnas || []);
       const cautionLagnaSolar = !!rules.caution_lagna_solar;
       const allowedNakshatras = new Set(
         (rules.allowed_nakshatras || []).map(muCanonicalNakshatra));
@@ -998,6 +999,15 @@ async function findMuhurta() {
             if (!slotLagna || !allowedLagnas.has(slotLagna)) continue;
             activityMatch.push(`${slotLagna} lagna is admitted for ${activityLabel}`);
           }
+          if (preferLagnas.size) {
+            const lagnaDay = lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null;
+            const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+            if (slotLagna && preferLagnas.has(slotLagna)) {
+              score += 1;
+              activityMatch.push(
+                `${slotLagna} lagna specifically favoured for ${activityLabel} (+1)`);
+            }
+          }
 
           // Activity-class lagna preference (Muhurta Chintamani):
           // independent of any personal kendra/trikona check —
@@ -1198,6 +1208,7 @@ const MU_ACT_LABEL = {
   seemantha: 'seemantha (prenatal ceremony)',
   gruhapravesha: 'gruhapravesha (home entry)',
   vehicle: 'a vehicle purchase', property: 'a land purchase for building',
+  house_purchase: 'a completed house purchase',
   gold: 'a gold / jewelry purchase',
   bhumi_puja: 'bhumi puja (foundation laying)',
   well_digging: 'well digging',
