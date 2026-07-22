@@ -45,6 +45,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'beginning': 'muhurta.dharma_kriya.commencement',
         'business': 'muhurta.capital_deployment',
         'job': 'muhurta.service_entry',
+        'yajna': 'muhurta.homahuti',
     }
     assert result['known_conflicts'] == {
         'cremation': {
@@ -53,10 +54,6 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         },
         'engagement': {
             'claim': 'muhurta.engagement.profile_conflict',
-            'state': 'contradicted',
-        },
-        'yajna': {
-            'claim': 'muhurta.yajna.profile_conflict',
             'state': 'contradicted',
         },
     }

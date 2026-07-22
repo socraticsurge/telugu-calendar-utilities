@@ -619,7 +619,32 @@ function muFactsAt(dt, vaaram) {
   const rashiIdx = Math.floor(moon / 30) % 12;
   const lunarSign = TB_RASIS[rashiIdx];
   const specialYogas = muSpecialYogasAt(vaaram, tithi, nakshatra);
-  return { nakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
+  const solarNakshatra = MU_NAKSHATRA_LIST[Math.floor(sun / nakSize) % 27];
+  return { nakshatra, solarNakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
+}
+
+const MU_HOMAHUTI_LORDS = [
+  'Surya', 'Budha', 'Shukra', 'Shani', 'Chandra',
+  'Mangala', 'Guru', 'Rahu', 'Ketu'];
+const MU_HOMAHUTI_BENEFICS = new Set(['Budha', 'Shukra', 'Chandra', 'Guru']);
+const MU_VAARAM_LIST = [
+  'Adivaram', 'Somavaram', 'Mangalavaram', 'Budhavaram',
+  'Guruvaram', 'Shukravaram', 'Shanivaram'];
+
+function muHomaElection(facts) {
+  const sunIdx = MU_NAKSHATRA_LIST.indexOf(facts.solarNakshatra);
+  const moonIdx = MU_NAKSHATRA_LIST.indexOf(facts.nakshatra);
+  const group = Math.floor(((moonIdx - sunIdx + 27) % 27) / 3);
+  const lord = MU_HOMAHUTI_LORDS[group];
+  const tithiOrdinal = MU_TITHI_LIST_FULL.indexOf(facts.tithi) + 1;
+  const varaOrdinal = MU_VAARAM_LIST.indexOf(facts.vaaram) + 1;
+  const remainder = (tithiOrdinal + 1 + varaOrdinal) % 4;
+  return {
+    admitted: MU_HOMAHUTI_BENEFICS.has(lord) && (remainder === 0 || remainder === 3),
+    reasons: [
+      `Homahuti group ${group + 1}: ${facts.solarNakshatra} to ${facts.nakshatra} falls to ${lord}`,
+      `Agnivasa remainder ${remainder}: Agni resides on earth`],
+  };
 }
 
 // MU_CHANDRA_GOOD/MU_CHANDRA_PUJA, MU_LAGNA_KENDRA/MU_LAGNA_TRIKONA,
@@ -861,6 +886,12 @@ async function findMuhurta() {
           // UTC → JD conversion internally.
           const slotStart = new Date(d.getTime() + s0 * 60000);
           const facts = muFactsAt(slotStart, data.vaaram);
+          let electionReasons = [];
+          if (rules.require_homa_election) {
+            const election = muHomaElection(facts);
+            if (!election.admitted) continue;
+            electionReasons = election.reasons;
+          }
           if (allowedNakshatras.size && !allowedNakshatras.has(facts.nakshatra)) continue;
           if (avoidNakshatras.has(facts.nakshatra)) continue;
           if (avoidJanmaNakshatra && people.some(
@@ -887,7 +918,7 @@ async function findMuhurta() {
             chogLine];
           const dayQuality = [];
           const groupFit = [];
-          const activityMatch = [];
+          const activityMatch = [...electionReasons];
           const taraUnfavNames = [];
           const chandraAvoidNames = [];
           const chandraPujaNames = [];
@@ -1243,7 +1274,7 @@ const MU_ACT_LABEL = {
   well_digging: 'well digging',
   home_repair: 'a home repair / renovation start',
   business: 'a capital deployment / business investment', job: 'entering employment / starting service',
-  yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
+  yajna: 'a Homa offering (Homahuti)', pilgrimage: 'a pilgrimage',
   court: 'filing a lawsuit / court action', surgery: 'a surgery / medical procedure',
 };
 

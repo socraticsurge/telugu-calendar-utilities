@@ -297,7 +297,8 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
 # Slot evaluation — orchestrates all scorers for one candidate slot
 # ---------------------------------------------------------------------------
 
-def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | None:
+def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu,
+                   election_reasons=()) -> dict | None:
     day = ctx.day
 
     if (ctx.avoid_janma_nakshatra and ctx.janma_nakshatras and
@@ -406,7 +407,7 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
     if tithi_day_reason:
         day_quality.append(tithi_day_reason)
     group_fit = list(tara_reasons) + list(chandra_reasons)
-    activity_match: list[str] = []
+    activity_match: list[str] = list(election_reasons)
     if tithi_activity_reason:
         activity_match.append(tithi_activity_reason)
     if preferred_number_tithi_reason:
@@ -696,6 +697,14 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     )
 
     use_engine = engine is not None and hasattr(engine, 'facts_at')
+    if rules.get('require_homa_election') and not use_engine:
+        from telugu_panchangam.engines.drik import DrikGanitaEngine
+        from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
+        from telugu_panchangam.engines.vakya import VakyaEngine
+        engine = {'drik': DrikGanitaEngine,
+                  'surya_siddhanta': SuryaSiddhantaEngine,
+                  'vakya': VakyaEngine}[day.system]()
+        use_engine = True
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
     # Iterate the 15 named daytime muhurtas (sunrise->sunset /15). Each is
@@ -719,7 +728,18 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         base = GOOD_CHOGHADIYA.get(block.name, 0)  # bad choghadiya scores 0, not gated
         facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
                 if use_engine else snapshot
-        slot_dict = _evaluate_slot(s, e, block, base, facts, ctx, mu)
+        election_reasons = ()
+        if rules.get('require_homa_election'):
+            from telugu_panchangam.personal.homa import (
+                homa_election, solar_nakshatra_at,
+            )
+            admitted, election_reasons = homa_election(
+                facts.tithi, facts.vaaram, facts.nakshatra,
+                solar_nakshatra_at(s, engine))
+            if not admitted:
+                continue
+        slot_dict = _evaluate_slot(
+            s, e, block, base, facts, ctx, mu, election_reasons)
         if slot_dict is not None:
             slots.append(slot_dict)
 
@@ -915,6 +935,14 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     )
 
     use_engine = engine is not None and hasattr(engine, 'facts_at')
+    if rules.get('require_homa_election') and not use_engine:
+        from telugu_panchangam.engines.drik import DrikGanitaEngine
+        from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
+        from telugu_panchangam.engines.vakya import VakyaEngine
+        engine = {'drik': DrikGanitaEngine,
+                  'surya_siddhanta': SuryaSiddhantaEngine,
+                  'vakya': VakyaEngine}[day.system]()
+        use_engine = True
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
     # The 15 named night muhurtas (sunset->next sunrise /15). Same model as
@@ -933,7 +961,18 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         base = GOOD_CHOGHADIYA.get(block.name, 0)
         facts = engine.facts_at(s, day.location, vaaram=day.vaaram) \
                 if use_engine else snapshot
-        slot_dict = _evaluate_slot(s, e, block, base, facts, ctx, mu)
+        election_reasons = ()
+        if rules.get('require_homa_election'):
+            from telugu_panchangam.personal.homa import (
+                homa_election, solar_nakshatra_at,
+            )
+            admitted, election_reasons = homa_election(
+                facts.tithi, facts.vaaram, facts.nakshatra,
+                solar_nakshatra_at(s, engine))
+            if not admitted:
+                continue
+        slot_dict = _evaluate_slot(
+            s, e, block, base, facts, ctx, mu, election_reasons)
         if slot_dict is None:
             continue
         if _overlaps(s, e, nishita_start, nishita_end):

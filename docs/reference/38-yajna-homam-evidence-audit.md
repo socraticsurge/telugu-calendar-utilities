@@ -1,54 +1,39 @@
-# Yajna / Homam Evidence Audit
+# Homa Offering (Homahuti) Evidence Audit
 
-## Status
+## Verdict
 
-The Yajna / Homam profile is **not source-verified**. Its `audit_claim`,
-`muhurta.yajna.profile_conflict`, has state `contradicted`.
+The `yajna` compatibility key now represents the narrower, source-verified
+**Homa offering (Homahuti)** election. It applies both computations in
+Muhurta Chintamani, Nakshatra-prakarana 35-36 as hard gates. The former Purna,
+Jaya, weekday and fixed-Lagna proxies have been removed.
 
-## Inspected authority
+## Source
 
-- Rama Daivajna, *Muhurta Chintamani*, Sanskrit text with Hindi commentary.
-- Internet Archive identifier `muhurta-chintamani-hindi`; publisher and date
-  are not exposed by the scan metadata.
-- Nakshatra-prakarana, “Homahuti Muhurta” and “Agnivasa,” verses 35–36.
-- Printed pages 43–44; OCR lines 2773–2796.
+- **MC-HINDI-IA** — *Muhurta Chintamani*, Hindi edition,
+  Nakshatra-prakarana, “Homahuti Muhurta” and “Agnivasa,” verses 35-36,
+  printed pp. 43-44; Internet Archive full-text OCR lines 2773-2796.
 
-## What the verses actually require
+## Implemented reading
 
-Verse 35 divides the 27 Nakshatras into nine consecutive groups of three,
-counted from the Nakshatra occupied by Surya. The groups are assigned in order
-to Surya, Budha, Shukra, Shani, Chandra, Mangala, Guru, Rahu and Ketu. The
-day’s Nakshatra determines the Graha into whose “mouth” the offering falls;
-an offering to a malefic group is rejected.
+Verse 35 counts the active lunar Nakshatra inclusively from Surya's Nakshatra.
+The 27 Nakshatras form nine consecutive groups of three, assigned in order to
+Surya, Budha, Shukra, Shani, Chandra, Mangala, Guru, Rahu and Ketu. The
+offering is rejected for a `khala` (malefic) group; automation therefore
+admits the natural-benefic groups Budha, Shukra, Chandra and Guru and rejects
+Surya, Mangala, Shani, Rahu and Ketu.
 
-Verse 36 computes Agnivasa by adding one to the Tithi number, adding the
-weekday number counted from Sunday, and taking the remainder modulo four.
-Remainders 3 and 0 place Agni on earth and support Homa; remainder 1 places
-Agni in the sky and warns of danger to life; remainder 2 places Agni below and
-warns of loss of wealth.
+Verse 36 numbers the Tithi from Shukla Pratipat across the full 30-Tithi lunar
+month, adds one, adds the weekday number counted Sunday=1 through Saturday=7,
+and takes modulo four. Remainders 3 and 0 place Agni on earth and admit Homa;
+remainder 1 places Agni in heaven and remainder 2 in the underworld, so both
+are rejected.
 
-## Criterion crosswalk
+Both tests are recomputed at each slot start using the selected Panchangam
+engine's Sun and Moon model. Passing slots disclose the group lord and the
+Agnivasa remainder in `activity_match`.
 
-| Criterion | Current profile | Verses 35–36 | Status |
-|---|---|---|---|
-| Tithi | Every Purna rewarded; every Jaya penalized | Tithi participates in a weekday-dependent modulo-four result | **Direct scoring conflict** |
-| Vara | Monday and Thursday preferred | Every weekday changes the Agnivasa result | Unsupported standalone preference |
-| Nakshatra | No Homam-specific calculation | Three-star group counted from Surya’s Nakshatra | Missing |
-| Lagna | Fixed signs preferred | No fixed-Lagna rule in these verses | Unsupported here |
-| Scope | Yajna and Homam combined | Homahuti election | Broader than citation |
+## Boundary
 
-Both Purna and Jaya families contain combinations producing favorable and
-unfavorable Agnivasa results. Family membership therefore cannot substitute
-for verse 36’s joint Tithi/weekday computation.
-
-## Correction boundary
-
-Implementing the source exactly requires Surya’s Nakshatra at the candidate
-time plus a dedicated Homahuti/Agnivasa evaluator. The current data contract
-does not expose the former to this activity scorer, and existing tests preserve
-the family and weekday bonuses. Until an owner-approved behavior change lands,
-all three source checks remain visible to practitioners.
-
-A broader Yajna can carry ritual-specific Kalpa and Sampradaya requirements
-beyond these Homahuti verses. The officiating priest’s requirements take
-precedence over this generic profile.
+This verifies an election for a fire offering, not a universal election for
+every ceremony called Yajna. The officiating priest's Kalpa/Sampradaya rules,
+ritual arrangements and fire safety remain explicit manual prerequisites.

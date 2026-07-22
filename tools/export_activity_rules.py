@@ -32,6 +32,7 @@ CONSUMED_FIELDS = (
     'source_claim', 'audit_claim', 'heuristic_claim', 'related_claims',
     'daytime_only',
     'forenoon_only', 'allowed_pakshams',
+    'require_homa_election',
     'allowed_solar_signs', 'allowed_tithi_names', 'skip_on_combust',
 )
 

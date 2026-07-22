@@ -896,25 +896,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'judgment take precedence over timing.',
                       ]},
     # — Spiritual —
-    'yajna':         {'label': 'Yajna / Homam',
-                      'audit_claim': 'muhurta.yajna.profile_conflict',
-                      'skip_on_yoga': list(_SAMSKARA_SKIP),
-                      'prefer_tithi_class': 'Purna',
-                      'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Guruvaram', 'Somavaram'],
-                      'prefer_lagna_class': 'Sthira',
+    'yajna':         {'label': 'Homa offering (Homahuti)',
+                      'source_claim': 'muhurta.homahuti',
+                      'require_homa_election': True,
+                      'manual_prerequisites': True,
                       'manual_checks': [
-                          'Homahuti check: count the day’s Nakshatra from '
-                          'Surya’s Nakshatra in three-star groups and reject '
-                          'a group assigned to a malefic Graha, per Muhurta '
-                          'Chintamani verse 35.',
-                          'Agnivasa check: apply the Tithi-plus-weekday '
-                          'modulo-four rule in verse 36; only remainders 3 '
-                          'and 0 place Agni on earth and support Homa.',
-                          'Ritual scope: a general Yajna is not necessarily '
-                          'equivalent to the cited Homahuti election; follow '
-                          'the officiating priest and the specific Kalpa or '
-                          'Sampradaya requirements.',
+                          'Ritual scope: this is the source’s Homahuti '
+                          'election, not a universal election for every '
+                          'Yajna. Follow the officiating priest and the '
+                          'specific Kalpa or Sampradaya requirements.',
+                          'Arrange a qualified officiant, a suitable venue '
+                          'and all required fire-safety precautions.',
                       ]},
     'pilgrimage':    {'label': 'Pilgrimage (Tirtha Yatra)',
                       'source_claim': 'muhurta.pilgrimage',

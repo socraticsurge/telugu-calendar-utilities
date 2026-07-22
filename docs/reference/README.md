@@ -63,7 +63,7 @@ PyPI MCP package.
 | 35 | [Litigation alias and Bhadra audit](35-litigation-evidence-audit.md) | Retired duplicate profile, explicit Court alias, exact Chintamani verses and isolated 5:8:3 approximation debt |
 | 36 | [Engagement evidence audit](36-engagement-evidence-audit.md) | Full-edition scope search and the unsafe marriage-rule inheritance boundary |
 | 37 | [Cremation evidence audit](37-cremation-evidence-audit.md) | Muhurta Chintamani verse 48 and the whole-Dhanishtha precision conflict |
-| 38 | [Yajna / Homam evidence audit](38-yajna-homam-evidence-audit.md) | Homahuti and Agnivasa verses versus the current family scoring |
+| 38 | [Homa offering evidence audit](38-yajna-homam-evidence-audit.md) | Exact Homahuti and Agnivasa election gates |
 | 39 | [General purchase source profile](39-purchase-profile.md) | Buyer-side Kraya verse, marketplace checks, and object-specific boundaries |
 | 40 | [Service-entry source profile](40-job-contract-evidence-audit.md) | Exact verse-26 gates, chart and employer/employee compatibility boundary |
 | 41 | [Capital-deployment source profile](41-business-evidence-audit.md) | Exact verse-27 stars and Chara gate, chart prerequisites, commercial and legal boundary |

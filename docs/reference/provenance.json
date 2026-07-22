@@ -315,14 +315,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.yajna.profile_conflict",
+      "id": "muhurta.homahuti",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["MC-HINDI-IA"],
       "locator": "Nakshatra-prakarana, 'Homahuti Muhurta' and 'Agnivasa,' verses 35-36, printed pp. 43-44 (OCR lines 2773-2796 in the Internet Archive full text)",
-      "scope": "Verses 35-36 govern Homa with two computations absent from the profile: a nine-group, three-Nakshatra cycle counted from Surya's Nakshatra that identifies the Graha receiving the offering, and an Agnivasa modulo-four test using the Tithi and weekday. The configured Purna-family reward and Jaya-family penalty conflict with that conditional formula because favorable and unfavorable Agnivasa outcomes occur within both families; Monday/Thursday and fixed-Lagna preferences are not supplied by these verses. The broader label 'Yajna / Homam' also exceeds the cited Homahuti scope. This claim records a direct scoring and taxonomy conflict, not verification of a universal Yajna rule.",
+      "scope": "Implements both conjunctive tests in verses 35-36 as hard gates. Homahuti counts the Moon's Nakshatra inclusively from Surya's Nakshatra in nine successive groups of three, assigned to Surya, Budha, Shukra, Shani, Chandra, Mangala, Guru, Rahu and Ketu; groups of the natural benefics Budha, Shukra, Chandra and Guru are admitted. Agnivasa numbers Tithis 1-30 from Shukla Pratipat and weekdays 1-7 from Sunday, adds one to the Tithi count, and admits modulo-four remainders 3 or 0, which place Agni on earth. The activity is deliberately scoped to a Homa offering (Homahuti), not every Yajna; rite-specific Kalpa and Sampradaya requirements remain manual.",
       "last_reviewed": "2026-07-22"
     },
     {

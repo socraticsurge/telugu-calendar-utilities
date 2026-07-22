@@ -1076,6 +1076,7 @@ def tool_find_muhurta(
             'avoid_janma_nakshatra',
             'avoid_vara_tithi_names',
             'avoid_nitya_yogas',
+            'require_homa_election',
         )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,

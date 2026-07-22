@@ -219,7 +219,7 @@ def test_wedding_skips_dagdha_day():
     # And the other samskaras that ride the same rule:
     for samskara in ('gruhapravesha', 'upanayana', 'naming',
                      'annaprasana', 'karnavedha', 'mundana',
-                     'engagement', 'bhumi_puja', 'yajna', 'vidyarambha'):
+                     'engagement', 'bhumi_puja', 'vidyarambha'):
         assert day_slots(day, activity=samskara) == [], \
             f'{samskara} should defer on Dagdha day'
 
@@ -479,10 +479,10 @@ def test_reason_groups_present_with_expected_keys():
 def test_reason_groups_categorise_correctly():
     """A slot with Siddha Yoga + tarabalam mixed + tithi-class match
     routes each reason to its category."""
-    # 2026-02-12 (Thu) — Siddha Yoga, Krishna Dashami (Purna).
-    # Yajna currently prefers Purna + Guruvaram, so all categories fire.
+    # 2026-02-12 (Thu) — Siddha Yoga, Krishna Dashami.
+    # Inventory purchase explicitly favours Dashami + Guruvaram.
     day = _day(2026, 2, 12)
-    slots = day_slots(day, activity='yajna',
+    slots = day_slots(day, activity='business_inventory_purchase',
                       janma_nakshatras=['Krittika'])
     assert slots
     rg = slots[0]['reason_groups']
@@ -498,9 +498,9 @@ def test_reason_groups_categorise_correctly():
            any('Siddha Yoga' in r for s in slots for r in s['reason_groups']['day_quality'])
     # Group fit contains tarabalam line (favourable or avoid)
     assert any('tarabalam' in r for r in rg['group_fit'])
-    # Activity match contains Purna + Guruvaram bonuses.
-    assert any('Purna' in r and 'favoured for Yajna' in r for r in rg['activity_match'])
-    assert any('Guruvaram favoured for Yajna' in r for r in rg['activity_match'])
+    # Activity match contains exact Dashami + Guruvaram bonuses.
+    assert any('Dashami specifically favoured' in r for r in rg['activity_match'])
+    assert any('Guruvaram favoured' in r for r in rg['activity_match'])
 
 
 def test_doctrinal_note_sarvartha_rectifies_tara():
