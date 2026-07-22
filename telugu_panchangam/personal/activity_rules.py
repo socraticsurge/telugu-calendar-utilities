@@ -611,6 +611,36 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Election chart: malefics should occupy 3rd, 6th or 11th; benefics should fortify Kendras and Trikonas.',
                           'Site ritual: after Puja, the first foundation stone is placed at the north-eastern corner.',
                       ]},
+    'home_repair':   {'label': 'Home repair / renovation start',
+                      'source_claim': 'muhurta.home_repair.commencement',
+                      'manual_prerequisites': True,
+                      # Raman prohibits only Tuesday absolutely. Sunday and
+                      # Saturday are admitted without a source-backed bonus.
+                      'allowed_varas': [
+                          'Adivaram', 'Somavaram', 'Budhavaram',
+                          'Guruvaram', 'Shukravaram', 'Shanivaram',
+                      ],
+                      'prefer_vara': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                      ],
+                      'manual_checks': [
+                          'Scope: commencement of repairs or renovation to '
+                          'an existing home only; painting/whitewashing, '
+                          'dismantling, new construction and post-work '
+                          're-entry are separate elections.',
+                          'Weekday-Lagna condition: Friday is especially '
+                          'suitable with Vrishabha or Tula Lagna; Monday is '
+                          'especially suitable with Karka Lagna.',
+                          'Election chart: Lagna should be occupied by a '
+                          'benefic and Chandra should be in an aquatic Rasi.',
+                          'Mangala transit: if Chandra is in Krittika, Magha, '
+                          'Pushya, Purva Phalguni, Hasta, Moola or Revati, '
+                          'confirm Mangala is not transiting that same '
+                          'Nakshatra.',
+                          'Building permits, structural engineering, utility '
+                          'safety and contractor readiness take precedence '
+                          'over electional timing.',
+                      ]},
     'business':      {'label': 'Business launch',
                       'audit_claim': 'muhurta.business.profile_conflict',
                       'prefer_choghadiya': ('Amrit', 1),

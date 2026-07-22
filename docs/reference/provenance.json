@@ -546,6 +546,17 @@
       "last_reviewed": "2026-07-21"
     },
     {
+      "id": "muhurta.home_repair.commencement",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter XII, 'Repairing Houses,' printed pp. 53-54 (PDF pp. 57-58)",
+      "scope": "Supports Tuesday as the sole absolute weekday prohibition and Monday/Wednesday/Thursday as preferences for commencing repairs. Friday with Vrishabha/Tula Lagna, Monday with Karka Lagna, a benefic in Lagna, Chandra in an aquatic Rasi, and the Mangala-same-Nakshatra condition remain manual prerequisites. The seven named Nakshatras are not unconditionally rejected. Whitewashing, dismantling, new construction and moving/re-entry are separate scopes; engineering, permits and worksite safety take precedence.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
       "id": "muhurta.house_purchase.completed",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

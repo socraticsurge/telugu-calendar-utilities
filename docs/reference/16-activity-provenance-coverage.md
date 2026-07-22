@@ -17,6 +17,7 @@ python tools/check_activity_provenance.py
 |---|---|---|---|
 | `bhumi_puja` | Bhumi Puja / foundation laying | `muhurta.bhumi_puja.foundation` | Verified rule-level profile |
 | `well_digging` | Well digging | `muhurta.well_digging` | Verified rule-level profile |
+| `home_repair` | Home repair / renovation commencement | `muhurta.home_repair.commencement` | Verified weekday profile; conditional chart rules remain manual |
 | `property` | Land purchase for building | `muhurta.land_purchase.building` | Verified rule-level profile |
 | `house_purchase` | Purchase of a completed new or old house | `muhurta.house_purchase.completed` | Verified house-specific profile; chart conditions remain manual |
 | `naming` | Naming ceremony (Namakarana) | `muhurta.namakarana` | Verified rule-level profile |
@@ -48,7 +49,7 @@ python tools/check_activity_provenance.py
 | `beginning` | New beginning (general) | `muhurta.beginning.profile_conflict` | **Contradicted:** nearest Dharma-kriya verse is narrower and does not support generic ranking proxies |
 | `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
-Coverage is therefore **20 of 32 profiles**. The verified profiles use
+Coverage is therefore **21 of 33 profiles**. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
 printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
 not scripture; this

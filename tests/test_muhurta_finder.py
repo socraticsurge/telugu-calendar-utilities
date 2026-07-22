@@ -185,9 +185,9 @@ def test_invalid_activity_raises():
 
 # --- Activity taxonomy (Batch D) ---
 
-def test_all_32_activities_callable():
+def test_all_33_activities_callable():
     from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
-    assert len(ACTIVITIES) == 32
+    assert len(ACTIVITIES) == 33
     # backward-compat: every old key must still be accepted
     for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
         assert old in ACTIVITY_RULES

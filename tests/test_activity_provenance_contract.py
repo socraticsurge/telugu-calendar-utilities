@@ -25,6 +25,7 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'property': 'muhurta.land_purchase.building',
         'house_purchase': 'muhurta.house_purchase.completed',
         'bhumi_puja': 'muhurta.bhumi_puja.foundation',
+        'home_repair': 'muhurta.home_repair.commencement',
         'construction_roof': 'muhurta.construction_roof',
         'coronation': 'muhurta.coronation',
         'wood_cutting': 'muhurta.wood_cutting',

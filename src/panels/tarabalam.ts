@@ -1212,6 +1212,7 @@ const MU_ACT_LABEL = {
   gold: 'a gold / jewelry purchase',
   bhumi_puja: 'bhumi puja (foundation laying)',
   well_digging: 'well digging',
+  home_repair: 'a home repair / renovation start',
   business: 'a business launch', job: 'a job start / contract',
   yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
   court: 'a court / legal matter', surgery: 'a surgery / medical procedure',

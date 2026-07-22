@@ -41,12 +41,12 @@
       "key": "home_repair",
       "label": "Home repair or renovation commencement",
       "priority": "P0",
-      "disposition": "missing_candidate",
-      "reason": "Common household work has its own passage and is not foundation laying, roof laying or Gruhapravesha.",
+      "disposition": "implemented_verified",
+      "reason": "Implemented from its dedicated passage without conflating foundation laying, roof laying or Gruhapravesha.",
       "source_candidates": [
         {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XII, 'Repairing houses,' printed pp. 53-54 (PDF pp. 57-58)"}
       ],
-      "boundary": "Separate structural repair commencement from painting/whitewashing and from re-entry after works."
+      "boundary": "The implementation separates repair commencement from painting/whitewashing, dismantling and re-entry after works."
     },
     {
       "key": "business_inventory_purchase",
