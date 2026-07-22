@@ -278,7 +278,7 @@
       "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
-      "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or the manual alternative of Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; and separation of the Lagna and 6th lords. The passage says to avoid the usual unfavorable lunar days without repeating them; automation transparently resolves that phrase to Raman's recurring explicit list in the same edition: Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The separate Litigation / contest activity retains its own contradicted audit claim.",
+      "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or the manual alternative of Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; and separation of the Lagna and 6th lords. The passage says to avoid the usual unfavorable lunar days without repeating them; automation transparently resolves that phrase to Raman's recurring explicit list in the same edition: Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The legacy litigation API key resolves explicitly to this profile and is not a separate election.",
       "last_reviewed": "2026-07-22"
     },
     {
@@ -289,7 +289,18 @@
       "verification_state": "contradicted",
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
-      "scope": "The configured Litigation / contest profile prefers Mangalavaram, while Raman explicitly directs that Tuesday and Saturday be avoided for filing lawsuits. Its Jaya-family reward and Purna-family penalty are not authorized by this passage, and the ten admitted Nakshatras and election-chart requirements are absent. The separate Bhadra Puchha bonus is attributed in code to Muhurta Chintamani and Dharma Sindhu, but those attributions still lack edition-specific verse or page locators and do not cure the weekday contradiction. This audit claim records the conflict and must not be presented as verification.",
+      "scope": "Historical audit of the removed standalone Litigation / contest profile. It preferred Mangalavaram although Raman rejects Tuesday and Saturday for filing lawsuits, added unsupported Jaya/Purna family scoring, and attached an activity-specific Bhadra Puchha bonus without a located passage. The public litigation key is now only a compatibility alias for the corrected, narrowly scoped court filing profile; this contradicted claim is retained as the correction record, not as an active activity claim.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "panchangam.bhadra_mukha_puchha.approximation",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/karana_windows.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Shubhashubha-prakarana, verses 43-45, printed pp. 20-21 (Internet Archive OCR lines 1743-1797)",
+      "scope": "Verse 44 places five-Ghati Bhadra Mukha and three-Ghati Puchha windows in Tithi-specific numbered Yamas for the eight Vishti-bearing Tithis. The implementation instead scales every observed Vishti span proportionally as 5:8:3. It preserves the broad face/body/tail ordering but does not reproduce the text's Tithi-specific clock positions and must be presented as an approximation until a dedicated shared-computation correction is approved and verified.",
       "last_reviewed": "2026-07-22"
     },
     {

@@ -951,21 +951,6 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'and personal safety always take precedence over '
                           'electional timing.',
                       ]},
-    'litigation':    {'label': 'Litigation / contest',
-                      'audit_claim': 'muhurta.litigation.profile_conflict',
-                      'prefer_tithi_class': 'Jaya',
-                      'avoid_tithi_class': ['Purna'],
-                      'prefer_vara': ['Mangalavaram'],
-                      'prefer_bhadra_puchha': 2,
-                      'manual_checks': [
-                          'Known source mismatch: this profile rewards '
-                          'Tuesday, but Raman rejects Tuesday and Saturday '
-                          'for filing lawsuits; verify the exact Nakshatra '
-                          'and weekday gates before acting.',
-                          'The Bhadra Puchha contest bonus is attributed to '
-                          'Muhurta Chintamani and Dharma Sindhu but still '
-                          'needs an edition-specific verse/page locator.',
-                      ]},
     'surgery':       {'label': 'Surgery / medical procedure',
                       'source_claim': 'muhurta.surgery',
                       'avoid_karana': ['Vishti'],
@@ -1073,4 +1058,20 @@ ACTIVITY_RULES: dict[str, dict] = {
                           ]},
 }
 
-ACTIVITIES = tuple(ACTIVITY_RULES.keys())
+# Backward-compatible API names which do not represent distinct elections.
+# Keep these outside ACTIVITY_RULES so provenance coverage counts real profiles
+# rather than aliases, and always resolve them before reading configuration.
+ACTIVITY_ALIASES = {'litigation': 'court'}
+
+
+def resolve_activity(activity: str) -> str:
+    """Return the canonical activity key for a public key or legacy alias."""
+    return ACTIVITY_ALIASES.get(activity, activity)
+
+
+def get_activity_rules(activity: str) -> dict:
+    """Return canonical rules while preserving compatibility aliases."""
+    return ACTIVITY_RULES[resolve_activity(activity)]
+
+
+ACTIVITIES = tuple(ACTIVITY_RULES.keys()) + tuple(ACTIVITY_ALIASES.keys())

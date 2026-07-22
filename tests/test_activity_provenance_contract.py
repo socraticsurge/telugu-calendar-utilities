@@ -67,10 +67,6 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
             'claim': 'muhurta.job_contract.profile_conflict',
             'state': 'contradicted',
         },
-        'litigation': {
-            'claim': 'muhurta.litigation.profile_conflict',
-            'state': 'contradicted',
-        },
         'yajna': {
             'claim': 'muhurta.yajna.profile_conflict',
             'state': 'contradicted',
@@ -91,7 +87,6 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
     assert 'engagement' not in result['needs_rule_locators']
     assert 'gruhapravesha' not in result['needs_rule_locators']
     assert 'job' not in result['needs_rule_locators']
-    assert 'litigation' not in result['needs_rule_locators']
     assert 'wedding' not in result['needs_rule_locators']
     assert 'yajna' not in result['needs_rule_locators']
 

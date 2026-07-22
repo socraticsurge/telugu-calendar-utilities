@@ -13,6 +13,7 @@ from telugu_panchangam.personal.activity_rules import (
     ACTIVITY_RULES,
     ACTIVITIES,
     canonical_activity_nakshatras,
+    get_activity_rules,
 )
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.lagna_position import lagna_class_of, lagnas_in_class
@@ -286,7 +287,8 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
     Returns a string (the reason) or None when the day is not filtered.
     Used by MCP find_muhurta to populate dropped_days[].
     """
-    rules = ACTIVITY_RULES.get(activity, ACTIVITY_RULES['any'])
+    rules = (get_activity_rules(activity)
+             if activity in ACTIVITIES else ACTIVITY_RULES['any'])
     return _day_skip_reason(day, rules, activity, travel_direction,
                             janma_rasis, chandra_mode)
 
@@ -606,7 +608,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
             raise ValueError('janma_rasis must align with janma_nakshatras '
                              '(use None for people whose rashi is unknown).')
 
-    rules = ACTIVITY_RULES[activity]
+    rules = get_activity_rules(activity)
     reason = _day_skip_reason(day, rules, activity, travel_direction,
                               janma_rasis, chandra_mode)
     if reason is not None:
@@ -763,7 +765,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         if blocked is not None and travel_direction == blocked:
             return []
 
-    rules = ACTIVITY_RULES[activity]
+    rules = get_activity_rules(activity)
     if rules.get('daytime_only') or rules.get('forenoon_only'):
         return []
 

@@ -58,7 +58,7 @@ def test_claim_has_exact_locator_scope_and_tithi_disclosure():
     assert 'printed p. 67' in claim['locator']
     assert 'recurring explicit list in the same edition' in claim['scope']
     assert 'filing or initiating a lawsuit' in claim['scope']
-    assert 'Litigation / contest activity retains' in claim['scope']
+    assert 'legacy litigation API key resolves explicitly' in claim['scope']
 
 
 def test_mcp_and_browser_expose_the_same_verified_profile():

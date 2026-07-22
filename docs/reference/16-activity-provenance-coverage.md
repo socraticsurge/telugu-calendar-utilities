@@ -43,7 +43,7 @@ python tools/check_activity_provenance.py
 | `engagement` | Engagement (Nischayam) | `muhurta.engagement.profile_conflict` | **Contradicted:** no dedicated passage found; nearest marriage rules conflict with copied scoring |
 | `gruhapravesha` | First entry into a newly built home | `muhurta.gruhapravesha` | Verified Raman-lineage profile; exact day/anga/Lagna gates and published-practice divergence disclosed |
 | `court` | Filing a lawsuit / court action | `muhurta.court.filing_lawsuit` | Verified Raman-lineage filing profile; exact weekday, Tithi, Nakshatra and conservative Lagna gates, with chart prerequisites disclosed |
-| `litigation` | Litigation / contest | `muhurta.litigation.profile_conflict` | **Contradicted:** repeats the Tuesday reversal; Bhadra Puchha attribution lacks an exact locator |
+| `litigation` | Legacy API alias for lawsuit filing | Alias of `court` | Compatibility name only; resolves to the verified filing profile and is not counted as a distinct election |
 | `cremation` | Cremation rites | `muhurta.cremation.profile_conflict` | **Contradicted:** whole-Dhanishtha block overstates the cited 4½-Nakshatra Panchaka |
 | `yajna` | Yajna / Homam | `muhurta.yajna.profile_conflict` | **Contradicted:** family scoring omits and conflicts with Homahuti/Agnivasa formulas |
 | `job` | Job start / Contract signing | `muhurta.job_contract.profile_conflict` | **Contradicted:** combines distinct service-entry and contract scopes under unsupported proxies |
@@ -52,14 +52,15 @@ python tools/check_activity_provenance.py
 | `beginning` | New beginning (general) | `muhurta.beginning.profile_conflict` | **Contradicted:** nearest Dharma-kriya verse is narrower and does not support generic ranking proxies |
 | `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
-Coverage is therefore **27 of 36 profiles**. The verified profiles use
+Coverage is therefore **27 of 35 distinct profiles**, plus one compatibility
+alias. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
 printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
 not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
 
-Engagement, Litigation, Cremation, Yajna,
+Engagement, Cremation, Yajna,
 Job/Contract, Business, Ceremony and New Beginning are excluded from the
 verified count. Their
 `audit_claim` fields record known source conflicts without granting authority

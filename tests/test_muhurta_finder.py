@@ -187,6 +187,7 @@ def test_invalid_activity_raises():
 
 def test_all_36_activities_callable():
     from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
+    from telugu_panchangam.personal.activity_rules import ACTIVITY_ALIASES
     assert len(ACTIVITIES) == 36
     # backward-compat: every old key must still be accepted
     for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
@@ -195,9 +196,10 @@ def test_all_36_activities_callable():
     for new in ('wedding', 'gruhapravesha', 'naming', 'annaprasana',
                 'karnavedha', 'mundana', 'upanayana', 'vidyarambha',
                 'engagement', 'vehicle', 'property', 'gold', 'bhumi_puja',
-                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery',
-                'litigation'):
+                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery'):
         assert new in ACTIVITY_RULES
+    assert ACTIVITY_ALIASES['litigation'] == 'court'
+    assert 'litigation' in ACTIVITIES
     # Task 15: Nakshatra Mukha activities
     for mukha_act in ('well_digging', 'coronation'):
         assert mukha_act in ACTIVITY_RULES
@@ -321,10 +323,10 @@ def test_rikta_tithi_universal_penalty():
                for s in slots for r in s['reasons'])
 
 
-def test_rikta_penalty_applies_to_litigation_activity():
-    # Same Rikta day, with a soft-scored activity — penalty still appears.
+def test_rikta_penalty_applies_to_generic_activity():
+    # Same Rikta day, with the generic explorer — penalty still appears.
     day = _day(2026, 6, 23)
-    slots = day_slots(day, activity='litigation')
+    slots = day_slots(day, activity='any')
     assert any('Rikta tithi' in r and '(-2)' in r
                for s in slots for r in s['reasons'])
 
@@ -918,17 +920,10 @@ def test_shukla_tritiya_admitted_for_wedding_without_jaya_penalty():
         assert not any('Jaya' in r for r in act_reasons)
 
 
-def test_purna_tithi_penalised_for_litigation_integration():
-    # 2026-07-05 = Krishna Panchami (Purna tithi). Litigation should -1 avoid.
-    from telugu_panchangam.personal.tithi_class import tithi_family
-    day = _day(2026, 7, 5)
-    assert tithi_family(day.tithi.name) == 'Purna', f'fixture: expected Purna, got {day.tithi.name}'
-    slots = day_slots(day, activity='litigation')
-    assert slots, 'expected litigation slots'
-    for s in slots:
-        act_reasons = s['reason_groups']['activity_match']
-        assert any('inauspicious' in r and 'Purna' in r for r in act_reasons), \
-            f'slot {s["start"]}: expected Purna inauspicious reason, got {act_reasons}'
+def test_litigation_alias_matches_court_results():
+    day = _day(2026, 4, 20)
+    assert day_slots(day, activity='litigation') == \
+        day_slots(day, activity='court')
 
 
 def test_tithi_class_scorer_still_supports_preferred_class():

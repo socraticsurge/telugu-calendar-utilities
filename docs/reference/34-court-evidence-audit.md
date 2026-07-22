@@ -37,6 +37,5 @@ Legal deadlines, court rules, counsel, evidence and personal safety always
 take precedence over electional timing. A Muhurtam cannot predict or guarantee
 a legal outcome.
 
-The separate internal `litigation` activity is broader and retains the
-contradicted claim `muhurta.litigation.profile_conflict`. It does not inherit
-this narrow filing claim.
+The legacy internal `litigation` key is now an explicit compatibility alias for
+this narrow filing profile. It does not represent a broader election.

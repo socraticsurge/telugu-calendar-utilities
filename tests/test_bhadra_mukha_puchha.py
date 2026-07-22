@@ -58,13 +58,8 @@ def test_mukha_5_16_puchha_3_16_proportional():
     # If we couldn't find a clean case, that's OK — the rule still holds in theory.
 
 
-def test_litigation_activity_gets_puchha_bonus():
-    """A slot overlapping day.bhadra_puchha must score +2 for 'litigation' activity.
-
-    We scan for a day where a good choghadiya block actually overlaps the Puchha
-    window (not every Puchha day has a good block in that range), then assert the
-    scoring path emits the 'Bhadra Puchha' bonus reason.
-    """
+def test_litigation_alias_does_not_turn_approximate_puchha_into_legal_bonus():
+    """The compatibility alias must use Court rules without a Puchha score."""
     from datetime import timedelta
     from telugu_panchangam.personal.muhurta import day_slots, GOOD_CHOGHADIYA
 
@@ -87,17 +82,11 @@ def test_litigation_activity_gets_puchha_bonus():
         if not has_overlap:
             continue
         slots = day_slots(day, activity='litigation')
-        bonus_slots = [
-            s for s in slots
-            if any('Bhadra Puchha' in r for r in s.get('reasons', []))
-        ]
-        assert len(bonus_slots) > 0, (
-            f"Expected at least one slot with 'Bhadra Puchha' bonus reason "
-            f"for litigation activity on {target} (puchha={p.start.time()}–"
-            f"{p.end.time()}); got {len(slots)} slots, none with Puchha bonus. "
-            f"Reasons across slots: {[s.get('reasons', []) for s in slots[:3]]}"
+        assert not any(
+            'Bhadra Puchha' in reason
+            for slot in slots for reason in slot.get('reasons', [])
         )
-        return  # one passing day is enough
+        return
 
     # If no qualifying day was found, skip rather than fail.
     import pytest
