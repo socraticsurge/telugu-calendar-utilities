@@ -1,8 +1,8 @@
 # Gochara verdicts from Janma Rasi. Brihat Samhita 104.4 supplies the
 # favourable houses for the seven classical Grahas. Phaladeepika 26.3-8
-# supplies the Vedha mappings and exemptions. Node treatment and named Shani
-# conditions are separate configured traditions. The node houses have a known
-# conflict with Phaladeepika 26.2. Named-Shani houses are partially verified;
+# supplies the Vedha mappings and exemptions. Phaladeepika 26.2 directs that
+# Rahu and Ketu use Surya's favourable houses; their no-Vedha handling remains
+# a separate conservative policy. Named-Shani houses are partially verified;
 # their grouping names, phase labels and advice remain conventional presentation.
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 
@@ -21,8 +21,8 @@ GOCHARA_FAVOURABLE: dict[str, frozenset[int]] = {
     'Guru':    frozenset({2, 5, 7, 9, 11}),
     'Shukra':  frozenset({1, 2, 3, 4, 5, 8, 9, 11, 12}),
     'Shani':   frozenset({3, 6, 11}),
-    'Rahu':    frozenset({3, 6, 11}),
-    'Ketu':    frozenset({3, 6, 11}),
+    'Rahu':    frozenset({3, 6, 10, 11}),
+    'Ketu':    frozenset({3, 6, 10, 11}),
 }
 
 # Favourable house -> obstruction house, verified against Phaladeepika 26.3-8

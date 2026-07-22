@@ -166,10 +166,10 @@
       "surface": "daily_horoscope",
       "implementation": "telugu_panchangam/gochara/rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["PD-SASTRI-1942"],
       "locator": "Phaladeepika, Adhyaya XXVI, sloka 2 (printed p. 286), especially the concluding direction that Rahu and Ketu are similar to Surya",
-      "scope": "The implementation gives Rahu and Ketu Shani's favourable houses (3, 6 and 11) and therefore marks the 10th adverse. Phaladeepika 26.2 directs that both nodes be treated like Surya, whose favourable set is 3, 6, 10 and 11. This directly contradicts the implemented favourable-house set. The passage does not establish whether nodes cause or receive Vedha, so the separate no-Vedha policy remains unverified rather than contradicted by this locator.",
+      "scope": "Implements Phaladeepika 26.2's direction to treat Rahu and Ketu like Surya by admitting houses 3, 6, 10 and 11 from Janma Chandra. The passage does not establish whether nodes cause or receive Vedha, so the separate no-node-Vedha policy remains an explicitly unverified conservative boundary and does not inherit authority from this locator.",
       "last_reviewed": "2026-07-21"
     },
     {

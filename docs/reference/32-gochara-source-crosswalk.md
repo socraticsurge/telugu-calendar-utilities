@@ -43,21 +43,15 @@ The ledger claim is `gochara.vedha_tables`. This verification stops at the
 seven classical Grahas; it does not silently authorize the project's node
 policy.
 
-## Known node conflict
+## Verified node houses
 
 *Phaladeepika* XXVI.2 concludes that Rahu and Ketu are to be treated like
-Surya. That makes houses 3, 6, 10 and 11 favourable. The implementation instead
-copies Shani's set, 3, 6 and 11, so it incorrectly marks a node in the 10th as
-adverse under this cited authority. The `gochara.nodes` claim is therefore
-`contradicted`, not merely unsupported.
+Surya. The implementation therefore uses houses 3, 6, 10 and 11 for both
+nodes. The `gochara.nodes` claim is verified for this favourable-house layer.
 
 This locator does not say whether Rahu or Ketu causes or receives Vedha. The
-current no-node-Vedha behavior remains an unverified sub-rule and must not be
-presented as disproven by XXVI.2.
-
-Changing the node calculation would alter an existing tested assertion. Under
-the frozen-contract working agreement, this audit records the conflict and
-leaves behavior unchanged pending explicit owner approval.
+current no-node-Vedha behavior remains an unverified conservative sub-rule and
+does not inherit the authority of XXVI.2.
 
 ## Partially verified named-Shani layer
 
@@ -101,7 +95,7 @@ or imply that verified Vedha evidence also settles the two open layers.
 
 ## Engineering consequence
 
-No calculation changed in this audit. Exact table tests bind the classical
+Exact table tests bind the classical
 source crosswalk to the implementation, while each adjacent conventional layer
 retains its own status and can be promoted without rewriting the calculation
 contract.

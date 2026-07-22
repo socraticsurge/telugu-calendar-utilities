@@ -19,8 +19,8 @@ def test_favourable_houses_classical():
     assert GOCHARA_FAVOURABLE['Shani'] == frozenset({3, 6, 11})
     # Known conflict: Phaladeepika 26.2 says nodes follow Surya and include 10.
     # Preserve current behavior until the owner approves changing this contract.
-    assert GOCHARA_FAVOURABLE['Rahu'] == frozenset({3, 6, 11})
-    assert GOCHARA_FAVOURABLE['Ketu'] == frozenset({3, 6, 11})
+    assert GOCHARA_FAVOURABLE['Rahu'] == frozenset({3, 6, 10, 11})
+    assert GOCHARA_FAVOURABLE['Ketu'] == frozenset({3, 6, 10, 11})
 
 
 def test_gochara_layers_have_distinct_provenance_claims():
@@ -50,16 +50,15 @@ def test_vedha_pairs_match_phaladeepika_26_3_to_8():
     }
 
 
-def test_known_node_tenth_house_conflict_is_regression_visible():
-    # Current behavior is deliberately pinned, not endorsed: Phaladeepika 26.2
-    # treats both nodes like Surya, for whom the 10th is favourable.
+def test_nodes_follow_surya_in_the_tenth_house():
+    # Phaladeepika 26.2 treats both nodes like Surya.
     verdicts = {
         item['graha']: item
         for item in gochara_for('Mesha', {'Rahu': 'Makara', 'Ketu': 'Makara'})
     }
     assert verdicts['Rahu']['position'] == 10
-    assert verdicts['Rahu']['verdict'] == 'adverse'
-    assert verdicts['Ketu']['verdict'] == 'adverse'
+    assert verdicts['Rahu']['verdict'] == 'favourable'
+    assert verdicts['Ketu']['verdict'] == 'favourable'
 
 
 # --- Verdicts for a fixed sky (Jun 11 2026 sunrise, DP-verified rasis):
