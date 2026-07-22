@@ -4,12 +4,11 @@ Vishaghati ("poison ghatika") — a short window inside each nakshatra's
 transit classically considered inauspicious for muhurta. Offsets per
 Muhurta Chintamani; width 4 vighatis.
 
-Bhadra Mukha / Puchha — sub-windows of Vishti karana (Bhadra). The
-classical 5:8:3 split across the full Vishti span:
-  Mukha  (first 5/16)  — most inauspicious; hard-cut from muhurta slots
-  Body   (middle 8/16) — ordinary avoidance (already handled by Vishti karana)
-  Puchha (last 3/16)   — auspicious for warfare, lawsuits, contests
-Sources: Muhurta Chintamani, Dharma Sindhu.
+Bhadra Mukha / Puchha — Tithi-specific sub-windows of Vishti Karana (Bhadra),
+implementing Muhurta Chintamani 44. Vishti is divided into four quarters;
+Mukha occupies the first five nominal Ghatis of its Tithi-assigned quarter and
+Puchha the final three nominal Ghatis of its assigned quarter. The nominal
+thirty-Ghati Vishti measure is scaled to the observed Karana duration.
 """
 from datetime import timedelta
 from telugu_panchangam.models.panchangam_day import Span, GhatiWindow, GhatiClock
@@ -69,12 +68,26 @@ def compute_vishaghati(
     return windows
 
 
+_BHADRA_QUARTERS = {
+    'Shukla Chaturthi': (1, 4),
+    'Shukla Ashtami': (2, 1),
+    'Shukla Ekadashi': (3, 2),
+    'Pournami': (4, 3),
+    'Krishna Tritiya': (4, 3),
+    'Krishna Saptami': (3, 2),
+    'Krishna Dashami': (2, 1),
+    'Krishna Chaturdashi': (1, 4),
+}
+
+
 def compute_bhadra_windows(
-    karana_spans: list[Span], clk: GhatiClock,
+    karana_spans: list[Span], clk: GhatiClock, *, tithi_at,
 ) -> tuple[GhatiWindow | None, GhatiWindow | None]:
-    """Locate Vishti karana in the day's karana list; split into Mukha
-    (first 5/16, hard-avoid) and Puchha (last 3/16, auspicious for
-    contests/litigation). The middle 8/16 is the "body" with no special status.
+    """Return the verse-44 Mukha and Puchha of the day's Vishti span.
+
+    ``tithi_at`` supplies the active Tithi name at a datetime. The Tithi
+    selects the Mukha/Puchha quarter; five and three nominal Ghatis are scaled
+    against the observed duration of the nominal thirty-Ghati Vishti.
     Returns (mukha, puchha) — either can be None when the corresponding
     sub-window is fully outside the panchangam day.
     """
@@ -84,11 +97,17 @@ def compute_bhadra_windows(
     total_s = (vishti.end - vishti.start).total_seconds()
     if total_s <= 0:
         return (None, None)
-    # 5:8:3 split across the full Vishti span.
-    mukha_start = vishti.start
-    mukha_end = vishti.start + timedelta(seconds=total_s * 5 / 16)
-    puchha_start = vishti.start + timedelta(seconds=total_s * 13 / 16)
-    puchha_end = vishti.end
+    midpoint = vishti.start + (vishti.end - vishti.start) / 2
+    tithi_name = tithi_at(midpoint)
+    quarters = _BHADRA_QUARTERS.get(tithi_name)
+    if quarters is None:
+        return (None, None)
+    mukha_quarter, puchha_quarter = quarters
+    quarter_s = total_s / 4
+    mukha_start = vishti.start + timedelta(seconds=quarter_s * (mukha_quarter - 1))
+    mukha_end = mukha_start + timedelta(seconds=total_s * 5 / 30)
+    puchha_end = vishti.start + timedelta(seconds=quarter_s * puchha_quarter)
+    puchha_start = puchha_end - timedelta(seconds=total_s * 3 / 30)
 
     def _clip(name: str, s, e) -> GhatiWindow | None:
         if e <= clk.sunrise or s >= clk.next_sunrise:

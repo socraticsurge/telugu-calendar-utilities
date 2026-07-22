@@ -1,0 +1,101 @@
+# Gochara Source Crosswalk
+
+## Verified layer
+
+The seven classical Grahas' favourable transit houses are verified against
+Varahamihira's *Brihat Samhita*, Chapter 104, stanza 4, in the N. Chidambaram
+Iyer translation (1884). The stanza lists each Graha's favourable houses from
+Janma Chandra and concludes that every Graha is favourable in the 11th.
+
+| Graha | Implemented favourable houses | How stanza 4 supports the set |
+|---|---|---|
+| Surya | 3, 6, 10, 11 | 3, 6 and 10 listed; 11 supplied by the concluding rule |
+| Chandra | 1, 3, 6, 7, 10, 11 | 1, 3, 6, 7 and 10 listed; 11 supplied by the concluding rule |
+| Mangala | 3, 6, 11 | 3 and 6 listed; 11 supplied by the concluding rule |
+| Budha | 2, 4, 6, 8, 10, 11 | 2, 4, 6, 8 and 10 listed; 11 supplied by the concluding rule |
+| Guru | 2, 5, 7, 9, 11 | 2, 5, 7 and 9 listed; 11 supplied by the concluding rule |
+| Shukra | 1, 2, 3, 4, 5, 8, 9, 11, 12 | 6, 7 and 10 called malefic; 11 supplied by the concluding rule |
+| Shani | 3, 6, 11 | 3 and 6 listed; 11 supplied by the concluding rule |
+
+The ledger claim is `gochara.favourable_houses`. This verifies the table, not
+every interpretive sentence produced from it.
+
+## Verified Vedha layer
+
+Mantreswara's *Phaladeepika*, Adhyaya XXVI, slokas 3–8, states the favourable
+houses and their corresponding Vedha houses planet by planet. The same passage
+explicitly exempts Shani from obstructing Surya, Surya from obstructing Shani,
+Budha from obstructing Chandra, and Chandra from obstructing Budha. The
+consolidated table and father–son explanation also appear in *Jataka Parijata*,
+Volume III, Adhyaya XIII, note to sloka 60, printed pages 833–834.
+
+| Graha | Implemented favourable → Vedha pairs | Phaladeepika locator |
+|---|---|---|
+| Surya | 3→9, 6→12, 10→4, 11→5 | XXVI.3 |
+| Chandra | 1→5, 3→9, 6→12, 7→2, 10→4, 11→8 | XXVI.4 |
+| Kuja | 3→12, 6→9, 11→5 | XXVI.5 |
+| Budha | 2→5, 4→3, 6→9, 8→1, 10→8, 11→12 | XXVI.6 |
+| Guru | 2→12, 5→4, 7→3, 9→10, 11→8 | XXVI.7 |
+| Shukra | 1→8, 2→7, 3→1, 4→10, 5→9, 8→5, 9→11, 11→6, 12→3 | XXVI.8 |
+| Shani | 3→12, 6→9, 11→5 | XXVI.5 |
+
+The ledger claim is `gochara.vedha_tables`. This verification stops at the
+seven classical Grahas; it does not silently authorize the project's node
+policy.
+
+## Verified node houses
+
+*Phaladeepika* XXVI.2 concludes that Rahu and Ketu are to be treated like
+Surya. The implementation therefore uses houses 3, 6, 10 and 11 for both
+nodes. The `gochara.nodes` claim is verified for this favourable-house layer.
+
+This locator does not say whether Rahu or Ketu causes or receives Vedha. The
+current no-node-Vedha behavior remains an unverified conservative sub-rule and
+does not inherit the authority of XXVI.2.
+
+## Partially verified named-Shani layer
+
+| Layer | Claim | State | Boundary |
+|---|---|---|---|
+| Named Shani conditions | `gochara.named_shani_conditions` | `partially_verified` | Phaladeepika XXVI.1 establishes Janma Chandra as the reference; XXVI.22–23 describes adverse effects in houses 1, 2, 4, 8 and 12. It does not supply the configured grouping, names, phase labels or advice. |
+
+This distinction corrects a former frontend error: when users supplied both a
+Moon sign and lagna, the browser generated named Shani flags independently from
+both. Named conditions are now calculated only from the Moon sign. Lagna remains
+available as a secondary lens for ordinary house-by-house gochara verdicts.
+
+The terms “Sade Sati,” “Ashtama Shani,” and “Ardhastama Shani” remain useful
+conventional shorthand, but the product does not call them verbatim classical
+labels. Likewise, “rising,” “peak,” and “setting” are presentation labels rather
+than claims found in the cited slokas.
+
+## Generated interpretation boundary
+
+The website may publish a daily LLM-written interpretation above the computed
+fallback reading. Its `transits_cited` graha, house and verdict triples are
+checked against the engine. That check does not prove every prose sentence or
+piece of advice. Those fields carry the separate
+`daily_horoscope.llm_interpretation` heuristic claim and must not inherit the
+textual authority of the transit table.
+
+The 2026-07-21 published artifact demonstrated the boundary failure that this
+contract fixes: while its declared transit triples were accepted, uncited prose
+introduced a late-afternoon contract window, a 48-hour decision delay, and
+claims about investment returns, health and intraday clarity. None of those
+facts existed in the generator input.
+
+Generation now fails closed on duplicate or missing rashis, empty citations,
+cited Grahas absent from the prose, precise intraday/waiting-period claims, and
+selected medical, legal, investment or contract directives. These controls
+reduce unsupported output; they are not represented as semantic proof.
+
+The MCP response publishes all four claim IDs and explains the split. Product
+copy must not describe the entire verdict system as “the Brihat Samhita table,”
+or imply that verified Vedha evidence also settles the two open layers.
+
+## Engineering consequence
+
+Exact table tests bind the classical
+source crosswalk to the implementation, while each adjacent conventional layer
+retains its own status and can be promoted without rewriting the calculation
+contract.

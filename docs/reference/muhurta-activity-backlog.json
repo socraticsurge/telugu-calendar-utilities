@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "last_reviewed": "2026-07-22",
+  "status_note": "Candidate locators are discovery evidence only. A new activity is not verified until its rules are crosswalked, implemented, tested and assigned a verified provenance claim.",
+  "items": [
+    {
+      "key": "gruhapravesha",
+      "label": "Gruhapravesha (first entry into a newly built home)",
+      "priority": "P0",
+      "disposition": "implemented_verified",
+      "reason": "Corrected from a conflicting soft profile to Raman's exact first-entry gates, with chart and ritual prerequisites visible and the current Drik Panchang divergence disclosed.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XII, 'Entering a new house,' printed pp. 52-53 (PDF pp. 56-57)"}
+      ],
+      "boundary": "The implementation keeps first occupation of a newly built home separate from buying a completed house, moving between rentals and re-entry after renovation; medical and ritual prerequisites remain manual."
+    },
+    {
+      "key": "seemantha",
+      "label": "Seemantha (prenatal ceremony)",
+      "priority": "P0",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a source-verified additive profile with conservative chart gates and explicit pregnancy/medical boundaries.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)"},
+        {"source_id": "MC-HINDI-IA", "locator": "Samskara-prakarana, 'Seemantonnayana Muhurta,' verse 8, printed p. 77 (OCR lines 4157-4180)"}
+      ],
+      "boundary": "Raman gives the 5th/7th pregnancy month while Muhurta Chintamani gives the 6th/8th; disclose the lineage choice. Medical care always takes precedence."
+    },
+    {
+      "key": "house_purchase",
+      "label": "Purchase of a completed house",
+      "priority": "P0",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a dedicated source-verified profile; the existing Property profile remains explicitly land-for-building.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XII, 'Buying houses,' printed p. 53 (PDF p. 57)"}
+      ],
+      "boundary": "The implementation does not reuse the land-purchase profile; the source's distinct Tithi, weekday, Nakshatra and preferred-Lagna formula is preserved."
+    },
+    {
+      "key": "home_repair",
+      "label": "Home repair or renovation commencement",
+      "priority": "P0",
+      "disposition": "implemented_verified",
+      "reason": "Implemented from its dedicated passage without conflating foundation laying, roof laying or Gruhapravesha.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XII, 'Repairing houses,' printed pp. 53-54 (PDF pp. 57-58)"}
+      ],
+      "boundary": "The implementation separates repair commencement from painting/whitewashing, dismantling and re-entry after works."
+    },
+    {
+      "key": "business_inventory_purchase",
+      "label": "Buying inventory for trade",
+      "priority": "P1",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a precise buyer-side commercial act, distinct from the overbroad Business launch profile.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter X, 'Buying for business,' printed p. 45 (PDF p. 49)"}
+      ],
+      "boundary": "The implementation is distinct from founding an enterprise, deploying capital, selling inventory and ordinary consumer purchase."
+    },
+    {
+      "key": "borrowing_money",
+      "label": "Borrowing money",
+      "priority": "P1",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a debtor-side profile distinct from lending, with the Chintamani divergence disclosed.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter X, 'Borrowing money,' printed p. 45 (PDF p. 49)"},
+        {"source_id": "MC-HINDI-IA", "locator": "Nakshatra-prakarana, Dravyaprayoga and debt-taking, verse 27, printed pp. 38-39"}
+      ],
+      "boundary": "The implementation states that repayment capacity, borrowing cost, collateral, lender terms and qualified advice govern the decision."
+    },
+    {
+      "key": "lending_money",
+      "label": "Lending money",
+      "priority": "P1",
+      "disposition": "implemented_verified",
+      "reason": "Implemented as a creditor-side Raman profile distinct from borrowing; the current Drik Panchang Wednesday divergence is disclosed.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter X, 'Lending money,' printed p. 45 (PDF p. 49)"}
+      ],
+      "boundary": "The implementation states that creditworthiness, repayment probability, enforceability, legal compliance and investment safety cannot be inferred from Muhurtam."
+    },
+    {
+      "key": "deity_installation",
+      "label": "Deity installation (Prana Pratishtha)",
+      "priority": "P1",
+      "disposition": "specialist_candidate",
+      "reason": "The activity is culturally important, but the inspected secondary source expressly directs readers to specialist authorities.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XVI, 'Installing a deity,' printed pp. 66-67 (PDF pp. 70-71)"},
+        {"source_id": "MC-HINDI-IA", "locator": "Nakshatra-prakarana, reservoir and deity installation, printed p. 52"}
+      ],
+      "boundary": "Do not automate as a complete election from the summary passage; require specialist chart and ritual review."
+    },
+    {
+      "key": "garbhadhana",
+      "label": "Garbhadhana (conception rite)",
+      "priority": "P2",
+      "disposition": "sensitive_candidate",
+      "reason": "A major samskara is missing, but health, consent and fertility claims require careful modern framing.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter VII, Nisheka and Garbhadana, printed pp. 16-17 (PDF pp. 20-21)"}
+      ],
+      "boundary": "Never imply conception, fetal health or sex outcomes; consent and medical guidance are non-negotiable."
+    },
+    {
+      "key": "pumsavana",
+      "label": "Pumsavana ceremony",
+      "priority": "P3",
+      "disposition": "policy_hold",
+      "reason": "The source frames the rite around fetal sex selection, creating a serious ethical and product-safety problem.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter VII, 'Pumsavana,' printed pp. 17-20 (PDF pp. 21-24)"}
+      ],
+      "boundary": "Do not implement unless the owner adopts a culturally sensitive, legally reviewed framing that rejects sex-selection and medical-efficacy claims."
+    },
+    {
+      "key": "agriculture_start",
+      "label": "Agricultural operation commencement",
+      "priority": "P2",
+      "disposition": "split_required",
+      "reason": "Both sources contain extensive agricultural elections, but ploughing, sowing, planting, pruning, reaping and storage have different rules.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XIII, 'Agriculture and farming,' printed pp. 55-58 (PDF pp. 59-62)"},
+        {"source_id": "MC-HINDI-IA", "locator": "Nakshatra-prakarana, agricultural elections, verses 28-33, printed pp. 39-43"}
+      ],
+      "boundary": "Create separate profiles per operation; never ship one generic Agriculture rule."
+    },
+    {
+      "key": "medicine_preparation",
+      "label": "Commencing medicine preparation",
+      "priority": "P2",
+      "disposition": "safety_candidate",
+      "reason": "The activity has an exact election passage and is distinct from surgery.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XV, 'To prepare medicines,' printed p. 64 (PDF p. 68)"}
+      ],
+      "boundary": "Manufacturing standards, qualified pharmacy practice and clinical evidence always take precedence; timing cannot establish safety or efficacy."
+    },
+    {
+      "key": "competition_entry",
+      "label": "Entering a competition",
+      "priority": "P2",
+      "disposition": "missing_candidate",
+      "reason": "The source provides a bounded competition-entry election and explicitly warns that chance outcomes depend on the natal chart.",
+      "source_candidates": [
+        {"source_id": "BVR-MUHURTHA-1993", "locator": "Chapter XVII, 'Lotteries and competitions,' printed p. 67 (PDF p. 71)"}
+      ],
+      "boundary": "Exclude gambling and lottery optimization from product claims; restrict any future profile to skill-based competition entry."
+    }
+  ]
+}

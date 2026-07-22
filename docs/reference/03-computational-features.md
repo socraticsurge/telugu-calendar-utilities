@@ -21,7 +21,7 @@ Several filters are only expressible on this scale.
 | Module | Computes | Source | Surfaces as |
 |---|---|---|---|
 | `ghati.py` | `GhatiClock` / `GhatiWindow` — civil↔ghati conversion, sunrise-anchored | Surya Siddhanta | `PanchangamDay.ghati_clock`; foundation for the two below |
-| `karana_windows.py` | **Vishaghati** ("poison ghatika") — 4-vighati window per nakshatra at a classical offset; **Bhadra Mukha/Puchha** — Vishti-karana split into Mukha (first 5/16, hard-avoid), body, Puchha (last 3/16, auspicious for contests/litigation) | Muhurta Chintamani; Dharma Sindhu | `vishaghati`, `bhadra_mukha`, `bhadra_puchha` |
+| `karana_windows.py` | **Vishaghati** ("poison ghatika") — 4-vighati window per Nakshatra at a classical offset; **Bhadra Mukha/Puchha** — verse-44 Tithi-specific Yama quarters with five-/three-Ghati widths scaled to observed Vishti duration | Muhurta Chintamani 43–44; exact locator and mapping in provenance | `vishaghati`, `bhadra_mukha`, `bhadra_puchha` |
 | `sankramana.py` | Sun's rasi-ingress avoidance — ±16 ghatis around the exact crossing (~12h48m) | classical samskara rule | `sankramana_avoidance` |
 
 ---
@@ -52,7 +52,8 @@ Several filters are only expressible on this scale.
 | Module | Computes | Source | Surfaces as |
 |---|---|---|---|
 | `gochara/positions.py` | Sidereal positions of all **9 grahas** at a JD — longitude, rasi, nakshatra, pada, retrograde, next ingress date; ayanamsa-configurable | Vedic astrology | MCP `get_graha_positions`; basis for gochara & phalalu |
-| `gochara/rules.py` | **Gochara verdicts** from a janma rasi (Brihat Samhita scheme) — favourable / blocked-by-vedha / adverse, plus named conditions (Sade Sati, Ashtama/Ardhastama Shani) | Brihat Samhita | MCP `get_gochara` |
+| `gochara/rules.py` | **Gochara verdicts** from a janma rasi — favourable / blocked-by-vedha / adverse, plus named conditions (Sade Sati, Ashtama/Ardhastama Shani) | Brihat Samhita 104.4 for seven classical favourable-house sets; Phaladeepika 26.3–8 for Vedha; 26.1 and 26.22–23 for the Moon reference and underlying Shani-house effects. Names and phase labels are conventional presentation. | MCP `get_gochara` |
+| `personal/llm_phalalu.py` | **Daily website interpretation** generated from computed transit facts | `transits_cited` triples are engine-verified; prose and advice are explicitly heuristic model interpretation and screened for unsupported timing/high-stakes directives | Website Daily Horoscope panel |
 | `gochara/combustion.py` | **Guru/Shukra Maudhya** — combustion thresholds (Jupiter 11°, Venus 10°) | Brihat Samhita, Muhurta Chintamani | `guru_maudhya`, `shukra_maudhya` (Drik) |
 | `gochara/simha_stha.py` | **Simha-stha** — Jupiter or Venus in Simha (wedding restriction; Guru hard, Shukra penalty) | classical samskara tradition | `simha_stha_guru/shukra` (Drik) |
 | `maudhya_calendar.py` | **All-planet Asta/Udaya** — heliacal setting & rising for Mercury/Venus/Mars/Jupiter/Saturn via swisseph `heliacal_ut()`, per-city | BPHS | MCP `get_combustion_calendar` |

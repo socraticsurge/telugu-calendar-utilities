@@ -120,11 +120,13 @@ Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, naks
 
 #### `get_gochara(date, janma_rasi, city, ayanamsa="lahiri", ...)`
 
-Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position counted from the janma rashi with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse — per classical Brihat Samhita tables. Includes named conditions: Sade Sati (with phase), Ashtama Shani, Ardhastama Shani.
+Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position counted from the janma rashi with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse. Brihat Samhita 104.4 supports the seven classical grahas' favourable-house sets; Phaladeepika 26.3–8 supports the Vedha pairs and exemptions. The configured Rahu/Ketu set (3, 6, 11) has a known conflict with Phaladeepika 26.2, which treats both like Surya and includes the 10th; node Vedha remains unverified. Phaladeepika 26.1 and 26.22–23 support the natal-Moon reference and adverse effects underlying the Sade Sati / Ashtama / Ardhastama flags. The grouping names, rising/peak/setting labels and advice are conventional product presentation, not quotations from those slokas.
 
 #### `get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra=None, ayanamsa="lahiri", ...)`
 
 Deterministic daily reading for a janma rashi, rendered entirely from computed facts: the Moon's Chandrabalam house sets the day quality, each graha's gochara verdict (with vedha) becomes one traceable sentence, Sade Sati/Ashtama Shani are stated when active, and passing `janma_nakshatra` adds the day's Tarabalam line. Every sentence maps to a calculation.
+
+The website can additionally display a daily AI-written interpretation. This is a separate provenance layer: its declared graha/house/verdict citations are engine-verified, while its prose and guidance remain heuristic model interpretation. Generation rejects structural defects, unsupported precise timing, and selected high-stakes directives; it does not claim semantic or scriptural verification of the prose.
 
 ---
 

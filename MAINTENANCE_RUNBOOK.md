@@ -6,8 +6,9 @@ muscle memory.
 
 > See also: [`ARCHITECTURE.md`](ARCHITECTURE.md) for the layer cake,
 > [`CLAUDE.md`](CLAUDE.md) for the working agreement,
-> [`docs/tracking/improvement-plan.md`](docs/tracking/improvement-plan.md)
-> for the active phased roadmap.
+> [`docs/reference/06-roadmap-and-backlog.md`](docs/reference/06-roadmap-and-backlog.md)
+> for the current roadmap. The older improvement plan is retained as a
+> historical decision log and contains intentionally stale phase-era detail.
 
 ## Table of contents
 
@@ -168,10 +169,15 @@ _NISHITA     = [...]   # midnight
 
 ---
 
-## Verify against Drik Panchang
+## Compare Drik calculations against Drik Panchang
 
 Drik Panchang ([drikpanchang.com](https://drikpanchang.com)) is the
-authoritative reference for this project. When in doubt, DP wins.
+project's external comparison reference for the **Drik calculation system**.
+It does not establish scriptural provenance for interpretive or Muhurtam
+rules, and it is not the comparator for intentionally distinct Surya
+Siddhanta or Vakya outputs. Record exact city, date, values, tolerance and URL;
+resolve discrepancies by inspecting both implementations rather than treating
+a website label as textual authority.
 
 ### Manual cross-check
 

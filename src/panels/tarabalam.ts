@@ -12,7 +12,8 @@ import {
   muLagnaPosition, muLagnaVerdict,
   muIsFavourableLagna, muIsAshtamaLagna, muLagnaAtMin,
   muLagnaClassOf, muLagnasInClass,
-  muScoreTier, muRelativeTier,
+  muScoreTier, muRelativeTier, muCanonicalNakshatra, muScoreTithiClass,
+  muEndsBySolarNoon, muCombustionDropReason,
   computePersonalDosha, computeDayDosha,
 } from '../muhurta-scorer';
 import { selEl, inpEl } from '../lib/dom';
@@ -25,6 +26,7 @@ import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
 import { RASI_NAMES, NAKSHATRA_NAMES, rasiFromStar } from '../data/rasis';
 import { MUHURTA_DAY } from '../data/muhurtas';
+import activityContract from '../data/activity-rules.generated.json';
 import { goHasData, goBuildViewSelect, renderGochara } from './gochara';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
@@ -36,6 +38,35 @@ const TARA_GOOD = new Set([2,4,6,8,9]);
 const TB_RASIS = RASI_NAMES;
 const CHANDRA_GOOD = new Set([1,3,6,7,10,11]);
 const CHANDRA_PUJA = new Set([2,5,9]);
+const MU_ENGLISH_WEEKDAY = {
+  Adivaram: 'Sunday', Somavaram: 'Monday', Mangalavaram: 'Tuesday',
+  Budhavaram: 'Wednesday', Guruvaram: 'Thursday', Shukravaram: 'Friday',
+  Shanivaram: 'Saturday',
+};
+const MU_WEEKDAY_NAMES = Object.values(MU_ENGLISH_WEEKDAY);
+
+export function muRelevantManualChecks(items, vaaram) {
+  const current = MU_ENGLISH_WEEKDAY[vaaram];
+  return (items || []).filter(item => {
+    const namedDays = MU_WEEKDAY_NAMES.filter(day =>
+      new RegExp(`\\b${day}\\b`, 'i').test(item));
+    return !namedDays.length || namedDays.includes(current);
+  });
+}
+
+export function muClassifyManualChecks(items) {
+  const result = { chart: [], information: [], practical: [] };
+  for (const item of items || []) {
+    if (/^(Election chart|Horoscope|Birth chart|Weekday-Lagna condition|Mangala transit|Employer\/employee compatibility|Personal (?:Guru|star))/i.test(item)) {
+      result.chart.push(item.replace(/^(Election chart|Horoscope|Birth chart):\s*/i, ''));
+    } else if (/(take precedence|legal|medical|clinical|commercial need|cash flow|supplier terms|structural|permit|safety|consent|qualified advice)/i.test(item)) {
+      result.practical.push(item);
+    } else {
+      result.information.push(item);
+    }
+  }
+  return result;
+}
 let TB_DAYS = null;    // last computed result rows
 let TB_EVENTS = null;  // feed events used for the last calculation
 
@@ -617,7 +648,32 @@ function muFactsAt(dt, vaaram) {
   const rashiIdx = Math.floor(moon / 30) % 12;
   const lunarSign = TB_RASIS[rashiIdx];
   const specialYogas = muSpecialYogasAt(vaaram, tithi, nakshatra);
-  return { nakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
+  const solarNakshatra = MU_NAKSHATRA_LIST[Math.floor(sun / nakSize) % 27];
+  return { nakshatra, solarNakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
+}
+
+const MU_HOMAHUTI_LORDS = [
+  'Surya', 'Budha', 'Shukra', 'Shani', 'Chandra',
+  'Mangala', 'Guru', 'Rahu', 'Ketu'];
+const MU_HOMAHUTI_BENEFICS = new Set(['Budha', 'Shukra', 'Chandra', 'Guru']);
+const MU_VAARAM_LIST = [
+  'Adivaram', 'Somavaram', 'Mangalavaram', 'Budhavaram',
+  'Guruvaram', 'Shukravaram', 'Shanivaram'];
+
+function muHomaElection(facts) {
+  const sunIdx = MU_NAKSHATRA_LIST.indexOf(facts.solarNakshatra);
+  const moonIdx = MU_NAKSHATRA_LIST.indexOf(facts.nakshatra);
+  const group = Math.floor(((moonIdx - sunIdx + 27) % 27) / 3);
+  const lord = MU_HOMAHUTI_LORDS[group];
+  const tithiOrdinal = MU_TITHI_LIST_FULL.indexOf(facts.tithi) + 1;
+  const varaOrdinal = MU_VAARAM_LIST.indexOf(facts.vaaram) + 1;
+  const remainder = (tithiOrdinal + 1 + varaOrdinal) % 4;
+  return {
+    admitted: MU_HOMAHUTI_BENEFICS.has(lord) && (remainder === 0 || remainder === 3),
+    reasons: [
+      `Homahuti group ${group + 1}: ${facts.solarNakshatra} to ${facts.nakshatra} falls to ${lord}`,
+      `Agnivasa remainder ${remainder}: Agni resides on earth`],
+  };
 }
 
 // MU_CHANDRA_GOOD/MU_CHANDRA_PUJA, MU_LAGNA_KENDRA/MU_LAGNA_TRIKONA,
@@ -633,19 +689,12 @@ const TITHI_NAMES_ORDER = [
   'Ekadashi', 'Dwadashi','Trayodashi','Chaturdashi','Pournami',
 ];
 const TITHI_ALIASES = { Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15 };
-const TITHI_NUMBER_FAMILY = {
-  1:'Nanda',  6:'Nanda',  11:'Nanda',
-  2:'Bhadra', 7:'Bhadra', 12:'Bhadra',
-  3:'Jaya',   8:'Jaya',   13:'Jaya',
-  4:'Rikta',  9:'Rikta',  14:'Rikta',
-  5:'Purna', 10:'Purna',  15:'Purna',
-};
-function tithiFamily(name) {
+function activityTithiNumber(name) {
   if (!name) return null;
   const last = name.trim().split(/\s+/).pop();
-  if (TITHI_ALIASES[last]) return TITHI_NUMBER_FAMILY[TITHI_ALIASES[last]];
+  if (TITHI_ALIASES[last]) return TITHI_ALIASES[last];
   const idx = TITHI_NAMES_ORDER.indexOf(last);
-  return idx >= 0 ? TITHI_NUMBER_FAMILY[idx + 1] : null;
+  return idx >= 0 ? idx + 1 : null;
 }
 
 // Activity rules — mirror telugu_panchangam/personal/muhurta.py
@@ -654,111 +703,7 @@ function tithiFamily(name) {
 // avoid_karana are still enforced by the engine; the JS reads
 // parsed-feed yogas and karanas to mirror behaviour for activities the
 // user picks via the in-page dropdown.
-const MU_ACTIVITY = {
-  any:           { label: 'Anything auspicious' },
-  travel:        { label: 'Travel / journey', avoid_karana: ['Vishti'],
-                   prefer_lagna_class: 'Chara' },
-  purchase:      { label: 'Purchase (general)', prefer_choghadiya: ['Labh', 1] },
-  ceremony:      { label: 'Ceremony / puja (general)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_vara: ['Somavaram','Guruvaram'] },
-  beginning:     { label: 'New beginning (general)',
-                   prefer_choghadiya: ['Amrit', 1],
-                   prefer_tithi_class: 'Nanda',
-                   prefer_vara: ['Budhavaram','Guruvaram'] },
-  wedding:       { label: 'Wedding (Vivaha)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Purna',
-                   prefer_vara: ['Guruvaram','Somavaram'],
-                   prefer_lagna_class: 'Sthira' },
-  engagement:    { label: 'Engagement (Nischayam)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Purna',
-                   prefer_vara: ['Guruvaram','Somavaram'],
-                   prefer_lagna_class: 'Sthira' },
-  naming:        { label: 'Naming (Namakaranam)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_choghadiya: ['Shubh', 1],
-                   prefer_tithi_class: 'Nanda',
-                   prefer_vara: ['Budhavaram','Guruvaram'],
-                   prefer_lagna_class: 'Dvisvabhava' },
-  annaprasana:   { label: 'Annaprasana (First feeding)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_choghadiya: ['Shubh', 1],
-                   prefer_tithi_class: 'Bhadra',
-                   prefer_vara: ['Somavaram','Guruvaram'],
-                   prefer_lagna_class: 'Dvisvabhava' },
-  karnavedha:    { label: 'Karnavedha (Ear-piercing)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Bhadra',
-                   prefer_vara: ['Budhavaram','Shukravaram'],
-                   prefer_lagna_class: 'Dvisvabhava' },
-  mundana:       { label: 'Mundana / Chaula (First head-shave)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Nanda',
-                   prefer_vara: ['Budhavaram','Guruvaram'],
-                   prefer_lagna_class: 'Dvisvabhava' },
-  upanayana:     { label: 'Upanayana (Sacred thread)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Nanda',
-                   prefer_vara: ['Budhavaram','Guruvaram'],
-                   prefer_lagna_class: 'Dvisvabhava' },
-  vidyarambha:   { label: 'Education start (Vidyarambha)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_choghadiya: ['Amrit', 1],
-                   prefer_tithi_class: 'Nanda',
-                   prefer_vara: ['Budhavaram'],
-                   prefer_lagna_class: 'Dvisvabhava' },
-  gruhapravesha: { label: 'Gruhapravesha (Home entry)',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Bhadra',
-                   prefer_vara: ['Guruvaram','Somavaram'],
-                   prefer_lagna_class: 'Sthira' },
-  vehicle:       { label: 'Vehicle purchase',
-                   prefer_choghadiya: ['Labh', 1],
-                   prefer_tithi_class: 'Bhadra',
-                   prefer_vara: ['Shukravaram'],
-                   prefer_lagna_class: 'Sthira' },
-  property:      { label: 'Property / Land purchase',
-                   prefer_choghadiya: ['Labh', 1],
-                   prefer_tithi_class: 'Bhadra',
-                   prefer_vara: ['Guruvaram','Shukravaram'],
-                   prefer_lagna_class: 'Sthira' },
-  gold:          { label: 'Gold / Jewelry purchase',
-                   prefer_choghadiya: ['Labh', 1],
-                   prefer_tithi_class: 'Bhadra',
-                   prefer_vara: ['Shukravaram','Guruvaram'],
-                   prefer_lagna_class: 'Sthira' },
-  bhumi_puja:    { label: 'Bhumi Puja / Foundation laying',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Bhadra',
-                   prefer_vara: ['Guruvaram','Somavaram'],
-                   prefer_lagna_class: 'Sthira' },
-  business:      { label: 'Business launch',
-                   prefer_choghadiya: ['Amrit', 1],
-                   prefer_tithi_class: 'Nanda',
-                   prefer_vara: ['Guruvaram','Budhavaram'],
-                   prefer_lagna_class: 'Sthira' },
-  job:           { label: 'Job start / Contract signing',
-                   prefer_choghadiya: ['Amrit', 1],
-                   prefer_tithi_class: 'Nanda',
-                   prefer_vara: ['Guruvaram','Budhavaram'],
-                   prefer_lagna_class: 'Sthira' },
-  yajna:         { label: 'Yajna / Homam',
-                   skip_on_yoga: ['Visha Yoga','Dagdha Yoga'],
-                   prefer_tithi_class: 'Purna',
-                   prefer_vara: ['Guruvaram','Somavaram'],
-                   prefer_lagna_class: 'Sthira' },
-  pilgrimage:    { label: 'Pilgrimage (Tirtha Yatra)', avoid_karana: ['Vishti'],
-                   prefer_lagna_class: 'Chara' },
-  court:         { label: 'Court / legal matter',
-                   prefer_tithi_class: 'Jaya',
-                   prefer_vara: ['Mangalavaram'] },
-  surgery:       { label: 'Surgery / medical procedure',
-                   avoid_karana: ['Vishti'],
-                   prefer_vara: ['Mangalavaram'] },
-};
-
+const MU_ACTIVITY = activityContract.rules;
 async function findMuhurta() {
   const box = document.getElementById('mu-result');
   box.innerHTML = '<p class="preview-error">Searching…</p>';
@@ -780,7 +725,9 @@ async function findMuhurta() {
     // activity has a preferred lagna class (Sthira/Chara/...).
     // Cached per session, shared with the day-card's lagna ribbon.
     const activityRules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
-    const activityNeedsLagna = !!activityRules.prefer_lagna_class;
+    const activityNeedsLagna = !!(
+      activityRules.prefer_lagna_class || activityRules.required_lagna_class ||
+      activityRules.allowed_lagnas?.length || activityRules.skip_on_combust?.length);
     const lagnaCityData = (people.length || activityNeedsLagna)
       ? await loadLagna(city) : null;
     const slots = [];
@@ -809,9 +756,85 @@ async function findMuhurta() {
       const preferChog = rules.prefer_choghadiya || null;     // ['Block', bonus]
       const avoidKaranaNames = new Set(rules.avoid_karana || []);
       const preferTithiClass = rules.prefer_tithi_class || null;
+      const avoidTithiClasses = rules.avoid_tithi_class || [];
       const preferVaras = new Set(rules.prefer_vara || []);
       const preferLagnaClass = rules.prefer_lagna_class || null;
+      const requiredLagnaClass = rules.required_lagna_class || null;
+      const allowedLagnas = new Set(rules.allowed_lagnas || []);
+      const preferLagnas = new Set(rules.prefer_lagnas || []);
+      const cautionLagnaSolar = !!rules.caution_lagna_solar;
+      const allowedNakshatras = new Set(
+        (rules.allowed_nakshatras || []).map(muCanonicalNakshatra));
+      const avoidNakshatras = new Set(
+        (rules.avoid_nakshatras || []).map(muCanonicalNakshatra));
+      const avoidJanmaNakshatra = !!rules.avoid_janma_nakshatra;
+      const preferNakshatras = new Set(
+        (rules.prefer_nakshatras || []).map(muCanonicalNakshatra));
+      const allowedTithiNumbers = new Set(rules.allowed_tithi_numbers || []);
+      const preferTithiNumbers = new Set(rules.prefer_tithi_numbers || []);
+      const allowedTithiNames = new Set(rules.allowed_tithi_names || []);
+      const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);
+      const avoidVaraTithiNames = new Set(
+        (rules.avoid_vara_tithi_names || []).map(pair => `${pair[0]}|${pair[1]}`));
+      const avoidNityaYogas = new Set(rules.avoid_nitya_yogas || []);
+      const manualChecks = muRelevantManualChecks(
+        rules.manual_checks || [], data.vaaram);
+      const manualGuidance = muClassifyManualChecks(manualChecks);
       const activityLabel = rules.label;
+      if (rules.skip_on_sankramana && data.special.some(
+          item => /Sankraman/i.test(item))) {
+        droppedDays.push({
+          date: isoDate,
+          reason: `Sankramana · ${activityLabel} source profile avoids this day`,
+        });
+        continue;
+      }
+      const combustionReason = muCombustionDropReason(
+        lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null,
+        rules.skip_on_combust || [], activityLabel);
+      if (combustionReason) {
+        droppedDays.push({ date: isoDate, reason: combustionReason });
+        continue;
+      }
+
+      const normalizedMaasam = (data.maasam || '').replace(/^(?:Nija|Adhika)\s+/, '');
+      const maasaSolarAdmitted = (rules.allowed_maasa_solar_pairs || []).some(pair =>
+        pair[0] === normalizedMaasam && pair[1] === data.solarSign);
+      if ((rules.allowed_maasams?.length || rules.allowed_maasa_solar_pairs?.length) &&
+          !rules.allowed_maasams?.includes(normalizedMaasam) && !maasaSolarAdmitted) {
+        droppedDays.push({ date: isoDate,
+          reason: `${data.maasam} Maasa · ${activityLabel} source profile does not admit this lunar month` });
+        continue;
+      }
+      if (rules.allowed_varas?.length && !rules.allowed_varas.includes(data.vaaram)) {
+        droppedDays.push({ date: isoDate,
+          reason: `${data.vaaram} · ${activityLabel} source profile does not admit this weekday` });
+        continue;
+      }
+      if (rules.allowed_pakshams?.length && !rules.allowed_pakshams.includes(data.paksham)) {
+        droppedDays.push({ date: isoDate,
+          reason: `${data.paksham} Paksha · ${activityLabel} source profile does not admit this lunar fortnight` });
+        continue;
+      }
+      if ((rules.avoid_vara_paksha || []).some(pair =>
+        pair[0] === data.vaaram && pair[1] === data.paksham)) {
+        droppedDays.push({ date: isoDate,
+          reason: `${data.vaaram} during ${data.paksham} Paksha · ${activityLabel} source profile rejects this combination` });
+        continue;
+      }
+      const solarClass = data.solarSign ? muLagnaClassOf(data.solarSign) : null;
+      if (rules.allowed_solar_classes?.length &&
+          (!solarClass || !rules.allowed_solar_classes.includes(solarClass))) {
+        droppedDays.push({ date: isoDate,
+          reason: `Surya in ${data.solarSign} (${solarClass}) · ${activityLabel} source profile does not admit this Rasi class` });
+        continue;
+      }
+      if (rules.allowed_solar_signs?.length &&
+          !rules.allowed_solar_signs.includes(data.solarSign)) {
+        droppedDays.push({ date: isoDate,
+          reason: `Surya in ${data.solarSign} · ${activityLabel} source profile does not admit this solar Rasi` });
+        continue;
+      }
 
       // Vara is sunrise-anchored — compute once per day.
       const varaBonus = (data.vaaram && preferVaras.has(data.vaaram)) ? 1 : 0;
@@ -878,6 +901,7 @@ async function findMuhurta() {
           // math); contiguous because both edges round the same expression.
           const s0 = Math.round(srMin + mi * muLen);
           const e0 = Math.round(srMin + (mi + 1) * muLen);
+          if (rules.forenoon_only && !muEndsBySolarNoon(e0, srMin, ssMin)) continue;
           if (bad.some(([b0, b1]) => s0 < b1 && b0 < e0)) continue;  // decision 1
           const dom = dominantChog(s0, e0);
           const c = dom.block;
@@ -893,6 +917,21 @@ async function findMuhurta() {
           // UTC → JD conversion internally.
           const slotStart = new Date(d.getTime() + s0 * 60000);
           const facts = muFactsAt(slotStart, data.vaaram);
+          let electionReasons = [];
+          if (rules.require_homa_election) {
+            const election = muHomaElection(facts);
+            if (!election.admitted) continue;
+            electionReasons = election.reasons;
+          }
+          if (allowedNakshatras.size && !allowedNakshatras.has(facts.nakshatra)) continue;
+          if (avoidNakshatras.has(facts.nakshatra)) continue;
+          if (avoidJanmaNakshatra && people.some(
+              person => muCanonicalNakshatra(person.nak) === facts.nakshatra)) continue;
+          if (allowedTithiNumbers.size &&
+              !allowedTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
+          if (allowedTithiNames.size && !allowedTithiNames.has(facts.tithi)) continue;
+          if (avoidTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
+          if (avoidVaraTithiNames.has(`${data.vaaram}|${facts.tithi}`)) continue;
 
           // Build reason groups as we score — slot_quality, day_quality,
           // group_fit, activity_match, notes — mirroring Python's
@@ -910,7 +949,7 @@ async function findMuhurta() {
             chogLine];
           const dayQuality = [];
           const groupFit = [];
-          const activityMatch = [];
+          const activityMatch = [...electionReasons];
           const taraUnfavNames = [];
           const chandraAvoidNames = [];
           const chandraPujaNames = [];
@@ -1027,6 +1066,30 @@ async function findMuhurta() {
             }
           }
 
+          if (requiredLagnaClass) {
+            const lagnaDay = lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null;
+            const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+            const required = muLagnasInClass(requiredLagnaClass);
+            if (!slotLagna || !required?.has(slotLagna)) continue;
+            activityMatch.push(
+              `${slotLagna} lagna satisfies required ${requiredLagnaClass} class`);
+          }
+          if (allowedLagnas.size) {
+            const lagnaDay = lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null;
+            const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+            if (!slotLagna || !allowedLagnas.has(slotLagna)) continue;
+            activityMatch.push(`${slotLagna} lagna is admitted for ${activityLabel}`);
+          }
+          if (preferLagnas.size) {
+            const lagnaDay = lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null;
+            const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+            if (slotLagna && preferLagnas.has(slotLagna)) {
+              score += 1;
+              activityMatch.push(
+                `${slotLagna} lagna specifically favoured for ${activityLabel} (+1)`);
+            }
+          }
+
           // Activity-class lagna preference (Muhurta Chintamani):
           // independent of any personal kendra/trikona check —
           // this is about the activity's nature (wedding wants
@@ -1045,13 +1108,18 @@ async function findMuhurta() {
 
           // Tithi family — slot-time tithi (Rikta → day_quality penalty;
           // activity class match → activity_match bonus)
-          const tFam = tithiFamily(facts.tithi);
-          if (tFam === 'Rikta') {
-            score -= 2;
-            dayQuality.push(`${facts.tithi} (Rikta tithi) (-2)`);
-          } else if (tFam && preferTithiClass && tFam === preferTithiClass) {
+          const tithiScore = muScoreTithiClass(
+            facts.tithi, preferTithiClass, activityLabel, facts.nakshatra,
+            facts.specialYogas, avoidTithiClasses);
+          const tFam = tithiScore.family;
+          score += tithiScore.bonus;
+          if (tithiScore.dayReason) dayQuality.push(tithiScore.dayReason);
+          if (tithiScore.activityReason) activityMatch.push(tithiScore.activityReason);
+          const activeTithiNumber = activityTithiNumber(facts.tithi);
+          if (activeTithiNumber && preferTithiNumbers.has(activeTithiNumber)) {
             score += 1;
-            activityMatch.push(`${facts.tithi} (${preferTithiClass}) favoured for ${activityLabel} (+1)`);
+            activityMatch.push(
+              `${facts.tithi} specifically favoured for ${activityLabel} (+1)`);
           }
 
           // Special yogas — slot-time
@@ -1067,6 +1135,7 @@ async function findMuhurta() {
 
           // Nitya yoga — slot-time (samskara skip on Vyatipata/Vaidhriti)
           const ny = facts.yoga;
+          if (avoidNityaYogas.has(ny)) continue;
           if (MU_NITYA_HARD_AVOID.has(ny)) {
             if (skipYogas.size) { continue; }
             score += MU_NITYA_HARD_PENALTY;
@@ -1087,6 +1156,10 @@ async function findMuhurta() {
 
           // Vara — activity_match (day-level)
           if (varaReason) { score += 1; activityMatch.push(varaReason); }
+          if (preferNakshatras.has(facts.nakshatra)) {
+            score += 1;
+            activityMatch.push(`${facts.nakshatra} specifically favoured for ${activityLabel} (+1)`);
+          }
 
           // Slot-overlap bonuses → slot_quality (Abhijit is now scored as
           // the 8th muhurta's nature above).
@@ -1101,6 +1174,14 @@ async function findMuhurta() {
 
           // Doctrinal notes — explanatory, no score effect
           const notes = [];
+          if (cautionLagnaSolar && lagnaCityData) {
+            const lagnaDay = lagnaDayFor(lagnaCityData, isoDate);
+            const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
+            if (slotLagna && slotLagna === data.solarSign) {
+              notes.push(`Source caution · ${slotLagna} Lagna is occupied by Surya; ` +
+                         `Raman associates this with delay from hard rock.`);
+            }
+          }
           const siddhiYogas = facts.specialYogas.filter(y =>
             y === 'Sarvartha Siddhi Yoga' || y === 'Amrita Siddhi Yoga');
           const hasPushkara = facts.specialYogas.some(y =>
@@ -1121,6 +1202,9 @@ async function findMuhurta() {
           const reasonGroups = {
             slot_quality: slotQuality, day_quality: dayQuality,
             group_fit: groupFit, activity_match: activityMatch, notes,
+            chart_validation: manualGuidance.chart,
+            information: manualGuidance.information,
+            practical: manualGuidance.practical,
           };
           const reasons = [...slotQuality, ...groupFit, ...dayQuality, ...activityMatch];
 
@@ -1142,6 +1226,7 @@ async function findMuhurta() {
           if (tFam === 'Rikta') dayDosha = 'rikta_tithi';
           else if (facts.specialYogas.some(y => MU_YOGA_PENALTY[y] !== undefined)) dayDosha = 'visha_dagdha_yoga';
           else if (MU_NITYA_HARD_AVOID.has(ny)) dayDosha = 'vyatipata_vaidhriti';
+          else if (rules.manual_prerequisites) dayDosha = 'practitioner_review';
 
           slots.push({ d: new Date(d), s0, e0, score, reasons, reasonGroups, personalDosha, dayDosha, dayCtx });
           slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
@@ -1205,18 +1290,27 @@ let MU_LAST = null;
 const MU_ACT_LABEL = {
   any: 'anything auspicious',
   travel: 'travel', purchase: 'a purchase',
-  ceremony: 'a ceremony', beginning: 'a new beginning',
-  wedding: 'a wedding (Vivaha)', engagement: 'an engagement',
+  ceremony: 'a Shantika / Paushtika rite', beginning: 'a Dharma-kriya commencement',
+  wedding: 'a wedding (Vivaha)',
+  engagement: 'a mutual engagement (Kanya-Varavarana)',
+  cremation: 'deferred funeral rites (Pretakriya)',
   naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
   upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',
+  seemantha: 'seemantha (prenatal ceremony)',
   gruhapravesha: 'gruhapravesha (home entry)',
-  vehicle: 'a vehicle purchase', property: 'a property purchase',
+  vehicle: 'a vehicle purchase', property: 'a land purchase for building',
+  house_purchase: 'a completed house purchase',
   gold: 'a gold / jewelry purchase',
+  business_inventory_purchase: 'a trade inventory purchase',
+  borrowing_money: 'borrowing money / taking a loan',
+  lending_money: 'lending money / giving a loan',
   bhumi_puja: 'bhumi puja (foundation laying)',
-  business: 'a business launch', job: 'a job start / contract',
-  yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
-  court: 'a court / legal matter', surgery: 'a surgery / medical procedure',
+  well_digging: 'well digging',
+  home_repair: 'a home repair / renovation start',
+  business: 'a capital deployment / business investment', job: 'entering employment / starting service',
+  yajna: 'a Homa offering (Homahuti)', pilgrimage: 'a pilgrimage',
+  court: 'filing a lawsuit / court action', surgery: 'a surgery / medical procedure',
 };
 
 function muToT(mm) {
@@ -1263,6 +1357,17 @@ function renderMuhurta() {
               <ul class="mu-rg-items">${lis}</ul>
             </div>`;
   };
+  const renderChartValidation = items => {
+    if (!items || !items.length) return '';
+    const lis = items.map(it => `<li>${muCapitalize(it)}</li>`).join('');
+    return `<div class="mu-rg mu-rg-validation">
+              <span class="mu-rg-label">Validate with chart</span>
+              <div class="mu-rg-content">
+                <p>This slot passed the automated checks. Before finalising it, validate these conditions in the election chart or relevant horoscope:</p>
+                <ul class="mu-rg-items">${lis}</ul>
+              </div>
+            </div>`;
+  };
   const renderSlot = (s, i) => {
     const rg = s.reasonGroups;
     const groupsHtml = rg
@@ -1271,7 +1376,10 @@ function renderMuhurta() {
            ${renderGroup('Day quality', rg.day_quality)}
            ${renderGroup('Group fit', rg.group_fit)}
            ${renderGroup('Activity', rg.activity_match)}
-           ${renderGroup('Notes', rg.notes, 'mu-rg-notes')}
+           ${renderChartValidation(rg.chart_validation)}
+           ${renderGroup('About this election', rg.information, 'mu-rg-information')}
+           ${renderGroup('Practical checks', rg.practical, 'mu-rg-practical')}
+           ${renderGroup('Important nuance', rg.notes, 'mu-rg-notes')}
          </div>`
       : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
     const tier = s.tier || muScoreTier(s.score);

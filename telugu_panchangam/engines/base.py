@@ -556,7 +556,11 @@ class PanchangamEngine(ABC):
         day.nakshatra_pada = int((moon_lon / (360.0 / 27.0)) * 4) % 4 + 1
         from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
         day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
-        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(day.karana, day.ghati_clock)
+        day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(
+            day.karana, day.ghati_clock,
+            tithi_at=lambda dt: self.facts_at(
+                dt, day.location, vaaram=day.vaaram).tithi,
+        )
         from telugu_panchangam.sankramana import compute_sankramana_window
         _, sankranti_jd = self._sankramanam_name_and_jd(jd_sunrise, jd_sunset)
         sankranti_dt = jd_to_utc(sankranti_jd) if sankranti_jd is not None else None

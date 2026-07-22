@@ -1,8 +1,11 @@
 # 06 · Roadmap & Backlog
 
 Where the project has been and what's queued — so you can reconnect quickly. The
-authoritative living tracker is [`docs/tracking/improvement-plan.md`](../tracking/improvement-plan.md)
-(gitignored); this is a stable snapshot as of **2026-06-17**.
+historical phase tracker is
+[`docs/tracking/improvement-plan.md`](../tracking/improvement-plan.md). This
+page is the maintained summary, refreshed **2026-07-22**; the phase tracker is
+retained for decision history and should not be read as current execution
+state.
 
 ---
 
@@ -31,14 +34,14 @@ tool, Panchanga Shuddhi. Then 1.10.4 wired ayanamsa through gochara/ingress/phal
 
 ---
 
-## Paused (the application is in good shape; remaining work is polish)
+## Current maintenance posture
 
 | Phase | Theme | State / resume |
 |---|---|---|
-| **Phase 3** | **Vite + TypeScript migration** | PR 2a WIP on local branch `chore/p3-pr2a-vite-vitest-typescript-scaffold`. Resume → continue with PR 2b (codegen scripts). The structural step that unblocks 4/5/8. Parity strategy: codegen `ACTIVITY_RULES` → JSON, both Python & TS consume it. |
-| **Phase 4** | UI/UX harvest (a11y, wayfinding, comprehension popovers, mobile hero) | Rides on Vite; individual items cherry-pickable pre-Vite at higher cost. |
-| **Phase 5** | PWA / offline (manifest, service worker, offline `feeds/*.ics`) | Depends on Vite. |
-| **Phase 8** | Additive features: festival explainer + `festivals.html`, embed widget, sun/moon timeline, month grid, engine-compare, weekly-digest feed, "what's new" page, **1.9.0 computations on the website** (Groups A/B/C of scorer parity) | After Vite + EngineCore. |
+| **Vite + TypeScript** | **Shipped.** Root `index.html`, `src/`, Vitest, TypeScript checks and the production Vite build are the active frontend. |
+| **Accessibility / one-shell UI** | **Shipped baseline.** Contrast, dialogs/focus management, main landmark, skip link and local-time affordance are implemented; every visible change still needs browser evidence and owner sign-off. |
+| **PWA / offline** | Optional future feature; no longer described as blocked on a missing Vite migration. |
+| **Additive product work** | One feature at a time on the frozen core. The Muhurtam catalogue has 34 verified purpose-specific profiles, one explicit heuristic and one compatibility alias; specialist/sensitive candidates remain intentionally held in the activity backlog. |
 
 ---
 

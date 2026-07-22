@@ -25,6 +25,98 @@ export const MU_CHANDRA_PUJA = new Set([2, 5, 9]);
 export const MU_TIER_NAMES = ['Avoid', 'Fair', 'Good', 'Excellent'];
 export const MU_RELATIVE_BANDS = [0.75, 0.5, 0.25];
 
+const MU_NAKSHATRA_ALIASES: Record<string, string> = {
+  Ashwini: 'Ashvini',
+  Moola: 'Mula',
+};
+
+export function muCanonicalNakshatra(name: string): string {
+  return MU_NAKSHATRA_ALIASES[name] || name;
+}
+
+const MU_TITHI_NAMES = [
+  'Pratipat', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
+  'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',
+  'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Pournami',
+];
+const MU_TITHI_ALIASES: Record<string, number> = {
+  Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15,
+};
+const MU_TITHI_FAMILIES: Record<number, string> = {
+  1: 'Nanda', 6: 'Nanda', 11: 'Nanda',
+  2: 'Bhadra', 7: 'Bhadra', 12: 'Bhadra',
+  3: 'Jaya', 8: 'Jaya', 13: 'Jaya',
+  4: 'Rikta', 9: 'Rikta', 14: 'Rikta',
+  5: 'Purna', 10: 'Purna', 15: 'Purna',
+};
+
+export function muTithiFamily(name: string): string | null {
+  if (!name) return null;
+  const last = name.trim().split(/\s+/).pop() || '';
+  const number = MU_TITHI_ALIASES[last] || MU_TITHI_NAMES.indexOf(last) + 1;
+  return number > 0 ? MU_TITHI_FAMILIES[number] || null : null;
+}
+
+export function muScoreTithiClass(
+  tithiName: string,
+  preferTithiClass: string | null,
+  activityLabel: string,
+  nakshatra: string | null = null,
+  specialYogas: string[] = [],
+  avoidTithiClasses: string[] = [],
+) {
+  const family = muTithiFamily(tithiName);
+  if (!family) return { bonus: 0, dayReason: null, activityReason: null, family };
+
+  if (family === 'Rikta') {
+    if (nakshatra === 'Pushya') {
+      return {
+        bonus: 0,
+        dayReason: `${tithiName} (Rikta tithi) neutralised by Pushya nakshatra (0)`,
+        activityReason: null,
+        family,
+      };
+    }
+    const siddhi = specialYogas.filter(
+      yoga => yoga === 'Sarvartha Siddhi Yoga' || yoga === 'Amrita Siddhi Yoga');
+    if (siddhi.length) {
+      return {
+        bonus: -1,
+        dayReason: `${tithiName} (Rikta tithi) partially offset by ${siddhi.join(' + ')} (-1)`,
+        activityReason: null,
+        family,
+      };
+    }
+    return {
+      bonus: -2,
+      dayReason: `${tithiName} (Rikta tithi) (-2)`,
+      activityReason: null,
+      family,
+    };
+  }
+  if (tithiName.includes('Amavasya')) {
+    return { bonus: -2, dayReason: `${tithiName} (-2)`, activityReason: null,
+      family: 'Amavasya' };
+  }
+  if (preferTithiClass && family === preferTithiClass) {
+    return {
+      bonus: 1,
+      dayReason: null,
+      activityReason: `${tithiName} (${preferTithiClass} tithi) favoured for ${activityLabel} (+1)`,
+      family,
+    };
+  }
+  if (avoidTithiClasses.includes(family)) {
+    return {
+      bonus: -1,
+      dayReason: null,
+      activityReason: `${tithiName} (${family} tithi) inauspicious for ${activityLabel} (-1)`,
+      family,
+    };
+  }
+  return { bonus: 0, dayReason: null, activityReason: null, family };
+}
+
 export function muLagnaClassOf(rashi: string): string | null {
   for (const k of Object.keys(MU_LAGNA_CLASSES)) {
     if (MU_LAGNA_CLASSES[k].has(rashi)) return k;
@@ -89,6 +181,35 @@ export function muRelativeTier(score: number, ceiling: number, floor: number): s
   if (rel >= MU_RELATIVE_BANDS[1]) return 'Good';
   if (rel >= MU_RELATIVE_BANDS[2]) return 'Fair';
   return 'Avoid';
+}
+
+export function muEndsBySolarNoon(
+  slotEndMin: number,
+  sunriseMin: number,
+  sunsetMin: number,
+): boolean {
+  return slotEndMin <= sunriseMin + (sunsetMin - sunriseMin) / 2;
+}
+
+export function muCombustionDropReason(
+  lagnaDayData: any,
+  requiredPlanets: string[],
+  activityLabel: string,
+): string | null {
+  if (!requiredPlanets.length) return null;
+  const fields: Record<string, string> = {
+    Guru: 'guruCombust',
+    Shukra: 'shukraCombust',
+  };
+  const unknown = requiredPlanets.filter(planet =>
+    !fields[planet] || typeof lagnaDayData?.[fields[planet]] !== 'boolean');
+  if (unknown.length) {
+    return `${activityLabel} combustion screening unavailable (${unknown.join(', ')})`;
+  }
+  const combust = requiredPlanets.filter(planet => lagnaDayData[fields[planet]]);
+  return combust.length
+    ? `${combust.join(' and ')} Maudhya · ${activityLabel} deferred`
+    : null;
 }
 
 export function computePersonalDosha({

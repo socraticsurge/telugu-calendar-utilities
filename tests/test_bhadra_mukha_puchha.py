@@ -26,45 +26,37 @@ def test_mukha_and_puchha_present_when_vishti_in_day():
     assert day.bhadra_mukha is not None or day.bhadra_puchha is not None
 
 
-def test_mukha_precedes_puchha_when_both_present():
-    day = _find_vishti_day(2026, 6)
-    assert day is not None
-    if day.bhadra_mukha is not None and day.bhadra_puchha is not None:
-        assert day.bhadra_mukha.end <= day.bhadra_puchha.start
+def test_tithi_specific_yama_quarters_and_widths():
+    """Verse 44 assigns quarters; Mukha=5/30 and Puchha=3/30 of Vishti."""
+    from datetime import datetime, timedelta, timezone
+    from telugu_panchangam.ghati import make_clock
+    from telugu_panchangam.karana_windows import compute_bhadra_windows
+    from telugu_panchangam.models.panchangam_day import Span
+
+    start = datetime(2026, 6, 1, tzinfo=timezone.utc)
+    end = start + timedelta(hours=12)
+    clock = make_clock(start, start + timedelta(hours=24))
+    expected = {
+        'Shukla Chaturthi': (1, 4), 'Krishna Chaturdashi': (1, 4),
+        'Shukla Ashtami': (2, 1), 'Krishna Dashami': (2, 1),
+        'Shukla Ekadashi': (3, 2), 'Krishna Saptami': (3, 2),
+        'Pournami': (4, 3), 'Krishna Tritiya': (4, 3),
+    }
+    for tithi, (mq, pq) in expected.items():
+        mukha, puchha = compute_bhadra_windows(
+            [Span('Vishti', start, end)], clock,
+            tithi_at=lambda _dt, name=tithi: name,
+        )
+        assert mukha is not None and puchha is not None
+        total = (end - start).total_seconds()
+        assert abs((mukha.start - start).total_seconds() - total * (mq - 1) / 4) < 1
+        assert abs((mukha.end - mukha.start).total_seconds() - total * 5 / 30) < 1
+        assert abs((puchha.end - start).total_seconds() - total * pq / 4) < 1
+        assert abs((puchha.end - puchha.start).total_seconds() - total * 3 / 30) < 1
 
 
-def test_mukha_5_16_puchha_3_16_proportional():
-    """When the full Vishti span sits inside the day, Mukha = 5/16, Puchha = 3/16."""
-    from datetime import timedelta
-    eng = DrikGanitaEngine()
-    city = _hyderabad()
-    # Scan a couple months; the first day with both Mukha and Puchha set is sufficient.
-    for d in range(1, 60):
-        target = date(2026, 6, 1) + timedelta(days=d)
-        day = eng.calculate(target, city)
-        if day.bhadra_mukha is None or day.bhadra_puchha is None:
-            continue
-        vishti = next(k for k in day.karana if k.name == 'Vishti')
-        full_s = (vishti.end - vishti.start).total_seconds()
-        # Skip days where the full Vishti span gets clipped by sunrise/next_sunrise
-        # (we want the unclipped case for proportional comparison).
-        if vishti.start < day.ghati_clock.sunrise or vishti.end > day.ghati_clock.next_sunrise:
-            continue
-        mukha_s = (day.bhadra_mukha.end - day.bhadra_mukha.start).total_seconds()
-        puchha_s = (day.bhadra_puchha.end - day.bhadra_puchha.start).total_seconds()
-        assert abs(mukha_s - full_s * 5 / 16) < 1.0
-        assert abs(puchha_s - full_s * 3 / 16) < 1.0
-        return
-    # If we couldn't find a clean case, that's OK — the rule still holds in theory.
-
-
-def test_litigation_activity_gets_puchha_bonus():
-    """A slot overlapping day.bhadra_puchha must score +2 for 'litigation' activity.
-
-    We scan for a day where a good choghadiya block actually overlaps the Puchha
-    window (not every Puchha day has a good block in that range), then assert the
-    scoring path emits the 'Bhadra Puchha' bonus reason.
-    """
+def test_litigation_alias_does_not_turn_approximate_puchha_into_legal_bonus():
+    """The compatibility alias must use Court rules without a Puchha score."""
     from datetime import timedelta
     from telugu_panchangam.personal.muhurta import day_slots, GOOD_CHOGHADIYA
 
@@ -87,17 +79,11 @@ def test_litigation_activity_gets_puchha_bonus():
         if not has_overlap:
             continue
         slots = day_slots(day, activity='litigation')
-        bonus_slots = [
-            s for s in slots
-            if any('Bhadra Puchha' in r for r in s.get('reasons', []))
-        ]
-        assert len(bonus_slots) > 0, (
-            f"Expected at least one slot with 'Bhadra Puchha' bonus reason "
-            f"for litigation activity on {target} (puchha={p.start.time()}–"
-            f"{p.end.time()}); got {len(slots)} slots, none with Puchha bonus. "
-            f"Reasons across slots: {[s.get('reasons', []) for s in slots[:3]]}"
+        assert not any(
+            'Bhadra Puchha' in reason
+            for slot in slots for reason in slot.get('reasons', [])
         )
-        return  # one passing day is enough
+        return
 
     # If no qualifying day was found, skip rather than fail.
     import pytest

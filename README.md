@@ -143,7 +143,7 @@ GitHub Actions (monthly cron)
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-pytest tests/ -v
+npm install
+python tools/verify_project.py
 python -m telugu_panchangam.generate   # writes to feeds/
 ```
-

@@ -14,6 +14,48 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import * as M from '../../muhurta-scorer';
 
+test('muCanonicalNakshatra normalizes source spellings', () => {
+  assert.equal(M.muCanonicalNakshatra('Ashwini'), 'Ashvini');
+  assert.equal(M.muCanonicalNakshatra('Moola'), 'Mula');
+  assert.equal(M.muCanonicalNakshatra('Pushya'), 'Pushya');
+});
+
+test('muScoreTithiClass mirrors Python prefer and avoid paths', () => {
+  const preferred = M.muScoreTithiClass(
+    'Shukla Panchami', 'Purna', 'Wedding (Vivaha)');
+  assert.equal(preferred.bonus, 1);
+  assert.match(preferred.activityReason || '', /favoured/);
+
+  const avoided = M.muScoreTithiClass(
+    'Shukla Tritiya', 'Purna', 'Wedding (Vivaha)', null, [], ['Jaya']);
+  assert.equal(avoided.bonus, -1);
+  assert.match(avoided.activityReason || '', /Jaya tithi.*inauspicious/);
+});
+
+test('muScoreTithiClass penalizes Amavasya before Purna preference', () => {
+  const result = M.muScoreTithiClass(
+    'Amavasya', 'Purna', 'Wedding (Vivaha)');
+  assert.equal(result.bonus, -2);
+  assert.equal(result.family, 'Amavasya');
+  assert.equal(result.activityReason, null);
+});
+
+test('muScoreTithiClass applies Rikta neutralizations', () => {
+  const pushya = M.muScoreTithiClass(
+    'Shukla Chaturthi', null, 'Ceremony', 'Pushya');
+  assert.equal(pushya.bonus, 0);
+  assert.match(pushya.dayReason || '', /neutralised by Pushya/);
+
+  const siddhi = M.muScoreTithiClass(
+    'Shukla Navami', null, 'Ceremony', 'Rohini', ['Sarvartha Siddhi Yoga']);
+  assert.equal(siddhi.bonus, -1);
+  assert.match(siddhi.dayReason || '', /partially offset/);
+
+  const plain = M.muScoreTithiClass(
+    'Shukla Chaturdashi', null, 'Ceremony');
+  assert.equal(plain.bonus, -2);
+});
+
 // ── Lagna position math ─────────────────────────────────────────
 
 test('muLagnaPosition: inclusive count from janma', () => {
@@ -81,6 +123,19 @@ test('muLagnaAtMin returns the rashi rising at a slot start', () => {
   assert.equal(M.muLagnaAtMin(SAMPLE_DAY, 341), 'Vrishabha');
   // slotMin near end of last visible cell → Simha.
   assert.equal(M.muLagnaAtMin(SAMPLE_DAY, 341 + 350), 'Simha');
+});
+
+test('muCombustionDropReason enforces and fails closed on Maudhya data', () => {
+  const clear = { guruCombust: false, shukraCombust: false };
+  assert.equal(M.muCombustionDropReason(clear, ['Guru'], 'Pilgrimage (Tirtha Yatra)'), null);
+  assert.equal(
+    M.muCombustionDropReason(
+      { guruCombust: true, shukraCombust: false }, ['Guru'],
+      'Pilgrimage (Tirtha Yatra)'),
+    'Guru Maudhya · Pilgrimage (Tirtha Yatra) deferred');
+  assert.equal(
+    M.muCombustionDropReason(null, ['Guru'], 'Pilgrimage (Tirtha Yatra)'),
+    'Pilgrimage (Tirtha Yatra) combustion screening unavailable (Guru)');
 });
 
 test('muLagnaAtMin returns null before sunrise or outside data', () => {
@@ -240,4 +295,12 @@ test('muLagnasInClass returns the right set', () => {
   assert.equal(M.muLagnasInClass('Sthira'), M.MU_LAGNA_STHIRA);
   assert.equal(M.muLagnasInClass('Dvisvabhava'), M.MU_LAGNA_DVISVABHAVA);
   assert.equal(M.muLagnasInClass('Bogus'), null);
+});
+
+test('muEndsBySolarNoon conservatively requires the whole slot before noon', () => {
+  // Sunrise 06:00, sunset 18:00 -> solar noon 12:00 (720 minutes).
+  assert.equal(M.muEndsBySolarNoon(720, 360, 1080), true);
+  assert.equal(M.muEndsBySolarNoon(721, 360, 1080), false);
+  // Seasonal daylight: 05:30 to 18:30 has the same 12:00 midpoint.
+  assert.equal(M.muEndsBySolarNoon(720, 330, 1110), true);
 });

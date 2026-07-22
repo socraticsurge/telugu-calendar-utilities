@@ -7,10 +7,114 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
-Documentation and repository housekeeping only — no engine, MCP, or
-ICS-feed behaviour changes; all code trees byte-identical.
+## [1.13.0] — 2026-07-22
+
+Astrological authority and Muhurtam coverage release. The daily Panchangam,
+Daily Horoscope and Muhurtam surfaces now disclose criterion-level provenance
+instead of treating computed output as uniform textual authority.
+
+### Release highlights
+
+- **Muhurtam coverage:** 34 of 35 distinct purpose-specific profiles now have
+  verified rule-level source claims; `Anything auspicious` remains the sole
+  explicit heuristic. House warming is the narrowly scoped, source-verified
+  Gruhapravesha election, with completed-house purchase and renovation kept
+  separate.
+- **Corrected elections:** wedding, Gruhapravesha, court filing, engagement,
+  Homahuti, deferred Pretakriya, Seemantha, borrowing, lending, inventory
+  purchase, service entry, capital deployment, Shantika/Paushtika and
+  Dharma-kriya rules now follow their inspected passages and disclose manual
+  chart conditions.
+- **Panchangam and horoscope corrections:** Bhadra Mukha/Puchha follows the
+  Tithi-specific Muhurta Chintamani Yamas; Rahu and Ketu transit houses follow
+  Phaladeepika rather than inheriting Shani's set.
+- **MCP trust contract:** `find_muhurta` returns the selected activity's
+  provenance, automated constraints and manual prerequisites. Panchangam
+  responses disclose authority state by output category.
+- **Clearer recommendations:** browser results remove irrelevant weekday
+  guidance, separate computed strengths from chart validation and practical
+  information, and keep specialist Dharma-kriya/Pretakriya activities out of
+  the general public selector while retaining them in Python and MCP.
+- **Engineering:** generated Python-to-browser activity contracts, provenance
+  validation, documentation-drift checks and `tools/verify_project.py` provide
+  one fail-fast verification path across Python, frontend tests, type checking
+  and production build.
+
+### Added
+- **Precisely scoped vehicle-acquisition profile.** Raman Chapter IV, printed
+  page 10 (PDF page 14), now supplies a +1 preference for five movable
+  Nakshatras without treating every other star as rejected.
+  Other vehicle ranking preferences remain explicitly uncited project rules;
+  the citation is not presented as a complete vehicle election. Coverage is
+  now 10/30.
+- **Source-backed Upanayana profile.** Raman Chapter VIII, printed pages
+  23–24 (PDF pages 27–28), now supplies lunar months, Uttarayana solar Rasis,
+  exact Paksha-qualified Tithis, weekdays, Nakshatras, Lagnas and a before-noon
+  gate. Age, conditional Budha combustion and chart checks remain explicit.
+  Verified activity coverage reaches 9/30.
+- **Source-backed Vidyarambha profile.** Raman Chapter VIII, printed page 23
+  (PDF page 27), now supplies exact weekday, Nakshatra and movable-or-common
+  Lagna gates; age, forenoon/noon preference and chart checks remain explicit.
+  Verified activity coverage reaches 8/30.
+- **Source-backed Mundana / Chaula profile.** Raman Chapter VIII, printed
+  pages 22–23 (PDF pages 26–27), now supplies Shukla-Paksha, combustion,
+  Tithi, Nakshatra, weekday, conservative Lagna and forenoon constraints.
+  Python and browser share the solar-noon boundary. Coverage reaches 7/30.
+- **Source-backed Karnavedha profile.** Raman Chapter VIII, printed page 22
+  (PDF page 26), now supplies the never-at-night rule, weekdays and rejected
+  rising Rasis; its Tithi reference resolves to Chapter V. Age, transition and
+  election-house checks remain explicit. Coverage rises from 5/30 to 6/30.
+- **Source-backed Annaprasana profile.** Raman Chapter VIII, printed pages
+  21–22 (PDF pages 25–26), now supplies the admitted Nakshatras, weekdays and
+  rising Rasis; its general-Tithi reference is resolved to Chapter V's exact
+  Panchanga-Suddhi list. Child-age and election-chart checks remain explicit.
+  Verified activity coverage rises from 4/30 to 5/30.
+- **Source-backed Namakarana profile.** Raman Chapter VIII, printed page 21
+  (PDF page 25), now supplies the ceremony's admitted Nakshatras and weekdays,
+  rejected Tithi numbers, fixed-Lagna preference, and disclosed birth-day,
+  election-chart and name-selection checks. Verified activity coverage rises
+  from 3/30 to 4/30.
+- **One-command project verification.** `python tools/verify_project.py` now
+  runs provenance-link validation, generated activity-data drift checks, the
+  complete Python suite, frontend tests, typecheck, and production build in a
+  fixed fail-fast order.
+- **Machine-checked activity provenance.** Verified Muhurtam profiles now
+  declare their stable ledger claim beside the Python rules; MCP and the
+  browser consume that shared field. A CI-ready audit rejects missing,
+  non-Muhurtam, non-verified, or duplicate links and reports the honest
+  coverage baseline: 3 of 30 activity profiles have exact rule locators.
+- **Source-backed land-purchase profile.** The former generic Property / Land
+  option is now accurately scoped to buying land for building, following
+  Raman Chapter XII, printed page 53 (PDF page 57): fourteen Nakshatras, four
+  weekdays, hard Rikta-Tithi rejection, fixed-Lagna preference, and disclosed
+  manual election-chart checks. Buying a completed house is explicitly outside
+  this profile rather than silently conflated with land purchase.
+- **Source-backed well-digging activity.** Raman, *Muhurtha*, Chapter XII,
+  printed page 51 (PDF page 55), now supplies the eight admitted Nakshatras,
+  three admitted rising Rasis, the Surya-in-Lagna hard-rock caution, and
+  explicit manual Shukra/Chandra chart checks. The activity is now selectable
+  on the website and exposed through the same generated contract as Python.
+- **Source-backed Bhumi Puja / house-foundation profile.** B. V. Raman,
+  *Muhurtha*, Chapter XII, printed page 50 (PDF page 54), now governs the
+  activity's admitted lunar months, solar-Rasi classes, exact Tithi numbers,
+  Nakshatras, weekdays and fixed Lagna. Full election-chart and site-placement
+  conditions remain explicit manual checks.
+- `find_muhurta` now returns an additive `activity_profile` with the automated
+  constraints, manual review requirements, and stable provenance claim ID.
+  The website consumes the same generated Python activity contract.
+
+### Changed
+- Bhumi Puja / foundation candidates use the cited activity profile instead
+  of the former generic Bhadra-tithi/fixed-Lagna preference pair. Shared
+  samskara and ranking rules remain independently disclosed.
 
 ### Documentation
+- Corrected the Muhurtam architecture guide from the retired
+  Choghadiya-derived slot model to the named, indivisible 30-Muhurta pipeline;
+  narrowed Drik Panchang's role to external Drik-output comparison rather than
+  universal textual authority.
+- Added a criterion-level foundation-laying crosswalk and verified
+  `muhurta.bhumi_puja.foundation` provenance claim.
 - CHANGELOG reconciled against the full git history. The operational-
   maturity round that actually shipped **inside the v1.9.0 tag** is now
   folded into the [1.9.0] entry — it had been stranded under a misplaced
@@ -826,7 +930,8 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.12.0...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.13.0...HEAD
+[1.13.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.11.0...v1.12.0
 [1.10.4]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.3...v1.10.4
 [1.10.3]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.9.0...v1.10.3

@@ -31,14 +31,15 @@ flowchart TB
     CAL --> MCP
     ICS --> PAGES["GitHub Pages (webcal)"]
     MCP --> CLIENT["Claude / Cursor / any MCP client"]
-    DAY --> SITE["docs/index.html + muhurta-scorer.js"]
+    DAY --> SITE["Vite website + TypeScript scorer"]
 ```
 
 Two notes:
 - The five **calendar** features (combustion, graha yuddha, ingress, eclipse) go
   largely straight to ephemeris, not through `PanchangamDay`.
-- The landing page re-implements the scorer in JS to score in-browser; the
-  Python↔JS parity is the motivation for the parked Phase 3 codegen step.
+- The landing page implements the scorer in TypeScript for in-browser use.
+  Python owns the activity catalogue; a generated JSON contract and parity
+  tests prevent the two surfaces from silently diverging.
 
 ---
 
@@ -52,18 +53,28 @@ tier (Excellent / Good / Fair / Avoid).
 
 | File | Role |
 |---|---|
-| `personal/activity_rules.py` | Declarative `ACTIVITY_RULES` dict — 28 activities, pure data. |
+| `personal/activity_rules.py` | Declarative `ACTIVITY_RULES` dict — 30 activities, pure data. |
+| `personal/activity_catalog.py` | Ordered browser-supported subset and selector groups. |
 | `personal/slot_scorers.py` | Atomic scoring functions + `_DayContext` dataclass. |
 | `personal/muhurta.py` | Orchestrator (~530 lines) — public API only. |
 
 ### Configuration: `ACTIVITY_RULES` (`activity_rules.py`)
 
-A declarative dict — **adding an activity is a data change, not code.** Each entry
-can carry: `skip_on_yoga`, `skip_on_sankramana / khar_maasa / adhika /
-pitru_paksha / simha_stha_guru / combust`, `prefer_choghadiya`,
-`prefer_tithi_class`, `avoid_tithi_class`, `prefer_vara`, `prefer_lagna_class`,
-`prefer_bhadra_puchha`, `prefer_nakshatra_mukha`, `penalty_on_simha_stha_shukra`.
-28 activities are supported; all are exposed via the MCP `find_muhurta` tool.
+A declarative dict — **adding an activity is primarily a data change**, plus a
+catalogue/export update and source evidence. Entries carry hard gates,
+preferences, exact admitted Tithis/Nakshatras/Lagnas, manual practitioner
+checks, and (where verified) a stable provenance claim.
+Source-facing Nakshatra spellings are preserved in this declarative contract,
+but Python and TypeScript normalize `Ashwini`→`Ashvini` and `Moola`→`Mula`
+before membership tests. These are the only non-canonical names currently
+present; parity tests require both scorers to apply the same aliases.
+30 activities are supported by Python/MCP. The browser-supported subset is
+declared in `activity_catalog.py`; `tools/export_activity_rules.py` generates
+the exact rule fields consumed by TypeScript. `npm run activity:check` and the
+Python contract tests fail if the committed export or static selector drifts.
+Tithi-family scoring is likewise shared as a behavioral contract: the browser
+exports `avoid_tithi_class` and its pure scorer mirrors Python's preferred and
+avoided families, Amavasya precedence, and Pushya/Siddhi Rikta neutralization.
 
 ### The pipeline
 
@@ -71,10 +82,10 @@ pitru_paksha / simha_stha_guru / combust`, `prefer_choghadiya`,
 flowchart TB
     A["day + activity + birth data"] --> B{"Day-level HARD filters"}
     B -->|"eclipse · Disha Shoola · Panchaka ·<br/>Khar/Adhika/Pitru · Simha-stha ·<br/>combust · skip-on-yoga"| X["return [] (dropped_days + reason)"]
-    B -->|"passes"| C["Choghadiya blocks → candidate slots"]
-    C --> D["Subtract inauspicious windows<br/>Rahu/Gulika/Yamagandam/Varjyam/<br/>Durmuhurtham/Vishaghati/Bhadra-Mukha"]
-    D --> E["Drop slots < 1 ghati (~24 min)"]
-    E --> F["Score each slot — _evaluate_slot()"]
+    B -->|"passes"| C["15 named day or night Muhurtas"]
+    C --> D{"Overlaps a hard-avoid window?"}
+    D -->|"yes"| X2["exclude the whole indivisible Muhurta"]
+    D -->|"no"| F["Score intrinsic nature + dominant Choghadiya<br/>and personal/activity factors"]
     F --> G["Tier (absolute + relative bands)"]
     G --> H["Dosha tier-cap: personal/day dosha ⇒ max Good"]
     H --> I["Sort by (tier, -score, dosha, time) → top slots"]
@@ -82,11 +93,13 @@ flowchart TB
 
 ### What `_evaluate_slot()` adds up (`slot_scorers.py` + `muhurta.py`)
 
-Per slot, starting from the Choghadiya base score (`Amrit 3 / Shubh 2 / Labh 2 /
-Char 1`), in five reason groups:
+Per slot, the score combines named-Muhurta nature (`Abhijit`/`Brahma` +2,
+other auspicious +1, inauspicious -2) with the dominant Choghadiya
+(`Amrit` +3, `Shubh`/`Labh` +2, `Char` +1; others 0), in five reason groups:
 
-- **slot_quality** — Choghadiya base; +2 for Abhijit-muhurta overlap; +2 per
-  Amrita-kalam overlap.
+- **slot_quality** — named Muhurta identity, deity and intrinsic nature;
+  dominant Choghadiya (with boundary straddles disclosed); +2 for Amrita
+  Kalam overlap.
 - **day_quality** — special yogas (Sarvartha/Amrita +2, **Siddha Yoga +1**,
   Dvi/Tripushkara +1, Visha/Dagdha −2, Vyatipata/Vaidhriti −2);
   tithi class (Rikta −2 with classical neutralization; preferred +1);
@@ -146,7 +159,8 @@ by `day_slots()` to keep day-skip logic in one place.
 
 | Module | Function | Output |
 |---|---|---|
-| `activity_rules.py` | `ACTIVITY_RULES`, `ACTIVITIES` | Declarative per-activity config for all 28 activities |
+| `activity_rules.py` | `ACTIVITY_RULES`, `ACTIVITIES` | Declarative per-activity config for all 30 activities |
+| `activity_catalog.py` | `BROWSER_ACTIVITY_GROUPS`, `BROWSER_ACTIVITIES` | Explicit browser capability boundary and selector ordering |
 | `slot_scorers.py` | `score_tithi_class`, `score_tara`, `score_chandra`, `score_lagna`, `score_special_yogas`, `score_nitya_yoga`, `anandadi_day_modifier`, `_DayContext` | All atomic scoring functions; `_DayContext` bundles day-constant params |
 | `tarabalam.py` | `tara_number`, `is_auspicious_tara`, `good_for_all` | 9-tara strength from a birth star |
 | `chandrabalam.py` | `chandra_position`, `chandra_verdict`, `rasi_from_nakshatra` | 12-position Moon-sign strength |
@@ -156,6 +170,8 @@ by `day_slots()` to keep day-skip logic in one place.
 | `tithi_class.py` | `tithi_family`, `is_rikta` | Nanda/Bhadra/Jaya/Rikta/Purna |
 | `phalalu.py` | `rasi_phalalu` | deterministic daily reading (every line traced to a computation) |
 
-> **Design throughline:** every score and every phalalu line is *deterministic and
-> explainable* — no heuristic prose, no invented text. Per-person components are
-> independent ±1 contributors, so you can add/remove people without re-tuning.
+> **Design throughline:** every score and every phalalu line is deterministic
+> and explainable. Project ranking heuristics are labelled as heuristics;
+> textual doctrine requires a ledger citation. Per-person components are
+> independent contributors, so people can be added or removed without hidden
+> model state.

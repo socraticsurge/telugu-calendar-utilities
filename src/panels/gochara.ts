@@ -9,6 +9,7 @@ import { gcEvent } from '../lib/analytics';
 import { RASI_NAMES, rasiFromStar } from '../data/rasis';
 import { MU_CHANDRA_GOOD, MU_CHANDRA_PUJA } from '../muhurta-scorer';
 import { selEl } from '../lib/dom';
+import { shaniConditionFromMoonHouse, shaniConditionLine } from '../shani-conditions';
 
 // Chandrabalam house sets — same classical table the muhurta scorer pins.
 const CHANDRA_GOOD = MU_CHANDRA_GOOD;
@@ -16,7 +17,7 @@ const CHANDRA_PUJA = MU_CHANDRA_PUJA;
 
 const GO_FAV = { Surya:[3,6,10,11], Chandra:[1,3,6,7,10,11], Kuja:[3,6,11],
   Budha:[2,4,6,8,10,11], Guru:[2,5,7,9,11], Shukra:[1,2,3,4,5,8,9,11,12],
-  Shani:[3,6,11], Rahu:[3,6,11], Ketu:[3,6,11] };
+  Shani:[3,6,11], Rahu:[3,6,10,11], Ketu:[3,6,10,11] };
 const GO_VEDHA = { Surya:{3:9,6:12,10:4,11:5}, Chandra:{1:5,3:9,6:12,7:2,10:4,11:8},
   Kuja:{3:12,6:9,11:5}, Budha:{2:5,4:3,6:9,8:1,10:8,11:12},
   Guru:{2:12,5:4,7:3,9:10,11:8}, Shukra:{1:8,2:7,3:1,4:10,5:9,8:5,9:11,11:6,12:3},
@@ -159,7 +160,8 @@ function renderGochara() {
 
   // Per-graha verdicts using a chosen reference index (rashi index
   // 0..11). Works for both janma rashi and janma lagna — same
-  // Brihat Samhita rules, different reference frame.
+  // Janma-Chandra transit frame. Brihat Samhita 104.4 supports the seven
+  // classical favourable-house sets; Vedha and node policy are separate.
   const houseFrom = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
   const occupantsFor = (ref) => {
     const o = {};
@@ -191,7 +193,7 @@ function renderGochara() {
   const houseOf = gi => jr === null ? null : houseFrom(gi, jr);
 
   // Chart colour is anchored to the janma RASHI verdict — the
-  // traditional Brihat Samhita gochara frame. The lagna lens is
+  // traditional Janma-Chandra gochara frame. The lagna lens is
   // surfaced separately (tooltip + prose) without judgement;
   // classical texts don't prescribe a single rule for merging the
   // two into one verdict, so we don't invent one.
@@ -206,27 +208,14 @@ function renderGochara() {
     return { vr, vl };
   };
 
-  // Conditions banner — Sade Sati / Ashtama / Ardhastama Shani.
-  // Checked from BOTH references when both are set, so users see
-  // conditions that fire on only one lens (a common Jyotisha case).
+  // Named Shani conditions are reckoned only from Janma Chandra. Lagna can be
+  // a useful second lens for ordinary gochara, but it does not define Sade Sati.
   const condBox = document.getElementById('go-conditions');
   const shaniIdx = GO_DATA.grahas.indexOf('Shani');
-  const shaniCondFor = (sp) => {
-    if (sp === 12) return 'Sade Sati (rising phase)';
-    if (sp === 1) return 'Sade Sati (peak phase)';
-    if (sp === 2) return 'Sade Sati (setting phase)';
-    if (sp === 8) return 'Ashtama Shani';
-    if (sp === 4) return 'Ardhastama Shani';
-    return null;
-  };
-  let conds = [];
+  const conds = [];
   if (jr !== null) {
-    const cR = shaniCondFor(houseFrom(shaniIdx, jr));
-    if (cR) conds.push(jl !== null ? `${cR} — from rashi` : cR);
-  }
-  if (jl !== null) {
-    const cL = shaniCondFor(houseFrom(shaniIdx, jl));
-    if (cL) conds.push(`${cL} — from lagna`);
+    const condition = shaniConditionFromMoonHouse(houseFrom(shaniIdx, jr));
+    if (condition) conds.push(`${condition} — from Moon sign`);
   }
   condBox.innerHTML = conds.length
     ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${htmlEsc(c)}</span>`).join('')}
@@ -303,6 +292,9 @@ function renderGochara() {
     const llmRasiKey = view.label.replace(/ (rashi|lagna)$/i, '').trim();
     const llmEntry = LLM_PHALALU?.rashis?.[llmRasiKey];
     const llmForToday = !!llmEntry;
+    const interpretationBoundary = llmForToday
+      ? `<p style="font-size:0.72rem;color:#746B5E;margin-top:0.65rem;">AI-written interpretation: cited transit positions and verdicts are engine-checked; prose and guidance are interpretive, not independently scripturally verified.</p>`
+      : '';
     const adviceBlock = llmForToday && llmEntry.advice
       ? `<div style="margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;">` +
         `<span style="font-size:0.68rem;color:#8B7355;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;">Today's guidance</span>` +
@@ -311,7 +303,7 @@ function renderGochara() {
     phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:0.4rem;">Rasi Phalalu — ${htmlEsc(view.label)}
       <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
       (llmForToday
-        ? `<p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}`
+        ? `<p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}${interpretationBoundary}`
         : ph.lines.map(l => `<p>${l}</p>`).join('') +
           `<p style="font-size:0.72rem;color:#746B5E;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p>`) +
       `</div>`;
@@ -381,23 +373,11 @@ function buildPhalalu(jr, jl, row, view, idx) {
   const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
   const lines = [PHALALU_OPENERS[mv]];
 
-  // Shani condition checked from BOTH references (matches the
-  // chart's conditions banner). Each hit gets its own line so the
-  // reader sees which lens triggered it.
+  // Named Shani conditions are Moon-sign constructs, even when the chart also
+  // displays lagna as a secondary reference for ordinary transit verdicts.
   const shaniIdx = GO_DATA.grahas.indexOf('Shani');
-  const shaniCondText = (sp) => sp === 12 ? 'Sade Sati (rising phase)' : sp === 1 ? 'Sade Sati (peak phase)'
-    : sp === 2 ? 'Sade Sati (setting phase)' : sp === 8 ? 'Ashtama Shani'
-    : sp === 4 ? 'Ardhastama Shani' : null;
-  const shaniLineFor = (cond, refLabel) => {
-    const suffix = refLabel ? ` (from ${refLabel})` : '';
-    return cond.startsWith('Sade Sati')
-      ? `${cond}${suffix} is running — Shani asks for patience, discipline and steady work.`
-      : `${cond}${suffix} is running — avoid risks and keep commitments minimal.`;
-  };
-  const condR = shaniCondText(houseFromRef(shaniIdx, jr));
-  const condL = (jl !== null) ? shaniCondText(houseFromRef(shaniIdx, jl)) : null;
-  if (condR) lines.push(shaniLineFor(condR, jl !== null ? 'rashi' : null));
-  if (condL) lines.push(shaniLineFor(condL, 'lagna'));
+  const condition = shaniConditionFromMoonHouse(houseFromRef(shaniIdx, jr));
+  if (condition) lines.push(shaniConditionLine(condition));
 
   const verdictClause = (v, pos, m) => v === 'favourable' ? `favours ${m}`
     : v === 'blocked' ? `is under vedha — ${m} arrives with friction`

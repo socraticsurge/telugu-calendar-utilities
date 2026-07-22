@@ -91,7 +91,7 @@ disclosed to the user. For a chosen activity, a muhurta's score layers:
    already implemented.
 
 **"Good for [event]" is not a per-muhurta attribute** — it is answered by
-the finder's existing 30-activity model (`ACTIVITY_RULES`): the user selects
+the finder's source-profile activity catalogue (`ACTIVITY_RULES`): the user selects
 the event (wedding, gruhapravesha, travel, surgery, …) and the finder scores
 muhurtas for it. No per-muhurta activity list is invented.
 

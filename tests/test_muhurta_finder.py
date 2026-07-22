@@ -185,9 +185,10 @@ def test_invalid_activity_raises():
 
 # --- Activity taxonomy (Batch D) ---
 
-def test_all_30_activities_callable():
+def test_all_36_activities_callable():
     from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
-    assert len(ACTIVITIES) == 30
+    from telugu_panchangam.personal.activity_rules import ACTIVITY_ALIASES
+    assert len(ACTIVITIES) == 36
     # backward-compat: every old key must still be accepted
     for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
         assert old in ACTIVITY_RULES
@@ -195,9 +196,10 @@ def test_all_30_activities_callable():
     for new in ('wedding', 'gruhapravesha', 'naming', 'annaprasana',
                 'karnavedha', 'mundana', 'upanayana', 'vidyarambha',
                 'engagement', 'vehicle', 'property', 'gold', 'bhumi_puja',
-                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery',
-                'litigation'):
+                'business', 'job', 'yajna', 'pilgrimage', 'court', 'surgery'):
         assert new in ACTIVITY_RULES
+    assert ACTIVITY_ALIASES['litigation'] == 'court'
+    assert 'litigation' in ACTIVITIES
     # Task 15: Nakshatra Mukha activities
     for mukha_act in ('well_digging', 'coronation'):
         assert mukha_act in ACTIVITY_RULES
@@ -217,7 +219,7 @@ def test_wedding_skips_dagdha_day():
     # And the other samskaras that ride the same rule:
     for samskara in ('gruhapravesha', 'upanayana', 'naming',
                      'annaprasana', 'karnavedha', 'mundana',
-                     'engagement', 'bhumi_puja', 'yajna', 'vidyarambha'):
+                     'engagement', 'bhumi_puja', 'vidyarambha'):
         assert day_slots(day, activity=samskara) == [], \
             f'{samskara} should defer on Dagdha day'
 
@@ -262,13 +264,14 @@ def test_naming_uses_shubh_bonus():
         assert any('Shubh favoured for Naming' in r for r in shubh[0]['reasons'])
 
 
-def test_court_uses_jaya_class():
-    # court prefers Jaya tithi class. 2026-06-17 is Krishna Trayodashi
-    # (tithi 13 — Jaya family). Court slots should pick up the bonus.
-    day = _day(2026, 6, 17)
+def test_court_uses_exact_source_gates_not_tithi_family_bonus():
+    # 2026-04-20 is an admitted Monday, Shukla Tritiya (Jaya), Rohini day.
+    # The corrected filing profile admits it without a Jaya-family proxy.
+    day = _day(2026, 4, 20)
     slots = day_slots(day, activity='court')
     assert slots
-    assert any('Jaya' in r and 'favoured for Court' in r for s in slots for r in s['reasons'])
+    assert not any('Jaya' in r and 'favoured' in r
+                   for s in slots for r in s['reasons'])
 
 
 # --- Tithi family + Vara (Batch B) ---
@@ -320,60 +323,42 @@ def test_rikta_tithi_universal_penalty():
                for s in slots for r in s['reasons'])
 
 
-def test_rikta_penalty_applies_to_any_activity():
-    # Same Rikta day, with 'court' activity — penalty still appears.
+def test_rikta_penalty_applies_to_generic_activity():
+    # Same Rikta day, with the generic explorer — penalty still appears.
     day = _day(2026, 6, 23)
-    slots = day_slots(day, activity='court')
+    slots = day_slots(day, activity='any')
     assert any('Rikta tithi' in r and '(-2)' in r
                for s in slots for r in s['reasons'])
 
 
-def test_purna_tithi_wedding_bonus():
-    # 2026-06-29 (Mon) = Pournami (Purna). Wedding prefers Purna + Somavaram.
-    # Both the tithi-class AND vara bonuses should fire.
-    day = _day(2026, 6, 29)
-    slots = day_slots(day, activity='wedding')
-    assert slots, 'fixture: 2026-06-29 has no Visha/Dagdha'
-    reasons = [r for s in slots for r in s['reasons']]
-    assert any('Purna' in r and 'favoured for Wedding' in r for r in reasons), \
-        f'expected Purna wedding reason; saw {reasons}'
-    assert any('Somavaram favoured for Wedding' in r for r in reasons), \
-        f'expected Somavaram wedding vara reason; saw {reasons}'
+def test_pournami_rejected_for_wedding_instead_of_purna_bonus():
+    assert day_slots(_day(2026, 6, 29), activity='wedding') == []
 
 
-def test_jaya_tithi_court_bonus():
-    # 2026-06-17 (Wed) = Shukla Tritiya (Jaya). Court has prefer Jaya.
-    # Court has no skip_on_yoga, so Dagdha just adds a -2 penalty here.
-    slots = day_slots(_day(2026, 6, 17), activity='court')
-    assert any('Jaya' in r and 'favoured for Court' in r
-               for s in slots for r in s['reasons'])
-
-
-def test_bhadra_tithi_gruhapravesha_bonus():
-    # 2026-06-21 (Sun) = Shukla Saptami (Bhadra). Gruhapravesha prefers
-    # Bhadra. Adivaram is not in gruhapravesha's preferred vara list, so
-    # only the tithi-class +1 should fire — clean isolation.
-    day = _day(2026, 6, 21)
-    slots = day_slots(day, activity='gruhapravesha')
+def test_court_does_not_inherit_jaya_tithi_bonus():
+    slots = day_slots(_day(2026, 4, 20), activity='court')
     assert slots
-    reasons = [r for s in slots for r in s['reasons']]
-    assert any('Bhadra' in r and 'favoured for Gruhapravesha' in r for r in reasons)
-    # Sunday is NOT preferred — no Adivaram vara bonus should appear.
-    assert not any('Adivaram favoured for Gruhapravesha' in r for r in reasons)
+    assert not any('Jaya' in r and 'favoured' in r
+                   for s in slots for r in s['reasons'])
+
+
+def test_gruhapravesha_uses_exact_source_gates_not_tithi_family_bonus():
+    # The corrected profile rejects Sunday outright and admits the source's
+    # Jaya-family Shukla Tritiya/Trayodashi instead of penalizing the family.
+    assert day_slots(_day(2026, 6, 21), activity='gruhapravesha') == []
+    slots = day_slots(_day(2026, 4, 20), activity='gruhapravesha')
+    assert slots
+    assert not any('Bhadra' in r or 'Jaya' in r
+                   for slot in slots for r in slot['reasons'])
 
 
 def test_vara_bonus_thursday_wedding():
-    # 2026-08-20 (Thu) = Shukla Ashtami (Jaya), Nitya yoga = Indra.
-    # Neither Guru nor Shukra combust; no Simha-Stha; not Khar-Maasa.
-    # Wedding prefers Purna tithi (not Jaya) and Guruvaram vara —
-    # so only the vara bonus fires.
-    day = _day(2026, 8, 20)
+    day = _day(2026, 2, 26)  # Thu, Shukla Dashami, Mrigashira
     slots = day_slots(day, activity='wedding')
     assert slots
     reasons = [r for s in slots for r in s['reasons']]
     assert any('Guruvaram favoured for Wedding' in r for r in reasons)
-    # Jaya is not preferred by wedding — no tithi-class line for it.
-    assert not any('Jaya' in r and 'favoured for Wedding' in r for r in reasons)
+    assert not any('Purna' in r or 'Jaya' in r for r in reasons)
 
 
 def test_vara_bonus_friday_vehicle():
@@ -397,14 +382,9 @@ def test_vara_and_tithi_class_stack():
     assert any('Shukravaram favoured for Vehicle' in r for r in reasons)
 
 
-def test_vara_bonus_tuesday_court():
-    # 2026-06-16 (Tue) = Shukla Dwitiya (Bhadra). Court prefers Jaya
-    # (not Bhadra) and Mangalavaram — only vara bonus fires.
+def test_tuesday_is_rejected_for_court_filing():
     day = _day(2026, 6, 16)
-    slots = day_slots(day, activity='court')
-    assert slots
-    reasons = [r for s in slots for r in s['reasons']]
-    assert any('Mangalavaram favoured for Court' in r for r in reasons)
+    assert day_slots(day, activity='court') == []
 
 
 def test_no_vara_match_no_bonus():
@@ -497,12 +477,12 @@ def test_reason_groups_present_with_expected_keys():
 
 
 def test_reason_groups_categorise_correctly():
-    """A slot with Sarvartha Siddhi + tarabalam mixed + tithi-class match
+    """A slot with Siddha Yoga + tarabalam mixed + tithi-class match
     routes each reason to its category."""
-    # 2026-06-25 (Thu) — Sarvartha Siddhi at sunrise, Shukla Ekadashi (Nanda).
-    # Activity 'business' prefers Nanda + Guruvaram, so all categories fire.
-    day = _day(2026, 6, 25)
-    slots = day_slots(day, activity='business',
+    # 2026-02-12 (Thu) — Siddha Yoga, Krishna Dashami.
+    # Inventory purchase explicitly favours Dashami + Guruvaram.
+    day = _day(2026, 2, 12)
+    slots = day_slots(day, activity='business_inventory_purchase',
                       janma_nakshatras=['Krittika'])
     assert slots
     rg = slots[0]['reason_groups']
@@ -513,14 +493,14 @@ def test_reason_groups_categorise_correctly():
     assert any('muhurta' in r for r in rg['slot_quality'])
     assert any('choghadiya' in r for r in rg['slot_quality'])
     assert not any('clear of all inauspicious windows' in r for r in rg['slot_quality'])
-    # Day quality contains the Sarvartha yoga reason
-    assert any('Sarvartha Siddhi' in r for r in rg['day_quality']) or \
-           any('Sarvartha Siddhi' in r for s in slots for r in s['reason_groups']['day_quality'])
+    # Day quality contains the Siddha Yoga reason.
+    assert any('Siddha Yoga' in r for r in rg['day_quality']) or \
+           any('Siddha Yoga' in r for s in slots for r in s['reason_groups']['day_quality'])
     # Group fit contains tarabalam line (favourable or avoid)
     assert any('tarabalam' in r for r in rg['group_fit'])
-    # Activity match contains Nanda + Guruvaram bonuses
-    assert any('Nanda' in r and 'favoured for Business' in r for r in rg['activity_match'])
-    assert any('Guruvaram favoured for Business' in r for r in rg['activity_match'])
+    # Activity match contains exact Dashami + Guruvaram bonuses.
+    assert any('Dashami specifically favoured' in r for r in rg['activity_match'])
+    assert any('Guruvaram favoured' in r for r in rg['activity_match'])
 
 
 def test_doctrinal_note_sarvartha_rectifies_tara():
@@ -570,7 +550,7 @@ def test_no_notes_on_clean_day():
 def test_reason_groups_score_consistency():
     """The sum of (+N)/(-N) across all groups equals the slot's score."""
     import re
-    day = _day(2026, 6, 25)
+    day = _day(2026, 4, 20)
     slots = day_slots(day, activity='wedding',
                       janma_nakshatras=['Krittika'], janma_rasis=['Mesha'])
     assert slots
@@ -889,7 +869,7 @@ def test_sarvartha_active_for_early_slot():
 
 def test_score_tithi_class_avoid_gives_minus_one():
     from telugu_panchangam.personal.slot_scorers import score_tithi_class
-    # Jaya tithi avoided for wedding: should return -1 with an activity reason
+    # A hypothetical activity may still avoid a whole Tithi family.
     bonus, day_r, act_r, fam = score_tithi_class(
         'Shukla Tritiya', 'Purna', 'Wedding (Vivaha)',
         avoid_tithi_class=['Jaya'])
@@ -929,38 +909,27 @@ def test_score_tithi_class_rikta_unaffected_by_avoid():
     assert fam == 'Rikta'
 
 
-def test_jaya_tithi_penalised_for_wedding_integration():
-    # 2026-07-03 = Krishna Tritiya (Jaya tithi). Wedding searches should
-    # surface the -1 avoid reason in every slot's activity_match reasons.
+def test_shukla_tritiya_admitted_for_wedding_without_jaya_penalty():
     from telugu_panchangam.personal.tithi_class import tithi_family
-    day = _day(2026, 7, 3)
+    day = _day(2026, 4, 20)
     assert tithi_family(day.tithi.name) == 'Jaya', f'fixture: expected Jaya tithi, got {day.tithi.name}'
     slots = day_slots(day, activity='wedding')
-    assert slots, 'expected wedding slots on a non-skip day'
+    assert slots
     for s in slots:
         act_reasons = s['reason_groups']['activity_match']
-        assert any('inauspicious' in r and 'Jaya' in r for r in act_reasons), \
-            f'slot {s["start"]}: expected Jaya inauspicious reason, got {act_reasons}'
+        assert not any('Jaya' in r for r in act_reasons)
 
 
-def test_purna_tithi_penalised_for_litigation_integration():
-    # 2026-07-05 = Krishna Panchami (Purna tithi). Litigation should -1 avoid.
-    from telugu_panchangam.personal.tithi_class import tithi_family
-    day = _day(2026, 7, 5)
-    assert tithi_family(day.tithi.name) == 'Purna', f'fixture: expected Purna, got {day.tithi.name}'
-    slots = day_slots(day, activity='litigation')
-    assert slots, 'expected litigation slots'
-    for s in slots:
-        act_reasons = s['reason_groups']['activity_match']
-        assert any('inauspicious' in r and 'Purna' in r for r in act_reasons), \
-            f'slot {s["start"]}: expected Purna inauspicious reason, got {act_reasons}'
+def test_litigation_alias_matches_court_results():
+    day = _day(2026, 4, 20)
+    assert day_slots(day, activity='litigation') == \
+        day_slots(day, activity='court')
 
 
-def test_jaya_tithi_no_penalty_for_court_itself():
-    # Jaya is court's PREFERRED class — should get +1, not -1
+def test_tithi_class_scorer_still_supports_preferred_class():
     from telugu_panchangam.personal.slot_scorers import score_tithi_class
     bonus, _, act_r, _ = score_tithi_class(
-        'Shukla Tritiya', 'Jaya', 'Court / legal matter',
+        'Shukla Tritiya', 'Jaya', 'Example activity',
         avoid_tithi_class=['Purna'])
     assert bonus == 1
     assert act_r is not None and 'favoured' in act_r

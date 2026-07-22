@@ -20,9 +20,15 @@ from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
 from telugu_panchangam.gochara.positions import graha_positions
-from telugu_panchangam.gochara.rules import gochara_for, named_conditions
+from telugu_panchangam.gochara.rules import (
+    GOCHARA_PROVENANCE, gochara_for, named_conditions,
+)
 from telugu_panchangam.personal.phalalu import rasi_phalalu
 from telugu_panchangam.personal.muhurta import day_slots, night_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
+from telugu_panchangam.personal.activity_rules import (
+    ACTIVITY_ALIASES, get_activity_rules,
+)
+from telugu_panchangam.panchangam_provenance import panchangam_provenance
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -315,6 +321,7 @@ def tool_get_panchangam(
             'disha_shoola_direction': day.disha_shoola_direction,
             'nakshatra_mukha': day.nakshatra_mukha,
             'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
+            'provenance': panchangam_provenance(system),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -377,6 +384,7 @@ def tool_get_muhurta(
             'disha_shoola_direction': day.disha_shoola_direction,
             'nakshatra_mukha': day.nakshatra_mukha,
             'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
+            'provenance': panchangam_provenance(system),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -533,6 +541,7 @@ def tool_get_panchangam_range(
             'system': system,
             'ayanamsa': ayanamsa,
             'days': days,
+            'provenance': panchangam_provenance(system),
         })
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -744,10 +753,18 @@ def tool_get_gochara(
                            'verdict': v['verdict'], 'vedha_by': v['vedha_by']})
         return json.dumps({
             'date': date_str, 'city': city, 'janma_rasi': janma_rasi,
-            'convention': 'Brihat Samhita gochara from the natal Moon sign: favourable '
-                          'houses per graha with vedha obstruction (Surya-Shani and '
-                          'Chandra-Budha exempt; nodes neither cause nor receive vedha). '
-                          'Positions at sunrise. Gochara is one factor — not a muhurta.',
+            'convention': 'Transit houses are counted from the natal Moon sign. '
+                          'Brihat Samhita 104.4 supports favourable houses for the '
+                          'seven classical grahas. Phaladeepika 26.3-8 supports '
+                          'the Vedha pairs and classical exemptions. The configured '
+                          'Rahu/Ketu houses (3, 6, 11) conflict with Phaladeepika '
+                          '26.2, which treats both like Surya and therefore includes '
+                          'the 10th; node Vedha remains unverified. Phaladeepika '
+                          '26.1 and 26.22-23 support the Moon-sign reference and '
+                          'underlying Shani-house effects, not the conventional '
+                          'condition names, phase labels or advice. '
+                          'Positions are at sunrise. Gochara is one factor — not a muhurta.',
+            'provenance': GOCHARA_PROVENANCE,
             'conditions': named_conditions(janma_rasi, sky),
             'gochara': merged,
         })
@@ -1044,12 +1061,44 @@ def tool_find_muhurta(
         slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
                                   x['personal_dosha'] is not None,
                                   x['date'], x['start']))
+        rules = get_activity_rules(activity)
+        constraint_fields = (
+            'allowed_maasams', 'allowed_maasa_solar_pairs', 'allowed_varas',
+            'avoid_vara_paksha',
+            'allowed_solar_classes', 'allowed_nakshatras', 'avoid_nakshatras',
+            'prefer_nakshatras',
+            'allowed_tithi_numbers', 'prefer_tithi_numbers',
+            'avoid_tithi_numbers',
+            'required_lagna_class',
+            'allowed_lagnas', 'prefer_lagnas', 'caution_lagna_solar',
+            'daytime_only', 'forenoon_only', 'allowed_pakshams',
+            'allowed_solar_signs', 'allowed_tithi_names', 'skip_on_combust',
+            'avoid_janma_nakshatra',
+            'avoid_vara_tithi_names',
+            'avoid_nitya_yogas',
+            'require_homa_election',
+        )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
+            'resolved_activity': ACTIVITY_ALIASES.get(activity, activity),
             'city': city, 'system': system, 'chandra_mode': chandra_mode,
             'ayanamsa': ayanamsa,
             'slots': slots[:12],
             'dropped_days': dropped_days,
+            'activity_profile': {
+                'alias_of': ACTIVITY_ALIASES.get(activity),
+                'source_claim': rules.get('source_claim'),
+                'audit_claim': rules.get('audit_claim'),
+                'heuristic_claim': rules.get('heuristic_claim'),
+                'related_claims': rules.get('related_claims', []),
+                'manual_prerequisites': rules.get(
+                    'manual_prerequisites', False),
+                'automated_constraints': {
+                    field: rules[field]
+                    for field in constraint_fields if field in rules
+                },
+                'manual_checks': rules.get('manual_checks', []),
+            },
             'disclaimer': _MUHURTA_DISCLAIMER,
         })
     except ValueError as e:
