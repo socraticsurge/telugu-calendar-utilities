@@ -6,8 +6,9 @@ muscle memory.
 
 > See also: [`ARCHITECTURE.md`](ARCHITECTURE.md) for the layer cake,
 > [`CLAUDE.md`](CLAUDE.md) for the working agreement,
-> [`docs/tracking/improvement-plan.md`](docs/tracking/improvement-plan.md)
-> for the active phased roadmap.
+> [`docs/reference/06-roadmap-and-backlog.md`](docs/reference/06-roadmap-and-backlog.md)
+> for the current roadmap. The older improvement plan is retained as a
+> historical decision log and contains intentionally stale phase-era detail.
 
 ## Table of contents
 

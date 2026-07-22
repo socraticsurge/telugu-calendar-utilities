@@ -39,4 +39,9 @@ The owner's standard is stated positively: *"the simpler and the more elegant it
 
 ## Accessibility & Inclusion
 
-WCAG AA is the target. Known backlog (improvement-plan Phase 4): sub-AA muted-text contrast, real dialog semantics for drawer/help-sheet, `<main>` landmark + skip link. Reduced motion respected throughout. Transliterated Telugu terms (Tithi, Varjyam) are kept as-is per project policy, with plain-English explanations available in context.
+WCAG AA is the target. The July 2026 accessibility pass corrected muted-text
+contrast, added dialog semantics and focus management to the drawer/help sheet,
+and added the `<main>` landmark and skip link. Reduced motion is respected
+throughout. Transliterated Telugu terms (Tithi, Varjyam) are kept as-is per
+project policy, with plain-English explanations available in context. New UI
+work must preserve these contracts and pass the browser review gate.

@@ -1,6 +1,11 @@
 # Telugu Calendar Utilities — Improvement Plan
 
-_Created 2026-06-16. Last updated 2026-06-16 — **Phases 1 / 2 / 6 / 7 + housekeeping fully shipped** (14 PRs total). **Phases 3 / 4 / 5 / 8 PAUSED 2026-06-16** — the application is in good shape; remaining work is quality-of-life polish. See "Pause notes" section below for the precise state and resume path. Living tracker — gitignored under `docs/tracking/`. **This file is the source of truth for the plan.**_
+_Created 2026-06-16. Historical phase-era decision log. It is deliberately
+not the current source of truth: Vite/TypeScript and the principal Phase 4
+accessibility work later shipped, so unchecked items and counts below describe
+the June 2026 snapshot. Use
+[`docs/reference/06-roadmap-and-backlog.md`](../reference/06-roadmap-and-backlog.md)
+for current status and `AGENTS.md` for the governing maintenance contract._
 
 ---
 

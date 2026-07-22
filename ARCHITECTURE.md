@@ -151,7 +151,8 @@ re-enforces this at release time.
 
 ## Test architecture
 
-1,000+ tests pin behaviour. Three philosophies are in use:
+1,250+ Python tests plus frontend contract tests pin behaviour. Three
+philosophies are in use:
 
 - **Golden-output**: most engine tests verify against pre-computed
   values cross-checked with [drikpanchang.com](https://drikpanchang.com).
@@ -162,9 +163,11 @@ re-enforces this at release time.
   catches asset references that don't reach gh-pages.
   `tests/test_version_sync.py` catches manifest drift.
 
-The forward-year regression scheduled in Phase 6 will extend the
-golden-output set to 2027–2030 across multiple anchor festivals × all
-three engines.
+The forward-year fixture currently covers 2027–2028. Its ledger records one
+independently checked Drik Panchang cell and 29 engine-pinned cells, so the
+suite must not describe the whole fixture as externally verified. Extending
+independent checks and coverage through 2030 remains evidence work, not a
+prerequisite for the parked `EngineCore` refactor.
 
 ## Where to add new things
 
@@ -175,7 +178,7 @@ three engines.
 | A new MCP tool | `telugu_panchangam/mcp/tools.py` (logic) + `mcp/server.py` (signature) | Both need to stay in sync; the audit caught a drift case in Phase 7 |
 | A new ICS feed shape | `telugu_panchangam/generators/<name>.py` | The existing `ics.py` is the dense daily; new shapes (weekly digest, Ekadashi-only) belong as siblings |
 | A new city | `telugu_panchangam/cities.py` (or wherever the 22-city table lives) + a test | Verify timezone, lat/long, and at least one DP cross-check |
-| A landing-page change | Root `index.html` + `src/main.ts` (Vite) | Anything visible needs sign-off per the project's UI review rule |
+| A landing-page change | Root `index.html` + the relevant `src/` module (Vite) | Anything visible needs screenshots, live browser verification and owner sign-off per the UI review rule |
 
 ## See also
 
