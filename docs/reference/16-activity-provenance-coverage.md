@@ -47,12 +47,12 @@ python tools/check_activity_provenance.py
 | `cremation` | Cremation rites | `muhurta.cremation.profile_conflict` | **Contradicted:** whole-Dhanishtha block overstates the cited 4½-Nakshatra Panchaka |
 | `yajna` | Yajna / Homam | `muhurta.yajna.profile_conflict` | **Contradicted:** family scoring omits and conflicts with Homahuti/Agnivasa formulas |
 | `job` | Job start / Contract signing | `muhurta.job_contract.profile_conflict` | **Contradicted:** combines distinct service-entry and contract scopes under unsupported proxies |
-| `business` | Business launch | `muhurta.business.profile_conflict` | **Contradicted:** nearest capital-deployment verse requires Chara, not configured Sthira, Lagna |
+| `business` | Deploying capital / business investment | `muhurta.capital_deployment` | Verified verse-27 profile; benefic-house and empty-8th checks remain manual |
 | `ceremony` | Shantika / Paushtika rite | `muhurta.shantika_paushtika` | Verified exact verse-34 profile; chart prerequisites and remedial exception disclosed |
 | `beginning` | Dharma-kriya commencement | `muhurta.dharma_kriya.commencement` | Verified verse-30 profile; Varga, Guru placement and personal Guru-bala remain manual |
 | `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
-Coverage is therefore **29 of 35 distinct profiles**, plus one compatibility
+Coverage is therefore **30 of 35 distinct profiles**, plus one compatibility
 alias. The verified profiles use
 B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
 printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
@@ -61,7 +61,7 @@ status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
 
 Engagement, Cremation, Yajna,
-Job/Contract and Business are excluded from the
+Job/Contract is excluded from the
 verified count. Their
 `audit_claim` fields record known source conflicts without granting authority
 to the current profiles. See the [Engagement evidence audit](36-engagement-evidence-audit.md), the

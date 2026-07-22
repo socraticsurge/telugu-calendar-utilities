@@ -480,9 +480,9 @@ def test_reason_groups_categorise_correctly():
     """A slot with Sarvartha Siddhi + tarabalam mixed + tithi-class match
     routes each reason to its category."""
     # 2026-06-25 (Thu) — Sarvartha Siddhi at sunrise, Shukla Ekadashi (Nanda).
-    # Activity 'business' prefers Nanda + Guruvaram, so all categories fire.
+    # Legacy Job profile prefers Nanda + Guruvaram, so all categories fire.
     day = _day(2026, 6, 25)
-    slots = day_slots(day, activity='business',
+    slots = day_slots(day, activity='job',
                       janma_nakshatras=['Krittika'])
     assert slots
     rg = slots[0]['reason_groups']
@@ -499,8 +499,8 @@ def test_reason_groups_categorise_correctly():
     # Group fit contains tarabalam line (favourable or avoid)
     assert any('tarabalam' in r for r in rg['group_fit'])
     # Activity match contains Nanda + Guruvaram bonuses
-    assert any('Nanda' in r and 'favoured for Business' in r for r in rg['activity_match'])
-    assert any('Guruvaram favoured for Business' in r for r in rg['activity_match'])
+    assert any('Nanda' in r and 'favoured for Job' in r for r in rg['activity_match'])
+    assert any('Guruvaram favoured for Job' in r for r in rg['activity_match'])
 
 
 def test_doctrinal_note_sarvartha_rectifies_tara():

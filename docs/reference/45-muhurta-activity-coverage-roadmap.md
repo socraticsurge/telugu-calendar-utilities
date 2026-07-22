@@ -32,6 +32,7 @@ occupation of a newly built home remain separate acts.
 | 9 | Litigation duplicate correction | **Implemented:** legacy key now resolves to Court; unsupported Bhadra/legal scoring removed |
 | 10 | Ceremony correction | **Implemented:** generic Puja proxies replaced by the exact Shantika/Paushtika election |
 | 11 | New Beginning correction | **Implemented:** generic proxies replaced by the exact Dharma-kriya commencement election |
+| 12 | Business correction | **Implemented:** generic launch proxies replaced by the exact capital-deployment election |
 
 Seemantha, completed-house purchase, home-repair commencement and trade-
 inventory purchase, borrowing and lending are now implemented as separate,

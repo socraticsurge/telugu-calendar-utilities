@@ -66,7 +66,7 @@ PyPI MCP package.
 | 38 | [Yajna / Homam evidence audit](38-yajna-homam-evidence-audit.md) | Homahuti and Agnivasa verses versus the current family scoring |
 | 39 | [General purchase source profile](39-purchase-profile.md) | Buyer-side Kraya verse, marketplace checks, and object-specific boundaries |
 | 40 | [Job / Contract evidence audit](40-job-contract-evidence-audit.md) | Service-entry verse and the unsupported modern-contract conflation |
-| 41 | [Business-launch evidence audit](41-business-evidence-audit.md) | Capital-deployment verse, movable-Lagna conflict, and scope boundaries |
+| 41 | [Capital-deployment source profile](41-business-evidence-audit.md) | Exact verse-27 stars and Chara gate, chart prerequisites, commercial and legal boundary |
 | 42 | [Shantika / Paushtika source profile](42-ceremony-evidence-audit.md) | Exact verse-34 gates, chart prerequisites, narrow rite scope and remedial exception |
 | 43 | [Dharma-kriya commencement profile](43-beginning-evidence-audit.md) | Exact verse-30 gates, meritorious-work scope, Varga and personal Guru-bala boundary |
 | 44 | [Activity provenance states](44-activity-provenance-states.md) | Enforced verified, contradicted and heuristic claim contract across Python, MCP and browser |

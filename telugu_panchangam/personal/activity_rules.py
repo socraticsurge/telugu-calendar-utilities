@@ -849,24 +849,26 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'safety and contractor readiness take precedence '
                           'over electional timing.',
                       ]},
-    'business':      {'label': 'Business launch',
-                      'audit_claim': 'muhurta.business.profile_conflict',
-                      'prefer_choghadiya': ('Amrit', 1),
-                      'prefer_tithi_class': 'Nanda',
-                      'prefer_vara': ['Guruvaram', 'Budhavaram'],
-                      'prefer_lagna_class': 'Sthira',
+    'business':      {'label': 'Deploying capital / business investment',
+                      'source_claim': 'muhurta.capital_deployment',
+                      'manual_prerequisites': True,
+                      'allowed_nakshatras': [
+                          'Swati', 'Punarvasu', 'Chitra', 'Anuradha',
+                          'Mrigashira', 'Revati', 'Vishakha', 'Pushya',
+                          'Shravana', 'Dhanishtha', 'Shatabhisha', 'Ashwini',
+                      ],
+                      'required_lagna_class': 'Chara',
                       'manual_checks': [
-                          'Capital-deployment cross-check: Muhurta '
-                          'Chintamani verse 27 prefers Swati, Punarvasu, '
-                          'Chitra, Anuradha, Mrigashira, Revati, Vishakha, '
-                          'Pushya, Shravana, Dhanishtha, Shatabhisha and '
-                          'Ashwini, with a Chara—not Sthira—Lagna.',
-                          'Election chart for deploying funds: benefics in '
-                          'the 5th and 9th and an unoccupied 8th house.',
-                          'Scope warning: capital deployment, marketplace '
-                          'trade and inventory purchase are distinct source '
-                          'activities; none inspected is a universal modern '
-                          'business-launch election.',
+                          'Scope: Dravyaprayoga means putting funds to work '
+                          'or investing capital in an enterprise; founding '
+                          'a company, opening a marketplace, buying '
+                          'inventory and making a loan are separate acts.',
+                          'Election chart: place benefics in the 5th and '
+                          '9th houses and leave the 8th house unoccupied.',
+                          'Commercial viability, diversification, liquidity, '
+                          'contracts, tax and securities law, due diligence '
+                          'and qualified financial or legal advice take '
+                          'precedence over electional timing.',
                       ]},
     'job':           {'label': 'Job start / Contract signing',
                       'audit_claim': 'muhurta.job_contract.profile_conflict',

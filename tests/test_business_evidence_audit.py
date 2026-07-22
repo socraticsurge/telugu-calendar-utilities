@@ -1,4 +1,4 @@
-"""Business launch must disclose its capital-deployment mismatch."""
+"""Capital-deployment rules preserve Chintamani 27 on every surface."""
 import json
 from pathlib import Path
 
@@ -6,7 +6,7 @@ from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 
 
 ROOT = Path(__file__).parents[1]
-CLAIM_ID = 'muhurta.business.profile_conflict'
+CLAIM_ID = 'muhurta.capital_deployment'
 
 
 def _claim():
@@ -15,40 +15,48 @@ def _claim():
     return next(item for item in ledger['claims'] if item['id'] == CLAIM_ID)
 
 
-def test_business_profile_records_scope_and_lagna_conflict():
+def test_business_key_is_exact_capital_deployment_profile():
     rules = ACTIVITY_RULES['business']
-    assert rules['audit_claim'] == CLAIM_ID
-    assert 'source_claim' not in rules
-    assert rules['prefer_lagna_class'] == 'Sthira'
-    assert rules['prefer_tithi_class'] == 'Nanda'
-    assert len(rules['manual_checks']) == 3
-    assert 'Chara—not Sthira—Lagna' in rules['manual_checks'][0]
-    assert 'benefics in the 5th and 9th' in rules['manual_checks'][1]
-    assert 'distinct source activities' in rules['manual_checks'][2]
+    assert rules['label'] == 'Deploying capital / business investment'
+    assert rules['source_claim'] == CLAIM_ID
+    assert 'audit_claim' not in rules
+    assert rules['manual_prerequisites'] is True
+    assert len(rules['allowed_nakshatras']) == 12
+    assert rules['required_lagna_class'] == 'Chara'
+    for field in (
+        'prefer_choghadiya', 'prefer_tithi_class', 'prefer_vara',
+        'prefer_lagna_class',
+    ):
+        assert field not in rules
 
 
-def test_business_claim_has_exact_capital_deployment_boundary():
+def test_claim_has_exact_scope_and_chart_boundary():
     claim = _claim()
-    assert claim['verification_state'] == 'contradicted'
+    assert claim['verification_state'] == 'verified'
     assert claim['source_ids'] == ['MC-HINDI-IA']
     assert "'Dravyaprayoga and taking a loan,' verse 27" in claim['locator']
-    assert 'requires Chara Lagna' in claim['scope']
-    assert 'directly contradicts the configured Sthira-Lagna bonus' in claim['scope']
-    assert 'Marketplace transactions and purchase for inventory are separate' in claim['scope']
+    assert 'twelve named Nakshatras' in claim['scope']
+    assert 'Chara Lagna' in claim['scope']
+    assert 'unoccupied 8th' in claim['scope']
+    assert 'does not authorize a universal company-founding election' in \
+        claim['scope']
 
 
-def test_mcp_and_browser_expose_business_audit():
+def test_mcp_and_browser_expose_the_same_verified_profile():
     from telugu_panchangam.mcp.tools import tool_find_muhurta
 
     result = json.loads(tool_find_muhurta(
         '2026-06-17', days=1, activity='business', city='Hyderabad'))
     profile = result['activity_profile']
-    assert profile['source_claim'] is None
-    assert profile['audit_claim'] == CLAIM_ID
-    assert profile['manual_checks'] == ACTIVITY_RULES['business']['manual_checks']
+    assert profile['source_claim'] == CLAIM_ID
+    assert profile['audit_claim'] is None
+    assert profile['manual_prerequisites'] is True
 
     browser = json.loads(
         (ROOT / 'src/data/activity-rules.generated.json').read_text(encoding='utf-8'))
     exported = browser['rules']['business']
-    assert exported['audit_claim'] == CLAIM_ID
-    assert exported['manual_checks'] == ACTIVITY_RULES['business']['manual_checks']
+    for field in (
+        'label', 'source_claim', 'manual_prerequisites',
+        'allowed_nakshatras', 'required_lagna_class', 'manual_checks',
+    ):
+        assert exported[field] == ACTIVITY_RULES['business'][field]

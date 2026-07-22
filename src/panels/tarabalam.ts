@@ -1242,7 +1242,7 @@ const MU_ACT_LABEL = {
   bhumi_puja: 'bhumi puja (foundation laying)',
   well_digging: 'well digging',
   home_repair: 'a home repair / renovation start',
-  business: 'a business launch', job: 'a job start / contract',
+  business: 'a capital deployment / business investment', job: 'a job start / contract',
   yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
   court: 'filing a lawsuit / court action', surgery: 'a surgery / medical procedure',
 };

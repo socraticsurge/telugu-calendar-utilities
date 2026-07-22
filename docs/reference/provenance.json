@@ -403,14 +403,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.business.profile_conflict",
+      "id": "muhurta.capital_deployment",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["MC-HINDI-IA"],
       "locator": "Nakshatra-prakarana, 'Dravyaprayoga and taking a loan,' verse 27, printed pp. 38-39 (OCR lines 2578-2599); compare marketplace verse 17, printed pp. 34-35",
-      "scope": "No inspected passage supplies a universal modern business-launch election. The closest capital-deployment rule, verse 27, names twelve Nakshatras, requires Chara Lagna, benefics in the 5th/9th and an empty 8th; its movable-Lagna requirement directly contradicts the configured Sthira-Lagna bonus. Marketplace transactions and purchase for inventory are separate scopes and cannot silently authorize launch timing. The configured Amrit, Nanda, Wednesday/Thursday and fixed-Lagna profile must not be presented as verified business-launch doctrine.",
+      "scope": "Supports twelve named Nakshatras, Chara Lagna, benefics in the 5th and 9th houses and an unoccupied 8th for Dravyaprayoga: putting funds to work, including investing capital in employment or business. The Chara requirement is automated; the three house conditions remain mandatory practitioner checks. This does not authorize a universal company-founding election and excludes marketplace opening, inventory purchase and lending, which are separate activities. Commercial, legal and financial judgment always takes precedence. The former Amrit, Nanda, weekday and Sthira-Lagna proxies have been removed.",
       "last_reviewed": "2026-07-22"
     },
     {

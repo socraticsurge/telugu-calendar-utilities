@@ -1,46 +1,33 @@
-# Business Launch Evidence Audit
+# Capital Deployment Source Profile
 
-## Status
+## Scope and authority
 
-The Business launch profile is **not source-verified**. Its `audit_claim`,
-`muhurta.business.profile_conflict`, has state `contradicted`.
+The `business` compatibility key now means **deploying capital / business
+investment**, not founding or launching a company generally. The verified claim
+is `muhurta.capital_deployment`.
 
-## Inspected authority
+The source is Rama Daivajna, *Muhurta Chintamani*, undated Sanskrit text with
+Hindi commentary, Nakshatra-prakarana, “Dravyaprayoga and taking a loan,”
+verse 27, printed pages 38–39 (Internet Archive OCR lines 2578–2599).
 
-- Rama Daivajna, *Muhurta Chintamani*, Sanskrit text with Hindi commentary.
-- Internet Archive identifier `muhurta-chintamani-hindi`; publisher and date
-  are absent from the scan metadata.
-- Nakshatra-prakarana, “Dravyaprayoga and taking a loan,” verse 27, printed
-  pages 38–39; OCR lines 2578–2599.
-- Compared with marketplace election verse 17, printed pages 34–35.
+The commentary explains Dravyaprayoga as putting funds to work, including
+lending or investing them in employment/business. The product already has a
+separate lender-side profile, so this key is restricted to deploying investment
+capital in an enterprise. Marketplace opening, inventory purchase and company
+formation remain distinct acts.
 
-## Scope finding
+## Exact crosswalk
 
-The inspected edition distinguishes several commercial acts:
+| Source criterion | Implementation | Boundary |
+|---|---|---|
+| Twelve named Nakshatras | Exact `allowed_nakshatras` | Hard slot-time gate |
+| Chara Lagna | `required_lagna_class = 'Chara'` | Hard slot-time gate |
+| Benefics in the 5th and 9th | Manual check | Mandatory chart review |
+| Eighth house unoccupied | Manual check | Mandatory chart review |
 
-- purchasing from the buyer’s side (verse 16);
-- selling and marketplace operation (verse 17);
-- deploying capital or lending/borrowing (verse 27).
+`manual_prerequisites = true` caps results below Excellent until the chart is
+checked. The former Amrit Choghadiya, Nanda Tithi, weekday and Sthira-Lagna
+proxies have been removed because verse 27 does not supply them.
 
-None is labelled as a universal election for founding or launching a modern
-enterprise. Combining them under “Business launch” would erase meaningful
-differences in purpose and rules.
-
-## Nearest-passage crosswalk
-
-| Criterion | Current Business profile | Verse 27 capital deployment | Status |
-|---|---|---|---|
-| Nakshatra | No activity-specific rule | Swati, Punarvasu, Chitra, Anuradha, Mrigashira, Revati, Vishakha, Pushya, Shravana, Dhanishtha, Shatabhisha and Ashwini | Missing |
-| Lagna | Sthira preferred | Chara required | **Direct contradiction** |
-| Election chart | Not represented | Benefics in the 5th and 9th; 8th unoccupied | Missing |
-| Tithi | Nanda rewarded | No Nanda-family rule here | Unsupported proxy |
-| Vara | Wednesday and Thursday rewarded | Transaction-specific cautions, not this pair as a launch rule | Unsupported proxy |
-| Choghadiya | Amrit rewarded | Not supplied by the passage | Project heuristic |
-
-## Correction boundary
-
-A defensible product should either narrow this activity to a precisely sourced
-commercial act or add distinct profiles for enterprise formation, capital
-deployment and marketplace opening. That changes the public taxonomy and
-existing tests. Until owner approval, results surface the Chara/Sthira conflict
-and scope warning instead of claiming classical verification.
+Commercial viability, diversification, liquidity, contracts, taxation,
+securities law, due diligence and qualified advice take precedence over timing.
