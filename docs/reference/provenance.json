@@ -216,15 +216,26 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.wedding.profile_conflict",
+      "id": "muhurta.wedding",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993"],
-      "locator": "Chapter IX, 'Electing a time for marriage,' printed p. 41 (PDF p. 45), especially the Tithi, Vara, Nakshatra and Rasi rules",
-      "scope": "The inspected passage contradicts the configured wedding Tithi-family scoring. The project penalizes every Jaya Tithi, but Raman names Shukla Tritiya and Trayodashi among the best while rejecting Ashtami. The project rewards every Purna Tithi, which can reward Pournami and Amavasya even though the passage rejects both. Raman also supplies exact weekday, Nakshatra and rising-Rasi lists that the current broad preferences do not represent. This audit claim records evidence debt only and must never be presented as a verified profile.",
-      "last_reviewed": "2026-07-21"
+      "locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46), from the lunar-month paragraph through the election-chart conditions",
+      "scope": "Supports six unconditionally admitted lunar months plus the Pushya/Makara and Chaitra/Mesha exceptions; exact rejection-derived Tithi admissions; Tuesday exclusion with four best and two middling weekdays; eleven Nakshatras; nine computable named Nitya-Yoga exclusions; Vishti rejection; three best and five middling rising Rasis; and the six visible chart prerequisites. Magha/Moola Pada 1, Revati Pada 4 and the source's non-Nitya 'Mrityu Yoga' remain mandatory manual checks because those facts are not represented across every surface. Adhika, Pitru Paksha, Sankramana, combustion and Simha-Stha filters are separately disclosed conservative Panchanga-Shuddhi safeguards rather than being attributed to this passage.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "muhurta.wedding.drkpanchang_divergence",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/31-wedding-evidence-audit.md",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["DP-DAY-PAGE"],
+      "locator": "Drik Panchang, 2026 Hindu Marriage Dates for Hyderabad and Panchang Shuddhi methodology; reviewed 2026-07-22",
+      "scope": "The published Hyderabad table admits qualifying Tuesdays and includes Tithis such as Chaturdashi, Pournami, Shashthi and Navami that Raman's method rejects. It also applies solar/lunar month, Adhika, Chaturmas and Guru/Shukra Asta filters. This is a real lineage and methodology divergence: the product follows its explicitly named Raman profile, preserves separately sourced conservative safeguards, and does not claim identity with Drik Panchang's marriage-date set.",
+      "last_reviewed": "2026-07-22"
     },
     {
       "id": "muhurta.engagement.profile_conflict",

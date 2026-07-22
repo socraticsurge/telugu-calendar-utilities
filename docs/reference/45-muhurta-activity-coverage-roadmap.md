@@ -27,6 +27,7 @@ occupation of a newly built home remain separate acts.
 | 4 | Buying inventory for trade | **Implemented:** buyer-side inventory profile distinct from launch |
 | 5 | Borrowing and lending | **Implemented:** separate debtor- and creditor-side profiles |
 | 6 | Gruhapravesha correction | **Implemented:** conflicting soft profile replaced by exact Raman-lineage gates |
+| 7 | Wedding correction | **Implemented:** contradictory family scoring replaced by the complete Raman election crosswalk |
 
 Seemantha, completed-house purchase, home-repair commencement and trade-
 inventory purchase, borrowing and lending are now implemented as separate,
@@ -36,6 +37,12 @@ the current Drik Panchang Wednesday divergence. Gruhapravesha is now corrected
 and verified, with its published-practice divergence visible. The
 highest-priority unresolved item is deity installation, which remains
 specialist-only pending a bounded product design.
+
+The Wedding profile is likewise corrected: exact lunar-month exceptions,
+Paksha-aware Tithis, weekday grades, Nakshatras, Nitya Yogas, Vishti and named
+Lagnas replace the former Purna/Jaya and fixed-class proxies. Pada and complete
+election-chart conditions remain mandatory practitioner checks, and the current
+Drik Panchang methodology divergence is visible.
 
 ## Important holds and splits
 

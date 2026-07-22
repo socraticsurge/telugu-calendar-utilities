@@ -147,12 +147,11 @@ def test_mcp_non_khar_maasa_fields_are_false_and_none():
 # Muhurta consumption: samskara activities skip Khar-Maasa days
 # ---------------------------------------------------------------------------
 
-def test_wedding_skipped_during_khar_maasa():
-    """Wedding activity returns [] on a Khar-Maasa day."""
+def test_wedding_rejects_unlisted_month_without_generic_khar_attribution():
     from telugu_panchangam.personal.muhurta import day_slots, diagnose_day
     eng = DrikEngine()
     city = _hyderabad()
-    day = eng.calculate(date(2026, 12, 20), city)
+    day = eng.calculate(date(2026, 1, 1), city)
     assert day.is_khar_maasa
 
     slots = day_slots(day, activity='wedding')
@@ -162,7 +161,8 @@ def test_wedding_skipped_during_khar_maasa():
 
     reason = diagnose_day(day, activity='wedding')
     assert reason is not None
-    assert 'Khar-Maasa' in reason
+    assert 'Pushya Maasa' in reason
+    assert 'lunar month' in reason
 
 
 def test_samskara_activities_skip_khar_maasa():

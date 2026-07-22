@@ -722,6 +722,7 @@ async function findMuhurta() {
       const avoidTithiNumbers = new Set(rules.avoid_tithi_numbers || []);
       const avoidVaraTithiNames = new Set(
         (rules.avoid_vara_tithi_names || []).map(pair => `${pair[0]}|${pair[1]}`));
+      const avoidNityaYogas = new Set(rules.avoid_nitya_yogas || []);
       const manualChecks = rules.manual_checks || [];
       const activityLabel = rules.label;
       const combustionReason = muCombustionDropReason(
@@ -733,7 +734,10 @@ async function findMuhurta() {
       }
 
       const normalizedMaasam = (data.maasam || '').replace(/^(?:Nija|Adhika)\s+/, '');
-      if (rules.allowed_maasams?.length && !rules.allowed_maasams.includes(normalizedMaasam)) {
+      const maasaSolarAdmitted = (rules.allowed_maasa_solar_pairs || []).some(pair =>
+        pair[0] === normalizedMaasam && pair[1] === data.solarSign);
+      if ((rules.allowed_maasams?.length || rules.allowed_maasa_solar_pairs?.length) &&
+          !rules.allowed_maasams?.includes(normalizedMaasam) && !maasaSolarAdmitted) {
         droppedDays.push({ date: isoDate,
           reason: `${data.maasam} Maasa · ${activityLabel} source profile does not admit this lunar month` });
         continue;
@@ -1061,6 +1065,7 @@ async function findMuhurta() {
 
           // Nitya yoga — slot-time (samskara skip on Vyatipata/Vaidhriti)
           const ny = facts.yoga;
+          if (avoidNityaYogas.has(ny)) continue;
           if (MU_NITYA_HARD_AVOID.has(ny)) {
             if (skipYogas.size) { continue; }
             score += MU_NITYA_HARD_PENALTY;

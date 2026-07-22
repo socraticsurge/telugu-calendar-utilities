@@ -182,8 +182,13 @@ def _day_skip_reason(day, rules, activity, travel_direction,
         return f'{kind} · auspicious activities deferred'
 
     allowed_maasams = rules.get('allowed_maasams')
+    allowed_maasa_solar_pairs = {
+        tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}
     normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')
-    if allowed_maasams and normalized_maasam not in allowed_maasams:
+    if ((allowed_maasams or allowed_maasa_solar_pairs) and
+            normalized_maasam not in (allowed_maasams or ()) and
+            (normalized_maasam, day.solar_sign) not in
+            allowed_maasa_solar_pairs):
         return (f'{day.maasam} Maasa · {rules["label"]} source profile '
                 'does not admit this lunar month')
 
@@ -313,6 +318,8 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu) -> dict | Non
     if active_tithi_number in ctx.avoid_tithi_numbers:
         return None
     if (day.vaaram, facts.tithi) in ctx.avoid_vara_tithi_names:
+        return None
+    if facts.yoga in ctx.avoid_nitya_yogas:
         return None
 
     # Special yogas
@@ -627,6 +634,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     avoid_vara_tithi_names = frozenset(
         tuple(pair) for pair in rules.get('avoid_vara_tithi_names', ()))
+    avoid_nitya_yogas = frozenset(rules.get('avoid_nitya_yogas', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
@@ -676,6 +684,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         avoid_vara_tithi_names=avoid_vara_tithi_names,
+        avoid_nitya_yogas=avoid_nitya_yogas,
         allowed_lagnas=allowed_lagnas,
         prefer_lagnas=prefer_lagnas,
         caution_lagna_solar=caution_lagna_solar,
@@ -759,8 +768,13 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         return []
 
     allowed_maasams = rules.get('allowed_maasams')
+    allowed_maasa_solar_pairs = {
+        tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}
     normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')
-    if allowed_maasams and normalized_maasam not in allowed_maasams:
+    if ((allowed_maasams or allowed_maasa_solar_pairs) and
+            normalized_maasam not in (allowed_maasams or ()) and
+            (normalized_maasam, day.solar_sign) not in
+            allowed_maasa_solar_pairs):
         return []
     allowed_varas = rules.get('allowed_varas')
     if allowed_varas and day.vaaram not in allowed_varas:
@@ -815,6 +829,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
     avoid_vara_tithi_names = frozenset(
         tuple(pair) for pair in rules.get('avoid_vara_tithi_names', ()))
+    avoid_nitya_yogas = frozenset(rules.get('avoid_nitya_yogas', ()))
     allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
     prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
     caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
@@ -887,6 +902,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         allowed_tithi_names=allowed_tithi_names,
         avoid_tithi_numbers=avoid_tithi_numbers,
         avoid_vara_tithi_names=avoid_vara_tithi_names,
+        avoid_nitya_yogas=avoid_nitya_yogas,
         allowed_lagnas=allowed_lagnas,
         prefer_lagnas=prefer_lagnas,
         caution_lagna_solar=caution_lagna_solar,

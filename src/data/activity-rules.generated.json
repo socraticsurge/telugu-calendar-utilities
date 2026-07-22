@@ -12,6 +12,7 @@
     "avoid_tithi_class",
     "required_lagna_class",
     "allowed_maasams",
+    "allowed_maasa_solar_pairs",
     "allowed_varas",
     "avoid_vara_paksha",
     "allowed_solar_classes",
@@ -25,6 +26,7 @@
     "manual_prerequisites",
     "avoid_janma_nakshatra",
     "avoid_vara_tithi_names",
+    "avoid_nitya_yogas",
     "allowed_lagnas",
     "prefer_lagnas",
     "caution_lagna_solar",
@@ -114,20 +116,113 @@
     },
     "wedding": {
       "label": "Wedding (Vivaha)",
-      "prefer_lagna_class": "Sthira",
+      "avoid_karana": [
+        "Vishti"
+      ],
       "skip_on_yoga": [
         "Visha Yoga",
         "Dagdha Yoga"
       ],
       "prefer_vara": [
+        "Somavaram",
+        "Budhavaram",
         "Guruvaram",
-        "Somavaram"
+        "Shukravaram"
       ],
-      "prefer_tithi_class": "Purna",
-      "avoid_tithi_class": [
-        "Jaya"
+      "allowed_maasams": [
+        "Magha",
+        "Phalguna",
+        "Vaishakha",
+        "Jyeshtha",
+        "Kartika",
+        "Margashira"
       ],
-      "audit_claim": "muhurta.wedding.profile_conflict",
+      "allowed_maasa_solar_pairs": [
+        [
+          "Pushya",
+          "Makara"
+        ],
+        [
+          "Chaitra",
+          "Mesha"
+        ]
+      ],
+      "allowed_varas": [
+        "Adivaram",
+        "Somavaram",
+        "Budhavaram",
+        "Guruvaram",
+        "Shukravaram",
+        "Shanivaram"
+      ],
+      "allowed_nakshatras": [
+        "Rohini",
+        "Mrigashira",
+        "Magha",
+        "Uttara Phalguni",
+        "Hasta",
+        "Swati",
+        "Anuradha",
+        "Moola",
+        "Uttara Ashadha",
+        "Uttara Bhadrapada",
+        "Revati"
+      ],
+      "manual_checks": [
+        "Nakshatra Pada gate: reject Magha and Moola Pada 1 and Revati Pada 4. Pada is not computed across every surface, so the automated profile admits the star only subject to this mandatory check.",
+        "Yoga vocabulary: Raman also rejects a named Mrityu Yoga that is not one of the engine’s 27 Nitya Yogas; verify the applicable lineage definition manually.",
+        "Election chart: keep the 7th house unoccupied; Mangala out of the 8th; Shukra out of the 6th; Lagna free from malefics and not hemmed between them; and Chandra unassociated with another Graha.",
+        "Fortification: consider Guru, Budha or Shukra in Lagna and malefics in the 3rd or 11th, or one of the source’s named marriage-election Yogas.",
+        "Couple-specific prerequisites: complete horoscope compatibility review, Tarabala, Chandrabala and Panchaka review for both partners; an election cannot substitute for consent or relationship judgment.",
+        "Lineage warning: current Drik Panchang Hyderabad dates admit some Tuesdays and Tithis Raman rejects. This profile follows Raman’s named method rather than silently blending published practices."
+      ],
+      "manual_prerequisites": true,
+      "avoid_nitya_yogas": [
+        "Vyatipata",
+        "Dhruva",
+        "Ganda",
+        "Vajra",
+        "Shoola",
+        "Vishkambha",
+        "Atiganda",
+        "Vyaghata",
+        "Parigha"
+      ],
+      "allowed_lagnas": [
+        "Mithuna",
+        "Kanya",
+        "Tula",
+        "Vrishabha",
+        "Karka",
+        "Simha",
+        "Dhanu",
+        "Kumbha"
+      ],
+      "prefer_lagnas": [
+        "Mithuna",
+        "Kanya",
+        "Tula"
+      ],
+      "source_claim": "muhurta.wedding",
+      "related_claims": [
+        "muhurta.wedding.drkpanchang_divergence"
+      ],
+      "allowed_tithi_names": [
+        "Shukla Pratipat",
+        "Shukla Dwitiya",
+        "Shukla Tritiya",
+        "Shukla Panchami",
+        "Shukla Saptami",
+        "Shukla Dashami",
+        "Shukla Ekadashi",
+        "Shukla Trayodashi",
+        "Krishna Pratipat",
+        "Krishna Dwitiya",
+        "Krishna Tritiya",
+        "Krishna Panchami",
+        "Krishna Saptami",
+        "Krishna Dashami"
+      ],
       "skip_on_combust": [
         "Guru",
         "Shukra"

@@ -19,6 +19,7 @@
 #   prefer_lagna_class      Sthira|Chara|Dvisvabhava — +1 when rising sign matches
 #   required_lagna_class    slot omitted unless its active Lagna matches
 #   allowed_maasams         day omitted unless its normalized lunar month is listed
+#   allowed_maasa_solar_pairs  additional exact (Maasa, Surya-Rasi) admissions
 #   allowed_varas           day omitted unless its sunrise weekday is listed
 #   avoid_vara_paksha       (Vara, Paksha) pairs that omit a day
 #   allowed_solar_classes   day omitted unless Surya's Rasi is in one of these classes
@@ -35,6 +36,7 @@
 #   manual_prerequisites    unresolved checks cap relative tier below Excellent
 #   avoid_janma_nakshatra   slot omitted when its star matches a supplied Janma star
 #   avoid_vara_tithi_names  slot omitted for exact (Vara, Tithi-name) pairs
+#   avoid_nitya_yogas       slot omitted while one of these Nitya Yogas is active
 #   audit_claim             provenance claim recording a known evidence conflict;
 #                           never grants verified status
 #   heuristic_claim         provenance claim recording intentionally project-defined
@@ -251,19 +253,84 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ]},
     # — Samskaras —
     'wedding':       {'label': 'Wedding (Vivaha)',
-                      'audit_claim': 'muhurta.wedding.profile_conflict',
+                      'source_claim': 'muhurta.wedding',
+                      'related_claims': [
+                          'muhurta.wedding.drkpanchang_divergence'],
+                      'manual_prerequisites': True,
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
-                      'skip_on_khar_maasa': True,
                       'skip_on_adhika': True,
                       'skip_on_pitru_paksha': True,
                       'skip_on_simha_stha_guru': True,
                       'penalty_on_simha_stha_shukra': -2,
                       'skip_on_combust': ['Guru', 'Shukra'],
-                      'prefer_tithi_class': 'Purna',
-                      'avoid_tithi_class': ['Jaya'],
-                      'prefer_vara': ['Guruvaram', 'Somavaram'],
-                      'prefer_lagna_class': 'Sthira'},
+                      'allowed_maasams': [
+                          'Magha', 'Phalguna', 'Vaishakha', 'Jyeshtha',
+                          'Kartika', 'Margashira',
+                      ],
+                      'allowed_maasa_solar_pairs': [
+                          ['Pushya', 'Makara'], ['Chaitra', 'Mesha'],
+                      ],
+                      'allowed_varas': [
+                          'Adivaram', 'Somavaram', 'Budhavaram',
+                          'Guruvaram', 'Shukravaram', 'Shanivaram',
+                      ],
+                      'prefer_vara': [
+                          'Somavaram', 'Budhavaram', 'Guruvaram',
+                          'Shukravaram',
+                      ],
+                      'allowed_tithi_names': [
+                          'Shukla Pratipat', 'Shukla Dwitiya',
+                          'Shukla Tritiya', 'Shukla Panchami',
+                          'Shukla Saptami', 'Shukla Dashami',
+                          'Shukla Ekadashi', 'Shukla Trayodashi',
+                          'Krishna Pratipat', 'Krishna Dwitiya',
+                          'Krishna Tritiya', 'Krishna Panchami',
+                          'Krishna Saptami', 'Krishna Dashami',
+                      ],
+                      'allowed_nakshatras': [
+                          'Rohini', 'Mrigashira', 'Magha',
+                          'Uttara Phalguni', 'Hasta', 'Swati', 'Anuradha',
+                          'Moola', 'Uttara Ashadha',
+                          'Uttara Bhadrapada', 'Revati',
+                      ],
+                      'avoid_karana': ['Vishti'],
+                      'avoid_nitya_yogas': [
+                          'Vyatipata', 'Dhruva', 'Ganda', 'Vajra',
+                          'Shoola', 'Vishkambha', 'Atiganda', 'Vyaghata',
+                          'Parigha',
+                      ],
+                      'allowed_lagnas': [
+                          'Mithuna', 'Kanya', 'Tula', 'Vrishabha',
+                          'Karka', 'Simha', 'Dhanu', 'Kumbha',
+                      ],
+                      'prefer_lagnas': ['Mithuna', 'Kanya', 'Tula'],
+                      'manual_checks': [
+                          'Nakshatra Pada gate: reject Magha and Moola Pada '
+                          '1 and Revati Pada 4. Pada is not computed across '
+                          'every surface, so the automated profile admits the '
+                          'star only subject to this mandatory check.',
+                          'Yoga vocabulary: Raman also rejects a named '
+                          'Mrityu Yoga that is not one of the engine’s 27 '
+                          'Nitya Yogas; verify the applicable lineage '
+                          'definition manually.',
+                          'Election chart: keep the 7th house unoccupied; '
+                          'Mangala out of the 8th; Shukra out of the 6th; '
+                          'Lagna free from malefics and not hemmed between '
+                          'them; and Chandra unassociated with another Graha.',
+                          'Fortification: consider Guru, Budha or Shukra in '
+                          'Lagna and malefics in the 3rd or 11th, or one of '
+                          'the source’s named marriage-election Yogas.',
+                          'Couple-specific prerequisites: complete horoscope '
+                          'compatibility review, Tarabala, Chandrabala and '
+                          'Panchaka review for both partners; an election '
+                          'cannot substitute for consent or relationship '
+                          'judgment.',
+                          'Lineage warning: current Drik Panchang Hyderabad '
+                          'dates admit some Tuesdays and Tithis Raman rejects. '
+                          'This profile follows Raman’s named method rather '
+                          'than silently blending published practices.',
+                      ]},
     'engagement':    {'label': 'Engagement (Nischayam)',
                       'audit_claim': 'muhurta.engagement.profile_conflict',
                       'skip_on_yoga': list(_SAMSKARA_SKIP),

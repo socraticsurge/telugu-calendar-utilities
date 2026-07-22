@@ -1,41 +1,56 @@
-# Wedding Evidence Audit
+# Wedding (Vivaha) source profile
 
-## Status
+## Authority and status
 
-The wedding profile is **not source-verified**. Its machine-readable
-`audit_claim` is `muhurta.wedding.profile_conflict`, whose state is
-`contradicted`. This is an evidence warning, not an authority badge.
+`wedding` follows B. V. Raman, *Muhurtha (Electional Astrology)*, Chapter IX,
+“Electing a Time for Marriage,” printed pages 41–42 (PDF pages 45–46). Raman is
+a modern secondary authority, not scripture. The claim `muhurta.wedding` means
+the configured criteria match this named passage; it does not claim that all
+regional Panchangams use the same method.
 
-## Inspected authority
+The former profile was contradicted: it rewarded the entire Purna family and
+penalized the entire Jaya family, reversing Raman on Pournami, Shukla Tritiya
+and Shukla Trayodashi. Those proxies have been removed.
 
-- B. V. Raman, *Muhurtha (Electional Astrology)*, UBS Publishers'
-  Distributors, 1993.
-- Chapter IX, “Electing a time for marriage,” printed page 41, PDF page 45.
-- Raman is a modern secondary authority, not scripture.
+## Exact automated crosswalk
 
-## Material conflicts
+| Criterion | Passage | Product treatment |
+|---|---|---|
+| Lunar month | Magha, Phalguna, Vaishakha and Jyeshtha good; Kartika and Margashira ordinary | All six admitted |
+| Conditional month | Pushya with Surya in Makara; Chaitra with Surya in Mesha | Exact `(Maasa, solar Rasi)` pairs admitted |
+| Tithi | Reject Krishna Ekadashi through Amavasya, Rikta, Shashthi, Ashtami and Dwadashi; seven named Shukla Tithis best | Every non-rejected Shukla/Krishna Tithi admitted by exact Paksha-qualified name; no family proxy |
+| Vara | Monday, Wednesday, Thursday and Friday best; Sunday/Saturday middling; Tuesday rejected | Six admitted, four receive a preference bonus |
+| Nakshatra | Rohini, Mrigashira, Magha, Uttara, Hasta, Swati, Anuradha, Moola, Uttara Ashadha, Uttara Bhadrapada and Revati | Exact eleven-star gate; “Uttara” resolved as Uttara Phalguni |
+| Yoga | Vyatipata, Dhruva, Mrityu, Ganda, Vajra, Shoola, Vishkambha, Atiganda, Vyaghata and Parigha rejected | Nine matching Nitya Yogas hard-gated; Mrityu remains manual because it is not one of the engine's 27 Nitya Yogas |
+| Karana | Vishti rejected | Slot-level hard gate |
+| Lagna | Mithuna, Kanya and Tula best; Vrishabha, Karka, Simha, Dhanu and Kumbha middling | Exact eight-Rasi gate with a bonus only for the best three |
 
-| Criterion | Current profile | Inspected passage | Consequence |
-|---|---|---|---|
-| Jaya Tithi family | Penalized wholesale | Shukla Tritiya and Trayodashi are named among the best; Ashtami is rejected | A family-level penalty reverses two explicit recommendations |
-| Purna Tithi family | Rewarded wholesale | Pournami and Amavasya are rejected | The score can reward expressly rejected Tithis |
-| Vara | Guruvara and Somavara preferred | Monday, Wednesday, Thursday and Friday are best; Tuesday rejected | The current preference is incomplete and has no hard Tuesday gate |
-| Nakshatra | No wedding-specific list | Eleven best Nakshatras are listed; others are called unsuitable, with Pada exceptions | Major activity-specific admission rule is absent |
-| Lagna | Fixed class preferred | Three Rasis are best, five middling, and the rest unsuitable | The class-level proxy does not reproduce the named-Rasi rule |
+The finder also retains separately sourced conservative samskara safeguards:
+Adhika and Pitru Paksha, Sankramana, Guru/Shukra combustion, Simha-Stha and the
+shared Visha/Dagdha layer. The Raman claim does not falsely attribute those
+extra filters to this passage.
 
-## Correction boundary
+## Mandatory manual prerequisites
 
-Existing tests explicitly preserve the Jaya penalty and Purna reward. Project
-policy treats those assertions as the frozen contract, so correcting them
-requires explicit owner approval. Until then:
+Reject Magha and Moola Pada 1 and Revati Pada 4. Pada is not computed across
+every product surface, so these remain explicit mandatory checks. The same is
+true for Raman's named “Mrityu Yoga,” whose definition is not represented in
+the 27-Nitya-Yoga model.
 
-1. the profile must not declare `source_claim`;
-2. browser and MCP contracts expose `audit_claim`;
-3. coverage reports wedding separately from both verified and merely unlocated
-   profiles; and
-4. downstream copy must not call wedding recommendations textually verified.
+The 7th house must be unoccupied; Mangala must avoid the 8th; Shukra must avoid
+the 6th; malefics must avoid and not hem Lagna; and Chandra must be
+unassociated with another Graha. Guru, Budha or Shukra in Lagna and malefics
+in the 3rd or 11th may fortify the election. Compatibility, Tarabala,
+Chandrabala and Panchaka require couple-specific review. These unresolved
+facts cap every automated result below `Excellent`.
 
-Once approved, the correction should use exact Tithi numbers/names and named
-Nakshatra/Rasi gates rather than Tithi or Lagna class proxies. Pada-level
-exceptions and election-chart conditions should remain explicit manual checks
-unless the relevant chart data is available across every surface.
+## Published-practice divergence
+
+Drik Panchang's 2026 Hyderabad marriage table admits qualifying Tuesdays and
+Tithis including Chaturdashi, Pournami, Shashthi and Navami that this Raman
+method rejects. Drik Panchang also applies its own solar/lunar-month, Adhika,
+Chaturmas and Guru/Shukra Asta method.
+
+This is recorded as `muhurta.wedding.drkpanchang_divergence`. The application
+does not present Raman-lineage results as identical to Drik Panchang's date
+set, and timing cannot replace consent or relationship judgment.

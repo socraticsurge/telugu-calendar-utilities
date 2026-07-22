@@ -79,6 +79,7 @@ class _DayContext:
     manual_prerequisites: bool
     avoid_janma_nakshatra: bool
     avoid_vara_tithi_names: frozenset
+    avoid_nitya_yogas: frozenset
 
 
 # ---------------------------------------------------------------------------

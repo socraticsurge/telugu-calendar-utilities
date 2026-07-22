@@ -1061,7 +1061,8 @@ def tool_find_muhurta(
                                   x['date'], x['start']))
         rules = ACTIVITY_RULES[activity]
         constraint_fields = (
-            'allowed_maasams', 'allowed_varas', 'avoid_vara_paksha',
+            'allowed_maasams', 'allowed_maasa_solar_pairs', 'allowed_varas',
+            'avoid_vara_paksha',
             'allowed_solar_classes', 'allowed_nakshatras', 'avoid_nakshatras',
             'prefer_nakshatras',
             'allowed_tithi_numbers', 'prefer_tithi_numbers',
@@ -1072,6 +1073,7 @@ def tool_find_muhurta(
             'allowed_solar_signs', 'allowed_tithi_names', 'skip_on_combust',
             'avoid_janma_nakshatra',
             'avoid_vara_tithi_names',
+            'avoid_nitya_yogas',
         )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
