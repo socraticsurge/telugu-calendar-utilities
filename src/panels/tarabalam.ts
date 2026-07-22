@@ -38,6 +38,35 @@ const TARA_GOOD = new Set([2,4,6,8,9]);
 const TB_RASIS = RASI_NAMES;
 const CHANDRA_GOOD = new Set([1,3,6,7,10,11]);
 const CHANDRA_PUJA = new Set([2,5,9]);
+const MU_ENGLISH_WEEKDAY = {
+  Adivaram: 'Sunday', Somavaram: 'Monday', Mangalavaram: 'Tuesday',
+  Budhavaram: 'Wednesday', Guruvaram: 'Thursday', Shukravaram: 'Friday',
+  Shanivaram: 'Saturday',
+};
+const MU_WEEKDAY_NAMES = Object.values(MU_ENGLISH_WEEKDAY);
+
+export function muRelevantManualChecks(items, vaaram) {
+  const current = MU_ENGLISH_WEEKDAY[vaaram];
+  return (items || []).filter(item => {
+    const namedDays = MU_WEEKDAY_NAMES.filter(day =>
+      new RegExp(`\\b${day}\\b`, 'i').test(item));
+    return !namedDays.length || namedDays.includes(current);
+  });
+}
+
+export function muClassifyManualChecks(items) {
+  const result = { chart: [], information: [], practical: [] };
+  for (const item of items || []) {
+    if (/^(Election chart|Horoscope|Birth chart|Weekday-Lagna condition|Mangala transit|Employer\/employee compatibility|Personal (?:Guru|star))/i.test(item)) {
+      result.chart.push(item.replace(/^(Election chart|Horoscope|Birth chart):\s*/i, ''));
+    } else if (/(take precedence|legal|medical|clinical|commercial need|cash flow|supplier terms|structural|permit|safety|consent|qualified advice)/i.test(item)) {
+      result.practical.push(item);
+    } else {
+      result.information.push(item);
+    }
+  }
+  return result;
+}
 let TB_DAYS = null;    // last computed result rows
 let TB_EVENTS = null;  // feed events used for the last calculation
 
@@ -748,7 +777,9 @@ async function findMuhurta() {
       const avoidVaraTithiNames = new Set(
         (rules.avoid_vara_tithi_names || []).map(pair => `${pair[0]}|${pair[1]}`));
       const avoidNityaYogas = new Set(rules.avoid_nitya_yogas || []);
-      const manualChecks = rules.manual_checks || [];
+      const manualChecks = muRelevantManualChecks(
+        rules.manual_checks || [], data.vaaram);
+      const manualGuidance = muClassifyManualChecks(manualChecks);
       const activityLabel = rules.label;
       if (rules.skip_on_sankramana && data.special.some(
           item => /Sankraman/i.test(item))) {
@@ -1143,7 +1174,6 @@ async function findMuhurta() {
 
           // Doctrinal notes — explanatory, no score effect
           const notes = [];
-          for (const item of manualChecks) notes.push(`Manual check required · ${item}`);
           if (cautionLagnaSolar && lagnaCityData) {
             const lagnaDay = lagnaDayFor(lagnaCityData, isoDate);
             const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
@@ -1172,6 +1202,9 @@ async function findMuhurta() {
           const reasonGroups = {
             slot_quality: slotQuality, day_quality: dayQuality,
             group_fit: groupFit, activity_match: activityMatch, notes,
+            chart_validation: manualGuidance.chart,
+            information: manualGuidance.information,
+            practical: manualGuidance.practical,
           };
           const reasons = [...slotQuality, ...groupFit, ...dayQuality, ...activityMatch];
 
@@ -1324,6 +1357,17 @@ function renderMuhurta() {
               <ul class="mu-rg-items">${lis}</ul>
             </div>`;
   };
+  const renderChartValidation = items => {
+    if (!items || !items.length) return '';
+    const lis = items.map(it => `<li>${muCapitalize(it)}</li>`).join('');
+    return `<div class="mu-rg mu-rg-validation">
+              <span class="mu-rg-label">Validate with chart</span>
+              <div class="mu-rg-content">
+                <p>This slot passed the automated checks. Before finalising it, validate these conditions in the election chart or relevant horoscope:</p>
+                <ul class="mu-rg-items">${lis}</ul>
+              </div>
+            </div>`;
+  };
   const renderSlot = (s, i) => {
     const rg = s.reasonGroups;
     const groupsHtml = rg
@@ -1332,7 +1376,10 @@ function renderMuhurta() {
            ${renderGroup('Day quality', rg.day_quality)}
            ${renderGroup('Group fit', rg.group_fit)}
            ${renderGroup('Activity', rg.activity_match)}
-           ${renderGroup('Notes', rg.notes, 'mu-rg-notes')}
+           ${renderChartValidation(rg.chart_validation)}
+           ${renderGroup('About this election', rg.information, 'mu-rg-information')}
+           ${renderGroup('Practical checks', rg.practical, 'mu-rg-practical')}
+           ${renderGroup('Important nuance', rg.notes, 'mu-rg-notes')}
          </div>`
       : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
     const tier = s.tier || muScoreTier(s.score);

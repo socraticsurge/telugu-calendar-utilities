@@ -106,9 +106,7 @@
     {
       "label": "Other",
       "activities": [
-        "travel",
-        "beginning",
-        "cremation"
+        "travel"
       ]
     }
   ],
@@ -1349,65 +1347,6 @@
         "For long-distance journeys, prefer waxing Chandra, avoid Mangala in the 8th and avoid malefics in the 7th."
       ],
       "source_claim": "muhurta.travel"
-    },
-    "beginning": {
-      "label": "Dharma-kriya commencement",
-      "allowed_varas": [
-        "Adivaram",
-        "Somavaram",
-        "Budhavaram",
-        "Guruvaram",
-        "Shukravaram"
-      ],
-      "allowed_nakshatras": [
-        "Anuradha",
-        "Ashwini",
-        "Pushya",
-        "Hasta",
-        "Shravana",
-        "Dhanishtha",
-        "Shatabhisha",
-        "Punarvasu",
-        "Swati",
-        "Uttara Phalguni",
-        "Uttara Ashadha",
-        "Uttara Bhadrapada",
-        "Rohini"
-      ],
-      "manual_checks": [
-        "Scope: Dharma-kriya means beginning religious or meritorious work; this is not a generic election for every project, habit, relationship, move or life change.",
-        "Lagna/Varga: automation admits Budha- or Guru-ruled Lagnas. A practitioner may evaluate the source’s alternative Budha/Guru Varga condition.",
-        "Election chart: Guru should occupy Lagna and the performer should have adequate personal Guru-bala."
-      ],
-      "manual_prerequisites": true,
-      "allowed_lagnas": [
-        "Mithuna",
-        "Kanya",
-        "Dhanu",
-        "Meena"
-      ],
-      "source_claim": "muhurta.dharma_kriya.commencement"
-    },
-    "cremation": {
-      "label": "Deferred funeral rites (Pretakriya)",
-      "allowed_nakshatras": [
-        "Ashvini",
-        "Pushya",
-        "Hasta",
-        "Ashlesha",
-        "Moola",
-        "Jyeshtha",
-        "Shravana",
-        "Ardra",
-        "Swati"
-      ],
-      "manual_checks": [
-        "Scope: verse 48 applies when Pretakriya could not be performed at the time of death. Do not delay immediate Antyeshti to wait for a listed Nakshatra.",
-        "Legal and medical requirements, timely rites, family Sampradaya and the officiating priest’s guidance override every project ranking.",
-        "The same verse separately prohibits cremation during latter-half Dhanishtha through Revati; none of those stars enter this positive Pretakriya admission list."
-      ],
-      "manual_prerequisites": true,
-      "source_claim": "muhurta.pretakriya.deferred"
     }
   }
 }

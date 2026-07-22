@@ -39,7 +39,7 @@ def test_claim_has_exact_scope_and_chart_boundary():
     assert 'personal Guru strength' in claim['scope']
 
 
-def test_mcp_and_browser_expose_the_same_verified_profile():
+def test_mcp_keeps_expert_profile_while_browser_hides_it():
     from telugu_panchangam.mcp.tools import tool_find_muhurta
 
     result = json.loads(tool_find_muhurta(
@@ -51,9 +51,6 @@ def test_mcp_and_browser_expose_the_same_verified_profile():
 
     browser = json.loads(
         (ROOT / 'src/data/activity-rules.generated.json').read_text(encoding='utf-8'))
-    exported = browser['rules']['beginning']
-    for field in (
-        'label', 'source_claim', 'manual_prerequisites', 'allowed_varas',
-        'allowed_nakshatras', 'allowed_lagnas', 'manual_checks',
-    ):
-        assert exported[field] == ACTIVITY_RULES['beginning'][field]
+    assert 'beginning' not in browser['rules']
+    assert all('beginning' not in group['activities']
+               for group in browser['groups'])

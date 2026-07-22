@@ -66,6 +66,21 @@ def test_tuesday_rejected_while_saturday_is_admissible_but_unpreferred():
                for slot in saturday)
 
 
+def test_slot_notes_omit_weekday_guidance_that_does_not_apply():
+    thursday = day_slots(
+        _day(2026, 5, 21), 'business_inventory_purchase')
+    assert thursday
+    assert all(not any('Saturday' in note for note in slot['reason_groups']['notes'])
+               for slot in thursday)
+
+    saturday = day_slots(
+        _day(2026, 1, 3), 'business_inventory_purchase')
+    assert saturday
+    assert all(any('Saturday is described as passable' in note
+                   for note in slot['reason_groups']['notes'])
+               for slot in saturday)
+
+
 def test_claim_mcp_and_browser_publish_the_same_profile():
     from telugu_panchangam.mcp.tools import tool_find_muhurta
 

@@ -59,7 +59,7 @@ def test_every_returned_slot_uses_an_admitted_star():
     assert found
 
 
-def test_mcp_and_browser_expose_verified_deferred_profile():
+def test_mcp_keeps_expert_profile_while_browser_hides_it():
     from telugu_panchangam.mcp.tools import tool_find_muhurta
 
     result = json.loads(tool_find_muhurta(
@@ -72,6 +72,6 @@ def test_mcp_and_browser_expose_verified_deferred_profile():
 
     browser = json.loads(
         (ROOT / 'src/data/activity-rules.generated.json').read_text(encoding='utf-8'))
-    exported = browser['rules']['cremation']
-    assert exported['source_claim'] == CLAIM_ID
-    assert set(exported['allowed_nakshatras']) == EXPECTED_STARS
+    assert 'cremation' not in browser['rules']
+    assert all('cremation' not in group['activities']
+               for group in browser['groups'])

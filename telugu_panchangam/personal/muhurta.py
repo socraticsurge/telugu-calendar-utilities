@@ -520,7 +520,19 @@ def _evaluate_slot(s, e, block, base, facts, ctx: _DayContext, mu,
         chandra_avoid_names=chandra_avoid_names,
         tithi_fam=tithi_fam,
     )
-    notes.extend(f'Manual check required · {item}' for item in ctx.manual_checks)
+    _english_weekday = {
+        'Adivaram': 'Sunday', 'Somavaram': 'Monday',
+        'Mangalavaram': 'Tuesday', 'Budhavaram': 'Wednesday',
+        'Guruvaram': 'Thursday', 'Shukravaram': 'Friday',
+        'Shanivaram': 'Saturday',
+    }
+    _current_weekday = _english_weekday.get(day.vaaram)
+    for item in ctx.manual_checks:
+        _named_weekdays = [
+            name for name in _english_weekday.values() if name in item]
+        if _named_weekdays and _current_weekday not in _named_weekdays:
+            continue
+        notes.append(f'Manual check required · {item}')
     if ctx.caution_lagna_solar and cur_lagna == day.solar_sign:
         notes.append(
             f'Source caution · {cur_lagna} Lagna is occupied by Surya; '
