@@ -40,12 +40,9 @@ def test_activity_source_claims_resolve_to_verified_muhurtam_claims():
         'wedding': 'muhurta.wedding',
         'travel': 'muhurta.travel',
         'well_digging': 'muhurta.well_digging',
+        'court': 'muhurta.court.filing_lawsuit',
     }
     assert result['known_conflicts'] == {
-        'court': {
-            'claim': 'muhurta.court.profile_conflict',
-            'state': 'contradicted',
-        },
         'business': {
             'claim': 'muhurta.business.profile_conflict',
             'state': 'contradicted',

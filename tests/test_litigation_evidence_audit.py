@@ -18,7 +18,7 @@ def _claim():
 def test_litigation_records_conflict_without_inheriting_court_claim():
     rules = ACTIVITY_RULES['litigation']
     assert rules['audit_claim'] == CLAIM_ID
-    assert rules['audit_claim'] != ACTIVITY_RULES['court']['audit_claim']
+    assert rules['audit_claim'] != ACTIVITY_RULES['court']['source_claim']
     assert 'source_claim' not in rules
     assert rules['prefer_vara'] == ['Mangalavaram']
     assert rules['prefer_bhadra_puchha'] == 2

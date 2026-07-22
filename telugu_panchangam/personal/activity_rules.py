@@ -912,19 +912,44 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'passage.',
                       ]},
     # — Civil & Medical —
-    'court':         {'label': 'Court / legal matter',
-                      'audit_claim': 'muhurta.court.profile_conflict',
-                      'prefer_tithi_class': 'Jaya',
-                      'avoid_tithi_class': ['Purna'],
-                      'prefer_vara': ['Mangalavaram'],
+    'court':         {'label': 'Filing a lawsuit / court action',
+                      'source_claim': 'muhurta.court.filing_lawsuit',
+                      'manual_prerequisites': True,
+                      'allowed_varas': [
+                          'Adivaram', 'Somavaram', 'Budhavaram',
+                          'Guruvaram', 'Shukravaram',
+                      ],
+                      'avoid_tithi_numbers': [4, 6, 8, 9, 12, 14, 15],
+                      'allowed_nakshatras': [
+                          'Ashwini', 'Rohini', 'Mrigashira', 'Pushya',
+                          'Uttara Phalguni', 'Hasta', 'Chitra', 'Anuradha',
+                          'Dhanishtha', 'Revati',
+                      ],
+                      # Raman also admits a non-Mesha Lagna when its Navamsa
+                      # is Mesha. Navamsa is not available on every surface,
+                      # so automation conservatively admits Mesha Lagna only.
+                      'allowed_lagnas': ['Mesha'],
                       'manual_checks': [
-                          'Known source mismatch: this profile rewards '
-                          'Tuesday, but Raman rejects Tuesday and Saturday '
-                          'for filing lawsuits; verify the exact Nakshatra '
-                          'and weekday gates before acting.',
-                          'Practitioner checks: Guru in a Trikona from a '
-                          'strengthened Lagna; no malefic in the 6th; Lagna '
-                          'and 6th lords separated; Mesha Lagna or Navamsa.',
+                          'Scope: this election is for filing or initiating '
+                          'a lawsuit, not a hearing, response, settlement, '
+                          'appeal or prediction of the case outcome.',
+                          'Tithi cross-reference: Raman says to avoid the '
+                          'usual unfavorable lunar days; the automated list '
+                          'uses his explicit recurring list of Chaturthi, '
+                          'Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, '
+                          'Pournami and Amavasya from the same edition.',
+                          'Lagna/Navamsa: automation admits Mesha Lagna. A '
+                          'practitioner may evaluate the source\'s alternative '
+                          'of a non-Mesha Lagna with Mesha Navamsa.',
+                          'Election chart: strengthen Lagna with Guru in a '
+                          'Trikona; place no malefic in the 6th; keep the '
+                          'Lagna and 6th lords well separated.',
+                          'Raman says benefics in Kendras, or benefic aspects '
+                          'from male Rasis, indicate peace between the '
+                          'parties; this is not a promise of legal success.',
+                          'Legal deadlines, court rules, counsel, evidence '
+                          'and personal safety always take precedence over '
+                          'electional timing.',
                       ]},
     'litigation':    {'label': 'Litigation / contest',
                       'audit_claim': 'muhurta.litigation.profile_conflict',

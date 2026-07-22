@@ -1236,7 +1236,7 @@ const MU_ACT_LABEL = {
   home_repair: 'a home repair / renovation start',
   business: 'a business launch', job: 'a job start / contract',
   yajna: 'a yajna / homam', pilgrimage: 'a pilgrimage',
-  court: 'a court / legal matter', surgery: 'a surgery / medical procedure',
+  court: 'filing a lawsuit / court action', surgery: 'a surgery / medical procedure',
 };
 
 function muToT(mm) {

@@ -28,6 +28,7 @@ occupation of a newly built home remain separate acts.
 | 5 | Borrowing and lending | **Implemented:** separate debtor- and creditor-side profiles |
 | 6 | Gruhapravesha correction | **Implemented:** conflicting soft profile replaced by exact Raman-lineage gates |
 | 7 | Wedding correction | **Implemented:** contradictory family scoring replaced by the complete Raman election crosswalk |
+| 8 | Lawsuit-filing correction | **Implemented:** generic Court proxies replaced by the exact Raman filing election |
 
 Seemantha, completed-house purchase, home-repair commencement and trade-
 inventory purchase, borrowing and lending are now implemented as separate,
@@ -43,6 +44,12 @@ Paksha-aware Tithis, weekday grades, Nakshatras, Nitya Yogas, Vishti and named
 Lagnas replace the former Purna/Jaya and fixed-class proxies. Pada and complete
 election-chart conditions remain mandatory practitioner checks, and the current
 Drik Panchang methodology divergence is visible.
+
+The Court profile is now narrowly scoped to filing or initiating a lawsuit.
+Raman's weekday and Nakshatra rules, his recurring unfavorable-Tithi list and
+conservative Mesha-Lagna gate replace the former Tuesday and Tithi-family
+proxies. The remaining election-chart conditions are mandatory practitioner
+checks, and legal deadlines and professional counsel always take precedence.
 
 ## Important holds and splits
 

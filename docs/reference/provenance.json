@@ -271,14 +271,14 @@
       "last_reviewed": "2026-07-22"
     },
     {
-      "id": "muhurta.court.profile_conflict",
+      "id": "muhurta.court.filing_lawsuit",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
-      "scope": "The configured Court profile prefers Mangalavaram, while Raman explicitly directs that Tuesday and Saturday be avoided for filing lawsuits. The project also rewards the entire Jaya Tithi family and penalizes the entire Purna family without support from this passage, and it omits Raman's ten admitted Nakshatras and election-chart requirements. This is a direct weekday contradiction and an incomplete rule profile; the audit claim must not be presented as verification. The separate internal litigation activity has its own audit claim and does not inherit this claim silently.",
+      "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or the manual alternative of Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; and separation of the Lagna and 6th lords. The passage says to avoid the usual unfavorable lunar days without repeating them; automation transparently resolves that phrase to Raman's recurring explicit list in the same edition: Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The separate Litigation / contest activity retains its own contradicted audit claim.",
       "last_reviewed": "2026-07-22"
     },
     {
