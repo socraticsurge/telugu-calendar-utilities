@@ -110,14 +110,37 @@
       "scope": "Samvatsara, Ayana, Ritu, lunar-month, Paksha, weekday and Rasi labels combine astronomical calculations with calendar rollover conventions. They require criterion-level locators and regional-scope notes; astronomical correctness alone does not verify the naming convention."
     },
     {
-      "id": "panchangam.traditional_windows",
+      "id": "panchangam.mixed_daily_windows",
       "surface": "panchangam",
       "implementation": "telugu_panchangam/engines/base.py",
       "evidence_class": "textual",
-      "verification_state": "needs_locator",
+      "verification_state": "partially_verified",
       "source_ids": ["BVR-MUHURTHA-1993", "MC-HINDI-IA"],
-      "locator": null,
-      "scope": "Brahma Muhurta, Abhijit, Amrita Kalam, Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham, Bhadra divisions, Sankramana avoidance and Choghadiya are regression-tested formulas from different traditions. No single title-level citation verifies this bundle; each table or formula needs an exact locator and scope crosswalk."
+      "locator": "B. V. Raman, Chapter III, printed p. 8 (Nakshatra Tyajyakala table), and Chapter V section 7, printed pp. 13-14 (Durmuhurta); regional tables remain regression-pinned",
+      "scope": "The auspicious, inauspicious and Choghadiya response objects are mixed containers. Raman supports the four-Ghati Nakshatra Tyajyakala concept and his printed Durmuhurta scheme, but the project's regional weekday tables are not identical to Raman's table and the remaining Brahma Muhurta, Abhijit, Amrita Kalam, Rahu Kalam, Gulika, Yamagandam and Choghadiya components do not yet have criterion-level textual claims. This state records partial evidence, not umbrella verification.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "panchangam.sankramana_avoidance",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/sankramana.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter V, 'Special adverse Yogas and their neutralization,' rule immediately before section 3 Karthari Dosha, printed p. 13 (PDF p. 17)",
+      "scope": "Supports rejecting sixteen Ghatis before and after Surya enters a new Rasi for new work. The implementation scales a Ghati to the local sunrise-to-next-sunrise Panchangam day. It does not implement any sign-specific longer Sankramana interval.",
+      "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "panchangam.panchaka_rahita",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/panchaka.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993"],
+      "locator": "Chapter III, 'Panchak (5-source energy),' printed pp. 8-9 (PDF pp. 12-13)",
+      "scope": "Supports adding the ordinal Tithi, weekday, Nakshatra and Lagna and reducing modulo nine; remainders 1, 2, 4, 6 and 8 as Mrityu, Agni, Raja, Chora and Roga; and activity-specific avoidance for occupation, building, travel, marriage and Upanayanam. The broader software avoid-for aliases are operational mappings of those categories, not additional textual quotations.",
+      "last_reviewed": "2026-07-22"
     },
     {
       "id": "panchangam.eclipse_events",

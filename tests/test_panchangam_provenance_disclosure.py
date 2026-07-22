@@ -68,3 +68,15 @@ def test_compact_panchangam_surfaces_keep_the_same_disclosure():
 
     assert muhurta['provenance'] == expected
     assert date_range['provenance'] == expected
+
+
+def test_verified_traditional_rules_are_not_hidden_in_umbrella_claims():
+    groups = {
+        group['id']: group for group in panchangam_provenance('drik')['coverage_groups']
+    }
+
+    assert groups['bhadra_subwindows']['state'] == 'verified'
+    assert groups['sankramana_avoidance']['state'] == 'verified'
+    assert groups['panchaka_rahita']['state'] == 'verified'
+    assert groups['mixed_daily_windows']['state'] == 'partially_verified'
+    assert groups['other_derived_traditional_classifications']['state'] == 'needs_locator'
