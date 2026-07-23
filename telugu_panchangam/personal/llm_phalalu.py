@@ -32,6 +32,10 @@ FALLBACK_MODEL = 'gemini-2.0-flash'
 TEMPERATURE = 0.4
 _MAX_RETRIES = 3
 _BASE_DELAY = 10.0
+# Verification failures are usually non-deterministic prose/citation drift
+# (the model cites a graha it forgot to name in the paragraph, or vice versa).
+# A fresh generation almost always resolves it, so regenerate before giving up.
+_VERIFY_RETRIES = 3
 
 # The engine names grahas in Sanskrit; the model occasionally labels one
 # in English (or a Sanskrit synonym) in transits_cited — e.g. "Sun" for
@@ -98,7 +102,12 @@ _SYSTEM = (
     "  'text': your paragraph (the full astrologer column text)\n"
     "  'advice': one concrete, self-contained sentence — the single most useful thing to do or avoid today\n"
     "  'transits_cited': array of grahas you discussed, each with 'graha', 'position' (house 1–12), "
-    "and 'verdict' (exactly one of: favourable, blocked, adverse — copied from the input data)"
+    "and 'verdict' (exactly one of: favourable, blocked, adverse — copied from the input data)\n"
+    "\n"
+    "CRITICAL: 'transits_cited' and the paragraph must agree. Every graha you list in "
+    "'transits_cited' MUST be named explicitly by name in that rasi's 'text' (its Sanskrit or "
+    "common English name, e.g. 'Shani' or 'Saturn'). Do not cite a graha you did not name in "
+    "the prose, and do not name a graha in the prose without citing it."
 )
 
 _SCHEMA = {
@@ -185,6 +194,26 @@ def _generate(model: str, user_prompt: str) -> list[dict]:
     if start == -1 or end == -1:
         raise ValueError(f'No JSON array found in model response: {text[:200]!r}')
     return json.loads(text[start:end + 1])
+
+
+def _generate_verified(model: str, user_prompt: str, all_rashis: dict) -> list[dict]:
+    """Generate and verify, regenerating on VerificationError.
+
+    Verification drift (a graha cited but not named in the prose, or a
+    stray citation) is non-deterministic, so a fresh generation from the
+    same model usually passes. HTTP errors are NOT caught here — they
+    propagate so the caller can fall back to the secondary model.
+    """
+    last_err = None
+    for attempt in range(_VERIFY_RETRIES):
+        items = _generate(model, user_prompt)
+        try:
+            _verify(items, all_rashis)
+            return items
+        except VerificationError as e:
+            last_err = e
+            print(f'Verification failed (attempt {attempt + 1}/{_VERIFY_RETRIES}): {e}')
+    raise last_err
 
 
 def _compute_all_rashis(sky: dict[str, str]) -> dict:
@@ -317,15 +346,13 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
     model_used = PRIMARY_MODEL
     try:
         print(f'Generating with {PRIMARY_MODEL}')
-        items = _generate(PRIMARY_MODEL, user_prompt)
+        items = _generate_verified(PRIMARY_MODEL, user_prompt, all_rashis)
     except requests.HTTPError as e:
         if e.response.status_code != 429:
             raise
         print(f'Primary model exhausted after retries — falling back to {FALLBACK_MODEL}')
         model_used = FALLBACK_MODEL
-        items = _generate(FALLBACK_MODEL, user_prompt)
-
-    _verify(items, all_rashis)
+        items = _generate_verified(FALLBACK_MODEL, user_prompt, all_rashis)
 
     return {
         'date': date_str,

@@ -7,11 +7,14 @@ The model had labelled Surya in English. That's a naming drift, not an
 astronomy error, so _verify normalizes the label before the membership
 check while still verifying position and verdict exactly.
 """
+import copy
+
 import pytest
 
+from telugu_panchangam.personal import llm_phalalu
 from telugu_panchangam.personal.llm_phalalu import (
     LLM_PHALALU_PROVENANCE, _canonical_graha, _verify, _compute_all_rashis,
-    VerificationError,
+    _generate_verified, VerificationError,
 )
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 
@@ -137,6 +140,48 @@ def test_verify_requires_citations_to_be_named_in_the_prose():
     items[0]['text'] = 'A quiet and reflective day may unfold.'
     with pytest.raises(VerificationError, match='is not named in text'):
         _verify(items, all_rashis)
+
+
+def test_generate_verified_regenerates_on_verification_drift(monkeypatch):
+    """A single non-deterministic prose/citation slip must not fail the run:
+    _generate_verified regenerates and accepts the next clean response.
+    This is the 2026-07-22/23 failure mode (Rahu/Shani cited but not named)."""
+    all_rashis = _all_rashis()
+    good = _base_items(all_rashis)
+    drifted = copy.deepcopy(good)
+    # First response: Mesha's prose omits the cited graha's name — a drift.
+    drifted[0]['text'] = 'A quiet and reflective day may unfold.'
+
+    responses = iter([drifted, good])
+    calls = []
+
+    def fake_generate(model, user_prompt):
+        calls.append(model)
+        return next(responses)
+
+    monkeypatch.setattr(llm_phalalu, '_generate', fake_generate)
+    items = _generate_verified('primary', 'prompt', all_rashis)
+    assert items is good
+    assert len(calls) == 2  # regenerated exactly once
+
+
+def test_generate_verified_raises_after_exhausting_retries(monkeypatch):
+    """If every attempt drifts, the last VerificationError propagates so
+    CI/cron still fails loudly rather than publishing an unverified column."""
+    all_rashis = _all_rashis()
+    drifted = _base_items(all_rashis)
+    drifted[0]['text'] = 'A quiet and reflective day may unfold.'
+
+    calls = []
+
+    def fake_generate(model, user_prompt):
+        calls.append(model)
+        return copy.deepcopy(drifted)
+
+    monkeypatch.setattr(llm_phalalu, '_generate', fake_generate)
+    with pytest.raises(VerificationError, match='is not named in text'):
+        _generate_verified('primary', 'prompt', all_rashis)
+    assert len(calls) == llm_phalalu._VERIFY_RETRIES
 
 
 def test_llm_interpretation_has_a_distinct_provenance_claim():
