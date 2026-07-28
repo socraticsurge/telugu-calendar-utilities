@@ -6,6 +6,7 @@
 |-----------|-----------|
 | `mcp-server-panchangam` on PyPI | latest release only |
 | Published calendar feeds (`panchangam.astrochaganti.com`) | always current (regenerated monthly) |
+| Versioned HTTP adapter | current contract on isolated staging and production Vercel projects; production alias is server-to-server only and not yet consumed by Astro public traffic |
 
 ## Reporting a vulnerability
 
@@ -19,8 +20,16 @@ You will get an acknowledgement within 72 hours. Once a fix ships, the issue can
 
 ## Scope notes
 
-- The published feeds and landing page are static files on GitHub Pages; there is no server-side code or user data anywhere in this project.
+- The published feeds and landing page remain static files on GitHub Pages and
+  contain no server-side user store. The additive Vercel HTTP adapter is a
+  stateless computation boundary and must not persist request bodies.
 - The MCP server runs locally on the user's machine and makes no network calls at runtime; its inputs are date/city strings validated at the tool layer. Input-validation bypasses there are still welcome reports.
+- The HTTP adapter requires an independently rotated `PANCHANGAM_API_TOKEN` on
+  all `/v1/*` routes, has no browser CORS, accepts only bounded request-local
+  participant labels, returns `private, no-store`, and emits generic error
+  messages. Astro Chaganti owns account/profile authorization before deriving
+  those contexts; this repository never receives user IDs, names, emails, or
+  raw birth details.
 
 ## Past findings
 

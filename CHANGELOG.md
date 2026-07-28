@@ -7,6 +7,79 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+### Added
+
+- Expose the already-computed nine-graha sidereal positions in Rasi Phalalu as
+  additive `sky_positions` evidence so visual clients can plot the real Surya
+  and Chandra longitudes instead of decorative marker positions.
+- Add a canonical eight-block night Choghadiya calculation from sunset to the
+  next sunrise. Daily API/MCP responses now expose `choghadiya_night`, while
+  Muhurtam search and ICS generation reuse the same implementation and
+  provenance disclosure.
+- Additive FastAPI adapter for a separate Vercel computation project. The
+  versioned endpoints expose catalog, daily/range Panchangam, deterministic
+  Rasi Phalalu, Tarabalam/Chandrabalam, and public or participant-context
+  Muhurtam through the existing MCP serializers without changing the frozen
+  engines, ICS generator, GitHub Pages site, or Actions.
+- Contract and parity coverage for bearer authentication, redacted errors,
+  request bounds, cache/CORS isolation, public-versus-profile Muhurtam evidence,
+  all three calculation systems, DST transitions, leap day, an eclipse,
+  festivals, and representative Indian/international cities.
+
+### Security
+
+- Require an environment-scoped `PANCHANGAM_API_TOKEN` on every `/v1/*`
+  endpoint; keep `/health` minimal and anonymous. Responses are `private,
+  no-store`, direct browser CORS is not enabled, request identifiers are
+  bounded, and validation/internal errors do not echo submitted values.
+
+### Changed
+
+- Pin the Vercel Python target to 3.12 and regenerate the passive dependency
+  lock snapshot with direct FastAPI and explicit HTTP-test dependencies.
+- Isolate the API deployment from the repository's Vite/static-site manifests,
+  pin Vercel's FastAPI framework preset, and expose the contract through the
+  framework-level `app.py` entrypoint. The verified preview bundle is 101.87 MB
+  in `bom1` with a 60-second execution cap.
+- Promote the API within its staging-only Vercel project to the stable
+  `telugu-calendar-api-staging.vercel.app` alias for Gate 6 integration. The
+  alias remains non-production and is consumed only by Astro staging.
+- Consume the same staging contract from Astro Gate 7 owner-scoped BFF routes:
+  live single/two-profile Tarabalam and participant-aware Muhurtam use anonymous
+  p1–p4 derived context, while the static site, feeds, Actions and production
+  consumers remain unchanged.
+- Record Gate 7 owner approval and begin the isolated Gate 8 migration
+  rehearsal. This does not authorise replacing the static site, feeds, Actions,
+  GitHub Pages service, or any production consumer.
+- Complete Gate 8 compatibility evidence against the unchanged `gh-pages`
+  estate: 220 published feed paths, 32 dated Rasi artifacts and representative
+  Drik/Surya Siddhanta/Vakya, festival, observance, Lagna and Rasi URLs all
+  remain exact-path HTTP 200. The service remains live pending later review.
+- Record owner approval of Gate 8 functionality and migration safety. Gate 9
+  release preparation may proceed, but the static service, feeds, workflows and
+  production consumers remain unchanged pending a separate go/no-go decision.
+- Verify the complete Gate 9 candidate on the Vercel-target Python 3.12 runtime:
+  1,296 Python tests pass with one browser-only skip; 56 Vitest tests, both
+  TypeScript checks and the Vite production build also pass.
+- Deploy the reviewed contract to isolated Vercel project
+  `telugu-calendar-api-production` as
+  `dpl_2WpDHW73JjfAc6ENG3L88vdYNL92`, using a fresh sensitive bearer token
+  shared only with Astro's production environment. Public health, rejected
+  unauthenticated access, authenticated catalog, Panchangam, Rasi Phalalu,
+  Tarabalam and participant-aware Muhurtam smoke tests pass. No Astro production
+  deployment consumes the service before the separate Gate 9 go/no-go.
+- Deploy the additive night-Choghadiya contract to the isolated staging project
+  as `dpl_CPgQyLCsyHokFi3JtJJaheuCbsWj`. Health reports engine 1.13.0, the full
+  Python suite passes 1,296 tests with one browser-only skip, and the existing
+  static site, Actions, feeds and production API remain unchanged.
+- Reverify the additive sky-position contract with 1,297 passing Python tests
+  and one browser-only skip. No frozen engine, feed, Action or static-site
+  behavior changes.
+- Deploy that additive evidence to the isolated staging service as
+  `dpl_H5LZCWuAPG6fMjVXhzR2ucYtaMoX`; the existing stable staging alias now
+  serves nine computed graha positions while production and legacy consumers
+  remain unchanged.
+
 ## [1.13.0] — 2026-07-22
 
 Astrological authority and Muhurtam coverage release. The daily Panchangam,

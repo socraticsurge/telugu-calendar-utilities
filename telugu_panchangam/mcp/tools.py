@@ -29,6 +29,7 @@ from telugu_panchangam.personal.activity_rules import (
     ACTIVITY_ALIASES, get_activity_rules,
 )
 from telugu_panchangam.panchangam_provenance import panchangam_provenance
+from telugu_panchangam.choghadiya import night_choghadiya
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
@@ -248,6 +249,8 @@ def tool_get_panchangam(
         loc = _resolve_city(city, latitude, longitude, timezone)
         engine = _get_engine(system, ayanamsa)
         day = engine.calculate(d, loc)
+        next_day = engine.calculate(d + timedelta(days=1), loc)
+        night_blocks = night_choghadiya(day, next_day)
         tz = loc.timezone
         specials = _special_events(day)
         return json.dumps({
@@ -297,6 +300,10 @@ def tool_get_panchangam(
             'choghadiya': [
                 {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
                 for w in day.choghadiya
+            ],
+            'choghadiya_night': [
+                {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
+                for w in night_blocks
             ],
             'eclipse': _eclipse_to_dict(day.eclipse, tz),
             'special_yogas': day.special_yogas,
@@ -802,6 +809,7 @@ def tool_get_rasi_phalalu(
                            day_nakshatra=day_nak if janma_nakshatra else None)
         out.update({
             'date': date_str, 'city': city, 'day_nakshatra': day_nak,
+            'sky_positions': positions,
             'disclaimer': 'Every line is rendered from computed gochara/chandrabalam/'
                           'tarabalam facts (Brihat Samhita conventions, sunrise positions). '
                           'This is a daily reading, not a horoscope consultation or a muhurta.',

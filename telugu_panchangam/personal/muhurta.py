@@ -27,21 +27,10 @@ from telugu_panchangam.personal.slot_scorers import (
     anandadi_day_modifier, doctrinal_notes, slot_lagna_name,
 )
 from telugu_panchangam.panchaka import evaluate_panchaka
+from telugu_panchangam.choghadiya import night_choghadiya
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MUHURTA_MINUTES = 48    # one classical muhurta (2 ghati) · the slot window size
-
-# Night choghadiya sequence (8 blocks sunset→next sunrise), weekday 0=Sunday.
-# Matches _NIGHT_CHOGHADIYA in generators/ics.py — both must stay in sync.
-_NIGHT_CHOGHADIYA = {
-    0: ['Shubh', 'Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh'],
-    1: ['Char',  'Rog',   'Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char'],
-    2: ['Kaal',  'Labh',  'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog',  'Kaal'],
-    3: ['Udveg', 'Shubh', 'Amrit', 'Char', 'Rog',   'Kaal', 'Labh', 'Udveg'],
-    4: ['Amrit', 'Char',  'Rog',  'Kaal', 'Labh',  'Udveg', 'Shubh', 'Amrit'],
-    5: ['Rog',   'Kaal',  'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog'],
-    6: ['Labh',  'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog',   'Kaal', 'Labh'],
-}
 
 CHANDRA_MODES = ('stars', 'puja_ok', 'strict')
 
@@ -889,15 +878,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     nishita_start = nishita_mid - _ONE_GHATI
     nishita_end = nishita_mid + _ONE_GHATI
 
-    # Night choghadiya blocks (engine convention: Sunday=0).
-    weekday = (day.date.weekday() + 1) % 7
-    _block_dur = (next_day.sunrise - day.sunset) / 8
-    night_blocks = [
-        Window(name=_NIGHT_CHOGHADIYA[weekday][i],
-               start=day.sunset + i * _block_dur,
-               end=day.sunset + (i + 1) * _block_dur)
-        for i in range(8)
-    ]
+    night_blocks = night_choghadiya(day, next_day)
 
     # get_horas() returns 24 horas covering the full day+night from today's sunrise.
     # get_lagna_transitions() covers sunrise to next sunrise.

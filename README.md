@@ -31,7 +31,7 @@ Everything is shareable to WhatsApp.
 - **Sky markers** — Sunrise, Sunset, Moonrise, Moonset
 - **Auspicious windows** — Brahma Muhurta, Abhijit Muhurta, Amrita Kalam
 - **Inauspicious windows** — Rahu Kalam, Gulika Kalam, Yamagandam, Varjyam, Durmuhurtham
-- **Choghadiya** — 8 day blocks with names
+- **Choghadiya** — 8 day and 8 night blocks with names
 - **Eclipses** — Solar and lunar eclipses with type (Total/Partial/Annular/Penumbral), visibility from your city, eclipse window, and Sutak period
 - **Special Yogas** — Sarvartha Siddhi, Amrita Siddhi, Visha, and Dagdha yogas based on weekday/tithi/nakshatra combination
 
@@ -126,6 +126,37 @@ claude mcp add panchangam -- uvx mcp-server-panchangam
 All tools accept any free-text city name. Pre-configured cities resolve instantly; any other city is geocoded via OpenStreetMap. You can also pass `latitude`, `longitude`, and `timezone` directly.
 
 Drik-system tools that accept a `city` or date also accept `ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha` (default: `lahiri`). Full API documentation and parameter details: [mcp-server-panchangam on PyPI](https://pypi.org/project/mcp-server-panchangam/).
+
+## Versioned HTTP adapter (migration service)
+
+The repository also contains an additive FastAPI adapter for Astro Chaganti's
+server-side BFF. It does not replace the GitHub Pages site, calendar feeds,
+Actions, or the MCP server. The frozen engines and ICS generator are unchanged.
+
+The public liveness route is `GET /health`. All `/v1/*` computation routes
+require `Authorization: Bearer $PANCHANGAM_API_TOKEN`; direct browser CORS is
+not enabled. Available routes cover the catalog, Panchangam day/range, Rasi
+Phalalu, Tarabalam/Chandrabalam, and Muhurtam search. Empty Muhurtam participant
+context returns a useful public baseline, while `p1`–`p4` contexts add personal
+factors without names, user IDs, emails, or raw birth details.
+
+Local contract verification:
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+PANCHANGAM_API_TOKEN=local-test-token-with-32-characters-minimum \
+  .venv/bin/uvicorn telugu_panchangam.api.app:app --port 8000
+```
+
+The Vercel target uses the framework-level `app.py` entrypoint and is pinned to
+the FastAPI preset, Python 3.12, `bom1`, and a 60-second execution maximum.
+Frontend/static manifests are excluded from this separate deployment target.
+The reviewed contract is deployed at
+`https://telugu-calendar-api-production.vercel.app` with an independently
+rotated production token. Astro's future production environment has the
+matching server-only URL/token, but no Astro production deployment or public
+traffic consumes them before the separate Gate 9 go/no-go.
 
 ## How it works
 

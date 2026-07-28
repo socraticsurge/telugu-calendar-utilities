@@ -6,6 +6,7 @@ from icalendar import Calendar, Event, vText
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.engines.base import ekadashi_name
+from telugu_panchangam.choghadiya import night_choghadiya
 
 
 SYSTEM_LABELS = {
@@ -13,19 +14,6 @@ SYSTEM_LABELS = {
     'surya_siddhanta': 'Surya Siddhanta',
     'vakya': 'Vakya',
 }
-
-# Night Choghadiya sequence (8 blocks from sunset to next sunrise), weekday
-# 0=Sunday — same convention as the engines' day tables.
-_NIGHT_CHOGHADIYA = {
-    0: ['Shubh', 'Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh'],
-    1: ['Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char'],
-    2: ['Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog', 'Kaal'],
-    3: ['Udveg', 'Shubh', 'Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg'],
-    4: ['Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit'],
-    5: ['Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog'],
-    6: ['Labh', 'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog', 'Kaal', 'Labh'],
-}
-
 
 class ICSGenerator:
 
@@ -171,15 +159,12 @@ class ICSGenerator:
             for w in day.choghadiya:
                 lines.append(f'  {fmt(w.start, tz)} – {fmt(w.end, tz)}  {w.name}')
         if next_day is not None:
-            weekday = (day.date.weekday() + 1) % 7  # 0=Sunday, engine convention
-            names = _NIGHT_CHOGHADIYA[weekday]
-            block = (next_day.sunrise - day.sunset) / 8
             lines.append('')
             lines.append('─ Night Choghadiya ─')
-            for i in range(8):
-                start = day.sunset + i * block
-                end = day.sunset + (i + 1) * block
-                lines.append(f'  {fmtr(start)} – {fmtr(end)}  {names[i]}')
+            for window in night_choghadiya(day, next_day):
+                lines.append(
+                    f'  {fmtr(window.start)} – {fmtr(window.end)}  {window.name}'
+                )
         if day.eclipse:
             e = day.eclipse
             emoji = '🌒' if e.kind == 'Solar' else '🌕'

@@ -134,7 +134,7 @@ Phase 8 features) should also consume only these.
 
 ## Distribution surfaces
 
-The project ships in three places. They're built from the same
+The project has four distribution surfaces. They're built from the same
 engine output but render to different audiences.
 
 | Surface | Form | Built by |
@@ -142,12 +142,60 @@ engine output but render to different audiences.
 | `panchangam.astrochaganti.com` (landing page) | static HTML + JS, served by GitHub Pages | Vite + TypeScript build from root `index.html` + `src/` (Phase 3 migration); deployed by `.github/workflows/deploy-landing.yml` |
 | `webcal://` subscriber feeds (22 cities × 3 systems) | static `.ics` files in `public/feeds/` | `python -m telugu_panchangam.generate` (monthly, via `.github/workflows/generate.yml`) |
 | `mcp-server-panchangam` on PyPI | Python package, stdio MCP server | `pyproject.toml` + `telugu_panchangam/mcp/`; published by `.github/workflows/publish.yml` on tag push |
+| Telugu Calendar HTTP API (migration target) | Authenticated FastAPI service on a separate Vercel project | `app.py` + `telugu_panchangam/api/`; additive and not a replacement for Pages, feeds, or MCP |
+
+Day and night Choghadiya share the canonical implementation in
+`telugu_panchangam/choghadiya.py`. The daily API exposes both arrays, and
+Muhurtam plus ICS generation consume the same sunset-to-next-sunrise windows
+instead of maintaining separate weekday tables.
 
 The MCP registry (`io.github.socraticsurge/panchangam`) reads
 `server.json` independently. The Phase 1 version-sync test
 (`tests/test_version_sync.py`) keeps `pyproject.toml`, `server.json`,
 and the tagged release in lockstep; the publish workflow
 re-enforces this at release time.
+
+### HTTP adapter boundary
+
+The HTTP adapter is a consumer layer above the same public functions used by
+the MCP server. `telugu_panchangam/api/service.py` serializes those existing
+tool responses; it does not duplicate Jyotisha formulas or modify the frozen
+engine modules. Vercel discovers the `FastAPI` application through the
+framework-level `app.py` entrypoint, so the contract's `/health` and `/v1/*`
+paths reach FastAPI unchanged.
+
+`GET /health` is anonymous and minimal. Every `/v1/*` route requires an
+environment-specific bearer token and is intended only for Astro Chaganti's
+server-side BFF. Browser CORS is deliberately absent. Pydantic rejects unknown
+fields and bounds dates, ranges, coordinates, IANA timezones, systems,
+ayanamsas, activities, participants, and request size before computation.
+Errors have stable non-sensitive codes and a request ID rather than submitted
+values or tracebacks.
+
+Swiss Ephemeris maintains process-global sidereal state. FastAPI can execute
+synchronous handlers concurrently, so the adapter serializes engine-backed
+tool calls within each warm function instance. This favours correctness while
+Gate 5 measures latency and determines whether later process-level isolation is
+needed. It does not change the already-established engine cache or formulae.
+
+The first contract is `1.0`:
+
+| Route | Maximum | Notes |
+|---|---:|---|
+| `GET /v1/catalog` | fixed response | 22 cities, systems, ayanamsas, signs, activities, limits |
+| `POST /v1/panchangam/day` | one day | Existing daily serializer plus 24 Horas and Lagna transitions |
+| `POST /v1/panchangam/range` | 31 inclusive days | Existing compact range serializer |
+| `POST /v1/rasi-phalalu` | one Rasi/date | Deterministic computed daily reading |
+| `POST /v1/tarabalam` | 90 days, four contexts | Joins at most two canonical 60-day tool responses; Lahiri-only until the MCP boundary explicitly supports another ayanamsa |
+| `POST /v1/muhurtam/search` | 14 days, four contexts | Empty participants returns a useful public baseline; supplied `p1`–`p4` labels add canonical personal factors |
+
+Deployment configuration pins the FastAPI framework, Python 3.12, `bom1`, and
+a 60-second maximum. `.vercelignore` excludes test, documentation, frontend,
+generated, and Node assets from the function bundle. The Vercel project and
+token are intentionally separate from the existing GitHub Pages distribution
+and can be rotated independently. The production project is live only as an
+isolated Gate 9 dependency candidate; no public Astro deployment consumes it
+and the GitHub Pages distribution remains active.
 
 ## Test architecture
 

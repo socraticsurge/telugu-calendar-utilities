@@ -15,7 +15,12 @@ _GROUPS = (
     },
     {
         'id': 'mixed_daily_windows',
-        'fields': ('auspicious', 'inauspicious', 'choghadiya'),
+        'fields': (
+            'auspicious',
+            'inauspicious',
+            'choghadiya',
+            'choghadiya_night',
+        ),
         'claim_id': 'panchangam.mixed_daily_windows',
         'state': 'partially_verified',
         'note': 'Varjyam and Durmuhurtham have inspected textual evidence, but this mixed regional bundle is not uniformly scriptural.',

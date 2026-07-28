@@ -1,0 +1,16 @@
+.github/
+coverage/
+dist/
+docs/
+node_modules/
+package-lock.json
+package.json
+public/
+src/
+tests/
+tools/
+tsconfig*.json
+vite.config.*
+**/__pycache__/
+**/*.test.py
+**/test_*.py

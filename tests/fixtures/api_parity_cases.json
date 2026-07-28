@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "hyderabad_drik",
+      "date": "2026-07-22",
+      "city": "Hyderabad",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Budhavaram", "tithi": "Shukla Navami", "nakshatra": "Swati", "yoga": "Sadhya", "sunrise": "05:52", "sunset": "18:52", "rahu_kalam": {"start": "12:22", "end": "14:00"}, "special_days": []}
+    },
+    {
+      "id": "hyderabad_surya",
+      "date": "2026-07-22",
+      "city": "Hyderabad",
+      "system": "surya_siddhanta",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Budhavaram", "tithi": "Shukla Ashtami", "nakshatra": "Swati", "yoga": "Sadhya", "sunrise": "05:52", "sunset": "18:52", "rahu_kalam": {"start": "12:22", "end": "14:00"}, "special_days": []}
+    },
+    {
+      "id": "hyderabad_vakya",
+      "date": "2026-07-22",
+      "city": "Hyderabad",
+      "system": "vakya",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Budhavaram", "tithi": "Shukla Ashtami", "nakshatra": "Swati", "yoga": "Sadhya", "sunrise": "05:52", "sunset": "18:52", "rahu_kalam": {"start": "12:22", "end": "14:00"}, "special_days": []}
+    },
+    {
+      "id": "london_dst_start",
+      "date": "2026-03-29",
+      "city": "London",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Adivaram", "tithi": "Shukla Dwadashi", "nakshatra": "Ashlesha", "yoga": "Dhriti", "sunrise": "06:42", "sunset": "19:28", "rahu_kalam": {"start": "17:52", "end": "19:28"}, "special_days": ["Ganda Moola (Ashlesha)"]}
+    },
+    {
+      "id": "dallas_dst_end",
+      "date": "2026-11-01",
+      "city": "Dallas",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Adivaram", "tithi": "Krishna Ashtami", "nakshatra": "Pushya", "yoga": "Shubha", "sunrise": "06:45", "sunset": "17:36", "rahu_kalam": {"start": "16:14", "end": "17:36"}, "special_days": []}
+    },
+    {
+      "id": "sydney_summer",
+      "date": "2026-12-21",
+      "city": "Sydney",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Adivaram", "tithi": "Shukla Dwadashi", "nakshatra": "Bharani", "yoga": "Shiva", "sunrise": "05:40", "sunset": "20:05", "rahu_kalam": {"start": "18:17", "end": "20:05"}, "special_days": []}
+    },
+    {
+      "id": "dubai_sankranti",
+      "date": "2026-01-14",
+      "city": "Dubai",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Budhavaram", "tithi": "Krishna Ekadashi", "nakshatra": "Anuradha", "yoga": "Ganda", "sunrise": "07:06", "sunset": "17:49", "rahu_kalam": {"start": "12:27", "end": "13:48"}, "special_days": ["Makara Sankranti", "Ekadashi — fasting day"]}
+    },
+    {
+      "id": "new_york_leap_day",
+      "date": "2028-02-29",
+      "city": "New York",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Mangalavaram", "tithi": "Shukla Chaturthi", "nakshatra": "Ashvini", "yoga": "Shukla", "sunrise": "06:30", "sunset": "17:46", "rahu_kalam": {"start": "14:57", "end": "16:22"}, "special_days": ["Ganda Moola (Ashvini)"]}
+    },
+    {
+      "id": "vijayawada_surya",
+      "date": "2027-08-15",
+      "city": "Vijayawada",
+      "system": "surya_siddhanta",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Adivaram", "tithi": "Shukla Trayodashi", "nakshatra": "Uttara Ashadha", "yoga": "Ayushman", "sunrise": "05:51", "sunset": "18:32", "rahu_kalam": {"start": "16:57", "end": "18:32"}, "special_days": ["Pradosham"]}
+    },
+    {
+      "id": "tirupati_vakya",
+      "date": "2027-01-14",
+      "city": "Tirupati",
+      "system": "vakya",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Guruvaram", "tithi": "Shukla Shashthi", "nakshatra": "Uttara Bhadrapada", "yoga": "Parigha", "sunrise": "06:39", "sunset": "18:03", "rahu_kalam": {"start": "13:46", "end": "15:12"}, "special_days": ["Bhogi"]}
+    },
+    {
+      "id": "san_jose_eclipse",
+      "date": "2026-08-12",
+      "city": "San Jose",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Budhavaram", "tithi": "Amavasya", "nakshatra": "Ashlesha", "yoga": "Variyan", "sunrise": "06:21", "sunset": "20:02", "rahu_kalam": {"start": "13:12", "end": "14:54"}, "special_days": ["Ganda Moola (Ashlesha)", "Amavasya", "Solar Eclipse (Total)"]}
+    },
+    {
+      "id": "chennai_deepavali",
+      "date": "2026-11-08",
+      "city": "Chennai",
+      "system": "drik",
+      "ayanamsa": "lahiri",
+      "expected": {"vaaram": "Adivaram", "tithi": "Krishna Chaturdashi", "nakshatra": "Swati", "yoga": "Ayushman", "sunrise": "06:04", "sunset": "17:40", "rahu_kalam": {"start": "16:13", "end": "17:40"}, "special_days": ["Naraka Chaturdashi", "Deepavali"]}
+    }
+  ]
+}

@@ -4,6 +4,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 .venv/
+.vercel/
 .worktrees
 dist/
 node_modules/
@@ -25,3 +26,4 @@ docs/feeds/
 
 .impeccable/
 .claude/
+.vercel
