@@ -54,4 +54,3 @@ jobs:
           publish_branch: gh-pages
           cname: panchangam.astrochaganti.com
           keep_files: true
-          force_orphan: true

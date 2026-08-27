@@ -24,6 +24,7 @@ on:
       - "Generate Gochara Data"
       - "Generate Lagna Data"
       - "Deploy Landing Page"
+      - "Compact GitHub Pages History"
     types: [completed]
 
 # Share the deploy lock with the content workflows so we never push to

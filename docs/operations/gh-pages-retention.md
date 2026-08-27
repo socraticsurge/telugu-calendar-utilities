@@ -1,17 +1,20 @@
 # GitHub Pages retention and rollback
 
-Status: implementation ready in issue #153; no live history has been rewritten
-and no generated file has been deleted. Activation requires merge approval and
-a separately approved first deployment.
+Status: the pre-activation backup and rollback were exercised on 2026-08-27.
+The original action-based activation was rolled back after the live check found
+that it removed layered artifacts. The corrected design compacts the complete
+published tree in a dedicated workflow instead of orphaning partial deploys.
 
 ## Why history is bounded
 
 `gh-pages` is a publication branch, not an audit archive. Its source inputs,
 calculation rules and tests live on `master`; generated output can be reproduced.
-Every Pages workflow therefore uses the pinned v4 deployment action with both
-`keep_files: true` and `force_orphan: true`. Version 4 supports this combination:
-the current live tree is preserved for layered deploys, while each successful
-deployment replaces the prior publication commit with a new orphan commit.
+The five content workflows remain layered deployments with `keep_files: true`
+and no orphan option. A separate serialized compactor reads the current Pages
+tip and tree through GitHub's Git data API, creates a parentless commit from the
+exact same tree, rechecks that the branch did not move, and then updates only
+`gh-pages`. This bounds history without asking a partial publisher to reconstruct
+files owned by the other workflows.
 
 ## Measured baseline — 2026-08-27
 
@@ -53,6 +56,22 @@ repository was untouched.
 5. Rollback from the 76 MiB backup bundle restored the exact original tip and
    tree, and `git fsck --full --no-dangling` passed.
 
+## Live activation finding and correction
+
+The first approved deployment tested the pinned `peaceiris/actions-gh-pages`
+v4.1.0 combination of `keep_files: true` and `force_orphan: true`. The workflow
+completed successfully, but the resulting root commit contained only the
+landing build: existing feeds, Gochara, Lagna and Rasi Phalalu files were absent.
+The live check caught the loss immediately and the verified bundle restored the
+exact original tip `0c8242ed4818838cba60f2d8ef41493eb1e2cd1f` and tree
+`af11e9b10c100e0ed8ea9036c203158727cca581`.
+
+The action's force-orphan path creates a new repository and copies only the
+current `publish_dir`; it does not clone the publication branch first. The
+corrected workflow therefore performs compaction independently, after all
+layered content deployments, and refuses to update the ref if the live tip or
+tree validation changes.
+
 The first live deployment may not immediately reduce GitHub-reported storage;
 unreachable server objects are reclaimed on GitHub's schedule. New clones stop
 requesting the old Pages history once the ref becomes orphaned.
@@ -71,7 +90,7 @@ After the first approved live deployment, repeat those checks, confirm the
 `CNAME` file and compare the published tree manifest before removing any local
 backup.
 
-## First activation
+## Activation
 
 Run these steps only with explicit owner approval:
 
@@ -85,7 +104,8 @@ git ls-tree -r --full-tree origin/gh-pages > gh-pages-YYYYMMDD.manifest
 ```
 
 Store the backup bundle, tip/tree SHAs and manifest outside the repository.
-Merge the approved workflow PR, manually run one deploy, then verify:
+Merge the approved workflow change, manually run **Compact GitHub Pages
+History**, then verify:
 
 ```bash
 git fetch origin gh-pages
