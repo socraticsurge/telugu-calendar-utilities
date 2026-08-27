@@ -2,5 +2,6 @@
 # This file exists so that `pip install -r requirements.txt` keeps working
 # in CI and local-dev muscle memory. The editable install picks up every
 # direct dep (mcp, pyswisseph, pytz, geopy, timezonefinder, icalendar) plus
-# the [test] extra (pytest). Playwright is installed separately in CI.
+# the [test] extra (pytest and the Ruff quality gate). Playwright is installed
+# separately in CI.
 -e .[test]

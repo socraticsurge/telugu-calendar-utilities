@@ -57,6 +57,9 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Enforce Ruff debt baseline
+        run: python tools/check_ruff_baseline.py
+
       - name: Run tests
         run: python -m pytest tests/ -v
 

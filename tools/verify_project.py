@@ -16,6 +16,7 @@ def commands(python: str = sys.executable) -> list[list[str]]:
     return [
         [python, 'tools/check_activity_provenance.py'],
         [python, 'tools/export_activity_rules.py', '--check'],
+        [python, 'tools/check_ruff_baseline.py'],
         [python, '-m', 'pytest', 'tests/'],
         ['npm', 'test'],
         ['npm', 'run', 'build'],
