@@ -5,7 +5,7 @@
 # slots for a given day. Scoring is universal (same astrological judgement
 # regardless of chandra_mode); chandra_mode controls only which slots
 # survive the filter pass.
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 from telugu_panchangam.muhurtas import named_muhurtas
