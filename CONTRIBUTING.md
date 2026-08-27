@@ -2,6 +2,16 @@
 
 Thanks for your interest in improving this Telugu Panchangam project. Contributions of all kinds are welcome — bug reports, timing corrections, new cities, festival rules, and code.
 
+## Finding current work
+
+The **[Telugu Calendar Utilities GitHub Project](https://github.com/users/socraticsurge/projects/2)**
+is the maintenance source of truth. It shows priority and status for current
+work. Use **[repository Issues](https://github.com/socraticsurge/telugu-calendar-utilities/issues)**
+for the acceptance criteria and discussion attached to each change.
+
+Files under `docs/tracking/` preserve the completed 2026 project and its
+decisions. Do not add new work to `STORIES.csv` or `TASKS.csv`.
+
 ## Reporting timing discrepancies
 
 The most valuable reports are about **wrong panchangam values** (tithi/nakshatra boundaries, muhurta windows, festival dates). When filing one, please include:

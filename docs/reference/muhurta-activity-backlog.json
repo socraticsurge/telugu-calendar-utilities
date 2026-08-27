@@ -2,6 +2,7 @@
   "schema_version": 1,
   "last_reviewed": "2026-07-22",
   "status_note": "Candidate locators are discovery evidence only. A new activity is not verified until its rules are crosswalked, implemented, tested and assigned a verified provenance claim.",
+  "tracking_note": "Research inventory only, not an active work queue. Current work is tracked in https://github.com/users/socraticsurge/projects/2 and repository Issues.",
   "items": [
     {
       "key": "gruhapravesha",

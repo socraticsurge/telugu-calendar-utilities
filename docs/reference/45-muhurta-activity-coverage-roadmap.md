@@ -1,5 +1,9 @@
 # Muhurtam Activity Coverage Roadmap
 
+This is a source-coverage inventory, not an active implementation queue. Any
+candidate selected for work must first have a repository Issue and be placed in
+the [Telugu Calendar Utilities GitHub Project](https://github.com/users/socraticsurge/projects/2).
+
 The current selector has 36 activity keys, all with an explicit provenance
 state. That closes attribution ambiguity; it does not mean the activity
 catalogue is complete. The machine-readable gap inventory is

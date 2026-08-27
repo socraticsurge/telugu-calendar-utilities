@@ -138,6 +138,17 @@ GitHub Actions (monthly cron)
   → GitHub Pages (webcal:// subscriptions)
 ```
 
+## Maintenance and roadmap
+
+The active maintenance queue is the
+**[Telugu Calendar Utilities GitHub Project](https://github.com/users/socraticsurge/projects/2)**.
+Use the linked status and priority fields to see what is planned, in progress,
+or ready for review. File defects and feature proposals in
+**[repository Issues](https://github.com/socraticsurge/telugu-calendar-utilities/issues)**.
+
+The CSV files and phase plans under `docs/tracking/` are preserved historical
+records; they are not a second backlog.
+
 ## Development
 
 ```bash

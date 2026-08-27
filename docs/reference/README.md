@@ -36,7 +36,7 @@ PyPI MCP package.
 | 03 | [Computational features](03-computational-features.md) | Every jyotisha computation, grouped, with classical source + output field |
 | 04 | [User-facing features](04-user-facing-features.md) | The 17 MCP tools, the ICS feeds, the landing page — how each works |
 | 05 | [Data flow & the muhurta pipeline](05-data-flow-and-muhurta.md) | End-to-end flow; the muhurta scorer in depth (the crown-jewel consumer) |
-| 06 | [Roadmap & backlog](06-roadmap-and-backlog.md) | Shipped phases, paused/parked work, and one governance inconsistency to reconcile |
+| 06 | [Roadmap & backlog](06-roadmap-and-backlog.md) | Release history, parked-work triggers, frozen-core posture, and links to the active GitHub Project |
 | 08 | [Provenance & authority](08-provenance-and-authority.md) | Evidence classes, source editions, claim-level citation status, and the verification ledger |
 | 13 | [Bhumi Puja / foundation profile](13-bhumi-puja-foundation-profile.md) | Raman page-level crosswalk, conservative automation, and practitioner checks |
 | 14 | [Well-digging source profile](14-well-digging-profile.md) | Raman's admitted Nakshatras/Lagnas, hard-rock caution, and manual chart checks |

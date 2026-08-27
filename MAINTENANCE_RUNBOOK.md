@@ -7,8 +7,11 @@ muscle memory.
 > See also: [`ARCHITECTURE.md`](ARCHITECTURE.md) for the layer cake,
 > [`CLAUDE.md`](CLAUDE.md) for the working agreement,
 > [`docs/reference/06-roadmap-and-backlog.md`](docs/reference/06-roadmap-and-backlog.md)
-> for the current roadmap. The older improvement plan is retained as a
-> historical decision log and contains intentionally stale phase-era detail.
+> for architectural roadmap context. The live work queue is the
+> [GitHub Project](https://github.com/users/socraticsurge/projects/2), backed by
+> [repository Issues](https://github.com/socraticsurge/telugu-calendar-utilities/issues).
+> The older improvement plan is retained as a historical decision log and
+> contains intentionally stale phase-era detail.
 
 ## Table of contents
 
