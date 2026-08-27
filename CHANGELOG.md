@@ -7,6 +7,12 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+### Fixed
+
+- Constrain the MCP SDK to the tested 1.x API so fresh installations cannot
+  resolve the incompatible 2.x package while the server uses
+  `mcp.server.fastmcp`.
+
 ## [1.13.0] — 2026-07-22
 
 Astrological authority and Muhurtam coverage release. The daily Panchangam,
