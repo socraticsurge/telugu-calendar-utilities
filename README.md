@@ -149,6 +149,15 @@ or ready for review. File defects and feature proposals in
 The CSV files and phase plans under `docs/tracking/` are preserved historical
 records; they are not a second backlog.
 
+## Documentation
+
+The repository is the canonical documentation source. Start with the
+**[documentation standard](docs/README.md)** for where current reference,
+operations, decisions, and historical material belong, then use the
+**[computation reference index](docs/reference/README.md)** for the detailed
+system map. A future documentation website will be generated from these files;
+it will not replace them as the source of truth.
+
 ## Development
 
 ```bash

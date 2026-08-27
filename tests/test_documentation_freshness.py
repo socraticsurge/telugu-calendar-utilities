@@ -31,3 +31,17 @@ def test_activity_documentation_avoids_a_stale_fixed_count():
 
     assert '30-activity model' not in muhurta_table
     assert 'source-profile activity catalogue' in muhurta_table
+
+
+def test_documentation_source_and_projection_contract_is_discoverable():
+    project_readme = _read('README.md')
+    contributor_guide = _read('CONTRIBUTING.md')
+    docs_standard = _read('docs/README.md')
+    reference_index = _read('docs/reference/README.md')
+
+    assert 'docs/README.md' in project_readme
+    assert 'docs/README.md' in contributor_guide
+    assert 'canonical source' in docs_standard.lower()
+    assert 'generated projection' in docs_standard.lower()
+    assert 'Gitignored' not in reference_index
+    assert 'local only' not in reference_index

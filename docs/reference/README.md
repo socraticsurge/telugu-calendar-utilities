@@ -2,11 +2,12 @@
 
 > **Audience:** the maintainer (you). A deep, diagram-first map of everything
 > the project computes, everything it exposes, and how it all fits together.
-> **Status:** generated 2026-06-17 from a full read of the codebase at master
-> (HEAD `045d828`, the jules-free rewrite). **Gitignored** — local only, per the
-> project's docs convention.
+> **Status:** maintained reference set, originally generated from a full
+> codebase read on 2026-06-17. The files are committed documentation source;
+> [the documentation standard](../README.md) defines how they are maintained
+> and projected.
 >
-> These complement — they do not replace — the on-GitHub docs:
+> These complement — they do not replace — the root entry points:
 > [`ARCHITECTURE.md`](../../ARCHITECTURE.md) (layer cake + engine boundary),
 > [`MAINTENANCE_RUNBOOK.md`](../../MAINTENANCE_RUNBOOK.md) (release/cron/recipes),
 > [`README.md`](../../README.md) / [`README_PYPI.md`](../../README_PYPI.md) (user-facing),
