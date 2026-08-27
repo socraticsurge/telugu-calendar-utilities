@@ -187,9 +187,10 @@ def test_generate_verified_raises_after_exhausting_retries(monkeypatch):
 def test_generate_verified_fails_explicitly_when_retry_budget_is_zero(monkeypatch):
     """A configuration error must not fall through to ``raise None``."""
     monkeypatch.setattr(llm_phalalu, '_VERIFY_RETRIES', 0)
+    all_rashis = _all_rashis()
 
     with pytest.raises(RuntimeError, match='without attempting verification'):
-        _generate_verified('primary', 'prompt', _all_rashis())
+        _generate_verified('primary', 'prompt', all_rashis)
 
 
 def test_llm_interpretation_has_a_distinct_provenance_claim():
