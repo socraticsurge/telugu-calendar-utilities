@@ -248,9 +248,10 @@ A failure means a CVE was disclosed in our dependency closure.
 2. Check if a fixed version exists. If yes:
    - Bump the dep in `pyproject.toml` (the `>=` floor goes up to the
      fixed version).
-   - Install `requirements.txt`, uninstall only the unpublished local project
-     distribution (`pip uninstall --yes mcp-server-panchangam`), then audit the
-     remaining dependency environment exactly as CI does:
+   - Install `requirements.txt`, then remove the unpublished local project and
+     the runner's build-only `setuptools` bootstrap from the audit set
+     (`pip uninstall --yes mcp-server-panchangam setuptools`). Audit the
+     remaining project dependency environment exactly as CI does:
      `pip-audit --local --strict`.
    - Refresh the Python 3.11 reproducibility snapshot (it is not the
      security gate):

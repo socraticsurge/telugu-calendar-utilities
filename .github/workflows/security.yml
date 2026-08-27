@@ -63,12 +63,13 @@ jobs:
       - name: Install runtime deps
         run: pip install -r requirements.txt
 
-      - name: Remove the unpublished local distribution
+      - name: Remove non-project distributions from the audit set
         # requirements.txt installs this checkout editably so its dependencies
         # match CI. The local version is not yet on PyPI and therefore cannot
-        # be queried by pip-audit; uninstalling it leaves its full dependency
-        # closure installed for the strict environment audit below.
-        run: pip uninstall --yes mcp-server-panchangam
+        # be queried by pip-audit. setuptools is a runner/build bootstrap, not
+        # a declared project dependency. Removing both leaves the full project
+        # dependency closure installed for the strict environment audit below.
+        run: pip uninstall --yes mcp-server-panchangam setuptools
 
       - name: Install pip-audit
         run: pip install pip-audit

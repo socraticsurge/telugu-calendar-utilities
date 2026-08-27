@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_security_workflow_audits_the_ci_requirements_input():
     workflow = (ROOT / ".github/workflows/security.yml").read_text()
 
-    assert "pip uninstall --yes mcp-server-panchangam" in workflow
+    assert "pip uninstall --yes mcp-server-panchangam setuptools" in workflow
     assert "pip-audit --local --strict" in workflow
     assert "pip-audit --local --strict --skip-editable" not in workflow
     assert "pip-audit -r requirements.txt" not in workflow
