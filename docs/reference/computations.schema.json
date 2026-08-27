@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://panchangam.astrochaganti.com/docs/schemas/computations.schema.json",
+  "title": "Telugu Calendar Utilities computation inventory",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "registry_id",
+    "vocabularies",
+    "coverage",
+    "computations"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "registry_id": { "const": "telugu-calendar-utilities.computations" },
+    "vocabularies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": { "type": "string", "minLength": 1 }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["roots", "exclusions"],
+      "properties": {
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["path", "extensions"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "extensions": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "pattern": "^\\." }
+              }
+            }
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "kind", "reason"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "minLength": 1 },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "computations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/computation" }
+    }
+  },
+  "$defs": {
+    "implementation": {
+      "type": "object",
+      "required": ["path", "symbol", "role"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "symbol": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "evidence_classes",
+        "verification_states",
+        "claim_ids",
+        "note"
+      ],
+      "properties": {
+        "evidence_classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "verification_states": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "claim_ids": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "note": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "computation": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "owning_layer",
+        "claim_kind",
+        "implementations",
+        "inputs",
+        "outputs",
+        "time_basis",
+        "surfaces",
+        "provenance",
+        "tests",
+        "limitations"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "owning_layer": { "type": "string", "minLength": 1 },
+        "claim_kind": { "type": "string", "minLength": 1 },
+        "implementations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/implementation" }
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "time_basis": { "type": "string", "minLength": 1 },
+        "surfaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "tests": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "test_gap": { "type": "string", "minLength": 1 },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
