@@ -4,8 +4,8 @@ How the project is layered and where each module sits. This is the
 mental model for "where should I add X?" and for understanding the
 engine-core refactor designed but parked in [improvement-plan Phase 6](docs/tracking/improvement-plan.md).
 
-> **Status note (updated 2026-06-17):** the engines remain **frozen core** —
-> per [`CLAUDE.md`](CLAUDE.md), changes need explicit owner approval (the one
+> **Status note (updated 2026-08-27):** the engines remain **frozen core** —
+> per [`AGENTS.md`](AGENTS.md), changes need explicit owner approval (the one
 > routine exception: appending a festival row to the rule tables in `base.py`
 > with a DP-verified test). Additive features live in new modules that consume
 > engine output. The `EngineCore` unification refactor described below is
@@ -16,6 +16,14 @@ engine-core refactor designed but parked in [improvement-plan Phase 6](docs/trac
 ## The layer cake
 
 ```
+
+This diagram is a placement model, not a literal acyclic import graph. The
+current engines aggregate additive fields into `PanchangamDay`, so
+`engines/base.py` imports derived modules for Ghati, Karana windows, Panchaka,
+special Yogas and other classifications. Derived calendar modules also import
+Julian-Day/sunrise helpers from `engines/utils.py`. The reproducible actual
+import graph, consumer map and current boundary decision are in
+[ADR 0002](docs/decisions/0002-computation-layer-organization.md).
 ┌──────────────────────────────────────────────────────────────────┐
 │ Consumers (no internal coupling — they read PanchangamDay /       │
 │            SlotFacts / name-tables only)                          │
@@ -109,20 +117,24 @@ driver reactivates it, the refactor stays parked and the engines stay frozen.
 
 ## The engine API contract
 
-Consumers (the modules in the top layer of the diagram) reach engines
-through exactly four entry points:
+Consumers reach engine instances through three behavioral entry points:
 
 ```python
-from telugu_panchangam.engines import DrikGanitaEngine
+from telugu_panchangam.engines.drik import DrikGanitaEngine
 engine = DrikGanitaEngine()
 
 day = engine.calculate(date, city)           # PanchangamDay
-days = engine.calculate_bulk(dates, city)    # list[PanchangamDay]
-slot = engine.facts_at(jd)                   # SlotFacts at a given Julian day
-                                              #   (re-derives — Phase 6 makes this cheap)
+days = engine.calculate_bulk(start, count, city)  # list[PanchangamDay]
+slot = engine.facts_at(instant, city)         # SlotFacts at a datetime
 ```
 
-Plus the constant tables that consumers import directly:
+There is no package-root engine façade today: `engines/__init__.py` is empty,
+and current consumers import concrete engine modules. ADR 0002 records that as
+a boundary to clarify only when a real public-library or new-engine driver
+appears; it is not silently changed in maintenance work.
+
+Constant tables that consumers import directly live in
+`panchangam_names.py`:
 `RASHI_NAMES`, `NAKSHATRA_NAMES`, `VAARAM_NAMES`, `TITHI_NAMES`,
 `MAASAM_NAMES`, `SAMVATSARA_NAMES`, `YOGA_NAMES`,
 `GANDA_MOOLA_NAKSHATRAS`, and the JD helpers from `utils.py`
@@ -151,7 +163,7 @@ re-enforces this at release time.
 
 ## Test architecture
 
-1,250+ Python tests plus frontend contract tests pin behaviour. Three
+1,290+ Python tests plus frontend contract tests pin behaviour. Three
 philosophies are in use:
 
 - **Golden-output**: most engine tests verify against pre-computed
@@ -182,7 +194,9 @@ prerequisite for the parked `EngineCore` refactor.
 
 ## See also
 
-- [`CLAUDE.md`](CLAUDE.md) — working agreement (test discipline, commit identity, etc.)
+- [`AGENTS.md`](AGENTS.md) — working agreement (test discipline, commit identity, etc.)
+- [ADR 0002](docs/decisions/0002-computation-layer-organization.md) — measured
+  coupling, duplication, change-risk findings and refactor triggers
 - [`MAINTENANCE_RUNBOOK.md`](MAINTENANCE_RUNBOOK.md) — release flow, monthly crons, adding a city, dealing with CVEs
 - [`docs/tracking/improvement-plan.md`](docs/tracking/improvement-plan.md) — phased roadmap
 - [`CHANGELOG.md`](CHANGELOG.md) — what shipped when
