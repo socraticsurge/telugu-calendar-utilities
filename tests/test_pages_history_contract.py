@@ -13,12 +13,24 @@ DEPLOY_WORKFLOWS = (
 )
 
 
-def test_every_pages_deploy_keeps_live_files_but_bounds_history():
+def test_partial_pages_deploys_keep_the_complete_live_tree():
     for name in DEPLOY_WORKFLOWS:
         workflow = (ROOT / '.github/workflows' / name).read_text()
         assert 'keep_files: true' in workflow
-        assert 'force_orphan: true' in workflow
+        assert 'force_orphan:' not in workflow
         assert 'cname: panchangam.astrochaganti.com' in workflow
+
+
+def test_pages_compactor_preserves_the_tree_in_a_parentless_commit():
+    workflow = (ROOT / '.github/workflows/compact-pages.yml').read_text()
+
+    assert '-f tree="$current_tree"' in workflow
+    assert 'parents[]' not in workflow
+    assert 'parent_count' in workflow
+    assert 'published_tree' in workflow
+    assert '-F force=true' in workflow
+    assert 'gh-pages moved during compaction' in workflow
+    assert 'panchangam.astrochaganti.com' in workflow
 
 
 def test_retention_runbook_defines_backup_verification_and_rollback():

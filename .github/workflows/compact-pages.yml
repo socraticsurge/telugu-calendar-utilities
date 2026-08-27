@@ -1,0 +1,79 @@
+name: Compact GitHub Pages History
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 21 * * *'  # after daily generation and the scheduled healer
+
+# Serialize with every writer to gh-pages. The tip is checked again immediately
+# before the force update so an unexpected external writer cannot be overwritten.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  compact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Replace Pages history without changing its tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          current_tip=$(gh api "repos/$REPO/git/ref/heads/gh-pages" --jq '.object.sha')
+          current_tree=$(gh api "repos/$REPO/git/commits/$current_tip" --jq '.tree.sha')
+
+          for required_path in \
+            CNAME \
+            feeds/hyderabad-drik.ics \
+            feeds/hyderabad-lagna.json \
+            gochara.json; do
+            gh api "repos/$REPO/contents/$required_path?ref=gh-pages" >/dev/null
+          done
+
+          cname=$(gh api "repos/$REPO/contents/CNAME?ref=gh-pages" --jq '.content' | base64 --decode)
+          if [ "$cname" != "panchangam.astrochaganti.com" ]; then
+            echo "::error::Unexpected CNAME: $cname"
+            exit 1
+          fi
+
+          new_tip=$(gh api -X POST "repos/$REPO/git/commits" \
+            -f message="deploy: compact gh-pages history" \
+            -f tree="$current_tree" \
+            --jq '.sha')
+
+          new_tree=$(gh api "repos/$REPO/git/commits/$new_tip" --jq '.tree.sha')
+          parent_count=$(gh api "repos/$REPO/git/commits/$new_tip" --jq '.parents | length')
+          if [ "$new_tree" != "$current_tree" ] || [ "$parent_count" -ne 0 ]; then
+            echo "::error::Compacted commit did not preserve the tree as a root commit."
+            exit 1
+          fi
+
+          latest_tip=$(gh api "repos/$REPO/git/ref/heads/gh-pages" --jq '.object.sha')
+          if [ "$latest_tip" != "$current_tip" ]; then
+            echo "::error::gh-pages moved during compaction; refusing to overwrite it."
+            exit 1
+          fi
+
+          gh api -X PATCH "repos/$REPO/git/refs/heads/gh-pages" \
+            -f sha="$new_tip" \
+            -F force=true >/dev/null
+
+          published_tip=$(gh api "repos/$REPO/git/ref/heads/gh-pages" --jq '.object.sha')
+          published_tree=$(gh api "repos/$REPO/git/commits/$published_tip" --jq '.tree.sha')
+          if [ "$published_tip" != "$new_tip" ] || [ "$published_tree" != "$current_tree" ]; then
+            echo "::error::Published compaction did not retain the original tree."
+            exit 1
+          fi
+
+          {
+            echo "### GitHub Pages history compacted"
+            echo "- Previous tip: \`$current_tip\`"
+            echo "- New root tip: \`$new_tip\`"
+            echo "- Preserved tree: \`$current_tree\`"
+          } >> "$GITHUB_STEP_SUMMARY"
