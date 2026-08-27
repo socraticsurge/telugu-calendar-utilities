@@ -27,6 +27,8 @@ BROWSER_ACTIVITY_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ('Other', ('travel',)),
 )
 
+# Public export consumed by tools/export_activity_rules.py and parity tests.
+# It intentionally has no module-local runtime consumer.
 BROWSER_ACTIVITIES: tuple[str, ...] = tuple(
     activity
     for _group, activities in BROWSER_ACTIVITY_GROUPS

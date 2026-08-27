@@ -213,6 +213,8 @@ def _generate_verified(model: str, user_prompt: str, all_rashis: dict) -> list[d
         except VerificationError as e:
             last_err = e
             print(f'Verification failed (attempt {attempt + 1}/{_VERIFY_RETRIES}): {e}')
+    if last_err is None:
+        raise RuntimeError('Verification loop exited without attempting verification')
     raise last_err
 
 
