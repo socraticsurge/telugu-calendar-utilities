@@ -34,13 +34,15 @@ def test_counts_and_tiling():
 
     # Day muhurtas tile sunrise -> sunset with no gaps (contiguity exact).
     assert day_ms[0]['start'] == day.sunrise
-    assert close(day_ms[-1]['end'], day.sunset)
+    day_ends_at_sunset = close(day_ms[-1]['end'], day.sunset)
+    assert day_ends_at_sunset
     for a, b in zip(day_ms, day_ms[1:]):
         assert a['end'] == b['start']
 
     # Night muhurtas tile sunset -> next sunrise.
     assert night_ms[0]['start'] == day.sunset
-    assert close(night_ms[-1]['end'], nxt.sunrise)
+    night_ends_at_sunrise = close(night_ms[-1]['end'], nxt.sunrise)
+    assert night_ends_at_sunrise
     for a, b in zip(night_ms, night_ms[1:]):
         assert a['end'] == b['start']
 

@@ -6,7 +6,7 @@ import pytest
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.personal.muhurta import (
-    day_slots, GOOD_CHOGHADIYA, relative_tier,
+    day_slots, relative_tier,
 )
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
