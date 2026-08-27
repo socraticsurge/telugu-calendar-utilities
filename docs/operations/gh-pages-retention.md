@@ -15,23 +15,25 @@ deployment replaces the prior publication commit with a new orphan commit.
 
 ## Measured baseline — 2026-08-27
 
-The local repository reported a 96.38 MiB pack across all local refs. A clean,
+The local repository reported a 96.58 MiB pack across all local refs. A clean,
 aggressively packed rehearsal containing `master`, release tags and `gh-pages`
-measured 77.79 MiB; the same repository without Pages history measured only
+measured 77.96 MiB; the same repository without Pages history measured only
 2.36 MiB.
 
-`gh-pages` contained 112 unrelated deployment commits from 2026-06-10 through
-2026-07-22. Its live tree contained 281 files and 89,082,209 bytes:
+`gh-pages` contained 148 deployment commits from 2026-06-10 through 2026-08-26.
+Its live tip was `0c8242ed4818838cba60f2d8ef41493eb1e2cd1f`; the exact live tree
+`af11e9b10c100e0ed8ea9036c203158727cca581` contained 317 files and
+90,103,569 bytes:
 
 | Live category | Files | Bytes | Required retention |
 |---|---:|---:|---|
 | Panchangam feeds under `feeds/` | 220 | 84,606,415 | Keep every currently published ICS feed and current per-city Lagna JSON. The feed horizon is the product contract. |
 | Built assets | 22 | 3,496,777 | Keep the current production build only. |
-| Rasi Phalalu | 32 | 768,997 | The UI reads today only. Retain a short operational window; deleting older live files is a separate approval-gated change. |
+| Rasi Phalalu | 68 | 1,790,357 | The UI reads today only. Retain a short operational window; deleting older live files is a separate approval-gated change. |
 | Root JSON | 1 | 23,081 | Keep the current Gochara snapshot only. |
 | Other (`index.html`, `CNAME`, etc.) | 6 | 186,939 | Keep the complete current site shell and custom-domain files. |
 
-Across historical Pages commits, 1,398 unique blobs occupied 812,145,432
+Across historical Pages commits, 1,434 unique blobs occupied 813,166,792
 uncompressed bytes. Panchangam feed history accounted for 801,319,230 bytes,
 so repeated generated feeds—not source history—were the dominant cause.
 
@@ -41,13 +43,13 @@ A bare clone containing only `master`, tags and `gh-pages` was used; the live
 repository was untouched.
 
 1. A complete backup bundle of the original Pages tip
-   `c55ddf9cebea32aa9062eff331165f8a61dfbafb` was created and verified.
+   `0c8242ed4818838cba60f2d8ef41493eb1e2cd1f` was created and verified.
 2. A parentless commit was created from the exact live tree
-   `5968de561b00bc6f27137bbf11b7a3d2ac6d1fb5`.
+   `af11e9b10c100e0ed8ea9036c203158727cca581`.
 3. `git diff` confirmed that the old and new commits had identical trees;
    `CNAME` still contained `panchangam.astrochaganti.com`.
 4. After unreachable objects were pruned and repacked, pack size fell from
-   77.79 MiB to 13.43 MiB, an 82.7% reduction.
+   77.96 MiB to 15.38 MiB, an 80.3% reduction.
 5. Rollback from the 76 MiB backup bundle restored the exact original tip and
    tree, and `git fsck --full --no-dangling` passed.
 
@@ -63,7 +65,7 @@ Before the rehearsal, each canonical URL returned HTTP 200:
 - Panchangam feed: `/feeds/hyderabad-drik.ics`
 - Gochara: `/gochara.json`
 - Lagna: `/feeds/hyderabad-lagna.json`
-- Rasi Phalalu sample: `/rasi_phalalu/2026-07-22.json`
+- Rasi Phalalu sample: `/rasi_phalalu/2026-08-27.json`
 
 After the first approved live deployment, repeat those checks, confirm the
 `CNAME` file and compare the published tree manifest before removing any local
