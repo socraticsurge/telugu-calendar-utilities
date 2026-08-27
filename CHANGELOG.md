@@ -18,6 +18,8 @@ PyPI version tracks this file's most recent release entry.
 - Constrain the MCP SDK to the tested 1.x API so fresh installations cannot
   resolve the incompatible 2.x package while the server uses
   `mcp.server.fastmcp`.
+- Keep `icalendar` below 7.3.0 until its revised content-line folding can be
+  adopted without changing the byte-stable subscriber feed contract.
 
 ## [1.13.0] — 2026-07-22
 
