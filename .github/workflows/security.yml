@@ -3,9 +3,9 @@ name: Security
 # Two scanners — both run on PR + push-to-master + weekly cron + on demand.
 #
 # CodeQL: catches Python correctness/security antipatterns at the source level.
-# pip-audit: catches known CVEs in the dependency closure that CI actually
-# installs (i.e. requirements.txt — the same closure that ships in the
-# generate.yml / publish.yml workflows).
+# pip-audit: catches known CVEs in the dependency environment that CI actually
+# installs from requirements.txt — the same input used by the generate.yml /
+# publish.yml workflows.
 #
 # Both are blocking on PRs. SECURITY.md promises a 72h ack — discovering
 # CVEs at PR time is how that ack gets enforced.
@@ -50,7 +50,7 @@ jobs:
           category: '/language:python'
 
   pip-audit:
-    name: pip-audit (requirements.txt)
+    name: pip-audit (installed environment)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -63,13 +63,18 @@ jobs:
       - name: Install runtime deps
         run: pip install -r requirements.txt
 
+      - name: Remove the unpublished local distribution
+        # requirements.txt installs this checkout editably so its dependencies
+        # match CI. The local version is not yet on PyPI and therefore cannot
+        # be queried by pip-audit; uninstalling it leaves its full dependency
+        # closure installed for the strict environment audit below.
+        run: pip uninstall --yes mcp-server-panchangam
+
       - name: Install pip-audit
         run: pip install pip-audit
 
       - name: Run pip-audit (strict — fail on any known CVE)
-        # Resolve and audit the same input used by CI and release workflows.
-        # The editable project itself is skipped because an unreleased local
-        # version cannot be looked up on PyPI; all declared dependencies and
-        # their transitives are still audited. --strict fails on audit errors
-        # as well as known vulnerabilities.
-        run: pip-audit -r requirements.txt --strict --skip-editable
+        # Audit the dependency environment installed above. --local keeps the
+        # gate aligned with CI; --strict fails on collection errors as well as
+        # known vulnerabilities.
+        run: pip-audit --local --strict

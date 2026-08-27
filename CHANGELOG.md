@@ -9,9 +9,10 @@ PyPI version tracks this file's most recent release entry.
 
 ### Changed
 
-- Align the dependency security gate with the same `requirements.txt` input
-  used by CI and release workflows, and refresh the separate Python 3.11
-  reproducibility snapshot with current dependency versions.
+- Align the dependency security gate with the environment installed from the
+  same `requirements.txt` input used by CI and release workflows, and refresh
+  the separate Python 3.11 reproducibility snapshot with current dependency
+  versions.
 
 ### Fixed
 
