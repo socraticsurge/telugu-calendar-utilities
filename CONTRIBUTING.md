@@ -29,8 +29,15 @@ python tools/verify_project.py
 ```
 
 The verifier checks the provenance ledger links, generated browser activity
-data, the Ruff debt baseline, the full Python suite, frontend tests, typecheck,
-and production build. Every gate must pass before any change merges.
+data, computation inventory and documentation freshness, the Ruff debt
+baseline, the full Python suite, frontend tests, typecheck, and production
+build. Every gate must pass before any change merges.
+
+For any new or changed calculation, follow
+**[Add or change a computation safely](docs/reference/10-computation-contributor-workflow.md)**
+and copy the linked story/registry template. It explains where the owner belongs,
+which evidence and parity tests are required, and exactly when work must stop
+for approval.
 
 Ruff currently uses a reviewed per-file, per-rule baseline in
 `tools/ruff_baseline.json`. New lint debt fails CI. If a change reduces existing
