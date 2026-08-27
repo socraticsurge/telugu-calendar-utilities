@@ -627,29 +627,29 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'manual_checks': [
                           'Pregnancy timing: the cited passage ordains '
-                          'Seemantha for the first pregnancy, in the 5th or '
-                          '7th month; if that schedule is missed, perform it '
-                          'before delivery under practitioner guidance. '
-                          'Muhurta Chintamani verse 8 instead specifies the '
-                          '6th or 8th month; choose the family’s tradition '
-                          'with a qualified practitioner.',
+                          + 'Seemantha for the first pregnancy, in the 5th or '
+                          + '7th month; if that schedule is missed, perform it '
+                          + 'before delivery under practitioner guidance. '
+                          + 'Muhurta Chintamani verse 8 instead specifies the '
+                          + '6th or 8th month; choose the family’s tradition '
+                          + 'with a qualified practitioner.',
                           'Under unavoidable circumstances, Ashwini, '
-                          'Anuradha or Moola may be considered; the automated '
-                          'profile admits only the primary Nakshatra list.',
+                          + 'Anuradha or Moola may be considered; the automated '
+                          + 'profile admits only the primary Nakshatra list.',
                           'Pournami is admissible only when Chandra is '
-                          'dignified; the automated profile conservatively '
-                          'omits it pending chart judgment.',
+                          + 'dignified; the automated profile conservatively '
+                          + 'omits it pending chart judgment.',
                           'Election chart: leave the 8th house vacant and '
-                          'do not place Chandra in the 8th.',
+                          + 'do not place Chandra in the 8th.',
                           'Personal star check: avoid the 3rd, 7th, 8th, '
-                          '10th and 22nd Nakshatras counted from the '
-                          'mother’s birth Nakshatra.',
+                          + '10th and 22nd Nakshatras counted from the '
+                          + 'mother’s birth Nakshatra.',
                           'The source makes the pregnancy month primary and '
-                          'permits Guru or Shukra combustion to be ignored '
-                          'for this rite; no combustion gate is applied.',
+                          + 'permits Guru or Shukra combustion to be ignored '
+                          + 'for this rite; no combustion gate is applied.',
                           'Maternal comfort, clinician instructions and '
-                          'medical care always take precedence over '
-                          'electional timing.',
+                          + 'medical care always take precedence over '
+                          + 'electional timing.',
                       ]},
     'gruhapravesha': {'label': 'Gruhapravesha (First entry into new home)',
                       'source_claim': 'muhurta.gruhapravesha',
@@ -682,28 +682,28 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_lagna_class': 'Sthira',
                       'manual_checks': [
                           'Ritual scope: first ceremonial entry into a newly '
-                          'built home only; buying a completed house, moving '
-                          'rental, or re-entering after repairs are separate '
-                          'elections.',
+                          + 'built home only; buying a completed house, moving '
+                          + 'rental, or re-entering after repairs are separate '
+                          + 'elections.',
                           'Election chart: Guru, Shukra and Chandra should be '
-                          'strong; leave the 8th house vacant, place malefics '
-                          'in Upachayas and benefics in Kendras, and preferably '
-                          'use a Guru- or Shukra-owned rising Rasi.',
+                          + 'strong; leave the 8th house vacant, place malefics '
+                          + 'in Upachayas and benefics in Kendras, and preferably '
+                          + 'use a Guru- or Shukra-owned rising Rasi.',
                           'Lagna lineage: fixed Rasis are preferred and dual '
-                          'Rasis are ordinary. Raman permits a movable Rasi '
-                          'only with Vrishabha Navamsa; the automated profile '
-                          'conservatively omits that uncomputed exception.',
+                          + 'Rasis are ordinary. Raman permits a movable Rasi '
+                          + 'only with Vrishabha Navamsa; the automated profile '
+                          + 'conservatively omits that uncomputed exception.',
                           'Personal and ritual checks: the owner’s Janma Rasi, '
-                          'Nakshatra or Lagna may strengthen the election; '
-                          'complete worship and Bhootabali before entry.',
+                          + 'Nakshatra or Lagna may strengthen the election; '
+                          + 'complete worship and Bhootabali before entry.',
                           'Pregnancy safety: Raman advises avoiding entry after '
-                          'six months of the wife’s pregnancy. Maternal comfort, '
-                          'clinician instructions and medical care always take '
-                          'precedence over timing.',
+                          + 'six months of the wife’s pregnancy. Maternal comfort, '
+                          + 'clinician instructions and medical care always take '
+                          + 'precedence over timing.',
                           'Lineage warning: current Drik Panchang practice also '
-                          'admits some Saturdays and applies additional month '
-                          'filters; this profile follows Raman’s four weekdays '
-                          'rather than silently blending methodologies.',
+                          + 'admits some Saturdays and applies additional month '
+                          + 'filters; this profile follows Raman’s four weekdays '
+                          + 'rather than silently blending methodologies.',
                       ]},
     # — Acquisitions —
     'vehicle':       {'label': 'Vehicle purchase',
@@ -737,13 +737,13 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_lagna_class': 'Sthira',
                       'manual_checks': [
                           'Election chart: the weekday lord should '
-                          'preferably occupy Lagna.',
+                          + 'preferably occupy Lagna.',
                           'Election chart: Guru should occupy a Kendra '
-                          'or Trikona.',
+                          + 'or Trikona.',
                           'Election chart: Mangala should occupy the 11th '
-                          'and not Lagna.',
+                          + 'and not Lagna.',
                           'Election chart: Lagna and 7th lords should be '
-                          'harmonious; avoid the 11th lord in the 12th.',
+                          + 'harmonious; avoid the 11th lord in the 12th.',
                       ]},
     'house_purchase': {
                       'label': 'Completed house purchase',
@@ -763,15 +763,15 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'manual_checks': [
                           'Scope: use this profile for buying a completed '
-                          'new or old house; it is not land purchase, '
-                          'construction commencement, rental moving or '
-                          'Gruhapravesha.',
+                          + 'new or old house; it is not land purchase, '
+                          + 'construction commencement, rental moving or '
+                          + 'Gruhapravesha.',
                           'Election chart: keep malefics out of the 7th '
-                          'house.',
+                          + 'house.',
                           'Election chart: do not place Mangala in Lagna.',
                           'Legal title, structural inspection, financing and '
-                          'contract advice take precedence over electional '
-                          'timing.',
+                          + 'contract advice take precedence over electional '
+                          + 'timing.',
                       ]},
     'gold':          {'label': 'Gold / Jewelry purchase',
                       'source_claim': 'muhurta.gold_jewelry.purchase',
@@ -781,9 +781,9 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_lagna_class': 'Sthira',
                       'manual_checks': [
                           'Election chart: Surya and Chandra should be well '
-                          'situated and aspected; the cited passage leaves '
-                          'this as a chart judgment rather than a fixed '
-                          'weekday, Tithi, Nakshatra or Lagna list.',
+                          + 'situated and aspected; the cited passage leaves '
+                          + 'this as a chart judgment rather than a fixed '
+                          + 'weekday, Tithi, Nakshatra or Lagna list.',
                       ]},
     # — Construction & Ventures —
     'bhumi_puja':    {'label': 'Bhumi Puja / Foundation laying',
@@ -836,21 +836,21 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'manual_checks': [
                           'Scope: commencement of repairs or renovation to '
-                          'an existing home only; painting/whitewashing, '
-                          'dismantling, new construction and post-work '
-                          're-entry are separate elections.',
+                          + 'an existing home only; painting/whitewashing, '
+                          + 'dismantling, new construction and post-work '
+                          + 're-entry are separate elections.',
                           'Weekday-Lagna condition: Friday is especially '
-                          'suitable with Vrishabha or Tula Lagna; Monday is '
-                          'especially suitable with Karka Lagna.',
+                          + 'suitable with Vrishabha or Tula Lagna; Monday is '
+                          + 'especially suitable with Karka Lagna.',
                           'Election chart: Lagna should be occupied by a '
-                          'benefic and Chandra should be in an aquatic Rasi.',
+                          + 'benefic and Chandra should be in an aquatic Rasi.',
                           'Mangala transit: if Chandra is in Krittika, Magha, '
-                          'Pushya, Purva Phalguni, Hasta, Moola or Revati, '
-                          'confirm Mangala is not transiting that same '
-                          'Nakshatra.',
+                          + 'Pushya, Purva Phalguni, Hasta, Moola or Revati, '
+                          + 'confirm Mangala is not transiting that same '
+                          + 'Nakshatra.',
                           'Building permits, structural engineering, utility '
-                          'safety and contractor readiness take precedence '
-                          'over electional timing.',
+                          + 'safety and contractor readiness take precedence '
+                          + 'over electional timing.',
                       ]},
     'business':      {'label': 'Deploying capital / business investment',
                       'source_claim': 'muhurta.capital_deployment',
@@ -863,15 +863,15 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'required_lagna_class': 'Chara',
                       'manual_checks': [
                           'Scope: Dravyaprayoga means putting funds to work '
-                          'or investing capital in an enterprise; founding '
-                          'a company, opening a marketplace, buying '
-                          'inventory and making a loan are separate acts.',
+                          + 'or investing capital in an enterprise; founding '
+                          + 'a company, opening a marketplace, buying '
+                          + 'inventory and making a loan are separate acts.',
                           'Election chart: place benefics in the 5th and '
-                          '9th houses and leave the 8th house unoccupied.',
+                          + '9th houses and leave the 8th house unoccupied.',
                           'Commercial viability, diversification, liquidity, '
-                          'contracts, tax and securities law, due diligence '
-                          'and qualified financial or legal advice take '
-                          'precedence over electional timing.',
+                          + 'contracts, tax and securities law, due diligence '
+                          + 'and qualified financial or legal advice take '
+                          + 'precedence over electional timing.',
                       ]},
     'job':           {'label': 'Entering employment / starting service',
                       'source_claim': 'muhurta.service_entry',
@@ -886,17 +886,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'manual_checks': [
                           'Scope: this is the employee-side act of entering '
-                          'service or starting employment; offer acceptance, '
-                          'contract signing, incorporation and hiring staff '
-                          'are separate acts.',
+                          + 'service or starting employment; offer acceptance, '
+                          + 'contract signing, incorporation and hiring staff '
+                          + 'are separate acts.',
                           'Election chart: place a benefic in Lagna and '
-                          'place Surya or Mangala in the 10th or 11th house.',
+                          + 'place Surya or Mangala in the 10th or 11th house.',
                           'Employer/employee compatibility: compare both '
-                          'birth-Nakshatra Yonis and the friendship between '
-                          'their Janma-Rasi lords.',
+                          + 'birth-Nakshatra Yonis and the friendship between '
+                          + 'their Janma-Rasi lords.',
                           'Employment terms, labour law, compensation, '
-                          'benefits, workplace safety and professional '
-                          'judgment take precedence over timing.',
+                          + 'benefits, workplace safety and professional '
+                          + 'judgment take precedence over timing.',
                       ]},
     # — Spiritual —
     'yajna':         {'label': 'Homa offering (Homahuti)',
@@ -905,11 +905,11 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'manual_prerequisites': True,
                       'manual_checks': [
                           'Ritual scope: this is the source’s Homahuti '
-                          'election, not a universal election for every '
-                          'Yajna. Follow the officiating priest and the '
-                          'specific Kalpa or Sampradaya requirements.',
+                          + 'election, not a universal election for every '
+                          + 'Yajna. Follow the officiating priest and the '
+                          + 'specific Kalpa or Sampradaya requirements.',
                           'Arrange a qualified officiant, a suitable venue '
-                          'and all required fire-safety precautions.',
+                          + 'and all required fire-safety precautions.',
                       ]},
     'pilgrimage':    {'label': 'Pilgrimage (Tirtha Yatra)',
                       'source_claim': 'muhurta.pilgrimage',
@@ -924,8 +924,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'prefer_lagna_class': 'Chara',
                       'manual_checks': [
                           'Election chart: place Guru in Lagna or the 9th '
-                          'house, as required by the pilgrimage-specific '
-                          'passage.',
+                          + 'house, as required by the pilgrimage-specific '
+                          + 'passage.',
                       ]},
     # — Civil & Medical —
     'court':         {'label': 'Filing a lawsuit / court action',
@@ -947,25 +947,25 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'allowed_lagnas': ['Mesha'],
                       'manual_checks': [
                           'Scope: this election is for filing or initiating '
-                          'a lawsuit, not a hearing, response, settlement, '
-                          'appeal or prediction of the case outcome.',
+                          + 'a lawsuit, not a hearing, response, settlement, '
+                          + 'appeal or prediction of the case outcome.',
                           'Tithi cross-reference: Raman says to avoid the '
-                          'usual unfavorable lunar days; the automated list '
-                          'uses his explicit recurring list of Chaturthi, '
-                          'Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, '
-                          'Pournami and Amavasya from the same edition.',
+                          + 'usual unfavorable lunar days; the automated list '
+                          + 'uses his explicit recurring list of Chaturthi, '
+                          + 'Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, '
+                          + 'Pournami and Amavasya from the same edition.',
                           'Lagna/Navamsa: automation admits Mesha Lagna. A '
-                          'practitioner may evaluate the source\'s alternative '
-                          'of a non-Mesha Lagna with Mesha Navamsa.',
+                          + 'practitioner may evaluate the source\'s alternative '
+                          + 'of a non-Mesha Lagna with Mesha Navamsa.',
                           'Election chart: strengthen Lagna with Guru in a '
-                          'Trikona; place no malefic in the 6th; keep the '
-                          'Lagna and 6th lords well separated.',
+                          + 'Trikona; place no malefic in the 6th; keep the '
+                          + 'Lagna and 6th lords well separated.',
                           'Raman says benefics in Kendras, or benefic aspects '
-                          'from male Rasis, indicate peace between the '
-                          'parties; this is not a promise of legal success.',
+                          + 'from male Rasis, indicate peace between the '
+                          + 'parties; this is not a promise of legal success.',
                           'Legal deadlines, court rules, counsel, evidence '
-                          'and personal safety always take precedence over '
-                          'electional timing.',
+                          + 'and personal safety always take precedence over '
+                          + 'electional timing.',
                       ]},
     'surgery':       {'label': 'Surgery / medical procedure',
                       'source_claim': 'muhurta.surgery',
@@ -980,14 +980,14 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'manual_checks': [
                           'Medical urgency and the treating clinician’s '
-                          'instructions always override Muhurtam; never '
-                          'delay necessary care for an astrological window.',
+                          + 'instructions always override Muhurtam; never '
+                          + 'delay necessary care for an astrological window.',
                           'Avoid Chandra in the patient’s natal Rasi and in '
-                          'the Rasi governing the body part being operated '
-                          'on, especially when afflicted by malefics.',
+                          + 'the Rasi governing the body part being operated '
+                          + 'on, especially when afflicted by malefics.',
                           'Strengthen Mangala and the house governing the '
-                          'body part; leave the 8th house unoccupied and '
-                          'avoid mutual aspects between Mangala and Shani.',
+                          + 'body part; leave the 8th house unoccupied and '
+                          + 'avoid mutual aspects between Mangala and Shani.',
                       ]},
     # — Panchaka-restricted activities —
     'cremation':         {'label': 'Deferred funeral rites (Pretakriya)',
@@ -1000,16 +1000,16 @@ ACTIVITY_RULES: dict[str, dict] = {
                           ],
                           'manual_checks': [
                               'Scope: verse 48 applies when Pretakriya could '
-                              'not be performed at the time of death. Do not '
-                              'delay immediate Antyeshti to wait for a listed '
-                              'Nakshatra.',
+                              + 'not be performed at the time of death. Do not '
+                              + 'delay immediate Antyeshti to wait for a listed '
+                              + 'Nakshatra.',
                               'Legal and medical requirements, timely rites, '
-                              'family Sampradaya and the officiating priest’s '
-                              'guidance override every project ranking.',
+                              + 'family Sampradaya and the officiating priest’s '
+                              + 'guidance override every project ranking.',
                               'The same verse separately prohibits cremation '
-                              'during latter-half Dhanishtha through Revati; '
-                              'none of those stars enter this positive '
-                              'Pretakriya admission list.',
+                              + 'during latter-half Dhanishtha through Revati; '
+                              + 'none of those stars enter this positive '
+                              + 'Pretakriya admission list.',
                           ]},
     'construction_roof': {'label': 'Roof-laying / construction milestone',
                           'source_claim': 'muhurta.construction_roof',
@@ -1026,8 +1026,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                           ],
                           'manual_checks': [
                               'Use a dry rising Rasi, preferably aspected '
-                              'by a dry Graha; the finder does not classify '
-                              'or evaluate this chart condition.',
+                              + 'by a dry Graha; the finder does not classify '
+                              + 'or evaluate this chart condition.',
                           ]},
     # — Specialized activities —
     'well_digging':      {'label': 'Well digging',
@@ -1043,9 +1043,9 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'caution_lagna_solar': True,
                           'manual_checks': [
                               'Election chart: Shukra and Chandra should '
-                              'occupy Kendras.',
+                              + 'occupy Kendras.',
                               'For abundant sweet water, Chandra or Shukra '
-                              'should occupy a Kendra in a full watery Rasi.',
+                              + 'should occupy a Kendra in a full watery Rasi.',
                           ]},
     'coronation':        {'label': 'Coronation / title ceremony',
                           'source_claim': 'muhurta.coronation',
@@ -1071,14 +1071,14 @@ ACTIVITY_RULES: dict[str, dict] = {
                           ],
                           'manual_checks': [
                               'Strengthen Surya, Chandra, Lagna, the 10th '
-                              'house and their lords; leave the 8th house '
-                              'vacant and confine malefics to Upachayas.',
+                              + 'house and their lords; leave the 8th house '
+                              + 'vacant and confine malefics to Upachayas.',
                               'For a traditional coronation, prefer Simha '
-                              'Lagna occupied by Surya and aspected by Guru.',
+                              + 'Lagna occupied by Surya and aspected by Guru.',
                               'For a democratic government beginning, the '
-                              'source instead describes Kumbha rising with '
-                              'Shani in Kumbha or Tula, aspected by Guru or '
-                              'Shukra.',
+                              + 'source instead describes Kumbha rising with '
+                              + 'Shani in Kumbha or Tula, aspected by Guru or '
+                              + 'Shukra.',
                           ]},
 }
 
