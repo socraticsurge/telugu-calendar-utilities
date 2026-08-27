@@ -43,5 +43,8 @@ def test_documentation_source_and_projection_contract_is_discoverable():
     assert 'docs/README.md' in contributor_guide
     assert 'canonical source' in docs_standard.lower()
     assert 'generated projection' in docs_standard.lower()
+    assert 'https://panchangam.astrochaganti.com/docs/' in docs_standard
+    assert 'how this is calculated' in docs_standard.lower()
+    assert 'verify this result' in docs_standard.lower()
     assert 'Gitignored' not in reference_index
     assert 'local only' not in reference_index

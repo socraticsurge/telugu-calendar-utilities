@@ -105,6 +105,61 @@ that states:
 The source registry remains canonical even when a website presents a more
 readable table, filter, or cross-link graph derived from it.
 
+## Public computation-reference contract
+
+Documentation explains a method; by itself, it does not verify the particular
+value a visitor sees. Every user-facing computation should therefore map to one
+stable computation identifier and one public reference route under
+`https://panchangam.astrochaganti.com/docs/`.
+
+Product links should use explicit labels such as **How this is calculated** or
+**Verify this result**, not a generic “Learn more”. The first link explains the
+method. The second carries the non-sensitive calculation context needed to
+interpret or reproduce the displayed value, such as:
+
+- date, city or coordinates, and IANA timezone;
+- calculation system, ayanamsa, and sunrise/day-boundary convention;
+- the displayed result and its units;
+- application and computation-registry versions; and
+- the stable computation identifier.
+
+Do not put birth details, names, free-form activity text, or other personal
+inputs into a verification URL. Personalised features may link to the method
+page and show their input summary locally instead.
+
+Each public computation page must distinguish:
+
+1. **Meaning** — what the value tells the user.
+2. **Method** — formula or textual rule, inputs, intermediates, units, and time
+   basis.
+3. **Evidence** — evidence class, exact source or comparison status, and known
+   disagreements.
+4. **Verification** — representative multi-date/multi-city tests, reproducible
+   command or machine-readable record, and the current result context when
+   supplied.
+5. **Limitations** — regional, lineage, approximation, manual-check, safety, or
+   generated-interpretation boundaries.
+6. **Implementation** — owning module, public consumers, tests, and release or
+   commit version.
+
+The page must not describe an `ENGINE_PINNED` regression value as independently
+verified. It should show exactly which cells or claims have independent source
+comparisons and which are protected only against software regression.
+
+Public labels use three explicit assurance levels:
+
+- **Documented and traceable** — the owner, method, inputs, outputs, and evidence
+  state are disclosed.
+- **Regression or reproduction checked** — tests or a repeatable command protect
+  the behaviour, but the check may still use the same implementation or pinned
+  output.
+- **Independently source-compared** — the specifically named claim or result cell
+  has been compared with an independent source and carries its locator.
+
+A page may contain claims at different levels. Re-fetching the same published
+result is reproduction, not independent verification, and must be labelled that
+way.
+
 ## Review and freshness
 
 - Behaviour changes update their computation record and affected prose in the
@@ -125,20 +180,28 @@ readable table, filter, or cross-link graph derived from it.
 GitHub's Markdown rendering remains the zero-build fallback. The proposed
 projection decision is recorded in
 [ADR 0001](decisions/0001-documentation-projection.md): evaluate a local
-Starlight projection first, while keeping the source renderer-neutral.
+VitePress projection first, while keeping the source renderer-neutral.
 
-If a public site is approved, it should use a separate deployment target and a
-dedicated documentation hostname such as `docs.panchangam.astrochaganti.com`.
-It must not write into the existing `gh-pages` branch. That branch is a layered
-product-data publication surface shared by multiple frozen workflows and owns
-the `panchangam.astrochaganti.com` CNAME.
+If publication is approved, the generated documentation belongs on the existing
+site at `https://panchangam.astrochaganti.com/docs/`. It should be built into
+`dist/docs/` as an atomic part of the landing-site build and published by the
+existing landing deployment. Do not add another independent `gh-pages` writer:
+that branch is already a layered product-data surface shared by several frozen
+workflows.
+
+The landing workflow will eventually need to notice canonical documentation
+source changes. That is a frozen-workflow change and therefore remains an
+explicit owner-approval gate. The approved design must preserve the current
+CNAME, generated feeds, Gochara, Lagna, and Rasi Phalalu artifacts.
 
 Publication is a later, explicit decision. The sequence is:
 
 1. build the selected content locally from committed source;
 2. verify links, search, Mermaid, accessibility, and representative mobile and
    desktop pages;
-3. review screenshots and the dependency/build footprint;
-4. obtain owner approval for hosting and DNS changes;
-5. add an isolated preview and publication path without modifying the frozen
-   product deployment workflows.
+3. verify stable computation routes and representative contextual links from
+   the existing feature screens;
+4. review screenshots and the dependency/build footprint;
+5. obtain owner approval for the public UI and frozen-workflow changes; and
+6. publish the combined landing-and-documentation artifact without changing the
+   production hostname or losing layered product data.

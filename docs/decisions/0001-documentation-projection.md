@@ -1,4 +1,4 @@
-# ADR 0001: Repository-first documentation with a separate projection
+# ADR 0001: Repository-first documentation projected into the product site
 
 - **Status:** Proposed for owner review
 - **Date:** 2026-08-27
@@ -14,11 +14,17 @@ reference documents are committed to Git, but their index incorrectly called
 them local and gitignored. There is no declared authoring/publication contract
 and no browsable documentation build.
 
-The existing GitHub Pages branch cannot safely absorb an unrelated docs
-generator. Multiple workflows layer the landing site and generated calendar
+Visitors need method and evidence links beside the values they are using. A
+separate documentation hostname would create an unnecessary product boundary;
+the useful destination is the existing
+`https://panchangam.astrochaganti.com/docs/` site area.
+
+The existing GitHub Pages branch cannot safely accept another independent docs
+publisher. Multiple workflows layer the landing site and generated calendar
 data into that branch, preserve each other's files, and maintain the production
-`panchangam.astrochaganti.com` CNAME. Those workflows are frozen unless the
-owner explicitly approves a change.
+`panchangam.astrochaganti.com` CNAME. Documentation must therefore join the
+landing build atomically rather than introduce another branch writer. The
+workflows are frozen unless the owner explicitly approves a change.
 
 ## Decision drivers
 
@@ -28,7 +34,10 @@ owner explicitly approves a change.
   indexing service;
 - the renderer must not force framework syntax into canonical pages;
 - generated output must be reproducible and disposable;
-- publication must be isolated from product data and frozen workflows;
+- public references must use stable URLs on the same origin as the feature UI;
+- the build path must remain isolated even though the result shares the product
+  origin;
+- no new workflow may compete with existing `gh-pages` writers;
 - the maintenance burden should fit a small project in maintenance mode.
 
 ## Options considered
@@ -36,8 +45,8 @@ owner explicitly approves a change.
 | Option | Strengths | Costs and risks | Disposition |
 |---|---|---|---|
 | GitHub-native Markdown | No added dependencies or hosting; Mermaid renders on GitHub | Weak cross-page navigation and discovery; repository search is not a documentation search experience | Keep as permanent fallback |
-| [Astro Starlight](https://starlight.astro.build/) | Documentation-focused navigation, accessibility defaults, and built-in local [Pagefind search](https://starlight.astro.build/guides/site-search/); Astro content loaders can read committed Markdown | Adds an Astro build layer; Mermaid requires a maintained integration; the project remains on a pre-1.0 release line | Recommended local pilot |
-| [VitePress](https://vitepress.dev/guide/what-is-vitepress) | Small Markdown/Vite model, default docs theme, and local search; aligns with the repository's existing Vite knowledge | Mermaid needs integration; the next major line is still published as an alpha, so choosing the stable line now creates an expected migration decision | Pilot fallback |
+| [VitePress](https://vitepress.dev/guide/what-is-vitepress) | Small Markdown/Vite model, default docs theme, local search, and straightforward `/docs/` base/output configuration; aligns with the existing Vite build | Mermaid needs integration; the next major line is still published as an alpha, so the pilot must pin and assess the stable line | Recommended local pilot |
+| [Astro Starlight](https://starlight.astro.build/) | Documentation-focused navigation, accessibility defaults, and built-in local [Pagefind search](https://starlight.astro.build/guides/site-search/) | Adds a second application framework to the current Vite site; external-source loading and Mermaid require more integration | Pilot fallback |
 | [Docusaurus](https://docusaurus.io/) | Mature docs platform and official Mermaid support | Larger React/MDX surface than this project needs; official search guidance favours hosted Algolia while local search is community-maintained | Do not adopt now |
 | [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) | Excellent established docs experience, search, and diagrams | Maintainers have announced end of life for November 2026 | Do not start a new site |
 | [Zensical](https://zensical.org/about/) | Open-source successor from the Material creators with a promising migration path | Described by its own project as alpha | Monitor; reconsider after stability |
@@ -48,20 +57,25 @@ owner explicitly approves a change.
 1. Keep all canonical documentation and computation metadata in this repository
    under the directory contract in [`docs/README.md`](../README.md).
 2. Keep the canonical pages renderer-neutral and usable through GitHub alone.
-3. Use Starlight for a **local, disposable projection pilot**, not as a new
-   source format. It wins the first evaluation on built-in local search,
-   documentation-oriented navigation, and accessibility defaults.
-4. Use VitePress stable as the fallback if the Starlight pilot cannot render
-   the current Markdown and Mermaid corpus without source coupling or excessive
-   dependencies.
-5. If a public projection is later approved, build it on a separate hosting
-   project and documentation subdomain. Do not publish it to this repository's
-   existing `gh-pages` branch.
-6. Do not deploy, change DNS, or alter `.github/workflows/` in story #171.
+3. Use the stable VitePress line for a **local, disposable projection pilot**,
+   not as a new source format. The same Vite ecosystem and a `/docs/` build
+   target make it the smallest fit for the clarified same-site requirement.
+4. Use Starlight as the fallback if VitePress cannot meet accessibility,
+   source-loading, search, or Mermaid requirements cleanly.
+5. Publish an approved projection under
+   `https://panchangam.astrochaganti.com/docs/` by composing `dist/docs/` into
+   the landing build. Do not create a second documentation deployment workflow
+   or change the production CNAME.
+6. Map every public computation to a stable route such as
+   `/docs/computations/<computation-id>/`. Feature screens should link to the
+   method and, where safe, pass non-sensitive result context for verification.
+7. Do not deploy or alter `.github/workflows/` in story #171. Updating the
+   frozen landing-workflow path contract requires a later explicit owner
+   approval after the local result is reviewed.
 
 ## Pilot acceptance gates
 
-The Starlight pilot is acceptable only if it can:
+The VitePress pilot is acceptable only if it can:
 
 - load the selected root and `docs/` Markdown without copied source files;
 - exclude plans, specs, tracking, and generated product data from default
@@ -69,30 +83,36 @@ The Starlight pilot is acceptable only if it can:
 - index the reference corpus locally without a hosted search dependency;
 - render existing Mermaid diagrams while preserving GitHub rendering;
 - preserve relative links or report each required source-link change;
-- produce a deterministic build without interfering with the landing-page
-  Vite build or Python package;
+- build deterministically into `dist/docs/` after the landing Vite build without
+  deleting or replacing landing or generated-data artifacts;
+- keep `/docs/computations/<computation-id>/` URLs stable and validate that
+  contextual product links resolve;
 - pass a keyboard, contrast, mobile, broken-link, and representative-page
   review; and
 - remain easy to remove without losing documentation source.
 
 If those gates fail, keep GitHub-native documentation and evaluate the
-VitePress fallback. A public site is useful, but it is not required for the
+Starlight fallback. A public site is useful, but it is not required for the
 documentation to remain authoritative and maintained.
 
 ## Consequences
 
 - Documentation can improve immediately without waiting for hosting.
-- A site can add navigation and search later without creating content drift.
-- The first projection adds a small, isolated JavaScript toolchain that must be
-  maintained and security-reviewed.
+- Visitors stay on the current site when they move from a result to its method,
+  evidence, and verification context.
+- The first projection adds a small VitePress toolchain that must be maintained
+  and security-reviewed.
 - Existing historical material stays auditable but will not crowd the supported
   documentation experience.
-- Hosting and DNS remain a separate owner-approval decision with a reviewable
-  local result first.
+- The landing build becomes the atomic owner of `/docs/`; no DNS change or new
+  `gh-pages` writer is needed.
+- The frozen landing-workflow path filter must eventually include canonical
+  docs inputs so docs-only changes deploy. That change needs explicit owner
+  approval and regression checks for every layered artifact.
 
 ## Revisit triggers
 
-Revisit this proposal if Starlight reaches or changes its stable contract, if
-Zensical leaves alpha with a compelling migration path, if the Mermaid
-integration becomes unmaintained, or if the documentation corpus no longer
-fits a static site.
+Revisit this proposal if VitePress changes its stable contract, if Starlight
+becomes materially simpler to integrate with the existing Vite site, if the
+Mermaid integration becomes unmaintained, or if the documentation corpus no
+longer fits a static site.
