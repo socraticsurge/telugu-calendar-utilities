@@ -67,10 +67,9 @@ jobs:
         run: pip install pip-audit
 
       - name: Run pip-audit (strict — fail on any known CVE)
-        # Audits requirements.lock (the resolved, pinned dependency closure
-        # — mcp, pyswisseph, pytz, geopy, timezonefinder, icalendar, pytest,
-        # all transitives) rather than requirements.txt. The lockfile does
-        # not include our own package, so version-bump PRs don't spuriously
-        # fail looking up the unreleased version on PyPI. --strict still
-        # fails on any known CVE in the closure.
-        run: pip-audit -r requirements.lock --strict
+        # Resolve and audit the same input used by CI and release workflows.
+        # The editable project itself is skipped because an unreleased local
+        # version cannot be looked up on PyPI; all declared dependencies and
+        # their transitives are still audited. --strict fails on audit errors
+        # as well as known vulnerabilities.
+        run: pip-audit -r requirements.txt --strict --skip-editable

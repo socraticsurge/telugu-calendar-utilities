@@ -248,7 +248,11 @@ A failure means a CVE was disclosed in our dependency closure.
 2. Check if a fixed version exists. If yes:
    - Bump the dep in `pyproject.toml` (the `>=` floor goes up to the
      fixed version).
-   - Run `pip-audit` locally to confirm: `pip-audit -r requirements.txt --strict`.
+   - Run `pip-audit` locally against the same input as CI:
+     `pip-audit -r requirements.txt --strict --skip-editable`.
+   - Refresh the Python 3.11 reproducibility snapshot (it is not the
+     security gate):
+     `uv pip compile pyproject.toml --extra test --python-version 3.11 --upgrade --generate-hashes -o requirements.lock`.
    - PR + merge.
 3. If no fixed version exists yet:
    - Assess severity. Most CVEs in non-network-facing libs (timezone

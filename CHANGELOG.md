@@ -7,6 +7,12 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+### Changed
+
+- Align the dependency security gate with the same `requirements.txt` input
+  used by CI and release workflows, and refresh the separate Python 3.11
+  reproducibility snapshot with current dependency versions.
+
 ### Fixed
 
 - Constrain the MCP SDK to the tested 1.x API so fresh installations cannot
