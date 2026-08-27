@@ -1,9 +1,8 @@
 # Pre-commit hooks — opt-in for local devs. Install with:
 #   pip install pre-commit && pre-commit install
 #
-# CI does NOT run these (yet) — they're a client-side guard to catch
-# trivial issues before they hit a PR review. Keep the hook set
-# narrow so onboarding stays cheap.
+# CI runs the same Ruff debt check. The remaining hooks are client-side
+# guards for trivial issues before they hit a PR review.
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -22,11 +21,13 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.0
+  - repo: local
     hooks:
-      # E = pycodestyle errors, F = pyflakes, I = isort (import order).
-      # Intentionally tight — broader rule sets will produce noise on
-      # an existing codebase. Expand once the team agrees on style.
-      - id: ruff
-        args: [--fix, --select, 'E,F,I', --extend-ignore, 'E501']
+      # The baseline makes the existing debt explicit while rejecting any
+      # increase. It avoids mass-formatting the frozen calculation core.
+      - id: ruff-baseline
+        name: ruff baseline (no new E/F/I debt)
+        entry: python tools/check_ruff_baseline.py
+        language: python
+        additional_dependencies: [ruff==0.16.2]
+        pass_filenames: false
