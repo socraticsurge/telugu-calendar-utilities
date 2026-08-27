@@ -82,7 +82,27 @@ Lists all special days in a given month: named festivals, Ekadashi, Amavasya, Po
 
 Ranked auspicious time slots: good Choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted, scored with Abhijit/Amrita overlap and special-yoga bonuses. Each slot carries its reasons.
 
-`activity` tunes the rules for: `travel`, `ceremony`, `purchase`, `beginning`, `litigation`, `cremation`, `construction_roof`, `wood_cutting`, `well_digging`, `coronation`, or `any`. Optional `travel_direction` (N/S/E/W/NE/NW/SE/SW) activates Disha Shoola filtering. Optional birth stars (`janma_nakshatras`) keep only days whose Tarabalam favours everyone; optional `janma_rasis` add Chandrabalam. Activity-aware filters — Bhadra Mukha, Khar-Maasa, Adhika Maasa, Pitru Paksha, Simha-Stha, Maudhya, and Panchaka Rahita — are applied automatically per activity.
+`activity` accepts these source-profile keys:
+
+- General: `any`
+- Samskaras: `wedding`, `engagement`, `naming`, `annaprasana`, `karnavedha`,
+  `mundana`, `upanayana`, `vidyarambha`, `seemantha`, `gruhapravesha`
+- Acquisitions and finance: `vehicle`, `property`, `house_purchase`, `gold`,
+  `business_inventory_purchase`, `purchase`, `borrowing_money`, `lending_money`
+- Construction and ventures: `bhumi_puja`, `well_digging`, `home_repair`,
+  `business`, `job`, `construction_roof`, `wood_cutting`
+- Spiritual and ceremonial: `yajna`, `pilgrimage`, `ceremony`, `beginning`,
+  `cremation`, `coronation`
+- Civil, medical, and travel: `court`, `surgery`, `travel`
+
+The legacy key `litigation` resolves to `court`. Some specialist profiles are
+available only through Python/MCP because the browser does not yet carry every
+decisive input. Optional `travel_direction` (N/S/E/W/NE/NW/SE/SW) activates
+Disha Shoola filtering. Optional birth stars (`janma_nakshatras`) keep only
+days whose Tarabalam favours everyone; optional `janma_rasis` add
+Chandrabalam. Activity-aware filters — Bhadra Mukha, Khar-Maasa, Adhika Maasa,
+Pitru Paksha, Simha-Stha, Maudhya, and Panchaka Rahita — are applied
+automatically per activity.
 
 #### `find_tarabalam_days(janma_nakshatras, start_date, days=14, city, system="drik", janma_rasis=None, ...)`
 
@@ -120,7 +140,7 @@ Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, naks
 
 #### `get_gochara(date, janma_rasi, city, ayanamsa="lahiri", ...)`
 
-Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position counted from the janma rashi with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse. Brihat Samhita 104.4 supports the seven classical grahas' favourable-house sets; Phaladeepika 26.3–8 supports the Vedha pairs and exemptions. The configured Rahu/Ketu set (3, 6, 11) has a known conflict with Phaladeepika 26.2, which treats both like Surya and includes the 10th; node Vedha remains unverified. Phaladeepika 26.1 and 26.22–23 support the natal-Moon reference and adverse effects underlying the Sade Sati / Ashtama / Ardhastama flags. The grouping names, rising/peak/setting labels and advice are conventional product presentation, not quotations from those slokas.
+Gochara (transit) verdicts from a janma rashi (natal Moon sign): each graha's house position counted from the janma rashi with a verdict — favourable, blocked (vedha, with the obstructing graha named), or adverse. Brihat Samhita 104.4 supports the seven classical grahas' favourable-house sets; Phaladeepika 26.3–8 supports the Vedha pairs and exemptions. Phaladeepika 26.2 supports the configured Rahu/Ketu houses 3, 6, 10, and 11 by treating both nodes like Surya; node Vedha remains unverified. Phaladeepika 26.1 and 26.22–23 support the natal-Moon reference and adverse effects underlying the Sade Sati / Ashtama / Ardhastama flags. The grouping names, rising/peak/setting labels and advice are conventional product presentation, not quotations from those slokas.
 
 #### `get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra=None, ayanamsa="lahiri", ...)`
 

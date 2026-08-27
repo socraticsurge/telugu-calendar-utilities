@@ -11,6 +11,14 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def documentation_commands(python: str = sys.executable) -> list[list[str]]:
+    """Return documentation gates added ahead of the established checks."""
+    return [
+        [python, 'tools/check_computation_inventory.py'],
+        [python, 'tools/check_documentation_freshness.py'],
+    ]
+
+
 def commands(python: str = sys.executable) -> list[list[str]]:
     """Return the canonical checks, kept inspectable for docs and tests."""
     return [
@@ -23,6 +31,11 @@ def commands(python: str = sys.executable) -> list[list[str]]:
     ]
 
 
+def all_commands(python: str = sys.executable) -> list[list[str]]:
+    """Return the complete verification contract in execution order."""
+    return documentation_commands(python) + commands(python)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description='Run provenance, generated-data, backend, and frontend checks.')
@@ -30,7 +43,7 @@ def main() -> int:
         '--list', action='store_true', help='print checks without running them')
     args = parser.parse_args()
 
-    checks = commands()
+    checks = all_commands()
     if args.list:
         for command in checks:
             print(subprocess.list2cmdline(command))

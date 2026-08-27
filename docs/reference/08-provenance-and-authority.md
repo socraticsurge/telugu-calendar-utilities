@@ -78,9 +78,10 @@ Until an edition and locator are recorded for the specific claim, it remains
 - The seven classical Gochara favourable-house sets have an exact Brihat
   Samhita 104.4 locator. Vedha mappings and exemptions are independently
   verified against Phaladeepika 26.3–8 and Jataka Parijata Volume III.
-  Phaladeepika 26.2 exposes a known conflict in the configured node houses.
-  Its 26.1 and 26.22–23 verify the Moon-sign reference and underlying adverse
-  Shani houses, but not the product's conventional names or phase labels.
+  Phaladeepika 26.2 supports the configured node houses 3, 6, 10 and 11 by
+  treating Rahu and Ketu like Surya; node Vedha remains unverified. Its 26.1
+  and 26.22–23 verify the Moon-sign reference and underlying adverse Shani
+  houses, but not the product's conventional names or phase labels.
 - Daily website prose has its own `daily_horoscope.llm_interpretation` claim.
   Only its declared transit triples are engine-verified; prose and advice stay
   `heuristic` even when every cited calculation is correct.

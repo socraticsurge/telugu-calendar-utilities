@@ -10,7 +10,7 @@ Three surfaces, all built from the same engine output:
 
 ## 1. MCP server — 17 tools
 
-FastMCP server (`mcp/server.py:23`), entry point `mcp.run()` (`server.py:176`),
+FastMCP server ([`mcp/server.py`](../../telugu_panchangam/mcp/server.py)), with
 decorator-registered tools wrapping logic in `mcp/tools.py`. Every tool returns a
 **JSON string**; failures return `{"error": "…"}`.
 
@@ -80,7 +80,7 @@ skip lookup entirely.
 days get 🪔 in the title; other special days (Ekadashi/Amavasya/Pournami/
 Pradosham/Sankranti/eclipse) get ⚡.
 
-**Each event's description** (`generators/ics.py:127–218`): metadata
+**Each event's description** (`generators/ics.py`): metadata
 (Samvatsara/Maasam/Paksham/Vaaram, ayanam/rituvu, signs), the five angas with
 HH:MM(±1) bounds, sky markers, auspicious & inauspicious windows, daytime **and**
 night Choghadiya, eclipse + Sutak, special yogas, and a specials summary.
