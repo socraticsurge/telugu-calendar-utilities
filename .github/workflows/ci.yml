@@ -5,11 +5,12 @@ on:
   push:
     branches-ignore: [master, gh-pages]
 
-# Cancel superseded CI runs on the same ref. Master and gh-pages
-# don't get CI runs (push is filtered above), so the ref here is
-# always a feature branch or a PR.
+# Push validates a branch before it has a PR. After a PR opens, GitHub emits
+# both push and pull_request events for the same commit; normalize both to the
+# source branch so only one matrix completes. Job names stay unchanged for
+# branch-protection compatibility.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:

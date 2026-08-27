@@ -14,13 +14,14 @@ muscle memory.
 
 1. [Release a new version](#release-a-new-version)
 2. [The monthly cron map](#the-monthly-cron-map)
-3. [Add a city](#add-a-city)
-4. [Add a festival](#add-a-festival)
-5. [Verify against Drik Panchang](#verify-against-drik-panchang)
-6. [Respond to a Dependabot PR](#respond-to-a-dependabot-pr)
-7. [Respond to a pip-audit CVE finding](#respond-to-a-pip-audit-cve-finding)
-8. [Fix a broken deploy](#fix-a-broken-deploy)
-9. [Open emergencies](#open-emergencies)
+3. [The CI event model](#the-ci-event-model)
+4. [Add a city](#add-a-city)
+5. [Add a festival](#add-a-festival)
+6. [Verify against Drik Panchang](#verify-against-drik-panchang)
+7. [Respond to a Dependabot PR](#respond-to-a-dependabot-pr)
+8. [Respond to a pip-audit CVE finding](#respond-to-a-pip-audit-cve-finding)
+9. [Fix a broken deploy](#fix-a-broken-deploy)
+10. [Open emergencies](#open-emergencies)
 
 ---
 
@@ -112,6 +113,24 @@ Each should return 200 with content dated within the last few days.
 Re-run the workflow from the Actions tab; if it fails twice, look at
 the log. The pre-deploy `pytest tests/` step catches most regressions
 before the deploy step runs.
+
+---
+
+## The CI event model
+
+CI listens to both feature-branch pushes and pull requests. A push therefore
+validates a new branch before a PR exists. Once a PR is open, GitHub emits both
+events for the same commit. The workflow maps both events to the source branch
+with `github.head_ref || github.ref_name`; concurrency then cancels the older
+run so exactly one complete Python 3.10–3.13 matrix remains.
+
+The matrix job names remain `test (3.10)` through `test (3.13)`, so the four
+required branch-protection contexts are unchanged. Security supplies the other
+required contexts: `CodeQL (Python)` and `pip-audit (requirements.txt)`.
+
+If duplicate matrices both complete, inspect the two runs' event types and
+concurrency groups. A `push` run and a `pull_request` run for the same head
+commit must resolve to the same `ci-<source-branch>` group.
 
 ---
 
@@ -248,7 +267,14 @@ A failure means a CVE was disclosed in our dependency closure.
 2. Check if a fixed version exists. If yes:
    - Bump the dep in `pyproject.toml` (the `>=` floor goes up to the
      fixed version).
-   - Run `pip-audit` locally to confirm: `pip-audit -r requirements.txt --strict`.
+   - Install `requirements.txt`, then remove the unpublished local project and
+     the runner's build-only `setuptools` bootstrap from the audit set
+     (`pip uninstall --yes mcp-server-panchangam setuptools`). Audit the
+     remaining project dependency environment exactly as CI does:
+     `pip-audit --local --strict`.
+   - Refresh the Python 3.11 reproducibility snapshot (it is not the
+     security gate):
+     `uv pip compile pyproject.toml --extra test --python-version 3.11 --upgrade --generate-hashes -o requirements.lock`.
    - PR + merge.
 3. If no fixed version exists yet:
    - Assess severity. Most CVEs in non-network-facing libs (timezone
