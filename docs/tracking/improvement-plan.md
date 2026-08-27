@@ -4,8 +4,11 @@ _Created 2026-06-16. Historical phase-era decision log. It is deliberately
 not the current source of truth: Vite/TypeScript and the principal Phase 4
 accessibility work later shipped, so unchecked items and counts below describe
 the June 2026 snapshot. Use
-[`docs/reference/06-roadmap-and-backlog.md`](../reference/06-roadmap-and-backlog.md)
-for current status and `AGENTS.md` for the governing maintenance contract._
+the [GitHub Project](https://github.com/users/socraticsurge/projects/2) and
+[repository Issues](https://github.com/socraticsurge/telugu-calendar-utilities/issues)
+for current status, [`docs/reference/06-roadmap-and-backlog.md`](../reference/06-roadmap-and-backlog.md)
+for architectural context, and `AGENTS.md` for the governing maintenance
+contract._
 
 ---
 
@@ -40,9 +43,11 @@ Either resume path stays consistent with the durable state in this doc and the p
 
 ---
 
-## State protocol
+## Historical state protocol (retired 2026-08-27)
 
-> Persist plans, decisions, and progress in this file as we work. The chat transcript is not durable; this doc is. Update this doc *in the same turn* whenever we change plans, lock decisions, or ship items. When checking project status, read this doc first.
+The original workflow persisted plans and progress in this file. That protocol
+is retired. Do not add current work here; use the GitHub Project and repository
+Issues. The text below remains a June 2026 planning snapshot.
 
 ---
 

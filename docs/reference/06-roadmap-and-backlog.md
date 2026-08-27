@@ -1,11 +1,15 @@
 # 06 · Roadmap & Backlog
 
-Where the project has been and what's queued — so you can reconnect quickly. The
-historical phase tracker is
+This page is architectural orientation and release history, not the active work
+queue. Current maintenance status and priority live in the
+[Telugu Calendar Utilities GitHub Project](https://github.com/users/socraticsurge/projects/2),
+with acceptance criteria and discussion in
+[repository Issues](https://github.com/socraticsurge/telugu-calendar-utilities/issues).
+
+The historical phase tracker is
 [`docs/tracking/improvement-plan.md`](../tracking/improvement-plan.md). This
-page is the maintained summary, refreshed **2026-07-22**; the phase tracker is
-retained for decision history and should not be read as current execution
-state.
+page was reconciled **2026-08-27**; the phase tracker is retained for decision
+history and should not be read as current execution state.
 
 ---
 
@@ -60,18 +64,12 @@ tool, Panchanga Shuddhi. Then 1.10.4 wired ayanamsa through gochara/ingress/phal
 
 ---
 
-## Done this session (2026-06-17) — not yet pushed
+## Historical maintenance checkpoint
 
-- **CHANGELOG backfill v1.0.5–v1.7.1** — this was the open Phase 8 item
-  *"Backfill CHANGELOG.md for v1.0.5..v1.7.1 from git log"*; now complete, plus
-  the misplaced `[Unreleased]` block was folded into 1.9.0 and all comparison
-  links restored. (Committed locally; rides the pending force-push.)
-- **Contributor cleanup** — the `google-labs-jules[bot]` commits were re-authored
-  to the maintainer identity (the "Jules bot itself: decide later" decision is now
-  partly resolved — its *authorship* is removed; whether to revoke its repo
-  *access* is still open). Verified byte-identical trees; awaiting the maintainer's
-  force-push.
-- **These reference docs** — gitignored under `docs/reference/`.
+The detailed 2026-06-17 changelog, contributor-rewrite and documentation
+checkpoint is retained in
+[`docs/tracking/2026-06-17-maintenance-changelog-contributors-docs.md`](../tracking/2026-06-17-maintenance-changelog-contributors-docs.md).
+Its temporary push instructions are historical, not current work.
 
 ---
 

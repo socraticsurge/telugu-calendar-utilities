@@ -1,25 +1,20 @@
-# Project Guidelines
+# Historical spec-harness guidelines
 
-> Filled in during Phase 2 (Tech Stack & Guidelines) of the spec-driven harness workflow.
+This file records the Phase 2 setup of the retired CSV/hook-driven planning
+harness. It is preserved for context and is not an active contributor guide.
 
-## Tech Stack
-- TBD during Phase 2 brainstorming.
+Use these current sources instead:
 
-## Environment Setup
-- This project uses its own virtual environment at `.venv/` (created via
-  `python3 -m venv .venv`), kept out of git via `.gitignore`.
-- Install/update dependencies with `.venv/bin/pip install -r requirements.txt`.
-- Run tests with `.venv/bin/pytest`. These commands are pre-approved in
-  `.claude/settings.json` so they run without a permission prompt.
-- Add new dependencies to `requirements.txt` and log the addition in
-  `docs/tracking/DECISIONS.md` per the Hard Rules below.
+- `AGENTS.md` for the frozen-core working agreement;
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) for setup, tests and pull requests;
+- `pyproject.toml` for Python dependency declarations;
+- the [Telugu Calendar Utilities GitHub Project](https://github.com/users/socraticsurge/projects/2)
+  and [repository Issues](https://github.com/socraticsurge/telugu-calendar-utilities/issues)
+  for current work and decisions.
 
-## Architecture Conventions
-- TBD.
+## Retired workflow snapshot
 
-## Testing Approach
-- TDD per `superpowers:test-driven-development`. Every source file has a corresponding test file.
-- A story's status only becomes `done` in `STORIES.csv` after its tasks' tests pass.
-
-## Hard Rules
-- No new dependencies without a `docs/tracking/DECISIONS.md` entry explaining why.
+The old harness created `.venv/`, ran `.venv/bin/pytest`, rolled completed
+tasks into `STORIES.csv`, and logged dependency decisions in
+`docs/tracking/DECISIONS.md`. Those tracker actions no longer govern this
+repository. The CSVs and decision log remain historical evidence only.

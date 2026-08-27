@@ -1,6 +1,8 @@
 # Decisions
 
-Append-only. Deviations, scope additions, override usages, with rationale.
+Historical record for the retired CSV/hook tracker. It remains append-only as
+evidence of that workflow; current decisions belong on the relevant repository
+Issue or pull request and are surfaced in the GitHub Project.
 
 ## 2026-06-10 — `sync_tracker_on_task.py` always passes `tests_passed=True`
 
