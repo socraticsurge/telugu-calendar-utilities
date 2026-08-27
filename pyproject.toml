@@ -4,19 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-server-panchangam"
-version = "1.13.0"
+version = "1.13.1"
 description = "MCP server for Panchangam calculations — Tithi, Nakshatra, Yoga, Muhurtas for any city"
 readme = "README_PYPI.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 keywords = ["panchangam", "vedic", "astrology", "mcp", "calendar"]
 dependencies = [
-    "mcp>=1.0",
+    "mcp>=1.0,<2.0",
     "pyswisseph>=2.10.3",
     "pytz>=2024.1",
     "geopy",
     "timezonefinder",
-    "icalendar>=5.0.0",
+    "icalendar>=5.0.0,<7.3.0",
 ]
 
 [project.optional-dependencies]
