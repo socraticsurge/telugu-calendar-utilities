@@ -16,7 +16,7 @@ dependencies = [
     "pytz>=2024.1",
     "geopy",
     "timezonefinder",
-    "icalendar>=5.0.0",
+    "icalendar>=5.0.0,<7.3.0",
 ]
 
 [project.optional-dependencies]
