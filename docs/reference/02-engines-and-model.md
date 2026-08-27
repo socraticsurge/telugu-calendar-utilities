@@ -1,199 +1,301 @@
-# 02 · Engines & the `PanchangamDay` Model
+# Engines and the `PanchangamDay` computation contract
 
-The engine layer is the project's core. All three engines share one base class
-and emit one object. The whole trick: **the base class derives every anga from
-just two functions — a Sun-longitude function and a Moon-longitude function.**
-Each engine differs *only* in how it computes those two longitudes.
+This document describes what the repository computes today. It is not a claim
+that every convention is textually authoritative or independently verified.
+Evidence states come from [`provenance.json`](provenance.json); stable
+computation IDs come from [`computations.json`](computations.json).
 
-- Code: `telugu_panchangam/engines/{base,drik,surya_siddhanta,vakya,utils}.py`
-- Model: `telugu_panchangam/models/panchangam_day.py`
+## Assurance key
 
----
+- **Source-traced** means the implementation has an inspected technical or
+  textual source with an exact locator.
+- **Independently compared** means a value was checked against a separate
+  published result for the same date and location.
+- **Regression-pinned** means tests preserve current output. It does not prove
+  that the output is correct outside those test cells.
+- **Unresolved** means the implementation or convention still needs source or
+  comparison work. The gap is named rather than hidden.
 
-## The three engines at a glance
+The current high-level evidence states are:
 
-| | **Drik Ganita** | **Surya Siddhanta** | **Vakya** |
-|---|---|---|---|
-| Source of positions | Swiss Ephemeris (true positions, aberration + nutation) | Mean motion + *manda* (epicyclic) correction | SS Sun **+** tabulated Moon correction |
-| Class | subclasses `PanchangamEngine` | subclasses `PanchangamEngine` | subclasses **`SuryaSiddhantaEngine`** |
-| Reference frame | sidereal via ayanamsa | Kali epoch (3102 BCE) | Kali epoch |
-| Ayanamsa param | **applied** (Lahiri / Raman / KP / true Chitrapaksha) | accepted, **no-op** | accepted, **no-op** |
-| Outer planets (Guru/Shukra) | **yes** (Simha-stha, Maudhya) | no | no |
-| Accuracy (modern) | highest (matches Drik Panchang) | classical, drifts over centuries | middle ground |
-| Best for | modern apps, accurate sky events | classical siddhantic tradition | Telugu/Tamil printed panchangams |
-| Overrides | every anga method | every anga method | **only Moon-touching methods** |
+| Layer | State | Provenance claim |
+|---|---|---|
+| Drik sidereal positions | Partially verified | `drik.sidereal_positions` |
+| Surya Siddhanta longitude model | Source-traced in part; output engine-pinned | `surya_siddhanta.mean_motion_manda`, `panchangam.non_drik_engine_outputs` |
+| Vakya longitude model | Provisional and engine-pinned | `vakya.provisional_lunar_model` |
+| Rise/set convention | Implementation traced; target convention unresolved | `panchangam.rise_set_convention` |
+| Calendar naming and rollover semantics | Needs criterion-level locators | `panchangam.calendar_semantics` |
+| Daily windows | Mixed, partially verified container | `panchangam.mixed_daily_windows` |
 
-The Moon-touching methods Vakya overrides: `_moon_longitude_func`,
-`_tithi_index_at`, `_tithi_span`, `_nakshatra_span`, `_yoga_span`,
-`_karana_spans`, `_special_flags`, `_maasam`. Everything else (windows,
-festivals, Sun) it inherits from Surya Siddhanta.
+## End-to-end calculation
 
----
+For `calculate(date, location, include_eclipse)` each engine follows this flow:
 
-## How each engine computes longitude
+1. `local_midnight_jd` localizes civil midnight in `location.timezone`, converts
+   it to UTC and then to a Universal-Time Julian day.
+2. Shared Swiss Ephemeris helpers find the first sunrise and Moon rise/set after
+   that local midnight, sunset after sunrise, and the next sunrise from the next
+   local midnight.
+3. The selected engine evaluates Sun and Moon longitudes at sunrise.
+4. The engine derives the five angas, their applicable spans, signs, Paksham,
+   Maasam, Samvatsara and special-day flags.
+5. Shared helpers derive windows, festivals and additive classifications.
+6. The result is returned as `PanchangamDay`. Datetimes are timezone-aware UTC;
+   presentation layers convert them for display.
 
-**Drik** (`drik.py:47–70`) — Swiss Ephemeris. For Lahiri (default) it uses the
-`@lru_cache`d `sun_longitude(jd)` / `moon_longitude(jd)` (`utils.py:70,75`); for
-other ayanamsas it calls `sidereal_longitude_with_ayanamsa(jd, planet, ayanamsa)`
-(`utils.py:23`), which sets the swisseph sid-mode and **restores Lahiri after
-each call** so the hot-path cache stays consistent. It additionally computes
-Jupiter & Venus longitudes after building the day, for Simha-stha and Maudhya
-(`drik.py:404–426`), and derives the sunrise lagna (via
-`personal/lagna_hora.get_lagna_transitions`) to populate Panchaka Rahita
-(`drik.py:390–403`).
+The three `calculate` methods are separate implementations, not a single shared
+calculation method. The base class owns shared helpers and per-instant
+`facts_at`, but it does not derive the complete day from two polymorphic
+longitude functions. This distinction matters when comparing the engines.
 
-**Surya Siddhanta** (`surya_siddhanta.py:46–68`) — closed-form classical math:
+## Time, units and boundary contract
+
+| Concern | Current behavior |
+|---|---|
+| Input date | A civil `date` interpreted in the supplied IANA timezone. |
+| Core time scale | Universal-Time Julian day as a floating-point number. One unit is one day. |
+| Returned datetimes | UTC, timezone-aware, truncated to whole seconds by `jd_to_utc`; not rounded. |
+| Panchangam day | Most day windows use `[sunrise, next sunrise)`. Daytime windows use `[sunrise, sunset]`. The stored `date` remains the input civil date. |
+| Longitude | Degrees normalized to `[0, 360)`. |
+| Span transitions | Located with `find_crossing`, at most 60 bisections and a default Julian-day tolerance of `1e-8` (about 0.864 ms), then exposed at whole-second precision. |
+| Weekday | `int(jd_sunrise + 1.5) % 7`, where 0 is Sunday; it is fixed for the Panchangam day. |
+| High-latitude failures | Swiss Ephemeris return codes are currently ignored. The configured city set avoids polar no-event cases, but the helper contract does not safely represent them. |
+
+### Rise and set are shared, not engine-specific
+
+`get_sunrise`, `get_sunset`, `get_moonrise` and `get_moonset` call Swiss
+Ephemeris `rise_trans` for all three systems. The call currently uses:
+
+- only `CALC_RISE` or `CALC_SET`;
+- longitude and latitude, with altitude forced to `0.0` metres;
+- pressure `1013.25` hPa and temperature `15.0` °C;
+- the default astronomical upper-limb/refraction convention.
+
+Swiss Ephemeris Programmer's Documentation sections 8.12 and 8.12.1 distinguish
+that default from its Hindu-calendar disc-centre/no-refraction mode. The project
+has not yet recorded a multi-city comparison that decides which convention its
+public Panchangam should promise. That work is tracked in
+[#177](https://github.com/socraticsurge/telugu-calendar-utilities/issues/177).
+Until it is resolved, do not describe these four fields as a verified Hindu
+sunrise convention.
+
+Technical source: [Swiss Ephemeris Programmer's Documentation](https://www.astro.com/swisseph/swephprg.htm),
+sections 3, 5.8, 8.12, 8.12.1 and 12.2.
+
+## The three longitude models
+
+### Drik Ganita
+
+Owner: `DrikGanitaEngine` in `telugu_panchangam/engines/drik.py`.
+
+`_sun_lon` and `_moon_lon` call Swiss Ephemeris `calc_ut` with
+`FLG_SWIEPH | FLG_SIDEREAL`, returning geocentric ecliptic longitude under the
+selected sidereal mode. Lahiri is the default and uses cached helpers. Raman,
+Krishnamurti and True Chitrapaksha bypass that cache, set the requested global
+Swiss sidereal mode, calculate the longitude and restore Lahiri afterward.
+
+The selected ayanamsa changes Drik Sun/Moon longitudes and downstream angas,
+signs, Maasam and ingress times. It also changes the Drik-only Jupiter and Venus
+positions used for Simha-stha and Maudhya. The Swiss documentation supports the
+API and flag semantics; representative repository tests and published day cells
+support only partial output verification.
+
+### Surya Siddhanta
+
+Owner: `SuryaSiddhantaEngine` in
+`telugu_panchangam/engines/surya_siddhanta.py`.
+
+The implementation is a bounded modern transcription of mean motion plus one
+manda correction, not a complete implementation of every Sūrya Siddhānta
+procedure:
 
 ```text
-ka          = jd − KALI_EPOCH_JD
-mean_long   = (ka · REVS / CIVIL_DAYS · 360) mod 360
-anomaly     = (mean_long − apogee) mod 360
-circumf     = base − 0.333·|sin(anomaly)|        # Sun base 14, Moon base 32
-correction  = asin( (circumf / 360) · sin(anomaly) )   # manda correction
-true_long   = (mean_long − correction) mod 360
+ahargana       = jd - 588465.5
+mean_longitude = (ahargana * revolutions / 1,577,917,828 * 360) mod 360
+anomaly        = (mean_longitude - apogee) mod 360
+circumference  = even - (even - odd) * abs(sin(anomaly))
+manda          = asin((circumference / 360) * sin(anomaly))
+true_longitude = (mean_longitude - manda) mod 360
 ```
 
-Exposed as module functions `ss_sun_longitude`, `ss_moon_longitude`,
-`ss_elongation`. Independent of swisseph ayanamsa.
+The Sun uses 4,320,000 revolutions, a fixed apogee of 77.333° and epicycle
+circumferences 14°/13°40′. The Moon uses 57,753,336 revolutions, a moving apogee
+of 488,219 revolutions plus 90° at the code epoch, and circumferences
+32°/31°40′.
 
-**Vakya** (`vakya.py:32–37`) — SS Sun unchanged; Moon gets an additive,
-table-driven correction that oscillates ±1° over a ~248-year cycle to mimic apse
-drift:
+The source crosswalk is Ebenezer Burgess and William Dwight Whitney,
+*Translation of the Sûrya-Siddhânta*, Journal of the American Oriental Society
+6 (1860): chapter I verses 29–34 and 53 for revolution counts and mean place;
+chapter II verses 29–39 for anomaly, epicycle dimensions and manda equation.
+The code uses direct floating-point trigonometry and fixed/simplified constants,
+so this locator supports the algorithm family, not a claim of complete textual
+fidelity or modern astronomical accuracy.
 
-```text
-idx        = int(|jd − KALI_EPOCH_JD| / CYCLE_DAYS) mod len(CORRECTIONS)
-moon_long  = (ss_moon_longitude(jd) + CORRECTIONS[idx]) mod 360
-```
+Tests bound the 2026 sample Sun difference from the Drik model below 1° and the
+Moon difference below 5.5°. That is a cross-model regression check, not an
+independent published Surya Siddhanta Panchangam comparison.
 
-### From two longitudes to every anga
+The constructor accepts an ayanamsa name for API symmetry and validation, but
+the selected name does not change any Surya Siddhanta output.
 
-The base class (`base.py`) turns the Sun/Moon functions into angas by
-**bisection on a monotonic longitude function** (`utils.find_crossing`,
-`utils.py:92`):
+### Vakya
 
-- **Tithi** — `int(elongation / 12°) mod 30`; span found by bisecting elongation.
-- **Nakshatra** — `int(moon_long / 13°20′)`; span by bisecting moon longitude.
-- **Yoga** — `int((sun+moon) / 13°20′)`; span by bisecting the sum.
-- **Karana** — half-tithis (6° of elongation each); up to 2 between sunrise/sunset.
-- **New-moon finders** — `previous_new_moon` / `next_new_moon` use iterative
-  mean-elongation refinement (~12.19°/day) to dodge wrap-around near full moon.
+Owner: `VakyaEngine` in `telugu_panchangam/engines/vakya.py`.
 
-Windows (Rahu Kalam, Gulika, Yamagandam, Brahma/Abhijit Muhurta, Choghadiya,
-Durmuhurtham) are weekday-keyed divisions of the sunrise→sunset (or
-sunset→next-sunrise) span — pure helpers shared by all three engines.
+The current implementation keeps the Surya Siddhanta Sun and adds one of nine
+offsets (`0`, `+0.5`, `+1`, `+0.5`, `0`, `-0.5`, `-1`, `-0.5`, `0` degrees) to
+the Surya Siddhanta Moon. The phase index is
+`int(abs(jd - 588465.5) / 3031) % 9`.
 
----
+This is a provisional project model. It is not a registered transcription of a
+248-entry lunar-vākya table, and 3,031 days must not be described as a 248-year
+cycle. Source reconstruction and a possible frozen-core correction are tracked
+in [#176](https://github.com/socraticsurge/telugu-calendar-utilities/issues/176).
+Current tests prove range, shape and regression behavior only.
 
-## Festival rules (the one place engines may grow)
+Like Surya Siddhanta, Vakya accepts but does not apply the ayanamsa parameter.
 
-`base.py` holds the festival dispatcher `_festivals(...)` (`base.py:496–575`) and
-**nine named rule tables**. Per the working agreement, *appending a row here with
-a DP-verified test is the only routine engine change allowed.*
+## Pancha anga formulas and transition spans
 
-| Table | Deciding moment | Pattern → example |
-|-------|-----------------|-------------------|
-| `_SUNRISE_FESTIVALS` | sunrise | (maasam, tithi) → Hanuman Jayanti, Guru Pournami |
-| `_MADHYAHNA_FESTIVALS` | midday | (maasam, tithi) → Ugadi, Sri Rama Navami |
-| `_APARAHNA_FESTIVALS` | afternoon (0.7·day) | (maasam, tithi) → Vijayadashami |
-| `_PRADOSHA_FESTIVALS` | after sunset | (maasam, tithi) → Deepavali |
-| `_NISHITA_FESTIVALS` | midnight | (maasam, tithi) → Maha Shivaratri |
-| `_WEEKDAY_IN_MAASAM_FESTIVALS` | every matching weekday | (maasam, weekday) → Karthika Somavaram |
-| `_LAST_WEEKDAY_IN_PAKSHAM_FESTIVALS` | last weekday in paksha | (maasam, weekday, paksham) → Varalakshmi Vratam |
-| `_MOONRISE_MONTHLY_FESTIVALS` | tithi at moonrise | (tithi) → Sankashti Chaturthi |
-| `_NISHITA_MONTHLY_FESTIVALS` | tithi at nishita | (tithi, suppress-if) → Masa Shivaratri |
+Let `S` be the engine's Sun longitude, `M` its Moon longitude and
+`E = (M - S) mod 360` at a Universal-Time Julian day.
 
----
-
-## The `PanchangamDay` field reference
-
-The canonical output object. Grouped logically; every consumer reads from here.
-
-### Identity & configuration
-| Field | Type | Meaning |
-|---|---|---|
-| `date` | `date` | Civil date |
-| `location` | `Location` | name, lat, lon, timezone, altitude |
-| `system` | `str` | `drik` / `surya_siddhanta` / `vakya` |
-
-### Core metadata
-| Field | Type | Meaning |
-|---|---|---|
-| `samvatsara` | `str` | 60-year-cycle name; flips at Ugadi |
-| `ayanam` | `str` | Uttarayanam / Dakshinayanam |
-| `rituvu` | `str` | Tropical season (uses **tropical** Sun) |
-| `maasam` | `str` | Lunar month; `Adhika`/`Nija` prefix for intercalary |
-| `paksham` | `str` | Shukla (waxing) / Krishna (waning) |
-
-### The five angas
-| Field | Type | Meaning |
-|---|---|---|
-| `tithi` | `Span` | Lunar day, with start/end |
-| `vaaram` | `str` | Weekday (sunrise-anchored, constant across the day) |
-| `nakshatra` | `Span` | Lunar mansion, with start/end |
-| `yoga` | `Span` | Nitya yoga, with start/end |
-| `karana` | `list[Span]` | Active half-tithis between sunrise & sunset |
-
-### Sky & signs
-`sunrise` · `sunset` · `moonrise` · `moonset` (all UTC `datetime`) ·
-`solar_sign` · `lunar_sign` (sidereal rasi `str`).
-
-### Auspicious windows
-`brahma_muhurta` (`Window`) · `abhijit_muhurta` (`Window | None`, omitted Wed) ·
-`amrita_kalam` (`list[Window]`).
-
-### Inauspicious windows
-`rahu_kalam` · `gulika_kalam` · `yamagandam` (each `Window`) ·
-`varjyam` · `durmuhurtham` (each `list[Window]`).
-
-### Choghadiya
-`choghadiya` (`list[Window]`) — 8 weekday-keyed day blocks, each auspicious or not.
-
-### Special-day flags
-`is_ekadashi` · `is_amavasya` · `is_pournami` · `is_pradosham` ·
-`is_shani_pradosham` · `is_soma_pradosham` · `is_sankranti` (all `bool`).
-
-### Festivals & events
-`festivals` (`list[str]`) · `special_yogas` (`list[str]`) ·
-`special_notes` (`list[str]`) · `eclipse` (`EclipseInfo | None`) ·
-`sankramanam` (`str | None` — rasi the Sun enters today).
-
-### Additive timing fields (1.9.0)
-| Field | Type | Engine | Meaning |
+| Anga | Sunrise value | Stored transition semantics | Owners |
 |---|---|---|---|
-| `ghati_clock` | `GhatiClock \| None` | all | sunrise-anchored 60-ghati scale |
-| `nakshatra_pada` | `int \| None` | all | pada (1–4) of the sunrise nakshatra |
-| `vishaghati` | `list[GhatiWindow]` | all | per-nakshatra "poison ghatika" windows |
-| `bhadra_mukha` / `bhadra_puchha` | `GhatiWindow \| None` | all | Vishti-karana mouth / tail |
-| `sankramana_avoidance` | `Window \| None` | all | ±16 ghatis around the Sun's ingress |
-| `in_panchaka_nakshatra` | `bool` | all | sunrise nakshatra is one of the 5 Panchaka |
-| `is_khar_maasa` / `khar_maasa_name` | `bool` / `str?` | all | Sun in Dhanu / Meena |
-| `is_pitru_paksha` | `bool` | all | Bhadrapada Krishna paksha |
-| `anandadi_yoga` | `str \| None` | all | one of 28 vaaram×nakshatra muhurta yogas |
-| `disha_shoola_direction` | `str \| None` | all | weekday's blocked travel direction |
-| `nakshatra_mukha` | `str \| None` | all | Adho / Urdhva / Tiryan facing |
-| `panchaka_rahita` | `PanchakaInfo \| None` | all | mod-9 dosha (needs sunrise lagna) |
-| `simha_stha_guru` / `simha_stha_shukra` | `bool` | **Drik only** | Jupiter / Venus in Simha |
-| `guru_maudhya` / `shukra_maudhya` | `MaudhyaInfo \| None` | **Drik only** | Jupiter / Venus combustion |
+| Tithi | `floor(E / 12°) mod 30` | `tithi` is the Tithi active at sunrise. Start is bisected in `[sunrise-2d, sunrise]`; end in `[sunrise, sunrise+2d]`. | Engine `_tithi_index_at`, `_tithi_span` |
+| Vaaram | Sunrise Julian weekday | `vaaram` is one name for the entire Panchangam day; it does not flip at civil midnight. | each engine `calculate` |
+| Nakshatra | `floor(M / (360°/27)) mod 27` | `nakshatra` is active at sunrise. Start/end use the engine's Moon model and ±2-day search windows. | engine `_nakshatra_span` |
+| Nitya Yoga | `floor(((S+M) mod 360) / (360°/27)) mod 27` | `yoga` is active at sunrise with the same ±2-day crossing windows. | engine `_yoga_span` |
+| Karana | `floor(E / 6°) mod 60` | Up to two spans intersecting sunrise–sunset are returned in `karana`. Spans are not clipped to the daylight interval. Fixed and sevenfold repeating names come from `panchangam_names.py`. | engine `_karana_spans` |
 
-> SS and Vakya don't model outer planets, so the four Drik-only fields stay
-> `False`/`None` there — by design, not omission.
+`facts_at` derives the same five instant-level names from an engine's exposed
+Sun/Moon functions. Callers must pass the day's `vaaram`; its UTC-weekday
+fallback is explicitly approximate around the sunrise/civil-day boundary.
 
----
+## Calendar metadata
 
-## `utils.py` — the shared toolbox
+| Fields | Algorithm | Implementation | Evidence state |
+|---|---|---|---|
+| `solar_sign`, `lunar_sign` | Sunrise longitude divided into twelve 30° Rasis. | each engine `calculate` | Follows the engine position state. |
+| `paksham` | Tithi indices 0–14 are Shukla; 15–29 are Krishna. | each engine `calculate` | `panchangam.calendar_semantics`; locator debt remains. |
+| `maasam` | Find bounding new moons from the engine elongation; name by the Sun sign at the starting new moon. Same Sun sign at start/end gives `Adhika`; same sign at previous/start gives `Nija`. | `maasam_name`, engine `_maasam` | Needs regional criterion-level verification. |
+| `samvatsara` | Count 365.25636-day years from JD 588465.5, shift by the lunar-month number so the label flips at Chaitra, then apply offset 12 modulo 60. | `samvatsara_name` | Project convention; needs exact locator. |
+| `ayanam` | Sidereal Sun signs Makara through Mithuna map to Uttarayanam; Karkataka through Dhanu to Dakshinayanam. | `ayanam_name` | Needs exact criterion locator. |
+| `rituvu` | Tropical Swiss Ephemeris Sun sign selects the six-season name. | `rituvu_name` | Hybrid: all three engines use the same Drik/tropical helper. |
 
-- **Ayanamsa** — `AYANAMSA_MODES` dict, `_validate_ayanamsa`,
-  `sidereal_longitude_with_ayanamsa` (sets mode, computes, restores Lahiri).
-- **JD** — `datetime_to_jd`, `jd_to_utc`, `local_midnight_jd`.
-- **Cached longitudes** (`@lru_cache(maxsize=1024)`) — `sidereal_longitude`,
-  `sun_longitude`, `moon_longitude`, `moon_sun_elongation`,
-  `tropical_sun_longitude` (the last drives `rituvu`).
-- **Rise/set** — `get_sunrise/sunset/moonrise/moonset` via swisseph `rise_trans`
-  (1013.25 hPa, 15° visual horizon).
-- **Crossing finder** — `find_crossing(func, target, jd_start, jd_end)` binary
-  search (≤60 iters, 180° wrap for stability), the workhorse for anga boundaries.
-- **New-moon finders** — `previous_new_moon`, `next_new_moon`.
+New-moon search uses a 12.19°/day iterative estimate for ten iterations and a
+fixed 29.530589-day fallback. Its result is an implementation technique, not a
+separately verified astronomical event series.
 
-See [doc 06](06-roadmap-and-backlog.md) for the parked `EngineCore` unification
-that would collapse the three engines into one core consuming
-`(sun_fn, moon_fn, ayanamsa_fn)`.
+## Core windows
+
+| Fields | Current calculation | Boundary notes |
+|---|---|---|
+| `rahu_kalam`, `gulika_kalam`, `yamagandam` | Weekday-selected one-eighth of sunrise–sunset. | Equal temporal eighths; tables use Sunday index 0. |
+| `brahma_muhurta` | 96 to 48 clock minutes before sunrise. | Uses fixed fractions of a 24-hour Julian day. |
+| `abhijit_muhurta` | Local daylight midpoint ± one-thirtieth of daylight. | Omitted on Wednesday; total length is one-fifteenth of daylight. |
+| `choghadiya` | Eight equal daytime blocks with weekday names. | Night Choghadiya is not returned. |
+| `durmuhurtham` | Weekday-selected parts of fifteen equal daylight divisions; Tuesday also uses the seventh of fifteen night divisions. | Night is sunset–next sunrise. |
+| `varjyam`, `amrita_kalam` | Four-sixtieths of the actual Nakshatra span, starting at its configured ghati. | Consider the sunrise Nakshatra and its successor; return a window only when its start falls in `[sunrise, next sunrise)`. |
+
+These fields form a mixed-evidence container. The exact Raman locators in
+`panchangam.mixed_daily_windows` cover Nakshatra Tyajyakala and a Durmuhurta
+scheme, while other tables and regional differences remain partially verified
+or regression-pinned.
+
+## Festival deciding moments
+
+`PanchangamEngine._festivals` applies shared rule tables using the selected
+engine's Tithi and Maasam. Its moment semantics are exact implementation
+contracts:
+
+| Rule family | Deciding instant |
+|---|---|
+| Sunrise | sunrise |
+| Madhyahna | `sunrise + 0.5 * daylight` |
+| Aparahna | `sunrise + 0.7 * daylight` |
+| Pradosha | `sunset + 0.05` Julian day (72 clock minutes) |
+| Nishita | midpoint of sunset and next sunrise |
+| Monthly Moonrise | Moonrise when it falls between sunset and next sunrise; otherwise `sunset + 0.1` Julian day |
+| Weekday in Maasam | sunrise Maasam plus sunrise weekday |
+| Last weekday in Paksha | current sunrise Paksha differs from the same weekday seven days later |
+| Solar ingress | between sunrise and sunset belongs to that day; after the previous sunset belongs to the next day |
+
+Moment-based rules compare the same instant one Julian day earlier to avoid
+double assignment when a Tithi spans two deciding instants. Adhika months skip
+the annual lunar festival tables but still admit the monthly vrata tables.
+
+The forward-year fixture contains a mixture of independently checked and
+engine-pinned cells. Consult each fixture cell's label; never describe the whole
+festival series as independently verified.
+
+## Engine asymmetries and hybrids
+
+| Concern | Drik | Surya Siddhanta | Vakya |
+|---|---|---|---|
+| Sun/Moon longitude | Swiss sidereal mode | Project SS mean-motion/manda model | SS Sun plus provisional Moon offset |
+| Ayanamsa parameter | Applied | Validated, no effect | Validated, no effect |
+| Pancha anga spans | Drik-specific methods | SS-specific methods | Vakya overrides every Moon-dependent method |
+| Rise/set | Shared Swiss default | Shared Swiss default | Shared Swiss default |
+| Rituvu | Shared tropical Swiss Sun | Shared tropical Swiss Sun | Shared tropical Swiss Sun |
+| Eclipse | Shared Swiss eclipse calculation | Shared Swiss eclipse calculation | Shared Swiss eclipse calculation |
+| Jupiter/Venus flags | Populated | Default `False`/`None` | Default `False`/`None` |
+| Festivals and windows | Shared rules fed by Drik facts | Shared rules fed by SS facts | Shared rules fed by Vakya facts |
+
+Consequently, “Surya Siddhanta day” and “Vakya day” do not mean that every
+field comes from that astronomical system. Rise/set, Rituvu and eclipse fields
+are deliberately shared Swiss-derived hybrids.
+
+## `PanchangamDay` field-to-owner map
+
+Every current model field appears below. “Default” means the dataclass supplies
+the initial value until an engine or finalizer replaces it.
+
+| Field group | Fields | Immediate owner |
+|---|---|---|
+| Request identity | `date`, `location`, `system` | engine `calculate` |
+| Calendar metadata | `samvatsara`, `ayanam`, `rituvu`, `maasam`, `paksham` | engine `calculate`; shared naming helpers |
+| Five angas | `tithi`, `vaaram`, `nakshatra`, `yoga`, `karana` | engine-specific span methods and `calculate` |
+| Sky and signs | `sunrise`, `sunset`, `moonrise`, `moonset`, `solar_sign`, `lunar_sign` | shared rise/set helpers plus engine sunrise longitudes |
+| Auspicious windows | `brahma_muhurta`, `abhijit_muhurta`, `amrita_kalam` | base window helpers |
+| Inauspicious windows | `rahu_kalam`, `gulika_kalam`, `yamagandam`, `varjyam`, `durmuhurtham` | base window helpers |
+| Choghadiya | `choghadiya` | `_choghadiya` |
+| Tithi/day flags | `is_ekadashi`, `is_amavasya`, `is_pournami`, `is_pradosham`, `is_shani_pradosham`, `is_soma_pradosham`, `is_sankranti` | engine `_special_flags` |
+| Events | `special_notes`, `eclipse`, `special_yogas`, `festivals`, `sankramanam` | default; eclipse/special-yoga modules; base festival/ingress helpers |
+| Ghati and Karana additions | `ghati_clock`, `nakshatra_pada`, `vishaghati`, `bhadra_mukha`, `bhadra_puchha` | `_finalize_day`, `ghati.py`, `karana_windows.py` |
+| Sankramana and month filters | `sankramana_avoidance`, `in_panchaka_nakshatra`, `is_khar_maasa`, `khar_maasa_name`, `is_pitru_paksha` | `_finalize_day` and dedicated derived modules |
+| Drik-only outer-planet fields | `simha_stha_guru`, `simha_stha_shukra`, `guru_maudhya`, `shukra_maudhya` | Drik `calculate`; dataclass defaults for SS/Vakya |
+| Other derived classifications | `anandadi_yoga`, `disha_shoola_direction`, `nakshatra_mukha`, `panchaka_rahita` | `_finalize_day` and dedicated derived modules |
+
+The derived rules in the last four rows are documented in
+[Computational features](03-computational-features.md) and will receive their
+own criterion-level evidence audit under story #167. This document records
+their ownership so no model field is orphaned.
+
+## Representative test map
+
+| Contract | Tests |
+|---|---|
+| Drik day, angas, signs, metadata and ingress | `tests/test_drik_engine.py`, `tests/test_integration.py` |
+| Ayanamsa application and no-op boundaries | `tests/test_ayanamsa.py` |
+| Surya Siddhanta day and cross-model longitude bounds | `tests/test_surya_siddhanta_engine.py` |
+| Vakya day and provisional-offset regression | `tests/test_vakya_engine.py` |
+| Shared windows and Maasam helpers | `tests/test_base.py`, `tests/test_muhurta_windows.py` |
+| Festival rules and deciding moments | `tests/test_festivals.py`, `tests/test_festivals_forward_year.py` |
+| Per-instant facts | `tests/test_engine_facts_at.py` |
+| Model shape | `tests/test_models.py` |
+| This documentation's links, symbols, fields and claims | `tests/test_engine_documentation.py` |
+
+## Review checklist
+
+When an engine-facing computation changes:
+
+1. Update the stable computation record and this contract in the same PR.
+2. State whether the result is regression-pinned, source-traced or independently
+   compared; do not promote one state into another.
+3. Add exact date, location, system, timezone, input convention and expected
+   value to comparison fixtures.
+4. Preserve UTC internally and make any display-time conversion explicit.
+5. Treat changes under `telugu_panchangam/engines/` as frozen-core changes that
+   require owner approval, focused tests, the full project gate and a PyPI
+   version bump.
