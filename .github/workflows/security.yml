@@ -3,9 +3,9 @@ name: Security
 # Two scanners — both run on PR + push-to-master + weekly cron + on demand.
 #
 # CodeQL: catches Python correctness/security antipatterns at the source level.
-# pip-audit: catches known CVEs in the dependency closure that CI actually
-# installs (i.e. requirements.txt — the same closure that ships in the
-# generate.yml / publish.yml workflows).
+# pip-audit: catches known CVEs in the dependency environment that CI actually
+# installs from requirements.txt — the same input used by the generate.yml /
+# publish.yml workflows.
 #
 # Both are blocking on PRs. SECURITY.md promises a 72h ack — discovering
 # CVEs at PR time is how that ack gets enforced.
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
+        uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
           languages: python
           # security-and-quality is slightly wider than the default
@@ -45,11 +45,12 @@ jobs:
           queries: security-and-quality
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
+        uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
           category: '/language:python'
 
   pip-audit:
+    # Keep this display name stable: branch protection requires this context.
     name: pip-audit (requirements.txt)
     runs-on: ubuntu-latest
     steps:
@@ -63,14 +64,19 @@ jobs:
       - name: Install runtime deps
         run: pip install -r requirements.txt
 
+      - name: Remove non-project distributions from the audit set
+        # requirements.txt installs this checkout editably so its dependencies
+        # match CI. The local version is not yet on PyPI and therefore cannot
+        # be queried by pip-audit. setuptools is a runner/build bootstrap, not
+        # a declared project dependency. Removing both leaves the full project
+        # dependency closure installed for the strict environment audit below.
+        run: pip uninstall --yes mcp-server-panchangam setuptools
+
       - name: Install pip-audit
         run: pip install pip-audit
 
       - name: Run pip-audit (strict — fail on any known CVE)
-        # Audits requirements.lock (the resolved, pinned dependency closure
-        # — mcp, pyswisseph, pytz, geopy, timezonefinder, icalendar, pytest,
-        # all transitives) rather than requirements.txt. The lockfile does
-        # not include our own package, so version-bump PRs don't spuriously
-        # fail looking up the unreleased version on PyPI. --strict still
-        # fails on any known CVE in the closure.
-        run: pip-audit -r requirements.lock --strict
+        # Audit the dependency environment installed above. --local keeps the
+        # gate aligned with CI; --strict fails on collection errors as well as
+        # known vulnerabilities.
+        run: pip-audit --local --strict
