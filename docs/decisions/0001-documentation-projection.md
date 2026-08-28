@@ -1,7 +1,8 @@
 # ADR 0001: Repository-first documentation projected into the product site
 
-- **Status:** Proposed for owner review
+- **Status:** Accepted; local implementation complete
 - **Date:** 2026-08-27
+- **Accepted:** 2026-08-28
 - **Decision owner:** repository owner
 - **Related work:** [epic #164](https://github.com/socraticsurge/telugu-calendar-utilities/issues/164),
   [story #171](https://github.com/socraticsurge/telugu-calendar-utilities/issues/171)
@@ -52,12 +53,13 @@ workflows are frozen unless the owner explicitly approves a change.
 | [Zensical](https://zensical.org/about/) | Open-source successor from the Material creators with a promising migration path | Described by its own project as alpha | Monitor; reconsider after stability |
 | External CMS or GitHub Wiki | Friendly browser editing | Creates a second source/repository and a drift path away from code, tests, and provenance registries | Reject as canonical source |
 
-## Proposed decision
+## Decision
 
 1. Keep all canonical documentation and computation metadata in this repository
-   under the directory contract in [`docs/README.md`](../README.md).
+   under the directory contract in
+   [`docs/README.md`](https://github.com/socraticsurge/telugu-calendar-utilities/blob/master/docs/README.md).
 2. Keep the canonical pages renderer-neutral and usable through GitHub alone.
-3. Use the stable VitePress line for a **local, disposable projection pilot**,
+3. Use the stable VitePress line for a **local, disposable projection**,
    not as a new source format. The same Vite ecosystem and a `/docs/` build
    target make it the smallest fit for the clarified same-site requirement.
 4. Use Starlight as the fallback if VitePress cannot meet accessibility,
@@ -73,9 +75,9 @@ workflows are frozen unless the owner explicitly approves a change.
    frozen landing-workflow path contract requires a later explicit owner
    approval after the local result is reviewed.
 
-## Pilot acceptance gates
+## Acceptance gates
 
-The VitePress pilot is acceptable only if it can:
+The VitePress projection is acceptable only if it can:
 
 - load the selected root and `docs/` Markdown without copied source files;
 - exclude plans, specs, tracking, and generated product data from default
@@ -112,7 +114,7 @@ documentation to remain authoritative and maintained.
 
 ## Revisit triggers
 
-Revisit this proposal if VitePress changes its stable contract, if Starlight
+Revisit this decision if VitePress changes its stable contract, if Starlight
 becomes materially simpler to integrate with the existing Vite site, if the
 Mermaid integration becomes unmaintained, or if the documentation corpus no
 longer fits a static site.
