@@ -100,8 +100,18 @@ def test_generated_pages_show_real_methods_and_visible_method_gaps():
     assert 'M_vakya = (M_SS + correction[i]) mod 360' in vakya
     assert 'provisional nine-value project offset' in vakya
 
+    panchaka = _read(
+        'docs/_generated/computations/derived.panchaka-rahita.md')
+    assert 'r = (T + V + N + L) mod 9' in panchaka
+    assert 'Remainder: 7' in panchaka
+
+    shuddhi = _read(
+        'docs/_generated/computations/derived.panchanga-shuddhi.md')
+    assert 'Grade each sunrise Panchangam limb' in shuddhi
+    assert 'Verdict: Sarva Shuddha' in shuddhi
+
     incomplete = _read(
-        'docs/_generated/computations/derived.anandadi-yoga.md')
+        'docs/_generated/computations/calendar.combustion-periods.md')
     assert 'Method documentation incomplete' in incomplete
     assert 'Incomplete — the contract is inventoried' in incomplete
 
