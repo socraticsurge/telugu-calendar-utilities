@@ -63,9 +63,17 @@
       "id": "SWISSEPH",
       "title": "Swiss Ephemeris",
       "author": "Astrodienst",
-      "edition": "pyswisseph runtime used by the Drik engine",
-      "url": "https://www.astro.com/swisseph/",
+      "edition": "Swiss Ephemeris 2.10 Programmer's Documentation and pyswisseph runtime used by the repository",
+      "url": "https://www.astro.com/swisseph/swephprg.htm",
       "authority_type": "astronomical_reference"
+    },
+    {
+      "id": "SS-BURGESS-WHITNEY-1860",
+      "title": "Translation of the Surya-Siddhanta: A Text-Book of Hindu Astronomy",
+      "author": "Ebenezer Burgess; edited with notes by William Dwight Whitney",
+      "edition": "Journal of the American Oriental Society, volume 6, 1860, pages 141-498",
+      "url": "https://commons.wikimedia.org/wiki/File:Translation_of_the_S%C3%BBrya-Siddh%C3%A2nta,_A_Text-Book_of_Hindu_Astronomy;_With_Notes,_and_an_Appendix_(IA_jstor-592174).pdf",
+      "authority_type": "primary_text_translation"
     }
   ],
   "claims": [
@@ -76,8 +84,42 @@
       "evidence_class": "astronomical",
       "verification_state": "partially_verified",
       "source_ids": ["SWISSEPH", "DP-DAY-PAGE"],
-      "locator": "Representative golden dates in tests/test_drik_engine.py and related timing tests",
-      "scope": "Supports computed Drik positions and representative event times; does not establish interpretive doctrine."
+      "locator": "Swiss Ephemeris Programmer's Documentation sections 3, 5.8 and 12.2 for calc_ut, sidereal flags and ayanamsa modes; representative date checks in tests/test_drik_engine.py and tests/test_ayanamsa.py",
+      "scope": "Traces the Drik longitude API and preserves representative outputs. The current register does not contain an exhaustive independently published position-and-transition fixture, and it establishes no interpretive doctrine.",
+      "last_reviewed": "2026-08-27"
+    },
+    {
+      "id": "surya_siddhanta.mean_motion_manda",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/surya_siddhanta.py",
+      "evidence_class": "textual",
+      "verification_state": "partially_verified",
+      "source_ids": ["SS-BURGESS-WHITNEY-1860"],
+      "locator": "Chapter I verses 29-34 and 53 for revolution counts and mean place; chapter II verses 29-39 for anomaly, epicycle dimensions and the manda equation",
+      "scope": "Supports the mean-motion and manda-correction algorithm family and the Sun/Moon revolution and epicycle constants. The implementation uses direct floating-point trigonometry, a fixed code epoch and simplified apogee treatment; this claim does not make it a complete textual transcription or independently verify its modern Panchangam outputs.",
+      "last_reviewed": "2026-08-27"
+    },
+    {
+      "id": "vakya.provisional_lunar_model",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/vakya.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "engine_pinned",
+      "source_ids": [],
+      "locator": "_VAKYA_CORRECTIONS and _VAKYA_CYCLE_DAYS; research gap tracked in GitHub issue 176",
+      "scope": "The current nine-value offset over 3,031-day steps is regression-pinned but has no registered primary-table derivation or published-Vakya comparison set. It must be described as provisional, not as a verified 248-day or 248-year Vākya algorithm.",
+      "last_reviewed": "2026-08-27"
+    },
+    {
+      "id": "panchangam.rise_set_convention",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/utils.py",
+      "evidence_class": "astronomical",
+      "verification_state": "partially_verified",
+      "source_ids": ["SWISSEPH"],
+      "locator": "Swiss Ephemeris Programmer's Documentation sections 8.12 and 8.12.1; convention decision and comparison gap tracked in GitHub issue 177",
+      "scope": "Precisely traces the current astronomical-default rise_trans behavior: upper limb with refraction, fixed 1013.25 hPa and 15 C, and zero-metre altitude passed by all engines. It does not establish that this is the intended Hindu-calendar convention or independently verify multiple city/date cells.",
+      "last_reviewed": "2026-08-27"
     },
     {
       "id": "festivals.forward_year_2027_2028",

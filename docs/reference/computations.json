@@ -257,7 +257,7 @@
     {
       "id": "astronomy.surya-siddhanta-longitudes",
       "title": "Surya Siddhanta mean-motion longitudes",
-      "summary": "Classical mean-motion and manda corrections produce solar and lunar longitudes for the Surya Siddhanta engine.",
+      "summary": "A bounded transcription of mean-motion and manda corrections produces solar and lunar longitudes for the Surya Siddhanta engine.",
       "owning_layer": "engine-core",
       "claim_kind": "deterministic-fact",
       "implementations": [
@@ -269,14 +269,14 @@
       "outputs": ["solar longitude", "lunar longitude", "Moon-Sun elongation"],
       "time_basis": "Julian day relative to the engine's Kali epoch constants.",
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
-      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.non_drik_engine_outputs"], "note": "Outputs are regression-pinned, not independently verified across the production range."},
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["surya_siddhanta.mean_motion_manda", "panchangam.non_drik_engine_outputs"], "note": "The algorithm family is source-traced in part; production outputs remain regression-pinned rather than independently compared."},
       "tests": ["tests/test_surya_siddhanta_engine.py"],
-      "limitations": ["Mean-motion results intentionally differ from modern observed-sky Drik positions."]
+      "limitations": ["This is not a complete textual transcription; direct floating-point trigonometry and simplified epoch/apogee constants intentionally differ from a full traditional procedure and from modern Drik positions."]
     },
     {
       "id": "astronomy.vakya-longitudes",
-      "title": "Vakya corrected lunar longitude",
-      "summary": "Published Vakya corrections alter the inherited Surya Siddhanta lunar model.",
+      "title": "Provisional Vakya lunar longitude",
+      "summary": "A provisional nine-value project offset alters the inherited Surya Siddhanta lunar model.",
       "owning_layer": "engine-core",
       "claim_kind": "regional-convention",
       "implementations": [
@@ -287,9 +287,9 @@
       "outputs": ["corrected lunar longitude", "corrected Moon-Sun elongation"],
       "time_basis": "Julian day with inherited Surya Siddhanta solar longitude.",
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
-      "provenance": {"evidence_classes": ["astronomical", "regional_convention"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.non_drik_engine_outputs"], "note": "The selected correction table represents one Vakya implementation, not every printed lineage."},
+      "provenance": {"evidence_classes": ["astronomical", "regional_convention", "project_heuristic"], "verification_states": ["engine_pinned"], "claim_ids": ["vakya.provisional_lunar_model", "panchangam.non_drik_engine_outputs"], "note": "No registered source derives the nine-value/3,031-day model; issue 176 tracks source reconstruction and possible correction."},
       "tests": ["tests/test_vakya_engine.py"],
-      "limitations": ["Traditional publishers use different tables and corrections, so minute-level agreement is not universal."]
+      "limitations": ["The current model must not be described as a faithful 248-entry lunar-vākya table or as independently verified against a published Vakya Panchangam."]
     },
     {
       "id": "calendar.combustion-periods",
@@ -976,13 +976,13 @@
         {"path": "telugu_panchangam/engines/utils.py", "symbol": "get_moonrise", "role": "owner"},
         {"path": "telugu_panchangam/engines/utils.py", "symbol": "get_moonset", "role": "owner"}
       ],
-      "inputs": ["date", "latitude", "longitude"],
+      "inputs": ["date", "latitude", "longitude", "fixed pressure 1013.25 hPa", "fixed temperature 15 C", "hard-coded altitude 0 m"],
       "outputs": ["UTC rise/set instants rendered in local timezone"],
       "time_basis": "Search from local-midnight Julian day with observer coordinates.",
       "surfaces": ["python-library", "mcp", "ics", "website"],
-      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["drik.sidereal_positions"], "note": "Representative Drik day cells are compared; rise/set coverage is not exhaustive."},
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.rise_set_convention", "drik.sidereal_positions"], "note": "Swiss Ephemeris documents the current astronomical-default behavior; issue 177 tracks the Hindu-calendar convention decision and multi-city comparisons."},
       "tests": ["tests/test_utils.py", "tests/test_drik_engine.py"],
-      "limitations": ["Atmospheric and horizon assumptions come from Swiss Ephemeris defaults."]
+      "limitations": ["All engines use the astronomical upper-limb/refraction default, ignore Location.alt and return codes, and lack a registered multi-city decision fixture for the intended public convention."]
     },
     {
       "id": "panchangam.samvatsara",
