@@ -110,8 +110,18 @@ def test_generated_pages_show_real_methods_and_visible_method_gaps():
     assert 'Grade each sunrise Panchangam limb' in shuddhi
     assert 'Verdict: Sarva Shuddha' in shuddhi
 
+    eclipses = _read(
+        'docs/_generated/computations/calendar.eclipse-events.md')
+    assert 'sutak_start = eclipse_start - H/24 day' in eclipses
+    assert 'Sutak: 00:50:06-13:17:18 UTC' in eclipses
+
+    ingresses = _read(
+        'docs/_generated/computations/calendar.rashi-ingresses.md')
+    assert 'r = floor((lambda mod 360) / 30) mod 12' in ingresses
+    assert 'Makara entry: 2026-01-14 09:37:19 UTC' in ingresses
+
     incomplete = _read(
-        'docs/_generated/computations/calendar.combustion-periods.md')
+        'docs/_generated/computations/personal.chandrabalam.md')
     assert 'Method documentation incomplete' in incomplete
     assert 'Incomplete — the contract is inventoried' in incomplete
 
