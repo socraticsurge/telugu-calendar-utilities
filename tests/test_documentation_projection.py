@@ -86,7 +86,22 @@ def test_generated_pages_show_real_methods_and_visible_method_gaps():
     assert 'panchangam.abhijit_muhurta_method' in abhijit
     assert '[**Abhijit Muhurat**](https://www.drikpanchang.com/' in abhijit
 
-    incomplete = _read('docs/_generated/computations/panchangam.tithi.md')
+    tithi = _read('docs/_generated/computations/panchangam.tithi.md')
+    assert 'E = (M - S) mod 360' in tithi
+    assert 'Krishna Ekadashi' in tithi
+
+    festivals = _read(
+        'docs/_generated/computations/panchangam.festivals.md')
+    assert 'Evaluate maintained Telugu festival rules' in festivals
+    assert 'Ugadi' in festivals
+
+    vakya = _read(
+        'docs/_generated/computations/astronomy.vakya-longitudes.md')
+    assert 'M_vakya = (M_SS + correction[i]) mod 360' in vakya
+    assert 'provisional nine-value project offset' in vakya
+
+    incomplete = _read(
+        'docs/_generated/computations/derived.anandadi-yoga.md')
     assert 'Method documentation incomplete' in incomplete
     assert 'Incomplete — the contract is inventoried' in incomplete
 
