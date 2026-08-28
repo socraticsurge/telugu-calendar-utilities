@@ -203,6 +203,23 @@ describe('CRUD and subscriptions', () => {
     expect(lengths).toEqual([1]);
   });
 
+  test('listener changes apply only to the next notification', () => {
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_listener_snapshot', 'guest_listener_next'),
+    });
+    const calls: string[] = [];
+    const later = () => calls.push('later');
+    store.subscribe(() => {
+      calls.push('first');
+      store.subscribe(later);
+    });
+
+    store.create({ name: 'One' });
+    expect(calls).toEqual(['first']);
+    store.create({ name: 'Two' });
+    expect(calls).toEqual(['first', 'first', 'later']);
+  });
+
   test('rejects empty records, unknown IDs and a fifth profile', () => {
     const store = createGuestProfileStore(storage, {
       idFactory: ids(

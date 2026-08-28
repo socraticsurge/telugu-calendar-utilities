@@ -78,6 +78,8 @@ interface GuestProfileStoreOptions {
   idFactory?: () => string;
 }
 
+let fallbackIdSequence = 0;
+
 export class GuestProfileStoreError extends Error {
   constructor(public readonly code: ProfileStoreErrorCode) {
     super(code);
@@ -130,7 +132,12 @@ function defaultIdFactory(): string {
   if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
     return `guest_${globalThis.crypto.randomUUID()}`;
   }
-  return `guest_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`;
+  if (globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
+    const values = globalThis.crypto.getRandomValues(new Uint32Array(4));
+    return `guest_${Array.from(values, value => value.toString(36)).join('_')}`;
+  }
+  fallbackIdSequence += 1;
+  return `guest_${Date.now().toString(36)}_${fallbackIdSequence.toString(36)}`;
 }
 
 /** Safe compatibility reader for the two legacy panels during migration. */
@@ -165,13 +172,17 @@ export function guestProfileReadiness(profile: GuestProfile): GuestProfileReadin
   const janmaRasi = profile.nakshatra
     ? rasiFromStar(profile.nakshatra, profile.pada)
     : null;
+  let missingForHoroscope: GuestProfileReadiness['missingForHoroscope'] = null;
+  if (profile.nakshatra === null) {
+    missingForHoroscope = 'nakshatra';
+  } else if (janmaRasi === null) {
+    missingForHoroscope = 'pada';
+  }
   return {
     muhurta: profile.nakshatra !== null,
     horoscope: janmaRasi !== null,
     janmaRasi,
-    missingForHoroscope: profile.nakshatra === null
-      ? 'nakshatra'
-      : janmaRasi === null ? 'pada' : null,
+    missingForHoroscope,
   };
 }
 
@@ -289,45 +300,17 @@ export class GuestProfileStore {
   }
 
   private load(initial: boolean): void {
-    let rawText: string | null;
-    try {
-      rawText = this.storage.getItem(GUEST_PROFILE_STORAGE_KEY);
-      this.persistence = 'persistent';
-      if (!initial || this.issue === 'storage-unavailable') this.issue = null;
-    } catch {
-      this.persistence = 'memory';
-      this.issue = 'storage-unavailable';
-      if (initial) this.profiles = [];
-      return;
-    }
-
+    const rawText = this.readStoredText(initial);
+    if (rawText === undefined) return;
     if (rawText === null) {
       this.profiles = [];
       return;
     }
 
-    let raw: unknown;
-    try {
-      raw = JSON.parse(rawText);
-    } catch {
-      this.profiles = [];
-      this.issue = 'malformed-storage';
-      this.persist();
-      return;
-    }
+    const raw = this.parseStoredRows(rawText);
+    if (raw === null) return;
 
-    if (!Array.isArray(raw)) {
-      this.profiles = [];
-      this.issue = 'malformed-storage';
-      this.persist();
-      return;
-    }
-
-    const hasFutureVersion = raw.some(value => {
-      if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-      const version = Number((value as Record<string, unknown>).schemaVersion);
-      return Number.isFinite(version) && version > GUEST_PROFILE_SCHEMA_VERSION;
-    });
+    const hasFutureVersion = this.hasFutureVersion(raw);
     if (hasFutureVersion) {
       // Never downgrade or overwrite data written by a newer profile schema.
       // Compatible v1/legacy rows remain available in memory for this session.
@@ -335,6 +318,48 @@ export class GuestProfileStore {
       this.issue = 'unsupported-storage-version';
     }
 
+    this.profiles = this.migrateStoredRows(raw);
+    const normalizedText = JSON.stringify(this.profiles.map(toStored));
+    if (normalizedText !== rawText) this.persist();
+  }
+
+  private readStoredText(initial: boolean): string | null | undefined {
+    try {
+      const rawText = this.storage.getItem(GUEST_PROFILE_STORAGE_KEY);
+      this.persistence = 'persistent';
+      if (!initial || this.issue === 'storage-unavailable') this.issue = null;
+      return rawText;
+    } catch {
+      this.persistence = 'memory';
+      this.issue = 'storage-unavailable';
+      if (initial) this.profiles = [];
+      return undefined;
+    }
+  }
+
+  private parseStoredRows(rawText: string): unknown[] | null {
+    try {
+      const raw: unknown = JSON.parse(rawText);
+      if (Array.isArray(raw)) return raw;
+    } catch {
+      // The recovery below handles both invalid JSON and a non-array payload.
+    }
+
+    this.profiles = [];
+    this.issue = 'malformed-storage';
+    this.persist();
+    return null;
+  }
+
+  private hasFutureVersion(raw: unknown[]): boolean {
+    return raw.some(value => {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+      const version = Number((value as Record<string, unknown>).schemaVersion);
+      return Number.isFinite(version) && version > GUEST_PROFILE_SCHEMA_VERSION;
+    });
+  }
+
+  private migrateStoredRows(raw: unknown[]): GuestProfile[] {
     const seen = new Set<string>();
     const migrated: GuestProfile[] = [];
     for (const value of raw.slice(0, MAX_GUEST_PROFILES)) {
@@ -356,10 +381,7 @@ export class GuestProfileStore {
         migrated.push(profile);
       }
     }
-    this.profiles = migrated;
-
-    const normalizedText = JSON.stringify(this.profiles.map(toStored));
-    if (normalizedText !== rawText) this.persist();
+    return migrated;
   }
 
   private persist(): void {
@@ -377,7 +399,8 @@ export class GuestProfileStore {
 
   private emit(): void {
     const snapshot = this.getSnapshot();
-    for (const listener of [...this.listeners]) listener(snapshot);
+    const listeners = Array.from(this.listeners);
+    for (const listener of listeners) listener(snapshot);
   }
 }
 
