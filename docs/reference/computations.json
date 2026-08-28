@@ -306,7 +306,7 @@
       "surfaces": ["python-library", "mcp"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": [], "note": "Swiss Ephemeris event behavior is tested, but independent event-cell comparisons are not yet registered."},
       "tests": ["tests/test_maudhya_calendar.py"],
-      "limitations": ["Heliacal visibility depends on observer, atmosphere, altitude, and Swiss Ephemeris modeling."]
+      "limitations": ["Heliacal visibility depends on observer, atmosphere, altitude, and Swiss Ephemeris modeling; the current fixed atmosphere and per-planet visibility parameters were tuned against a 2026 Hyderabad comparison set."]
     },
     {
       "id": "calendar.eclipse-events",
@@ -325,7 +325,7 @@
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.eclipse_events"], "note": "Event calculations are regression-pinned; the Sutak convention is a separate textual claim."},
       "tests": ["tests/test_eclipses.py"],
-      "limitations": ["Local visibility is modeled, and Sutak is omitted when the eclipse is not visible."]
+      "limitations": ["Local visibility is modeled and Sutak is omitted when the eclipse is not visible, but the current observer altitude is fixed to zero."]
     },
     {
       "id": "calendar.graha-yuddha",
@@ -620,7 +620,7 @@
       "surfaces": ["python-library", "mcp", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["drik.sidereal_positions"], "note": "The same Drik longitude evidence boundary applies to these derived fields."},
       "tests": ["tests/test_graha_positions.py"],
-      "limitations": ["Rahu and Ketu use the selected node convention; next-ingress dates are numerical search results."]
+      "limitations": ["Rahu and Ketu use the selected node convention; next-ingress dates are numerical search results and rasi_until is currently rendered as an IST calendar date rather than the requested city's local date."]
     },
     {
       "id": "gochara.named-shani-conditions",
@@ -1171,7 +1171,7 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["muhurta.homahuti"], "note": "The exact Homahuti and Agnivasa rules have registered locators."},
       "tests": ["tests/test_yajna_evidence_audit.py", "tests/test_activity_surface_parity.py"],
-      "limitations": ["This is election guidance and does not replace ritual prerequisites or a qualified practitioner."]
+      "limitations": ["This is election guidance and does not replace ritual prerequisites or a qualified practitioner; the current low-level reason list labels every Agnivasa remainder as earth-resident even when the admission gate fails, so consumers must rely on the admitted boolean until the tracked transparency fix lands."]
     },
     {
       "id": "personal.hora",
@@ -1245,7 +1245,7 @@
       "outputs": ["automated constraints", "ranking preferences", "manual checks", "provenance identifier"],
       "time_basis": "Rules are applied to each candidate day and slot.",
       "surfaces": ["python-library", "mcp", "website", "generated-data"],
-      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["needs_locator", "verified", "heuristic", "contradicted"], "claim_ids": ["muhurta.activity_rules"], "note": "The umbrella claim points to the claim-level activity records, whose states range from verified to explicit heuristic or conflict."},
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["needs_locator", "verified", "heuristic"], "claim_ids": ["muhurta.activity_rules"], "note": "The umbrella claim remains needs_locator and grants no authority. At the activity level, 34 of 35 canonical profiles are verified and the remaining generic any profile is an explicit heuristic; no profile is currently contradicted."},
       "tests": ["tests/test_activity_provenance_contract.py", "tests/test_activity_rules_export.py", "tests/test_activity_surface_parity.py"],
       "limitations": ["Each activity's evidence state must be read from its own provenance claim; this umbrella record is not a blanket verification claim."]
     },
@@ -1291,7 +1291,7 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Disposition and partial-window behavior are tested; exact claim locators remain open."},
       "tests": ["tests/test_muhurta_finder.py"],
-      "limitations": ["Disposition is one input to Muhurta ranking, not a standalone election verdict."]
+      "limitations": ["Disposition is one input to Muhurta ranking, not a standalone election verdict; partial-dosha windows currently use a fixed 24 civil minutes per Ghati rather than the proportional sunrise-to-sunrise Ghati clock."]
     },
     {
       "id": "personal.tarabalam",

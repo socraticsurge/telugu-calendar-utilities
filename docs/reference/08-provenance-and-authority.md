@@ -52,12 +52,21 @@ must always be interpreted against the named edition.
 - **DP-DAY-PAGE** — Drik Panchang day/festival pages for a recorded city and
   date. This is an external published-panchangam comparison surface, not a
   textual authority for every project rule.
-- **SWISSEPH** — Swiss Ephemeris/pyswisseph. This supports astronomical
-  positions and event times, not interpretive judgments.
+- **SWISSEPH** — Astrodienst, *Swiss Ephemeris 2.10 Programmer's
+  Documentation*, together with the repository's pinned `pyswisseph` runtime.
+  The registered claims cite the relevant API sections. This supports
+  astronomical positions and event models, not interpretive judgments.
+- **SS-BURGESS-WHITNEY-1860** — Ebenezer Burgess, edited with notes by William
+  Dwight Whitney, *Translation of the Surya-Siddhanta: A Text-Book of Hindu
+  Astronomy*, *Journal of the American Oriental Society* 6 (1860), pp.
+  141–498. The engine contract records chapter, verse and edition-page
+  locators against this edition.
 
-Muhurta Chintamani, Dharmasindhu, Surya Siddhanta, and BPHS remain in the
-register as authorities requiring edition-level normalization. Until an
-edition and locator are recorded, their claims remain `needs_locator`.
+Generic references to Dharmasindhu, BPHS and other editions of the named texts
+still require edition-level normalization. Registering one exact edition for
+one claim does not automatically verify every rule that cites the same title.
+Until an edition and locator are recorded for the specific claim, it remains
+`needs_locator`.
 
 ## Current ledger summary
 
@@ -112,11 +121,14 @@ edition and locator are recorded, their claims remain `needs_locator`.
 
 Activity-level coverage is tracked separately in
 [Muhurtam Activity Provenance Coverage](16-activity-provenance-coverage.md).
-It currently records **19 verified profiles, 11 known textual conflicts and 1
-explicit project heuristic across all 31 activity keys**. No activity remains
-implicitly covered by a title-level citation. `tools/check_activity_provenance.py`
-enforces verified, contradicted and heuristic links against the ledger and
-fails if a profile has no explicit disposition.
+It currently records **34 verified canonical profiles, no contradicted
+profiles and 1 explicit project heuristic across all 35 canonical profiles**.
+The accepted API catalogue also has the legacy `litigation` alias for `court`,
+so there are 36 accepted keys; aliases are not counted as distinct elections.
+No activity remains implicitly covered by a title-level citation.
+`tools/check_activity_provenance.py` enforces verified, contradicted and
+heuristic links against the ledger and fails if a profile has no explicit
+disposition.
 
 ## Citation acceptance rule
 

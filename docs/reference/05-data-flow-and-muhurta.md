@@ -53,7 +53,7 @@ tier (Excellent / Good / Fair / Avoid).
 
 | File | Role |
 |---|---|
-| `personal/activity_rules.py` | Declarative `ACTIVITY_RULES` dict — 30 activities, pure data. |
+| `personal/activity_rules.py` | Declarative `ACTIVITY_RULES` dict — 35 canonical activity profiles, pure data. |
 | `personal/activity_catalog.py` | Ordered browser-supported subset and selector groups. |
 | `personal/slot_scorers.py` | Atomic scoring functions + `_DayContext` dataclass. |
 | `personal/muhurta.py` | Orchestrator (~530 lines) — public API only. |
@@ -68,10 +68,14 @@ Source-facing Nakshatra spellings are preserved in this declarative contract,
 but Python and TypeScript normalize `Ashwini`→`Ashvini` and `Moola`→`Mula`
 before membership tests. These are the only non-canonical names currently
 present; parity tests require both scorers to apply the same aliases.
-30 activities are supported by Python/MCP. The browser-supported subset is
-declared in `activity_catalog.py`; `tools/export_activity_rules.py` generates
-the exact rule fields consumed by TypeScript. `npm run activity:check` and the
-Python contract tests fail if the committed export or static selector drifts.
+Python/MCP support 35 canonical activity profiles and one legacy alias
+(`litigation` → `court`), for 36 accepted API keys. The browser-supported
+subset is 30 activities in seven selector groups, declared in
+`activity_catalog.py`. The backend-only canonical profiles are `beginning`,
+`construction_roof`, `coronation`, `cremation`, and `wood_cutting`.
+`tools/export_activity_rules.py` generates the exact rule fields consumed by
+TypeScript. `npm run activity:check` and the Python contract tests fail if the
+committed export or static selector drifts.
 Tithi-family scoring is likewise shared as a behavioral contract: the browser
 exports `avoid_tithi_class` and its pure scorer mirrors Python's preferred and
 avoided families, Amavasya precedence, and Pushya/Siddhi Rikta neutralization.
@@ -159,7 +163,7 @@ by `day_slots()` to keep day-skip logic in one place.
 
 | Module | Function | Output |
 |---|---|---|
-| `activity_rules.py` | `ACTIVITY_RULES`, `ACTIVITIES` | Declarative per-activity config for all 30 activities |
+| `activity_rules.py` | `ACTIVITY_RULES`, `ACTIVITIES` | 35 canonical profiles and one accepted compatibility alias |
 | `activity_catalog.py` | `BROWSER_ACTIVITY_GROUPS`, `BROWSER_ACTIVITIES` | Explicit browser capability boundary and selector ordering |
 | `slot_scorers.py` | `score_tithi_class`, `score_tara`, `score_chandra`, `score_lagna`, `score_special_yogas`, `score_nitya_yoga`, `anandadi_day_modifier`, `_DayContext` | All atomic scoring functions; `_DayContext` bundles day-constant params |
 | `tarabalam.py` | `tara_number`, `is_auspicious_tara`, `good_for_all` | 9-tara strength from a birth star |
@@ -170,8 +174,9 @@ by `day_slots()` to keep day-skip logic in one place.
 | `tithi_class.py` | `tithi_family`, `is_rikta` | Nanda/Bhadra/Jaya/Rikta/Purna |
 | `phalalu.py` | `rasi_phalalu` | deterministic daily reading (every line traced to a computation) |
 
-> **Design throughline:** every score and every phalalu line is deterministic
-> and explainable. Project ranking heuristics are labelled as heuristics;
-> textual doctrine requires a ledger citation. Per-person components are
-> independent contributors, so people can be added or removed without hidden
-> model state.
+> **Design throughline:** every score and every deterministic `phalalu.py` line
+> is reproducible and explainable. Separately generated website prose is
+> checked against computed transit facts but remains heuristic interpretation.
+> Project ranking heuristics are labelled as heuristics; textual doctrine
+> requires a ledger citation. Per-person components are independent
+> contributors, so people can be added or removed without hidden model state.
