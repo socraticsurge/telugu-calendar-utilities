@@ -48,3 +48,33 @@ def test_inventory_test_links_are_repository_relative():
             assert not path.is_absolute()
             assert '..' not in path.parts
             assert (ROOT / path).is_file()
+
+
+def test_abhijit_has_a_complete_reference_method_contract():
+    records = {
+        record['id']: record for record in _registry()['computations']}
+    method = records['panchangam.abhijit-muhurta']['method']
+
+    assert method['kind'] == 'formula'
+    assert method['steps']
+    assert method['formulae']
+    assert method['worked_examples']
+    assert method['worked_examples'][0]['calculation']
+
+
+def test_method_validation_rejects_an_unreproducible_example(tmp_path):
+    registry = _registry()
+    record = next(
+        item for item in registry['computations']
+        if item['id'] == 'panchangam.abhijit-muhurta'
+    )
+    del record['method']['worked_examples']
+    candidate = tmp_path / 'computations.json'
+    candidate.write_text(json.dumps(registry), encoding='utf-8')
+
+    errors = validate_registry(candidate)
+
+    assert any(
+        'panchangam.abhijit-muhurta.method.worked_examples' in error
+        for error in errors
+    )

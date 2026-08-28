@@ -47,6 +47,21 @@ def test_contradicted_claims_require_inspected_evidence():
         assert claim.get('last_reviewed')
 
 
+def test_abhijit_method_has_a_direct_scoped_published_reference():
+    ledger = _load(LEDGER_PATH)
+    sources = {source['id']: source for source in ledger['sources']}
+    claims = {claim['id']: claim for claim in ledger['claims']}
+
+    claim = claims['panchangam.abhijit_muhurta_method']
+    assert claim['evidence_class'] == 'published_panchangam'
+    assert claim['verification_state'] == 'partially_verified'
+    assert claim['source_ids'] == ['DP-ABHIJIT-MUHURAT']
+    assert '15 equal sunrise-to-sunset parts' in claim['locator']
+    assert 'Wednesday exclusion' in claim['locator']
+    assert sources['DP-ABHIJIT-MUHURAT']['url'].endswith(
+        '/muhurat/daily/abhijit-muhurat.html')
+
+
 def test_forward_festival_fixture_discloses_verification_per_cell():
     fixture = _load(FESTIVAL_FIXTURE)
     statuses = [cell['verification']['status'] for cell in fixture['cells']]

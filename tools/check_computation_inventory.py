@@ -26,7 +26,7 @@ _REQUIRED_RECORD_FIELDS = {
 }
 _REQUIRED_VOCABULARIES = {
     'owning_layers', 'claim_kinds', 'implementation_roles', 'surfaces',
-    'evidence_classes', 'verification_states', 'exclusion_kinds',
+    'evidence_classes', 'verification_states', 'exclusion_kinds', 'method_kinds',
 }
 
 
@@ -74,6 +74,67 @@ def _is_string_list(value: Any, *, allow_empty: bool = False) -> bool:
         and (allow_empty or bool(value))
         and all(isinstance(item, str) and item.strip() for item in value)
     )
+
+
+def _validate_method(
+    label: str,
+    method: Any,
+    vocabularies: dict[str, Any],
+    errors: list[str],
+) -> None:
+    """Validate a present method; missing methods remain visible rollout gaps."""
+    if method is None:
+        return
+    if not isinstance(method, dict):
+        errors.append(f'{label}.method must be an object')
+        return
+
+    kind = method.get('kind')
+    if kind not in vocabularies.get('method_kinds', []):
+        errors.append(f'{label}.method.kind is unknown: {kind!r}')
+    summary = method.get('summary')
+    if not isinstance(summary, str) or not summary.strip():
+        errors.append(f'{label}.method.summary must be a non-empty string')
+    if not _is_string_list(method.get('steps')):
+        errors.append(f'{label}.method.steps must be a non-empty string list')
+
+    formulae = method.get('formulae', [])
+    if not isinstance(formulae, list):
+        errors.append(f'{label}.method.formulae must be a list')
+        formulae = []
+    if kind == 'formula' and not formulae:
+        errors.append(f'{label}.method.formulae is required for formula methods')
+    for index, formula in enumerate(formulae):
+        formula_label = f'{label}.method.formulae[{index}]'
+        if not isinstance(formula, dict):
+            errors.append(f'{formula_label} must be an object')
+            continue
+        for field in ('name', 'expression'):
+            value = formula.get(field)
+            if not isinstance(value, str) or not value.strip():
+                errors.append(f'{formula_label}.{field} must be a non-empty string')
+        if not _is_string_list(formula.get('variables')):
+            errors.append(f'{formula_label}.variables must be a non-empty string list')
+
+    examples = method.get('worked_examples')
+    if not isinstance(examples, list) or not examples:
+        errors.append(f'{label}.method.worked_examples must be a non-empty list')
+        examples = []
+    for index, example in enumerate(examples):
+        example_label = f'{label}.method.worked_examples[{index}]'
+        if not isinstance(example, dict):
+            errors.append(f'{example_label} must be an object')
+            continue
+        example_name = example.get('label')
+        if not isinstance(example_name, str) or not example_name.strip():
+            errors.append(f'{example_label}.label must be a non-empty string')
+        for field in ('inputs', 'calculation', 'result'):
+            if not _is_string_list(example.get(field)):
+                errors.append(
+                    f'{example_label}.{field} must be a non-empty string list')
+
+    if 'notes' in method and not _is_string_list(method['notes']):
+        errors.append(f'{label}.method.notes must be a non-empty string list')
 
 
 def _relative_source_paths(registry: dict[str, Any]) -> set[str]:
@@ -173,6 +234,8 @@ def validate_registry(path: Path = REGISTRY_PATH) -> list[str]:
         for surface in record.get('surfaces', []):
             if surface not in vocabularies.get('surfaces', []):
                 errors.append(f'{label}.surfaces contains unknown value: {surface}')
+
+        _validate_method(label, record.get('method'), vocabularies, errors)
 
         implementations = record.get('implementations')
         if not isinstance(implementations, list) or not implementations:
@@ -305,10 +368,13 @@ def main() -> int:
     registry = _load_json(REGISTRY_PATH)
     implementation_count = sum(
         len(record['implementations']) for record in registry['computations'])
+    method_count = sum(
+        'method' in record for record in registry['computations'])
     print(
         f"Computation inventory valid: {len(registry['computations'])} records, "
         f'{implementation_count} implementations, '
-        f"{len(_relative_source_paths(registry))} audited source files."
+        f"{len(_relative_source_paths(registry))} audited source files, "
+        f'{method_count}/{len(registry["computations"])} methods documented.'
     )
     return 0
 
