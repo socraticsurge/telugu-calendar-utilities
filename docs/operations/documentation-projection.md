@@ -58,6 +58,12 @@ index.
 and independent source support separately. The build also exposes exact copies
 of the maintained JSON registries under `/docs/reference/` for traceability.
 
+## Application navigation
+
+The shared desktop sidebar and mobile navigation drawer expose one
+**Documentation** link to `/docs/`. Calculation screens remain focused on their
+results; they do not embed documentation inventories or verification panels.
+
 ## Publication boundary
 
 The documentation build deliberately adds no deploy workflow, `CNAME`, DNS
