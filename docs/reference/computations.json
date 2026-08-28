@@ -1,0 +1,1371 @@
+{
+  "$schema": "./computations.schema.json",
+  "schema_version": 1,
+  "registry_id": "telugu-calendar-utilities.computations",
+  "vocabularies": {
+    "owning_layers": [
+      "engine-core",
+      "derived",
+      "calendar",
+      "personal",
+      "interpretation"
+    ],
+    "claim_kinds": [
+      "deterministic-fact",
+      "textual-rule",
+      "regional-convention",
+      "project-heuristic",
+      "generated-interpretation"
+    ],
+    "implementation_roles": ["owner", "mirror"],
+    "surfaces": [
+      "python-library",
+      "mcp",
+      "ics",
+      "website",
+      "generated-data"
+    ],
+    "evidence_classes": [
+      "astronomical",
+      "textual",
+      "published_panchangam",
+      "regional_convention",
+      "project_heuristic"
+    ],
+    "verification_states": [
+      "verified",
+      "partially_verified",
+      "engine_pinned",
+      "needs_locator",
+      "heuristic",
+      "contradicted"
+    ],
+    "exclusion_kinds": [
+      "package-marker",
+      "lookup-data",
+      "data-model",
+      "adapter",
+      "serialization",
+      "orchestration",
+      "ui-only"
+    ]
+  },
+  "coverage": {
+    "roots": [
+      {"path": "telugu_panchangam", "extensions": [".py"]},
+      {"path": "src", "extensions": [".ts"]},
+      {"path": "scripts", "extensions": [".py"]}
+    ],
+    "exclusions": [
+      {
+        "path": "telugu_panchangam/__init__.py",
+        "kind": "package-marker",
+        "reason": "Package metadata only; it owns no computation."
+      },
+      {
+        "path": "telugu_panchangam/cities.py",
+        "kind": "lookup-data",
+        "reason": "Static location catalogue consumed as computation input."
+      },
+      {
+        "path": "telugu_panchangam/engines/__init__.py",
+        "kind": "package-marker",
+        "reason": "Engine export surface only."
+      },
+      {
+        "path": "telugu_panchangam/generate.py",
+        "kind": "orchestration",
+        "reason": "Coordinates engines and serializers without owning a domain computation."
+      },
+      {
+        "path": "telugu_panchangam/generators/__init__.py",
+        "kind": "package-marker",
+        "reason": "Generator package marker only."
+      },
+      {
+        "path": "telugu_panchangam/generators/anga_variants.py",
+        "kind": "serialization",
+        "reason": "Filters already-computed PanchangamDay records and serializes feed variants."
+      },
+      {
+        "path": "telugu_panchangam/generators/ics.py",
+        "kind": "serialization",
+        "reason": "Frozen subscriber-facing representation of computed values."
+      },
+      {
+        "path": "telugu_panchangam/gochara/__init__.py",
+        "kind": "package-marker",
+        "reason": "Gochara export surface only."
+      },
+      {
+        "path": "telugu_panchangam/mcp/__init__.py",
+        "kind": "package-marker",
+        "reason": "MCP package marker only."
+      },
+      {
+        "path": "telugu_panchangam/mcp/location.py",
+        "kind": "adapter",
+        "reason": "Geocoding and timezone input resolution, not a Panchangam computation."
+      },
+      {
+        "path": "telugu_panchangam/mcp/server.py",
+        "kind": "adapter",
+        "reason": "MCP signatures delegate to canonical computation owners."
+      },
+      {
+        "path": "telugu_panchangam/mcp/tools.py",
+        "kind": "adapter",
+        "reason": "Input validation, orchestration, and JSON projection of canonical results."
+      },
+      {
+        "path": "telugu_panchangam/models/__init__.py",
+        "kind": "package-marker",
+        "reason": "Model export surface only."
+      },
+      {
+        "path": "telugu_panchangam/models/panchangam_day.py",
+        "kind": "data-model",
+        "reason": "Typed result containers define outputs but perform no calculation."
+      },
+      {
+        "path": "telugu_panchangam/panchangam_names.py",
+        "kind": "lookup-data",
+        "reason": "Canonical names and tables consumed by computations."
+      },
+      {
+        "path": "telugu_panchangam/panchangam_provenance.py",
+        "kind": "adapter",
+        "reason": "Projects evidence metadata into MCP responses."
+      },
+      {
+        "path": "telugu_panchangam/personal/__init__.py",
+        "kind": "package-marker",
+        "reason": "Personal-calculation package marker only."
+      },
+      {
+        "path": "telugu_panchangam/personal/activity_catalog.py",
+        "kind": "lookup-data",
+        "reason": "User-facing activity labels and catalogue metadata."
+      },
+      {
+        "path": "src/data/cities.ts",
+        "kind": "lookup-data",
+        "reason": "Browser location catalogue."
+      },
+      {
+        "path": "src/data/systems.ts",
+        "kind": "lookup-data",
+        "reason": "Browser calculation-system labels."
+      },
+      {
+        "path": "src/lib/analytics.ts",
+        "kind": "adapter",
+        "reason": "Analytics event delivery only."
+      },
+      {
+        "path": "src/lib/dom.ts",
+        "kind": "ui-only",
+        "reason": "DOM utilities only."
+      },
+      {
+        "path": "src/lib/feed-loader.ts",
+        "kind": "adapter",
+        "reason": "Fetches published computed feeds."
+      },
+      {
+        "path": "src/lib/format.ts",
+        "kind": "serialization",
+        "reason": "Display formatting only."
+      },
+      {
+        "path": "src/lib/html.ts",
+        "kind": "ui-only",
+        "reason": "HTML escaping and rendering helpers."
+      },
+      {
+        "path": "src/lib/ics.ts",
+        "kind": "serialization",
+        "reason": "ICS parsing and field extraction, not domain calculation."
+      },
+      {
+        "path": "src/lib/lagna-loader.ts",
+        "kind": "adapter",
+        "reason": "Loads generated Lagna data."
+      },
+      {
+        "path": "src/lib/parse-description.ts",
+        "kind": "serialization",
+        "reason": "Parses the frozen ICS description into browser fields."
+      },
+      {
+        "path": "src/main.ts",
+        "kind": "ui-only",
+        "reason": "Application bootstrap and navigation wiring."
+      },
+      {
+        "path": "src/selection-store.ts",
+        "kind": "ui-only",
+        "reason": "Browser selection state only."
+      },
+      {
+        "path": "scripts/__init__.py",
+        "kind": "package-marker",
+        "reason": "Build-script package marker only."
+      },
+      {
+        "path": "scripts/build_gochara_json.py",
+        "kind": "orchestration",
+        "reason": "Materializes canonical graha and gochara computations as browser data."
+      },
+      {
+        "path": "scripts/build_lagna_json.py",
+        "kind": "orchestration",
+        "reason": "Materializes canonical Lagna transitions as browser data."
+      },
+      {
+        "path": "scripts/build_landing_page.py",
+        "kind": "orchestration",
+        "reason": "Legacy/static landing build helper without a domain computation."
+      },
+      {
+        "path": "scripts/generate_llm_phalalu.py",
+        "kind": "orchestration",
+        "reason": "Batch runner for the registered generated-interpretation owner."
+      }
+    ]
+  },
+  "computations": [
+    {
+      "id": "astronomy.drik-sidereal-longitudes",
+      "title": "Drik sidereal planetary longitudes",
+      "summary": "Swiss Ephemeris longitudes under the selected ayanamsa form the Drik astronomical basis.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/utils.py", "symbol": "sidereal_longitude_with_ayanamsa", "role": "owner"},
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._sun_lon", "role": "owner"},
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._moon_lon", "role": "owner"}
+      ],
+      "inputs": ["Julian day", "Swiss Ephemeris body", "ayanamsa"],
+      "outputs": ["sidereal longitude in degrees [0, 360)"],
+      "time_basis": "UTC Julian day; ayanamsa is explicit and defaults to Lahiri.",
+      "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["drik.sidereal_positions"], "note": "Representative Drik cells are independently compared; the full range remains broader than those cells."},
+      "tests": ["tests/test_ayanamsa.py", "tests/test_utils.py"],
+      "limitations": ["Accuracy and conventions inherit Swiss Ephemeris and the chosen ayanamsa."]
+    },
+    {
+      "id": "astronomy.surya-siddhanta-longitudes",
+      "title": "Surya Siddhanta mean-motion longitudes",
+      "summary": "Classical mean-motion and manda corrections produce solar and lunar longitudes for the Surya Siddhanta engine.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "ss_sun_longitude", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "ss_moon_longitude", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "ss_elongation", "role": "owner"}
+      ],
+      "inputs": ["Julian day"],
+      "outputs": ["solar longitude", "lunar longitude", "Moon-Sun elongation"],
+      "time_basis": "Julian day relative to the engine's Kali epoch constants.",
+      "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.non_drik_engine_outputs"], "note": "Outputs are regression-pinned, not independently verified across the production range."},
+      "tests": ["tests/test_surya_siddhanta_engine.py"],
+      "limitations": ["Mean-motion results intentionally differ from modern observed-sky Drik positions."]
+    },
+    {
+      "id": "astronomy.vakya-longitudes",
+      "title": "Vakya corrected lunar longitude",
+      "summary": "Published Vakya corrections alter the inherited Surya Siddhanta lunar model.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "vakya_moon_longitude", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "vakya_elongation", "role": "owner"}
+      ],
+      "inputs": ["Julian day", "Vakya correction table"],
+      "outputs": ["corrected lunar longitude", "corrected Moon-Sun elongation"],
+      "time_basis": "Julian day with inherited Surya Siddhanta solar longitude.",
+      "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["astronomical", "regional_convention"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.non_drik_engine_outputs"], "note": "The selected correction table represents one Vakya implementation, not every printed lineage."},
+      "tests": ["tests/test_vakya_engine.py"],
+      "limitations": ["Traditional publishers use different tables and corrections, so minute-level agreement is not universal."]
+    },
+    {
+      "id": "calendar.combustion-periods",
+      "title": "Planetary Asta and Udaya calendar",
+      "summary": "Swiss Ephemeris heliacal events produce per-location combustion setting and rising periods.",
+      "owning_layer": "calendar",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/maudhya_calendar.py", "symbol": "combustion_periods", "role": "owner"}
+      ],
+      "inputs": ["date range", "location including altitude", "planet"],
+      "outputs": ["combustion periods with Asta and Udaya instants"],
+      "time_basis": "UTC heliacal event search converted for the requested location.",
+      "surfaces": ["python-library", "mcp"],
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": [], "note": "Swiss Ephemeris event behavior is tested, but independent event-cell comparisons are not yet registered."},
+      "tests": ["tests/test_maudhya_calendar.py"],
+      "limitations": ["Heliacal visibility depends on observer, atmosphere, altitude, and Swiss Ephemeris modeling."]
+    },
+    {
+      "id": "calendar.eclipse-events",
+      "title": "Solar and lunar eclipse events",
+      "summary": "Global eclipse searches are combined with per-location visibility and Sutak timing.",
+      "owning_layer": "calendar",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/eclipses.py", "symbol": "list_eclipses_in_range", "role": "owner"},
+        {"path": "telugu_panchangam/eclipses.py", "symbol": "get_eclipse_from_precomputed", "role": "owner"},
+        {"path": "telugu_panchangam/eclipses.py", "symbol": "get_eclipse_for_date", "role": "owner"}
+      ],
+      "inputs": ["date or Julian-day range", "observer latitude and longitude"],
+      "outputs": ["eclipse kind and subtype", "visibility", "start and end", "Sutak window"],
+      "time_basis": "Swiss Ephemeris UTC events; Sutak is a fixed pre-end interval when locally visible.",
+      "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.eclipse_events"], "note": "Event calculations are regression-pinned; the Sutak convention is a separate textual claim."},
+      "tests": ["tests/test_eclipses.py"],
+      "limitations": ["Local visibility is modeled, and Sutak is omitted when the eclipse is not visible."]
+    },
+    {
+      "id": "calendar.graha-yuddha",
+      "title": "Graha Yuddha periods",
+      "summary": "Planetary-war entry, closest approach, victor, and exit are derived for tara graha pairs.",
+      "owning_layer": "calendar",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/graha_yuddha.py", "symbol": "graha_yuddha_periods", "role": "owner"}
+      ],
+      "inputs": ["date range", "planetary longitudes and latitudes"],
+      "outputs": ["entry", "minimum separation", "exit", "winner", "loser"],
+      "time_basis": "UTC Julian-day numerical search.",
+      "surfaces": ["python-library", "mcp"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["engine_pinned", "needs_locator"], "claim_ids": [], "note": "Numerical boundaries are tested; the one-degree admission and latitude-victor rules need claim-level registry locators."},
+      "tests": ["tests/test_graha_yuddha.py"],
+      "limitations": ["The result implements the project's documented one-degree and latitude rule, not every tradition's definition."]
+    },
+    {
+      "id": "calendar.rashi-ingresses",
+      "title": "Planetary rashi ingresses",
+      "summary": "Sidereal sign changes, including retrograde re-entry, are found over a requested range.",
+      "owning_layer": "calendar",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/ingress.py", "symbol": "rashi_ingresses", "role": "owner"}
+      ],
+      "inputs": ["date range", "planet", "sidereal longitude model"],
+      "outputs": ["ingress instant", "from rashi", "to rashi", "motion direction"],
+      "time_basis": "UTC Julian-day crossing search.",
+      "surfaces": ["python-library", "mcp"],
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": [], "note": "Crossing behavior is regression-tested; independent event-cell evidence is not registered."},
+      "tests": ["tests/test_ingress.py"],
+      "limitations": ["Moon is excluded and results follow the fixed sidereal model used by this module."]
+    },
+    {
+      "id": "derived.anandadi-yoga",
+      "title": "Anandadi Yoga",
+      "summary": "A weekday and Nakshatra table assigns one of the 28 Anandadi Yogas.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/special_yogas.py", "symbol": "compute_anandadi_yoga", "role": "owner"}
+      ],
+      "inputs": ["Vaaram", "Nakshatra"],
+      "outputs": ["Anandadi Yoga name"],
+      "time_basis": "Panchangam day and its active Nakshatra.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "The table is regression-tested but still belongs to the broader derived-classification locator gap."},
+      "tests": ["tests/test_anandadi.py"],
+      "limitations": ["The table is a named textual convention, not an astronomical observation."]
+    },
+    {
+      "id": "derived.bhadra-mukha-puchha",
+      "title": "Bhadra Mukha and Puchha windows",
+      "summary": "Vishti Karana duration is partitioned into Tithi-specific Bhadra face and tail windows.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/karana_windows.py", "symbol": "compute_bhadra_windows", "role": "owner"}
+      ],
+      "inputs": ["Tithi span", "Vishti Karana spans", "Ghati clock"],
+      "outputs": ["Bhadra Mukha window", "Bhadra Puchha window"],
+      "time_basis": "Observed Vishti duration expressed on the sunrise-anchored Ghati scale.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["panchangam.bhadra_mukha_puchha"], "note": "The verse mapping and computation contract are registered as verified."},
+      "tests": ["tests/test_bhadra_mukha_puchha.py"],
+      "limitations": ["This implements the registered Tithi/Yama mapping and does not blend conflicting published tables."]
+    },
+    {
+      "id": "derived.disha-shoola",
+      "title": "Disha Shoola direction",
+      "summary": "A weekday table returns the traditionally avoided travel direction.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/disha_shoola.py", "symbol": "disha_shoola", "role": "owner"}
+      ],
+      "inputs": ["Vaaram"],
+      "outputs": ["avoided travel direction"],
+      "time_basis": "Sunrise-anchored Panchangam weekday.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "The table is tested but its exact edition locator remains part of derived-classification debt."},
+      "tests": ["tests/test_disha_shoola.py"],
+      "limitations": ["Travel-direction rules vary by lineage and remedies are not automated."]
+    },
+    {
+      "id": "derived.ghati-clock",
+      "title": "Sunrise-anchored Ghati clock",
+      "summary": "The interval from sunrise to next sunrise is divided into 60 proportional Ghatis.",
+      "owning_layer": "derived",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/ghati.py", "symbol": "make_clock", "role": "owner"},
+        {"path": "telugu_panchangam/ghati.py", "symbol": "civil_to_ghati", "role": "owner"},
+        {"path": "telugu_panchangam/ghati.py", "symbol": "ghati_to_civil", "role": "owner"},
+        {"path": "telugu_panchangam/ghati.py", "symbol": "ghati_window", "role": "owner"}
+      ],
+      "inputs": ["sunrise", "next sunrise", "civil instant or Ghati value"],
+      "outputs": ["seconds per Ghati", "civil/Ghati conversion", "Ghati window"],
+      "time_basis": "Local sunrise to next local sunrise, divided into 60 equal parts.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Conversion behavior is tested; the textual use of scaled Ghatis is covered only in part."},
+      "tests": ["tests/test_ghati.py"],
+      "limitations": ["A Ghati is proportional to that local sunrise-to-sunrise interval, not fixed to civil minutes."]
+    },
+    {
+      "id": "derived.khar-maasa",
+      "title": "Khar Maasa classification",
+      "summary": "Solar sign classifies Dhanu or Meena periods as Khar Maasa.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/maasa_filters.py", "symbol": "khar_maasa_name", "role": "owner"}
+      ],
+      "inputs": ["solar rashi"],
+      "outputs": ["Khar Maasa name or null"],
+      "time_basis": "Solar rashi at the Panchangam-day snapshot.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "The classification is tested but remains under the broad locator gap."},
+      "tests": ["tests/test_khar_maasa.py"],
+      "limitations": ["Its effect depends on the activity profile; the flag alone is not an absolute verdict."]
+    },
+    {
+      "id": "derived.named-muhurtas",
+      "title": "Thirty named Muhurtas",
+      "summary": "Day and night are each divided into fifteen named proportional Muhurtas.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/muhurtas.py", "symbol": "named_muhurtas", "role": "owner"},
+        {"path": "src/data/muhurtas.ts", "symbol": "MUHURTA_DAY", "role": "mirror"}
+      ],
+      "inputs": ["sunrise", "sunset", "next sunrise"],
+      "outputs": ["30 named day/night windows and dispositions"],
+      "time_basis": "Fifteen equal day parts and fifteen equal night parts.",
+      "surfaces": ["python-library", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": [], "note": "The checked table is maintained in docs/reference/07-muhurta-table.md and parity-tested."},
+      "tests": ["tests/test_named_muhurtas.py"],
+      "limitations": ["Names and dispositions follow the project's verified table; other almanacs may label variants differently."]
+    },
+    {
+      "id": "derived.nakshatra-mukha",
+      "title": "Nakshatra Mukha direction",
+      "summary": "Nakshatras are classified as Adho, Urdhva, or Tiryan Mukha.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/nakshatra_filters.py", "symbol": "nakshatra_mukha", "role": "owner"}
+      ],
+      "inputs": ["Nakshatra name"],
+      "outputs": ["Mukha direction or null"],
+      "time_basis": "Active Nakshatra at the evaluated day or slot.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Classification behavior is tested; exact source locators remain incomplete."},
+      "tests": ["tests/test_mukha_nakshatra.py"],
+      "limitations": ["The direction is an activity input, not a general day-quality score."]
+    },
+    {
+      "id": "derived.panchaka-nakshatra",
+      "title": "Panchaka Nakshatra flag",
+      "summary": "Dhanishtha through Revati are marked for activity-specific Panchaka restrictions.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/nakshatra_filters.py", "symbol": "is_panchaka_nakshatra", "role": "owner"}
+      ],
+      "inputs": ["Nakshatra name"],
+      "outputs": ["Panchaka membership boolean"],
+      "time_basis": "Active Nakshatra.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "The set is tested; individual activity consequences have separate provenance where available."},
+      "tests": ["tests/test_panchaka_nakshatras.py"],
+      "limitations": ["Restrictions are activity-specific and should not be presented as a universal prohibition."]
+    },
+    {
+      "id": "derived.panchaka-rahita",
+      "title": "Panchaka Rahita remainder",
+      "summary": "Tithi, Vaaram, Nakshatra, and Lagna ordinals are summed modulo nine to classify dosha.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/panchaka.py", "symbol": "get_panchaka_remainder", "role": "owner"},
+        {"path": "telugu_panchangam/panchaka.py", "symbol": "evaluate_panchaka", "role": "owner"}
+      ],
+      "inputs": ["Tithi", "Vaaram", "Nakshatra", "Lagna"],
+      "outputs": ["remainder", "dosha name", "auspicious flag", "activity cautions"],
+      "time_basis": "Sunrise snapshot for the day field; recomputed at slot Lagna for Muhurtam.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["panchangam.panchaka_rahita"], "note": "Formula and remainder meanings have registered source evidence."},
+      "tests": ["tests/test_panchaka_rahita.py"],
+      "limitations": ["Ordinal naming and activity cautions follow the registered convention."]
+    },
+    {
+      "id": "derived.panchanga-shuddhi",
+      "title": "Five-limb Panchanga Shuddhi",
+      "summary": "Tithi, Vaaram, Nakshatra, Yoga, and Karana are individually graded and counted.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/panchanga_shuddhi.py", "symbol": "assess_shuddhi", "role": "owner"}
+      ],
+      "inputs": ["PanchangamDay five limbs"],
+      "outputs": ["per-limb assessment", "0-5 Shuddhi count", "summary verdict"],
+      "time_basis": "Panchangam day at sunrise.",
+      "surfaces": ["python-library", "mcp"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchanga_shuddhi.five_limb_count"], "note": "The implemented count and tables are tested; the exact textual locator remains open."},
+      "tests": ["tests/test_panchanga_shuddhi.py"],
+      "limitations": ["A five-limb count is not a complete personal election chart."]
+    },
+    {
+      "id": "derived.pitru-paksha",
+      "title": "Pitru Paksha flag",
+      "summary": "Bhadrapada Krishna Paksha is classified as the ancestral fortnight.",
+      "owning_layer": "derived",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/pitru_paksha.py", "symbol": "is_pitru_paksha_day", "role": "owner"}
+      ],
+      "inputs": ["Maasam", "Paksham"],
+      "outputs": ["Pitru Paksha boolean"],
+      "time_basis": "Telugu Amanta month and fortnight for the Panchangam day.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "The Telugu regional convention is tested but not yet claim-located independently."},
+      "tests": ["tests/test_pitru_paksha.py"],
+      "limitations": ["Other regional month conventions can place the named fortnight differently."]
+    },
+    {
+      "id": "derived.sankramana-avoidance",
+      "title": "Sankramana avoidance window",
+      "summary": "A symmetric sixteen-Ghati interval is placed around exact solar ingress.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/sankramana.py", "symbol": "compute_sankramana_window", "role": "owner"}
+      ],
+      "inputs": ["solar ingress instant", "Ghati clock"],
+      "outputs": ["avoidance start and end"],
+      "time_basis": "Sixteen proportional Ghatis before and after ingress.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["panchangam.sankramana_avoidance"], "note": "The duration and placement have registered textual evidence."},
+      "tests": ["tests/test_sankramana_window.py"],
+      "limitations": ["The window is a textual election rule, not uncertainty around the astronomical crossing."]
+    },
+    {
+      "id": "derived.special-yogas",
+      "title": "Vaaram-Tithi-Nakshatra special Yogas",
+      "summary": "Table rules identify Sarvartha Siddhi, Amrita Siddhi, Siddha, Visha, Dagdha, and Pushkara Yogas.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/special_yogas.py", "symbol": "get_special_yogas", "role": "owner"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "muSpecialYogasAt", "role": "mirror"}
+      ],
+      "inputs": ["Vaaram", "Tithi", "Nakshatra"],
+      "outputs": ["list of applicable special Yoga names"],
+      "time_basis": "Evaluated at the day snapshot and again at slot time where supported.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Python/browser parity is tested, while some table locators remain open."},
+      "tests": ["tests/test_special_yogas.py", "tests/test_activity_surface_parity.py"],
+      "limitations": ["Named Yogas with similar names in other traditions are not inferred beyond these exact tables."]
+    },
+    {
+      "id": "derived.vishaghati",
+      "title": "Nakshatra Vishaghati windows",
+      "summary": "Nakshatra-specific poison-Ghati offsets produce clipped civil-time windows.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/karana_windows.py", "symbol": "compute_vishaghati", "role": "owner"}
+      ],
+      "inputs": ["Nakshatra spans", "Ghati clock", "day bounds"],
+      "outputs": ["Vishaghati windows in civil time and Ghatis"],
+      "time_basis": "Nakshatra duration mapped to the sunrise-anchored Ghati scale.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Offsets and clipping are tested; claim-level source coverage remains grouped with mixed daily windows."},
+      "tests": ["tests/test_vishaghati.py"],
+      "limitations": ["The selected offset table is tradition-specific."]
+    },
+    {
+      "id": "gochara.graha-positions",
+      "title": "Nine-graha sidereal positions",
+      "summary": "Sidereal longitude produces rashi, Nakshatra, Pada, retrograde state, and next ingress for nine grahas.",
+      "owning_layer": "calendar",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/gochara/positions.py", "symbol": "graha_positions", "role": "owner"}
+      ],
+      "inputs": ["Julian day", "ayanamsa"],
+      "outputs": ["longitude", "rashi", "Nakshatra", "Pada", "retrograde", "next ingress date"],
+      "time_basis": "Requested Julian day, normally local sunrise for daily surfaces.",
+      "surfaces": ["python-library", "mcp", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["drik.sidereal_positions"], "note": "The same Drik longitude evidence boundary applies to these derived fields."},
+      "tests": ["tests/test_graha_positions.py"],
+      "limitations": ["Rahu and Ketu use the selected node convention; next-ingress dates are numerical search results."]
+    },
+    {
+      "id": "gochara.named-shani-conditions",
+      "title": "Named Shani transit conditions",
+      "summary": "Saturn's house from Janma Rashi is labeled as Sade Sati, Ashtama Shani, or Ardhastama Shani where applicable.",
+      "owning_layer": "personal",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/gochara/rules.py", "symbol": "named_conditions", "role": "owner"},
+        {"path": "src/shani-conditions.ts", "symbol": "shaniConditionFromMoonHouse", "role": "mirror"}
+      ],
+      "inputs": ["Janma Rashi", "current Saturn rashi"],
+      "outputs": ["named Shani condition and phase"],
+      "time_basis": "Transit snapshot relative to natal Moon sign.",
+      "surfaces": ["python-library", "mcp", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["partially_verified"], "claim_ids": ["gochara.named_shani_conditions"], "note": "Underlying adverse houses have support; conventional names and phases are explicitly bounded."},
+      "tests": ["tests/test_gochara_rules.py", "src/__tests__/shani-conditions.test.ts"],
+      "limitations": ["Names and phase labels are conventional presentation and not a complete natal transit judgment."]
+    },
+    {
+      "id": "gochara.transit-verdicts",
+      "title": "Gochara transit verdicts and Vedha",
+      "summary": "Each graha's house from Janma Rashi is assessed against favourable houses and Vedha blocking rules.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/gochara/rules.py", "symbol": "gochara_for", "role": "owner"},
+        {"path": "src/panels/gochara.ts", "symbol": "renderGochara", "role": "mirror"}
+      ],
+      "inputs": ["Janma Rashi", "current graha rashis"],
+      "outputs": ["house", "favourable boolean", "Vedha blocker", "verdict"],
+      "time_basis": "Daily transit snapshot relative to natal Moon sign.",
+      "surfaces": ["python-library", "mcp", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["gochara.favourable_houses", "gochara.vedha_tables", "gochara.nodes"], "note": "Classical house and Vedha tables are claim-located; disclosed node handling is separately registered."},
+      "tests": ["tests/test_gochara_rules.py", "tests/test_gochara_provenance.py"],
+      "limitations": ["This is Moon-sign Gochara, not a full natal-chart or Dasha interpretation."]
+    },
+    {
+      "id": "interpretation.daily-rasi-phalalu-deterministic",
+      "title": "Deterministic daily Rasi Phalalu",
+      "summary": "Computed Gochara facts are rendered into deterministic daily reading text.",
+      "owning_layer": "interpretation",
+      "claim_kind": "project-heuristic",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/phalalu.py", "symbol": "rasi_phalalu", "role": "owner"},
+        {"path": "src/panels/gochara.ts", "symbol": "buildPhalalu", "role": "mirror"}
+      ],
+      "inputs": ["Janma Rashi", "computed graha positions", "Gochara verdicts"],
+      "outputs": ["deterministic explanatory reading"],
+      "time_basis": "Daily transit snapshot.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["verified", "heuristic"], "claim_ids": ["gochara.favourable_houses", "gochara.vedha_tables"], "note": "Transit facts inherit verified rule tables; wording and synthesis remain project interpretation."},
+      "tests": ["tests/test_phalalu.py"],
+      "limitations": ["Narrative wording is interpretive and must not be treated as individualized professional advice."]
+    },
+    {
+      "id": "interpretation.daily-rasi-phalalu-generated",
+      "title": "Model-generated daily Rasi Phalalu",
+      "summary": "An external model produces prose that is checked against deterministic Gochara facts before acceptance.",
+      "owning_layer": "interpretation",
+      "claim_kind": "generated-interpretation",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/llm_phalalu.py", "symbol": "generate_rasi_phalalu", "role": "owner"},
+        {"path": "telugu_panchangam/personal/llm_phalalu.py", "symbol": "_verify", "role": "owner"}
+      ],
+      "inputs": ["date", "computed graha positions", "model response"],
+      "outputs": ["verified transit citations", "generated prose"],
+      "time_basis": "Daily generated-data batch for the supplied transit snapshot.",
+      "surfaces": ["website", "generated-data"],
+      "provenance": {"evidence_classes": ["project_heuristic"], "verification_states": ["heuristic"], "claim_ids": ["daily_horoscope.llm_interpretation"], "note": "Cited transit triples are checked; prose and advice are explicitly generated interpretation."},
+      "tests": ["tests/test_llm_phalalu_verify.py"],
+      "limitations": ["Verification prevents unsupported transit facts but cannot make generated prose a classical or professional authority."]
+    },
+    {
+      "id": "panchangam.abhijit-muhurta",
+      "title": "Abhijit Muhurta window",
+      "summary": "The midday auspicious interval is derived proportionally from daytime length, except on Wednesday.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._abhijit_muhurta", "role": "owner"}
+      ],
+      "inputs": ["sunrise", "sunset", "weekday"],
+      "outputs": ["Abhijit start/end or null"],
+      "time_basis": "Proportional local daytime centered on solar midday.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative published values are checked; the full textual locator set is incomplete."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["Wednesday omission follows the selected convention."]
+    },
+    {
+      "id": "panchangam.amrita-kalam",
+      "title": "Amrita Kalam windows",
+      "summary": "Nakshatra-specific Ghati offsets produce auspicious sub-windows.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "nakshatra_day_windows", "role": "owner"}
+      ],
+      "inputs": ["Nakshatra spans", "Amrita offset table", "day bounds"],
+      "outputs": ["Amrita Kalam windows"],
+      "time_basis": "Four-sixtieths of actual Nakshatra duration at the table offset.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative values are compared; the table's full locator coverage remains incomplete."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["Offsets follow one maintained table and are clipped to the Panchangam day convention."]
+    },
+    {
+      "id": "panchangam.ayanam-rituvu",
+      "title": "Ayanam and Rituvu",
+      "summary": "Solar position classifies the half-year and six seasonal names.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "ayanam_name", "role": "owner"},
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "rituvu_name", "role": "owner"}
+      ],
+      "inputs": ["solar sign or tropical solar longitude"],
+      "outputs": ["Ayanam", "Rituvu"],
+      "time_basis": "Solar position at sunrise.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "Calendar semantics need more exact source locators."},
+      "tests": ["tests/test_drik_engine.py"],
+      "limitations": ["Rituvu uses tropical solar longitude while other fields are predominantly sidereal."]
+    },
+    {
+      "id": "panchangam.brahma-muhurta",
+      "title": "Brahma Muhurta window",
+      "summary": "A fixed pre-sunrise interval identifies Brahma Muhurta.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._brahma_muhurta", "role": "owner"}
+      ],
+      "inputs": ["sunrise instant"],
+      "outputs": ["Brahma Muhurta start/end"],
+      "time_basis": "Fixed civil interval before local sunrise.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative published values are checked; textual coverage remains grouped."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["The fixed-minute implementation does not scale this window by seasonal day length."]
+    },
+    {
+      "id": "panchangam.choghadiya",
+      "title": "Day and night Choghadiya",
+      "summary": "Weekday-specific sequences label eight proportional day and night segments.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._choghadiya", "role": "owner"},
+        {"path": "src/panels/today.ts", "symbol": "nightChoghadiya", "role": "owner"}
+      ],
+      "inputs": ["weekday", "sunrise", "sunset", "next sunrise"],
+      "outputs": ["named proportional day and night windows"],
+      "time_basis": "Eight equal local-day parts and eight equal local-night parts.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Day values have representative comparisons; browser-owned night extension is regression-tested through UI contracts."},
+      "tests": ["tests/test_muhurta_windows.py", "tests/test_browser_smoke.py"],
+      "limitations": ["The browser computes the night sequence separately from the Python day sequence."]
+    },
+    {
+      "id": "panchangam.durmuhurtham",
+      "title": "Durmuhurtham windows",
+      "summary": "Weekday tables select proportional daytime Muhurtas plus the Tuesday night exception.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._durmuhurtham", "role": "owner"}
+      ],
+      "inputs": ["weekday", "sunrise", "sunset", "next sunrise"],
+      "outputs": ["one or more Durmuhurtham windows"],
+      "time_basis": "Selected fifteenths of local day or night.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative values are compared; exact table locators remain grouped."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["The Tuesday night exception requires next-sunrise context."]
+    },
+    {
+      "id": "panchangam.eclipse-sutak",
+      "title": "Daily eclipse and Sutak field",
+      "summary": "The range-calendar eclipse result is attached to the local Panchangam day.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine.calculate", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine.calculate", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine.calculate", "role": "owner"}
+      ],
+      "inputs": ["date", "location", "calendar eclipse result"],
+      "outputs": ["PanchangamDay.eclipse"],
+      "time_basis": "Local Panchangam date with UTC event instants converted for presentation.",
+      "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.eclipse_events"], "note": "This is the daily projection of the canonical eclipse calculation."},
+      "tests": ["tests/test_eclipses.py", "tests/test_integration.py"],
+      "limitations": ["This record owns attachment to the day; event calculation is separately inventoried."]
+    },
+    {
+      "id": "panchangam.festivals",
+      "title": "Festival date rules",
+      "summary": "Moment-specific Amanta month, Tithi, weekday, and specialty rules select named festivals.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._festivals", "role": "owner"}
+      ],
+      "inputs": ["Maasam", "Tithi at deciding moments", "weekday", "adjacent-day facts"],
+      "outputs": ["festival names"],
+      "time_basis": "Festival-specific sunrise, Madhyahna, Aparahna, Pradosha, Nishita, or moonrise rule.",
+      "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["published_panchangam", "regional_convention"], "verification_states": ["partially_verified"], "claim_ids": ["festivals.forward_year_2027_2028"], "note": "Individual 2026 rules have comparisons; the forward-year fixture contains mixed independent and engine-pinned cells."},
+      "tests": ["tests/test_festivals.py", "tests/test_festivals_forward_year.py"],
+      "limitations": ["The table follows documented Telugu conventions and is not a universal regional festival calendar."]
+    },
+    {
+      "id": "panchangam.gulika-kalam",
+      "title": "Gulika Kalam",
+      "summary": "A weekday table selects one of eight proportional daytime segments.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._gulika_kalam", "role": "owner"}
+      ],
+      "inputs": ["weekday", "sunrise", "sunset"],
+      "outputs": ["Gulika Kalam start/end"],
+      "time_basis": "One eighth of local sunrise-to-sunset daytime.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative city/date values are independently compared."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["Weekday-part tables are conventional and location-specific through sunrise/sunset."]
+    },
+    {
+      "id": "panchangam.karana",
+      "title": "Karana spans",
+      "summary": "Each six-degree Moon-Sun elongation interval is mapped to fixed or repeating Karana names.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._karana_spans", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine._karana_spans", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine._karana_spans", "role": "owner"}
+      ],
+      "inputs": ["Moon-Sun elongation over the Panchangam day"],
+      "outputs": ["Karana names and boundary instants"],
+      "time_basis": "Sunrise-anchored day with crossings solved in UTC Julian day.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
+      "limitations": ["Boundary times inherit the selected engine's longitude model."]
+    },
+    {
+      "id": "panchangam.maasam-paksham",
+      "title": "Amanta Maasam and Paksham",
+      "summary": "Bounding new moons and solar signs determine lunar month, Adhika/Nija status, and fortnight.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "maasam_name", "role": "owner"},
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._maasam", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine._maasam", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine._maasam", "role": "owner"}
+      ],
+      "inputs": ["Moon-Sun elongation", "solar longitude", "sunrise"],
+      "outputs": ["Amanta month", "Adhika/Nija prefix", "Shukla/Krishna Paksham"],
+      "time_basis": "Month at local sunrise bounded by engine-specific new moons.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual", "regional_convention"], "verification_states": ["needs_locator", "engine_pinned"], "claim_ids": ["panchangam.calendar_semantics", "panchangam.non_drik_engine_outputs"], "note": "Semantics need exact locators; non-Drik month outputs are regression-pinned."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_adhika_maasa_muhurta.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
+      "limitations": ["The project follows Telugu Amanta conventions; Purnimanta calendars differ."]
+    },
+    {
+      "id": "panchangam.nakshatra",
+      "title": "Nakshatra and Pada",
+      "summary": "Sidereal lunar longitude selects one of 27 Nakshatras and one of four Padas.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._nakshatra_span", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine._nakshatra_span", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine._nakshatra_span", "role": "owner"}
+      ],
+      "inputs": ["engine lunar longitude"],
+      "outputs": ["Nakshatra name", "start/end", "Pada"],
+      "time_basis": "Active at local sunrise with UTC boundary crossings.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_pada_on_daily.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
+      "limitations": ["Names and boundaries inherit engine and ayanamsa choices."]
+    },
+    {
+      "id": "panchangam.nitya-yoga",
+      "title": "Nitya Yoga span",
+      "summary": "The normalized sum of solar and lunar longitude selects one of 27 Nitya Yogas.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._yoga_span", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine._yoga_span", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine._yoga_span", "role": "owner"}
+      ],
+      "inputs": ["solar longitude", "lunar longitude"],
+      "outputs": ["Nitya Yoga name and boundary"],
+      "time_basis": "Active at local sunrise with UTC crossing search.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
+      "limitations": ["This is the 27-part Nitya Yoga, not every other named Yoga vocabulary."]
+    },
+    {
+      "id": "panchangam.rahu-kalam",
+      "title": "Rahu Kalam",
+      "summary": "A weekday table selects one of eight proportional daytime segments.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._rahu_kalam", "role": "owner"}
+      ],
+      "inputs": ["weekday", "sunrise", "sunset"],
+      "outputs": ["Rahu Kalam start/end"],
+      "time_basis": "One eighth of local sunrise-to-sunset daytime.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative city/date values are independently compared."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["Weekday-part tables are conventional and location-specific through sunrise/sunset."]
+    },
+    {
+      "id": "panchangam.rashi",
+      "title": "Solar and lunar Rashi",
+      "summary": "Thirty-degree sidereal longitude sectors determine solar and lunar signs.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine.calculate", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine.calculate", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine.calculate", "role": "owner"}
+      ],
+      "inputs": ["engine solar and lunar longitude"],
+      "outputs": ["solar Rashi", "lunar Rashi"],
+      "time_basis": "Longitude at local sunrise.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparison evidence; non-Drik outputs are engine-pinned."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
+      "limitations": ["Signs follow the selected engine and ayanamsa conventions."]
+    },
+    {
+      "id": "panchangam.rise-set",
+      "title": "Sunrise, sunset, moonrise, and moonset",
+      "summary": "Swiss Ephemeris rise/transit searches produce local sky-marker instants.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/utils.py", "symbol": "get_sunrise", "role": "owner"},
+        {"path": "telugu_panchangam/engines/utils.py", "symbol": "get_sunset", "role": "owner"},
+        {"path": "telugu_panchangam/engines/utils.py", "symbol": "get_moonrise", "role": "owner"},
+        {"path": "telugu_panchangam/engines/utils.py", "symbol": "get_moonset", "role": "owner"}
+      ],
+      "inputs": ["date", "latitude", "longitude"],
+      "outputs": ["UTC rise/set instants rendered in local timezone"],
+      "time_basis": "Search from local-midnight Julian day with observer coordinates.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["drik.sidereal_positions"], "note": "Representative Drik day cells are compared; rise/set coverage is not exhaustive."},
+      "tests": ["tests/test_utils.py", "tests/test_drik_engine.py"],
+      "limitations": ["Atmospheric and horizon assumptions come from Swiss Ephemeris defaults."]
+    },
+    {
+      "id": "panchangam.samvatsara",
+      "title": "Samvatsara name",
+      "summary": "Elapsed Kali-era solar years and the current lunar month map to the 60-year Telugu cycle.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "samvatsara_name", "role": "owner"},
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._samvatsara", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine._samvatsara", "role": "owner"}
+      ],
+      "inputs": ["Julian day", "Maasam"],
+      "outputs": ["60-year-cycle name"],
+      "time_basis": "Year flips at Chaitra under the southern Chaitradi convention.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "Expected years are regression-tested; epoch/offset semantics need exact source documentation."},
+      "tests": ["tests/test_samvatsara.py"],
+      "limitations": ["Cycle anchoring follows the documented Telugu Chaitradi convention."]
+    },
+    {
+      "id": "panchangam.sankramana-day",
+      "title": "Daily Sankramana assignment",
+      "summary": "Exact solar ingress is assigned to a Panchangam day with the project's after-sunset convention.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._sankramanam_name_and_jd", "role": "owner"}
+      ],
+      "inputs": ["sunrise", "sunset", "solar longitude crossing"],
+      "outputs": ["entered Rashi", "ingress Julian day", "Sankranti flag"],
+      "time_basis": "Ingress after local sunset is assigned to the next Panchangam day.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "Crossing code is tested; day-assignment semantics need exact locator evidence."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py"],
+      "limitations": ["Day assignment is conventional and distinct from the astronomical crossing instant."]
+    },
+    {
+      "id": "panchangam.slot-facts",
+      "title": "Per-instant Panchangam facts",
+      "summary": "Active Tithi, Nakshatra, Yoga, Karana, lunar Rashi, Vaaram, and special Yogas are recomputed for a slot.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine.facts_at", "role": "owner"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "muFactsAt", "role": "mirror"}
+      ],
+      "inputs": ["instant", "location", "engine longitude functions", "sunrise-anchored Vaaram"],
+      "outputs": ["slot-time Panchangam facts"],
+      "time_basis": "Exact evaluated instant; Vaaram remains anchored to the Panchangam sunrise day.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Slot facts inherit the evidence state of the selected engine and calendar semantics."},
+      "tests": ["tests/test_engine_facts_at.py", "tests/test_activity_surface_parity.py"],
+      "limitations": ["The browser mirror currently implements Drik/Lahiri only for slot scoring."]
+    },
+    {
+      "id": "panchangam.special-lunar-days",
+      "title": "Ekadashi, Amavasya, Pournami, and Pradosham flags",
+      "summary": "Sunrise and deciding-moment Tithi rules assign recurring lunar observances and Ekadashi names.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "ekadashi_name", "role": "owner"},
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._special_flags", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine._special_flags", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine._special_flags", "role": "owner"},
+        {"path": "src/panels/today.ts", "symbol": "ekadashiName", "role": "mirror"}
+      ],
+      "inputs": ["Maasam", "Paksham", "Tithi at deciding moments", "weekday", "solar sign"],
+      "outputs": ["observance flags", "Ekadashi name"],
+      "time_basis": "Panchangam-day deciding moments; names use Telugu Amanta convention.",
+      "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["published_panchangam", "regional_convention"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["festivals.forward_year_2027_2028", "panchangam.non_drik_engine_outputs"], "note": "Drik has representative comparisons; non-Drik flags are regression-pinned."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_festivals.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
+      "limitations": ["Naming and deciding moments follow documented Telugu conventions."]
+    },
+    {
+      "id": "panchangam.tithi",
+      "title": "Tithi span",
+      "summary": "Moon-Sun elongation is divided into thirty twelve-degree lunar days with solved boundaries.",
+      "owning_layer": "engine-core",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine._tithi_span", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine._tithi_span", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine._tithi_span", "role": "owner"}
+      ],
+      "inputs": ["engine solar longitude", "engine lunar longitude"],
+      "outputs": ["Tithi name", "start", "end"],
+      "time_basis": "Active at local sunrise with boundary crossings solved in UTC Julian day.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
+      "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
+      "limitations": ["Boundary times differ by engine model and ayanamsa."]
+    },
+    {
+      "id": "panchangam.vaaram",
+      "title": "Sunrise-anchored Vaaram",
+      "summary": "The weekday is selected for the Panchangam day and remains constant until the next sunrise.",
+      "owning_layer": "engine-core",
+      "claim_kind": "regional-convention",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/drik.py", "symbol": "DrikGanitaEngine.calculate", "role": "owner"},
+        {"path": "telugu_panchangam/engines/surya_siddhanta.py", "symbol": "SuryaSiddhantaEngine.calculate", "role": "owner"},
+        {"path": "telugu_panchangam/engines/vakya.py", "symbol": "VakyaEngine.calculate", "role": "owner"}
+      ],
+      "inputs": ["local Panchangam date and sunrise"],
+      "outputs": ["Vaaram name"],
+      "time_basis": "Sunrise-to-next-sunrise day, not civil midnight.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "The sunrise-day semantic is tested but needs an exact textual locator."},
+      "tests": ["tests/test_engine_facts_at.py", "tests/test_drik_engine.py"],
+      "limitations": ["Civil-midnight weekday expectations can differ before local sunrise."]
+    },
+    {
+      "id": "panchangam.varjyam",
+      "title": "Varjyam windows",
+      "summary": "Nakshatra-specific Tyajya Ghati offsets produce inauspicious sub-windows.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "nakshatra_ghati_window", "role": "owner"},
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "nakshatra_day_windows", "role": "owner"}
+      ],
+      "inputs": ["Nakshatra spans", "Varjyam offset table", "day bounds"],
+      "outputs": ["Varjyam windows"],
+      "time_basis": "Four-sixtieths of actual Nakshatra duration at the table offset.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative values are compared; the table's full locator coverage remains incomplete."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["Offsets follow one maintained table and are clipped to the Panchangam day convention."]
+    },
+    {
+      "id": "panchangam.yamagandam",
+      "title": "Yamagandam",
+      "summary": "A weekday table selects one of eight proportional daytime segments.",
+      "owning_layer": "engine-core",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine._yamagandam", "role": "owner"}
+      ],
+      "inputs": ["weekday", "sunrise", "sunset"],
+      "outputs": ["Yamagandam start/end"],
+      "time_basis": "One eighth of local sunrise-to-sunset daytime.",
+      "surfaces": ["python-library", "mcp", "ics", "website"],
+      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative city/date values are independently compared."},
+      "tests": ["tests/test_muhurta_windows.py"],
+      "limitations": ["Weekday-part tables are conventional and location-specific through sunrise/sunset."]
+    },
+    {
+      "id": "personal.chandrabalam",
+      "title": "Chandrabalam",
+      "summary": "The Moon's house from Janma Rashi is classified for favourability and Puja exceptions.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "chandra_position", "role": "owner"},
+        {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "chandra_verdict", "role": "owner"},
+        {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "rasi_from_nakshatra", "role": "owner"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "chandraOf", "role": "mirror"},
+        {"path": "src/data/rasis.ts", "symbol": "rasiFromStar", "role": "mirror"}
+      ],
+      "inputs": ["Janma Rashi or birth Nakshatra/Pada", "day lunar Rashi"],
+      "outputs": ["house number", "verdict", "favourability"],
+      "time_basis": "Day or slot lunar Rashi relative to natal Moon sign.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Python/browser behavior is tested; exact source locators for the full verdict vocabulary remain open."},
+      "tests": ["tests/test_chandrabalam.py", "tests/test_activity_surface_parity.py"],
+      "limitations": ["Nakshatra-to-Rashi without Pada can be ambiguous at sign boundaries."]
+    },
+    {
+      "id": "personal.homa-election",
+      "title": "Homahuti and Agnivasa election",
+      "summary": "Solar/lunar Nakshatra and Tithi/Vaaram remainders produce Homa offering guidance.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/homa.py", "symbol": "homahuti_group", "role": "owner"},
+        {"path": "telugu_panchangam/personal/homa.py", "symbol": "agnivasa_remainder", "role": "owner"},
+        {"path": "telugu_panchangam/personal/homa.py", "symbol": "homa_election", "role": "owner"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "muHomaElection", "role": "mirror"}
+      ],
+      "inputs": ["solar Nakshatra", "lunar Nakshatra", "Tithi", "Vaaram"],
+      "outputs": ["Homahuti group/lord", "Agnivasa remainder", "admission guidance"],
+      "time_basis": "Evaluated for the candidate slot.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["muhurta.homahuti"], "note": "The exact Homahuti and Agnivasa rules have registered locators."},
+      "tests": ["tests/test_yajna_evidence_audit.py", "tests/test_activity_surface_parity.py"],
+      "limitations": ["This is election guidance and does not replace ritual prerequisites or a qualified practitioner."]
+    },
+    {
+      "id": "personal.hora",
+      "title": "Planetary Hora windows",
+      "summary": "Chaldean order and weekday lord assign twelve day and twelve night planetary hours.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/lagna_hora.py", "symbol": "get_horas", "role": "owner"},
+        {"path": "src/panels/today.ts", "symbol": "computeHoras", "role": "mirror"}
+      ],
+      "inputs": ["Vaaram", "sunrise", "sunset", "next sunrise"],
+      "outputs": ["24 planetary Hora windows"],
+      "time_basis": "Twelve equal day parts and twelve equal night parts.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": [], "note": "Order and segmentation are parity-tested, but a claim-level source locator is not yet registered."},
+      "tests": ["tests/test_lagna_hora.py", "tests/test_browser_smoke.py"],
+      "limitations": ["Planetary favourability labels in the browser are presentation, not personalized Hora judgment."]
+    },
+    {
+      "id": "personal.lagna-strength",
+      "title": "Personal Lagna position and class",
+      "summary": "Candidate Lagna is measured from Janma Rashi and classified by mobility and favourable houses.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/lagna_position.py", "symbol": "lagna_class_of", "role": "owner"},
+        {"path": "telugu_panchangam/personal/lagna_position.py", "symbol": "lagna_position", "role": "owner"},
+        {"path": "telugu_panchangam/personal/lagna_position.py", "symbol": "lagna_verdict", "role": "owner"},
+        {"path": "src/muhurta-scorer.ts", "symbol": "muLagnaClassOf", "role": "mirror"},
+        {"path": "src/muhurta-scorer.ts", "symbol": "muLagnaPosition", "role": "mirror"}
+      ],
+      "inputs": ["Janma Rashi", "candidate Lagna Rashi"],
+      "outputs": ["relative house", "Lagna class", "verdict", "Ashtama flag"],
+      "time_basis": "Candidate slot Lagna relative to natal Rashi.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Parity and unit behavior are tested; broad Lagna verdict semantics need claim-level locators."},
+      "tests": ["tests/test_lagna_position.py", "src/scorer/__tests__/muhurta-scorer.test.ts"],
+      "limitations": ["This house-only strength is not a complete election-chart Lagna assessment."]
+    },
+    {
+      "id": "personal.lagna-transitions",
+      "title": "Daily Lagna transitions",
+      "summary": "Swiss Ephemeris houses and bisection locate ascendant sign changes through the day.",
+      "owning_layer": "personal",
+      "claim_kind": "deterministic-fact",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/lagna_hora.py", "symbol": "get_lagna_transitions", "role": "owner"},
+        {"path": "src/panels/today.ts", "symbol": "lagnaSegments", "role": "mirror"}
+      ],
+      "inputs": ["date", "location", "sunrise", "next sunrise"],
+      "outputs": ["Lagna Rashi transition windows"],
+      "time_basis": "Local sunrise-to-next-sunrise with UTC bisection of ascendant crossings.",
+      "surfaces": ["python-library", "mcp", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": [], "note": "Transitions are numerically and integration tested; independent city/date comparison cells are not registered."},
+      "tests": ["tests/test_lagna_hora.py", "tests/test_lagna_json_builder.py"],
+      "limitations": ["The browser mirror renders generated transitions; it does not independently recompute the ascendant."]
+    },
+    {
+      "id": "personal.muhurta-activity-profiles",
+      "title": "Activity-specific Muhurta profiles",
+      "summary": "Source-profile rule tables define admissions, exclusions, preferences, and manual checks per activity.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/activity_rules.py", "symbol": "ACTIVITY_RULES", "role": "owner"},
+        {"path": "telugu_panchangam/personal/activity_rules.py", "symbol": "get_activity_rules", "role": "owner"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "MU_ACTIVITY", "role": "mirror"}
+      ],
+      "inputs": ["activity identifier"],
+      "outputs": ["automated constraints", "ranking preferences", "manual checks", "provenance identifier"],
+      "time_basis": "Rules are applied to each candidate day and slot.",
+      "surfaces": ["python-library", "mcp", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["needs_locator", "verified", "heuristic", "contradicted"], "claim_ids": ["muhurta.activity_rules"], "note": "The umbrella claim points to the claim-level activity records, whose states range from verified to explicit heuristic or conflict."},
+      "tests": ["tests/test_activity_provenance_contract.py", "tests/test_activity_rules_export.py", "tests/test_activity_surface_parity.py"],
+      "limitations": ["Each activity's evidence state must be read from its own provenance claim; this umbrella record is not a blanket verification claim."]
+    },
+    {
+      "id": "personal.muhurta-slot-ranking",
+      "title": "Muhurta day diagnosis and slot ranking",
+      "summary": "Hard exclusions, time-window subtraction, personal strengths, textual preferences, and disclosed heuristics produce ranked slots.",
+      "owning_layer": "personal",
+      "claim_kind": "project-heuristic",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/muhurta.py", "symbol": "diagnose_day", "role": "owner"},
+        {"path": "telugu_panchangam/personal/muhurta.py", "symbol": "day_slots", "role": "owner"},
+        {"path": "telugu_panchangam/personal/muhurta.py", "symbol": "night_slots", "role": "owner"},
+        {"path": "telugu_panchangam/personal/muhurta.py", "symbol": "assign_tiers", "role": "owner"},
+        {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_tara", "role": "owner"},
+        {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_chandra", "role": "owner"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "findMuhurta", "role": "mirror"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "muAssignTiers", "role": "mirror"},
+        {"path": "src/muhurta-scorer.ts", "symbol": "computePersonalDosha", "role": "mirror"},
+        {"path": "src/muhurta-scorer.ts", "symbol": "computeDayDosha", "role": "mirror"}
+      ],
+      "inputs": ["Panchangam days", "activity profile", "birth profiles", "travel direction", "slot duration"],
+      "outputs": ["day diagnosis", "candidate slots", "scores", "relative tiers", "reasons", "manual checks"],
+      "time_basis": "Day and night candidate windows evaluated using per-slot Panchangam facts.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["heuristic"], "claim_ids": ["muhurta.any.shared_scoring", "muhurta.relative_tiers"], "note": "Activity gates may have verified sources, but aggregate scores and relative tier bands are disclosed project heuristics."},
+      "tests": ["tests/test_muhurta_finder.py", "tests/test_muhurta_lagna_integration.py", "src/scorer/__tests__/muhurta-scorer.test.ts"],
+      "limitations": ["Relative rankings mean best available under the inputs, not absolute scriptural quality or professional advice."]
+    },
+    {
+      "id": "personal.nitya-yoga-disposition",
+      "title": "Nitya Yoga disposition",
+      "summary": "Each of the 27 Nitya Yogas is classified for slot scoring and partial-window cautions.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/nitya_yoga.py", "symbol": "nitya_disposition", "role": "owner"},
+        {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_nitya_yoga", "role": "owner"}
+      ],
+      "inputs": ["Nitya Yoga name", "slot start", "Yoga span"],
+      "outputs": ["disposition", "score adjustment", "hard/partial caution"],
+      "time_basis": "Active Yoga and candidate slot instant.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Disposition and partial-window behavior are tested; exact claim locators remain open."},
+      "tests": ["tests/test_muhurta_finder.py"],
+      "limitations": ["Disposition is one input to Muhurta ranking, not a standalone election verdict."]
+    },
+    {
+      "id": "personal.tarabalam",
+      "title": "Tarabalam",
+      "summary": "Cyclic distance from Janma Nakshatra produces one of nine Tara names and favourability.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "tara_number", "role": "owner"},
+        {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "tara_name", "role": "owner"},
+        {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "taras_for_day", "role": "owner"},
+        {"path": "src/panels/tarabalam.ts", "symbol": "taraOf", "role": "mirror"}
+      ],
+      "inputs": ["Janma Nakshatra", "day or slot Nakshatra"],
+      "outputs": ["Tara number", "Tara name", "favourability"],
+      "time_basis": "Active day or slot Nakshatra relative to birth Nakshatra.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Formula and browser parity are tested; a claim-specific exact locator is not yet registered."},
+      "tests": ["tests/test_tarabalam.py", "tests/test_activity_surface_parity.py"],
+      "limitations": ["Tarabalam is one personal factor and should not be presented as a complete Muhurta judgment."]
+    },
+    {
+      "id": "personal.tithi-family",
+      "title": "Fivefold Tithi family",
+      "summary": "Tithi ordinal cycles through Nanda, Bhadra, Jaya, Rikta, and Purna families.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/tithi_class.py", "symbol": "tithi_family", "role": "owner"},
+        {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_tithi_class", "role": "owner"},
+        {"path": "src/muhurta-scorer.ts", "symbol": "muTithiFamily", "role": "mirror"},
+        {"path": "src/muhurta-scorer.ts", "symbol": "muScoreTithiClass", "role": "mirror"}
+      ],
+      "inputs": ["Tithi name", "activity preference or exclusion"],
+      "outputs": ["family name", "Rikta flag", "score or exclusion reason"],
+      "time_basis": "Active day or slot Tithi.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Family mapping and parity are tested; exact source coverage remains broad."},
+      "tests": ["tests/test_muhurta_finder.py", "src/scorer/__tests__/muhurta-scorer.test.ts"],
+      "limitations": ["Activity-specific use must come from the selected profile rather than a universal family ranking."]
+    },
+    {
+      "id": "panchangam.graha-maudhya",
+      "title": "Daily Guru and Shukra Maudhya",
+      "summary": "Shortest-arc Sun-planet elongation is compared with configured combustion thresholds.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/gochara/combustion.py", "symbol": "compute_maudhya", "role": "owner"}
+      ],
+      "inputs": ["graha", "solar longitude", "planetary longitude"],
+      "outputs": ["elongation", "threshold", "combust boolean"],
+      "time_basis": "Drik snapshot at local sunrise.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Numerical behavior is tested; exact threshold locators remain under derived-classification debt."},
+      "tests": ["tests/test_maudhya.py"],
+      "limitations": ["Only Drik populates outer-planet Maudhya in PanchangamDay."]
+    },
+    {
+      "id": "panchangam.simha-stha",
+      "title": "Simha-stha Guru and Shukra",
+      "summary": "Jupiter or Venus in Simha is flagged for activity-specific restrictions.",
+      "owning_layer": "derived",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/gochara/simha_stha.py", "symbol": "is_simha_stha", "role": "owner"}
+      ],
+      "inputs": ["Guru or Shukra Rashi"],
+      "outputs": ["Simha-stha boolean"],
+      "time_basis": "Drik snapshot at local sunrise.",
+      "surfaces": ["python-library", "mcp", "website"],
+      "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Flag behavior is tested; exact scope and source locator remain open."},
+      "tests": ["tests/test_simha_stha.py"],
+      "limitations": ["Only Drik models the required planets; activity consequences are profile-specific."]
+    }
+  ]
+}
