@@ -1,8 +1,8 @@
 # Documentation standard
 
 This repository is the **canonical source** for Telugu Calendar Utilities
-documentation. A future documentation website is a generated projection of
-selected committed files; it must never become a second place where source
+documentation. The VitePress website under `/docs/` is a generated projection
+of selected committed files; it must never become a second place where source
 content is edited.
 
 This contract applies to maintainers, contributors, automation, and any static
@@ -177,13 +177,13 @@ way.
 
 ## Projection and hosting
 
-GitHub's Markdown rendering remains the zero-build fallback. The proposed
+GitHub's Markdown rendering remains the zero-build fallback. The implemented
 projection decision is recorded in
-[ADR 0001](decisions/0001-documentation-projection.md): evaluate a local
-VitePress projection first, while keeping the source renderer-neutral.
+[ADR 0001](decisions/0001-documentation-projection.md): use a local VitePress
+projection while keeping the source renderer-neutral.
 
-If publication is approved, the generated documentation belongs on the existing
-site at `https://panchangam.astrochaganti.com/docs/`. It should be built into
+When publication is approved, the generated documentation belongs on the
+existing site at `https://panchangam.astrochaganti.com/docs/`. It is built into
 `dist/docs/` as an atomic part of the landing-site build and published by the
 existing landing deployment. Do not add another independent `gh-pages` writer:
 that branch is already a layered product-data surface shared by several frozen

@@ -155,8 +155,9 @@ The repository is the canonical documentation source. Start with the
 **[documentation standard](docs/README.md)** for where current reference,
 operations, decisions, and historical material belong, then use the
 **[computation reference index](docs/reference/README.md)** for the detailed
-system map. A future documentation website will be generated from these files;
-it will not replace them as the source of truth.
+system map. A searchable VitePress projection is built from these files at
+`/docs/`; it is disposable presentation output and does not replace the
+repository as the source of truth.
 
 ## Development
 
