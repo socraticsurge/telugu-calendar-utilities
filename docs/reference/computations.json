@@ -375,7 +375,14 @@
       "surfaces": ["python-library", "mcp"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": [], "note": "Swiss Ephemeris event behavior is tested, but independent event-cell comparisons are not yet registered."},
       "tests": ["tests/test_maudhya_calendar.py"],
-      "limitations": ["Heliacal visibility depends on observer, atmosphere, altitude, and Swiss Ephemeris modeling; the current fixed atmosphere and per-planet visibility parameters were tuned against a 2026 Hyderabad comparison set."]
+      "limitations": ["Heliacal visibility depends on observer, atmosphere, altitude, and Swiss Ephemeris modeling; the current fixed atmosphere and per-planet visibility parameters were tuned against a 2026 Hyderabad comparison set."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Search Swiss Ephemeris heliacal events with a fixed atmosphere and per-planet observer parameters, pair disappearance with reappearance, and retain periods overlapping the requested range.",
+        "steps": ["Validate the planet subset and build observer longitude, latitude, and altitude.", "Start each search 120 days before the requested range so an already-active Asta is retained.", "For Mars, Jupiter, and Saturn pair Heliacal Setting with Heliacal Rising; for Mercury and Venus search both superior- and inferior-conjunction event pairs.", "Advance beyond each exit, convert event Julian days to UTC, filter by overlap, and sort by Asta instant."],
+        "worked_examples": [{"label": "Saturn Asta/Udaya, Hyderabad 2026", "inputs": ["Range: 2026-02-01 through 2026-05-01", "Observer: Hyderabad, altitude 531 m", "Planet: Saturn"], "calculation": ["Search Heliacal Setting with Saturn Snellen ratio 5.0.", "Search Heliacal Rising after entry with ratio 1.0.", "The resulting pair overlaps the requested range."], "result": ["Asta: 2026-03-13 13:17:49 UTC", "Udaya: 2026-04-21 23:43:55 UTC"]}],
+        "notes": ["This is the heliacal-visibility calendar, distinct from the per-day fixed-elongation Maudhya flag.", "The current Hyderabad regression compares Saturn/Jupiter/Venus within about two days; the parameters are model calibration, not universal atmospheric constants."]
+      }
     },
     {
       "id": "calendar.eclipse-events",
@@ -394,7 +401,15 @@
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.eclipse_events"], "note": "Event calculations are regression-pinned; the Sutak convention is a separate textual claim."},
       "tests": ["tests/test_eclipses.py"],
-      "limitations": ["Local visibility is modeled and Sutak is omitted when the eclipse is not visible, but the current observer altitude is fixed to zero."]
+      "limitations": ["Local visibility is modeled and Sutak is omitted when the eclipse is not visible, but the current observer altitude is fixed to zero."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Find Swiss Ephemeris global eclipse phases, assign them to the observer's local civil day, test local visibility, and add Sutak only for a visible event.",
+        "steps": ["Search solar and lunar global events and decode subtype bits.", "Keep an event only when its maximum falls between local midnight and the next local midnight.", "For solar eclipses, require a matching local eclipse maximum; for lunar eclipses, sample Moon altitude across the phase window and require at least one sample above the horizon.", "Convert phase boundaries to UTC.", "If visible, start Sutak 12 hours before solar first contact or 9 hours before lunar first contact and end it at the eclipse end; otherwise leave Sutak null."],
+        "formulae": [{"name": "Visible-event Sutak", "expression": "sutak_start = eclipse_start - H/24 day; sutak_end = eclipse_end", "variables": ["H: 12 hours for Solar, 9 hours for Lunar"]}],
+        "worked_examples": [{"label": "Total lunar eclipse, Hyderabad 2026-03-03", "inputs": ["Observer: Hyderabad at zero modeled altitude", "Event kind: Lunar", "Subtype: Total"], "calculation": ["At least one of ten sampled instants has Moon altitude above zero, so the event is locally visible.", "Subtract 9 hours from phase start 09:50:06 UTC."], "result": ["Eclipse: 09:50:06-13:17:18 UTC", "Sutak: 00:50:06-13:17:18 UTC"]}],
+        "notes": ["A visible late partial phase is sufficient for lunar visibility even when maximum occurs before local moonrise."]
+      }
     },
     {
       "id": "calendar.graha-yuddha",
@@ -411,7 +426,15 @@
       "surfaces": ["python-library", "mcp"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["engine_pinned", "needs_locator"], "claim_ids": [], "note": "Numerical boundaries are tested; the one-degree admission and latitude-victor rules need claim-level registry locators."},
       "tests": ["tests/test_graha_yuddha.py"],
-      "limitations": ["The result implements the project's documented one-degree and latitude rule, not every tradition's definition."]
+      "limitations": ["The result implements the project's documented one-degree and latitude rule, not every tradition's definition."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Scan every selected Tara-graha pair for geocentric longitude separation below one degree, refine threshold crossings and closest approach, then choose the more northerly planet as victor.",
+        "steps": ["Generate unordered pairs from Mercury, Venus, Mars, Jupiter, and Saturn.", "Scan at six-hour steps from 120 days before the range through 60 days after it.", "When angular separation crosses one degree, bisect the entry or exit with 44 iterations.", "Ternary-search the enclosed interval for minimum separation.", "Compare ecliptic latitudes at that instant; the greater latitude wins, and retain only periods overlapping the requested range."],
+        "formulae": [{"name": "War admission", "expression": "delta = min(abs(lambda_1-lambda_2) mod 360, 360-(abs(lambda_1-lambda_2) mod 360)); in_war = delta < 1 degree", "variables": ["lambda_1, lambda_2: geocentric ecliptic longitudes"]}],
+        "worked_examples": [{"label": "Venus-Jupiter, June 2026", "inputs": ["Range: 2026-06-01 through 2026-06-30", "Pair: Venus and Jupiter"], "calculation": ["The scan brackets entry and exit at the one-degree threshold.", "Minimum longitudinal separation rounds to 0.000 arcminutes.", "Venus has the greater ecliptic latitude at closest approach."], "result": ["Starts: 2026-06-08 19:18:54 UTC", "Exact: 2026-06-09 19:59:14 UTC", "Ends: 2026-06-10 20:43:12 UTC", "Winner: Venus; loser: Jupiter"]}],
+        "notes": ["Ayanamsa cancels in pairwise longitude difference, so the implementation uses tropical coordinates for the separation search."]
+      }
     },
     {
       "id": "calendar.rashi-ingresses",
@@ -428,7 +451,15 @@
       "surfaces": ["python-library", "mcp"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": [], "note": "Crossing behavior is regression-tested; independent event-cell evidence is not registered."},
       "tests": ["tests/test_ingress.py"],
-      "limitations": ["Moon is excluded and results follow the fixed sidereal model used by this module."]
+      "limitations": ["Moon is excluded and results follow the fixed sidereal model used by this module."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Follow sidereal longitude through adaptive time steps, bisect each 30-degree sign-index change, and continue past the crossing so direct and retrograde re-entries are both emitted.",
+        "steps": ["Validate the planet subset and select the requested ayanamsa.", "Compute sidereal longitude and speed; add 180 degrees for Ketu because it shares Rahu's Swiss body.", "Choose an adaptive step from distance to the nearest sign boundary and absolute speed.", "When the sign index changes, bisect for 44 iterations and record the new Rashi.", "Search again just after entry for its exit, repeat through the inclusive range, sort chronologically, and restore Lahiri mode."],
+        "formulae": [{"name": "Rashi index", "expression": "r = floor((lambda mod 360) / 30) mod 12", "variables": ["lambda: configured sidereal longitude", "r: zero-based Rashi index"]}],
+        "worked_examples": [{"label": "Sun enters Makara, 2026", "inputs": ["Range: 2026-01-01 through 2026-02-28", "Planet: Sun", "Ayanamsa: Lahiri"], "calculation": ["The sign index changes to Makara and the crossing is bisected.", "The following crossing supplies the exit from Makara."], "result": ["Makara entry: 2026-01-14 09:37:19 UTC", "Makara exit/Kumbha entry: 2026-02-12 22:38:58 UTC"]}],
+        "notes": ["The Moon is intentionally absent from INGRESS_PLANETS; the output does include retrograde re-entry rather than assuming sign order is always forward."]
+      }
     },
     {
       "id": "derived.anandadi-yoga",

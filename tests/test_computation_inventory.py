@@ -86,6 +86,18 @@ def test_derived_method_family_is_complete():
     assert all(record['method']['worked_examples'] for record in records)
 
 
+def test_calendar_method_family_is_complete():
+    records = [
+        record for record in _registry()['computations']
+        if record['id'].startswith('calendar.')
+    ]
+
+    assert len(records) == 4
+    assert all(record.get('method') for record in records)
+    assert all(record['method']['steps'] for record in records)
+    assert all(record['method']['worked_examples'] for record in records)
+
+
 def test_method_validation_rejects_an_unreproducible_example(tmp_path):
     registry = _registry()
     record = next(
