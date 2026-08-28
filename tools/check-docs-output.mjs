@@ -65,7 +65,6 @@ await Promise.all([
   requirePath(join(docsOutput, 'index.html'), 'documentation home'),
   requirePath(join(docsOutput, 'computations', 'index.html'), 'computation index'),
   requirePath(join(docsOutput, 'docs-mark.svg'), 'documentation brand mark'),
-  requirePath(join(docsOutput, 'docs-mark-dark.svg'), 'dark documentation brand mark'),
   requirePath(join(docsOutput, 'sitemap.xml'), 'documentation sitemap'),
 ])
 

@@ -38,6 +38,20 @@ def test_projection_uses_stable_same_site_paths_and_local_search():
     assert "publicDir: './docs/public'" in config
 
 
+def test_projection_is_light_only():
+    config = _read('.vitepress/config.ts')
+    styles = _read('.vitepress/theme/custom.css')
+
+    assert 'appearance: false' in config
+    assert "src: '/docs-mark.svg'" in config
+    assert 'darkModeSwitchLabel' not in config
+    assert 'darkModeSwitchTitle' not in config
+    assert 'lightModeSwitchTitle' not in config
+    assert ':root,\n.dark {' in styles
+    assert 'color-scheme: light' in styles
+    assert '#201b18' not in styles
+
+
 def test_projection_excludes_archives_runtime_data_and_ignored_output():
     config = _read('.vitepress/config.ts')
 

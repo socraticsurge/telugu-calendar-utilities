@@ -104,6 +104,7 @@ export default defineConfig({
   title: 'Panchangam Reference',
   description: 'Methods, evidence, verification and limitations for Astro Chaganti Panchangam.',
   base: '/docs/',
+  appearance: false,
   cleanUrls: true,
   srcDir: './docs',
   rewrites: (path) => path.replace(/^_generated\/computations\//, 'computations/'),
@@ -144,8 +145,7 @@ export default defineConfig({
   },
   themeConfig: {
     logo: {
-      light: '/docs-mark.svg',
-      dark: '/docs-mark-dark.svg',
+      src: '/docs-mark.svg',
       alt: 'Astro Chaganti',
     },
     siteTitle: 'Panchangam Reference',
@@ -232,9 +232,6 @@ export default defineConfig({
     externalLinkIcon: true,
     returnToTopLabel: 'Return to top',
     sidebarMenuLabel: 'Reference navigation',
-    darkModeSwitchLabel: 'Appearance',
-    lightModeSwitchTitle: 'Use light appearance',
-    darkModeSwitchTitle: 'Use dark appearance',
     socialLinks: [
       {
         icon: 'github',
