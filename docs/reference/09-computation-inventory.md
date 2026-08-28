@@ -6,6 +6,13 @@ The canonical inventory of production computations is
 enforces the stronger cross-file rules with
 [`tools/check_computation_inventory.py`](../../tools/check_computation_inventory.py).
 
+Repository-wide catalogue counts are derived into
+[`project-facts.json`](project-facts.json). Run
+`python tools/check_documentation_freshness.py --write` after intentionally
+changing calculation systems, cities, MCP tools, activity catalogues, or the
+computation inventory. The normal `tools/verify_project.py` command fails if
+that generated snapshot or the high-level documentation has drifted.
+
 The inventory answers these questions for each conceptual computation:
 
 - What stable ID names it?

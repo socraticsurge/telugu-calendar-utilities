@@ -59,7 +59,7 @@ PyPI MCP package.
 | 29 | [Pilgrimage source profile](29-pilgrimage-profile.md) | Chapter XIV's incorporated journey rules, Guru conditions, and heuristic boundary |
 | 30 | [Travel source profile](30-travel-profile.md) | Chapter XIV's hard exclusions, preferred stars, chart checks, and isolated Disha Shoola debt |
 | 31 | [Wedding source profile](31-wedding-evidence-audit.md) | Complete Raman crosswalk, manual Pada/chart boundary and published-practice divergence |
-| 32 | [Gochara source crosswalk](32-gochara-source-crosswalk.md) | Verified favourable houses and Vedha, a known Rahu/Ketu conflict, and a precisely bounded named-Shani evidence layer |
+| 32 | [Gochara source crosswalk](32-gochara-source-crosswalk.md) | Verified favourable houses, Vedha and node houses, plus a precisely bounded named-Shani evidence layer |
 | 33 | [Gruhapravesha evidence audit](33-gruhapravesha-evidence-audit.md) | Exact Chapter XII crosswalk and approval-gated conflicts in the current home-entry profile |
 | 34 | [Lawsuit-filing source profile](34-court-evidence-audit.md) | Exact Raman crosswalk, disclosed Tithi shorthand, conservative Mesha-Lagna automation and legal-safety boundary |
 | 35 | [Litigation alias and Bhadra audit](35-litigation-evidence-audit.md) | Retired duplicate profile, explicit Court alias and corrected Chintamani Yama mapping |

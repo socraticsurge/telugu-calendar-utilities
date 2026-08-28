@@ -21,6 +21,8 @@ PyPI version tracks this file's most recent release entry.
   `mcp.server.fastmcp`.
 - Keep `icalendar` below 7.3.0 until its revised content-line folding can be
   adopted without changing the byte-stable subscriber feed contract.
+- Correct the published `get_gochara` help text to match the implemented and
+  source-verified Rahu/Ketu houses 3, 6, 10 and 11.
 
 ## [1.13.0] — 2026-07-22
 
