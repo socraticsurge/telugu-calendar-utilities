@@ -32,6 +32,11 @@ The verifier checks the provenance ledger links, generated browser activity
 data, the Ruff debt baseline, the full Python suite, frontend tests, typecheck,
 and production build. Every gate must pass before any change merges.
 
+Documentation is maintained with the code. Read
+[`docs/README.md`](docs/README.md) before adding or reorganising documentation;
+it defines the canonical directories, authoring contract, archival boundary,
+and publication approval gate.
+
 Ruff currently uses a reviewed per-file, per-rule baseline in
 `tools/ruff_baseline.json`. New lint debt fails CI. If a change reduces existing
 debt, regenerate the baseline with
