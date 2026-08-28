@@ -2,6 +2,8 @@
 from datetime import date
 from pathlib import Path
 
+import pytest
+
 from tools.analyze_computation_architecture import build_report
 from tools.benchmark_computation_paths import benchmark
 
@@ -19,6 +21,18 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     assert len({item['id'] for item in report['output_consumer_map']}) == 62
     assert {'engines', 'derived-calendar', 'scoring', 'mcp', 'browser-panels'} \
         <= set(report['layers'])
+
+
+@pytest.mark.parametrize('ref', ('--help', 'HEAD..master', 'HEAD^{tree}', '../HEAD'))
+def test_architecture_report_rejects_unsafe_git_refs(ref):
+    with pytest.raises(ValueError, match='unsupported Git ref'):
+        build_report(ref, commit_limit=1)
+
+
+@pytest.mark.parametrize('commit_limit', (0, -1, 10_001))
+def test_architecture_report_bounds_history_work(commit_limit):
+    with pytest.raises(ValueError, match='commit_limit must be between'):
+        build_report('HEAD', commit_limit=commit_limit)
 
 
 def test_architecture_report_exposes_real_boundary_risks():

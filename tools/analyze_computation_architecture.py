@@ -19,9 +19,14 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_HISTORY_COMMITS = 200
+MAX_HISTORY_COMMITS = 10_000
 
-_TS_IMPORT_RE = re.compile(
-    r"(?:import|export)\s+(?:[^'\"]+?\s+from\s+)?['\"]([^'\"]+)['\"]"
+_GIT_REF_RE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._/-]{0,254}$')
+_TS_FROM_IMPORT_RE = re.compile(
+    r"(?:import|export)\s+[^'\"\n]*\bfrom\s+['\"]([^'\"\n]+)['\"]"
+)
+_TS_SIDE_EFFECT_IMPORT_RE = re.compile(
+    r"import\s+['\"]([^'\"\n]+)['\"]"
 )
 _TS_DEFINITION_RE = re.compile(
     r'^\s*(?:export\s+)?(?:async\s+)?'
@@ -29,19 +34,23 @@ _TS_DEFINITION_RE = re.compile(
     re.MULTILINE,
 )
 
+_ACTIVITY_RULES_ARTIFACT = 'src/data/activity-rules.generated.json'
+_PANCHANGAM_NAMES = 'telugu_panchangam/panchangam_names.py'
+_TARABALAM_PANEL = 'src/panels/tarabalam.ts'
+
 _DUPLICATE_CONTRACTS = {
     'activity_profiles': {
         'strategy': 'generated-from-python',
         'locations': [
             ('telugu_panchangam/personal/activity_rules.py', 'ACTIVITY_RULES'),
-            ('src/data/activity-rules.generated.json', '"rules"'),
-            ('src/panels/tarabalam.ts', 'MU_ACTIVITY'),
+            (_ACTIVITY_RULES_ARTIFACT, '"rules"'),
+            (_TARABALAM_PANEL, 'MU_ACTIVITY'),
         ],
     },
     'rashi_vocabulary': {
         'strategy': 'manual-mirror',
         'locations': [
-            ('telugu_panchangam/panchangam_names.py', 'RASHI_NAMES'),
+            (_PANCHANGAM_NAMES, 'RASHI_NAMES'),
             ('src/data/rasis.ts', 'RASI_NAMES'),
             ('src/muhurta-scorer.ts', 'MU_RASHI_NAMES'),
             ('src/panels/today.ts', 'RASHI_NAMES_JS'),
@@ -50,24 +59,24 @@ _DUPLICATE_CONTRACTS = {
     'nakshatra_vocabulary': {
         'strategy': 'manual-mirror',
         'locations': [
-            ('telugu_panchangam/panchangam_names.py', 'NAKSHATRA_NAMES'),
+            (_PANCHANGAM_NAMES, 'NAKSHATRA_NAMES'),
             ('src/data/rasis.ts', 'NAKSHATRA_NAMES'),
         ],
     },
     'nitya_yoga_vocabulary_and_disposition': {
         'strategy': 'manual-mirror',
         'locations': [
-            ('telugu_panchangam/panchangam_names.py', 'YOGA_NAMES'),
+            (_PANCHANGAM_NAMES, 'YOGA_NAMES'),
             ('telugu_panchangam/personal/nitya_yoga.py', 'NITYA_AUSPICIOUS'),
-            ('src/panels/tarabalam.ts', 'MU_YOGA_NAMES_27'),
-            ('src/panels/tarabalam.ts', 'MU_NITYA_AUSPICIOUS'),
+            (_TARABALAM_PANEL, 'MU_YOGA_NAMES_27'),
+            (_TARABALAM_PANEL, 'MU_NITYA_AUSPICIOUS'),
         ],
     },
     'special_yoga_tables': {
         'strategy': 'manual-mirror',
         'locations': [
             ('telugu_panchangam/special_yogas.py', '_SARVARTHA_SIDDHI'),
-            ('src/panels/tarabalam.ts', 'MU_SARVARTHA'),
+            (_TARABALAM_PANEL, 'MU_SARVARTHA'),
         ],
     },
     'hora_tables': {
@@ -81,7 +90,7 @@ _DUPLICATE_CONTRACTS = {
         'strategy': 'manual-mirror',
         'locations': [
             ('telugu_panchangam/personal/homa.py', 'HOMAHUTI_GROUP_LORDS'),
-            ('src/panels/tarabalam.ts', 'MU_HOMAHUTI_LORDS'),
+            (_TARABALAM_PANEL, 'MU_HOMAHUTI_LORDS'),
         ],
     },
     'named_shani_conditions': {
@@ -95,15 +104,28 @@ _DUPLICATE_CONTRACTS = {
 
 
 def _git(*args: str) -> str:
+    if not args or args[0] not in {'log', 'ls-tree', 'rev-parse', 'show'}:
+        raise ValueError('unsupported Git command')
+    if any('\0' in argument or '\n' in argument or '\r' in argument for argument in args):
+        raise ValueError('Git arguments must not contain control characters')
+    # Every caller supplies a fixed subcommand. The only CLI-derived value is
+    # validated by _resolve_ref before it reaches later Git commands.
     result = subprocess.run(
         ['git', *args], cwd=ROOT, check=True, text=True,
         capture_output=True,
-    )
+    )  # NOSONAR -- fixed executable, no shell, validated command/arguments
     return result.stdout
 
 
 def _resolve_ref(ref: str) -> str:
-    return _git('rev-parse', ref).strip()
+    if not _GIT_REF_RE.fullmatch(ref) or '..' in ref or ref.endswith(('.', '/')):
+        raise ValueError(f'unsupported Git ref: {ref!r}')
+    commit = _git(
+        'rev-parse', '--verify', '--end-of-options', f'{ref}^{{commit}}',
+    ).strip()
+    if not re.fullmatch(r'[0-9a-f]{40}', commit):
+        raise ValueError(f'Git ref did not resolve to a commit: {ref!r}')
+    return commit
 
 
 def _tree_paths(ref: str) -> list[str]:
@@ -210,6 +232,14 @@ def _python_imports(content: str) -> tuple[list[tuple[str, list[str]]], list[dic
     return imports, private_attributes
 
 
+def _typescript_imports(content: str) -> list[str]:
+    """Return static TypeScript imports without ambiguous regex backtracking."""
+    return [
+        *_TS_FROM_IMPORT_RE.findall(content),
+        *_TS_SIDE_EFFECT_IMPORT_RE.findall(content),
+    ]
+
+
 def _resolve_python_import(
     imported: str, module_to_path: dict[str, str]
 ) -> str | None:
@@ -226,7 +256,7 @@ def _resolve_ts_import(source: str, imported: str, paths: set[str]) -> str | Non
         return None
     candidate = PurePosixPath(source).parent.joinpath(imported)
     normalized = str(PurePosixPath(candidate))
-    while normalized.startswith('../'):
+    if normalized.startswith('../'):
         return None
     for suffix in ('.ts', '/index.ts', '.json'):
         target = f'{normalized}{suffix}'
@@ -268,7 +298,7 @@ def _module_graph(
             for item in attributes:
                 private_attributes.append({'path': path, **item})
         else:
-            for imported in _TS_IMPORT_RE.findall(content):
+            for imported in _typescript_imports(content):
                 target = _resolve_ts_import(path, imported, all_paths)
                 if target and target != path:
                     targets.add(target)
@@ -297,7 +327,7 @@ def _test_links(
                 if target:
                     links[target].add(path)
         else:
-            for imported in _TS_IMPORT_RE.findall(content):
+            for imported in _typescript_imports(content):
                 target = _resolve_ts_import(path, imported, all_paths)
                 if target:
                     links[target].add(path)
@@ -419,6 +449,10 @@ def _duplicate_contracts(ref: str) -> list[dict]:
 
 def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS) -> dict:
     """Build a deterministic architecture report for one Git tree and history."""
+    if not 1 <= commit_limit <= MAX_HISTORY_COMMITS:
+        raise ValueError(
+            f'commit_limit must be between 1 and {MAX_HISTORY_COMMITS}'
+        )
     commit = _resolve_ref(ref)
     tree_paths = _tree_paths(commit)
     all_paths = set(tree_paths)
@@ -512,7 +546,7 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
             concrete_engine_imports.append(detail)
 
     generated_contract = json.loads(
-        _read_at(commit, 'src/data/activity-rules.generated.json')
+        _read_at(commit, _ACTIVITY_RULES_ARTIFACT)
     )
     unique_private_imports = {
         (item['importer'], item['owner'], item['symbol'])
@@ -573,7 +607,7 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
         'generated_contracts': [{
             'source': 'telugu_panchangam/personal/activity_rules.py',
             'generator': 'tools/export_activity_rules.py',
-            'artifact': 'src/data/activity-rules.generated.json',
+            'artifact': _ACTIVITY_RULES_ARTIFACT,
             'exported_rule_count': len(generated_contract['rules']),
         }],
         'history_top_changed_files': history[:25],
