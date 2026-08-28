@@ -67,7 +67,7 @@ def test_every_computation_gets_a_registry_driven_searchable_route():
     assert 'Not independently verified' in generator
 
 
-def test_generated_pages_show_real_methods_and_visible_method_gaps():
+def test_generated_pages_show_real_methods_for_every_family():
     subprocess.run(
         ['node', 'tools/generate-docs-computations.mjs'],
         cwd=ROOT,
@@ -120,10 +120,28 @@ def test_generated_pages_show_real_methods_and_visible_method_gaps():
     assert 'r = floor((lambda mod 360) / 30) mod 12' in ingresses
     assert 'Makara entry: 2026-01-14 09:37:19 UTC' in ingresses
 
-    incomplete = _read(
+    chandrabalam = _read(
         'docs/_generated/computations/personal.chandrabalam.md')
-    assert 'Method documentation incomplete' in incomplete
-    assert 'Incomplete — the contract is inventoried' in incomplete
+    assert 'h = ((index(day_rasi)-index(janma_rasi)) mod 12)+1' in chandrabalam
+    assert 'Position: 3' in chandrabalam
+
+    ranking = _read(
+        'docs/_generated/computations/personal.muhurta-slot-ranking.md')
+    assert 'q = (score-floor)/(ceiling-floor)' in ranking
+    assert 'Score: 7' in ranking
+
+    generated = _read(
+        'docs/_generated/computations/interpretation.daily-rasi-phalalu-generated.md')
+    assert 'Generate structured prose for all twelve Rashis' in generated
+    assert 'only citation fields are engine-verified' in generated
+
+    generated_pages = list(
+        (ROOT / 'docs' / '_generated' / 'computations').glob('*.md'))
+    assert len(generated_pages) == 62
+    assert all(
+        'Method documentation incomplete' not in page.read_text(encoding='utf-8')
+        for page in generated_pages
+    )
 
 
 def test_projection_adds_no_competing_pages_workflow_or_cname():
