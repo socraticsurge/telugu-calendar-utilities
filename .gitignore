@@ -18,10 +18,13 @@ dashboard.html
 /*.png
 docs/gochara.json
 public/
+!docs/public/
+!docs/public/docs-mark*.svg
 build/
 
 # Generated lagna/feed data lives on gh-pages, not master.
 docs/feeds/
+docs/_generated/
 
 .impeccable/
 .claude/
