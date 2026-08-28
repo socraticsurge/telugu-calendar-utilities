@@ -189,6 +189,11 @@
         "reason": "HTML escaping and rendering helpers."
       },
       {
+        "path": "src/lib/guest-profile-store.ts",
+        "kind": "ui-only",
+        "reason": "Browser-local guest profile state, validation, and storage migration; it owns no Panchangam computation."
+      },
+      {
         "path": "src/lib/ics.ts",
         "kind": "serialization",
         "reason": "ICS parsing and field extraction, not domain calculation."

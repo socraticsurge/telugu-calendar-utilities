@@ -24,6 +24,10 @@ import { fmtT, dayMark, fmtRange, fmtPlain, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
+import {
+  mergeLegacyGuestProfileRow,
+  readLegacyGuestProfileRows,
+} from '../lib/guest-profile-store';
 import { RASI_NAMES, NAKSHATRA_NAMES, rasiFromStar } from '../data/rasis';
 import { MUHURTA_DAY } from '../data/muhurtas';
 import activityContract from '../data/activity-rules.generated.json';
@@ -98,13 +102,18 @@ function tbProfiles() {
 }
 
 function tbSaveProfiles() {
+  const existing = readLegacyGuestProfileRows(localStorage);
   const raw = [];
   for (let i = 0; i < TB_ROWS; i++) {
     const lagnaInput = selEl(`tb-lagna-${i}`);
-    raw.push({ name: inpEl(`tb-name-${i}`).value,
-               nak: selEl(`tb-nak-${i}`).value,
-               pada: selEl(`tb-pada-${i}`).value,
-               lagna: lagnaInput ? lagnaInput.value : '' });
+    const previous = existing[i] || {};
+    const row = mergeLegacyGuestProfileRow(previous, {
+      name: inpEl(`tb-name-${i}`).value,
+      nak: selEl(`tb-nak-${i}`).value,
+      pada: selEl(`tb-pada-${i}`).value,
+      lagna: lagnaInput ? lagnaInput.value : '',
+    });
+    raw.push(row);
   }
   localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
 }
@@ -112,7 +121,7 @@ function tbSaveProfiles() {
 let TB_ROWS = 1;  // visible person rows (1..4)
 
 function tbRenderProfileInputs() {
-  const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
+  const saved = readLegacyGuestProfileRows(localStorage);
   TB_ROWS = Math.max(TB_ROWS, Math.min(4, saved.filter(v => v && (v.nak || v.name)).length || 1));
   const wrap = document.getElementById('tb-profiles');
   let html = '';
@@ -129,7 +138,7 @@ function tbRenderProfileInputs() {
       ? '<span class="tb-you" style="color:#8A5518;">add padam for rashi</span>'
       : '';
     html += `<div class="tb-profile-row">
-      <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
+      <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${htmlEsc(v.name || '')}" onchange="tbSaveProfiles()">
       <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
       <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star, needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
       <select id="tb-lagna-${i}" style="min-width:130px;" title="Janma Lagna: the rising sign at the moment of birth. Leave blank if you don't know it; we'll use your janma rashi instead for muhurta scoring." onchange="tbSaveProfiles();">${lagnaOpts}</select>
@@ -161,7 +170,7 @@ function tbAddRow() {
 }
 
 function tbRemoveRow(i) {
-  const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
+  const saved = readLegacyGuestProfileRows(localStorage);
   saved.splice(i, 1);
   localStorage.setItem('tc-tb-profiles', JSON.stringify(saved));
   TB_ROWS = Math.max(1, TB_ROWS - 1);

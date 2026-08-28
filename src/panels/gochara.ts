@@ -10,6 +10,7 @@ import { RASI_NAMES, rasiFromStar } from '../data/rasis';
 import { MU_CHANDRA_GOOD, MU_CHANDRA_PUJA } from '../muhurta-scorer';
 import { selEl } from '../lib/dom';
 import { shaniConditionFromMoonHouse, shaniConditionLine } from '../shani-conditions';
+import { readLegacyGuestProfileRows } from '../lib/guest-profile-store';
 
 // Chandrabalam house sets — same classical table the muhurta scorer pins.
 const CHANDRA_GOOD = MU_CHANDRA_GOOD;
@@ -81,7 +82,7 @@ function goTill(idx, gi) {
 }
 
 function goSavedPeople() {
-  const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
+  const saved = readLegacyGuestProfileRows(localStorage);
   return saved.map((v, i) => {
     if (!v || !v.nak) return null;
     const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
