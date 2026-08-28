@@ -255,6 +255,23 @@
       "inputs": ["Julian day", "Swiss Ephemeris body", "ayanamsa"],
       "outputs": ["sidereal longitude in degrees [0, 360)"],
       "time_basis": "UTC Julian day; ayanamsa is explicit and defaults to Lahiri.",
+      "method": {
+        "kind": "algorithm",
+        "summary": "Select the requested Swiss Ephemeris sidereal mode, calculate the body's geocentric ecliptic longitude at the supplied UT Julian day, normalize it to one revolution, and restore Lahiri mode for cached callers.",
+        "steps": [
+          "Validate the ayanamsa name and map it to a Swiss Ephemeris sidereal-mode constant.",
+          "Set that global sidereal mode and call calc_ut with FLG_SWIEPH | FLG_SIDEREAL for the requested body.",
+          "Take result[0] modulo 360 degrees as the longitude.",
+          "Restore Lahiri mode before returning so later cached Lahiri calculations do not inherit mutable global state."
+        ],
+        "worked_examples": [{
+          "label": "Hyderabad sunrise, 2026-06-11, Lahiri",
+          "inputs": ["UT Julian day: 2461202.5077662035", "Bodies: Sun and Moon", "Ayanamsa: lahiri"],
+          "calculation": ["Swiss Ephemeris is called separately for Sun and Moon with sidereal flags.", "Each returned longitude is normalized with value modulo 360."],
+          "result": ["Sun: 55.8893662040 degrees", "Moon: 358.4708221648 degrees", "Moon-Sun elongation used downstream: 302.5814559608 degrees"]
+        }],
+        "notes": ["The example reproduces the repository runtime; it is not an independent ephemeris comparison.", "Swiss Ephemeris global sidereal mode makes restoration part of the computation contract."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["drik.sidereal_positions"], "note": "Representative Drik cells are independently compared; the full range remains broader than those cells."},
       "tests": ["tests/test_ayanamsa.py", "tests/test_utils.py"],
@@ -274,6 +291,29 @@
       "inputs": ["Julian day"],
       "outputs": ["solar longitude", "lunar longitude", "Moon-Sun elongation"],
       "time_basis": "Julian day relative to the engine's Kali epoch constants.",
+      "method": {
+        "kind": "formula",
+        "summary": "Compute mean longitude from elapsed Kali-epoch days and revolution counts, then apply one variable-circumference manda correction for the Sun and Moon.",
+        "steps": [
+          "Subtract the code epoch, including the Ujjain longitude adjustment, to obtain Kali ahargana.",
+          "Convert ahargana and the body's revolution count into a normalized mean longitude.",
+          "Compute anomaly from the fixed solar apogee or moving lunar apogee.",
+          "Interpolate the manda epicycle circumference between its even- and odd-quadrant values.",
+          "Subtract the arcsine manda correction and normalize to 0-360 degrees; subtract Sun from Moon for elongation."
+        ],
+        "formulae": [{
+          "name": "Mean motion and manda correction",
+          "expression": "K = JD - epoch\nL_mean = (K * revolutions / 1577917828 * 360) mod 360\nA = (L_mean - apogee) mod 360\nC = C_even - (C_even - C_odd) * abs(sin A)\nmanda = asin((C / 360) * sin A)\nL_true = (L_mean - manda) mod 360",
+          "variables": ["K: Kali ahargana in days", "A: anomaly", "C: interpolated epicycle circumference in degrees", "L_true: returned longitude"]
+        }],
+        "worked_examples": [{
+          "label": "Hyderabad sunrise, 2026-06-11",
+          "inputs": ["UT Julian day: 2461202.5077662035", "Sun revolutions: 4,320,000", "Moon revolutions: 57,753,336"],
+          "calculation": ["Apply the mean-motion formula with the Sun constants and solar apogee 77.333 degrees.", "Apply it again with the moving lunar apogee and lunar epicycle constants.", "Compute elongation as (Moon - Sun) modulo 360."],
+          "result": ["Sun: 55.6206770967 degrees", "Moon: 0.5772516191 degrees", "Elongation: 304.9565745224 degrees"]
+        }],
+        "notes": ["The direct floating-point formula is a bounded modern transcription, not a complete traditional procedure.", "The ayanamsa constructor argument is validated but does not alter these longitudes."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["surya_siddhanta.mean_motion_manda", "panchangam.non_drik_engine_outputs"], "note": "The algorithm family is source-traced in part; production outputs remain regression-pinned rather than independently compared."},
       "tests": ["tests/test_surya_siddhanta_engine.py"],
@@ -292,6 +332,29 @@
       "inputs": ["Julian day", "Vakya correction table"],
       "outputs": ["corrected lunar longitude", "corrected Moon-Sun elongation"],
       "time_basis": "Julian day with inherited Surya Siddhanta solar longitude.",
+      "method": {
+        "kind": "formula",
+        "summary": "Choose one of nine project offsets from 3,031-day blocks since the code epoch and add it to the Surya Siddhanta Moon; the Sun remains the Surya Siddhanta Sun.",
+        "steps": [
+          "Compute absolute elapsed days K from the Surya Siddhanta code epoch.",
+          "Select phase index floor(K / 3031) modulo 9.",
+          "Read the corresponding correction from [0, +0.5, +1, +0.5, 0, -0.5, -1, -0.5, 0] degrees.",
+          "Add the correction to the Surya Siddhanta Moon and normalize to one revolution.",
+          "Subtract the inherited Surya Siddhanta Sun to obtain Vakya elongation."
+        ],
+        "formulae": [{
+          "name": "Provisional lunar correction",
+          "expression": "i = floor(abs(JD - epoch) / 3031) mod 9\nM_vakya = (M_SS + correction[i]) mod 360\nE_vakya = (M_vakya - S_SS) mod 360",
+          "variables": ["i: nine-phase table index", "M_SS: Surya Siddhanta Moon longitude", "S_SS: Surya Siddhanta Sun longitude", "E_vakya: corrected elongation"]
+        }],
+        "worked_examples": [{
+          "label": "Hyderabad sunrise, 2026-06-11",
+          "inputs": ["UT Julian day: 2461202.5077662035", "Elapsed days from code epoch: 1,872,737.2182337036", "Surya Siddhanta Moon: 0.5772516191 degrees"],
+          "calculation": ["floor(1,872,737.2182 / 3,031) modulo 9 = 5.", "Correction[5] = -0.5 degrees.", "Normalize 0.5772516191 - 0.5 and subtract the Surya Siddhanta Sun."],
+          "result": ["Vakya Moon: 0.0772516191 degrees", "Vakya elongation: 304.4565745224 degrees"]
+        }],
+        "notes": ["This documents current code exactly; the table derivation is unresolved and tracked separately.", "The 3,031-day block must not be represented as a verified 248-year Vakya cycle."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical", "regional_convention", "project_heuristic"], "verification_states": ["engine_pinned"], "claim_ids": ["vakya.provisional_lunar_model", "panchangam.non_drik_engine_outputs"], "note": "No registered source derives the nine-value/3,031-day model; issue 176 tracks source reconstruction and possible correction."},
       "tests": ["tests/test_vakya_engine.py"],
@@ -791,6 +854,14 @@
       "inputs": ["Nakshatra spans", "Amrita offset table", "day bounds"],
       "outputs": ["Amrita Kalam windows"],
       "time_basis": "Four-sixtieths of actual Nakshatra duration at the table offset.",
+      "method": {
+        "kind": "formula",
+        "summary": "For the Nakshatra active at sunrise and its successor, place a four-Ghati window at that Nakshatra's configured Amrita offset and retain it only when its start lies inside the sunrise-to-next-sunrise Panchangam day.",
+        "steps": ["Find the complete UTC span of the sunrise Nakshatra and the immediately following Nakshatra using the selected engine's Moon model.", "Look up the Nakshatra-specific Amrita start offset on a 60-Ghati scale.", "Scale both the offset and four-Ghati duration by the actual Nakshatra span rather than by clock minutes.", "Keep a window only when day_start <= start < next_sunrise."],
+        "formulae": [{"name": "Nakshatra-scaled window", "expression": "start = N_start + N_duration * offset[n] / 60\nend = start + N_duration * 4 / 60", "variables": ["N_start: Nakshatra start", "N_duration: actual Nakshatra duration", "offset[n]: maintained Amrita Ghati offset for Nakshatra n"]}],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11, Drik Ganita", "inputs": ["Panchangam day: sunrise 05:41:11 IST to next sunrise 05:41:17 IST", "Sunrise Nakshatra: Revati; successor: Ashvini", "Offsets come from AMRITA_GHATIS"], "calculation": ["Construct one four-sixtieths window for each of the two full Nakshatra spans.", "Filter by each computed start against the Panchangam-day bounds."], "result": ["05:59:05.5-07:30:45.166667 IST", "23:49:07.4-01:17:56.2 IST; both starts fall within the Panchangam day"]}],
+        "notes": ["The registered umbrella claim does not yet provide a criterion-level locator for the complete Amrita offset table."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative values are compared; the table's full locator coverage remains incomplete."},
       "tests": ["tests/test_muhurta_windows.py"],
@@ -809,6 +880,13 @@
       "inputs": ["solar sign or tropical solar longitude"],
       "outputs": ["Ayanam", "Rituvu"],
       "time_basis": "Solar position at sunrise.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Ayanam uses the engine's sidereal solar sign at sunrise, while Rituvu independently bins the shared tropical Swiss solar longitude into a twelve-sign-to-six-season lookup.",
+        "steps": ["Compute the sidereal sunrise Sun sign index from the selected engine.", "Return Uttarayanam for sign indices 9, 10, 11, 0, 1, or 2; otherwise return Dakshinayanam.", "Compute tropical Swiss Sun longitude at the same sunrise instant.", "Take floor(tropical longitude / 30) modulo 12 and use that index in RITUVU_NAMES."],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11", "inputs": ["Drik sidereal Sun: 55.889366 degrees", "Sidereal sign index: floor(55.889366 / 30) = 1", "Tropical solar sign maps to the Grishma entries"], "calculation": ["Index 1 is in the Uttarayanam set.", "The tropical-sign lookup is evaluated separately from the sidereal sign."], "result": ["Ayanam: Uttarayanam", "Rituvu: Grishma"]}],
+        "notes": ["This hybrid is intentional: Rituvu does not use the selected engine's sidereal Sun.", "Criterion-level source locators for the naming convention remain unresolved."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "Calendar semantics need more exact source locators."},
       "tests": ["tests/test_drik_engine.py"],
@@ -826,6 +904,14 @@
       "inputs": ["sunrise instant"],
       "outputs": ["Brahma Muhurta start/end"],
       "time_basis": "Fixed civil interval before local sunrise.",
+      "method": {
+        "kind": "formula",
+        "summary": "Return the fixed interval from 96 to 48 clock minutes before the computed sunrise.",
+        "steps": ["Represent 48 minutes as 1/30 of a Julian day.", "Subtract two such units from sunrise for the start.", "Subtract one such unit from sunrise for the end.", "Convert both Julian instants to whole-second UTC datetimes."],
+        "formulae": [{"name": "Fixed pre-sunrise interval", "expression": "m = 1 day / 30 = 48 minutes\nstart = sunrise - 2m\nend = sunrise - m", "variables": ["sunrise: computed location/date sunrise", "m: fixed 48-minute Julian-day fraction"]}],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11", "inputs": ["Sunrise: 05:41:11 IST"], "calculation": ["Start = 05:41:11 - 96 minutes.", "End = 05:41:11 - 48 minutes."], "result": ["Brahma Muhurta: 04:05:11-04:53:11 IST"]}],
+        "notes": ["The interval is fixed in clock minutes and does not scale with seasonal day or night length."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative published values are checked; textual coverage remains grouped."},
       "tests": ["tests/test_muhurta_windows.py"],
@@ -844,6 +930,14 @@
       "inputs": ["weekday", "sunrise", "sunset", "next sunrise"],
       "outputs": ["named proportional day and night windows"],
       "time_basis": "Eight equal local-day parts and eight equal local-night parts.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Split daylight and night into eight equal intervals and label them from weekday-specific sequences; Python owns exact daytime instants and the browser owns the minute-based night fallback.",
+        "steps": ["Select the eight daytime labels for weekday index 0=Sunday through 6=Saturday.", "Set daytime block length to (sunset - sunrise) / 8 and construct eight contiguous windows.", "For the browser night fallback, treat next sunrise as minutes after midnight by adding 1,440, then divide sunset-to-next-sunrise into eight.", "Rotate the seven-name night cycle from the weekday's configured start name and round rendered minute boundaries."],
+        "formulae": [{"name": "Equal day or night block", "expression": "block = (period_end - period_start) / 8\nstart_i = period_start + i * block\nend_i = period_start + (i + 1) * block", "variables": ["i: zero-based block 0 through 7", "period: sunrise-to-sunset or sunset-to-next-sunrise"]}],
+        "worked_examples": [{"label": "Hyderabad daytime, Thursday 2026-06-11", "inputs": ["Sunrise: 05:41:11 IST", "Sunset: 18:50:12 IST", "Thursday labels: Shubh, Rog, Udveg, Char, Labh, Amrit, Kaal, Shubh"], "calculation": ["Daylight 13:09:01 divided by 8 gives 01:38:37.625 per block.", "Apply the Thursday label at each contiguous boundary."], "result": ["First block: Shubh 05:41:11-07:19:48 IST", "Fourth block: Char 10:37:04-12:15:41 IST", "Eighth block: Shubh 17:11:34-18:50:12 IST"]}],
+        "notes": ["The Python record does not return night Choghadiya; the browser fallback uses HH:MM inputs and rounded minutes.", "The table's criterion-level textual locator remains grouped and incomplete."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Day values have representative comparisons; browser-owned night extension is regression-tested through UI contracts."},
       "tests": ["tests/test_muhurta_windows.py", "tests/test_browser_smoke.py"],
@@ -861,6 +955,14 @@
       "inputs": ["weekday", "sunrise", "sunset", "next sunrise"],
       "outputs": ["one or more Durmuhurtham windows"],
       "time_basis": "Selected fifteenths of local day or night.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Divide daylight into 15 equal Muhurtas and return the weekday-selected indices; on Tuesday also divide the night into 15 and return its seventh part.",
+        "steps": ["Read one or two 1-based daytime indices from DURMUHURTA_DAY_MUHURTAS for the weekday.", "Set day Muhurta length to (sunset - sunrise) / 15 and construct each selected interval.", "Set night Muhurta length to (next_sunrise - sunset) / 15.", "If the weekday has a night-table entry, currently only Tuesday part 7, append that interval."],
+        "formulae": [{"name": "Selected Muhurta part", "expression": "part_size = (period_end - period_start) / 15\nstart_p = period_start + (p - 1) * part_size\nend_p = period_start + p * part_size", "variables": ["p: 1-based table-selected Muhurta", "period: daylight or Tuesday night"]}],
+        "worked_examples": [{"label": "Hyderabad, Thursday 2026-06-11", "inputs": ["Sunrise: 05:41:11 IST", "Sunset: 18:50:12 IST", "Thursday weekday index 4 selects daytime parts 6 and 12"], "calculation": ["Daylight / 15 = 52 minutes 36.067 seconds.", "Apply the part formula for p=6 and p=12."], "result": ["10:04:11-10:56:47 IST", "15:19:48-16:12:24 IST"]}],
+        "notes": ["Tuesday needs next-sunrise context because its second window is a night Muhurta."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative values are compared; exact table locators remain grouped."},
       "tests": ["tests/test_muhurta_windows.py"],
@@ -880,6 +982,13 @@
       "inputs": ["date", "location", "calendar eclipse result"],
       "outputs": ["PanchangamDay.eclipse"],
       "time_basis": "Local Panchangam date with UTC event instants converted for presentation.",
+      "method": {
+        "kind": "algorithm",
+        "summary": "Each engine conditionally requests the canonical location-aware eclipse calculation for the civil date and attaches the returned EclipseInfo unchanged to PanchangamDay.",
+        "steps": ["When include_eclipse is false, skip the lookup and attach null.", "Otherwise pass the input civil date and Location to get_eclipse_for_date.", "The canonical calculator keeps an event only when its maximum falls within the location's two civil-midnight Julian bounds.", "Attach kind, subtype, visibility, UTC phase instants, and visibility-dependent Sutak fields to the day.", "Presentation layers convert UTC instants to the requested timezone."],
+        "worked_examples": [{"label": "Hyderabad, 2026-02-17", "inputs": ["include_eclipse=true", "Canonical event: annular solar eclipse", "Local visibility: false"], "calculation": ["The event maximum falls within the Hyderabad civil date, so attach EclipseInfo.", "Because it is not locally visible, leave Sutak start/end null."], "result": ["kind=Solar; subtype=Annular; visible=false", "sutak_start=null; sutak_end=null"]}],
+        "notes": ["This page documents day attachment; astronomical search, visibility, and Sutak calculation are separately inventoried."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["engine_pinned"], "claim_ids": ["panchangam.eclipse_events"], "note": "This is the daily projection of the canonical eclipse calculation."},
       "tests": ["tests/test_eclipses.py", "tests/test_integration.py"],
@@ -897,6 +1006,14 @@
       "inputs": ["Maasam", "Tithi at deciding moments", "weekday", "adjacent-day facts"],
       "outputs": ["festival names"],
       "time_basis": "Festival-specific sunrise, Madhyahna, Aparahna, Pradosha, Nishita, or moonrise rule.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Evaluate maintained Telugu festival rules at each rule family's deciding instant, suppress duplicate day assignment, handle Amanta rollover and Adhika exclusions, and add monthly and solar-ingress observances.",
+        "steps": ["Add the Makara Sankranti cluster from solar-ingress day assignment.", "For non-Adhika months, evaluate sunrise rules directly and Madhyahna, Aparahna, Pradosha, and Nishita tables at their configured instants.", "For moment rules, require the target Tithi now but not at the same moment one day earlier; when sunrise is Amavasya and Pratipat begins by the moment, advance the Amanta month.", "Evaluate weekday-in-month and last-weekday-in-Paksha rules.", "Evaluate moonrise and Nishita monthly Vratas even in Adhika months, with annual-variant suppression."],
+        "formulae": [{"name": "Deciding instants", "expression": "Madhyahna = sunrise + 0.5 * daylight\nAparahna = sunrise + 0.7 * daylight\nPradosha = sunset + 0.05 day\nNishita = (sunset + next_sunrise) / 2", "variables": ["daylight: sunset - sunrise", "0.05 day: 72 clock minutes"]}],
+        "worked_examples": [{"label": "Ugadi, Hyderabad 2026-03-19", "inputs": ["Sunrise Maasam/Tithi: Phalguna Amavasya, index 29", "Madhyahna Tithi: Shukla Pratipat, index 0", "Same moment previous day: index 29"], "calculation": ["Ugadi is the Chaitra index-0 Madhyahna rule.", "Because sunrise was Amavasya and Pratipat began by Madhyahna, advance moment Maasam from Phalguna to Chaitra.", "Previous-day Madhyahna was not index 0, so first-day suppression passes."], "result": ["Festival list includes Ugadi on 2026-03-19"]}],
+        "notes": ["The forward-year fixture mixes independently compared and engine-pinned cells.", "The tables implement maintained Telugu/Amanta conventions, not a universal regional calendar."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["published_panchangam", "regional_convention"], "verification_states": ["partially_verified"], "claim_ids": ["festivals.forward_year_2027_2028"], "note": "Individual 2026 rules have comparisons; the forward-year fixture contains mixed independent and engine-pinned cells."},
       "tests": ["tests/test_festivals.py", "tests/test_festivals_forward_year.py"],
@@ -914,6 +1031,14 @@
       "inputs": ["weekday", "sunrise", "sunset"],
       "outputs": ["Gulika Kalam start/end"],
       "time_basis": "One eighth of local sunrise-to-sunset daytime.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Select a weekday-specific 1-based eighth of local daylight from the Gulika table.",
+        "steps": ["Map weekday 0=Sunday through 6=Saturday to Gulika part [7, 6, 5, 4, 3, 2, 1].", "Compute daylight block size as (sunset - sunrise) / 8.", "Return the selected contiguous block as whole-second UTC instants."],
+        "formulae": [{"name": "Day-part window", "expression": "B = (sunset - sunrise) / 8\nstart = sunrise + (part - 1) * B\nend = start + B", "variables": ["part: weekday-selected Gulika index", "B: one-eighth daylight duration"]}],
+        "worked_examples": [{"label": "Hyderabad, Thursday 2026-06-11", "inputs": ["Weekday index: 4", "Gulika part: 3", "Sunrise/sunset: 05:41:11/18:50:12 IST"], "calculation": ["B = 13:09:01 / 8 = 01:38:37.625.", "Take the third block."], "result": ["Gulika Kalam: 08:58:26-10:37:04 IST"]}],
+        "notes": ["The weekday table is conventional; location changes the result only through sunrise and sunset."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative city/date values are independently compared."},
       "tests": ["tests/test_muhurta_windows.py"],
@@ -933,6 +1058,14 @@
       "inputs": ["Moon-Sun elongation over the Panchangam day"],
       "outputs": ["Karana names and boundary instants"],
       "time_basis": "Sunrise-anchored day with crossings solved in UTC Julian day.",
+      "method": {
+        "kind": "formula",
+        "summary": "Divide Moon-Sun elongation into 60 six-degree half-Tithis, solve each boundary with the selected engine, map fixed or sevenfold repeating names, and return at most two spans intersecting daylight.",
+        "steps": ["Compute E = (Moon - Sun) modulo 360 at sunrise and set half-Tithi index h=floor(E/6) modulo 60.", "For h and the next two indices, bisect the engine elongation at h*6 and (h+1)*6 degrees.", "Discard a span ending before sunrise or starting after sunset.", "Use KARANA_FIXED when h is a fixed index; otherwise use KARANA_REPEATING[(h-1) modulo 7].", "Stop after two intersecting spans."],
+        "formulae": [{"name": "Karana index", "expression": "E = (M - S) mod 360\nh = floor(E / 6) mod 60", "variables": ["M: engine Moon longitude", "S: engine Sun longitude", "h: half-Tithi index"]}],
+        "worked_examples": [{"label": "Hyderabad sunrise, 2026-06-11, Drik Ganita", "inputs": ["Elongation: 302.5814559608 degrees", "Daylight: 05:41:11-18:50:12 IST"], "calculation": ["floor(302.5814559608 / 6) modulo 60 = 50.", "Solve consecutive six-degree crossings and retain the first two daylight-intersecting spans.", "Map indices through the fixed/repeating name tables."], "result": ["Bava: 00:58:16-11:52:44 IST", "Balava: 11:52:44-22:36:44 IST; spans are not clipped to daylight"]}],
+        "notes": ["Boundary instants and the sunrise index inherit the selected engine's longitude model."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
       "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
@@ -953,6 +1086,13 @@
       "inputs": ["Moon-Sun elongation", "solar longitude", "sunrise"],
       "outputs": ["Amanta month", "Adhika/Nija prefix", "Shukla/Krishna Paksham"],
       "time_basis": "Month at local sunrise bounded by engine-specific new moons.",
+      "method": {
+        "kind": "algorithm",
+        "summary": "Find the new moons bounding sunrise from engine elongation, name the Amanta month from the Sun sign at the starting new moon, identify Adhika or Nija repetition, and derive Paksham from the sunrise Tithi index.",
+        "steps": ["Iteratively locate the previous new moon using mean elongation rate 12.19 degrees/day for ten corrections, with a 29.530589-day fallback.", "Name the month from (starting-new-moon Sun-sign index - 11) modulo 12.", "Find the next bound; equal Sun signs at start and end imply Adhika.", "Otherwise inspect the previous bound; equal previous/start signs imply Nija.", "Set Paksham to Shukla for Tithi indices 0-14 and Krishna for 15-29."],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11, Drik Ganita", "inputs": ["Sunrise elongation: 302.5814559608 degrees", "Sunrise Tithi index: 25", "Engine-specific bounding new moons and solar signs"], "calculation": ["The bounding-new-moon Sun signs are equal, so prefix the derived Jyeshtha name with Adhika.", "Tithi index 25 lies in 15-29, so choose Krishna Paksham."], "result": ["Maasam: Adhika Jyeshtha", "Paksham: Krishna"]}],
+        "notes": ["The numerical search is an implementation technique, not a separately verified new-moon series.", "The convention is Telugu Amanta; Purnimanta calendars differ."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual", "regional_convention"], "verification_states": ["needs_locator", "engine_pinned"], "claim_ids": ["panchangam.calendar_semantics", "panchangam.non_drik_engine_outputs"], "note": "Semantics need exact locators; non-Drik month outputs are regression-pinned."},
       "tests": ["tests/test_drik_engine.py", "tests/test_adhika_maasa_muhurta.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
@@ -972,6 +1112,14 @@
       "inputs": ["engine lunar longitude"],
       "outputs": ["Nakshatra name", "start/end", "Pada"],
       "time_basis": "Active at local sunrise with UTC boundary crossings.",
+      "method": {
+        "kind": "formula",
+        "summary": "Divide sidereal lunar longitude into 27 equal Nakshatras and each Nakshatra into four Padas, then solve the enclosing longitude crossings around sunrise.",
+        "steps": ["Set Nakshatra size N=360/27 degrees.", "At sunrise choose n=floor(M/N) modulo 27.", "Bisect the Moon model at n*N in [sunrise-2 days, sunrise] and at (n+1)*N in [sunrise, sunrise+2 days].", "Compute Pada as floor((M/N)*4) modulo 4 plus 1.", "Map n through NAKSHATRA_NAMES and expose whole-second UTC boundaries."],
+        "formulae": [{"name": "Nakshatra and Pada", "expression": "N = 360 / 27\nn = floor(M / N) mod 27\npada = floor((M / N) * 4) mod 4 + 1", "variables": ["M: selected engine Moon longitude", "n: Nakshatra index", "pada: 1 through 4"]}],
+        "worked_examples": [{"label": "Hyderabad sunrise, 2026-06-11, Drik Ganita", "inputs": ["Moon longitude: 358.4708221648 degrees", "N = 13.3333333333 degrees"], "calculation": ["floor(358.4708221648/N) modulo 27 = 26, Revati.", "The Pada formula yields 4.", "Bisect the Drik Moon at the two Revati boundaries."], "result": ["Revati, Pada 4", "Span: 2026-06-10 09:21:40 to 2026-06-11 08:16:35 IST"]}],
+        "notes": ["Surya Siddhanta and Vakya use their own Moon functions, so their boundaries can differ from Drik."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
       "tests": ["tests/test_drik_engine.py", "tests/test_pada_on_daily.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
@@ -991,6 +1139,14 @@
       "inputs": ["solar longitude", "lunar longitude"],
       "outputs": ["Nitya Yoga name and boundary"],
       "time_basis": "Active at local sunrise with UTC crossing search.",
+      "method": {
+        "kind": "formula",
+        "summary": "Add the selected engine's Sun and Moon longitudes modulo one revolution, divide the result into 27 equal Yoga sectors, and solve the enclosing crossings around sunrise.",
+        "steps": ["Compute combined longitude Y=(S+M) modulo 360.", "Set N=360/27 and y=floor(Y/N) modulo 27.", "Bisect the combined-longitude function at y*N before sunrise and at (y+1)*N after sunrise, each within a two-day window.", "Map y through YOGA_NAMES and return whole-second UTC boundaries."],
+        "formulae": [{"name": "Nitya Yoga index", "expression": "Y = (S + M) mod 360\ny = floor(Y / (360 / 27)) mod 27", "variables": ["S: engine Sun longitude", "M: engine Moon longitude", "y: Yoga index"]}],
+        "worked_examples": [{"label": "Hyderabad sunrise, 2026-06-11, Drik Ganita", "inputs": ["Sun: 55.8893662040 degrees", "Moon: 358.4708221648 degrees"], "calculation": ["Y=(55.8893662040+358.4708221648) modulo 360 = 54.3601883689 degrees.", "floor(Y/13.3333333333)=4, Shobhana.", "Solve the adjacent combined-longitude crossings."], "result": ["Shobhana", "Span: 2026-06-11 04:03:08 to 2026-06-12 01:00:09 IST"]}],
+        "notes": ["The selected Sun/Moon model controls both classification and transition times."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
       "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
@@ -1008,6 +1164,14 @@
       "inputs": ["weekday", "sunrise", "sunset"],
       "outputs": ["Rahu Kalam start/end"],
       "time_basis": "One eighth of local sunrise-to-sunset daytime.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Select a weekday-specific 1-based eighth of local daylight from the Rahu table.",
+        "steps": ["Map weekday 0=Sunday through 6=Saturday to Rahu part [8, 2, 7, 5, 6, 4, 3].", "Compute daylight block size as (sunset - sunrise) / 8.", "Return the selected contiguous block as whole-second UTC instants."],
+        "formulae": [{"name": "Day-part window", "expression": "B = (sunset - sunrise) / 8\nstart = sunrise + (part - 1) * B\nend = start + B", "variables": ["part: weekday-selected Rahu index", "B: one-eighth daylight duration"]}],
+        "worked_examples": [{"label": "Hyderabad, Thursday 2026-06-11", "inputs": ["Weekday index: 4", "Rahu part: 6", "Sunrise/sunset: 05:41:11/18:50:12 IST"], "calculation": ["B = 13:09:01 / 8 = 01:38:37.625.", "Take the sixth block."], "result": ["Rahu Kalam: 13:54:19-15:32:57 IST"]}],
+        "notes": ["The weekday table is conventional; location changes the result only through sunrise and sunset."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative city/date values are independently compared."},
       "tests": ["tests/test_muhurta_windows.py"],
@@ -1027,6 +1191,14 @@
       "inputs": ["engine solar and lunar longitude"],
       "outputs": ["solar Rashi", "lunar Rashi"],
       "time_basis": "Longitude at local sunrise.",
+      "method": {
+        "kind": "formula",
+        "summary": "Divide the selected engine's normalized sunrise Sun and Moon longitudes into twelve 30-degree sidereal signs.",
+        "steps": ["Evaluate engine Sun and Moon longitude at local sunrise.", "For each body compute floor(longitude/30) modulo 12.", "Map both indices through RASHI_NAMES."],
+        "formulae": [{"name": "Rashi index", "expression": "r = floor(longitude / 30) mod 12", "variables": ["longitude: normalized sidereal body longitude", "r: Rashi index, Mesha=0"]}],
+        "worked_examples": [{"label": "Hyderabad sunrise, 2026-06-11, Drik Ganita", "inputs": ["Sun: 55.8893662040 degrees", "Moon: 358.4708221648 degrees"], "calculation": ["floor(55.8893662040/30)=1.", "floor(358.4708221648/30)=11."], "result": ["Solar Rashi: Vrishabha", "Lunar Rashi: Meena"]}],
+        "notes": ["These are sunrise classifications, not continuous sign-ingress spans."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparison evidence; non-Drik outputs are engine-pinned."},
       "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
@@ -1047,6 +1219,13 @@
       "inputs": ["date", "latitude", "longitude", "fixed pressure 1013.25 hPa", "fixed temperature 15 C", "hard-coded altitude 0 m"],
       "outputs": ["UTC rise/set instants rendered in local timezone"],
       "time_basis": "Search from local-midnight Julian day with observer coordinates.",
+      "method": {
+        "kind": "algorithm",
+        "summary": "Convert local civil midnight to UT Julian day and ask Swiss Ephemeris for the next Sun or Moon rise/set event using fixed observer and atmosphere parameters.",
+        "steps": ["Localize 00:00 on the requested date in the IANA timezone and convert it to UTC Julian day.", "Call swe.rise_trans for Sun or Moon with CALC_RISE or CALC_SET.", "Use [longitude, latitude, 0 metres], pressure 1013.25 hPa, temperature 15 C, and Swiss default upper-limb/refraction behavior.", "Search sunset from sunrise and next sunrise from the following local midnight.", "Convert tret[0] to a whole-second UTC datetime."],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11", "inputs": ["Location: Hyderabad, Asia/Kolkata", "Altitude forced to 0 metres", "Swiss default rise/set flags and atmosphere"], "calculation": ["Search the next solar rise after local midnight, then solar set after that rise.", "Search the next lunar rise and set after local midnight."], "result": ["Sunrise: 05:41:11 IST; sunset: 18:50:12 IST", "Moonrise: 01:55:18 IST; moonset: 14:53:44 IST"]}],
+        "notes": ["Swiss return codes are ignored; polar no-event cases are not represented safely.", "The Hindu disc-centre/no-refraction convention remains unresolved."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.rise_set_convention", "drik.sidereal_positions"], "note": "Swiss Ephemeris documents the current astronomical-default behavior; issue 177 tracks the Hindu-calendar convention decision and multi-city comparisons."},
       "tests": ["tests/test_utils.py", "tests/test_drik_engine.py"],
@@ -1066,6 +1245,14 @@
       "inputs": ["Julian day", "Maasam"],
       "outputs": ["60-year-cycle name"],
       "time_basis": "Year flips at Chaitra under the southern Chaitradi convention.",
+      "method": {
+        "kind": "formula",
+        "summary": "Count mean sidereal years since the code Kali epoch, shift by lunar-month number so the name changes at Chaitra, then apply the repository's 60-name anchor.",
+        "steps": ["Remove Adhika or Nija and convert Chaitra..Phalguna to month number 1..12.", "Set ahargana=JD-588465.5.", "Compute elapsed=floor((ahargana+(4-month_number)*30)/365.25636).", "Return SAMVATSARA_NAMES[(elapsed+12) modulo 60]."],
+        "formulae": [{"name": "Sixty-year index", "expression": "A = JD - 588465.5\ny = floor((A + (4 - month_number) * 30) / 365.25636)\nindex = (y + 12) mod 60", "variables": ["month_number: Chaitra=1 through Phalguna=12", "y: elapsed project sidereal years", "12: project cycle anchor"]}],
+        "worked_examples": [{"label": "Hyderabad sunrise, 2026-06-11", "inputs": ["JD: 2461202.5077662035", "Maasam: Adhika Jyeshtha, base month number 3"], "calculation": ["A=1,872,737.0077662035 days.", "floor((A+30)/365.25636)=5,127.", "(5,127+12) modulo 60=39."], "result": ["SAMVATSARA_NAMES[39]: Parabhava"]}],
+        "notes": ["The anchor and month shift are project conventions whose criterion-level locator remains unresolved."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "Expected years are regression-tested; epoch/offset semantics need exact source documentation."},
       "tests": ["tests/test_samvatsara.py"],
@@ -1083,6 +1270,13 @@
       "inputs": ["sunrise", "sunset", "solar longitude crossing"],
       "outputs": ["entered Rashi", "ingress Julian day", "Sankranti flag"],
       "time_basis": "Ingress after local sunset is assigned to the next Panchangam day.",
+      "method": {
+        "kind": "algorithm",
+        "summary": "Detect a solar-sign change across today's daylight or after yesterday's sunset, bisect the exact 30-degree crossing with the selected engine Sun, and assign after-sunset ingress to the following Panchangam day.",
+        "steps": ["Compare Sun-sign indices at today's sunrise and sunset.", "If they differ, bisect the engine Sun between sunrise and sunset at the entered sign's boundary.", "Otherwise compare yesterday's sunrise and sunset with today's sunrise.", "When the sign changed after yesterday's sunset, bisect in [yesterday sunset, today sunrise] and assign it to today.", "Return no event when neither condition holds."],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-15, Drik Ganita", "inputs": ["Sunrise: 05:41:40 IST", "Sunset: 18:51:22 IST", "Sun changes from Vrishabha to Mithuna during daylight"], "calculation": ["Sunrise and sunset sign indices differ.", "Bisect Drik Sun longitude at 60 degrees between sunrise and sunset."], "result": ["Entered Rashi: Mithuna", "Ingress JD: 2461206.8076462564; local time 12:53:00 IST; assigned to 2026-06-15"]}],
+        "notes": ["Day assignment is a convention separate from the astronomical crossing instant."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "Crossing code is tested; day-assignment semantics need exact locator evidence."},
       "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py"],
@@ -1101,6 +1295,13 @@
       "inputs": ["instant", "location", "engine longitude functions", "sunrise-anchored Vaaram"],
       "outputs": ["slot-time Panchangam facts"],
       "time_basis": "Exact evaluated instant; Vaaram remains anchored to the Panchangam sunrise day.",
+      "method": {
+        "kind": "algorithm",
+        "summary": "At an arbitrary instant, evaluate the selected engine's Sun and Moon once and derive Tithi, Nakshatra, Yoga, Karana, lunar Rashi, Vaaram, and special-Yoga names without rebuilding a full day.",
+        "steps": ["Normalize the datetime to UTC and convert it to Julian day.", "Evaluate and normalize engine Sun and Moon; compute elongation.", "Apply the 12-degree, 360/27-degree, 6-degree, and 30-degree index formulae used by the daily angas.", "Use caller-supplied sunrise Vaaram; only if absent, approximate it from UTC weekday.", "Pass Vaaram, Tithi, and Nakshatra names to the special-Yoga table."],
+        "worked_examples": [{"label": "Hyderabad sunrise instant, 2026-06-11, Drik Ganita", "inputs": ["Instant: 2026-06-11 05:41:11 IST", "Sun/Moon: 55.8893662040/358.4708221648 degrees", "Vaaram supplied: Guruvaram"], "calculation": ["Apply all five index formulae at that instant.", "Evaluate special Yogas from Guruvaram and the derived Tithi/Nakshatra."], "result": ["Krishna Ekadashi, Revati, Shobhana, Bava, Meena, Guruvaram", "Special-Yoga list is table-derived from those exact slot facts"]}],
+        "notes": ["The UTC-weekday fallback is approximate around the local sunrise boundary.", "The browser mirror implements Drik/Lahiri slot facts only."]
+      },
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Slot facts inherit the evidence state of the selected engine and calendar semantics."},
       "tests": ["tests/test_engine_facts_at.py", "tests/test_activity_surface_parity.py"],
@@ -1122,6 +1323,13 @@
       "inputs": ["Maasam", "Paksham", "Tithi at deciding moments", "weekday", "solar sign"],
       "outputs": ["observance flags", "Ekadashi name"],
       "time_basis": "Panchangam-day deciding moments; names use Telugu Amanta convention.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Classify recurring lunar days from sunrise and sunset Tithi indices, combine Pradosham with weekday, detect Sankranti from solar-sign changes, and name Ekadashi from Maasam/Paksham overrides.",
+        "steps": ["At sunrise set Ekadashi for indices 10 or 25, Pournami for 14, and Amavasya for 29.", "Set Pradosham when index 12 or 27 is active at sunrise or sunset; add Shani/Soma for Saturday/Monday.", "Detect a solar-sign change across the engine's comparison window for Sankranti.", "For Adhika Maasam name Shukla/Krishna Ekadashi Padmini/Parama.", "Otherwise use the base Maasam/Paksham lookup and append Vaikunta for Shukla Ekadashi with Sun in Dhanu."],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11, Drik Ganita", "inputs": ["Sunrise Tithi index: 25", "Maasam/Paksham: Adhika Jyeshtha/Krishna", "Weekday: Thursday", "No solar-sign change"], "calculation": ["Index 25 matches Krishna Ekadashi.", "The Adhika-Krishna override selects Parama.", "Other special indices and weekday combinations do not match."], "result": ["is_ekadashi=true; name=Parama Ekadashi", "Other lunar-day and Sankranti flags are false"]}],
+        "notes": ["Deciding moments and names follow maintained Telugu conventions rather than a universal calendar rule."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website", "generated-data"],
       "provenance": {"evidence_classes": ["published_panchangam", "regional_convention"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["festivals.forward_year_2027_2028", "panchangam.non_drik_engine_outputs"], "note": "Drik has representative comparisons; non-Drik flags are regression-pinned."},
       "tests": ["tests/test_drik_engine.py", "tests/test_festivals.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
@@ -1141,6 +1349,14 @@
       "inputs": ["engine solar longitude", "engine lunar longitude"],
       "outputs": ["Tithi name", "start", "end"],
       "time_basis": "Active at local sunrise with boundary crossings solved in UTC Julian day.",
+      "method": {
+        "kind": "formula",
+        "summary": "Divide normalized Moon-Sun elongation into 30 twelve-degree Tithis and bisect the selected engine's elongation for the enclosing boundaries around sunrise.",
+        "steps": ["Compute E=(Moon-Sun) modulo 360 at sunrise.", "Set t=floor(E/12) modulo 30 and map through TITHI_NAMES.", "Bisect elongation at t*12 degrees in [sunrise-2 days, sunrise].", "Bisect the next boundary in [sunrise, sunrise+2 days].", "Convert both Julian days to whole-second UTC datetimes."],
+        "formulae": [{"name": "Tithi index", "expression": "E = (M - S) mod 360\nt = floor(E / 12) mod 30", "variables": ["M: engine Moon longitude", "S: engine Sun longitude", "t: Tithi index, Shukla Pratipat=0"]}],
+        "worked_examples": [{"label": "Hyderabad sunrise, 2026-06-11, Drik Ganita", "inputs": ["Sun: 55.8893662040 degrees", "Moon: 358.4708221648 degrees"], "calculation": ["E=302.5814559608 degrees.", "floor(E/12)=25, Krishna Ekadashi.", "Bisect Drik elongation at 300 and 312 degrees."], "result": ["Krishna Ekadashi", "Span: 2026-06-11 00:58:16-22:36:44 IST"]}],
+        "notes": ["Surya Siddhanta and Vakya use the same sector definition with their own longitude models."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["partially_verified", "engine_pinned"], "claim_ids": ["drik.sidereal_positions", "panchangam.non_drik_engine_outputs", "panchangam.calendar_semantics"], "note": "Drik has representative comparisons; non-Drik spans are engine-pinned."},
       "tests": ["tests/test_drik_engine.py", "tests/test_surya_siddhanta_engine.py", "tests/test_vakya_engine.py"],
@@ -1160,6 +1376,14 @@
       "inputs": ["local Panchangam date and sunrise"],
       "outputs": ["Vaaram name"],
       "time_basis": "Sunrise-to-next-sunrise day, not civil midnight.",
+      "method": {
+        "kind": "formula",
+        "summary": "Derive weekday from sunrise Julian day and hold that Vaaram constant for the complete sunrise-to-next-sunrise Panchangam day.",
+        "steps": ["Compute location/date sunrise as a UT Julian day.", "Set weekday index to int(JD_sunrise+1.5) modulo 7, where 0=Sunday.", "Map through VAARAM_NAMES and attach the single name to the day.", "Pass the same value into slot-time facts so it does not flip at civil midnight."],
+        "formulae": [{"name": "Sunrise weekday", "expression": "weekday = int(JD_sunrise + 1.5) mod 7", "variables": ["JD_sunrise: UT Julian day of local sunrise", "weekday: Sunday=0 through Saturday=6"]}],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11", "inputs": ["Sunrise JD: 2461202.5077662035"], "calculation": ["int(2461202.5077662035+1.5) modulo 7 = 4.", "VAARAM_NAMES[4] is Guruvaram."], "result": ["Guruvaram from sunrise 2026-06-11 until the next sunrise"]}],
+        "notes": ["Before local sunrise, civil-date weekday expectations can differ from active Panchangam Vaaram."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.calendar_semantics"], "note": "The sunrise-day semantic is tested but needs an exact textual locator."},
       "tests": ["tests/test_engine_facts_at.py", "tests/test_drik_engine.py"],
@@ -1178,6 +1402,14 @@
       "inputs": ["Nakshatra spans", "Varjyam offset table", "day bounds"],
       "outputs": ["Varjyam windows"],
       "time_basis": "Four-sixtieths of actual Nakshatra duration at the table offset.",
+      "method": {
+        "kind": "formula",
+        "summary": "For the sunrise Nakshatra and its successor, place a four-Ghati Tyajya window at the maintained Nakshatra offset and retain it only when its start lies in the Panchangam day.",
+        "steps": ["Find the full span of the sunrise Nakshatra and the immediately following span with the selected engine's Moon model.", "Read the Nakshatra-specific Varjyam start offset on a 60-Ghati scale.", "Scale the offset and four-Ghati duration by the actual Nakshatra span.", "Keep only windows whose starts satisfy sunrise <= start < next sunrise."],
+        "formulae": [{"name": "Nakshatra-scaled Tyajya window", "expression": "start = N_start + N_duration * offset[n] / 60\nend = start + N_duration * 4 / 60", "variables": ["N_duration: actual Nakshatra duration", "offset[n]: VARJYAM_GHATIS entry for Nakshatra n"]}],
+        "worked_examples": [{"label": "Hyderabad, 2026-06-11, Drik Ganita", "inputs": ["Panchangam day: 05:41:11 IST to next sunrise", "Sunrise Nakshatra: Revati; successor: Ashvini", "Offsets from VARJYAM_GHATIS"], "calculation": ["Construct the scaled Tyajya window for both spans.", "Discard a window when its computed start is outside the Panchangam day."], "result": ["Retained Varjyam: 2026-06-12 02:46:45-04:15:33.8 IST"]}],
+        "notes": ["The Raman locator supports the Tyajyakala concept; the maintained complete offset table remains only partially evidenced."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative values are compared; the table's full locator coverage remains incomplete."},
       "tests": ["tests/test_muhurta_windows.py"],
@@ -1195,6 +1427,14 @@
       "inputs": ["weekday", "sunrise", "sunset"],
       "outputs": ["Yamagandam start/end"],
       "time_basis": "One eighth of local sunrise-to-sunset daytime.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Select a weekday-specific 1-based eighth of local daylight from the Yamagandam table.",
+        "steps": ["Map weekday 0=Sunday through 6=Saturday to Yamagandam part [5, 4, 3, 2, 1, 7, 6].", "Compute daylight block size as (sunset - sunrise) / 8.", "Return the selected contiguous block as whole-second UTC instants."],
+        "formulae": [{"name": "Day-part window", "expression": "B = (sunset - sunrise) / 8\nstart = sunrise + (part - 1) * B\nend = start + B", "variables": ["part: weekday-selected Yamagandam index", "B: one-eighth daylight duration"]}],
+        "worked_examples": [{"label": "Hyderabad, Thursday 2026-06-11", "inputs": ["Weekday index: 4", "Yamagandam part: 1", "Sunrise/sunset: 05:41:11/18:50:12 IST"], "calculation": ["B = 13:09:01 / 8 = 01:38:37.625.", "Take the first block from sunrise."], "result": ["Yamagandam: 05:41:11-07:19:48 IST"]}],
+        "notes": ["The weekday table is conventional; location changes the result only through sunrise and sunset."]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
       "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative city/date values are independently compared."},
       "tests": ["tests/test_muhurta_windows.py"],
@@ -1413,6 +1653,14 @@
       "inputs": ["graha", "solar longitude", "planetary longitude"],
       "outputs": ["elongation", "threshold", "combust boolean"],
       "time_basis": "Drik snapshot at local sunrise.",
+      "method": {
+        "kind": "formula",
+        "summary": "Compute the absolute shortest angular separation between the Sun and Guru or Shukra and compare it with the maintained strict combustion threshold.",
+        "steps": ["Select threshold 11 degrees for Guru or 10 degrees for Shukra.", "Normalize planet-Sun difference onto the signed shortest arc and take its absolute value in 0-180 degrees.", "Set combust=true only when separation is strictly less than the threshold.", "Return graha, separation, flag, and threshold."],
+        "formulae": [{"name": "Shortest-arc combustion", "expression": "d = abs((planet - sun + 180) mod 360 - 180)\ncombust = d < threshold[graha]", "variables": ["d: shortest angular separation", "threshold: Guru 11 degrees; Shukra 10 degrees"]}],
+        "worked_examples": [{"label": "Illustrative Guru conjunction", "inputs": ["Sun longitude: 100 degrees", "Guru longitude: 109 degrees", "Guru threshold: 11 degrees"], "calculation": ["d=abs((109-100+180) modulo 360 - 180)=9 degrees.", "9 < 11."], "result": ["elongation_deg=9; combust=true; threshold_deg=11"]}],
+        "notes": ["Equality is not combust because comparison is strict.", "Surya Siddhanta and Vakya do not populate outer-planet Maudhya fields."]
+      },
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["astronomical", "textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Numerical behavior is tested; exact threshold locators remain under derived-classification debt."},
       "tests": ["tests/test_maudhya.py"],
@@ -1430,6 +1678,13 @@
       "inputs": ["Guru or Shukra Rashi"],
       "outputs": ["Simha-stha boolean"],
       "time_basis": "Drik snapshot at local sunrise.",
+      "method": {
+        "kind": "decision-table",
+        "summary": "Return true exactly when the already-computed Guru or Shukra Rashi name is Simha.",
+        "steps": ["Receive the planetary Rashi name or null from the upstream longitude-to-Rashi computation.", "Compare it for exact equality with Simha.", "Return the Boolean result without applying strength, dignity, aspect, or time-window logic."],
+        "worked_examples": [{"label": "Exact-name classification", "inputs": ["Guru Rashi: Simha", "Shukra Rashi: Karka"], "calculation": ["Simha equals Simha, so Guru passes.", "Karka does not equal Simha, so Shukra fails."], "result": ["simha_stha_guru=true", "simha_stha_shukra=false"]}],
+        "notes": ["The function classifies an upstream sign result; it does not calculate planetary longitude.", "Surya Siddhanta and Vakya leave these flags at model defaults."]
+      },
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Flag behavior is tested; exact scope and source locator remain open."},
       "tests": ["tests/test_simha_stha.py"],
