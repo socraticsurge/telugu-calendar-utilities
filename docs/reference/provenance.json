@@ -60,6 +60,14 @@
       "authority_type": "published_panchangam"
     },
     {
+      "id": "DP-ABHIJIT-MUHURAT",
+      "title": "Abhijit Muhurat",
+      "author": "Drik Panchang",
+      "edition": "Web reference page, accessed 2026-08-28",
+      "url": "https://www.drikpanchang.com/muhurat/daily/abhijit-muhurat.html",
+      "authority_type": "published_panchangam"
+    },
+    {
       "id": "SWISSEPH",
       "title": "Swiss Ephemeris",
       "author": "Astrodienst",
@@ -161,6 +169,17 @@
       "locator": "B. V. Raman, Chapter III, printed p. 8 (Nakshatra Tyajyakala table), and Chapter V section 7, printed pp. 13-14 (Durmuhurta); regional tables remain regression-pinned",
       "scope": "The auspicious, inauspicious and Choghadiya response objects are mixed containers. Raman supports the four-Ghati Nakshatra Tyajyakala concept and his printed Durmuhurta scheme, but the project's regional weekday tables are not identical to Raman's table and the remaining Brahma Muhurta, Abhijit, Amrita Kalam, Rahu Kalam, Gulika, Yamagandam and Choghadiya components do not yet have criterion-level textual claims. This state records partial evidence, not umbrella verification.",
       "last_reviewed": "2026-07-22"
+    },
+    {
+      "id": "panchangam.abhijit_muhurta_method",
+      "surface": "panchangam",
+      "implementation": "telugu_panchangam/engines/base.py",
+      "evidence_class": "published_panchangam",
+      "verification_state": "partially_verified",
+      "source_ids": ["DP-ABHIJIT-MUHURAT"],
+      "locator": "Section 'About Abhijit Muhurat': the second paragraph defines Abhijit as the eighth of 15 equal sunrise-to-sunset parts; the following example derives 11:40-12:20 for a 06:00-18:00 day; the final paragraph records the Wednesday exclusion",
+      "scope": "Supports the maintained daylight-division formula and selected Wednesday convention. It is a published-Panchangam reference rather than a primary textual edition. The repository currently has one explicit location/date comparison for the displayed window, so this does not establish exhaustive multi-city output verification or universal activity suitability.",
+      "last_reviewed": "2026-08-28"
     },
     {
       "id": "panchangam.sankramana_avoidance",

@@ -17,6 +17,12 @@
       "project-heuristic",
       "generated-interpretation"
     ],
+    "method_kinds": [
+      "formula",
+      "algorithm",
+      "decision-table",
+      "interpretive-procedure"
+    ],
     "implementation_roles": ["owner", "mirror"],
     "surfaces": [
       "python-library",
@@ -705,11 +711,73 @@
       ],
       "inputs": ["sunrise", "sunset", "weekday"],
       "outputs": ["Abhijit start/end or null"],
-      "time_basis": "Proportional local daytime centered on solar midday.",
+      "time_basis": "Proportional local daytime centered on the arithmetic midpoint between sunrise and sunset.",
+      "method": {
+        "kind": "formula",
+        "summary": "Divide the sunrise-to-sunset interval into 15 equal Muhurta-length parts and return the eighth, middle part, except that the selected convention suppresses it on Wednesday.",
+        "steps": [
+          "If the weekday is Wednesday, return null and do not construct an Abhijit window.",
+          "Subtract sunrise from sunset to obtain the local daylight duration D.",
+          "Take the arithmetic midpoint M of the sunrise and sunset instants.",
+          "Set the half-width H to D / 30, which makes the complete interval 2H = D / 15.",
+          "Return M - H as the start and M + H as the end; the engine stores both as UTC instants and presentation layers convert them to local civil time."
+        ],
+        "formulae": [
+          {
+            "name": "Daylight duration and midpoint",
+            "expression": "D = T_set - T_rise\nM = (T_rise + T_set) / 2",
+            "variables": [
+              "T_rise: computed sunrise instant for the location and date",
+              "T_set: computed sunset instant for the location and date",
+              "D: elapsed sunrise-to-sunset duration",
+              "M: arithmetic midpoint of the sunrise-to-sunset interval"
+            ]
+          },
+          {
+            "name": "Abhijit interval",
+            "expression": "H = D / 30\nstart = M - H\nend = M + H\nend - start = D / 15",
+            "variables": [
+              "H: half of one daytime Muhurta",
+              "start: beginning of the eighth daytime part",
+              "end: end of the eighth daytime part"
+            ]
+          }
+        ],
+        "worked_examples": [
+          {
+            "label": "Hyderabad, 2026-06-11, Drik Ganita (Asia/Kolkata)",
+            "inputs": [
+              "Weekday: Thursday, so the Wednesday exclusion does not apply",
+              "Sunrise: 05:41:11 IST (00:11:11 UTC)",
+              "Sunset: 18:50:12 IST (13:20:12 UTC)"
+            ],
+            "calculation": [
+              "D = 18:50:12 - 05:41:11 = 13:09:01 = 47,341 seconds.",
+              "M = (05:41:11 + 18:50:12) / 2 = 12:15:41.5 IST.",
+              "H = 47,341 / 30 = 1,578.033 seconds, or 00:26:18.033.",
+              "start = 12:15:41.5 - 00:26:18.033 = 11:49:23.467 IST; end = 12:15:41.5 + 00:26:18.033 = 12:41:59.533 IST."
+            ],
+            "result": [
+              "Engine instants at whole-second precision: 11:49:23–12:41:59 IST.",
+              "Published-reference comparison in the regression test: 11:50–12:42, within the test's one-minute display tolerance.",
+              "Total duration: 52 minutes 36 seconds, equal to daylight duration / 15."
+            ]
+          }
+        ],
+        "notes": [
+          "This midpoint is derived from sunrise and sunset; it is not a separate calculation of the Sun's meridian transit.",
+          "The cited published reference also cautions against marriage and Upanayana during Abhijit; this low-level window function does not evaluate activity suitability.",
+          "A criterion-level primary textual verse or edition locator has not yet been registered."
+        ]
+      },
       "surfaces": ["python-library", "mcp", "ics", "website"],
-      "provenance": {"evidence_classes": ["textual", "published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.mixed_daily_windows"], "note": "Representative published values are checked; the full textual locator set is incomplete."},
-      "tests": ["tests/test_muhurta_windows.py"],
-      "limitations": ["Wednesday omission follows the selected convention."]
+      "provenance": {"evidence_classes": ["published_panchangam"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.abhijit_muhurta_method"], "note": "The maintained implementation formula and Wednesday convention have a direct published-Panchangam reference and a representative output comparison. This is not a primary textual locator or a broad multi-city comparison set."},
+      "tests": ["tests/test_muhurta_windows.py", "tests/test_named_muhurtas.py"],
+      "limitations": [
+        "Wednesday returns no Abhijit window under the selected convention.",
+        "The registered external method reference is a published Panchangam, not a primary textual edition.",
+        "The low-level computation does not enforce activity-specific restrictions such as marriage or Upanayana suitability."
+      ]
     },
     {
       "id": "panchangam.amrita-kalam",

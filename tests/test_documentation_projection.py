@@ -1,5 +1,6 @@
 """The local documentation projection must preserve its publication boundary."""
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,6 +65,30 @@ def test_every_computation_gets_a_registry_driven_searchable_route():
     assert "path.replace(/^_generated\\/computations\\//" in config
     assert 'engine_pinned' in generator
     assert 'Not independently verified' in generator
+
+
+def test_generated_pages_show_real_methods_and_visible_method_gaps():
+    subprocess.run(
+        ['node', 'tools/generate-docs-computations.mjs'],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    abhijit = _read(
+        'docs/_generated/computations/panchangam.abhijit-muhurta.md')
+    assert '## Computation method' in abhijit
+    assert 'D = T_set - T_rise' in abhijit
+    assert 'end - start = D / 15' in abhijit
+    assert 'Hyderabad, 2026-06-11, Drik Ganita' in abhijit
+    assert '11:49:23–12:41:59 IST' in abhijit
+    assert 'panchangam.abhijit_muhurta_method' in abhijit
+    assert '[**Abhijit Muhurat**](https://www.drikpanchang.com/' in abhijit
+
+    incomplete = _read('docs/_generated/computations/panchangam.tithi.md')
+    assert 'Method documentation incomplete' in incomplete
+    assert 'Incomplete — the contract is inventoried' in incomplete
 
 
 def test_projection_adds_no_competing_pages_workflow_or_cname():
