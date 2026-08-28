@@ -178,6 +178,7 @@
         "inputs",
         "outputs",
         "time_basis",
+        "method",
         "surfaces",
         "provenance",
         "tests",

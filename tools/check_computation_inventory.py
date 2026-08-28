@@ -22,7 +22,7 @@ _TS_SYMBOL_RE = re.compile(
 _REQUIRED_RECORD_FIELDS = {
     'id', 'title', 'summary', 'owning_layer', 'claim_kind',
     'implementations', 'inputs', 'outputs', 'time_basis', 'surfaces',
-    'provenance', 'tests', 'limitations',
+    'method', 'provenance', 'tests', 'limitations',
 }
 _REQUIRED_VOCABULARIES = {
     'owning_layers', 'claim_kinds', 'implementation_roles', 'surfaces',
@@ -82,8 +82,9 @@ def _validate_method(
     vocabularies: dict[str, Any],
     errors: list[str],
 ) -> None:
-    """Validate a present method; missing methods remain visible rollout gaps."""
+    """Validate the required reproducible computation method."""
     if method is None:
+        errors.append(f'{label}.method is required')
         return
     if not isinstance(method, dict):
         errors.append(f'{label}.method must be an object')

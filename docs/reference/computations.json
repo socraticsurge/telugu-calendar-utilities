@@ -825,7 +825,15 @@
       "surfaces": ["python-library", "mcp", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["drik.sidereal_positions"], "note": "The same Drik longitude evidence boundary applies to these derived fields."},
       "tests": ["tests/test_graha_positions.py"],
-      "limitations": ["Rahu and Ketu use the selected node convention; next-ingress dates are numerical search results and rasi_until is currently rendered as an IST calendar date rather than the requested city's local date."]
+      "limitations": ["Rahu and Ketu use the selected node convention; next-ingress dates are numerical search results and rasi_until is currently rendered as an IST calendar date rather than the requested city's local date."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Compute sidereal longitude and speed for each of nine Grahas, derive the categorical fields, and search adaptively for the next 30-degree sign crossing.",
+        "steps": ["Set the requested Swiss Ephemeris sidereal mode.", "Compute longitude and daily speed; derive Ketu as mean Rahu plus 180 degrees.", "Map longitude to Rashi, one of 27 Nakshatras, and one of four Padas; mark negative speed as retrograde.", "Step adaptively toward the nearest sign boundary and bisect the first sign-index change with 40 iterations.", "Convert the ingress to an IST date, emit the next Rashi, and restore Lahiri mode."],
+        "formulae": [{"name": "Rashi, Nakshatra, and Pada", "expression": "r=floor(lambda/30); n=floor(lambda/(360/27)); pada=(floor((lambda/(360/27))*4) mod 4)+1", "variables": ["lambda: normalized sidereal longitude in degrees"]}],
+        "worked_examples": [{"label": "Guru at Hyderabad sunrise, 2026-06-11", "inputs": ["UT Julian day: 2461202.5077662035", "Ayanamsa: Lahiri"], "calculation": ["Guru longitude = 91.7834 degrees, placing it in Rashi index 3 and Punarvasu Pada 4.", "Positive daily speed means it is not retrograde.", "The next sign-index crossing is searched numerically."], "result": ["Rashi: Karka", "Nakshatra: Punarvasu, Pada 4", "Next Rashi: Simha on 2026-10-31 IST"]}],
+        "notes": ["The longitude evidence boundary is inherited from the Drik calculation; next-ingress date localization is currently fixed to IST."]
+      }
     },
     {
       "id": "gochara.named-shani-conditions",
@@ -843,7 +851,15 @@
       "surfaces": ["python-library", "mcp", "website", "generated-data"],
       "provenance": {"evidence_classes": ["textual", "regional_convention"], "verification_states": ["partially_verified"], "claim_ids": ["gochara.named_shani_conditions"], "note": "Underlying adverse houses have support; conventional names and phases are explicitly bounded."},
       "tests": ["tests/test_gochara_rules.py", "src/__tests__/shani-conditions.test.ts"],
-      "limitations": ["Names and phase labels are conventional presentation and not a complete natal transit judgment."]
+      "limitations": ["Names and phase labels are conventional presentation and not a complete natal transit judgment."],
+      "method": {
+        "kind": "decision-table",
+        "summary": "Count Saturn's current sign inclusively from Janma Rashi and label only houses 12, 1, 2, 8, and 4.",
+        "steps": ["Convert Janma Rashi and Shani Rashi to canonical indices.", "Compute the inclusive wrapped house number.", "Map 12/1/2 to rising/peak/setting Sade Sati, 8 to Ashtama Shani, and 4 to Ardhastama Shani.", "Return an empty list for every other house."],
+        "formulae": [{"name": "Transit house", "expression": "h = ((index(transit)-index(janma)) mod 12)+1", "variables": ["h: inclusive house from Janma Rashi"]}],
+        "worked_examples": [{"label": "Shani in Meena from Mesha Janma Rashi", "inputs": ["Janma Rashi: Mesha", "Shani Rashi: Meena"], "calculation": ["((11 - 0) mod 12) + 1 = 12.", "House 12 maps to the rising phase label."], "result": ["Sade Sati (rising phase)"]}],
+        "notes": ["The labels summarize a Moon-sign transit convention; they do not infer natal placements, Dasha, aspects, or individualized outcomes."]
+      }
     },
     {
       "id": "gochara.transit-verdicts",
@@ -861,7 +877,15 @@
       "surfaces": ["python-library", "mcp", "website", "generated-data"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["gochara.favourable_houses", "gochara.vedha_tables", "gochara.nodes"], "note": "Classical house and Vedha tables are claim-located; disclosed node handling is separately registered."},
       "tests": ["tests/test_gochara_rules.py", "tests/test_gochara_provenance.py"],
-      "limitations": ["This is Moon-sign Gochara, not a full natal-chart or Dasha interpretation."]
+      "limitations": ["This is Moon-sign Gochara, not a full natal-chart or Dasha interpretation."],
+      "method": {
+        "kind": "decision-table",
+        "summary": "Count each Graha's house from Janma Rashi, test its favourable-house set, and downgrade a favourable result when a non-exempt Graha occupies its mapped Vedha house.",
+        "steps": ["Build a house-to-occupants index for the supplied sky.", "For each Graha, compute its inclusive house from Janma Rashi.", "Start adverse; change to favourable only when that house is in the Graha's favourable set.", "For non-node Grahas, find the Vedha house for that favourable position and scan its occupants.", "Ignore self, Rahu/Ketu, and the Surya-Shani or Chandra-Budha exemption pairs; otherwise mark blocked and name the first blocker."],
+        "formulae": [{"name": "Gochara house", "expression": "h_g = ((index(rasi_g)-index(janma_rasi)) mod 12)+1", "variables": ["h_g: Graha house from natal Moon sign"]}],
+        "worked_examples": [{"label": "Surya in Mithuna with Guru in Dhanu, Janma Mesha", "inputs": ["Janma Rashi: Mesha", "Surya: Mithuna", "Guru: Dhanu"], "calculation": ["Surya is in house 3, one of its favourable houses.", "Surya house 3 has Vedha house 9.", "Guru occupies house 9 and is not an exempt blocker."], "result": ["Surya verdict: blocked", "Vedha by: Guru"]}],
+        "notes": ["Rahu and Ketu use Surya's favourable houses but intentionally receive no Vedha processing under the registered conservative policy."]
+      }
     },
     {
       "id": "interpretation.daily-rasi-phalalu-deterministic",
@@ -879,7 +903,14 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["verified", "heuristic"], "claim_ids": ["gochara.favourable_houses", "gochara.vedha_tables"], "note": "Transit facts inherit verified rule tables; wording and synthesis remain project interpretation."},
       "tests": ["tests/test_phalalu.py"],
-      "limitations": ["Narrative wording is interpretive and must not be treated as individualized professional advice."]
+      "limitations": ["Narrative wording is interpretive and must not be treated as individualized professional advice."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Compose fixed English sentences from Chandrabalam, verified Gochara verdicts, named Shani conditions, and optional Tarabalam, then assign a small project-defined day-quality label.",
+        "steps": ["Compute all nine Gochara verdicts and any named Shani condition.", "Compute the Moon house and good/puja/bad Chandrabalam verdict.", "Count favourable, blocked, and adverse Grahas.", "Label good when Moon is good and at least four Grahas are favourable; label difficult when Moon is bad and at most two are favourable; otherwise label mixed.", "Render deterministic opener, optional Tara sentence, condition sentence, eight ordered Graha lines, and a count summary."],
+        "worked_examples": [{"label": "Mesha reading from the 2026-06-11 sunrise sky", "inputs": ["Moon house: 12 (bad)", "Favourable Grahas: 2", "Blocked: 0", "Adverse: 7", "Condition: Sade Sati (rising phase)"], "calculation": ["Moon is bad and favourable count is at most 2, so day_quality=difficult.", "The fixed templates render the Moon opener, Shani condition, transit lines, and count."], "result": ["Day quality: difficult", "Summary: 2 of 9 grahas favour you today."]}],
+        "notes": ["Transit facts are rule-derived; the thresholds, life-area wording, and synthesis are declared project heuristics."]
+      }
     },
     {
       "id": "interpretation.daily-rasi-phalalu-generated",
@@ -897,7 +928,14 @@
       "surfaces": ["website", "generated-data"],
       "provenance": {"evidence_classes": ["project_heuristic"], "verification_states": ["heuristic"], "claim_ids": ["daily_horoscope.llm_interpretation"], "note": "Cited transit triples are checked; prose and advice are explicitly generated interpretation."},
       "tests": ["tests/test_llm_phalalu_verify.py"],
-      "limitations": ["Verification prevents unsupported transit facts but cannot make generated prose a classical or professional authority."]
+      "limitations": ["Verification prevents unsupported transit facts but cannot make generated prose a classical or professional authority."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Generate structured prose for all twelve Rashis, then reject the batch unless every cited transit matches computed facts and the text passes narrow safety and consistency checks.",
+        "steps": ["Compute the sky, Gochara verdicts, Moon house, and named conditions for all twelve Rashis.", "Request a schema-constrained JSON array with text, advice, and explicit transit citations.", "Require exactly twelve unique known Rashis, non-empty text/advice, and at least one citation per Rashi.", "Normalize known English/Sanskrit Graha aliases, then require exact computed position and verdict and require the cited Graha to be named in the prose.", "Reject intraday precision, waiting-period claims, and medical/legal/investment/contract guidance.", "Regenerate up to three times on verification drift; retry transient HTTP errors and use the fallback model only after primary 429 exhaustion."],
+        "worked_examples": [{"label": "Verifier treatment of an English Graha alias", "inputs": ["Citation Graha: Sun", "Computed canonical Graha: Surya", "Citation position and verdict: exact engine values", "Prose explicitly names Surya"], "calculation": ["Canonicalize Sun to Surya.", "Compare position and verdict exactly.", "Confirm a recognized Surya/Sun label occurs in the text."], "result": ["Citation accepted", "Prose remains labeled model interpretation; only citation fields are engine-verified"]}],
+        "notes": ["The verifier is a factual/safety boundary, not a semantic proof of the prose and not evidence of classical authority."]
+      }
     },
     {
       "id": "panchangam.abhijit-muhurta",
@@ -1595,7 +1633,15 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Python/browser behavior is tested; exact source locators for the full verdict vocabulary remain open."},
       "tests": ["tests/test_chandrabalam.py", "tests/test_activity_surface_parity.py"],
-      "limitations": ["Nakshatra-to-Rashi without Pada can be ambiguous at sign boundaries."]
+      "limitations": ["Nakshatra-to-Rashi without Pada can be ambiguous at sign boundaries."],
+      "method": {
+        "kind": "formula",
+        "summary": "Count the current Moon sign inclusively from Janma Rashi and classify houses into good, remedial-Puja, or avoid sets; optionally derive Janma Rashi from Nakshatra Pada.",
+        "steps": ["Resolve Janma Rashi directly or map the birth Nakshatra/Pada over 108 Padas and twelve Rashis.", "Return unknown when a Nakshatra straddles two Rashis and Pada is absent.", "Compute the wrapped inclusive Moon house from 1 through 12.", "Classify 1/3/6/7/10/11 as good, 2/5/9 as puja, and 4/8/12 as bad."],
+        "formulae": [{"name": "Moon house", "expression": "h = ((index(day_rasi)-index(janma_rasi)) mod 12)+1", "variables": ["h: Moon house from natal Moon sign"]}],
+        "worked_examples": [{"label": "Mesha Janma Rashi, Moon in Mithuna", "inputs": ["Janma index: 0", "Day Moon index: 2"], "calculation": ["((2 - 0) mod 12) + 1 = 3.", "House 3 is in CHANDRA_GOOD."], "result": ["Position: 3", "Verdict: good", "Favourable: true"]}],
+        "notes": ["The verdict table is parity-tested but its exact claim-level textual locator remains open."]
+      }
     },
     {
       "id": "personal.homa-election",
@@ -1615,7 +1661,15 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["muhurta.homahuti"], "note": "The exact Homahuti and Agnivasa rules have registered locators."},
       "tests": ["tests/test_yajna_evidence_audit.py", "tests/test_activity_surface_parity.py"],
-      "limitations": ["This is election guidance and does not replace ritual prerequisites or a qualified practitioner; the current low-level reason list labels every Agnivasa remainder as earth-resident even when the admission gate fails, so consumers must rely on the admitted boolean until the tracked transparency fix lands."]
+      "limitations": ["This is election guidance and does not replace ritual prerequisites or a qualified practitioner; the current low-level reason list labels every Agnivasa remainder as earth-resident even when the admission gate fails, so consumers must rely on the admitted boolean until the tracked transparency fix lands."],
+      "method": {
+        "kind": "formula",
+        "summary": "Apply two conjunctive hard gates: the lunar Nakshatra must fall in a benefic three-star Homahuti group counted from Surya, and the Tithi/Vaaram Agnivasa remainder must be zero or three.",
+        "steps": ["Count lunar Nakshatra cyclically from solar Nakshatra and divide the 27-star cycle into nine groups of three.", "Map the group to its Graha lord and require Budha, Shukra, Chandra, or Guru.", "Convert full Tithi to ordinal 1-30 and Vaaram to Sunday-based ordinal 1-7.", "Compute the modulo-four Agnivasa remainder and require 0 or 3.", "Admit only when both requirements pass."],
+        "formulae": [{"name": "Homahuti and Agnivasa", "expression": "group=floor(((N_moon-N_sun) mod 27)/3)+1; a=(T+1+V) mod 4", "variables": ["T: full Tithi ordinal 1-30", "V: Sunday-based weekday ordinal"]}],
+        "worked_examples": [{"label": "Shukla Pratipat on Sunday, Ashvini Sun and Ardra Moon", "inputs": ["Solar Nakshatra: Ashvini", "Lunar Nakshatra: Ardra", "Tithi ordinal: 1", "Vaaram ordinal: 1"], "calculation": ["Ashvini-to-Ardra falls in group 2, ruled by benefic Budha.", "(1 + 1 + 1) mod 4 = 3, an admitted remainder.", "Both hard gates pass."], "result": ["Admitted: true"]}],
+        "notes": ["Consumers must use the admitted boolean; the existing human reason string overstates earth residence when the remainder gate fails."]
+      }
     },
     {
       "id": "personal.hora",
@@ -1633,7 +1687,15 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": [], "note": "Order and segmentation are parity-tested, but a claim-level source locator is not yet registered."},
       "tests": ["tests/test_lagna_hora.py", "tests/test_browser_smoke.py"],
-      "limitations": ["Planetary favourability labels in the browser are presentation, not personalized Hora judgment."]
+      "limitations": ["Planetary favourability labels in the browser are presentation, not personalized Hora judgment."],
+      "method": {
+        "kind": "formula",
+        "summary": "Divide daylight and night into twelve equal parts and assign lords by the repeating seven-Graha Chaldean sequence starting from the weekday lord.",
+        "steps": ["Compute next sunrise for the observer.", "Divide sunrise-to-sunset by 12 and sunset-to-next-sunrise by 12.", "Select the weekday lord's index in Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars order.", "Emit twelve day and twelve night windows, advancing one lord per window without resetting at sunset."],
+        "formulae": [{"name": "Hora boundaries and lord", "expression": "day_i=[rise+(i-1)D/12,rise+iD/12]; lord_i=L[(start+i-1) mod 7]", "variables": ["D: daylight duration", "L: seven-lord sequence", "i: one-based Hora index"]}],
+        "worked_examples": [{"label": "Hyderabad, Guruvaram 2026-06-11", "inputs": ["Sunrise: 05:41:11 IST", "Sunset: 18:50:12 IST", "Weekday lord: Jupiter"], "calculation": ["Day Hora length is approximately 1h05m45s.", "Start the lord cycle at Jupiter, followed by Mars."], "result": ["Jupiter Hora: 05:41:11-06:46:56 IST", "Mars Hora: 06:46:56-07:52:41 IST"]}],
+        "notes": ["The astronomical segmentation and sequence are deterministic; browser favourability badges do not constitute a personal Hora election."]
+      }
     },
     {
       "id": "personal.lagna-strength",
@@ -1654,7 +1716,15 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Parity and unit behavior are tested; broad Lagna verdict semantics need claim-level locators."},
       "tests": ["tests/test_lagna_position.py", "src/scorer/__tests__/muhurta-scorer.test.ts"],
-      "limitations": ["This house-only strength is not a complete election-chart Lagna assessment."]
+      "limitations": ["This house-only strength is not a complete election-chart Lagna assessment."],
+      "method": {
+        "kind": "formula",
+        "summary": "Count candidate Lagna inclusively from Janma Rashi, classify its relative house, and independently classify the rising Rashi as movable, fixed, or dual.",
+        "steps": ["Compute the wrapped one-based house from Janma Rashi to Lagna Rashi.", "Return own for house 1, ashtama for 8, trikona for 5 or 9, kendra for 4, 7, or 10, and neutral otherwise.", "Classify Mesha/Karka/Tula/Makara as Chara, Vrishabha/Simha/Vrischika/Kumbha as Sthira, and Mithuna/Kanya/Dhanu/Meena as Dvisvabhava.", "Treat the union of Kendra and Trikona houses as favourable."],
+        "formulae": [{"name": "Relative Lagna house", "expression": "h = ((index(lagna)-index(janma)) mod 12)+1", "variables": ["h: candidate Lagna house from Janma Rashi"]}],
+        "worked_examples": [{"label": "Mesha Janma Rashi, Vrischika Lagna", "inputs": ["Janma index: 0", "Lagna index: 7"], "calculation": ["((7 - 0) mod 12) + 1 = 8.", "House 8 maps to ashtama.", "Vrischika belongs to the Sthira class."], "result": ["Position: 8", "Verdict: ashtama", "Class: Sthira", "Favourable: false"]}],
+        "notes": ["No planetary occupancy, aspects, dignity, Vargas, or house-lord strength are inferred by this helper."]
+      }
     },
     {
       "id": "personal.lagna-transitions",
@@ -1672,7 +1742,15 @@
       "surfaces": ["python-library", "mcp", "website", "generated-data"],
       "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["engine_pinned"], "claim_ids": [], "note": "Transitions are numerically and integration tested; independent city/date comparison cells are not registered."},
       "tests": ["tests/test_lagna_hora.py", "tests/test_lagna_json_builder.py"],
-      "limitations": ["The browser mirror renders generated transitions; it does not independently recompute the ascendant."]
+      "limitations": ["The browser mirror renders generated transitions; it does not independently recompute the ascendant."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Compute the tropical Ascendant from Swiss houses, subtract Lahiri ayanamsa, scan sunrise to next sunrise at five-minute steps, and bisect every Rashi change to half-minute precision.",
+        "steps": ["Compute next sunrise and set Lahiri sidereal mode.", "At an instant, obtain the Placidus Ascendant, subtract ayanamsa, normalize, and divide by 30 degrees.", "Scan in five-minute Julian-day increments.", "When the sign changes, bisect until the bracket is at most 0.5 minute and close the current Lagna window.", "Append the final window through next sunrise."],
+        "formulae": [{"name": "Sidereal Lagna index", "expression": "r = floor(((asc_tropical - ayanamsa) mod 360)/30)", "variables": ["r: zero-based rising Rashi index"]}],
+        "worked_examples": [{"label": "Hyderabad, 2024-01-01", "inputs": ["Location: 17.385 N, 78.4867 E", "Day start: local sunrise 06:45:59 IST"], "calculation": ["The sunrise Ascendant maps to Dhanu.", "A five-minute scan brackets the next sign change and bisection refines it."], "result": ["Dhanu Lagna: 06:45:59-07:47:23 IST", "Makara Lagna begins: 07:47:23 IST"]}],
+        "notes": ["The Python owner computes the transitions; the browser consumes generated data and is not an independent astronomical implementation."]
+      }
     },
     {
       "id": "personal.muhurta-activity-profiles",
@@ -1691,7 +1769,14 @@
       "surfaces": ["python-library", "mcp", "website", "generated-data"],
       "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["needs_locator", "verified", "heuristic"], "claim_ids": ["muhurta.activity_rules"], "note": "The umbrella claim remains needs_locator and grants no authority. At the activity level, 34 of 35 canonical profiles are verified and the remaining generic any profile is an explicit heuristic; no profile is currently contradicted."},
       "tests": ["tests/test_activity_provenance_contract.py", "tests/test_activity_rules_export.py", "tests/test_activity_surface_parity.py"],
-      "limitations": ["Each activity's evidence state must be read from its own provenance claim; this umbrella record is not a blanket verification claim."]
+      "limitations": ["Each activity's evidence state must be read from its own provenance claim; this umbrella record is not a blanket verification claim."],
+      "method": {
+        "kind": "interpretive-procedure",
+        "summary": "Resolve an activity key to one declarative profile whose fields separately express hard day gates, slot gates, ranking preferences, unresolved manual checks, and provenance authority.",
+        "steps": ["Resolve the single compatibility alias litigation to the canonical court profile.", "Load the profile by exact activity identifier; reject unknown identifiers in the public finder.", "Normalize source-facing Nakshatra spellings to engine spellings at comparison time.", "Apply allowed/avoid/required fields as hard gates and prefer/penalty fields as disclosed score changes.", "Surface manual_checks and manual_prerequisites rather than pretending to compute horoscope or practitioner judgments.", "Read source_claim, audit_claim, heuristic_claim, and related_claims independently; never promote the umbrella record into authority for a profile."],
+        "worked_examples": [{"label": "Wedding profile authority and gates", "inputs": ["Activity: wedding"], "calculation": ["Resolve directly to ACTIVITY_RULES[wedding].", "Require its admitted Maasams, Vaarams, Tithis, Nakshatras, Lagnas, and non-Vishti Karana; apply eclipse, Sankramana, Adhika, Pitru Paksha, Simha-Stha, Yoga, and combustion exclusions.", "Preserve the manual Pada, chart, and couple-specific prerequisites in output.", "Attach source_claim muhurta.wedding and disclose its related lineage-divergence claim."], "result": ["A structured rule profile, not a precomputed yes/no date", "Any surviving slot remains subject to listed practitioner checks"]}],
+        "notes": ["At this snapshot 34 of 35 canonical profiles have verified activity-level claims; the generic any profile is an explicit heuristic."]
+      }
     },
     {
       "id": "personal.muhurta-slot-ranking",
@@ -1717,7 +1802,15 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["heuristic"], "claim_ids": ["muhurta.any.shared_scoring", "muhurta.relative_tiers"], "note": "Activity gates may have verified sources, but aggregate scores and relative tier bands are disclosed project heuristics."},
       "tests": ["tests/test_muhurta_finder.py", "tests/test_muhurta_lagna_integration.py", "src/scorer/__tests__/muhurta-scorer.test.ts"],
-      "limitations": ["Relative rankings mean best available under the inputs, not absolute scriptural quality or professional advice."]
+      "limitations": ["Relative rankings mean best available under the inputs, not absolute scriptural quality or professional advice."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Apply profile day gates, remove candidate named Muhurtas that intersect hard windows, evaluate slot-time facts and personal/profile factors, then rank survivors with transparent additive scores and relative tiers.",
+        "steps": ["Validate activity and Chandra mode, load its profile, and return a diagnosis when a day-level gate fails.", "Build fifteen named day slots or fifteen night slots and remove those overlapping applicable hard windows.", "For each survivor choose dominant Choghadiya, recompute slot facts when an engine is supplied, and apply profile admission gates.", "Add disclosed contributions from Muhurta nature, Choghadiya, Tara, Chandra, Tithi, Vara, special/Nitya/Anandadi Yogas, Amrita, Lagna, Hora, Panchaka, and profile preferences or penalties.", "Attach grouped reasons, personal/day dosha flags, and uncomputed manual checks.", "Map score to a tier relative to the batch's minimum and maximum; cap Excellent to Good when a dosha exists, then sort by tier, score, dosha, and time."],
+        "formulae": [{"name": "Relative tier coordinate", "expression": "q = (score-floor)/(ceiling-floor); Excellent if q>=0.75, Good if q>=0.50, Fair if q>=0.25, else Avoid", "variables": ["floor, ceiling: minimum and maximum survivor scores in the batch"]}],
+        "worked_examples": [{"label": "Generic slot, Hyderabad 2026-06-11", "inputs": ["Activity: any", "Slot: 07:26:23-08:18:59 IST", "Mitra named Muhurta", "Rog Choghadiya"], "calculation": ["Mitra auspicious nature +1; Rog Choghadiya +0.", "Amrita Kalam overlap +2, Sarvartha Siddhi +2, Shobhana +1, Anandadi Chhatra +1.", "Total score = 7; no personal or day dosha.", "This score is at the top relative band among surviving slots."], "result": ["Score: 7", "Tier: Excellent"]}],
+        "notes": ["The additive weights and relative-tier bands are project heuristics even when an individual activity gate has verified textual support."]
+      }
     },
     {
       "id": "personal.nitya-yoga-disposition",
@@ -1735,7 +1828,14 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Disposition and partial-window behavior are tested; exact claim locators remain open."},
       "tests": ["tests/test_muhurta_finder.py"],
-      "limitations": ["Disposition is one input to Muhurta ranking, not a standalone election verdict; partial-dosha windows currently use a fixed 24 civil minutes per Ghati rather than the proportional sunrise-to-sunrise Ghati clock."]
+      "limitations": ["Disposition is one input to Muhurta ranking, not a standalone election verdict; partial-dosha windows currently use a fixed 24 civil minutes per Ghati rather than the proportional sunrise-to-sunrise Ghati clock."],
+      "method": {
+        "kind": "decision-table",
+        "summary": "Classify the active Nitya Yoga, then apply a hard defer, fixed score, or time-bounded penalty according to the candidate slot and activity policy.",
+        "steps": ["Map Vyatipata and Vaidhriti to hard-avoid.", "Map six named Yogas to partial-avoid windows of 3, 5, 6, or 9 fixed 24-minute Ghatis from Yoga start.", "Map seventeen named Yogas to auspicious and Vajra/Variyan or unknown values to neutral.", "For a hard-avoid Yoga, defer when the activity enables samskara skips or otherwise score -2.", "For a partial Yoga, score -1 only when slot start is within its configured window; score auspicious +1 and neutral 0."],
+        "worked_examples": [{"label": "Shobhana at a candidate slot", "inputs": ["Active Nitya Yoga: Shobhana"], "calculation": ["Shobhana is in NITYA_AUSPICIOUS.", "Apply the auspicious slot adjustment."], "result": ["Disposition: auspicious", "Score adjustment: +1", "Defer: false"]}],
+        "notes": ["Partial windows use fixed civil minutes in current code; they do not use the proportional Ghati clock documented on the Ghati page."]
+      }
     },
     {
       "id": "personal.tarabalam",
@@ -1755,7 +1855,15 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Formula and browser parity are tested; a claim-specific exact locator is not yet registered."},
       "tests": ["tests/test_tarabalam.py", "tests/test_activity_surface_parity.py"],
-      "limitations": ["Tarabalam is one personal factor and should not be presented as a complete Muhurta judgment."]
+      "limitations": ["Tarabalam is one personal factor and should not be presented as a complete Muhurta judgment."],
+      "method": {
+        "kind": "formula",
+        "summary": "Count inclusively from Janma Nakshatra to the active Nakshatra around the 27-star cycle, reduce the count to a repeating nine-Tara cycle, and classify the configured auspicious Tara numbers.",
+        "steps": ["Look up both canonical Nakshatra indices.", "Compute the wrapped inclusive count from 1 through 27.", "Reduce that count to Tara number 1 through 9.", "Map to Janma, Sampat, Vipat, Kshema, Pratyak, Sadhana, Naidhana, Mitra, or Parama Mitra.", "Mark 2, 4, 6, 8, and 9 auspicious; a group passes good_for_all only if every member is auspicious."],
+        "formulae": [{"name": "Tara number", "expression": "c=((index(day)-index(janma)) mod 27)+1; tara=((c-1) mod 9)+1", "variables": ["c: inclusive cyclic Nakshatra count"]}],
+        "worked_examples": [{"label": "Ashvini birth star, Pushya active star", "inputs": ["Ashvini index: 0", "Pushya index: 7"], "calculation": ["Inclusive count = ((7 - 0) mod 27) + 1 = 8.", "Tara number = 8, named Mitra.", "8 is in AUSPICIOUS_TARAS."], "result": ["Tara: 8 Mitra", "Auspicious: true"]}],
+        "notes": ["This project follows the disclosed Telugu convention that Tara 1 Janma is avoid rather than auspicious."]
+      }
     },
     {
       "id": "personal.tithi-family",
@@ -1775,7 +1883,15 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Family mapping and parity are tested; exact source coverage remains broad."},
       "tests": ["tests/test_muhurta_finder.py", "src/scorer/__tests__/muhurta-scorer.test.ts"],
-      "limitations": ["Activity-specific use must come from the selected profile rather than a universal family ranking."]
+      "limitations": ["Activity-specific use must come from the selected profile rather than a universal family ranking."],
+      "method": {
+        "kind": "formula",
+        "summary": "Extract the Paksha-local Tithi ordinal from the final word of the name and map its repeating fivefold remainder to a family.",
+        "steps": ["Read the final token so Paksha prefixes and named Ekadashi prefixes do not affect classification.", "Normalize accepted aliases including Pratipada, Shashti, and Amavasya.", "Convert to an ordinal from 1 through 15.", "Map 1/6/11 Nanda, 2/7/12 Bhadra, 3/8/13 Jaya, 4/9/14 Rikta, and 5/10/15 Purna.", "Let the selected activity profile decide whether that family is preferred, penalized, neutralized, or excluded."],
+        "formulae": [{"name": "Fivefold family index", "expression": "family_index = (t-1) mod 5", "variables": ["t: Paksha-local Tithi ordinal 1 through 15", "family order: Nanda, Bhadra, Jaya, Rikta, Purna"]}],
+        "worked_examples": [{"label": "Shukla Navami", "inputs": ["Final token: Navami", "Tithi ordinal: 9"], "calculation": ["(9 - 1) mod 5 = 3.", "Family index 3 maps to Rikta."], "result": ["Family: Rikta", "Rikta flag: true"]}],
+        "notes": ["The family mapping is stable across Shukla and Krishna Paksha; activity suitability is not inferred here."]
+      }
     },
     {
       "id": "panchangam.graha-maudhya",

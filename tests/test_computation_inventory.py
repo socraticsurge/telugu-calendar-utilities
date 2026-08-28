@@ -98,6 +98,20 @@ def test_calendar_method_family_is_complete():
     assert all(record['method']['worked_examples'] for record in records)
 
 
+def test_personal_gochara_and_interpretation_method_family_is_complete():
+    prefixes = ('personal.', 'gochara.', 'interpretation.')
+    records = [
+        record for record in _registry()['computations']
+        if record['id'].startswith(prefixes)
+    ]
+
+    assert len(records) == 15
+    assert all(record.get('method') for record in records)
+    assert all(record['method']['steps'] for record in records)
+    assert all(record['method']['worked_examples'] for record in records)
+    assert len(_registry()['computations']) == 62
+
+
 def test_method_validation_rejects_an_unreproducible_example(tmp_path):
     registry = _registry()
     record = next(
@@ -114,3 +128,14 @@ def test_method_validation_rejects_an_unreproducible_example(tmp_path):
         'panchangam.abhijit-muhurta.method.worked_examples' in error
         for error in errors
     )
+
+
+def test_method_validation_rejects_a_missing_method(tmp_path):
+    registry = _registry()
+    del registry['computations'][0]['method']
+    candidate = tmp_path / 'computations.json'
+    candidate.write_text(json.dumps(registry), encoding='utf-8')
+
+    errors = validate_registry(candidate)
+
+    assert any('.method is required' in error for error in errors)
