@@ -1241,6 +1241,108 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
 
         panel = page.locator('#card-profiles')
         panel.get_by_role('button', name='Create profile', exact=True).click()
+
+        desktop_layout = page.evaluate("""() => {
+            const rect = selector => document.querySelector(selector).getBoundingClientRect();
+            const panel = rect('#card-profiles');
+            const root = rect('#profiles-root');
+            const form = rect('.profiles-form');
+            const methods = rect('.profiles-methods');
+            const date = rect('#profile-birth-date');
+            const time = rect('#profile-birth-time');
+            const choices = [...document.querySelectorAll('.profiles-methods__choice')]
+                .map(choice => choice.getBoundingClientRect());
+            const calculation = document.querySelector('.profiles-calculation');
+            const calculationStyle = getComputedStyle(calculation);
+            return {
+                panelCenter: panel.left + panel.width / 2,
+                rootCenter: root.left + root.width / 2,
+                formCenter: form.left + form.width / 2,
+                methodsCenter: methods.left + methods.width / 2,
+                dateTop: date.top,
+                dateHeight: date.height,
+                timeTop: time.top,
+                timeHeight: time.height,
+                choiceWidths: choices.map(choice => choice.width),
+                calculationBorderTop: parseFloat(calculationStyle.borderTopWidth),
+                calculationBorderLeft: parseFloat(calculationStyle.borderLeftWidth),
+            };
+        }""")
+        assert abs(desktop_layout['panelCenter'] - desktop_layout['rootCenter']) <= 1
+        assert abs(desktop_layout['rootCenter'] - desktop_layout['formCenter']) <= 1
+        assert abs(desktop_layout['formCenter'] - desktop_layout['methodsCenter']) <= 1
+        assert abs(desktop_layout['dateTop'] - desktop_layout['timeTop']) <= 1
+        assert abs(desktop_layout['dateHeight'] - desktop_layout['timeHeight']) <= 1
+        assert abs(
+            desktop_layout['choiceWidths'][0] - desktop_layout['choiceWidths'][1]
+        ) <= 1
+        assert desktop_layout['calculationBorderTop'] == 1
+        assert desktop_layout['calculationBorderLeft'] == 1
+        assert panel.locator('.profiles-form__actions button').all_inner_texts() == [
+            'Cancel', 'Save calculated profile',
+        ]
+
+        page.set_viewport_size({'width': 768, 'height': 1024})
+        page.wait_for_function("document.body.dataset.mode === 'mobile'")
+        tablet_layout = page.evaluate("""() => {
+            const rect = selector => document.querySelector(selector).getBoundingClientRect();
+            const panel = rect('#card-profiles');
+            const root = rect('#profiles-root');
+            const date = rect('#profile-birth-date');
+            const time = rect('#profile-birth-time');
+            const place = rect('#profile-birth-place');
+            const findPlace = rect('[data-action="search-birth-place"]');
+            const choices = [...document.querySelectorAll('.profiles-methods__choice')]
+                .map(choice => choice.getBoundingClientRect());
+            return {
+                panelCenter: panel.left + panel.width / 2,
+                rootCenter: root.left + root.width / 2,
+                dateTop: date.top,
+                timeTop: time.top,
+                placeTop: place.top,
+                findPlaceTop: findPlace.top,
+                choiceTops: choices.map(choice => choice.top),
+                overflow: document.documentElement.scrollWidth - window.innerWidth,
+            };
+        }""")
+        assert abs(tablet_layout['panelCenter'] - tablet_layout['rootCenter']) <= 1
+        assert abs(tablet_layout['dateTop'] - tablet_layout['timeTop']) <= 1
+        assert abs(tablet_layout['placeTop'] - tablet_layout['findPlaceTop']) <= 1
+        assert abs(
+            tablet_layout['choiceTops'][0] - tablet_layout['choiceTops'][1]
+        ) <= 1
+        assert tablet_layout['overflow'] <= 0
+
+        page.set_viewport_size({'width': 390, 'height': 844})
+        mobile_layout = page.evaluate("""() => {
+            const dateGroup = document.querySelector('#profile-birth-date')
+                .closest('.profiles-field').getBoundingClientRect();
+            const timeGroup = document.querySelector('#profile-birth-time')
+                .closest('.profiles-field').getBoundingClientRect();
+            const choices = [...document.querySelectorAll('.profiles-methods__choice')]
+                .map(choice => choice.getBoundingClientRect());
+            const actions = [...document.querySelectorAll('.profiles-form__actions button')]
+                .map(action => ({
+                    text: action.textContent.trim(),
+                    top: action.getBoundingClientRect().top,
+                }));
+            return {
+                birthFieldGap: timeGroup.top - dateGroup.bottom,
+                choiceTops: choices.map(choice => choice.top),
+                actions,
+                overflow: document.documentElement.scrollWidth - window.innerWidth,
+            };
+        }""")
+        assert 15 <= mobile_layout['birthFieldGap'] <= 17
+        assert mobile_layout['choiceTops'][1] > mobile_layout['choiceTops'][0]
+        assert [action['text'] for action in mobile_layout['actions']] == [
+            'Cancel', 'Save calculated profile',
+        ]
+        assert mobile_layout['actions'][0]['top'] < mobile_layout['actions'][1]['top']
+        assert mobile_layout['overflow'] <= 0
+
+        page.set_viewport_size({'width': 1024, 'height': 900})
+        page.wait_for_function("document.body.dataset.mode === 'desktop'")
         page.fill('#profile-name', 'Browser Ananya')
         page.fill('#profile-birth-date', '1990-04-15')
         page.fill('#profile-birth-time', '14:30')
@@ -1252,6 +1354,32 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
         place_choice.click()
         panel.get_by_role('button', name='Calculate details', exact=True).click()
         panel.locator('.profiles-birth-review').wait_for(state='visible')
+
+        recalculate = panel.get_by_role(
+            'button', name='Recalculate details', exact=True,
+        )
+        assert recalculate.get_attribute('class').find('profiles-button--secondary') >= 0
+        assert recalculate.get_attribute('class').find('profiles-button--primary') == -1
+
+        page.set_viewport_size({'width': 390, 'height': 844})
+        page.wait_for_function("document.body.dataset.mode === 'mobile'")
+        post_calculation_actions = page.evaluate("""() => (
+            [...document.querySelectorAll('.profiles-form__actions button')].map(action => ({
+                text: action.textContent.trim(),
+                top: action.getBoundingClientRect().top,
+            }))
+        )""")
+        assert [action['text'] for action in post_calculation_actions] == [
+            'Cancel', 'Save calculated profile',
+        ]
+        assert post_calculation_actions[0]['top'] < post_calculation_actions[1]['top']
+        panel.get_by_role('button', name='Cancel', exact=True).focus()
+        page.keyboard.press('Tab')
+        assert page.evaluate("document.activeElement.textContent.trim()") == (
+            'Save calculated profile'
+        )
+        page.set_viewport_size({'width': 1024, 'height': 900})
+        page.wait_for_function("document.body.dataset.mode === 'desktop'")
 
         assert panel.locator('.profiles-birth-facts').inner_text().find('Rohini') >= 0
         assert panel.locator('.profiles-chart__cell').count() == 12

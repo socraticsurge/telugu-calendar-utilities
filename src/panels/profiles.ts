@@ -1037,7 +1037,6 @@ export function initProfilesPanel(
       useBirthDetails.addEventListener('click', () => renderBirthForm(mode, context, profile));
       methodActions.append(useBirthDetails, useManualDetails);
       methods.append(methodsTitle, methodActions);
-      fragment.append(methods);
     }
     const snapshot = store.getSnapshot();
     const issue = renderIssue(snapshot);
@@ -1068,6 +1067,7 @@ export function initProfilesPanel(
       existing.append(existingTitle, existingHint, existingList);
       fragment.append(existing);
     }
+    if (methods) fragment.append(methods);
 
     const form = element('form', 'profiles-form');
     form.noValidate = true;
@@ -1167,7 +1167,7 @@ export function initProfilesPanel(
     const save = element('button', 'profiles-button profiles-button--primary', mode === 'create' ? 'Save profile' : 'Save changes');
     save.type = 'submit';
     const cancel = button('Cancel', 'profiles-button profiles-button--secondary');
-    actions.append(save, cancel);
+    actions.append(cancel, save);
     form.append(nameGroup, nakshatraGroup, padaGroup, lagnaGroup, formError, actions);
     fragment.append(form);
     root.replaceChildren(fragment);
@@ -1586,7 +1586,7 @@ export function initProfilesPanel(
     );
     saveHelp.id = 'profile-save-help';
     const cancel = button('Cancel', 'profiles-button profiles-button--secondary');
-    actions.append(save, cancel);
+    actions.append(cancel, save);
 
     form.append(
       nameGroup,
@@ -1615,6 +1615,8 @@ export function initProfilesPanel(
         ? 'Review complete. Saving keeps these details only in this browser.'
         : 'Calculate and review the astrology details before saving.';
       calculateButton.textContent = calculated ? 'Recalculate details' : 'Calculate details';
+      calculateButton.classList.toggle('profiles-button--primary', !calculated);
+      calculateButton.classList.toggle('profiles-button--secondary', Boolean(calculated));
     };
     const invalidateCalculation = (): void => {
       calculationSequence += 1;
