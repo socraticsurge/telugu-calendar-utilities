@@ -91,6 +91,8 @@ const TIER_RANK: Record<string, number> = {
   Fair: 1,
   Avoid: 0,
 };
+const NAKSHATRA_SPAN_DEGREES = 360 / 27;
+const DISPLAYED_DEGREE_HALF_STEP = 0.005;
 
 function rank<TSlot extends EnrichableMuhurtamSlot>(slots: TSlot[]): TSlot[] {
   return [...slots].sort((left, right) =>
@@ -104,6 +106,41 @@ function rank<TSlot extends EnrichableMuhurtamSlot>(slots: TSlot[]): TSlot[] {
     || left.s0 - right.s0);
 }
 
+function mergeEngineProvenance(
+  current: ElectionChartDerivation['engine'] | null,
+  next: ElectionChartDerivation['engine'],
+): ElectionChartDerivation['engine'] {
+  if (!current) return { ...next };
+  if (
+    current.name !== next.name
+    || current.version !== next.version
+    || current.ayanamsha !== next.ayanamsha
+    || current.nodeConvention !== next.nodeConvention
+  ) {
+    throw new ElectionChartApiError(
+      'invalid-response',
+      'Chart screening batches returned incompatible calculation provenance.',
+    );
+  }
+  return {
+    ...current,
+    ephemeris: current.ephemeris === next.ephemeris ? current.ephemeris : 'mixed',
+  };
+}
+
+function chandraNakshatraBoundaryUncertain(longitude: number, rashiIndex: number): boolean {
+  const rashiStart = rashiIndex * 30;
+  const rashiEnd = rashiStart + 30;
+  for (let boundaryIndex = 1; boundaryIndex < 27; boundaryIndex += 1) {
+    const boundary = boundaryIndex * NAKSHATRA_SPAN_DEGREES;
+    if (boundary <= rashiStart || boundary >= rashiEnd) continue;
+    if (Math.abs(longitude - boundary) <= DISPLAYED_DEGREE_HALF_STEP + 1e-9) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function exactPersonalFacts(
   chart: ElectionChartDerivation['charts'][number],
   canonicalLagna: string,
@@ -114,6 +151,7 @@ function exactPersonalFacts(
     ? rashiIndex * 30 + chandra.degree
     : null;
   const nakshatra = longitude === null
+    || chandraNakshatraBoundaryUncertain(longitude, rashiIndex)
     ? ''
     : NAKSHATRA_NAMES[Math.floor(longitude / (360 / 27)) % 27] || '';
   return {
@@ -333,7 +371,7 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
         },
       );
       requestCount += 1;
-      engine = response.engine;
+      engine = mergeEngineProvenance(engine, response.engine);
       let chartOffset = 0;
       for (let index = 0; index < chunk.length; index += 1) {
         const charts = response.charts.slice(
@@ -413,6 +451,33 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
     }
   } catch (error) {
     if (options.signal?.aborted) throw error;
+    if (processed > 0) {
+      const shown = rank(survivors).slice(0, RESULT_LIMIT);
+      const removalParts = [
+        chartRemovedCount
+          ? `${chartRemovedCount} failed an exact chart requirement`
+          : '',
+        personalRemovedCount
+          ? `${personalRemovedCount} failed a profile-specific source requirement`
+          : '',
+      ].filter(Boolean);
+      const removalSummary = removalParts.length
+        ? ` ${removalParts.join('; ')}.`
+        : '';
+      return {
+        state: 'unavailable',
+        slots: shown,
+        screenedCount: processed,
+        removedCount,
+        candidateLimitReached: processed < baseSlots.length,
+        chartRemovedCount,
+        personalRemovedCount,
+        personalRemovedRules: [...personalRemovedRules.values()],
+        boundaryReviewCount,
+        message: `${processed} highest-ranked candidates received exact chart screening before screening stopped early; only ${shown.length} already-screened survivor${shown.length === 1 ? ' is' : 's are'} shown.${removalSummary} Unprocessed candidates were not shown. ${unavailableMessage(error)}`,
+        engine,
+      };
+    }
     return unavailableResult(
       baseSlots,
       unavailableMessage(error),

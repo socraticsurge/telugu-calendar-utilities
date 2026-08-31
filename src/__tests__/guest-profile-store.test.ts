@@ -65,9 +65,13 @@ function rawCommit(): {
 }
 
 function birthProfileDraft(name = 'Anu'): GuestProfileDraft {
+  const rashiOrder = [
+    'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+    'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena',
+  ];
   const rashis = [
     'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
-    'Kanya', 'Tula', 'Vrischika', 'Dhanu',
+    'Kanya', 'Tula', 'Vrischika', 'Vrishabha',
   ];
   return {
     source: 'birth-details',
@@ -85,13 +89,13 @@ function birthProfileDraft(name = 'Anu'): GuestProfileDraft {
       timezone: 'Asia/Kolkata',
     },
     natalChart: {
-      lagnaDegree: 12.345,
+      lagnaDegree: 12.35,
       planets: rashis.map((rashi, index) => ({
-        name: ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'][index],
+        name: ['Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani', 'Rahu', 'Ketu'][index],
         rashi,
-        degree: index + 0.25,
-        house: index + 1,
-        retrograde: index === 6,
+        degree: index === 1 ? 15 : index >= 7 ? 10 : index + 0.25,
+        house: ((rashiOrder.indexOf(rashi) - 3 + 12) % 12) + 1,
+        retrograde: index >= 6,
       })),
     },
     calculation: {
@@ -375,7 +379,7 @@ describe('birth profile extension storage', () => {
           lagna: 'Karka',
           janmaRasi: 'Vrishabha',
           birthDetails: { placeLabel: 'Vijayawada, Andhra Pradesh, India' },
-          natalChart: { lagnaDegree: 12.345 },
+          natalChart: { lagnaDegree: 12.35 },
           calculation: { engine: { name: 'DashaFlow' } },
         },
       },
@@ -385,6 +389,185 @@ describe('birth profile extension storage', () => {
       idFactory: () => { throw new Error('stable row should not need a new ID'); },
     });
     expect(reloaded.get('guest_birth_profile')).toEqual(created);
+  });
+
+  test.each([
+    ['planet order', (draft: GuestProfileDraft) => {
+      const planets = (draft.natalChart as { planets: Array<Record<string, unknown>> }).planets;
+      [planets[0], planets[1]] = [planets[1], planets[0]];
+    }],
+    ['engine name', (draft: GuestProfileDraft) => {
+      (draft.calculation as { engine: { name: string } }).engine.name = 'UnknownEngine';
+    }],
+    ['contract version', (draft: GuestProfileDraft) => {
+      (draft.calculation as { contractVersion: string }).contractVersion = '2.0';
+    }],
+    ['padded contract version', (draft: GuestProfileDraft) => {
+      (draft.calculation as { contractVersion: string }).contractVersion = ' 1.0 ';
+    }],
+    ['ayanamsha', (draft: GuestProfileDraft) => {
+      (draft.calculation as { engine: { ayanamsha: string } }).engine.ayanamsha = 'Raman';
+    }],
+    ['Janma Rashi', (draft: GuestProfileDraft) => {
+      draft.janmaRasi = 'Mesha';
+    }],
+    ['padded Nakshatra', (draft: GuestProfileDraft) => {
+      draft.nakshatra = ' Rohini ';
+    }],
+    ['string Padam', (draft: GuestProfileDraft) => {
+      draft.pada = '2';
+    }],
+    ['Chandra Rashi', (draft: GuestProfileDraft) => {
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[1]).rashi = 'Mesha';
+    }],
+    ['Chandra position', (draft: GuestProfileDraft) => {
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[1]).degree = 5;
+    }],
+    ['unrounded Chandra position', (draft: GuestProfileDraft) => {
+      draft.pada = 1;
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[1]).degree = 13.338;
+    }],
+    ['unrounded Lagna degree', (draft: GuestProfileDraft) => {
+      (draft.natalChart as { lagnaDegree: number }).lagnaDegree = 12.345;
+    }],
+    ['Whole Sign house', (draft: GuestProfileDraft) => {
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[0]).house = 1;
+    }],
+    ['padded graha name', (draft: GuestProfileDraft) => {
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[0]).name = ' Surya ';
+    }],
+    ['fixed retrograde flags', (draft: GuestProfileDraft) => {
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[7]).retrograde = false;
+    }],
+    ['Rahu-Ketu opposition', (draft: GuestProfileDraft) => {
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[8]).degree = 10.02;
+    }],
+  ])('degrades a birth draft with noncanonical %s to a manual profile', (_label, mutate) => {
+    const draft = birthProfileDraft();
+    mutate(draft);
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_unsafe_birth'),
+    });
+    const created = store.create(draft);
+
+    expect(created).toMatchObject({
+      source: 'manual',
+      birthDetails: null,
+      natalChart: null,
+      calculation: null,
+    });
+    const envelope = JSON.parse(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    expect(envelope.profiles).toEqual({});
+  });
+
+  test.each([
+    ['planet order', (extension: Record<string, unknown>) => {
+      const planets = (extension.natalChart as { planets: Array<Record<string, unknown>> }).planets;
+      [planets[0], planets[1]] = [planets[1], planets[0]];
+    }],
+    ['calculation provenance', (extension: Record<string, unknown>) => {
+      (extension.calculation as { engine: { ayanamsha: string } }).engine.ayanamsha = 'Raman';
+    }],
+    ['Chandra placement', (extension: Record<string, unknown>) => {
+      ((extension.natalChart as { planets: Array<Record<string, unknown>> }).planets[1]).degree = 5;
+    }],
+    ['unrounded Chandra placement', (extension: Record<string, unknown>) => {
+      extension.pada = 1;
+      ((extension.natalChart as { planets: Array<Record<string, unknown>> }).planets[1]).degree = 13.338;
+    }],
+    ['unrounded Lagna degree', (extension: Record<string, unknown>) => {
+      (extension.natalChart as { lagnaDegree: number }).lagnaDegree = 12.345;
+    }],
+    ['Whole Sign house', (extension: Record<string, unknown>) => {
+      ((extension.natalChart as { planets: Array<Record<string, unknown>> }).planets[0]).house = 1;
+    }],
+    ['fixed retrograde flags', (extension: Record<string, unknown>) => {
+      ((extension.natalChart as { planets: Array<Record<string, unknown>> }).planets[8]).retrograde = false;
+    }],
+    ['Rahu-Ketu opposition', (extension: Record<string, unknown>) => {
+      ((extension.natalChart as { planets: Array<Record<string, unknown>> }).planets[8]).degree = 10.02;
+    }],
+  ])('keeps a persisted extension with tampered %s detached', (_label, tamper) => {
+    const source = new MemoryStorage();
+    const writer = createGuestProfileStore(source, {
+      idFactory: ids('guest_tampered_birth'),
+      revisionFactory: ids('revision_tampered_birth'),
+    });
+    writer.create(birthProfileDraft());
+    const envelope = JSON.parse(source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    tamper(envelope.profiles.guest_tampered_birth);
+    source.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, JSON.stringify(envelope));
+
+    const reader = createGuestProfileStore(source);
+
+    expect(reader.getSnapshot()).toMatchObject({
+      profiles: [{
+        id: 'guest_tampered_birth',
+        source: 'manual',
+        birthDetails: null,
+        natalChart: null,
+        calculation: null,
+      }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+  });
+
+  test('detaches a persisted unrounded Chandra value without relying on a base-field mismatch', () => {
+    const source = new MemoryStorage();
+    const draft = birthProfileDraft();
+    draft.pada = 1;
+    ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[1]).degree = 13.33;
+    const writer = createGuestProfileStore(source, {
+      idFactory: ids('guest_unrounded_moon'),
+      revisionFactory: ids('revision_unrounded_moon'),
+    });
+    expect(writer.create(draft).source).toBe('birth-details');
+    const envelope = JSON.parse(source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    envelope.profiles.guest_unrounded_moon.natalChart.planets[1].degree = 13.338;
+    source.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, JSON.stringify(envelope));
+
+    const reader = createGuestProfileStore(source);
+
+    expect(reader.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_unrounded_moon', source: 'manual', birthDetails: null }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+  });
+
+  test.each([13.33, 16.67])(
+    'retains a birth extension when rounded Chandra %s overlaps the Rohini Pada 2 boundary',
+    degree => {
+      const draft = birthProfileDraft();
+      ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[1]).degree = degree;
+      const store = createGuestProfileStore(storage, {
+        idFactory: ids('guest_rounded_boundary'),
+      });
+
+      expect(store.create(draft)).toMatchObject({
+        source: 'birth-details',
+        natalChart: { planets: expect.arrayContaining([
+          expect.objectContaining({ name: 'Chandra', degree }),
+        ]) },
+      });
+    },
+  );
+
+  test('retains rounded node degrees whose intervals still permit exact opposition', () => {
+    const draft = birthProfileDraft();
+    ((draft.natalChart as { planets: Array<Record<string, unknown>> }).planets[8]).degree = 10.01;
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_rounded_nodes'),
+    });
+
+    expect(store.create(draft)).toMatchObject({
+      source: 'birth-details',
+      natalChart: { planets: expect.arrayContaining([
+        expect.objectContaining({ name: 'Rahu', degree: 10 }),
+        expect.objectContaining({ name: 'Ketu', degree: 10.01 }),
+      ]) },
+    });
   });
 
   test('binds the birth envelope to an exact committed base payload', () => {
@@ -1058,12 +1241,30 @@ describe('birth profile extension storage', () => {
     const sourceStore = createGuestProfileStore(temporary, {
       idFactory: ids('guest_partial_write'),
     });
+    const recalculated = birthProfileDraft();
+    const rashiOrder = [
+      'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+      'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena',
+    ];
+    const recalculatedChart = recalculated.natalChart as NonNullable<GuestProfile['natalChart']>;
     sourceStore.create({
-      ...birthProfileDraft(),
+      ...recalculated,
       nakshatra: 'Hasta',
       pada: 3,
       lagna: 'Kanya',
       janmaRasi: 'Kanya',
+      natalChart: {
+        ...recalculatedChart,
+        planets: recalculatedChart.planets.map((planet, index) => {
+          const rashi = index === 1 ? 'Kanya' : planet.rashi;
+          return {
+            ...planet,
+            rashi,
+            degree: index === 1 ? 18 : planet.degree,
+            house: ((rashiOrder.indexOf(rashi) - 5 + 12) % 12) + 1,
+          };
+        }),
+      },
     });
     storage.setItem(
       GUEST_BIRTH_PROFILE_STORAGE_KEY,

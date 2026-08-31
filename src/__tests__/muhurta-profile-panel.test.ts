@@ -75,6 +75,8 @@ interface TarabalamPanelModule {
   ): boolean;
   muValidLagnaDayData(lagnaDay: unknown): boolean;
   muShareableMuhurtaReasons(slot: unknown): string[];
+  muChartShareScreeningLine(chartEnrichment: unknown): string;
+  muChartShareIncludesRemainder(chartEnrichment: unknown): boolean;
 }
 
 class MemoryStorage implements ProfileStorage {
@@ -241,6 +243,27 @@ afterAll(() => {
 });
 
 describe('Muhurtam saved-profile participants', () => {
+  test('describes partial chart screening without claiming it was skipped', () => {
+    expect(panel.muChartShareScreeningLine({
+      state: 'unavailable',
+      screenedCount: 24,
+    })).toBe(
+      'Partial exact chart screening was applied to 24 candidates; only already-screened survivors are included, and unprocessed candidates were withheld.',
+    );
+    expect(panel.muChartShareScreeningLine({
+      state: 'unavailable',
+      screenedCount: 0,
+    })).toBe('Panchangam-ranked; exact election-chart screening was not applied.');
+    expect(panel.muChartShareIncludesRemainder({
+      state: 'unavailable',
+      screenedCount: 24,
+    })).toBe(true);
+    expect(panel.muChartShareIncludesRemainder({
+      state: 'unavailable',
+      screenedCount: 0,
+    })).toBe(false);
+  });
+
   test('samples both sides of every Lagna transition inside a slot', () => {
     const day = {
       sunrise: '06:00',

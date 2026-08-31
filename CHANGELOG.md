@@ -31,6 +31,19 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Validate calculated birth-profile responses and restored browser records
+  against the exact `1.0` DashaFlow/Lahiri contract, canonical ordered
+  nine-graha tuple, Whole Sign houses, fixed node facts, and
+  Moon/Nakshatra/Padam/Janma-Rashi relationships while allowing only the
+  service's explicit two-decimal rounding interval; validate future, ambiguous
+  and nonexistent civil times in the birthplace timezone.
+- Preserve conclusive removals and survivors from completed Muhurtam chart
+  batches when a later batch fails, withhold every unscreened candidate, reject
+  incompatible cross-batch engine provenance, and disclose differing accepted
+  ephemerides as `mixed`; reject election snapshots that contradict the same
+  two-decimal, Whole Sign, and fixed-graha projection contract.
+- Remove third-party executable analytics from the profile-bearing origin and
+  omit saved profile names from built-in share text.
 - Keep published Lagna-transition and Hora feeds within the requested
   sunrise-to-next-sunrise cycle, including date-city combinations where a
   Julian-day seed could previously skip the first following sunrise.

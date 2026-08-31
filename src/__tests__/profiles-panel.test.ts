@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   GUEST_BIRTH_PROFILE_STORAGE_KEY,
   GUEST_PROFILE_COMMIT_STORAGE_KEY,
@@ -83,8 +83,13 @@ const VIJAYAWADA: BirthPlaceCandidate = {
 function calculatedProfile(): BirthProfileDerivation {
   const rashis = [
     'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
-    'Kanya', 'Tula', 'Vrischika', 'Dhanu',
+    'Kanya', 'Tula', 'Vrischika', 'Vrishabha',
   ];
+  const planets = [
+    'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
+    'Shukra', 'Shani', 'Rahu', 'Ketu',
+  ];
+  const houses = [10, 11, 12, 1, 2, 3, 4, 5, 11];
   return {
     contractVersion: '1.0',
     engine: {
@@ -94,13 +99,13 @@ function calculatedProfile(): BirthProfileDerivation {
     pada: 2,
     janmaRashi: 'Vrishabha',
     lagna: 'Karka',
-    lagnaDegree: 12.345,
+    lagnaDegree: 12.35,
     planets: rashis.map((rashi, index) => ({
-      name: ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'][index],
+      name: planets[index],
       rashi,
-      degree: index + 0.25,
-      house: index + 1,
-      retrograde: index === 6,
+      degree: index === 1 ? 15 : index === 8 ? 7.25 : index + 0.25,
+      house: houses[index],
+      retrograde: index >= 6,
     })),
   };
 }
@@ -149,6 +154,10 @@ beforeEach(() => {
   store = createGuestProfileStore(storage, { idFactory: ids() });
   navigate = vi.fn<(tool: string) => void>();
   controller = initProfilesPanel(store, { navigate });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe('Profiles panel CRUD', () => {
@@ -285,6 +294,109 @@ describe('birth-details profile journey', () => {
     });
     expect(query('.profiles-roster__source').textContent).toBe('Calculated from birth details');
     expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toContain('Vijayawada');
+  });
+
+  test('validates today and the exact birth time in the selected birthplace timezone', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-01-01T23:30:00Z'));
+    const kiritimati: BirthPlaceCandidate = {
+      id: 'test:kiritimati', label: 'Kiritimati, Kiribati',
+      latitude: 1.8721, longitude: -157.4278, timezone: 'Pacific/Kiritimati',
+    };
+    const deriveProfile = vi.fn(async () => calculatedProfile());
+    installBirthApi({
+      searchPlaces: vi.fn(async () => ({
+        results: [kiritimati], attribution: 'Test provider',
+      })),
+      deriveProfile,
+    });
+    controller.openCreate();
+    expect(query<HTMLInputElement>('#profile-birth-date').max).toBe('');
+    inputValue('#profile-name', 'Today in Kiritimati');
+    inputValue('#profile-birth-date', '2026-01-02');
+    inputValue('#profile-birth-time', '13:00');
+    inputValue('#profile-birth-place', 'Kiritimati');
+    buttonNamed('Find place').click();
+    await vi.waitFor(() => {
+      expect(document.querySelectorAll('.profiles-place-results__choice')).toHaveLength(1);
+    });
+    query<HTMLButtonElement>('.profiles-place-results__choice').click();
+
+    expect(query<HTMLInputElement>('#profile-birth-date').max).toBe('2026-01-02');
+    buttonNamed('Calculate details').click();
+    await vi.waitFor(() => expect(deriveProfile).toHaveBeenCalledTimes(1));
+
+    inputValue('#profile-birth-time', '13:31');
+    buttonNamed('Calculate details').click();
+    expect(deriveProfile).toHaveBeenCalledTimes(1);
+    expect(query('#profile-birth-time-error').textContent).toContain(
+      'cannot be in the future at the selected birthplace',
+    );
+  });
+
+  test('does not allow tomorrow at a birthplace west of UTC', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-01-02T00:30:00Z'));
+    const honolulu: BirthPlaceCandidate = {
+      id: 'test:honolulu', label: 'Honolulu, Hawaii, United States',
+      latitude: 21.3099, longitude: -157.8581, timezone: 'Pacific/Honolulu',
+    };
+    const deriveProfile = vi.fn(async () => calculatedProfile());
+    installBirthApi({
+      searchPlaces: vi.fn(async () => ({
+        results: [honolulu], attribution: 'Test provider',
+      })),
+      deriveProfile,
+    });
+    controller.openCreate();
+    inputValue('#profile-name', 'Tomorrow in Honolulu');
+    inputValue('#profile-birth-date', '2026-01-02');
+    inputValue('#profile-birth-time', '08:00');
+    inputValue('#profile-birth-place', 'Honolulu');
+    buttonNamed('Find place').click();
+    await vi.waitFor(() => {
+      expect(document.querySelectorAll('.profiles-place-results__choice')).toHaveLength(1);
+    });
+    query<HTMLButtonElement>('.profiles-place-results__choice').click();
+
+    expect(query<HTMLInputElement>('#profile-birth-date').max).toBe('2026-01-01');
+    buttonNamed('Calculate details').click();
+    expect(deriveProfile).not.toHaveBeenCalled();
+    expect(query('#profile-birth-date-error').textContent).toContain('not in the future');
+  });
+
+  test.each([
+    ['2026-03-08', '02:30', 'did not occur'],
+    ['2026-11-01', '01:30', 'occurred twice'],
+  ])('rejects the New York DST wall time %s %s', async (date, time, message) => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-12-01T12:00:00Z'));
+    const newYork: BirthPlaceCandidate = {
+      id: 'test:new-york', label: 'New York, United States',
+      latitude: 40.7128, longitude: -74.006, timezone: 'America/New_York',
+    };
+    const deriveProfile = vi.fn(async () => calculatedProfile());
+    installBirthApi({
+      searchPlaces: vi.fn(async () => ({
+        results: [newYork], attribution: 'Test provider',
+      })),
+      deriveProfile,
+    });
+    controller.openCreate();
+    inputValue('#profile-name', 'DST boundary');
+    inputValue('#profile-birth-date', date);
+    inputValue('#profile-birth-time', time);
+    inputValue('#profile-birth-place', 'New York');
+    buttonNamed('Find place').click();
+    await vi.waitFor(() => {
+      expect(document.querySelectorAll('.profiles-place-results__choice')).toHaveLength(1);
+    });
+    query<HTMLButtonElement>('.profiles-place-results__choice').click();
+
+    buttonNamed('Calculate details').click();
+    expect(deriveProfile).not.toHaveBeenCalled();
+    expect(query('#profile-birth-time-error').textContent).toContain(message);
+    expect(query<HTMLInputElement>('#profile-birth-time').getAttribute('aria-invalid')).toBe('true');
   });
 
   test('invalidates a reviewed calculation whenever a calculation input changes', async () => {

@@ -190,12 +190,12 @@ the user-facing documentation projection.
 
 | Evidence ID | Task / check | Viewport | Before / after | File or URL | Inspected by | Notes |
 |---|---|---|---|---|---|---|
-| E19 | Horoscope hierarchy decision | comparison | Before + mock | `19-horoscope-surface-options.png` | Codex | Design aid, not acceptance proof. |
-| E20 | Profile onward actions | phone | After | `20-profile-detail-actions-mobile.png` | Codex | Ready state exposes both supported journeys. |
-| E21 | Daily Horoscope | phone | Before 15 / after 21 | `15-horoscope-profile-mobile.png`, `21-horoscope-profile-mobile-after.png` | Codex | First answer reduced; Lagna verdict removed. |
-| E22 | Muhurtam hierarchy | compact shell | Before 07 / after 22–23 | `07-muhurtam-results-desktop.png`, `22-muhurtam-results-mobile-after.png`, `23-muhurtam-results-midwidth-full-after.png` | Codex | Tier-first explanation and closed reasons. |
-| E24 | Panchangam failure zone | 853 × 900 | After | `24-panchangam-responsive-after.png` | Codex | Zero overflow after 959/960 breakpoint alignment. |
-| E25 | Next observance | compact shell | Before 08 / after 25 | `08-festivals-desktop.png`, `25-festivals-next-observance-after.png` | Codex | Direct date-to-Panchangam handoff. |
+| E19 | Horoscope hierarchy decision | comparison | Before + mock | `19-horoscope-surface-options.jpg` | Codex | Design aid, not acceptance proof. |
+| E20 | Profile onward actions | phone | After | `20-profile-detail-actions-mobile.jpg` | Codex | Ready state exposes both supported journeys. |
+| E21 | Daily Horoscope | phone | Before 15 / after 21 | `15-horoscope-profile-mobile.jpg`, `21-horoscope-profile-mobile-after.jpg` | Codex | First answer reduced; Lagna verdict removed. |
+| E22 | Muhurtam hierarchy | compact shell | Before 07 / after 22–23 | `07-muhurtam-results-desktop.jpg`, `22-muhurtam-results-mobile-after.jpg`, `23-muhurtam-results-midwidth-full-after.jpg` | Codex | Tier-first explanation and closed reasons. |
+| E24 | Panchangam failure zone | 853 × 900 | After | `24-panchangam-responsive-after.jpg` | Codex | Zero overflow after 959/960 breakpoint alignment. |
+| E25 | Next observance | compact shell | Before 08 / after 25 | `08-festivals-desktop.jpg`, `25-festivals-next-observance-after.jpg` | Codex | Direct date-to-Panchangam handoff. |
 
 ## Gate decision
 

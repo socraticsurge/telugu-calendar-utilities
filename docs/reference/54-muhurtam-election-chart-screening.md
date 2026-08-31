@@ -108,10 +108,13 @@ The chart service returns:
 - the contract-bound `mean` lunar-node convention;
 - sidecar Whole Sign houses and Lagna, retained for contract diagnostics but
   not used as the browser's house authority; and
-- Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, mean Rahu and Ketu.
+- exactly the ordered tuple `Surya`, `Chandra`, `Kuja`, `Budha`, `Guru`,
+  `Shukra`, `Shani`, `Rahu`, `Ketu`; the separate node convention makes Rahu
+  the mean node.
 
-`mixed` means the batch did not use one uniform ephemeris state across every
-snapshot; it must be disclosed rather than simplified to `swiss` or `moshier`.
+`mixed` means the screening run did not use one uniform ephemeris state across
+every snapshot or accepted service batch; it must be disclosed rather than
+simplified to `swiss` or `moshier`.
 The same derivation and licensing caveats as the guest D1 chart apply; see
 [Guest birth profiles and the D1 Rashi chart](53-birth-profile-calculation.md).
 For a vacancy predicate, **all nine returned grahas count as occupants**,
@@ -119,7 +122,12 @@ including Rahu and Ketu. The network adapter accepts only one complete set of
 those nine canonical names with canonical Rashis and integer houses 1–12. It
 also checks response order, exact input instants, echoed location, DashaFlow,
 Lahiri, mean-node and Whole Sign metadata. One missing, duplicated, reordered or
-unrecognized value rejects the entire batch as an invalid response. Before a
+unrecognized value rejects the entire batch as an invalid response. Planet and
+Lagna degrees must match the sidecar's two-decimal projection (including its
+representable value immediately below a rounded 30° boundary); each returned
+house must agree with the returned Whole Sign Lagna; Surya and Chandra must be
+direct; and retrograde Rahu/Ketu must remain opposite within the combined
+0.01° rounding envelope. A contradiction fails the batch closed. Before a
 predicate runs, the browser resolves the local Lagna Rashi for the exact sample
 minute and recomputes every graha's Whole Sign house as:
 
@@ -128,10 +136,17 @@ H(p) = ((RashiIndex(p) - LocalLagnaIndex + 12) mod 12) + 1
 ```
 
 The sidecar's returned `planet.house` and Lagna Rashi cannot override this
-frame. A missing or invalid minute-to-Lagna mapping rejects the entire
-enrichment as unavailable; the UI falls back to the unscreened shortlist with
-state `unavailable`. It never uses
+frame. A missing or invalid minute-to-Lagna mapping rejects the affected
+service batch before it can contribute outcomes. If no earlier batch completed,
+the UI falls back to the unscreened shortlist with state `unavailable`; after
+one or more batches completed, the partial-run rules below apply. It never uses
 the valid-looking part of a malformed batch.
+
+Engine provenance is also a run-wide invariant. Name, version, ayanamsha and
+node convention must remain identical across accepted batches; an incompatible
+later batch is rejected before any of its windows are applied. Ephemeris is the
+only aggregating field: differing accepted ephemeris disclosures are preserved
+as `mixed`.
 
 The pure Python and TypeScript predicate evaluators separately fail closed to
 `unknown` if a caller invokes them directly with an incomplete chart. That is
@@ -347,6 +362,13 @@ coverage from depending only on one rounded transition minute. Current
 predicates depend on Rashi, Nakshatra or Whole Sign house states, not a
 continuous degree threshold.
 
+The sidecar projects graha degrees to two decimals. For Seemantha's mandatory
+relative-Nakshatra rule, the browser therefore treats the returned Chandra
+degree as a closed ±0.005° interval. If that interval spans an internal
+Nakshatra boundary within the returned Rashi, the Nakshatra outcome is
+`unknown`: the slot remains visible, earns no preference, and is capped for
+review rather than being admitted or rejected from rounded evidence.
+
 The browser also reads and validates the selected city's precomputed
 Drik/Lahiri Lagna transitions. Every sample minute is mapped to its canonical
 local Lagna, and all nine houses are recomputed from the returned planetary
@@ -392,11 +414,16 @@ The table below defines the **chart-predicate** window combiner:
 | Preference statuses differ between samples | Not applicable | `unknown`; retain, require review, no preference |
 
 A complete, valid batch is a precondition for this table. A malformed or
-incomplete network response does not become a retained `unknown`; the whole
-batch is discarded and the UI reports `unavailable`. Within a valid batch,
-`unknown` represents a supported unresolved evaluation: a preference whose
-status differs across sampled states, or a Lagna-dependent rule in a partial
-boundary-guard window.
+incomplete network response does not become a retained `unknown`; that batch is
+discarded and the UI reports `unavailable`. If it is the first batch, the
+original conservatively capped shortlist remains visible. If a later batch
+fails, every conclusive removal and survivor from earlier completed batches is
+preserved: only those already-screened survivors remain visible, while the
+failed batch and all unprocessed candidates are withheld. The result is
+labelled partial exact chart screening, never a completed run. Within a valid
+batch, `unknown` represents a supported unresolved evaluation: a preference
+whose status differs across sampled states, or a Lagna-dependent rule in a
+partial boundary-guard window.
 
 The local personal-role combiner uses the same fail-at-any-sample rule for a
 prohibition. When a fully resolved personal preference is not present at every
@@ -425,18 +452,21 @@ raw score. Ordering is:
 6. date and start time.
 
 The browser dynamically packs the next base-ranked windows into no more than
-24 unique instants per request and refills after failures where possible,
-returning at most 10 survivors. One search makes at most five chart requests.
+24 unique instants per request and refills after conclusive candidate removals
+where possible, returning at most 10 survivors. One search makes at most five
+chart requests.
 Because windows can need different numbers of transition samples, the exact
 candidate count is data-dependent rather than a fixed 60-window guarantee. If
 that request budget is reached, `candidateLimitReached` is true and the message
 states the exact number of highest-ranked candidates that were screened; a
 short or empty list is not represented as proof that every remaining base
-candidate was screened. If
-the chart service is unavailable or its response is invalid, the original
-Panchangam-ranked top 10 remain visible with an explicit `unavailable` state;
-they are not labelled chart-screened. If the base scorer produced no candidate,
-the enrichment state is `not-run` and no chart request is made. An
+candidate was screened. If the chart service is unavailable or its response is
+invalid before any batch completes, the original Panchangam-ranked top 10
+remain visible with an explicit `unavailable` state; they are not labelled
+chart-screened. A later failure instead shows only survivors from completed
+batches, retains their removal accounting, withholds every unscreened
+candidate, and clearly labels the result partial. If the base scorer produced
+no candidate, the enrichment state is `not-run` and no chart request is made. An
 intentionally inactive build uses the separate `disabled` state with the same
 conservative shortlist and rating cap, so a release decision is never
 misreported as a service outage.

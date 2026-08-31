@@ -348,13 +348,14 @@ def _muhurta_planets(scenario, chart_index, canonical_lagna):
             'Chandra': 1 if chart_index % 2 == 0 else 2,
             'Shukra': 1,
         })
+    houses['Ketu'] = (houses['Rahu'] + 5) % 12 + 1
     rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
     lagna_index = rashis.index(canonical_lagna)
     return [
         {
             'name': name,
             'rashi': rashis[(lagna_index + houses[name] - 1) % 12],
-            'degree': index + 0.25,
+            'degree': 10 if name in {'Rahu', 'Ketu'} else index + 0.25,
             'house': houses[name],
             'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
         }
@@ -482,9 +483,9 @@ def _seed_private_muhurta_profiles(page):
     natal_planets = [
         {
             'name': name,
-            'rashi': MUHURTA_PLANET_RASHIS[index],
-            'degree': index + 0.5,
-            'house': index + 1,
+            'rashi': 'Vrishabha' if name == 'Ketu' else MUHURTA_PLANET_RASHIS[index],
+            'degree': 15 if name == 'Chandra' else 10 if name in {'Rahu', 'Ketu'} else index + 0.5,
+            'house': ((1 if name == 'Ketu' else index) - 5) % 12 + 1,
             'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
         }
         for index, name in enumerate(MUHURTA_PLANET_NAMES)
@@ -1176,15 +1177,15 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
         {
             'name': name,
             'rashi': rashi,
-            'degree': index + 0.25,
-            'house': index + 1,
+            'degree': 15 if name == 'Chandra' else 10 if name in {'Rahu', 'Ketu'} else index + 0.25,
+            'house': ((1 if name == 'Ketu' else index) - 4) % 12 + 1,
             'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
         }
         for index, (name, rashi) in enumerate((
             ('Surya', 'Mesha'), ('Chandra', 'Vrishabha'),
             ('Kuja', 'Mithuna'), ('Budha', 'Karka'), ('Guru', 'Simha'),
             ('Shukra', 'Kanya'), ('Shani', 'Tula'),
-            ('Rahu', 'Vrischika'), ('Ketu', 'Dhanu'),
+            ('Rahu', 'Vrischika'), ('Ketu', 'Vrishabha'),
         ))
     ]
 
