@@ -8,7 +8,14 @@ import { fmtT, dayMark, fmtRange, fmtPlain } from './lib/format';
 import { htmlEsc } from './lib/html';
 import { gcEvent } from './lib/analytics';
 import { RASI_NAMES } from './data/rasis';
-import { loadGochara, renderGochara, goBuildViewSelect, shareGocharaOnWhatsApp, goHasData } from './panels/gochara';
+import {
+  initGocharaProfiles,
+  loadGochara,
+  renderGochara,
+  goBuildViewSelect,
+  shareGocharaOnWhatsApp,
+  goHasData,
+} from './panels/gochara';
 import { loadPreview, renderAll, toggleFestivalMonth, shareTodayOnWhatsApp, initTodayPanel } from './panels/today';
 import {
   calcTarabalam, renderTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
@@ -164,6 +171,19 @@ import { initProfilesPanel } from './panels/profiles';
 
   const profileStore = createGuestProfileStore(localStorage);
   const profilesPanel = initProfilesPanel(profileStore, { navigate: switchTool });
+  initGocharaProfiles(profileStore, {
+    createProfile() {
+      profilesPanel.openCreate({ returnTo: 'gochara' });
+      switchTool('profiles');
+    },
+    editProfile(id) {
+      profilesPanel.openEdit(id, { returnTo: 'gochara' });
+      switchTool('profiles');
+    },
+    manageProfiles() {
+      switchTool('profiles');
+    },
+  });
 
 
   // Quiet settings summary — the controls live behind it. The city

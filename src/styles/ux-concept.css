@@ -743,6 +743,67 @@ h2.panel-heading { display: none !important; }
   line-height: 1.55;
 }
 
+/* Personalized journeys keep profile context visible but subordinate. */
+#panel-gochara > .tb-controls {
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: var(--ux-space-3);
+  padding: var(--ux-space-3) var(--ux-space-4);
+}
+
+#panel-gochara > .tb-controls .selector-row { margin: 0; }
+#panel-gochara > .tb-controls .selector { min-width: min(20rem, 100%); }
+#panel-gochara > .tb-controls select {
+  min-height: 44px;
+  font-family: var(--brand-sans);
+  font-size: var(--ux-text-md);
+}
+
+.journey-profile-state:empty { display: none; }
+
+.go-profile-context {
+  max-width: 65ch;
+  margin: 0 0 var(--ux-space-5);
+  padding: var(--ux-space-3) 0 var(--ux-space-3) var(--ux-space-4);
+  border-left: 3px solid var(--ux-line);
+}
+
+.go-profile-notice {
+  margin: 0;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-sm);
+  line-height: 1.55;
+}
+
+.go-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ux-space-2);
+  margin-top: var(--ux-space-3);
+}
+
+.go-profile-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--ux-line);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ux-brand);
+  font: 600 var(--ux-text-sm)/1.2 var(--brand-sans);
+  cursor: pointer;
+}
+
+.go-profile-action--primary {
+  border-color: var(--ux-brand);
+  background: var(--ux-brand);
+  color: #fff;
+}
+
+.go-profile-action--secondary { background: transparent; }
+
 /* Settings only appear where they change the result on screen. */
 body[data-tool='profiles'] #settings-line,
 body[data-tool='profiles'] #global-controls-bar,

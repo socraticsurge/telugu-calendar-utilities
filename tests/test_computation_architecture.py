@@ -27,6 +27,10 @@ def test_profiles_panel_extends_architecture_additively():
     assert source_scope_class('src/panels/profiles.ts') == 'additive-feature'
 
 
+def test_profile_selection_extends_architecture_additively():
+    assert source_scope_class('src/lib/profile-selection.ts') == 'additive-feature'
+
+
 @pytest.mark.parametrize('ref', ('--help', 'HEAD..master', 'HEAD^{tree}', '../HEAD'))
 def test_architecture_report_rejects_unsafe_git_refs(ref):
     with pytest.raises(ValueError, match='unsupported Git ref'):

@@ -12,8 +12,19 @@ import { selEl } from '../lib/dom';
 import { shaniConditionFromMoonHouse, shaniConditionLine } from '../shani-conditions';
 import {
   canonicalLegacyGuestProfileLagna,
+  guestProfileReadiness,
   readLegacyGuestProfileRows,
+  type GuestProfile,
+  type GuestProfileStore,
+  type ProfileStorage,
 } from '../lib/guest-profile-store';
+import {
+  GOCHARA_SELECTION_STORAGE_KEY,
+  gocharaProfileValue,
+  loadGocharaSelection,
+  resolveGocharaSelection,
+  type GocharaSelectionResolution,
+} from '../lib/profile-selection';
 
 // Chandrabalam house sets — same classical table the muhurta scorer pins.
 const CHANDRA_GOOD = MU_CHANDRA_GOOD;
@@ -30,6 +41,173 @@ const GO_EXEMPT = new Set(['Surya|Shani','Shani|Surya','Chandra|Budha','Budha|Ch
 const GO_NODES = new Set(['Rahu','Ketu']);
 let GO_DATA = null;
 let LLM_PHALALU = null;
+
+export interface GocharaProfileActions {
+  createProfile(): void;
+  editProfile(id: string): void;
+  manageProfiles(): void;
+}
+
+export interface GocharaProfilesController {
+  refresh(): void;
+  destroy(): void;
+}
+
+let gocharaProfileStore: GuestProfileStore | null = null;
+let gocharaProfileActions: GocharaProfileActions | null = null;
+let destroyGocharaProfiles: (() => void) | null = null;
+
+const unavailableSelectionStorage: ProfileStorage = {
+  getItem() { throw new Error('storage unavailable'); },
+  setItem() { throw new Error('storage unavailable'); },
+};
+
+function goSelectionStorage(): ProfileStorage {
+  try {
+    return globalThis.localStorage || unavailableSelectionStorage;
+  } catch {
+    return unavailableSelectionStorage;
+  }
+}
+
+function persistGocharaSelection(value: string): boolean {
+  try {
+    goSelectionStorage().setItem(GOCHARA_SELECTION_STORAGE_KEY, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function profileDisplayName(profile: Readonly<GuestProfile>): string {
+  return profile.name || 'Unnamed profile';
+}
+
+function option(
+  value: string,
+  label: string,
+  disabled = false,
+): HTMLOptionElement {
+  const node = document.createElement('option');
+  node.value = value;
+  node.textContent = label;
+  node.disabled = disabled;
+  return node;
+}
+
+function stateAction(
+  label: string,
+  action: 'create' | 'edit' | 'manage',
+  callback: () => void,
+  primary = false,
+): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `go-profile-action go-profile-action--${primary ? 'primary' : 'secondary'}`;
+  button.dataset.goProfileAction = action;
+  button.textContent = label;
+  button.addEventListener('click', callback);
+  return button;
+}
+
+function profileIdFromSelection(value: string | null): string | null {
+  const match = value?.match(/^profile:(.+)$/);
+  return match ? match[1] : null;
+}
+
+function renderGocharaProfileState(
+  resolution: GocharaSelectionResolution,
+  selectionStorageUnavailable = false,
+): void {
+  const root = document.getElementById('go-profile-state');
+  if (!root) return;
+  root.replaceChildren();
+
+  const snapshot = gocharaProfileStore?.getSnapshot();
+  const profiles = snapshot?.profiles || [];
+  const requestedProfileId = profileIdFromSelection(resolution.requestedValue);
+  const requestedProfile = requestedProfileId
+    ? profiles.find(profile => profile.id === requestedProfileId) || null
+    : null;
+
+  const addNotice = (message: string): void => {
+    const notice = document.createElement('p');
+    notice.className = 'go-profile-notice';
+    notice.setAttribute('role', 'status');
+    notice.textContent = message;
+    root.append(notice);
+  };
+  const addContext = (message: string): void => {
+    const context = document.createElement('p');
+    context.className = 'go-profile-context';
+    context.textContent = message;
+    root.append(context);
+  };
+  const addActions = (...buttons: HTMLButtonElement[]): void => {
+    if (!buttons.length) return;
+    const actions = document.createElement('div');
+    actions.className = 'go-profile-actions';
+    actions.append(...buttons);
+    root.append(actions);
+  };
+
+  if (resolution.fallback) addNotice(resolution.fallback.message);
+  if (
+    !resolution.fallback &&
+    (selectionStorageUnavailable || snapshot?.persistence === 'memory')
+  ) {
+    addNotice('Your horoscope choice works for this page, but this browser cannot save it.');
+  }
+
+  if (requestedProfile && resolution.fallback?.code === 'profile-not-horoscope-ready') {
+    const missing = resolution.fallback.missingField === 'pada' ? 'Padam' : 'Nakshatra';
+    addContext(`Add ${missing} to ${profileDisplayName(requestedProfile)} before using this profile here.`);
+    if (gocharaProfileActions) {
+      addActions(
+        stateAction(
+          `Edit ${profileDisplayName(requestedProfile)}`,
+          'edit',
+          () => gocharaProfileActions?.editProfile(requestedProfile.id),
+          true,
+        ),
+        stateAction('Manage profiles', 'manage', () => gocharaProfileActions?.manageProfiles()),
+      );
+    }
+    return;
+  }
+
+  if (resolution.kind === 'profile' && resolution.profile) {
+    addContext(`Using ${resolution.profile.name || 'this profile'}'s saved birth star for this Daily Horoscope.`);
+    if (gocharaProfileActions) {
+      addActions(
+        stateAction(
+          `Edit ${resolution.profile.name || 'profile'}`,
+          'edit',
+          () => gocharaProfileActions?.editProfile(resolution.profile!.id),
+        ),
+        stateAction('Manage profiles', 'manage', () => gocharaProfileActions?.manageProfiles()),
+      );
+    }
+    return;
+  }
+
+  if (profiles.length === 0) {
+    addContext('Create a profile to reuse a birth star here and in Muhurtam. It stays only in this browser.');
+    if (gocharaProfileActions) {
+      addActions(stateAction('Create profile', 'create', () => gocharaProfileActions?.createProfile(), true));
+    }
+    return;
+  }
+
+  if (resolution.kind === 'rashi') {
+    addContext('This is a one-off Rashi view. Choose a saved profile above to return to a personal horoscope faster.');
+  } else {
+    addContext('Choose a saved profile above for a personal Daily Horoscope, or select any Rashi for a one-off view.');
+  }
+  if (gocharaProfileActions) {
+    addActions(stateAction('Manage profiles', 'manage', () => gocharaProfileActions?.manageProfiles()));
+  }
+}
 
 async function loadGochara() {
   const firstLoad = !GO_DATA;
@@ -52,16 +230,8 @@ async function loadGochara() {
       if (pr.ok) LLM_PHALALU = await pr.json();
     } catch (_) { /* no LLM phalalu today — computed fallback will be used */ }
   }
-  // people may have changed in the Tarabalam tab — rebuild, keep selection
-  const sel = selEl('go-view');
-  let keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
-  // An earlier iteration of this PR had separate 'p<i>r' / 'p<i>l'
-  // options; we collapsed those into a single 'p<i>' combined
-  // option. Strip the suffix on load so test users who saved a
-  // suffixed value during the iteration don't end up unselected.
-  if (keep && /^p\d+[rl]$/.test(keep)) keep = keep.slice(0, -1);
+  // Profiles may have changed elsewhere; rebuild from the subscribed store.
   goBuildViewSelect();
-  if (keep && [...sel.options].some(o => o.value === keep)) sel.value = keep;
   renderGochara();
 }
 
@@ -85,7 +255,14 @@ function goTill(idx, gi) {
 }
 
 function goSavedPeople() {
-  const saved = readLegacyGuestProfileRows(localStorage);
+  let saved: ReturnType<typeof readLegacyGuestProfileRows>;
+  try {
+    // Keep the compatibility boundary explicit for corrupt legacy payloads;
+    // the outer guard also covers browsers that deny the localStorage getter.
+    saved = readLegacyGuestProfileRows(localStorage);
+  } catch {
+    saved = [];
+  }
   return saved.map((v, i) => {
     if (!v || !v.nak) return null;
     const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
@@ -101,31 +278,175 @@ function goSavedPeople() {
   }).filter(Boolean);
 }
 
-function goBuildViewSelect() {
-  const sel = selEl('go-view');
-  const people = goSavedPeople();
-  let html = '<option value="">Transits only — whole sky</option>';
-  if (people.length) {
-    // One row per person — when janma lagna is also on the profile,
-    // the row label says so. The chart then uses BOTH references to
-    // verdict each graha; you don't pick rashi-or-lagna, you get
-    // the personalised combined view.
-    const rows = people.map((k, i) => {
-      const refs = k.lagna
-        ? `${htmlEsc(k.rasi)} rashi + ${htmlEsc(k.lagna)} lagna`
-        : `${htmlEsc(k.rasi)} rashi`;
-      return `<option value="p${i}">${htmlEsc(k.name)} · ${refs}</option>`;
-    });
-    html += '<optgroup label="Your saved people">' + rows.join('') + '</optgroup>';
+function stableProfileOption(profile: Readonly<GuestProfile>): HTMLOptionElement {
+  const readiness = guestProfileReadiness(profile);
+  const name = profileDisplayName(profile);
+  if (!readiness.horoscope) {
+    const missing = readiness.missingForHoroscope === 'pada' ? 'Padam' : 'Nakshatra';
+    return option(gocharaProfileValue(profile.id), `${name} · Needs ${missing}`, true);
   }
-  html += '<optgroup label="Any rashi">' +
-    GO_DATA.rasis.map((r, i) => `<option value="${i}">${r}</option>`).join('') + '</optgroup>';
-  sel.innerHTML = html;
+  const refs = profile.lagna
+    ? `${readiness.janmaRasi} Rashi + ${profile.lagna} Lagna`
+    : `${readiness.janmaRasi} Rashi`;
+  return option(gocharaProfileValue(profile.id), `${name} · ${refs}`);
+}
+
+function buildStableViewSelect(preferredValue?: string): GocharaSelectionResolution {
+  const sel = selEl('go-view');
+  const snapshot = gocharaProfileStore!.getSnapshot();
+  const hadOptions = sel.options.length > 0;
+  let selectionStorageUnavailable = false;
+  let resolution: GocharaSelectionResolution;
+
+  if (preferredValue === undefined && !hadOptions) {
+    const loaded = loadGocharaSelection(goSelectionStorage(), snapshot.profiles);
+    resolution = loaded;
+    selectionStorageUnavailable = loaded.storageIssue === 'storage-unavailable';
+  } else {
+    const requestedValue = preferredValue === undefined ? sel.value : preferredValue;
+    resolution = resolveGocharaSelection(requestedValue, snapshot.profiles);
+    selectionStorageUnavailable = !persistGocharaSelection(resolution.value);
+  }
+
+  const wholeSky = option('', 'Transits only — whole sky');
+  const nodes: Array<HTMLOptionElement | HTMLOptGroupElement> = [wholeSky];
+  if (snapshot.profiles.length) {
+    const saved = document.createElement('optgroup');
+    saved.label = 'Saved profiles';
+    for (const profile of snapshot.profiles) saved.append(stableProfileOption(profile));
+    nodes.push(saved);
+  }
+  const anyRashi = document.createElement('optgroup');
+  anyRashi.label = 'Any Rashi';
+  RASI_NAMES.forEach((rasi, index) => anyRashi.append(option(String(index), rasi)));
+  nodes.push(anyRashi);
+  sel.replaceChildren(...nodes);
+  sel.value = [...sel.options].some(candidate => candidate.value === resolution.value)
+    ? resolution.value
+    : '';
+  renderGocharaProfileState(resolution, selectionStorageUnavailable);
+  return resolution;
+}
+
+function buildLegacyViewSelect(): void {
+  const sel = selEl('go-view');
+  const hadOptions = sel.options.length > 0;
+  let keep = hadOptions ? sel.value : null;
+  if (!hadOptions) {
+    try {
+      keep = goSelectionStorage().getItem(GOCHARA_SELECTION_STORAGE_KEY);
+    } catch {
+      keep = null;
+    }
+  }
+  // An earlier iteration stored separate rashi/lagna suffixes. The combined
+  // legacy option remains available until the profile store initializes.
+  if (keep && /^p\d+[rl]$/.test(keep)) keep = keep.slice(0, -1);
+  const people = goSavedPeople();
+  const nodes: Array<HTMLOptionElement | HTMLOptGroupElement> = [
+    option('', 'Transits only — whole sky'),
+  ];
+  if (people.length) {
+    const saved = document.createElement('optgroup');
+    saved.label = 'Your saved people';
+    people.forEach((person, index) => {
+      const refs = person.lagna
+        ? `${person.rasi} Rashi + ${person.lagna} Lagna`
+        : `${person.rasi} Rashi`;
+      saved.append(option(`p${index}`, `${person.name} · ${refs}`));
+    });
+    nodes.push(saved);
+  }
+  const anyRashi = document.createElement('optgroup');
+  anyRashi.label = 'Any Rashi';
+  RASI_NAMES.forEach((rasi, index) => anyRashi.append(option(String(index), rasi)));
+  nodes.push(anyRashi);
+  sel.replaceChildren(...nodes);
+  if (keep && [...sel.options].some(candidate => candidate.value === keep)) sel.value = keep;
+}
+
+function goBuildViewSelect(preferredValue?: string) {
+  if (gocharaProfileStore) return buildStableViewSelect(preferredValue);
+  buildLegacyViewSelect();
+  return null;
+}
+
+/**
+ * Connect the Daily Horoscope selector to the shared guest-profile store.
+ * The subscription is intentionally owned here so profile edits made from
+ * any journey update this panel without relying on Tarabalam to rebuild it.
+ */
+export function initGocharaProfiles(
+  store: GuestProfileStore,
+  actions: GocharaProfileActions,
+): GocharaProfilesController {
+  destroyGocharaProfiles?.();
+  gocharaProfileStore = store;
+  gocharaProfileActions = actions;
+
+  const select = document.getElementById('go-view') as HTMLSelectElement | null;
+  if (!select) throw new Error('Daily Horoscope selector #go-view was not found');
+  let destroyed = false;
+
+  const refresh = (): void => {
+    if (destroyed) return;
+    goBuildViewSelect();
+    if (GO_DATA) renderGochara();
+  };
+  const handleChange = (): void => {
+    if (destroyed) return;
+    goBuildViewSelect(select.value);
+    if (GO_DATA) renderGochara();
+  };
+
+  select.addEventListener('change', handleChange);
+  const unsubscribe = store.subscribe(refresh);
+
+  const destroy = (): void => {
+    if (destroyed) return;
+    destroyed = true;
+    select.removeEventListener('change', handleChange);
+    unsubscribe();
+    if (destroyGocharaProfiles === destroy) {
+      destroyGocharaProfiles = null;
+      gocharaProfileStore = null;
+      gocharaProfileActions = null;
+    }
+  };
+  destroyGocharaProfiles = destroy;
+
+  const controller: GocharaProfilesController = { refresh, destroy };
+  refresh();
+  return controller;
 }
 
 function goCurrentView() {
   const val = selEl('go-view').value;
   if (val === '') return { jr: null, jl: null, label: null };
+  if (gocharaProfileStore) {
+    const resolved = resolveGocharaSelection(
+      val,
+      gocharaProfileStore.getSnapshot().profiles,
+    );
+    if (resolved.kind === 'profile' && resolved.profile?.rasi) {
+      const jr = RASI_NAMES.indexOf(resolved.profile.rasi);
+      const jl = resolved.profile.lagna
+        ? RASI_NAMES.indexOf(resolved.profile.lagna)
+        : null;
+      const refLabel = resolved.profile.lagna
+        ? `${resolved.profile.rasi} rashi + ${resolved.profile.lagna} lagna (${resolved.profile.name})`
+        : `${resolved.profile.rasi} rashi (${resolved.profile.name})`;
+      return { jr, jl, label: refLabel };
+    }
+    if (resolved.kind === 'rashi' && resolved.rasiIndex !== null) {
+      return {
+        jr: resolved.rasiIndex,
+        jl: null,
+        label: `${RASI_NAMES[resolved.rasiIndex]} rashi`,
+      };
+    }
+    return { jr: null, jl: null, label: null };
+  }
   // 'p<i>' — profile-keyed combined view. We carry BOTH the rashi
   // index (jr, used to lay out the chart and number houses) AND the
   // optional lagna index (jl, used as a second reference for graha
@@ -142,7 +463,12 @@ function goCurrentView() {
     return { jr, jl, label: refLabel };
   }
   // Bare rashi-index option from the "Any rashi" group.
-  return { jr: Number(val), jl: null, label: GO_DATA.rasis[Number(val)] + ' rashi' };
+  const rasiIndex = Number(val);
+  return {
+    jr: rasiIndex,
+    jl: null,
+    label: `${RASI_NAMES[rasiIndex]} rashi`,
+  };
 }
 
 // South Indian chart: fixed rasi positions on a 4x4 grid (row, col)
@@ -150,14 +476,14 @@ const GO_LAYOUT = { 11:[1,1], 0:[1,2], 1:[1,3], 2:[1,4], 3:[2,4], 4:[3,4],
                     5:[4,4], 6:[4,3], 7:[4,2], 8:[4,1], 9:[3,1], 10:[2,1] };
 
 function renderGochara() {
+  // A denied browser-storage write must never prevent the chart from rendering.
+  persistGocharaSelection(selEl('go-view').value);
   if (!GO_DATA) return;
   const idx = goDateIndex();
   const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
   const view = goCurrentView();
   const jr = view.jr;
   const jl = (typeof view.jl === 'number') ? view.jl : null;
-  localStorage.setItem('tc-go-view', selEl('go-view').value);
-
   const dateShown = new Date(GO_DATA.start + 'T00:00:00');
   dateShown.setDate(dateShown.getDate() + idx);
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
