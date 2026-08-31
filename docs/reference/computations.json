@@ -214,6 +214,11 @@
         "reason": "Application bootstrap and navigation wiring."
       },
       {
+        "path": "src/panels/profiles.ts",
+        "kind": "ui-only",
+        "reason": "Accessible browser-local profile management UI; it owns no Panchangam computation."
+      },
+      {
         "path": "src/selection-store.ts",
         "kind": "ui-only",
         "reason": "Browser selection state only."

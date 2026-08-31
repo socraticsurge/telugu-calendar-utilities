@@ -18,6 +18,8 @@ import {
 } from './panels/tarabalam';
 import { loadLagna, lagnaDayFor } from './lib/lagna-loader';
 import { stampOf } from './lib/format';
+import { createGuestProfileStore } from './lib/guest-profile-store';
+import { initProfilesPanel } from './panels/profiles';
 
   function populateCitySelect(select) {
     CITY_GROUPS.forEach(([label, cities]) => {
@@ -99,6 +101,7 @@ import { stampOf } from './lib/format';
     today:     ["Today's Panchangam", 'What is the day?'],
     gochara:   ['Gochara · Rasi Phalalu', 'What does it mean for me?'],
     tarabalam: ['Tarabalam · Muhurtam', 'When should we act?'],
+    profiles:  ['Profiles', 'Saved only in this browser'],
     festivals: ['Festivals', 'Special days — next 30 days'],
     subscribe: ['Subscribe', 'Get panchangam in your calendar'],
     useinai:   ['Use in AI', 'MCP server for AI assistants'],
@@ -158,6 +161,9 @@ import { stampOf } from './lib/format';
     if (typeof gcEvent === 'function') gcEvent('tab-' + which);
     if (which === 'gochara') loadGochara();
   }
+
+  const profileStore = createGuestProfileStore(localStorage);
+  const profilesPanel = initProfilesPanel(profileStore, { navigate: switchTool });
 
 
   // Quiet settings summary — the controls live behind it. The city
@@ -243,6 +249,7 @@ import { stampOf } from './lib/format';
   if (location.hash === '#tarabalam') switchTool('tarabalam');
   if (location.hash === '#gochara') switchTool('gochara');
   if (location.hash === '#muhurta') switchTool('tarabalam');  // muhurtam lives there now
+  if (location.hash === '#profiles') switchTool('profiles');
   if (location.hash === '#festivals') switchTool('festivals');
   if (location.hash === '#subscribe') switchTool('subscribe');
   if (location.hash === '#useinai') switchTool('useinai');

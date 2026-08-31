@@ -879,9 +879,11 @@
     body[data-tool="tarabalam"] #subscribe,
     body[data-tool="tarabalam"] #card-mcp,
     body[data-tool="tarabalam"] #card-system,
-    body[data-tool="tarabalam"] #card-about { display: none; }
+    body[data-tool="tarabalam"] #card-about,
+    body:not([data-tool="profiles"]) #card-profiles { display: none; }
 
     /* Hide tool card when a secondary section is active */
+    body[data-tool="profiles"] #card-tools,
     body[data-tool="festivals"] #card-tools,
     body[data-tool="subscribe"] #card-tools,
     body[data-tool="useinai"] #card-tools,
@@ -909,6 +911,13 @@
     body[data-tool="about"] #subscribe,
     body[data-tool="about"] #card-mcp,
     body[data-tool="about"] #card-system { display: none; }
+
+    /* Profiles: show only the local profile-management destination. */
+    body[data-tool="profiles"] #special-days-card,
+    body[data-tool="profiles"] #subscribe,
+    body[data-tool="profiles"] #card-mcp,
+    body[data-tool="profiles"] #card-system,
+    body[data-tool="profiles"] #card-about { display: none; }
 
     /* Sidebar chrome */
     .sidebar-brand {
@@ -1092,6 +1101,12 @@
           <button class="sidebar-item" id="sidebar-tarabalam" onclick="switchTool('tarabalam')">
             <span class="sidebar-icon">⏰</span>
             <span class="sidebar-label">Muhurtam</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-profiles" onclick="switchTool('profiles')">
+            <span class="sidebar-icon">♙</span>
+            <span class="sidebar-label">Profiles</span>
           </button>
         </li>
         <li>
@@ -1336,6 +1351,10 @@
       </details>
     </div><!-- /panel-gochara -->
   </div>
+
+  <section class="card" id="card-profiles" aria-labelledby="profiles-title">
+    <div id="profiles-root"></div>
+  </section>
 
   <div class="card" id="special-days-card">
     <h2>Festivals</h2>

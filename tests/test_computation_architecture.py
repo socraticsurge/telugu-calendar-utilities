@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.analyze_computation_architecture import build_report
+from tools.analyze_computation_architecture import build_report, source_scope_class
 from tools.benchmark_computation_paths import benchmark
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +21,10 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     assert len({item['id'] for item in report['output_consumer_map']}) == 62
     assert {'engines', 'derived-calendar', 'scoring', 'mcp', 'browser-panels'} \
         <= set(report['layers'])
+
+
+def test_profiles_panel_extends_architecture_additively():
+    assert source_scope_class('src/panels/profiles.ts') == 'additive-feature'
 
 
 @pytest.mark.parametrize('ref', ('--help', 'HEAD..master', 'HEAD^{tree}', '../HEAD'))
