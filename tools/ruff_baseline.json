@@ -76,9 +76,6 @@
     "telugu_panchangam/personal/homa.py": {
       "I001": 1
     },
-    "telugu_panchangam/personal/lagna_hora.py": {
-      "I001": 1
-    },
     "telugu_panchangam/personal/muhurta.py": {
       "I001": 4
     },
@@ -228,10 +225,6 @@
       "I001": 1
     },
     "tests/test_khar_maasa.py": {
-      "I001": 2
-    },
-    "tests/test_lagna_hora.py": {
-      "E402": 1,
       "I001": 2
     },
     "tests/test_lagna_json_builder.py": {

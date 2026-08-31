@@ -1,7 +1,7 @@
 import swisseph as swe
 
+from telugu_panchangam.engines.utils import datetime_to_jd, get_sunrise, jd_to_utc
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
-from telugu_panchangam.engines.utils import datetime_to_jd, jd_to_utc, get_sunrise
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 _HORA_LORDS = ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars']
@@ -16,6 +16,19 @@ _WEEKDAY_TO_LORD_START = {
     'Shanivaram': 4,    # Saturn
 }
 
+
+def _first_sunrise_after(day: PanchangamDay) -> float:
+    """Return the first sunrise after this Panchangam day's sunset.
+
+    Seeding the Swiss Ephemeris search exactly one Julian day after sunrise can
+    fall a few seconds beyond the immediately following sunrise.  In that case
+    ``get_sunrise`` correctly finds the *second* following sunrise.  Sunset is
+    an unambiguous instant inside the requested sunrise cycle, so searching
+    from there preserves the documented first-following-sunrise boundary.
+    """
+    geopos = [day.location.lon, day.location.lat, 0.0]
+    return get_sunrise(datetime_to_jd(day.sunset), geopos)
+
 def get_horas(day: PanchangamDay) -> list[Window]:
     """Calculate the 24 planetary hours (horas) for the day.
     12 daytime horas from sunrise to sunset.
@@ -24,9 +37,8 @@ def get_horas(day: PanchangamDay) -> list[Window]:
     """
     horas = []
 
-    # Calculate next sunrise for the nighttime calculation
-    geopos = [day.location.lon, day.location.lat, 0.0]
-    jd_next_sunrise = get_sunrise(datetime_to_jd(day.sunrise) + 1.0, geopos)
+    # Reuse the first-following-sunrise boundary protected by #430/#437.
+    jd_next_sunrise = _first_sunrise_after(day)
     next_sunrise = jd_to_utc(jd_next_sunrise)
 
     day_duration = day.sunset - day.sunrise
@@ -61,10 +73,10 @@ def get_lagna_transitions(day: PanchangamDay) -> list[Window]:
     """
     swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
 
-    # Calculate next sunrise
-    geopos = [day.location.lon, day.location.lat, 0.0]
+    # Calculate the first following sunrise from an instant safely inside the
+    # requested cycle.  See #430 for the former two-cycle regression.
     jd_start = datetime_to_jd(day.sunrise)
-    jd_end = get_sunrise(jd_start + 1.0, geopos)
+    jd_end = _first_sunrise_after(day)
 
     transitions = []
     current_jd = jd_start
@@ -72,7 +84,7 @@ def get_lagna_transitions(day: PanchangamDay) -> list[Window]:
 
     def get_ascendant_sign(jd):
         # Calculate house cusps (0 = Placidus). Parameter needs to be bytes, so b'P'
-        cusps, ascmc = swe.houses(jd, day.location.lat, day.location.lon, b'P')
+        _cusps, ascmc = swe.houses(jd, day.location.lat, day.location.lon, b'P')
         ascendant_deg = ascmc[0] # Ascendant is the first element
 
         # Apply Ayanamsa to get sidereal degree
@@ -99,9 +111,7 @@ def get_lagna_transitions(day: PanchangamDay) -> list[Window]:
     current_sign_idx = start_sign_idx
 
     while current_jd < jd_end:
-        next_jd = current_jd + step_jd
-        if next_jd > jd_end:
-            next_jd = jd_end
+        next_jd = min(current_jd + step_jd, jd_end)
 
         sign_idx = get_ascendant_sign(next_jd)
         if sign_idx != current_sign_idx:

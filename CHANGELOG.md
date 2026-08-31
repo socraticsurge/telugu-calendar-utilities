@@ -16,6 +16,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Keep published Lagna-transition and Hora feeds within the requested
+  sunrise-to-next-sunrise cycle, including date-city combinations where a
+  Julian-day seed could previously skip the first following sunrise.
 - Constrain the MCP SDK to the tested 1.x API so fresh installations cannot
   resolve the incompatible 2.x package while the server uses
   `mcp.server.fastmcp`.
