@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-08-29T12:52:08+00:00",
+  "capturedAt": "2026-08-29T13:34:23+00:00",
   "source": "tools/capture_muhurta_chart_screenshots.py",
   "liveServicesUsed": false,
   "captures": [
@@ -105,7 +105,7 @@
       },
       "expectedState": "unavailable",
       "expectedCopy": "Panchangam shortlist shown",
-      "sha256": "be64c03ee032894d43a5019acd0b1957c1f3958d8f782587e34a5fd87eb6a63d"
+      "sha256": "3a6bd0b8a25ceacc99b4ef78570bbf4f23abead9ddb5e60552d48e4e2e97ac3c"
     },
     {
       "file": "fixture-chart-screening-loading-desktop-1440x900.png",
@@ -131,7 +131,7 @@
       },
       "expectedState": "unavailable",
       "expectedCopy": "Panchangam shortlist shown",
-      "sha256": "591cc65683e078c1744f69eefe9e9ffde693286217012e32ed179b30cc5d0eb3"
+      "sha256": "a93051bb7601da04089069ad57e792f7ad445734275832b080a9c7747a07fded"
     }
   ]
 }

@@ -144,8 +144,8 @@ def _configure_search(page, smoke, base_url: str, activity: str) -> None:
     page.fill('#tb-to', smoke.MUHURTA_FIXTURE_DATE)
 
 
-def _capture_page(page, path: Path) -> None:
-    page.locator('#mu-result').scroll_into_view_if_needed()
+def _capture_page(page, path: Path, anchor: str = '#mu-result') -> None:
+    page.locator(anchor).scroll_into_view_if_needed()
     page.screenshot(path=str(path), full_page=False)
 
 
@@ -223,7 +223,7 @@ def _capture_loading_and_timeout(browser, smoke, base_url: str) -> list[dict]:
         )
         page.set_viewport_size({'width': timeout.width, 'height': timeout.height})
         timeout_path = OUTPUT_DIR / timeout.filename
-        _capture_page(page, timeout_path)
+        _capture_page(page, timeout_path, '.mu-chart-status--unavailable')
         rows.append(_manifest_row(timeout, timeout_path))
         return rows
     finally:
