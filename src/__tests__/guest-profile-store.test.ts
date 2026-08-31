@@ -28,7 +28,7 @@ class MemoryStorage implements ProfileStorage {
   private readonly values = new Map<string, string>();
 
   getItem(key: string): string | null {
-    return this.values.get(key) || null;
+    return this.values.get(key) ?? null;
   }
 
   setItem(key: string, value: string): void {
@@ -41,6 +41,16 @@ class MemoryStorage implements ProfileStorage {
 }
 
 let storage: MemoryStorage;
+
+const PROFILE_TRANSACTION_KEYS = [
+  GUEST_PROFILE_STORAGE_KEY,
+  GUEST_BIRTH_PROFILE_STORAGE_KEY,
+  GUEST_PROFILE_COMMIT_STORAGE_KEY,
+] as const;
+
+function transactionBytes(source: ProfileStorage = storage): Array<string | null> {
+  return PROFILE_TRANSACTION_KEYS.map(key => source.getItem(key));
+}
 
 function rawProfiles(): unknown[] {
   return JSON.parse(storage.getItem(GUEST_PROFILE_STORAGE_KEY) || '[]');
@@ -410,26 +420,37 @@ describe('birth profile extension storage', () => {
     ['base write', GUEST_PROFILE_STORAGE_KEY],
     ['birth-envelope write', GUEST_BIRTH_PROFILE_STORAGE_KEY],
     ['commit-marker write', GUEST_PROFILE_COMMIT_STORAGE_KEY],
-  ])('does not attach same-derived birth data after a failed %s', (_label, failureKey) => {
+  ])('keeps multi-profile birth data detached after a failed %s', (_label, failureKey) => {
     let armed = false;
+    let failed = false;
     const flaky: ProfileStorage = {
       getItem: key => storage.getItem(key),
       setItem: (key, value) => {
-        if (armed && key === failureKey) throw new DOMException('full', 'QuotaExceededError');
+        if (armed && !failed && key === failureKey) {
+          failed = true;
+          throw new DOMException('full', 'QuotaExceededError');
+        }
         storage.setItem(key, value);
       },
       removeItem: key => storage.removeItem(key),
     };
     const store = createGuestProfileStore(flaky, {
-      idFactory: ids('guest_torn_profile'),
-      revisionFactory: ids('revision_before_001', 'revision_after_002'),
+      idFactory: ids('guest_torn_profile', 'guest_unrelated_profile'),
+      revisionFactory: ids(
+        'revision_first_001',
+        'revision_before_002',
+        'revision_after_003',
+      ),
     });
     const created = store.create(birthProfileDraft());
-    const originalBase = storage.getItem(GUEST_PROFILE_STORAGE_KEY);
-    const originalCommit = storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+    store.create(birthProfileDraft('Unrelated'));
+    const originalSnapshot = store.getSnapshot();
+    const originalBytes = transactionBytes();
+    const originalEnvelope = JSON.parse(originalBytes[1]!);
     armed = true;
 
     store.update(created.id, {
+      name: 'Updated Anu',
       birthDetails: {
         ...created.birthDetails!,
         placeLabel: 'Same chart, newly corrected birthplace label',
@@ -439,27 +460,46 @@ describe('birth profile extension storage', () => {
     expect(store.getSnapshot()).toMatchObject({
       persistence: 'memory', issue: 'storage-unavailable',
     });
+    expect(failed).toBe(true);
+    const failedBytes = transactionBytes();
     if (failureKey === GUEST_PROFILE_STORAGE_KEY) {
-      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(originalBase);
-      expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(originalCommit);
-      const retainedEnvelope = JSON.parse(
-        storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}',
-      );
-      expect(retainedEnvelope.revision).toBe('revision_before_001');
+      expect(failedBytes).toEqual(originalBytes);
     } else {
-      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(originalBase);
-      expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBeNull();
-      expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+      expect(failedBytes[0]).not.toBe(originalBytes[0]);
+      expect(JSON.parse(failedBytes[0]!)[0].name).toBe('Updated Anu');
+      expect(failedBytes[2]).toBe(originalBytes[2]);
+      if (failureKey === GUEST_BIRTH_PROFILE_STORAGE_KEY) {
+        expect(failedBytes[1]).toBe(originalBytes[1]);
+      } else {
+        expect(failedBytes[1]).not.toBe(originalBytes[1]);
+      }
     }
+    const retainedEnvelope = JSON.parse(failedBytes[1]!);
+    expect(retainedEnvelope.profiles.guest_unrelated_profile).toEqual(
+      originalEnvelope.profiles.guest_unrelated_profile,
+    );
 
     const reloaded = createGuestProfileStore(storage, {
       idFactory: () => { throw new Error('the stored ID must stay stable'); },
       revisionFactory: ids('revision_unused_001'),
     });
-    expect(reloaded.getSnapshot()).toMatchObject({ persistence: 'persistent' });
-    expect(reloaded.get(created.id)).toMatchObject({
-      source: failureKey === GUEST_PROFILE_STORAGE_KEY ? 'birth-details' : 'manual',
-    });
+    if (failureKey === GUEST_PROFILE_STORAGE_KEY) {
+      expect(reloaded.getSnapshot()).toMatchObject({
+        profiles: originalSnapshot.profiles,
+        persistence: 'persistent',
+        issue: null,
+      });
+    } else {
+      expect(reloaded.getSnapshot()).toMatchObject({
+        persistence: 'persistent', issue: 'uncommitted-birth-storage',
+      });
+      expect(reloaded.get(created.id)).toMatchObject({
+        name: 'Updated Anu', source: 'manual', birthDetails: null,
+      });
+      expect(reloaded.get('guest_unrelated_profile')).toMatchObject({
+        source: 'manual', birthDetails: null,
+      });
+    }
   });
 
   test.each([
@@ -468,10 +508,14 @@ describe('birth profile extension storage', () => {
     ['commit-marker write', GUEST_PROFILE_COMMIT_STORAGE_KEY],
   ])('keeps first-create storage recoverable after a failed %s', (_label, failureKey) => {
     let armed = true;
+    let failed = false;
     const flaky: ProfileStorage = {
       getItem: key => storage.getItem(key),
       setItem: (key, value) => {
-        if (armed && key === failureKey) throw new DOMException('full', 'QuotaExceededError');
+        if (armed && !failed && key === failureKey) {
+          failed = true;
+          throw new DOMException('full', 'QuotaExceededError');
+        }
         storage.setItem(key, value);
       },
       removeItem: key => storage.removeItem(key),
@@ -486,13 +530,18 @@ describe('birth profile extension storage', () => {
       profiles: [{ id: 'guest_first_failure', source: 'birth-details' }],
       persistence: 'memory', issue: 'storage-unavailable',
     });
+    expect(failed).toBe(true);
+    const failedBytes = transactionBytes();
     if (failureKey === GUEST_PROFILE_STORAGE_KEY) {
-      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBeNull();
+      expect(failedBytes).toEqual([null, null, null]);
+    } else if (failureKey === GUEST_BIRTH_PROFILE_STORAGE_KEY) {
+      expect(failedBytes[0]).not.toBeNull();
+      expect(failedBytes.slice(1)).toEqual([null, null]);
     } else {
-      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).not.toBeNull();
+      expect(failedBytes[0]).not.toBeNull();
+      expect(failedBytes[1]).not.toBeNull();
+      expect(failedBytes[2]).toBeNull();
     }
-    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBeNull();
-    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
 
     armed = false;
     const recovered = createGuestProfileStore(flaky, {
@@ -500,16 +549,22 @@ describe('birth profile extension storage', () => {
       revisionFactory: ids('revision_after_failure'),
     });
     expect(recovered.getSnapshot()).toMatchObject({
-      persistence: 'persistent', issue: null,
+      profiles: failureKey === GUEST_PROFILE_STORAGE_KEY
+        ? []
+        : [{ id: 'guest_first_failure', source: 'manual', birthDetails: null }],
+      persistence: 'persistent',
+      issue: failureKey === GUEST_PROFILE_COMMIT_STORAGE_KEY
+        ? 'uncommitted-birth-storage'
+        : null,
     });
-    if (failureKey === GUEST_PROFILE_STORAGE_KEY) {
-      recovered.create({ name: 'Recovered' });
-      expect(recovered.getSnapshot().profiles).toMatchObject([{ name: 'Recovered' }]);
-    } else {
-      expect(recovered.get('guest_first_failure')).toMatchObject({
-        source: 'manual', birthDetails: null,
-      });
-    }
+    recovered.clear();
+    const verified = createGuestProfileStore(storage);
+    expect(verified.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'persistent', issue: null,
+    });
+    expect(JSON.parse(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)!)).toMatchObject({
+      profiles: {},
+    });
   });
 
   test('restores a coherent cross-tab snapshot only after the final commit marker', () => {
@@ -1099,21 +1154,20 @@ describe('storage failures', () => {
     expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(commitBytes);
   });
 
-  test('attempts marker cleanup even when birth-envelope cleanup throws', () => {
+  test('does not delete storage after a commit-marker write failure', () => {
     const removeAttempts: string[] = [];
+    let commitFailed = false;
     const flaky: ProfileStorage = {
       getItem: key => storage.getItem(key),
       setItem: (key, value) => {
-        if (key === GUEST_PROFILE_COMMIT_STORAGE_KEY) {
+        if (!commitFailed && key === GUEST_PROFILE_COMMIT_STORAGE_KEY) {
+          commitFailed = true;
           throw new DOMException('full', 'QuotaExceededError');
         }
         storage.setItem(key, value);
       },
       removeItem: key => {
         removeAttempts.push(key);
-        if (key === GUEST_BIRTH_PROFILE_STORAGE_KEY) {
-          throw new DOMException('denied', 'SecurityError');
-        }
         storage.removeItem(key);
       },
     };
@@ -1127,18 +1181,19 @@ describe('storage failures', () => {
     expect(store.getSnapshot()).toMatchObject({
       persistence: 'memory', issue: 'storage-unavailable',
     });
-    expect(removeAttempts).toEqual([
-      GUEST_BIRTH_PROFILE_STORAGE_KEY,
-      GUEST_PROFILE_COMMIT_STORAGE_KEY,
-    ]);
+    expect(removeAttempts).toEqual([]);
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).not.toBeNull();
     expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).not.toBeNull();
     expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
     const reloaded = createGuestProfileStore(storage);
     expect(reloaded.getSnapshot()).toMatchObject({
       persistence: 'persistent', issue: 'uncommitted-birth-storage',
+      profiles: [{ id: 'guest_cleanup_attempt', source: 'manual', birthDetails: null }],
     });
-    expect(reloaded.get('guest_cleanup_attempt')).toMatchObject({
-      source: 'manual', birthDetails: null,
+    reloaded.clear();
+    expect(removeAttempts).toEqual([]);
+    expect(createGuestProfileStore(storage).getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'persistent', issue: null,
     });
   });
 

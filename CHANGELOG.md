@@ -26,6 +26,10 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Bind browser-local birth profiles to the exact committed base revision, keep
+  torn writes detached behind a marker, never automatically delete or roll back
+  failed writes across tabs, and limit recovery to recognized current-format
+  orphans.
 - Keep legacy Tarabalam profile edits compatible with hidden and future-schema
   rows, isolate faulty store listeners, and fail closed for malformed legacy
   Lagna values in Gochara.

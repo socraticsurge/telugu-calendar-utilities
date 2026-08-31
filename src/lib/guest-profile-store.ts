@@ -1020,7 +1020,6 @@ export class GuestProfileStore {
 
   private persist(): void {
     if (this.persistence === 'memory') return;
-    let wroteBase = false;
     try {
       const revision = this.freshRevision();
       const baseText = JSON.stringify(this.profiles.map(toStored));
@@ -1042,23 +1041,12 @@ export class GuestProfileStore {
       // The marker is the commit point. Readers ignore the birth envelope until
       // both earlier writes match this exact revision and exact base payload.
       this.storage.setItem(GUEST_PROFILE_STORAGE_KEY, baseText);
-      wroteBase = true;
       this.storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, JSON.stringify(envelope));
       this.storage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, JSON.stringify(commit));
     } catch {
-      if (wroteBase && typeof this.storage.removeItem === 'function') {
-        for (const key of [
-          GUEST_BIRTH_PROFILE_STORAGE_KEY,
-          GUEST_PROFILE_COMMIT_STORAGE_KEY,
-        ]) {
-          try {
-            this.storage.removeItem(key);
-          } catch {
-            // A later load recognizes owned orphan bytes and keeps them
-            // detached; each remaining cleanup is still attempted.
-          }
-        }
-      }
+      // Do not clean up or roll back here. localStorage has no atomic
+      // compare-and-swap, so either action could overwrite a newer tab's
+      // transaction. The unchanged marker keeps every partial write detached.
       this.persistence = 'memory';
       this.issue = 'storage-unavailable';
     }

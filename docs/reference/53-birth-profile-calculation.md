@@ -73,6 +73,31 @@ server must remain disabled until the licensing and provider gates below are
 resolved. A disabled browser adapter throws a typed `disabled` error before it
 creates a timeout or calls `fetch`.
 
+## Local storage transaction
+
+Calculated profiles use a three-key browser transaction: the legacy-compatible
+base profile array, a revision-bound birth-data envelope, and a commit marker.
+The marker is written last and records both the revision and the exact base
+payload. A reader attaches birth data only when all three values agree; base or
+envelope events observed before the marker therefore load fail-closed without
+attaching a mismatched chart.
+
+If any write fails, the store does not automatically delete or roll back keys:
+multi-key `localStorage` has no atomic fence that could prevent such cleanup
+from overwriting a newer tab. Existing companion bytes remain untouched until
+their own write step; an absent or mismatching marker keeps every partial new
+base or envelope detached.
+
+When the base key is absent, confirmed recovery is offered only when every
+present companion exactly matches the store's current recognized format; when
+both companions are present, their revision and base relationships must also
+agree. This is conservative format recognition, not proof of which code wrote
+the bytes. Unrecognized or future-format bytes remain read-only. A base-present
+torn transaction can be replaced only by an explicit user reset or later
+successful save. The failure points, cross-tab boundary, and orphan rules are
+pinned in
+[`src/__tests__/guest-profile-store.test.ts`](https://github.com/socraticsurge/telugu-calendar-utilities/blob/master/src/__tests__/guest-profile-store.test.ts).
+
 ## Calculation process
 
 ### 1. Resolve the birth instant
@@ -236,7 +261,7 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
 |---|---|---|
 | Browser API validation | `src/lib/birth-profile-api.ts` | `src/__tests__/birth-profile-api.test.ts` |
 | Public/local activation policy | `src/lib/remote-calculation-activation.ts` | `src/__tests__/remote-calculation-activation.test.ts` |
-| Rollback-safe local storage | `src/lib/guest-profile-store.ts` | `src/__tests__/guest-profile-store.test.ts` |
+| Commit-bound fail-closed local storage | `src/lib/guest-profile-store.ts` | `src/__tests__/guest-profile-store.test.ts` |
 | Profile form, review, and D1 chart | `src/panels/profiles.ts` | `src/__tests__/profiles-panel.test.ts`, browser smoke tests |
 | Public stateless gateway | `astro-unified-core` guest API routes | route, CORS, rate-limit, body-cap, and contract tests in that repository |
 | Authenticated calculation projection | `dashaflow-sidecar/api/profile.py` | sidecar profile-contract tests |
