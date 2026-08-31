@@ -25,7 +25,7 @@ dependencies = [
 # `pip install -e .[test]` so existing tooling keeps working.
 test = [
     "pytest>=8.0.0",
-    "ruff==0.16.2",
+    "ruff==0.16.5",
 ]
 # Browser-smoke deps. Heavy install (~100 MB chromium); kept separate
 # so plain `pip install -e .[test]` stays light for local dev — the
