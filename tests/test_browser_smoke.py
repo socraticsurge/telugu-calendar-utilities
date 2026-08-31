@@ -81,6 +81,19 @@ class _QuietHandler(http.server.SimpleHTTPRequestHandler):
     """Same as SimpleHTTPRequestHandler but doesn't spam stderr per
     request. Tests can be noisy enough already."""
 
+    def do_GET(self):  # noqa: N802 (matches base API)
+        if self.path.split('?', 1)[0] == '/rasi_phalalu/latest.json':
+            # Production layers this daily runtime artifact onto gh-pages; it
+            # must not be checked into or copied from the landing-site source.
+            body = b'{"date":"","rashis":{}}'
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        super().do_GET()
+
     def log_message(self, format, *args):  # noqa: A002 (matches base API)
         return
 
