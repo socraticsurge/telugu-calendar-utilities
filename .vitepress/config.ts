@@ -171,6 +171,7 @@ export default defineConfig({
           { text: 'Derived computations', link: '/reference/03-computational-features' },
           { text: 'Data flow and Muhurtam', link: '/reference/05-data-flow-and-muhurta' },
           { text: 'Birth profiles and D1 chart', link: '/reference/53-birth-profile-calculation' },
+          { text: 'Muhurtam election-chart screening', link: '/reference/54-muhurtam-election-chart-screening' },
         ],
       },
       {

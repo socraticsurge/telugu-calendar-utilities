@@ -20,10 +20,22 @@ MCP, and the generated browser contract consume the same field.
 
 ## Chart checks and separate rules
 
-The profile discloses Raman's Lagna, Guru/Shukra, waxing-Chandra, Mangala, and
-7th-house checks. Vishti rejection follows the separately cited general
+The browser asks for one primary traveller. It rejects candidate Lagnas that
+are 1st, 5th, 7th or 9th inclusively from that traveller's Janma Lagna, and a
+candidate Lagna matching the traveller's Janma Rashi is one tie-break
+preference when the match persists across every sampled state. A prohibited
+personal Lagna at any sample rejects the window. Samples cover the window
+edges and both sides of every known interior Drik Lagna transition. The Drik chart post-screen
+rejects Kuja in the 8th. The source asks for Guru or Shukra to be well placed
+in Lagna; occupancy alone does not establish that qualitative condition, so it
+does not earn an automated tie-break.
+
+Guru/Shukra quality, waxing-Chandra, general fortification and the 7th-house
+malefic judgment remain manual. Vishti rejection follows the separately cited general
 Panchanga-Suddhi rule. Chara-Lagna and Tiryan-Mukha scoring remain separately
-attributed project rules and do not inherit authority from this claim.
+attributed project rules and do not inherit authority from this claim. The
+chart and role screen is browser-only; Python/MCP keep the full manual wording.
+See [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 ## Known contract conflicts
 

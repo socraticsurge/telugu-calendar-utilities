@@ -20,6 +20,10 @@ explicitly activated public build can calculate Nakshatra, Padam, Janma Rashi, L
 D1 chart from date, exact time, and birthplace. Public builds fail closed until the licensed calculation
 service and place provider are approved; saved calculated profiles remain viewable. The name never leaves
 the browser. See the [calculation and privacy contract](docs/reference/53-birth-profile-calculation.md).
+Drik Muhurtam searches also contain a source-backed candidate-time chart
+post-screen, guarded by an independent fail-closed flag. Public builds make no
+chart request unless `VITE_ELECTION_CHART_API_ENABLED` is exactly `true`; see
+the [screening method and release boundary](docs/reference/54-muhurtam-election-chart-screening.md).
 Everything is shareable to WhatsApp.
 
 <details>

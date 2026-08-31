@@ -51,8 +51,10 @@ specialist-only pending a bounded product design.
 The Wedding profile is likewise corrected: exact lunar-month exceptions,
 Paksha-aware Tithis, weekday grades, Nakshatras, Nitya Yogas, Vishti and named
 Lagnas replace the former Purna/Jaya and fixed-class proxies. Pada and complete
-election-chart conditions remain mandatory practitioner checks, and the current
-Drik Panchang methodology divergence is visible.
+election judgment remain mandatory practitioner checks; the Drik browser now
+post-screens the three exact vacant-7th/Kuja/Shukra prohibitions without
+claiming the remaining conditions. The current Drik Panchang methodology
+divergence is visible.
 
 The Court profile is now narrowly scoped to filing or initiating a lawsuit.
 Raman's weekday and Nakshatra rules, his recurring unfavorable-Tithi list and

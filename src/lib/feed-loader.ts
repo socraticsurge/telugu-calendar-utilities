@@ -17,15 +17,28 @@ export function feedFilename(city: string, system: string, variant = ''): string
 
 const FEED_CACHE = new Map<string, Map<string, { summary: string; description: string }>>();
 
+async function parsedFeed(response: Response | null): Promise<ReturnType<typeof parseEvents> | null> {
+  if (!response?.ok) return null;
+  const events = parseEvents(await response.text());
+  return events.size ? events : null;
+}
+
 export async function loadFeed(city: string, system: string) {
   const key = `${city}|${system}`;
   if (FEED_CACHE.has(key)) return FEED_CACHE.get(key)!;
   // Relative path on the deployed site; fall back to the live feed URL
-  // so the page also works when previewed locally without a feeds/ dir.
-  let res = await fetch(`feeds/${feedFilename(city, system)}`).catch(() => null);
-  if (!res || !res.ok) res = await fetch(`${FEED_BASE_URL}${feedFilename(city, system)}`);
-  if (!res.ok) throw new Error('fetch failed');
-  const events = parseEvents(await res.text());
+  // so the page also works when previewed locally without a feeds/ dir. Vite
+  // serves index.html with status 200 for an unknown relative path, so HTTP
+  // status alone is insufficient: an empty parse must also trigger fallback.
+  const localResponse = await fetch(`feeds/${feedFilename(city, system)}`).catch(() => null);
+  let events = await parsedFeed(localResponse);
+  if (!events) {
+    const productionResponse = await fetch(
+      `${FEED_BASE_URL}${feedFilename(city, system)}`,
+    ).catch(() => null);
+    events = await parsedFeed(productionResponse);
+  }
+  if (!events) throw new Error('fetch failed');
   FEED_CACHE.set(key, events);
   return events;
 }

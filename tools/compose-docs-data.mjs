@@ -10,6 +10,7 @@ const publicData = [
   'computations.json',
   'computations.schema.json',
   'muhurta-activity-backlog.json',
+  'muhurtam-rule-crosswalk.json',
   'project-facts.json',
   'provenance.json',
 ]
