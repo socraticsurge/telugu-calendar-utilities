@@ -518,6 +518,121 @@ describe('storage failures', () => {
     expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(mixed);
   });
 
+  test.each([
+    ['primitive', 'opaque-future-row'],
+    ['array', ['opaque', { keep: true }]],
+    ['unknown object', { futureOnly: { keep: true } }],
+    ['contentless v1 object', {
+      id: 'guest_hidden', schemaVersion: 1, name: '', nak: '', pada: '', lagna: '',
+      privateNote: 'keep-hidden',
+    }],
+  ])('keeps exact bytes and uses session memory for an unrecognized %s row', (_label, opaque) => {
+    const original = JSON.stringify([
+      opaque,
+      {
+        id: 'guest_supported', schemaVersion: 1, name: 'Supported',
+        nak: 'Rohini', pada: 2, lagna: 'Karka',
+      },
+    ], null, 2);
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, original);
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_session_added'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_supported', name: 'Supported' }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+
+    store.update('guest_supported', { name: 'Session edit' });
+    const added = store.create({ name: 'Session added', nakshatra: 'Hasta' });
+    store.reload();
+    expect(store.get('guest_supported')?.name).toBe('Session edit');
+    expect(store.get(added.id)?.name).toBe('Session added');
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+
+    expect(store.remove('guest_supported')).toBe(true);
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+    store.clear();
+    expect(store.getSnapshot().profiles).toEqual([]);
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+
+    const repeatedLoad = createGuestProfileStore(storage, {
+      idFactory: ids('guest_still_unused'),
+    });
+    expect(repeatedLoad.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_supported', name: 'Supported' }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+  });
+
+  test('keeps a visible v1 profile with an additive field byte-for-byte', () => {
+    const original = JSON.stringify([{
+      id: 'guest_additive', schemaVersion: 1, name: 'Supported',
+      nak: 'Rohini', pada: 2, lagna: 'Karka',
+      futurePayload: { privateNote: 'keep this' },
+    }], null, 2);
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, original);
+    const store = createGuestProfileStore(storage);
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_additive', name: 'Supported' }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+
+    store.update('guest_additive', { name: 'Session edit' });
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+    expect(store.remove('guest_additive')).toBe(true);
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+    store.clear();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+  });
+
+  test('keeps an extra valid profile tail byte-for-byte and enforces four visible profiles', () => {
+    const rows = Array.from({ length: 5 }, (_, index) => ({
+      id: `guest_overflow_${index + 1}`,
+      schemaVersion: 1,
+      name: `Person ${index + 1}`,
+      nak: 'Rohini',
+      pada: 2,
+      lagna: 'Karka',
+    }));
+    const original = JSON.stringify(rows, null, 2);
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, original);
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_session_fifth'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: rows.slice(0, 4).map(row => ({ id: row.id, name: row.name })),
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    expect(store.get('guest_overflow_5')).toBeNull();
+    expect(() => store.create({ name: 'Blocked fifth' })).toThrowError(
+      expect.objectContaining<Partial<GuestProfileStoreError>>({ code: 'profile-limit' }),
+    );
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+
+    store.update('guest_overflow_1', { name: 'Session edit' });
+    expect(store.remove('guest_overflow_2')).toBe(true);
+    const added = store.create({ name: 'Session fifth' });
+    store.reload();
+    expect(store.get('guest_overflow_1')?.name).toBe('Session edit');
+    expect(store.get(added.id)?.name).toBe('Session fifth');
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+
+    store.clear();
+    expect(store.getSnapshot().profiles).toEqual([]);
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(original);
+  });
+
   test('legacy form edits preserve future schema fields instead of downgrading them', () => {
     const merged = mergeLegacyGuestProfileRow({
       id: 'guest_future', schemaVersion: 2, extra: { future: true },

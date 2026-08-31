@@ -111,7 +111,7 @@ function issueMessage(snapshot: GuestProfileSnapshot): string | null {
     return 'Saved birth calculations were damaged and have been removed. Your names and manual astrology details are still available.';
   }
   if (snapshot.issue === 'unsupported-storage-version') {
-    return 'These profiles use a newer format. Changes on this page last only for this session; your saved browser data was not overwritten.';
+    return 'These profiles use a newer or unrecognized format. Changes on this page last only for this session; your saved browser data was not overwritten.';
   }
   if (snapshot.persistence === 'memory' || snapshot.issue === 'storage-unavailable') {
     return 'Browser storage is unavailable. Profiles created now last only for this session.';

@@ -179,6 +179,20 @@ function hasProfileContent(value: Record<string, unknown>): boolean {
     .some(key => text(value[key]) !== '');
 }
 
+const STORED_PROFILE_KEYS = new Set([
+  'id', 'schemaVersion', 'name', 'nak', 'nakshatra', 'pada', 'lagna',
+]);
+
+function isBlankLegacyPlaceholder(value: Record<string, unknown>): boolean {
+  const legacyKeys = new Set(['name', 'nak', 'nakshatra', 'pada', 'lagna']);
+  const keys = Object.keys(value);
+  return keys.length > 0 && keys.every(key => legacyKeys.has(key));
+}
+
+function hasUnownedProfileKeys(value: Record<string, unknown>): boolean {
+  return Object.keys(value).some(key => !STORED_PROFILE_KEYS.has(key));
+}
+
 function clone(profile: GuestProfile): GuestProfile {
   return {
     ...profile,
@@ -576,9 +590,10 @@ export class GuestProfileStore {
     const raw = this.parseStoredRows(rawText);
     if (raw === null) return;
 
-    const hasFutureVersion = this.hasFutureVersion(raw);
-    if (hasFutureVersion) {
-      // Never downgrade or overwrite data written by a newer profile schema.
+    const hasUnsupportedRows = this.hasUnsupportedRows(raw);
+    if (hasUnsupportedRows) {
+      // Never discard or overwrite data that this store cannot safely own,
+      // including newer schemas, opaque rows, and profiles beyond its limit.
       // Compatible v1/legacy rows remain available in memory for this session.
       this.persistence = 'memory';
       this.issue = 'unsupported-storage-version';
@@ -618,18 +633,37 @@ export class GuestProfileStore {
     return null;
   }
 
-  private hasFutureVersion(raw: unknown[]): boolean {
-    return raw.some(value => {
-      if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-      const version = Number((value as Record<string, unknown>).schemaVersion);
-      return Number.isFinite(version) && version > GUEST_PROFILE_SCHEMA_VERSION;
-    });
+  private hasUnsupportedRows(raw: unknown[]): boolean {
+    let supportedProfiles = 0;
+    for (const value of raw) {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return true;
+      const record = value as Record<string, unknown>;
+      const version = Number(record.schemaVersion);
+      if (Number.isFinite(version) && version > GUEST_PROFILE_SCHEMA_VERSION) return true;
+      if (hasUnownedProfileKeys(record)) return true;
+      if (!hasProfileContent(record)) {
+        if (isBlankLegacyPlaceholder(record)) continue;
+        return true;
+      }
+
+      const profile = this.normalize({
+        source: 'manual',
+        name: record.name,
+        nakshatra: record.nakshatra ?? record.nak,
+        pada: record.pada,
+        lagna: record.lagna,
+      }, 'guest_validation');
+      if (this.hasContent(profile)) supportedProfiles += 1;
+      if (supportedProfiles > MAX_GUEST_PROFILES) return true;
+    }
+    return false;
   }
 
   private migrateStoredRows(raw: unknown[]): GuestProfile[] {
     const seen = new Set<string>();
     const migrated: GuestProfile[] = [];
-    for (const value of raw.slice(0, MAX_GUEST_PROFILES)) {
+    for (const value of raw) {
+      if (migrated.length >= MAX_GUEST_PROFILES) break;
       if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
       const record = value as Record<string, unknown>;
       if (Number(record.schemaVersion) > GUEST_PROFILE_SCHEMA_VERSION) continue;

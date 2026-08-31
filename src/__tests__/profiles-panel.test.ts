@@ -727,6 +727,25 @@ describe('storage and contextual journeys', () => {
     expect(query<HTMLElement>('[role="alert"]').textContent).toContain('damaged and has been reset');
   });
 
+  test('explains that unrecognized profile storage stays private and session-only', () => {
+    const root = query<HTMLElement>('#profiles-root');
+    controller.destroy();
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify([
+      {
+        id: 'guest_supported', schemaVersion: 1, name: 'Supported',
+        nak: 'Rohini', pada: 2, lagna: 'Karka',
+      },
+      { futureOnly: { keep: true } },
+    ]));
+    store = createGuestProfileStore(storage, { idFactory: ids() });
+    controller = initProfilesPanel(store, { root, navigate });
+
+    const alert = query<HTMLElement>('[role="alert"]');
+    expect(alert.textContent).toContain('newer or unrecognized format');
+    expect(alert.textContent).toContain('last only for this session');
+    expect(alert.textContent).toContain('saved browser data was not overwritten');
+  });
+
   test('returns to the originating journey after contextual save or cancel', () => {
     controller.openCreate({ returnTo: 'tarabalam' });
     buttonNamed('Cancel').click();

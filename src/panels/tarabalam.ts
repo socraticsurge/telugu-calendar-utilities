@@ -175,7 +175,7 @@ function tbProfileStoreIssue(snapshot: GuestProfileSnapshot): string | null {
     return 'Saved profile data was unreadable and has been reset safely.';
   }
   if (snapshot.issue === 'unsupported-storage-version') {
-    return 'These profiles use a newer format. They are available for this session, but changes cannot be saved here.';
+    return 'These profiles use a newer or unrecognized format. They are available for this session, but changes cannot be saved here.';
   }
   if (snapshot.persistence === 'memory' || snapshot.issue === 'storage-unavailable') {
     return 'Browser storage is unavailable. Profile choices work for this page only.';
