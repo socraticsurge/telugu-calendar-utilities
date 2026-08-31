@@ -9,6 +9,18 @@ from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.models.panchangam_day import Location
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 
+SUNRISE_CYCLE_CASES = (
+    ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 1, 15)),
+    ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 5, 28)),
+    ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 8, 30)),
+    ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 1, 15)),
+    ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 5, 28)),
+    ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 8, 30)),
+    ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 1, 15)),
+    ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 5, 28)),
+    ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 8, 30)),
+)
+
 
 def test_get_horas_count_and_sequence():
     """Verify that 24 horas are returned, they sequence correctly, and boundaries align."""
@@ -108,17 +120,7 @@ def test_get_lagna_transitions_multiple_cities():
 
 @pytest.mark.parametrize(
     ('name', 'lat', 'lon', 'timezone', 'target_date'),
-    [
-        ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 1, 15)),
-        ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 5, 28)),
-        ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 8, 30)),
-        ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 1, 15)),
-        ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 5, 28)),
-        ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 8, 30)),
-        ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 1, 15)),
-        ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 5, 28)),
-        ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 8, 30)),
-    ],
+    SUNRISE_CYCLE_CASES,
 )
 def test_lagna_transitions_end_at_first_following_sunrise(
     name,
@@ -148,17 +150,7 @@ def test_lagna_transitions_end_at_first_following_sunrise(
 
 @pytest.mark.parametrize(
     ('name', 'lat', 'lon', 'timezone', 'target_date'),
-    [
-        ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 1, 15)),
-        ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 5, 28)),
-        ('Hyderabad', 17.3850, 78.4867, 'Asia/Kolkata', date(2026, 8, 30)),
-        ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 1, 15)),
-        ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 5, 28)),
-        ('New York', 40.7128, -74.0060, 'America/New_York', date(2026, 8, 30)),
-        ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 1, 15)),
-        ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 5, 28)),
-        ('Sydney', -33.8688, 151.2093, 'Australia/Sydney', date(2026, 8, 30)),
-    ],
+    SUNRISE_CYCLE_CASES,
 )
 def test_horas_end_at_first_following_sunrise(
     name,
