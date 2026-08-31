@@ -3,6 +3,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   GUEST_BIRTH_PROFILE_STORAGE_KEY,
+  GUEST_PROFILE_COMMIT_STORAGE_KEY,
   GUEST_PROFILE_STORAGE_KEY,
   createGuestProfileStore,
   type GuestProfileStore,
@@ -29,6 +30,10 @@ class MemoryStorage implements ProfileStorage {
 
   setItem(key: string, value: string): void {
     this.values.set(key, value);
+  }
+
+  removeItem(key: string): void {
+    this.values.delete(key);
   }
 }
 
@@ -695,6 +700,18 @@ describe('storage and contextual journeys', () => {
     expect(reload).toHaveBeenCalledTimes(3);
   });
 
+  test('reloads when the profile commit marker finalizes a cross-tab write', () => {
+    const reload = vi.spyOn(store, 'reload');
+    const stop = listenForGuestProfileStorageChanges(store, window);
+
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: GUEST_PROFILE_COMMIT_STORAGE_KEY,
+    }));
+
+    expect(reload).toHaveBeenCalledOnce();
+    stop();
+  });
+
   test('preserves an unsaved edit and focus while an external reload updates the store', () => {
     const original = store.create({ name: 'Original', nakshatra: 'Rohini' });
     controller.openEdit(original.id);
@@ -785,6 +802,35 @@ describe('storage and contextual journeys', () => {
     expect(alert.textContent).toContain('newer or unrecognized format');
     expect(alert.textContent).toContain('last only for this session');
     expect(alert.textContent).toContain('saved browser data was not overwritten');
+  });
+
+  test('offers confirmed recovery for a recognized orphan even with no visible profiles', () => {
+    const root = query<HTMLElement>('#profiles-root');
+    controller.destroy();
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, JSON.stringify({
+      schemaVersion: 1,
+      revision: 'revision_orphan_ui',
+      profiles: {},
+    }));
+    store = createGuestProfileStore(storage, { idFactory: ids() });
+    controller = initProfilesPanel(store, { root, navigate });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'memory', issue: 'uncommitted-birth-storage',
+    });
+    buttonNamed('Remove incomplete saved data').click();
+    expect(query<HTMLDialogElement>('dialog').textContent).toContain(
+      'Remove incomplete saved data?',
+    );
+    buttonNamed('Remove incomplete data').click();
+
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'persistent', issue: null,
+    });
+    expect(buttonNamed('Create profile')).toBeTruthy();
   });
 
   test('returns to the originating journey after contextual save or cancel', () => {

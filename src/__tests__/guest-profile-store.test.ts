@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   GUEST_BIRTH_PROFILE_SCHEMA_VERSION,
   GUEST_BIRTH_PROFILE_STORAGE_KEY,
+  GUEST_PROFILE_COMMIT_SCHEMA_VERSION,
+  GUEST_PROFILE_COMMIT_STORAGE_KEY,
   GUEST_PROFILE_SCHEMA_VERSION,
   GUEST_PROFILE_STORAGE_KEY,
   GuestProfileStoreError,
@@ -32,12 +34,24 @@ class MemoryStorage implements ProfileStorage {
   setItem(key: string, value: string): void {
     this.values.set(key, value);
   }
+
+  removeItem(key: string): void {
+    this.values.delete(key);
+  }
 }
 
 let storage: MemoryStorage;
 
 function rawProfiles(): unknown[] {
   return JSON.parse(storage.getItem(GUEST_PROFILE_STORAGE_KEY) || '[]');
+}
+
+function rawCommit(): {
+  schemaVersion: number;
+  revision: string;
+  baseText: string;
+} {
+  return JSON.parse(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY) || '{}');
 }
 
 function birthProfileDraft(name = 'Anu'): GuestProfileDraft {
@@ -363,6 +377,585 @@ describe('birth profile extension storage', () => {
     expect(reloaded.get('guest_birth_profile')).toEqual(created);
   });
 
+  test('binds the birth envelope to an exact committed base payload', () => {
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_bound_profile'),
+      revisionFactory: ids('revision_bound_001'),
+    });
+    const created = store.create(birthProfileDraft());
+    const baseText = storage.getItem(GUEST_PROFILE_STORAGE_KEY)!;
+    const envelope = JSON.parse(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    const commit = rawCommit();
+
+    expect(Object.keys(commit).sort()).toEqual(['baseText', 'revision', 'schemaVersion']);
+    expect(commit).toEqual({
+      schemaVersion: GUEST_PROFILE_COMMIT_SCHEMA_VERSION,
+      revision: 'revision_bound_001',
+      baseText,
+    });
+    expect(envelope.revision).toBe(commit.revision);
+    expect(rawProfiles()).toEqual([{
+      id: 'guest_bound_profile', schemaVersion: 1, name: 'Anu',
+      nak: 'Rohini', pada: 2, lagna: 'Karka',
+    }]);
+
+    const reloaded = createGuestProfileStore(storage, {
+      idFactory: () => { throw new Error('the committed ID must stay stable'); },
+      revisionFactory: ids('revision_unused_001'),
+    });
+    expect(reloaded.get(created.id)).toEqual(created);
+  });
+
+  test.each([
+    ['base write', GUEST_PROFILE_STORAGE_KEY],
+    ['birth-envelope write', GUEST_BIRTH_PROFILE_STORAGE_KEY],
+    ['commit-marker write', GUEST_PROFILE_COMMIT_STORAGE_KEY],
+  ])('does not attach same-derived birth data after a failed %s', (_label, failureKey) => {
+    let armed = false;
+    const flaky: ProfileStorage = {
+      getItem: key => storage.getItem(key),
+      setItem: (key, value) => {
+        if (armed && key === failureKey) throw new DOMException('full', 'QuotaExceededError');
+        storage.setItem(key, value);
+      },
+      removeItem: key => storage.removeItem(key),
+    };
+    const store = createGuestProfileStore(flaky, {
+      idFactory: ids('guest_torn_profile'),
+      revisionFactory: ids('revision_before_001', 'revision_after_002'),
+    });
+    const created = store.create(birthProfileDraft());
+    const originalBase = storage.getItem(GUEST_PROFILE_STORAGE_KEY);
+    const originalCommit = storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+    armed = true;
+
+    store.update(created.id, {
+      birthDetails: {
+        ...created.birthDetails!,
+        placeLabel: 'Same chart, newly corrected birthplace label',
+      },
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      persistence: 'memory', issue: 'storage-unavailable',
+    });
+    if (failureKey === GUEST_PROFILE_STORAGE_KEY) {
+      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(originalBase);
+      expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(originalCommit);
+      const retainedEnvelope = JSON.parse(
+        storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}',
+      );
+      expect(retainedEnvelope.revision).toBe('revision_before_001');
+    } else {
+      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(originalBase);
+      expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBeNull();
+      expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+    }
+
+    const reloaded = createGuestProfileStore(storage, {
+      idFactory: () => { throw new Error('the stored ID must stay stable'); },
+      revisionFactory: ids('revision_unused_001'),
+    });
+    expect(reloaded.getSnapshot()).toMatchObject({ persistence: 'persistent' });
+    expect(reloaded.get(created.id)).toMatchObject({
+      source: failureKey === GUEST_PROFILE_STORAGE_KEY ? 'birth-details' : 'manual',
+    });
+  });
+
+  test.each([
+    ['base write', GUEST_PROFILE_STORAGE_KEY],
+    ['birth-envelope write', GUEST_BIRTH_PROFILE_STORAGE_KEY],
+    ['commit-marker write', GUEST_PROFILE_COMMIT_STORAGE_KEY],
+  ])('keeps first-create storage recoverable after a failed %s', (_label, failureKey) => {
+    let armed = true;
+    const flaky: ProfileStorage = {
+      getItem: key => storage.getItem(key),
+      setItem: (key, value) => {
+        if (armed && key === failureKey) throw new DOMException('full', 'QuotaExceededError');
+        storage.setItem(key, value);
+      },
+      removeItem: key => storage.removeItem(key),
+    };
+    const store = createGuestProfileStore(flaky, {
+      idFactory: ids('guest_first_failure'),
+      revisionFactory: ids('revision_first_failure'),
+    });
+
+    store.create(birthProfileDraft());
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_first_failure', source: 'birth-details' }],
+      persistence: 'memory', issue: 'storage-unavailable',
+    });
+    if (failureKey === GUEST_PROFILE_STORAGE_KEY) {
+      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBeNull();
+    } else {
+      expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).not.toBeNull();
+    }
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+
+    armed = false;
+    const recovered = createGuestProfileStore(flaky, {
+      idFactory: ids('guest_after_failure'),
+      revisionFactory: ids('revision_after_failure'),
+    });
+    expect(recovered.getSnapshot()).toMatchObject({
+      persistence: 'persistent', issue: null,
+    });
+    if (failureKey === GUEST_PROFILE_STORAGE_KEY) {
+      recovered.create({ name: 'Recovered' });
+      expect(recovered.getSnapshot().profiles).toMatchObject([{ name: 'Recovered' }]);
+    } else {
+      expect(recovered.get('guest_first_failure')).toMatchObject({
+        source: 'manual', birthDetails: null,
+      });
+    }
+  });
+
+  test('restores a coherent cross-tab snapshot only after the final commit marker', () => {
+    const initial = createGuestProfileStore(storage, {
+      idFactory: ids('guest_cross_tab'),
+      revisionFactory: ids('revision_cross_tab_001'),
+    });
+    const created = initial.create(birthProfileDraft());
+    const reader = createGuestProfileStore(storage, {
+      idFactory: () => { throw new Error('the stored ID must stay stable'); },
+      revisionFactory: ids('revision_reader_unused'),
+    });
+
+    const nextStorage = new MemoryStorage();
+    for (const key of [
+      GUEST_PROFILE_STORAGE_KEY,
+      GUEST_BIRTH_PROFILE_STORAGE_KEY,
+      GUEST_PROFILE_COMMIT_STORAGE_KEY,
+    ]) nextStorage.setItem(key, storage.getItem(key)!);
+    const writer = createGuestProfileStore(nextStorage, {
+      revisionFactory: ids('revision_cross_tab_002'),
+    });
+    writer.update(created.id, {
+      birthDetails: {
+        ...created.birthDetails!,
+        placeLabel: 'Cross-tab corrected birthplace label',
+      },
+    });
+
+    storage.setItem(
+      GUEST_PROFILE_STORAGE_KEY,
+      nextStorage.getItem(GUEST_PROFILE_STORAGE_KEY)!,
+    );
+    reader.reload();
+    expect(reader.getSnapshot().issue).toBeNull();
+    expect(reader.get(created.id)).toMatchObject({
+      source: 'birth-details',
+      birthDetails: { placeLabel: 'Vijayawada, Andhra Pradesh, India' },
+    });
+
+    storage.setItem(
+      GUEST_BIRTH_PROFILE_STORAGE_KEY,
+      nextStorage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)!,
+    );
+    reader.reload();
+    expect(reader.getSnapshot().issue).toBe('uncommitted-birth-storage');
+    expect(reader.get(created.id)?.source).toBe('manual');
+
+    storage.setItem(
+      GUEST_PROFILE_COMMIT_STORAGE_KEY,
+      nextStorage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)!,
+    );
+    reader.reload();
+    expect(reader.getSnapshot().issue).toBeNull();
+    expect(reader.get(created.id)).toMatchObject({
+      source: 'birth-details',
+      birthDetails: { placeLabel: 'Cross-tab corrected birthplace label' },
+    });
+  });
+
+  test('upgrades a unique unbound legacy birth extension on first load', () => {
+    const source = new MemoryStorage();
+    const sourceStore = createGuestProfileStore(source, {
+      idFactory: ids('guest_legacy_birth'),
+      revisionFactory: ids('revision_source_001'),
+    });
+    const created = sourceStore.create(birthProfileDraft());
+    const legacyEnvelope = JSON.parse(source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    delete legacyEnvelope.revision;
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, source.getItem(GUEST_PROFILE_STORAGE_KEY)!);
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, JSON.stringify(legacyEnvelope));
+
+    const migrated = createGuestProfileStore(storage, {
+      idFactory: () => { throw new Error('the legacy stable ID must be reused'); },
+      revisionFactory: ids('revision_upgrade_001'),
+    });
+
+    expect(migrated.get(created.id)).toEqual(created);
+    const upgradedEnvelope = JSON.parse(
+      storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}',
+    );
+    expect(upgradedEnvelope.revision).toBe('revision_upgrade_001');
+    expect(rawCommit()).toEqual({
+      schemaVersion: GUEST_PROFILE_COMMIT_SCHEMA_VERSION,
+      revision: 'revision_upgrade_001',
+      baseText: storage.getItem(GUEST_PROFILE_STORAGE_KEY),
+    });
+    migrated.reload();
+    expect(migrated.get(created.id)?.source).toBe('birth-details');
+  });
+
+  test.each([
+    ['schema type', (envelope: Record<string, unknown>) => {
+      envelope.schemaVersion = '1';
+    }],
+    ['envelope', (envelope: Record<string, unknown>) => {
+      envelope.futurePayload = { keep: true };
+    }],
+    ['profile record', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      profiles.guest_opaque_birth.futurePayload = { keep: true };
+    }],
+    ['birth details', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      const details = profiles.guest_opaque_birth.birthDetails as Record<string, unknown>;
+      details.futurePayload = { keep: true };
+    }],
+    ['natal chart', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      const chart = profiles.guest_opaque_birth.natalChart as Record<string, unknown>;
+      chart.futurePayload = { keep: true };
+    }],
+    ['planet', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      const chart = profiles.guest_opaque_birth.natalChart as Record<string, unknown>;
+      const planets = chart.planets as Array<Record<string, unknown>>;
+      planets[0].futurePayload = { keep: true };
+    }],
+    ['calculation', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      const calculation = profiles.guest_opaque_birth.calculation as Record<string, unknown>;
+      calculation.futurePayload = { keep: true };
+    }],
+    ['engine', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      const calculation = profiles.guest_opaque_birth.calculation as Record<string, unknown>;
+      const engine = calculation.engine as Record<string, unknown>;
+      engine.futurePayload = { keep: true };
+    }],
+    ['noncanonical recognized value', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      const details = profiles.guest_opaque_birth.birthDetails as Record<string, unknown>;
+      details.placeLabel = ` ${String(details.placeLabel)}`;
+    }],
+    ['overlong recognized value', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, Record<string, unknown>>;
+      const details = profiles.guest_opaque_birth.birthDetails as Record<string, unknown>;
+      details.placeLabel = 'X'.repeat(241);
+    }],
+    ['primitive profile value', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, unknown>;
+      profiles.guest_opaque_birth = 'opaque-sensitive-value';
+    }],
+    ['array profile value', (envelope: Record<string, unknown>) => {
+      const profiles = envelope.profiles as Record<string, unknown>;
+      profiles.guest_opaque_birth = ['opaque', { keep: true }];
+    }],
+  ])('preserves unrecognized legacy birth %s bytes across session mutations', (_label, mutate) => {
+    const source = new MemoryStorage();
+    const sourceStore = createGuestProfileStore(source, {
+      idFactory: ids('guest_opaque_birth'),
+      revisionFactory: ids('revision_source_opaque'),
+    });
+    sourceStore.create(birthProfileDraft());
+    const envelope = JSON.parse(
+      source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}',
+    ) as Record<string, unknown>;
+    delete envelope.revision;
+    mutate(envelope);
+    const baseBytes = source.getItem(GUEST_PROFILE_STORAGE_KEY)!;
+    const birthBytes = JSON.stringify(envelope, null, 2);
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, baseBytes);
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_session_opaque'),
+      revisionFactory: ids('revision_must_not_write'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_opaque_birth', source: 'manual' }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(baseBytes);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+
+    store.update('guest_opaque_birth', { name: 'Session edit' });
+    const added = store.create({ name: 'Session person' });
+    store.reload();
+    expect(store.get(added.id)?.name).toBe('Session person');
+    expect(store.remove('guest_opaque_birth')).toBe(true);
+    store.clear();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(baseBytes);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+  });
+
+  test.each([
+    ['birth envelope', true, false],
+    ['commit marker', false, true],
+    ['birth envelope and commit marker', true, true],
+  ])('fails closed for an orphan %s when the base key is absent', (
+    _label,
+    includeBirth,
+    includeCommit,
+  ) => {
+    const birthBytes = '{"opaqueSensitiveBirth":"keep-exactly"}';
+    const commitBytes = '{"opaqueCommit":"keep-exactly"}';
+    if (includeBirth) storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+    if (includeCommit) storage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, commitBytes);
+
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_orphan_session'),
+      revisionFactory: ids('revision_must_not_write'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'memory', issue: 'uncommitted-birth-storage',
+    });
+    expect(store.canDiscardUncommittedStorage()).toBe(false);
+    expect(store.discardUncommittedStorage()).toBe(false);
+    const created = store.create({ name: 'Session only', nakshatra: 'Rohini' });
+    store.reload();
+    expect(store.get(created.id)?.name).toBe('Session only');
+    store.clear();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(
+      includeBirth ? birthBytes : null,
+    );
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(
+      includeCommit ? commitBytes : null,
+    );
+  });
+
+  test('offers explicit cleanup only for a recognized orphan transaction', () => {
+    const source = new MemoryStorage();
+    const sourceStore = createGuestProfileStore(source, {
+      idFactory: ids('guest_owned_orphan'),
+      revisionFactory: ids('revision_owned_orphan'),
+    });
+    sourceStore.create(birthProfileDraft());
+    const birthBytes = source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)!;
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+    const removed: string[] = [];
+    const tracked: ProfileStorage = {
+      getItem: key => storage.getItem(key),
+      setItem: (key, value) => storage.setItem(key, value),
+      removeItem: key => {
+        removed.push(key);
+        storage.removeItem(key);
+      },
+    };
+    const store = createGuestProfileStore(tracked, {
+      idFactory: ids('guest_after_orphan_cleanup'),
+      revisionFactory: ids('revision_after_orphan_cleanup'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'memory', issue: 'uncommitted-birth-storage',
+    });
+    expect(store.canDiscardUncommittedStorage()).toBe(true);
+    expect(store.discardUncommittedStorage()).toBe(true);
+    expect(removed).toEqual([
+      GUEST_BIRTH_PROFILE_STORAGE_KEY,
+      GUEST_PROFILE_COMMIT_STORAGE_KEY,
+      GUEST_PROFILE_STORAGE_KEY,
+    ]);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'persistent', issue: null,
+    });
+    expect(store.create({ name: 'Recovered' }).name).toBe('Recovered');
+  });
+
+  test.each([
+    ['unowned marker base bytes', () => {
+      const markerBytes = JSON.stringify({
+        schemaVersion: GUEST_PROFILE_COMMIT_SCHEMA_VERSION,
+        revision: 'revision_unowned_marker',
+        baseText: JSON.stringify([{
+          id: 'guest_future_marker', schemaVersion: 2, name: 'Future',
+          nak: 'Rohini', pada: 2, lagna: 'Karka', futurePayload: { keep: true },
+        }]),
+      });
+      return { birthBytes: null, commitBytes: markerBytes };
+    }],
+    ['mismatched envelope and marker revisions', () => {
+      const source = new MemoryStorage();
+      const sourceStore = createGuestProfileStore(source, {
+        idFactory: ids('guest_mismatch_orphan'),
+        revisionFactory: ids('revision_mismatch_birth'),
+      });
+      sourceStore.create(birthProfileDraft());
+      const commit = JSON.parse(
+        source.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY) || '{}',
+      );
+      commit.revision = 'revision_mismatch_commit';
+      return {
+        birthBytes: source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY),
+        commitBytes: JSON.stringify(commit),
+      };
+    }],
+  ])('does not offer destructive cleanup for %s', (_label, companionBytes) => {
+    const { birthBytes, commitBytes } = companionBytes();
+    if (birthBytes !== null) storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+    if (commitBytes !== null) storage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, commitBytes);
+    const store = createGuestProfileStore(storage);
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'memory', issue: 'uncommitted-birth-storage',
+    });
+    expect(store.canDiscardUncommittedStorage()).toBe(false);
+    expect(store.discardUncommittedStorage()).toBe(false);
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(commitBytes);
+  });
+
+  test('keeps cross-tab reads fail-closed until a reset removes all three keys', () => {
+    const writer = createGuestProfileStore(storage, {
+      idFactory: ids('guest_reset_lifecycle'),
+      revisionFactory: ids('revision_reset_lifecycle'),
+    });
+    writer.create(birthProfileDraft());
+    const reader = createGuestProfileStore(storage);
+
+    storage.removeItem(GUEST_BIRTH_PROFILE_STORAGE_KEY);
+    reader.reload();
+    expect(reader.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_reset_lifecycle', source: 'manual' }],
+      persistence: 'persistent', issue: 'uncommitted-birth-storage',
+    });
+
+    storage.removeItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+    reader.reload();
+    expect(reader.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_reset_lifecycle', source: 'manual' }],
+      persistence: 'persistent', issue: null,
+    });
+
+    storage.removeItem(GUEST_PROFILE_STORAGE_KEY);
+    reader.reload();
+    expect(reader.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'persistent', issue: null,
+    });
+  });
+
+  test('fails closed when duplicate stored IDs make a birth extension ambiguous', () => {
+    const source = new MemoryStorage();
+    const sourceStore = createGuestProfileStore(source, {
+      idFactory: ids('guest_duplicate'),
+      revisionFactory: ids('revision_source_001'),
+    });
+    sourceStore.create(birthProfileDraft());
+    const legacyEnvelope = JSON.parse(source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    delete legacyEnvelope.revision;
+    const duplicateBase = JSON.stringify([
+      {
+        id: 'guest_duplicate', schemaVersion: 1, name: 'First',
+        nak: 'Rohini', pada: 2, lagna: 'Karka',
+      },
+      {
+        id: 'guest_duplicate', schemaVersion: 1, name: 'Second',
+        nak: 'Rohini', pada: 2, lagna: 'Karka',
+      },
+    ]);
+    const birthBytes = JSON.stringify(legacyEnvelope);
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, duplicateBase);
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_repaired'),
+      revisionFactory: ids('revision_unused_001'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [
+        { id: 'guest_duplicate', source: 'manual' },
+        { id: 'guest_repaired', source: 'manual' },
+      ],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(duplicateBase);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+
+    store.reload();
+    store.update('guest_duplicate', { name: 'Session edit' });
+    store.remove('guest_repaired');
+    store.clear();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(duplicateBase);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+  });
+
+  test('never attaches an extension to an ID synthesized during migration', () => {
+    const source = new MemoryStorage();
+    const sourceStore = createGuestProfileStore(source, {
+      idFactory: ids('guest_collision'),
+      revisionFactory: ids('revision_source_001'),
+    });
+    sourceStore.create(birthProfileDraft());
+    const legacyEnvelope = JSON.parse(source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    delete legacyEnvelope.revision;
+    const baseBytes = JSON.stringify([{
+      schemaVersion: 1, name: 'No stored ID', nak: 'Rohini', pada: 2, lagna: 'Karka',
+    }]);
+    const birthBytes = JSON.stringify(legacyEnvelope);
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, baseBytes);
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_collision'),
+      revisionFactory: ids('revision_unused_001'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_collision', source: 'manual', birthDetails: null }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(baseBytes);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+  });
+
+  test('commits manual conversion and deletion without retaining stale extensions', () => {
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_manual_commit', 'guest_deleted_commit'),
+      revisionFactory: ids(
+        'revision_lifecycle_001',
+        'revision_lifecycle_002',
+        'revision_lifecycle_003',
+        'revision_lifecycle_004',
+      ),
+    });
+    const converted = store.create(birthProfileDraft('Converted'));
+    store.update(converted.id, { source: 'manual' });
+    const deleted = store.create(birthProfileDraft('Deleted'));
+    store.remove(deleted.id);
+
+    const envelope = JSON.parse(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    expect(envelope.profiles).toEqual({});
+    expect(envelope.revision).toBe(rawCommit().revision);
+    expect(rawCommit().baseText).toBe(storage.getItem(GUEST_PROFILE_STORAGE_KEY));
+
+    const reloaded = createGuestProfileStore(storage, {
+      revisionFactory: ids('revision_unused_001'),
+    });
+    expect(reloaded.get(converted.id)).toMatchObject({
+      source: 'manual', birthDetails: null, natalChart: null, calculation: null,
+    });
+    expect(reloaded.get(deleted.id)).toBeNull();
+  });
+
   test('removes the birth extension when a profile is intentionally converted to manual entry', () => {
     const store = createGuestProfileStore(storage, {
       idFactory: ids('guest_birth_manual'),
@@ -466,6 +1059,89 @@ describe('storage failures', () => {
     expect(readLegacyGuestProfileRows(storage)).toEqual([]);
   });
 
+  test.each([
+    ['owned', () => {
+      const source = new MemoryStorage();
+      const sourceStore = createGuestProfileStore(source, {
+        idFactory: ids('guest_malformed_owned'),
+        revisionFactory: ids('revision_malformed_owned'),
+      });
+      sourceStore.create(birthProfileDraft());
+      return {
+        birthBytes: source.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)!,
+        commitBytes: source.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)!,
+      };
+    }],
+    ['opaque', () => ({
+      birthBytes: '{"futureSensitive":{"keep":"exactly"}}',
+      commitBytes: '{"futureCommit":{"keep":"exactly"}}',
+    })],
+  ])('preserves malformed base and %s companion bytes fail-closed', (_label, bytes) => {
+    const baseBytes = '{broken';
+    const { birthBytes, commitBytes } = bytes();
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, baseBytes);
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+    storage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, commitBytes);
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_malformed_session'),
+      revisionFactory: ids('revision_must_not_write'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [], persistence: 'memory', issue: 'unsupported-storage-version',
+    });
+    const created = store.create({ name: 'Session only' });
+    store.reload();
+    expect(store.get(created.id)?.name).toBe('Session only');
+    store.clear();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(baseBytes);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(commitBytes);
+  });
+
+  test('attempts marker cleanup even when birth-envelope cleanup throws', () => {
+    const removeAttempts: string[] = [];
+    const flaky: ProfileStorage = {
+      getItem: key => storage.getItem(key),
+      setItem: (key, value) => {
+        if (key === GUEST_PROFILE_COMMIT_STORAGE_KEY) {
+          throw new DOMException('full', 'QuotaExceededError');
+        }
+        storage.setItem(key, value);
+      },
+      removeItem: key => {
+        removeAttempts.push(key);
+        if (key === GUEST_BIRTH_PROFILE_STORAGE_KEY) {
+          throw new DOMException('denied', 'SecurityError');
+        }
+        storage.removeItem(key);
+      },
+    };
+    const store = createGuestProfileStore(flaky, {
+      idFactory: ids('guest_cleanup_attempt'),
+      revisionFactory: ids('revision_cleanup_attempt'),
+    });
+
+    store.create(birthProfileDraft());
+
+    expect(store.getSnapshot()).toMatchObject({
+      persistence: 'memory', issue: 'storage-unavailable',
+    });
+    expect(removeAttempts).toEqual([
+      GUEST_BIRTH_PROFILE_STORAGE_KEY,
+      GUEST_PROFILE_COMMIT_STORAGE_KEY,
+    ]);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).not.toBeNull();
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+    const reloaded = createGuestProfileStore(storage);
+    expect(reloaded.getSnapshot()).toMatchObject({
+      persistence: 'persistent', issue: 'uncommitted-birth-storage',
+    });
+    expect(reloaded.get('guest_cleanup_attempt')).toMatchObject({
+      source: 'manual', birthDetails: null,
+    });
+  });
+
   test('does not destructively downgrade records from a newer schema', () => {
     const future = JSON.stringify([
       { id: 'guest_future', schemaVersion: 2, name: 'Future', nak: 'Rohini', extra: true },
@@ -479,6 +1155,34 @@ describe('storage failures', () => {
       profiles: [], persistence: 'memory', issue: 'unsupported-storage-version',
     });
     expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(future);
+  });
+
+  test('preserves an unrecognized commit marker and all bound bytes', () => {
+    const sourceStore = createGuestProfileStore(storage, {
+      idFactory: ids('guest_marker_future'),
+      revisionFactory: ids('revision_marker_001'),
+    });
+    sourceStore.create(birthProfileDraft());
+    const baseBytes = storage.getItem(GUEST_PROFILE_STORAGE_KEY)!;
+    const birthBytes = storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)!;
+    const marker = rawCommit() as Record<string, unknown>;
+    marker.futurePayload = { keep: true };
+    const markerBytes = JSON.stringify(marker, null, 2);
+    storage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, markerBytes);
+
+    const store = createGuestProfileStore(storage, {
+      revisionFactory: ids('revision_unused_001'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_marker_future', source: 'manual' }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    store.clear();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(baseBytes);
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+    expect(storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(markerBytes);
   });
 
   test('never overwrites mixed v1 and future-schema bytes across reloads or attempted edits', () => {

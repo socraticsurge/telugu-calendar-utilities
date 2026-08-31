@@ -25,6 +25,9 @@ import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
 import {
+  GUEST_BIRTH_PROFILE_STORAGE_KEY,
+  GUEST_PROFILE_COMMIT_STORAGE_KEY,
+  GUEST_PROFILE_STORAGE_KEY,
   MAX_GUEST_PROFILES,
   guestProfileReadiness,
   mergeLegacyGuestProfileRow,
@@ -173,6 +176,9 @@ function tbSelectionStorage(): ProfileStorage {
 function tbProfileStoreIssue(snapshot: GuestProfileSnapshot): string | null {
   if (snapshot.issue === 'malformed-storage') {
     return 'Saved profile data was unreadable and has been reset safely.';
+  }
+  if (snapshot.issue === 'uncommitted-birth-storage') {
+    return 'A saved birth calculation could not be verified. Manual profile details remain available.';
   }
   if (snapshot.issue === 'unsupported-storage-version') {
     return 'These profiles use a newer or unrecognized format. They are available for this session, but changes cannot be saved here.';
@@ -722,8 +728,10 @@ function tbRenderProfileInputs(): void {
   if (addButton) addButton.style.display = TB_LEGACY_ROWS < MAX_GUEST_PROFILES ? '' : 'none';
 }
 
-function tbSaveProfiles(): void {
-  if (TB_PROFILE_CONTROLLER) return;
+function tbSaveProfiles(): boolean {
+  if (TB_PROFILE_CONTROLLER) return true;
+
+  if (tbHasBirthProfileStorage()) return false;
 
   const existing = readLegacyGuestProfileRows(localStorage);
   const fields = [];
@@ -744,6 +752,16 @@ function tbSaveProfiles(): void {
     });
   }
   writeLegacyGuestProfileRows(localStorage, fields);
+  return true;
+}
+
+function tbHasBirthProfileStorage(): boolean {
+  try {
+    return localStorage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) !== null
+      || localStorage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY) !== null;
+  } catch {
+    return true;
+  }
 }
 
 function tbResetProfiles(): void {
@@ -751,7 +769,9 @@ function tbResetProfiles(): void {
     TB_PROFILE_CONTROLLER.clearParticipants();
     return;
   }
-  localStorage.removeItem('tc-tb-profiles');
+  localStorage.removeItem(GUEST_BIRTH_PROFILE_STORAGE_KEY);
+  localStorage.removeItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+  localStorage.removeItem(GUEST_PROFILE_STORAGE_KEY);
   TB_LEGACY_ROWS = 1;
   TB_DAYS = null;
   TB_EVENTS = null;
@@ -767,7 +787,7 @@ function tbAddRow(): void {
     TB_PROFILE_CONTROLLER.addManualParticipant();
     return;
   }
-  tbSaveProfiles();
+  if (!tbSaveProfiles()) return;
   TB_LEGACY_ROWS = Math.min(MAX_GUEST_PROFILES, TB_LEGACY_ROWS + 1);
   tbRenderProfileInputs();
 }
@@ -779,6 +799,7 @@ function tbRemoveRow(index: number): void {
   }
   const saved = readLegacyGuestProfileRows(localStorage);
   if (index < 0 || index >= saved.length) return;
+  if (tbHasBirthProfileStorage()) return;
   removeLegacyGuestProfileRow(localStorage, index);
   TB_LEGACY_ROWS = Math.max(1, TB_LEGACY_ROWS - 1);
   tbRenderProfileInputs();

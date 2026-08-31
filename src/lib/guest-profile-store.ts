@@ -3,14 +3,17 @@ import type { BirthChartPlanet, BirthProfileEngine } from './birth-profile-api';
 
 export const GUEST_PROFILE_STORAGE_KEY = 'tc-tb-profiles';
 export const GUEST_BIRTH_PROFILE_STORAGE_KEY = 'tc-birth-profile-data';
+export const GUEST_PROFILE_COMMIT_STORAGE_KEY = 'tc-profile-storage-commit';
 export const GUEST_PROFILE_SCHEMA_VERSION = 1 as const;
 export const GUEST_BIRTH_PROFILE_SCHEMA_VERSION = 1 as const;
+export const GUEST_PROFILE_COMMIT_SCHEMA_VERSION = 1 as const;
 export const MAX_GUEST_PROFILES = 4;
 
 export type ProfilePersistence = 'persistent' | 'memory';
 export type ProfileStoreIssue =
   | 'malformed-storage'
   | 'malformed-birth-storage'
+  | 'uncommitted-birth-storage'
   | 'storage-unavailable'
   | 'unsupported-storage-version'
   | null;
@@ -19,6 +22,7 @@ export type ProfileStoreErrorCode = 'empty-profile' | 'profile-limit' | 'profile
 export interface ProfileStorage {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
+  removeItem?(key: string): void;
 }
 
 /**
@@ -34,6 +38,9 @@ export function browserProfileStorage(
     },
     setItem(key, value) {
       storageProvider().setItem(key, value);
+    },
+    removeItem(key) {
+      storageProvider().removeItem?.(key);
     },
   };
 }
@@ -137,14 +144,34 @@ interface StoredBirthProfileRecord {
 
 interface StoredBirthProfileEnvelope {
   schemaVersion: typeof GUEST_BIRTH_PROFILE_SCHEMA_VERSION;
+  revision?: string;
   profiles: Record<string, StoredBirthProfileRecord>;
+}
+
+interface StoredProfileCommitMarker {
+  schemaVersion: typeof GUEST_PROFILE_COMMIT_SCHEMA_VERSION;
+  revision: string;
+  baseText: string;
 }
 
 interface GuestProfileStoreOptions {
   idFactory?: () => string;
+  revisionFactory?: () => string;
 }
 
 let fallbackIdSequence = 0;
+let fallbackRevisionSequence = 0;
+
+interface StoredProfileMigration {
+  profiles: GuestProfile[];
+  extensionEligibleIds: Set<string>;
+  ambiguousStoredIds: Set<string>;
+}
+
+interface BirthProfileLoadResult {
+  needsUpgrade: boolean;
+  suppressPersist: boolean;
+}
 
 export class GuestProfileStoreError extends Error {
   constructor(public readonly code: ProfileStoreErrorCode) {
@@ -172,6 +199,91 @@ function pada(value: unknown): 1 | 2 | 3 | 4 | null {
 
 function validStoredId(value: unknown): value is string {
   return typeof value === 'string' && /^[A-Za-z0-9_-]{8,100}$/.test(value);
+}
+
+function validRevision(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{8,100}$/.test(value);
+}
+
+function hasExactKeys(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  const actual = Object.keys(value);
+  return actual.length === keys.length && actual.every(key => keys.includes(key));
+}
+
+function isOwnedBirthDetails(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  const normalized = normalizeBirthDetails(record);
+  return normalized !== null && hasExactKeys(record, [
+    'dateOfBirth', 'timeOfBirth', 'placeLabel', 'latitude', 'longitude', 'timezone',
+  ])
+    && record.dateOfBirth === normalized.dateOfBirth
+    && record.timeOfBirth === normalized.timeOfBirth
+    && record.placeLabel === normalized.placeLabel
+    && Object.is(record.latitude, normalized.latitude)
+    && Object.is(record.longitude, normalized.longitude)
+    && record.timezone === normalized.timezone;
+}
+
+function isOwnedPlanet(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  const normalized = normalizePlanet(record);
+  return normalized !== null
+    && hasExactKeys(record, ['name', 'rashi', 'degree', 'house', 'retrograde'])
+    && record.name === normalized.name
+    && record.rashi === normalized.rashi
+    && Object.is(record.degree, normalized.degree)
+    && Object.is(record.house, normalized.house)
+    && record.retrograde === normalized.retrograde;
+}
+
+function isOwnedNatalChart(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  const normalized = normalizeNatalChart(record);
+  return normalized !== null
+    && hasExactKeys(record, ['lagnaDegree', 'planets'])
+    && Object.is(record.lagnaDegree, normalized.lagnaDegree)
+    && Array.isArray(record.planets)
+    && record.planets.every(isOwnedPlanet);
+}
+
+function isOwnedCalculation(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  if (!hasExactKeys(record, ['contractVersion', 'engine'])) return false;
+  if (!record.engine || typeof record.engine !== 'object' || Array.isArray(record.engine)) {
+    return false;
+  }
+  const engine = record.engine as Record<string, unknown>;
+  const normalized = normalizeCalculation(record);
+  return normalized !== null && hasExactKeys(
+    engine,
+    ['name', 'version', 'ayanamsha', 'ephemeris'],
+  )
+    && record.contractVersion === normalized.contractVersion
+    && engine.name === normalized.engine.name
+    && engine.version === normalized.engine.version
+    && engine.ayanamsha === normalized.engine.ayanamsha
+    && engine.ephemeris === normalized.engine.ephemeris;
+}
+
+function isOwnedBirthProfileRecord(value: unknown): value is StoredBirthProfileRecord {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return hasExactKeys(record, [
+    'source', 'nakshatra', 'pada', 'lagna', 'birthDetails',
+    'janmaRasi', 'natalChart', 'calculation',
+  ])
+    && record.source === 'birth-details'
+    && canonical(record.nakshatra, NAKSHATRA_NAMES) === record.nakshatra
+    && pada(record.pada) === record.pada
+    && canonical(record.lagna, RASI_NAMES) === record.lagna
+    && canonical(record.janmaRasi, RASI_NAMES) === record.janmaRasi
+    && isOwnedBirthDetails(record.birthDetails)
+    && isOwnedNatalChart(record.natalChart)
+    && isOwnedCalculation(record.calculation);
 }
 
 function hasProfileContent(value: Record<string, unknown>): boolean {
@@ -332,6 +444,18 @@ function defaultIdFactory(): string {
   return `guest_${Date.now().toString(36)}_${fallbackIdSequence.toString(36)}`;
 }
 
+function defaultRevisionFactory(): string {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+    return `revision_${globalThis.crypto.randomUUID()}`;
+  }
+  if (globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
+    const values = globalThis.crypto.getRandomValues(new Uint32Array(4));
+    return `revision_${Array.from(values, value => value.toString(36)).join('_')}`;
+  }
+  fallbackRevisionSequence += 1;
+  return `revision_${Date.now().toString(36)}_${fallbackRevisionSequence.toString(36)}`;
+}
+
 /** Safe compatibility reader for the two legacy panels during migration. */
 export function readLegacyGuestProfileRows(storage: ProfileStorage): LegacyGuestProfileRow[] {
   try {
@@ -434,12 +558,16 @@ export class GuestProfileStore {
   private issue: ProfileStoreIssue = null;
   private readonly listeners = new Set<GuestProfileListener>();
   private readonly idFactory: () => string;
+  private readonly revisionFactory: () => string;
+  private lastRevision: string | null = null;
+  private discardableOrphan = false;
 
   constructor(
     private readonly storage: ProfileStorage,
     options: GuestProfileStoreOptions = {},
   ) {
     this.idFactory = options.idFactory || defaultIdFactory;
+    this.revisionFactory = options.revisionFactory || defaultRevisionFactory;
     this.load(true);
   }
 
@@ -533,6 +661,30 @@ export class GuestProfileStore {
     ) this.emit();
   }
 
+  canDiscardUncommittedStorage(): boolean {
+    return this.discardableOrphan && typeof this.storage.removeItem === 'function';
+  }
+
+  discardUncommittedStorage(): boolean {
+    if (!this.canDiscardUncommittedStorage()) return false;
+    try {
+      this.storage.removeItem!(GUEST_BIRTH_PROFILE_STORAGE_KEY);
+      this.storage.removeItem!(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+      this.storage.removeItem!(GUEST_PROFILE_STORAGE_KEY);
+    } catch {
+      this.persistence = 'memory';
+      this.issue = 'storage-unavailable';
+      this.emit();
+      return false;
+    }
+    this.profiles = [];
+    this.persistence = 'persistent';
+    this.issue = null;
+    this.discardableOrphan = false;
+    this.emit();
+    return true;
+  }
+
   reload(): void {
     // A failed write makes the in-memory state authoritative for this page.
     // Re-reading stale storage would silently discard the guest's edits.
@@ -579,16 +731,32 @@ export class GuestProfileStore {
     throw new Error('Unable to create a unique guest profile ID');
   }
 
+  private freshRevision(): string {
+    for (let attempt = 0; attempt < 100; attempt += 1) {
+      const candidate = this.revisionFactory();
+      if (validRevision(candidate) && candidate !== this.lastRevision) {
+        this.lastRevision = candidate;
+        return candidate;
+      }
+    }
+    throw new Error('Unable to create a profile storage revision');
+  }
+
   private load(initial: boolean): void {
+    this.discardableOrphan = false;
     const rawText = this.readStoredText(initial);
     if (rawText === undefined) return;
     if (rawText === null) {
       this.profiles = [];
+      this.failClosedForOrphanCompanions(initial);
       return;
     }
 
     const raw = this.parseStoredRows(rawText);
-    if (raw === null) return;
+    if (raw === null) {
+      if (!this.failClosedForMalformedBaseCompanions(initial)) this.persist();
+      return;
+    }
 
     const hasUnsupportedRows = this.hasUnsupportedRows(raw);
     if (hasUnsupportedRows) {
@@ -599,10 +767,19 @@ export class GuestProfileStore {
       this.issue = 'unsupported-storage-version';
     }
 
-    this.profiles = this.migrateStoredRows(raw);
-    this.loadBirthProfileExtensions(initial);
+    const migration = this.migrateStoredRows(raw);
+    this.profiles = migration.profiles;
+    const birthLoad = this.loadBirthProfileExtensions(
+      initial,
+      rawText,
+      migration,
+      hasUnsupportedRows,
+    );
     const normalizedText = JSON.stringify(this.profiles.map(toStored));
-    if (normalizedText !== rawText) this.persist();
+    if (
+      !birthLoad.suppressPersist
+      && (normalizedText !== rawText || birthLoad.needsUpgrade)
+    ) this.persist();
   }
 
   private readStoredText(initial: boolean): string | null | undefined {
@@ -619,6 +796,130 @@ export class GuestProfileStore {
     }
   }
 
+  private failClosedForOrphanCompanions(initial: boolean): void {
+    try {
+      const birthText = this.storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY);
+      const commitText = this.storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+      if (birthText !== null || commitText !== null) {
+        this.persistence = 'memory';
+        this.issue = 'uncommitted-birth-storage';
+        this.discardableOrphan = this.isOwnedOrphanTransaction(birthText, commitText);
+      }
+    } catch {
+      this.persistence = 'memory';
+      this.issue = 'storage-unavailable';
+      if (initial) this.profiles = [];
+    }
+  }
+
+  private failClosedForMalformedBaseCompanions(initial: boolean): boolean {
+    try {
+      const birthText = this.storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY);
+      const commitText = this.storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+      if (birthText === null && commitText === null) return false;
+      this.persistence = 'memory';
+      this.issue = 'unsupported-storage-version';
+      return true;
+    } catch {
+      this.persistence = 'memory';
+      this.issue = 'storage-unavailable';
+      if (initial) this.profiles = [];
+      return true;
+    }
+  }
+
+  private isOwnedOrphanBirthText(rawText: string | null): boolean {
+    if (rawText === null) return true;
+    let value: unknown;
+    try {
+      value = JSON.parse(rawText);
+    } catch {
+      return false;
+    }
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    const envelope = value as Record<string, unknown>;
+    if (envelope.schemaVersion !== GUEST_BIRTH_PROFILE_SCHEMA_VERSION) return false;
+    if (!envelope.profiles || typeof envelope.profiles !== 'object'
+      || Array.isArray(envelope.profiles)) return false;
+    const keys = envelope.revision === undefined
+      ? ['schemaVersion', 'profiles']
+      : ['schemaVersion', 'revision', 'profiles'];
+    if (!hasExactKeys(envelope, keys)) return false;
+    if (envelope.revision !== undefined && !validRevision(envelope.revision)) return false;
+    return Object.values(envelope.profiles as Record<string, unknown>)
+      .every(isOwnedBirthProfileRecord);
+  }
+
+  private isOwnedOrphanCommitText(rawText: string | null): boolean {
+    if (rawText === null) return true;
+    let value: unknown;
+    try {
+      value = JSON.parse(rawText);
+    } catch {
+      return false;
+    }
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    const record = value as Record<string, unknown>;
+    return hasExactKeys(record, ['schemaVersion', 'revision', 'baseText'])
+      && record.schemaVersion === GUEST_PROFILE_COMMIT_SCHEMA_VERSION
+      && validRevision(record.revision)
+      && typeof record.baseText === 'string'
+      && this.ownedOrphanBaseRows(record.baseText) !== null;
+  }
+
+  private ownedOrphanBaseRows(rawText: string): Map<string, StoredProfileRecord> | null {
+    let value: unknown;
+    try {
+      value = JSON.parse(rawText);
+    } catch {
+      return null;
+    }
+    if (!Array.isArray(value) || value.length > MAX_GUEST_PROFILES) return null;
+    const rows = new Map<string, StoredProfileRecord>();
+    for (const item of value) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+      const record = item as Record<string, unknown>;
+      if (!hasExactKeys(record, ['id', 'schemaVersion', 'name', 'nak', 'pada', 'lagna'])) {
+        return null;
+      }
+      if (
+        !validStoredId(record.id)
+        || rows.has(record.id)
+        || record.schemaVersion !== GUEST_PROFILE_SCHEMA_VERSION
+        || typeof record.name !== 'string'
+        || text(record.name) !== record.name
+        || !(record.nak === '' || canonical(record.nak, NAKSHATRA_NAMES) === record.nak)
+        || !(record.pada === '' || pada(record.pada) === record.pada)
+        || !(record.lagna === '' || canonical(record.lagna, RASI_NAMES) === record.lagna)
+        || !(record.name || record.nak || record.lagna)
+      ) return null;
+      rows.set(record.id, record as unknown as StoredProfileRecord);
+    }
+    return rows;
+  }
+
+  private isOwnedOrphanTransaction(
+    birthText: string | null,
+    commitText: string | null,
+  ): boolean {
+    if (!this.isOwnedOrphanBirthText(birthText) || !this.isOwnedOrphanCommitText(commitText)) {
+      return false;
+    }
+    if (birthText === null || commitText === null) return true;
+    const envelope = JSON.parse(birthText) as StoredBirthProfileEnvelope;
+    const commit = JSON.parse(commitText) as StoredProfileCommitMarker;
+    if (!envelope.revision || envelope.revision !== commit.revision) return false;
+    const rows = this.ownedOrphanBaseRows(commit.baseText);
+    if (!rows) return false;
+    return Object.entries(envelope.profiles).every(([id, extension]) => {
+      const row = rows.get(id);
+      return Boolean(row)
+        && extension.nakshatra === row!.nak
+        && extension.pada === row!.pada
+        && extension.lagna === row!.lagna;
+    });
+  }
+
   private parseStoredRows(rawText: string): unknown[] | null {
     try {
       const raw: unknown = JSON.parse(rawText);
@@ -629,7 +930,6 @@ export class GuestProfileStore {
 
     this.profiles = [];
     this.issue = 'malformed-storage';
-    this.persist();
     return null;
   }
 
@@ -659,17 +959,42 @@ export class GuestProfileStore {
     return false;
   }
 
-  private migrateStoredRows(raw: unknown[]): GuestProfile[] {
-    const seen = new Set<string>();
-    const migrated: GuestProfile[] = [];
+  private migrateStoredRows(raw: unknown[]): StoredProfileMigration {
+    const candidates: Array<{
+      record: Record<string, unknown>;
+      storedId: string | null;
+    }> = [];
+    const storedIdCounts = new Map<string, number>();
     for (const value of raw) {
-      if (migrated.length >= MAX_GUEST_PROFILES) break;
       if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
       const record = value as Record<string, unknown>;
       if (Number(record.schemaVersion) > GUEST_PROFILE_SCHEMA_VERSION) continue;
       if (!hasProfileContent(record)) continue;
-      const id = validStoredId(record.id) && !seen.has(record.id)
-        ? record.id
+      const preview = this.normalize({
+        source: 'manual',
+        name: record.name,
+        nakshatra: record.nakshatra ?? record.nak,
+        pada: record.pada,
+        lagna: record.lagna,
+      }, 'guest_validation');
+      if (!this.hasContent(preview)) continue;
+      const storedId = validStoredId(record.id) ? record.id : null;
+      candidates.push({ record, storedId });
+      if (storedId) storedIdCounts.set(storedId, (storedIdCounts.get(storedId) || 0) + 1);
+    }
+
+    const seen = new Set<string>();
+    const migrated: GuestProfile[] = [];
+    const extensionEligibleIds = new Set<string>();
+    const ambiguousStoredIds = new Set(
+      Array.from(storedIdCounts)
+        .filter(([, count]) => count > 1)
+        .map(([id]) => id),
+    );
+    for (const { record, storedId } of candidates) {
+      if (migrated.length >= MAX_GUEST_PROFILES) break;
+      const id = storedId && !seen.has(storedId)
+        ? storedId
         : this.freshId(seen);
       const profile = this.normalize({
         source: 'manual',
@@ -681,14 +1006,24 @@ export class GuestProfileStore {
       if (this.hasContent(profile)) {
         seen.add(id);
         migrated.push(profile);
+        if (storedId === id && storedIdCounts.get(storedId) === 1) {
+          extensionEligibleIds.add(id);
+        }
       }
     }
-    return migrated;
+    return {
+      profiles: migrated,
+      extensionEligibleIds,
+      ambiguousStoredIds,
+    };
   }
 
   private persist(): void {
     if (this.persistence === 'memory') return;
+    let wroteBase = false;
     try {
+      const revision = this.freshRevision();
+      const baseText = JSON.stringify(this.profiles.map(toStored));
       const extensions: Record<string, StoredBirthProfileRecord> = {};
       for (const profile of this.profiles) {
         const stored = toStoredBirthProfile(profile);
@@ -696,32 +1031,103 @@ export class GuestProfileStore {
       }
       const envelope: StoredBirthProfileEnvelope = {
         schemaVersion: GUEST_BIRTH_PROFILE_SCHEMA_VERSION,
+        revision,
         profiles: extensions,
       };
-      // Write the additive extension first. If the base write fails, a future
-      // load safely ignores the orphan extension rather than losing natal data.
+      const commit: StoredProfileCommitMarker = {
+        schemaVersion: GUEST_PROFILE_COMMIT_SCHEMA_VERSION,
+        revision,
+        baseText,
+      };
+      // The marker is the commit point. Readers ignore the birth envelope until
+      // both earlier writes match this exact revision and exact base payload.
+      this.storage.setItem(GUEST_PROFILE_STORAGE_KEY, baseText);
+      wroteBase = true;
       this.storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, JSON.stringify(envelope));
-      this.storage.setItem(
-        GUEST_PROFILE_STORAGE_KEY,
-        JSON.stringify(this.profiles.map(toStored)),
-      );
+      this.storage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, JSON.stringify(commit));
     } catch {
+      if (wroteBase && typeof this.storage.removeItem === 'function') {
+        for (const key of [
+          GUEST_BIRTH_PROFILE_STORAGE_KEY,
+          GUEST_PROFILE_COMMIT_STORAGE_KEY,
+        ]) {
+          try {
+            this.storage.removeItem(key);
+          } catch {
+            // A later load recognizes owned orphan bytes and keeps them
+            // detached; each remaining cleanup is still attempted.
+          }
+        }
+      }
       this.persistence = 'memory';
       this.issue = 'storage-unavailable';
     }
   }
 
-  private loadBirthProfileExtensions(initial: boolean): void {
+  private loadBirthProfileExtensions(
+    initial: boolean,
+    baseText: string,
+    migration: StoredProfileMigration,
+    baseHasUnsupportedRows: boolean,
+  ): BirthProfileLoadResult {
+    const noUpgrade: BirthProfileLoadResult = {
+      needsUpgrade: false,
+      suppressPersist: false,
+    };
     let rawText: string | null;
+    let commitText: string | null;
     try {
       rawText = this.storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY);
+      commitText = this.storage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
     } catch {
       this.persistence = 'memory';
       this.issue = 'storage-unavailable';
       if (initial) this.profiles = [];
-      return;
+      return { ...noUpgrade, suppressPersist: true };
     }
-    if (!rawText) return;
+
+    let commit: StoredProfileCommitMarker | null = null;
+    if (commitText) {
+      let value: unknown;
+      try {
+        value = JSON.parse(commitText);
+      } catch {
+        this.persistence = 'memory';
+        this.issue = 'unsupported-storage-version';
+        return { ...noUpgrade, suppressPersist: true };
+      }
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        this.persistence = 'memory';
+        this.issue = 'unsupported-storage-version';
+        return { ...noUpgrade, suppressPersist: true };
+      }
+      const record = value as Record<string, unknown>;
+      const keys = Object.keys(record);
+      if (
+        record.schemaVersion !== GUEST_PROFILE_COMMIT_SCHEMA_VERSION
+        || !validRevision(record.revision)
+        || typeof record.baseText !== 'string'
+        || keys.length !== 3
+        || !keys.every(key => ['schemaVersion', 'revision', 'baseText'].includes(key))
+      ) {
+        this.persistence = 'memory';
+        this.issue = 'unsupported-storage-version';
+        return { ...noUpgrade, suppressPersist: true };
+      }
+      commit = {
+        schemaVersion: GUEST_PROFILE_COMMIT_SCHEMA_VERSION,
+        revision: record.revision,
+        baseText: record.baseText,
+      };
+    }
+
+    if (!rawText) {
+      if (commit) {
+        this.issue = 'uncommitted-birth-storage';
+        return { ...noUpgrade, suppressPersist: true };
+      }
+      return noUpgrade;
+    }
 
     let value: unknown;
     try {
@@ -729,42 +1135,98 @@ export class GuestProfileStore {
     } catch {
       this.issue = 'malformed-birth-storage';
       this.clearBirthProfileExtensions();
-      return;
+      return { ...noUpgrade, suppressPersist: true };
     }
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
       this.issue = 'malformed-birth-storage';
       this.clearBirthProfileExtensions();
-      return;
+      return { ...noUpgrade, suppressPersist: true };
     }
     const envelope = value as Record<string, unknown>;
-    const version = Number(envelope.schemaVersion);
-    if (Number.isFinite(version) && version > GUEST_BIRTH_PROFILE_SCHEMA_VERSION) {
+    const version = envelope.schemaVersion;
+    if (typeof version !== 'number' || !Number.isFinite(version)) {
       this.persistence = 'memory';
       this.issue = 'unsupported-storage-version';
-      return;
+      return { ...noUpgrade, suppressPersist: true };
+    }
+    if (version > GUEST_BIRTH_PROFILE_SCHEMA_VERSION) {
+      this.persistence = 'memory';
+      this.issue = 'unsupported-storage-version';
+      return { ...noUpgrade, suppressPersist: true };
     }
     if (version !== GUEST_BIRTH_PROFILE_SCHEMA_VERSION
       || !envelope.profiles || typeof envelope.profiles !== 'object'
       || Array.isArray(envelope.profiles)) {
       this.issue = 'malformed-birth-storage';
       this.clearBirthProfileExtensions();
-      return;
+      return { ...noUpgrade, suppressPersist: true };
+    }
+
+    const envelopeKeys = envelope.revision === undefined
+      ? ['schemaVersion', 'profiles']
+      : ['schemaVersion', 'revision', 'profiles'];
+    if (!hasExactKeys(envelope, envelopeKeys)) {
+      this.persistence = 'memory';
+      this.issue = 'unsupported-storage-version';
+      return { ...noUpgrade, suppressPersist: true };
+    }
+    if (envelope.revision !== undefined && !validRevision(envelope.revision)) {
+      this.persistence = 'memory';
+      this.issue = 'unsupported-storage-version';
+      return { ...noUpgrade, suppressPersist: true };
     }
 
     const extensions = envelope.profiles as Record<string, unknown>;
+    if (baseHasUnsupportedRows && Object.keys(extensions).length > 0) {
+      return { ...noUpgrade, suppressPersist: true };
+    }
+
+    if (Object.values(extensions).some(extension => !isOwnedBirthProfileRecord(extension))) {
+      this.persistence = 'memory';
+      this.issue = 'unsupported-storage-version';
+      return { ...noUpgrade, suppressPersist: true };
+    }
+
+    const envelopeRevision = envelope.revision;
+    const isLegacyEnvelope = envelopeRevision === undefined && commit === null;
+    if (!isLegacyEnvelope) {
+      if (
+        !validRevision(envelopeRevision)
+        || !commit
+        || commit.revision !== envelopeRevision
+        || commit.baseText !== baseText
+      ) {
+        this.issue = 'uncommitted-birth-storage';
+        return { ...noUpgrade, suppressPersist: true };
+      }
+      this.lastRevision = commit.revision;
+    }
+
+    const extensionIds = Object.keys(extensions);
+    if (extensionIds.some(id =>
+      migration.ambiguousStoredIds.has(id)
+      || !migration.extensionEligibleIds.has(id))) {
+      this.persistence = 'memory';
+      this.issue = 'unsupported-storage-version';
+      return { ...noUpgrade, suppressPersist: true };
+    }
+
+    let extensionMismatch = false;
     this.profiles = this.profiles.map(profile => {
       const extension = extensions[profile.id];
-      if (!extension || typeof extension !== 'object' || Array.isArray(extension)) return profile;
-      const record = extension as Record<string, unknown>;
-      // The base row is written after the extension. A write that failed
-      // between those two operations can leave a newer extension beside an
-      // older base row. Only combine them when their derived fields agree.
+      if (!extension) return profile;
+      const record = extension as StoredBirthProfileRecord;
+      // Revision and exact-base checks establish the committed snapshot. Keep
+      // the derived-field guard as defense in depth before joining both keys.
       if (
         record.nakshatra !== profile.nakshatra
         || Number(record.pada) !== profile.pada
         || record.lagna !== profile.lagna
-      ) return profile;
-      return this.normalize({
+      ) {
+        extensionMismatch = true;
+        return profile;
+      }
+      const combined = this.normalize({
         source: record.source,
         name: profile.name,
         nakshatra: profile.nakshatra,
@@ -775,7 +1237,20 @@ export class GuestProfileStore {
         natalChart: record.natalChart,
         calculation: record.calculation,
       }, profile.id);
+      if (combined.source !== 'birth-details') {
+        extensionMismatch = true;
+        return profile;
+      }
+      return combined;
     });
+    if (extensionMismatch) {
+      this.issue = 'uncommitted-birth-storage';
+      return { ...noUpgrade, suppressPersist: true };
+    }
+    return {
+      needsUpgrade: isLegacyEnvelope,
+      suppressPersist: false,
+    };
   }
 
   private clearBirthProfileExtensions(): void {
@@ -786,6 +1261,7 @@ export class GuestProfileStore {
         profiles: {},
       };
       this.storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, JSON.stringify(empty));
+      this.storage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, '');
     } catch {
       this.persistence = 'memory';
       this.issue = 'storage-unavailable';

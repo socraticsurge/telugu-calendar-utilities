@@ -1,5 +1,7 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi, type Mock } from 'vitest';
 import {
+  GUEST_BIRTH_PROFILE_STORAGE_KEY,
+  GUEST_PROFILE_COMMIT_STORAGE_KEY,
   GUEST_PROFILE_STORAGE_KEY,
   createGuestProfileStore,
   type GuestProfileStore,
@@ -35,6 +37,7 @@ interface TarabalamPanelModule {
   tbAddRow(): void;
   tbProfiles(): Participant[];
   tbRenderProfileInputs(): void;
+  tbRemoveRow(index: number): void;
   tbSaveProfiles(): void;
   tbResetProfiles(): void;
 }
@@ -551,5 +554,57 @@ describe('Muhurtam saved-profile participants', () => {
       id: 'guest_alpha', name: 'Alpha updated', nak: 'Rohini', pada: 2,
       rasi: 'Vrishabha', lagna: 'Karka',
     }]);
+  });
+
+  test('fails closed for controller-absent mutations and reserves deletion for reset all', () => {
+    const base = JSON.stringify([{
+      id: 'guest_fallback_birth', schemaVersion: 1, name: 'Anu',
+      nak: 'Rohini', pada: 2, lagna: 'Karka',
+    }]);
+    const birthBytes = '{"sensitive":{"opaque":"keep-exactly"}}';
+    const commitBytes = '{"committed":{"opaque":"keep-exactly"}}';
+    localStorage.setItem(GUEST_PROFILE_STORAGE_KEY, base);
+    localStorage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, birthBytes);
+    localStorage.setItem(GUEST_PROFILE_COMMIT_STORAGE_KEY, commitBytes);
+    panel.tbRenderProfileInputs();
+    document.querySelector<HTMLInputElement>('#tb-name-0')!.value = 'Edited';
+    const originalRows = document.querySelectorAll('.tb-profile-row').length;
+
+    panel.tbSaveProfiles();
+    panel.tbAddRow();
+    panel.tbRemoveRow(0);
+    expect(localStorage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(base);
+    expect(localStorage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(birthBytes);
+    expect(localStorage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBe(commitBytes);
+    expect(document.querySelectorAll('.tb-profile-row')).toHaveLength(originalRows);
+
+    const removeItem = vi.spyOn(browserStorage, 'removeItem');
+    panel.tbResetProfiles();
+    expect(removeItem.mock.calls).toEqual([
+      [GUEST_BIRTH_PROFILE_STORAGE_KEY],
+      [GUEST_PROFILE_COMMIT_STORAGE_KEY],
+      [GUEST_PROFILE_STORAGE_KEY],
+    ]);
+    expect(localStorage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBeNull();
+    expect(localStorage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY)).toBeNull();
+    expect(localStorage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBeNull();
+  });
+
+  test('keeps controller-absent mutation inert when storage reads are denied', () => {
+    const setItem = vi.fn();
+    const removeItem = vi.fn();
+    vi.stubGlobal('localStorage', {
+      getItem: () => { throw new DOMException('denied', 'SecurityError'); },
+      setItem,
+      removeItem,
+    });
+    const originalRows = document.querySelectorAll('.tb-profile-row').length;
+
+    expect(() => panel.tbSaveProfiles()).not.toThrow();
+    expect(() => panel.tbAddRow()).not.toThrow();
+    expect(() => panel.tbRemoveRow(0)).not.toThrow();
+    expect(setItem).not.toHaveBeenCalled();
+    expect(removeItem).not.toHaveBeenCalled();
+    expect(document.querySelectorAll('.tb-profile-row')).toHaveLength(originalRows);
   });
 });

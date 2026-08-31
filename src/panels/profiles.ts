@@ -8,6 +8,7 @@ import {
 } from '../lib/birth-profile-api';
 import {
   GUEST_BIRTH_PROFILE_STORAGE_KEY,
+  GUEST_PROFILE_COMMIT_STORAGE_KEY,
   GUEST_PROFILE_SCHEMA_VERSION,
   GUEST_PROFILE_STORAGE_KEY,
   MAX_GUEST_PROFILES,
@@ -62,6 +63,7 @@ export function listenForGuestProfileStorageChanges(
       event.key !== null
       && event.key !== GUEST_PROFILE_STORAGE_KEY
       && event.key !== GUEST_BIRTH_PROFILE_STORAGE_KEY
+      && event.key !== GUEST_PROFILE_COMMIT_STORAGE_KEY
     ) return;
     store.reload();
   };
@@ -109,6 +111,9 @@ function issueMessage(snapshot: GuestProfileSnapshot): string | null {
   }
   if (snapshot.issue === 'malformed-birth-storage') {
     return 'Saved birth calculations were damaged and have been removed. Your names and manual astrology details are still available.';
+  }
+  if (snapshot.issue === 'uncommitted-birth-storage') {
+    return 'A saved birth calculation could not be verified and was not attached. Your manual profile details remain available; your saved browser data was not overwritten.';
   }
   if (snapshot.issue === 'unsupported-storage-version') {
     return 'These profiles use a newer or unrecognized format. Changes on this page last only for this session; your saved browser data was not overwritten.';
@@ -521,6 +526,29 @@ export function initProfilesPanel(
     const notice = element('div', 'profiles-notice profiles-notice--warning', message);
     notice.setAttribute('role', 'alert');
     notice.dataset.profileIssue = snapshot.issue || snapshot.persistence;
+    if (
+      snapshot.issue === 'uncommitted-birth-storage'
+      && store.canDiscardUncommittedStorage()
+    ) {
+      const discard = button(
+        'Remove incomplete saved data',
+        'profiles-button profiles-button--quiet',
+      );
+      discard.dataset.action = 'discard-uncommitted-storage';
+      discard.addEventListener('click', () => {
+        createConfirmDialog({
+          title: 'Remove incomplete saved data?',
+          description: 'This removes the incomplete local profile transaction so you can save profiles in this browser again. This action cannot be undone.',
+          confirmLabel: 'Remove incomplete data',
+          trigger: discard,
+          onConfirm: () => {
+            store.discardUncommittedStorage();
+            restoreFocus(root);
+          },
+        });
+      });
+      notice.append(discard);
+    }
     return notice;
   };
 
