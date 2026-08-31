@@ -38,6 +38,13 @@ site is a searchable projection, not a second documentation store.
     and limitations.</p>
   </div>
   <div class="reference-path">
+    <strong>Verify a birth profile</strong>
+    <p>Follow the exact inputs, Moon-longitude formulas, Lahiri and Whole Sign
+    conventions, D1 chart projection, privacy boundary, reproduction fixtures,
+    and public-release gates in <a href="./reference/53-birth-profile-calculation">Birth
+    profiles and the D1 chart</a>.</p>
+  </div>
+  <div class="reference-path">
     <strong>Contribute safely</strong>
     <p>Follow the <a href="./reference/10-computation-contributor-workflow">safe
     computation workflow</a> to choose an additive owner and recognize the

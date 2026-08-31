@@ -169,6 +169,11 @@
         "reason": "Analytics event delivery only."
       },
       {
+        "path": "src/lib/birth-profile-api.ts",
+        "kind": "adapter",
+        "reason": "Validates and transports the externally owned DashaFlow birth-profile contract; it does not own the astronomical calculation."
+      },
+      {
         "path": "src/lib/dom.ts",
         "kind": "ui-only",
         "reason": "DOM utilities only."
@@ -197,6 +202,11 @@
         "path": "src/lib/profile-selection.ts",
         "kind": "ui-only",
         "reason": "Stable browser-local journey selection and compatibility migration; it owns no Panchangam computation."
+      },
+      {
+        "path": "src/lib/remote-calculation-activation.ts",
+        "kind": "adapter",
+        "reason": "Fail-closed public and loopback-development activation policy for the birth-profile adapter; it owns no astrological calculation."
       },
       {
         "path": "src/lib/ics.ts",

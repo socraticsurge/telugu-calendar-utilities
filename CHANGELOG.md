@@ -9,6 +9,16 @@ PyPI version tracks this file's most recent release entry.
 
 ### Changed
 
+- Add browser-local guest profiles with manual entry, optional birth-derived
+  Nakshatra, Padam, Janma Rashi, Lagna and D1 review, stable reuse in Daily
+  Horoscope and Muhurtam, and non-destructive calculated-profile detail views.
+- Fail public birth-profile network calculation closed unless
+  `VITE_BIRTH_PROFILE_API_ENABLED` is the exact string `true`. Loopback keeps
+  the absent-flag development default; public requests use only the canonical
+  Astro Chaganti HTTPS guest gateway, while saved calculations stay viewable
+  and manual profile entry remains available.
+- Keep the established 79-module computation-layer contract unchanged while
+  reporting four profile/activation modules as additive feature sources.
 - Align the dependency security gate with the environment installed from the
   same `requirements.txt` input used by CI and release workflows, and refresh
   the separate Python 3.11 reproducibility snapshot with current dependency

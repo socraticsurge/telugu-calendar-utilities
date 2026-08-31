@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
+  GUEST_BIRTH_PROFILE_SCHEMA_VERSION,
+  GUEST_BIRTH_PROFILE_STORAGE_KEY,
   GUEST_PROFILE_SCHEMA_VERSION,
   GUEST_PROFILE_STORAGE_KEY,
   GuestProfileStoreError,
@@ -11,6 +13,7 @@ import {
   readLegacyGuestProfileRows,
   writeLegacyGuestProfileRows,
   type GuestProfile,
+  type GuestProfileDraft,
   type ProfileStorage,
 } from '../lib/guest-profile-store';
 
@@ -37,6 +40,45 @@ function rawProfiles(): unknown[] {
   return JSON.parse(storage.getItem(GUEST_PROFILE_STORAGE_KEY) || '[]');
 }
 
+function birthProfileDraft(name = 'Anu'): GuestProfileDraft {
+  const rashis = [
+    'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
+    'Kanya', 'Tula', 'Vrischika', 'Dhanu',
+  ];
+  return {
+    source: 'birth-details',
+    name,
+    nakshatra: 'Rohini',
+    pada: 2,
+    lagna: 'Karka',
+    janmaRasi: 'Vrishabha',
+    birthDetails: {
+      dateOfBirth: '1990-05-12',
+      timeOfBirth: '14:35',
+      placeLabel: 'Vijayawada, Andhra Pradesh, India',
+      latitude: 16.5062,
+      longitude: 80.648,
+      timezone: 'Asia/Kolkata',
+    },
+    natalChart: {
+      lagnaDegree: 12.345,
+      planets: rashis.map((rashi, index) => ({
+        name: ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'][index],
+        rashi,
+        degree: index + 0.25,
+        house: index + 1,
+        retrograde: index === 6,
+      })),
+    },
+    calculation: {
+      contractVersion: '1.0',
+      engine: {
+        name: 'DashaFlow', version: '1.0.0', ayanamsha: 'Lahiri', ephemeris: 'moshier',
+      },
+    },
+  };
+}
+
 beforeEach(() => { storage = new MemoryStorage(); });
 
 describe('legacy migration', () => {
@@ -55,18 +97,28 @@ describe('legacy migration', () => {
       {
         id: 'guest_profile_1',
         schemaVersion: GUEST_PROFILE_SCHEMA_VERSION,
+        source: 'manual',
         name: 'Vinay',
         nakshatra: 'Krittika',
         pada: 2,
         lagna: 'Mesha',
+        janmaRasi: 'Vrishabha',
+        birthDetails: null,
+        natalChart: null,
+        calculation: null,
       },
       {
         id: 'guest_profile_2',
         schemaVersion: GUEST_PROFILE_SCHEMA_VERSION,
+        source: 'manual',
         name: 'Name only',
         nakshatra: null,
         pada: null,
         lagna: null,
+        janmaRasi: null,
+        birthDetails: null,
+        natalChart: null,
+        calculation: null,
       },
     ]);
     expect(rawProfiles()).toEqual([
@@ -264,6 +316,139 @@ describe('CRUD and subscriptions', () => {
 
     expect(profile.name).toBe(name);
     expect((rawProfiles()[0] as { name: string }).name).toBe(name);
+  });
+});
+
+describe('birth profile extension storage', () => {
+  test('keeps the legacy base row compatible while round-tripping birth details and chart provenance', () => {
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_birth_profile'),
+    });
+    const created = store.create(birthProfileDraft());
+
+    expect(created).toMatchObject({
+      source: 'birth-details',
+      nakshatra: 'Rohini',
+      pada: 2,
+      janmaRasi: 'Vrishabha',
+      lagna: 'Karka',
+      birthDetails: { timezone: 'Asia/Kolkata' },
+      calculation: { contractVersion: '1.0' },
+    });
+    expect(rawProfiles()).toEqual([{
+      id: 'guest_birth_profile', schemaVersion: 1, name: 'Anu',
+      nak: 'Rohini', pada: 2, lagna: 'Karka',
+    }]);
+
+    const extension = JSON.parse(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    expect(extension).toMatchObject({
+      schemaVersion: GUEST_BIRTH_PROFILE_SCHEMA_VERSION,
+      profiles: {
+        guest_birth_profile: {
+          source: 'birth-details',
+          nakshatra: 'Rohini',
+          pada: 2,
+          lagna: 'Karka',
+          janmaRasi: 'Vrishabha',
+          birthDetails: { placeLabel: 'Vijayawada, Andhra Pradesh, India' },
+          natalChart: { lagnaDegree: 12.345 },
+          calculation: { engine: { name: 'DashaFlow' } },
+        },
+      },
+    });
+
+    const reloaded = createGuestProfileStore(storage, {
+      idFactory: () => { throw new Error('stable row should not need a new ID'); },
+    });
+    expect(reloaded.get('guest_birth_profile')).toEqual(created);
+  });
+
+  test('removes the birth extension when a profile is intentionally converted to manual entry', () => {
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_birth_manual'),
+    });
+    const created = store.create(birthProfileDraft());
+    const updated = store.update(created.id, {
+      source: 'manual',
+      nakshatra: 'Hasta',
+      pada: 3,
+      lagna: 'Kanya',
+    });
+
+    expect(updated).toMatchObject({
+      source: 'manual', birthDetails: null, natalChart: null, calculation: null,
+    });
+    const extension = JSON.parse(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}');
+    expect(extension.profiles).toEqual({});
+  });
+
+  test('recovers malformed extension data without deleting the compatible base profile', () => {
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify([{
+      id: 'guest_birth_damage', schemaVersion: 1, name: 'Anu',
+      nak: 'Rohini', pada: 2, lagna: 'Karka',
+    }]));
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, '{broken');
+
+    const store = createGuestProfileStore(storage);
+
+    expect(store.getSnapshot()).toMatchObject({
+      issue: 'malformed-birth-storage',
+      profiles: [{ id: 'guest_birth_damage', source: 'manual', name: 'Anu' }],
+    });
+    expect(JSON.parse(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}')).toEqual({
+      schemaVersion: GUEST_BIRTH_PROFILE_SCHEMA_VERSION,
+      profiles: {},
+    });
+  });
+
+  test('does not combine a partially written extension with stale derived base fields', () => {
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify([{
+      id: 'guest_partial_write', schemaVersion: 1, name: 'Anu',
+      nak: 'Rohini', pada: 2, lagna: 'Karka',
+    }]));
+    const temporary = new MemoryStorage();
+    const sourceStore = createGuestProfileStore(temporary, {
+      idFactory: ids('guest_partial_write'),
+    });
+    sourceStore.create({
+      ...birthProfileDraft(),
+      nakshatra: 'Hasta',
+      pada: 3,
+      lagna: 'Kanya',
+      janmaRasi: 'Kanya',
+    });
+    storage.setItem(
+      GUEST_BIRTH_PROFILE_STORAGE_KEY,
+      temporary.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '',
+    );
+
+    const store = createGuestProfileStore(storage);
+    expect(store.get('guest_partial_write')).toMatchObject({
+      source: 'manual',
+      nakshatra: 'Rohini',
+      pada: 2,
+      lagna: 'Karka',
+      birthDetails: null,
+    });
+  });
+
+  test('preserves a future birth-extension envelope byte-for-byte', () => {
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify([{
+      id: 'guest_birth_future', schemaVersion: 1, name: 'Future',
+      nak: 'Rohini', pada: 2, lagna: 'Karka',
+    }]));
+    const future = JSON.stringify({
+      schemaVersion: 2,
+      profiles: { guest_birth_future: { future: true } },
+    });
+    storage.setItem(GUEST_BIRTH_PROFILE_STORAGE_KEY, future);
+
+    const store = createGuestProfileStore(storage);
+    expect(store.getSnapshot()).toMatchObject({
+      persistence: 'memory', issue: 'unsupported-storage-version',
+    });
+    store.update('guest_birth_future', { name: 'Session only' });
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toBe(future);
   });
 });
 

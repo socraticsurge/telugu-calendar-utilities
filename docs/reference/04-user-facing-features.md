@@ -140,15 +140,28 @@ Everything is shareable to WhatsApp.
 ### Guest profiles and local data
 
 Guests can save up to **four profiles** for reuse in Daily Horoscope and
-Muhurtam. The Profiles destination supports create, edit, delete, and clear-all
-actions. A saved profile contains:
+Muhurtam. Manual entry is always available. On localhost, or in a public build
+that explicitly enables the remote calculation capability, the default flow
+accepts name, exact date/time of birth, and a selected birthplace. After an
+explicit calculation, it shows Nakshatra, Padam, Janma Rashi, Lagna, a South
+Indian D1 chart, an accessible graha table, and the calculation method before
+anything is saved.
+
+The Profiles destination supports create, edit, delete, and clear-all actions.
+Recalculation and editing of a calculated profile are available only while the
+birth-calculation capability is active. When it is inactive, an already-saved
+calculated profile remains viewable and usable and is never converted into a
+manual profile. A saved profile can contain:
 
 | Field | Purpose and readiness |
 |-------|-----------------------|
 | **Name** | Required display label for recognizing the person. |
-| **Nakshatra** | Optional while drafting; required for Muhurtam and for deriving the Daily Horoscope's Janma Rashi. |
+| **Date, time, and selected birthplace** | Used by calculated profiles to reproduce the birth instant and location-dependent Lagna. |
+| **Nakshatra** | Calculated from the sidereal Moon longitude, or supplied manually; required for Muhurtam and for deriving the Daily Horoscope's Janma Rashi. |
 | **Padam** | Optional for Muhurtam; needed for Daily Horoscope only when the selected Nakshatra spans two Rashis. |
-| **Lagna** | Optional; used only by journeys that support a Lagna view. |
+| **Janma Rashi** | Calculated from Chandra with the disclosed sidereal convention. |
+| **Lagna** | Calculated from the exact birth instant and selected coordinates; it remains optional in a manual profile. |
+| **D1 chart and provenance** | Nine graha positions, Whole Sign houses, contract version, engine version, Lahiri ayanamsha, and the actual reported ephemeris. |
 
 A profile is **Muhurtam-ready** once it has a Nakshatra. It is **Daily
 Horoscope-ready** once its Janma Rashi can be derived from the Nakshatra, with
@@ -156,17 +169,34 @@ Padam supplied for a Nakshatra that crosses a Rashi boundary. Contextual create
 and edit actions return to the originating journey; a one-off Muhurtam person
 can remain limited to that search instead of becoming a saved profile.
 
-Profiles are stored only in this browser's origin-scoped `localStorage`. Anyone
-using the same browser profile and site origin can see them. They are isolated
-from other browsers, devices, domains, protocols, and ports (including a local
-test server running on a different port). Clearing site data or deleting a
-profile is permanent, and private-browsing storage may disappear when the
-private session ends. There is no account, cloud sync, cross-device transfer,
-or recovery.
+Profiles are stored only in this browser's origin-scoped `localStorage`. The
+name never leaves the browser. Place search sends the submitted city/town text;
+calculation sends the date, time, selected coordinates, and IANA timezone to a
+stateless Astro Chaganti gateway and authenticated DashaFlow sidecar. See the
+[full calculation and privacy contract](53-birth-profile-calculation.md).
+
+Public builds fail closed by default. `VITE_BIRTH_PROFILE_API_ENABLED=true`
+is the only public opt-in, and `true` must be the exact, case-sensitive string;
+whitespace, alternate casing, empty and malformed values disable calculation.
+An absent flag enables calculation only on `localhost`, `127.0.0.1`, or
+`[::1]`. Public pages always route through the canonical
+`https://astrochaganti.com/api/guest` HTTPS gateway and ignore loopback or
+arbitrary base overrides. The client flag controls presentation and requests;
+independent server-side activation remains mandatory and blocked pending the
+licensing and place-provider decisions tracked in
+[#231](https://github.com/socraticsurge/telugu-calendar-utilities/issues/231)
+and [#233](https://github.com/socraticsurge/telugu-calendar-utilities/issues/233).
+
+Anyone using the same browser profile and site origin can see the saved data.
+It is isolated from other browsers, devices, domains, protocols, and ports
+(including a local test server running on a different port). Clearing site data
+or deleting a profile is permanent, and private-browsing storage may disappear
+when the private session ends. There is no account, cloud sync, cross-device
+transfer, or recovery.
 
 GoatCounter may receive fixed, content-free interface events. Analytics must
-never receive profile names, Nakshatra, Padam, Lagna, profile IDs, or stored
-journey selections.
+never receive profile names, birth details, coordinates, Nakshatra, Padam,
+Lagna, chart data, profile IDs, or stored journey selections.
 
 > MCP remains the complete computational interface. The website intentionally
 > presents a curated devotee-facing subset; its declared activity catalogue and

@@ -23,6 +23,7 @@ Install (one-time, ~120 MB):
 from __future__ import annotations
 
 import http.server
+import json
 import shutil
 import socket
 import socketserver
@@ -522,6 +523,59 @@ def test_guest_profiles_and_consumers_are_responsive_safe_and_ordered(
         assert 'Muhurtam\nNeeds Nakshatra' in incomplete_text
         assert 'Daily Horoscope\nNeeds Nakshatra' in incomplete_text
         assert profiles_panel.locator('img').count() == 0
+
+        # A manual profile has a real detail destination, but it must not imply
+        # that birth data, a natal chart, or calculation provenance exists.
+        manual_view = ready.get_by_role(
+            'button', name=f'View {HOSTILE_PROFILE_NAME}', exact=True,
+        )
+        _assert_visible_targets_are_44px(manual_view, 'profile View action')
+        manual_view.click()
+        assert profiles_panel.get_by_role(
+            'heading', name=HOSTILE_PROFILE_NAME, exact=True,
+        ).is_visible()
+        assert page.evaluate('document.activeElement.id') == 'profiles-title'
+        page.keyboard.press('Tab')
+        assert page.evaluate(
+            "document.activeElement?.textContent?.trim()"
+        ) == 'Back to profiles'
+        detail_text = profiles_panel.inner_text()
+        assert 'Rohini' in detail_text
+        assert 'Kanya' in detail_text
+        assert 'Muhurtam' in detail_text
+        assert 'Daily Horoscope' in detail_text
+        assert (
+            'Natal chart and calculation details are available only for '
+            'profiles calculated from birth details.'
+        ) in detail_text
+        assert profiles_panel.locator('[role="img"][aria-label*="D1"]').count() == 0
+        assert profiles_panel.locator('table').count() == 0
+        assert profiles_panel.get_by_role(
+            'link', name='How this is calculated and verified', exact=True,
+        ).count() == 0
+        _assert_visible_targets_are_44px(
+            profiles_panel.locator('button'), 'profile detail actions',
+        )
+        _assert_no_horizontal_overflow(page, 'Manual profile detail')
+        profiles_panel.get_by_role(
+            'button', name='Back to profiles', exact=True,
+        ).click()
+        assert page.evaluate(
+            "document.activeElement?.dataset.action === 'view-profile' && "
+            "document.activeElement?.closest('[data-profile-id]')?.dataset.profileId "
+            "=== 'guest_ready_001'"
+        )
+
+        privacy_box = profiles_panel.locator('.profiles-privacy').bounding_box()
+        roster_title_box = profiles_panel.locator(
+            '.profiles-roster__title'
+        ).bounding_box()
+        assert privacy_box is not None
+        assert roster_title_box is not None
+        intro_to_roster_gap = roster_title_box['y'] - (
+            privacy_box['y'] + privacy_box['height']
+        )
+        assert intro_to_roster_gap >= 24
         _assert_visible_targets_are_44px(
             profiles_panel.locator('button'), 'Profiles',
         )
@@ -539,6 +593,9 @@ def test_guest_profiles_and_consumers_are_responsive_safe_and_ordered(
             )
         profiles_panel.get_by_role(
             'button', name='Create another profile', exact=True,
+        ).click()
+        profiles_panel.get_by_role(
+            'button', name='Enter astrology details manually', exact=True,
         ).click()
         profiles_panel.locator('button[type="submit"]').click()
         assert profiles_panel.locator('#profile-name-error').is_visible()
@@ -643,6 +700,247 @@ def test_guest_profiles_and_consumers_are_responsive_safe_and_ordered(
         f'profile surfaces raised page errors at {width}x{height}: '
         f'{app_errors[:3]}'
     )
+
+
+def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
+    docs_server, browser,
+):
+    """Exercise the default birth-details path against a mocked gateway.
+
+    This verifies the deployed browser bundle, CORS-shaped network boundary,
+    review chart, local persistence and both existing profile consumers without
+    sending synthetic birth data to a live service.
+    """
+    page = browser.new_page(viewport={'width': 1024, 'height': 900})
+    captured = _capture_console(page)
+    calls = []
+    allowed_origin = docs_server
+
+    planets = [
+        {
+            'name': name,
+            'rashi': rashi,
+            'degree': index + 0.25,
+            'house': index + 1,
+            'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
+        }
+        for index, (name, rashi) in enumerate((
+            ('Surya', 'Mesha'), ('Chandra', 'Vrishabha'),
+            ('Kuja', 'Mithuna'), ('Budha', 'Karka'), ('Guru', 'Simha'),
+            ('Shukra', 'Kanya'), ('Shani', 'Tula'),
+            ('Rahu', 'Vrischika'), ('Ketu', 'Dhanu'),
+        ))
+    ]
+
+    def fulfill_guest_gateway(route):
+        request = route.request
+        headers = {
+            'Access-Control-Allow-Origin': allowed_origin,
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Cache-Control': 'private, no-store',
+        }
+        if request.method == 'OPTIONS':
+            route.fulfill(status=204, headers=headers, body='')
+            return
+        payload = request.post_data_json
+        calls.append((request.url, payload))
+        if request.url.endswith('/places/search'):
+            body = {
+                'data': {
+                    'results': [{
+                        'id': 'osm:hyderabad',
+                        'label': 'Hyderabad, Telangana, India',
+                        'latitude': 17.385,
+                        'longitude': 78.4867,
+                        'timezone': 'Asia/Kolkata',
+                    }],
+                    'attribution': 'OpenStreetMap contributors',
+                },
+            }
+        else:
+            body = {
+                'contract_version': '1.0',
+                'engine': {
+                    'name': 'DashaFlow',
+                    'version': '1.1.0',
+                    'ayanamsha': 'Lahiri',
+                    'ephemeris': 'moshier',
+                },
+                'data': {
+                    'nakshatra': 'Rohini',
+                    'pada': 2,
+                    'janma_rashi': 'Vrishabha',
+                    'lagna': 'Simha',
+                    'lagna_degree': 4.69,
+                    'planets': planets,
+                },
+            }
+        route.fulfill(
+            status=200,
+            headers=headers,
+            content_type='application/json',
+            body=json.dumps(body),
+        )
+
+    _keep_profile_smoke_offline(page)
+    page.route(
+        'http://127.0.0.1:3000/api/guest/**',
+        fulfill_guest_gateway,
+    )
+    try:
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        page.evaluate('localStorage.clear()')
+        page.reload(wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        page.evaluate("window.switchTool('profiles')")
+
+        panel = page.locator('#card-profiles')
+        panel.get_by_role('button', name='Create profile', exact=True).click()
+        page.fill('#profile-name', 'Browser Ananya')
+        page.fill('#profile-birth-date', '1990-04-15')
+        page.fill('#profile-birth-time', '14:30')
+        page.fill('#profile-birth-place', 'Hyderabad')
+        panel.get_by_role('button', name='Find place', exact=True).click()
+        place_choice = panel.locator('.profiles-place-results__choice')
+        place_choice.wait_for(state='visible')
+        assert 'Hyderabad, Telangana, India' in place_choice.inner_text()
+        place_choice.click()
+        panel.get_by_role('button', name='Calculate details', exact=True).click()
+        panel.locator('.profiles-birth-review').wait_for(state='visible')
+
+        assert panel.locator('.profiles-birth-facts').inner_text().find('Rohini') >= 0
+        assert panel.locator('.profiles-chart__cell').count() == 12
+        assert panel.locator('.profiles-chart-table tbody tr').count() == 9
+        reference = panel.get_by_role(
+            'link', name='How this is calculated and verified', exact=True,
+        )
+        assert reference.get_attribute('href') == (
+            '/docs/reference/53-birth-profile-calculation'
+        )
+        assert calls[0][1] == {'query': 'Hyderabad'}
+        assert calls[1][1] == {
+            'date_of_birth': '1990-04-15',
+            'time_of_birth': '14:30',
+            'latitude': 17.385,
+            'longitude': 78.4867,
+            'timezone': 'Asia/Kolkata',
+        }
+        assert 'name' not in calls[1][1]
+
+        panel.get_by_role(
+            'button', name='Save calculated profile', exact=True,
+        ).click()
+        assert 'Calculated from birth details' in panel.inner_text()
+        extension = page.evaluate(
+            "JSON.parse(localStorage.getItem('tc-birth-profile-data'))"
+        )
+        saved_extension = next(iter(extension['profiles'].values()))
+        assert saved_extension['birthDetails']['placeLabel'] == (
+            'Hyderabad, Telangana, India'
+        )
+
+        page.reload(wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        page.evaluate("window.switchTool('profiles')")
+        assert panel.locator('[data-profile-id]').filter(
+            has_text='Browser Ananya'
+        ).is_visible()
+
+        # Viewing a saved result is a read-only path: it reuses the persisted
+        # calculation, renders its evidence, and performs no new gateway call.
+        calls_before_view = list(calls)
+        url_before_view = page.url
+        storage_before_view = page.evaluate("""() => ({
+            roster: localStorage.getItem('tc-tb-profiles'),
+            birth: localStorage.getItem('tc-birth-profile-data'),
+        })""")
+        saved_row = panel.locator('[data-profile-id]').filter(
+            has_text='Browser Ananya'
+        )
+        saved_row.get_by_role(
+            'button', name='View Browser Ananya', exact=True,
+        ).click()
+
+        assert panel.get_by_role(
+            'heading', name='Browser Ananya', exact=True,
+        ).is_visible()
+        saved_detail = panel.inner_text()
+        for expected in (
+            '1990-04-15', '14:30', 'Hyderabad, Telangana, India',
+            'Asia/Kolkata', 'Rohini', 'Vrishabha', 'Simha',
+            'DashaFlow 1.1.0', 'Lahiri ayanamsha', 'moshier ephemeris',
+            'contract 1.0',
+        ):
+            assert expected in saved_detail
+        assert panel.locator(
+            '[role="img"][aria-label*="D1 Rashi chart"]'
+        ).count() == 1
+        chart_table = panel.get_by_role(
+            'table', name='Planet positions in the D1 Rashi chart', exact=True,
+        )
+        assert chart_table.locator('tbody tr').count() == 9
+        reference = panel.get_by_role(
+            'link', name='How this is calculated and verified', exact=True,
+        )
+        assert reference.get_attribute('href') == (
+            '/docs/reference/53-birth-profile-calculation'
+        )
+        assert page.url == url_before_view
+        assert calls == calls_before_view
+        assert page.evaluate("""() => ({
+            roster: localStorage.getItem('tc-tb-profiles'),
+            birth: localStorage.getItem('tc-birth-profile-data'),
+        })""") == storage_before_view
+        _assert_no_horizontal_overflow(page, 'Calculated profile detail')
+
+        page.set_viewport_size({'width': 320, 'height': 800})
+        page.wait_for_function("document.body.dataset.mode === 'mobile'")
+        assert panel.locator('.profiles-chart-table__hint').is_visible()
+        chart_text_size = panel.locator('.profiles-chart__rashi').first.evaluate(
+            'element => Number.parseFloat(getComputedStyle(element).fontSize)'
+        )
+        assert chart_text_size >= 11
+        _assert_no_horizontal_overflow(page, '320px calculated profile detail')
+        page.set_viewport_size({'width': 1024, 'height': 900})
+        page.wait_for_function("document.body.dataset.mode === 'desktop'")
+
+        panel.get_by_role(
+            'button', name='Back to profiles', exact=True,
+        ).click()
+        assert page.evaluate(
+            "document.activeElement?.dataset.action === 'view-profile' && "
+            "document.activeElement?.closest('[data-profile-id]')?.innerText"
+            ".includes('Browser Ananya')"
+        )
+        panel.get_by_role(
+            'button', name='View Browser Ananya', exact=True,
+        ).click()
+        panel.get_by_role('button', name='Edit profile', exact=True).click()
+        assert page.input_value('#profile-name') == 'Browser Ananya'
+        assert page.evaluate('document.activeElement.id') == 'profile-name'
+        panel.get_by_role('button', name='Cancel', exact=True).click()
+        assert calls == calls_before_view
+        assert page.evaluate("""() => ({
+            roster: localStorage.getItem('tc-tb-profiles'),
+            birth: localStorage.getItem('tc-birth-profile-data'),
+        })""") == storage_before_view
+
+        page.evaluate("window.switchTool('gochara')")
+        assert 'Browser Ananya' in page.locator('#go-view').inner_text()
+        page.evaluate("window.switchTool('tarabalam')")
+        result_row = page.locator('#tb-profiles [data-profile-id]').filter(
+            has_text='Browser Ananya'
+        )
+        assert result_row.is_visible()
+        assert not result_row.locator('input[data-profile-selection]').is_disabled()
+        assert page.evaluate('window.__hostileExecuted') is not True
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'birth-details profile surfaced errors: {app_errors[:3]}'
 
 
 def test_guest_profile_keyboard_order_and_native_confirmation(
@@ -763,6 +1061,9 @@ def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
         page_a.evaluate("window.switchTool('profiles')")
         panel_a = page_a.locator('#card-profiles')
         panel_a.get_by_role('button', name='Create profile', exact=True).click()
+        panel_a.get_by_role(
+            'button', name='Enter astrology details manually', exact=True,
+        ).click()
         page_a.fill('#profile-name', 'Unsaved local draft')
         assert page_a.evaluate('document.activeElement.id') == 'profile-name'
 
@@ -771,6 +1072,9 @@ def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
         page_b.evaluate("window.switchTool('profiles')")
         panel_b = page_b.locator('#card-profiles')
         panel_b.get_by_role('button', name='Create profile', exact=True).click()
+        panel_b.get_by_role(
+            'button', name='Enter astrology details manually', exact=True,
+        ).click()
         page_b.fill('#profile-name', 'External Ready')
         page_b.select_option('#profile-nakshatra', 'Rohini')
         panel_b.locator('button[type="submit"]').click()
@@ -939,6 +1243,9 @@ def test_daily_horoscope_contextual_profile_returns_and_stays_isolated(
         page.locator('[data-go-profile-action="create"]').click()
         assert page.locator('body').get_attribute('data-tool') == 'profiles'
 
+        page.get_by_role(
+            'button', name='Enter astrology details manually', exact=True,
+        ).click()
         page.fill('#profile-name', 'Browser Ananya')
         page.locator('button[type="submit"]').click()
         assert page.locator('#profile-nakshatra-error').is_visible()
@@ -989,6 +1296,9 @@ def test_muhurta_contextual_profile_preserves_task_and_other_journey(
         page.select_option('#mu-activity', 'wedding')
 
         page.locator('#tb-profiles [data-action="create-profile"]').click()
+        page.get_by_role(
+            'button', name='Enter astrology details manually', exact=True,
+        ).click()
         page.fill('#profile-name', 'Browser Ravi')
         page.locator('button[type="submit"]').click()
         assert page.locator('#profile-nakshatra-error').is_visible()

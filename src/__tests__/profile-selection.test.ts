@@ -39,10 +39,15 @@ function profile(
   return {
     id,
     schemaVersion: GUEST_PROFILE_SCHEMA_VERSION,
+    source: 'manual',
     name: id,
     nakshatra: 'Rohini',
     pada: null,
     lagna: null,
+    janmaRasi: 'Vrishabha',
+    birthDetails: null,
+    natalChart: null,
+    calculation: null,
     ...overrides,
   };
 }

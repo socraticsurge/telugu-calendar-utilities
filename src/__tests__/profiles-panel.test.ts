@@ -2,15 +2,22 @@
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
+  GUEST_BIRTH_PROFILE_STORAGE_KEY,
   GUEST_PROFILE_STORAGE_KEY,
   createGuestProfileStore,
   type GuestProfileStore,
   type ProfileStorage,
 } from '../lib/guest-profile-store';
+import type {
+  BirthPlaceCandidate,
+  BirthProfileDerivation,
+} from '../lib/birth-profile-api';
+import { BirthProfileApiError } from '../lib/birth-profile-api';
 import {
   initProfilesPanel,
   listenForGuestProfileStorageChanges,
   type ProfilesPanelController,
+  type ProfilesPanelOptions,
 } from '../panels/profiles';
 
 class MemoryStorage implements ProfileStorage {
@@ -56,6 +63,73 @@ function submit(): void {
   );
 }
 
+function chooseManualEntry(): void {
+  buttonNamed('Enter astrology details manually').click();
+}
+
+const VIJAYAWADA: BirthPlaceCandidate = {
+  id: 'osm:123',
+  label: 'Vijayawada, Andhra Pradesh, India',
+  latitude: 16.5062,
+  longitude: 80.648,
+  timezone: 'Asia/Kolkata',
+};
+
+function calculatedProfile(): BirthProfileDerivation {
+  const rashis = [
+    'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
+    'Kanya', 'Tula', 'Vrischika', 'Dhanu',
+  ];
+  return {
+    contractVersion: '1.0',
+    engine: {
+      name: 'DashaFlow', version: '1.1.0', ayanamsha: 'Lahiri', ephemeris: 'moshier',
+    },
+    nakshatra: 'Rohini',
+    pada: 2,
+    janmaRashi: 'Vrishabha',
+    lagna: 'Karka',
+    lagnaDegree: 12.345,
+    planets: rashis.map((rashi, index) => ({
+      name: ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'][index],
+      rashi,
+      degree: index + 0.25,
+      house: index + 1,
+      retrograde: index === 6,
+    })),
+  };
+}
+
+function installBirthApi(options: {
+  searchPlaces?: ReturnType<typeof vi.fn>;
+  deriveProfile?: ReturnType<typeof vi.fn>;
+} = {}): {
+  searchPlaces: ReturnType<typeof vi.fn>;
+  deriveProfile: ReturnType<typeof vi.fn>;
+} {
+  controller.destroy();
+  const searchPlaces = options.searchPlaces || vi.fn(async () => ({
+    results: [VIJAYAWADA],
+    attribution: 'OpenStreetMap contributors',
+  }));
+  const deriveProfile = options.deriveProfile || vi.fn(async () => calculatedProfile());
+  controller = initProfilesPanel(store, {
+    navigate,
+    searchPlaces: searchPlaces as NonNullable<ProfilesPanelOptions['searchPlaces']>,
+    deriveProfile: deriveProfile as NonNullable<ProfilesPanelOptions['deriveProfile']>,
+  });
+  return { searchPlaces, deriveProfile };
+}
+
+async function findAndSelectVijayawada(): Promise<void> {
+  inputValue('#profile-birth-place', 'Vijayawada');
+  buttonNamed('Find place').click();
+  await vi.waitFor(() => {
+    expect(document.querySelectorAll('.profiles-place-results__choice')).toHaveLength(1);
+  });
+  query<HTMLButtonElement>('.profiles-place-results__choice').click();
+}
+
 let storage: MemoryStorage;
 let store: GuestProfileStore;
 let controller: ProfilesPanelController;
@@ -75,6 +149,7 @@ beforeEach(() => {
 describe('Profiles panel CRUD', () => {
   test('creates and edits a reusable profile through labelled inline forms', () => {
     buttonNamed('Create profile').click();
+    chooseManualEntry();
     expect(document.activeElement).toBe(query('#profile-name'));
     expect(query<HTMLLabelElement>('label[for="profile-name"]').textContent).toBe('Name');
     expect(query<HTMLLabelElement>('label[for="profile-nakshatra"]').textContent).toBe('Nakshatra');
@@ -126,8 +201,318 @@ describe('Profiles panel CRUD', () => {
 
     const create = buttonNamed('Create another profile');
     expect(create.disabled).toBe(true);
+    expect(create.classList.contains('profiles-button--secondary')).toBe(true);
+    expect(create.classList.contains('profiles-button--primary')).toBe(false);
     expect(create.getAttribute('aria-describedby')).toBe('profiles-limit-message');
     expect(query('#profiles-limit-message').textContent).toContain('up to 4 profiles');
+  });
+});
+
+describe('birth-details profile journey', () => {
+  test('defaults to manual entry when public birth calculation is disabled', () => {
+    controller.destroy();
+    controller = initProfilesPanel(store, {
+      navigate,
+      birthCalculationEnabled: false,
+    });
+
+    buttonNamed('Create profile').click();
+
+    expect(query('.profiles-title').textContent).toBe('Create profile manually');
+    expect(document.querySelector('#profile-birth-date')).toBeNull();
+    expect(document.body.textContent).toContain(
+      'Birth-detail calculation is not active in this public build',
+    );
+    expect(document.body.textContent).not.toContain('Use birth details');
+    expect(query<HTMLSelectElement>('#profile-nakshatra')).toBeTruthy();
+  });
+
+  test('makes birth details the default and calculates a reviewable, local profile', async () => {
+    const { searchPlaces, deriveProfile } = installBirthApi();
+    buttonNamed('Create profile').click();
+
+    expect(query('.profiles-title').textContent).toBe('Create profile from birth details');
+    expect(buttonNamed('Use birth details').getAttribute('aria-pressed')).toBe('true');
+    expect(document.body.textContent).toContain('Your name always stays in this browser');
+    inputValue('#profile-name', 'Anu');
+    inputValue('#profile-birth-date', '1990-05-12');
+    inputValue('#profile-birth-time', '14:35');
+    await findAndSelectVijayawada();
+
+    expect(searchPlaces).toHaveBeenCalledWith('Vijayawada');
+    expect(store.getSnapshot().profiles).toHaveLength(0);
+    buttonNamed('Calculate details').click();
+    await vi.waitFor(() => {
+      expect(buttonNamed('Save calculated profile').disabled).toBe(false);
+    });
+
+    expect(deriveProfile).toHaveBeenCalledWith({
+      dateOfBirth: '1990-05-12',
+      timeOfBirth: '14:35',
+      latitude: 16.5062,
+      longitude: 80.648,
+      timezone: 'Asia/Kolkata',
+    });
+    expect(JSON.stringify(deriveProfile.mock.calls[0][0])).not.toContain('Anu');
+    expect(query('.profiles-birth-facts').textContent).toContain('NakshatraRohini');
+    expect(query('.profiles-birth-facts').textContent).toContain('Janma RashiVrishabha');
+    expect(document.querySelectorAll('.profiles-chart__cell')).toHaveLength(12);
+    expect(document.querySelectorAll('.profiles-chart-table tbody tr')).toHaveLength(9);
+    expect(query('.profiles-birth-review__method').textContent).toContain('Lahiri ayanamsha');
+    expect(query<HTMLAnchorElement>('.profiles-birth-review__reference').href).toBe(
+      'http://localhost:3000/docs/reference/53-birth-profile-calculation',
+    );
+    expect(store.getSnapshot().profiles).toHaveLength(0);
+
+    submit();
+    expect(store.getSnapshot().profiles[0]).toMatchObject({
+      source: 'birth-details',
+      name: 'Anu',
+      nakshatra: 'Rohini',
+      pada: 2,
+      janmaRasi: 'Vrishabha',
+      lagna: 'Karka',
+      birthDetails: {
+        placeLabel: 'Vijayawada, Andhra Pradesh, India',
+        timezone: 'Asia/Kolkata',
+      },
+      calculation: { engine: { name: 'DashaFlow', ephemeris: 'moshier' } },
+    });
+    expect(query('.profiles-roster__source').textContent).toBe('Calculated from birth details');
+    expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toContain('Vijayawada');
+  });
+
+  test('invalidates a reviewed calculation whenever a calculation input changes', async () => {
+    installBirthApi();
+    controller.openCreate();
+    inputValue('#profile-name', 'Anu');
+    inputValue('#profile-birth-date', '1990-05-12');
+    inputValue('#profile-birth-time', '14:35');
+    await findAndSelectVijayawada();
+    buttonNamed('Calculate details').click();
+    await vi.waitFor(() => expect(document.querySelector('.profiles-birth-review')).not.toBeNull());
+
+    inputValue('#profile-birth-date', '1990-05-13');
+
+    expect(document.querySelector('.profiles-birth-review')).toBeNull();
+    expect(buttonNamed('Save calculated profile').disabled).toBe(true);
+    expect(query('#profile-save-help').textContent).toContain('Calculate and review');
+  });
+
+  test('offers manual entry when exact birth time is unknown', () => {
+    installBirthApi();
+    controller.openCreate({ returnTo: 'tarabalam', requiredFor: 'muhurta' });
+
+    buttonNamed('Enter known astrology details instead').click();
+
+    expect(query('.profiles-title').textContent).toBe('Create profile manually');
+    expect(query<HTMLSelectElement>('#profile-nakshatra')).toBeTruthy();
+    expect(query('.profiles-form__intro').textContent).toContain('Padam and Lagna are optional');
+  });
+
+  test('shows a retryable place-search error without discarding entered birth details', async () => {
+    let attempt = 0;
+    const searchPlaces = vi.fn(async () => {
+      attempt += 1;
+      if (attempt === 1) {
+        throw new BirthProfileApiError(
+          'network',
+          'The calculation service is unavailable. Check your connection and try again.',
+        );
+      }
+      return { results: [VIJAYAWADA], attribution: 'OpenStreetMap contributors' };
+    });
+    installBirthApi({ searchPlaces });
+    controller.openCreate();
+    inputValue('#profile-name', 'Anu');
+    inputValue('#profile-birth-date', '1990-05-12');
+    inputValue('#profile-birth-time', '14:35');
+    inputValue('#profile-birth-place', 'Vijayawada');
+
+    buttonNamed('Find place').click();
+    await vi.waitFor(() => expect(query('#profile-birth-place-error').textContent).toContain('unavailable'));
+    expect(query<HTMLInputElement>('#profile-birth-date').value).toBe('1990-05-12');
+    expect(query<HTMLInputElement>('#profile-birth-time').value).toBe('14:35');
+
+    buttonNamed('Find place').click();
+    await vi.waitFor(() => {
+      expect(document.querySelectorAll('.profiles-place-results__choice')).toHaveLength(1);
+    });
+    expect(searchPlaces).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('saved profile detail view', () => {
+  test('keeps a saved calculated profile viewable but not editable while calculation is disabled', () => {
+    const result = calculatedProfile();
+    store.create({
+      source: 'birth-details',
+      name: 'Anu',
+      nakshatra: result.nakshatra,
+      pada: result.pada,
+      janmaRasi: result.janmaRashi,
+      lagna: result.lagna,
+      birthDetails: {
+        dateOfBirth: '1990-05-12',
+        timeOfBirth: '14:35',
+        placeLabel: VIJAYAWADA.label,
+        latitude: VIJAYAWADA.latitude,
+        longitude: VIJAYAWADA.longitude,
+        timezone: VIJAYAWADA.timezone,
+      },
+      natalChart: { lagnaDegree: result.lagnaDegree, planets: result.planets },
+      calculation: { contractVersion: result.contractVersion, engine: result.engine },
+    });
+    controller.destroy();
+    controller = initProfilesPanel(store, {
+      navigate,
+      birthCalculationEnabled: false,
+    });
+
+    expect(query<HTMLButtonElement>('button[aria-label="Edit Anu"]').disabled).toBe(true);
+    query<HTMLButtonElement>('button[aria-label="View Anu"]').click();
+
+    expect(query<HTMLButtonElement>('[data-action="edit-profile"]').disabled).toBe(true);
+    expect(query('[role="img"][aria-label*="D1 Rashi chart"]')).toBeTruthy();
+    expect(document.body.textContent).toContain('Your saved calculation remains');
+    expect(store.getSnapshot().profiles[0].source).toBe('birth-details');
+  });
+
+  test('opens a calculated profile without recalculating or mutating browser storage', () => {
+    const { searchPlaces, deriveProfile } = installBirthApi();
+    const result = calculatedProfile();
+    store.create({
+      source: 'birth-details',
+      name: 'Anu',
+      nakshatra: result.nakshatra,
+      pada: result.pada,
+      janmaRasi: result.janmaRashi,
+      lagna: result.lagna,
+      birthDetails: {
+        dateOfBirth: '1990-05-12',
+        timeOfBirth: '14:35',
+        placeLabel: VIJAYAWADA.label,
+        latitude: VIJAYAWADA.latitude,
+        longitude: VIJAYAWADA.longitude,
+        timezone: VIJAYAWADA.timezone,
+      },
+      natalChart: {
+        lagnaDegree: result.lagnaDegree,
+        planets: result.planets,
+      },
+      calculation: {
+        contractVersion: result.contractVersion,
+        engine: result.engine,
+      },
+    });
+    controller.render();
+    const expectedSnapshot = store.getSnapshot();
+    const expectedStorage = new Map(storage.values);
+    const setItem = vi.spyOn(storage, 'setItem');
+    setItem.mockClear();
+
+    const view = query<HTMLButtonElement>('button[aria-label="View Anu"]');
+    view.focus();
+    view.click();
+
+    expect(query<HTMLHeadingElement>('h1').textContent).toBe('Anu');
+    expect(document.activeElement).toBe(query('#profiles-title'));
+    expect(document.body.textContent).toContain('Vijayawada, Andhra Pradesh, India');
+    expect(document.body.textContent).toContain('Asia/Kolkata');
+    expect(document.body.textContent).toContain('Rohini');
+    expect(document.body.textContent).toContain('Vrishabha');
+    expect(document.body.textContent).toContain('Karka');
+    expect(query('[role="img"][aria-label*="D1 Rashi chart"]')).toBeTruthy();
+    expect(query<HTMLTableElement>('table').caption?.textContent).toBe(
+      'Planet positions in the D1 Rashi chart',
+    );
+    expect(document.querySelectorAll('tbody tr')).toHaveLength(9);
+    expect(document.body.textContent).toContain('DashaFlow 1.1.0');
+    expect(document.body.textContent).toContain('Lahiri ayanamsha');
+    expect(document.body.textContent).toContain('moshier ephemeris');
+    expect(document.body.textContent).toContain('contract 1.0');
+    expect(query<HTMLAnchorElement>('a').textContent).toBe(
+      'How this is calculated and verified',
+    );
+    expect(query<HTMLAnchorElement>('a').getAttribute('href')).toBe(
+      '/docs/reference/53-birth-profile-calculation',
+    );
+    expect(searchPlaces).not.toHaveBeenCalled();
+    expect(deriveProfile).not.toHaveBeenCalled();
+    expect(setItem).not.toHaveBeenCalled();
+    expect(store.getSnapshot()).toEqual(expectedSnapshot);
+    expect(storage.values).toEqual(expectedStorage);
+  });
+
+  test('returns focus to the same roster action and opens editing from the detail view', () => {
+    store.create({ name: 'Anu', nakshatra: 'Rohini', lagna: 'Karka' });
+    controller.render();
+    const view = query<HTMLButtonElement>('button[aria-label="View Anu"]');
+    view.focus();
+    view.click();
+
+    buttonNamed('Back to profiles').click();
+
+    const replacement = query<HTMLButtonElement>('button[aria-label="View Anu"]');
+    expect(document.activeElement).toBe(replacement);
+    replacement.click();
+    buttonNamed('Edit profile').click();
+    expect(query<HTMLInputElement>('#profile-name').value).toBe('Anu');
+    expect(document.activeElement).toBe(query('#profile-name'));
+  });
+
+  test('shows only known facts for a manual profile and does not fabricate a chart or provenance', () => {
+    store.create({ name: 'Manual Meera', nakshatra: 'Krittika', lagna: 'Tula' });
+    controller.render();
+
+    query<HTMLButtonElement>('button[aria-label="View Manual Meera"]').click();
+
+    expect(query<HTMLHeadingElement>('h1').textContent).toBe('Manual Meera');
+    expect(document.body.textContent).toContain('Krittika');
+    expect(document.body.textContent).toContain('Tula');
+    expect(document.body.textContent).toContain('Muhurtam');
+    expect(document.body.textContent).toContain('Daily Horoscope');
+    expect(document.body.textContent).toContain(
+      'Natal chart and calculation details are available only for profiles calculated from birth details.',
+    );
+    expect(document.querySelector('[role="img"][aria-label*="D1 Rashi chart"]')).toBeNull();
+    expect(document.querySelector('table')).toBeNull();
+    expect(document.body.textContent).not.toContain('DashaFlow');
+    expect(Array.from(document.querySelectorAll('a')).some(link =>
+      link.textContent === 'How this is calculated and verified')).toBe(false);
+  });
+
+  test('gives every saved profile an accessible View action', () => {
+    store.create({ name: 'Anu' });
+    store.create({ name: 'Bala' });
+    controller.render();
+
+    expect(query<HTMLButtonElement>('button[aria-label="View Anu"]').textContent).toBe('View');
+    expect(query<HTMLButtonElement>('button[aria-label="View Bala"]').textContent).toBe('View');
+  });
+
+  test('refreshes an open detail after a store update without losing action focus', () => {
+    const profile = store.create({ name: 'Anu', nakshatra: 'Rohini' });
+    controller.render();
+    query<HTMLButtonElement>('button[aria-label="View Anu"]').click();
+    const edit = buttonNamed('Edit profile');
+    edit.focus();
+
+    store.update(profile.id, { name: 'Anuradha' });
+
+    expect(query<HTMLHeadingElement>('h1').textContent).toBe('Anuradha');
+    expect(document.activeElement).toBe(buttonNamed('Edit profile'));
+  });
+
+  test('returns to the roster heading if an open profile is removed', () => {
+    const profile = store.create({ name: 'Anu', nakshatra: 'Rohini' });
+    controller.render();
+    query<HTMLButtonElement>('button[aria-label="View Anu"]').click();
+
+    store.remove(profile.id);
+
+    expect(document.body.textContent).toContain('Save a person once');
+    expect(document.activeElement).toBe(query('#profiles-title'));
   });
 });
 
@@ -157,6 +542,7 @@ describe('readiness and hostile data', () => {
   test('warns without blocking when a name duplicates another profile', () => {
     store.create({ name: 'Anu', nakshatra: 'Rohini' });
     controller.openCreate();
+    chooseManualEntry();
     inputValue('#profile-name', ' anu ');
 
     const warning = query<HTMLElement>('#profile-name-duplicate');
@@ -218,12 +604,13 @@ describe('storage and contextual journeys', () => {
     expect(reload).not.toHaveBeenCalled();
 
     window.dispatchEvent(new StorageEvent('storage', { key: GUEST_PROFILE_STORAGE_KEY }));
+    window.dispatchEvent(new StorageEvent('storage', { key: GUEST_BIRTH_PROFILE_STORAGE_KEY }));
     window.dispatchEvent(new StorageEvent('storage', { key: null }));
-    expect(reload).toHaveBeenCalledTimes(2);
+    expect(reload).toHaveBeenCalledTimes(3);
 
     stop();
     window.dispatchEvent(new StorageEvent('storage', { key: GUEST_PROFILE_STORAGE_KEY }));
-    expect(reload).toHaveBeenCalledTimes(2);
+    expect(reload).toHaveBeenCalledTimes(3);
   });
 
   test('preserves an unsaved edit and focus while an external reload updates the store', () => {
@@ -305,6 +692,7 @@ describe('storage and contextual journeys', () => {
     expect(navigate).toHaveBeenLastCalledWith('tarabalam');
 
     controller.openCreate({ returnTo: 'gochara' });
+    chooseManualEntry();
     inputValue('#profile-name', 'Anu');
     inputValue('#profile-nakshatra', 'Rohini');
     submit();
@@ -320,6 +708,7 @@ describe('storage and contextual journeys', () => {
   test('returns the exact created profile to the originating journey', () => {
     const onSaved = vi.fn();
     controller.openCreate({ returnTo: 'gochara', onSaved });
+    chooseManualEntry();
     inputValue('#profile-name', 'Anu');
     inputValue('#profile-nakshatra', 'Rohini');
     submit();
@@ -330,10 +719,15 @@ describe('storage and contextual journeys', () => {
     expect(onSaved.mock.calls[0][0]).toEqual({
       id: 'guest_panel_1',
       schemaVersion: 1,
+      source: 'manual',
       name: 'Anu',
       nakshatra: 'Rohini',
       pada: null,
       lagna: null,
+      janmaRasi: 'Vrishabha',
+      birthDetails: null,
+      natalChart: null,
+      calculation: null,
     });
     expect(navigate).toHaveBeenLastCalledWith('gochara');
   });
@@ -382,6 +776,7 @@ describe('storage and contextual journeys', () => {
     expect(document.activeElement).toBe(trigger);
 
     controller.openCreate({ returnTo: 'tarabalam', focusTarget: trigger });
+    chooseManualEntry();
     inputValue('#profile-name', 'Anu');
     submit();
     expect(navigate).toHaveBeenLastCalledWith('tarabalam');
@@ -391,6 +786,7 @@ describe('storage and contextual journeys', () => {
 
   test('requires the birth details that Daily Horoscope readiness reports missing', () => {
     controller.openCreate({ returnTo: 'gochara', requiredFor: 'horoscope' });
+    chooseManualEntry();
     expect(query('.profiles-form__intro').textContent).toContain('Lagna remains optional');
     inputValue('#profile-name', 'Anu');
     submit();
@@ -424,6 +820,7 @@ describe('storage and contextual journeys', () => {
 
   test('allows Daily Horoscope save without Padam when readiness can derive a Rashi', () => {
     controller.openCreate({ returnTo: 'gochara', requiredFor: 'horoscope' });
+    chooseManualEntry();
     inputValue('#profile-name', 'Rohini profile');
     inputValue('#profile-nakshatra', 'Rohini');
     submit();
@@ -436,6 +833,7 @@ describe('storage and contextual journeys', () => {
 
   test('requires only Nakshatra for a contextual Muhurtam profile', () => {
     controller.openCreate({ returnTo: 'tarabalam', requiredFor: 'muhurta' });
+    chooseManualEntry();
     expect(query('.profiles-form__intro').textContent).toContain('Padam and Lagna are optional');
     inputValue('#profile-name', 'Anu');
     submit();
@@ -456,6 +854,7 @@ describe('storage and contextual journeys', () => {
 
   test('keeps birth details optional in the normal Profiles destination', () => {
     controller.openCreate();
+    chooseManualEntry();
     inputValue('#profile-name', 'Name only');
     submit();
 
