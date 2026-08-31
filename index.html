@@ -195,7 +195,6 @@
     .anga-time { font-size: 0.75rem; color: #58504A; margin-top: 0.05rem; white-space: nowrap; }
     sup.plus1 { font-size: 0.62em; font-weight: 700; color: #8F5C18; cursor: help; }
     .preview-head sup.plus1 { color: #C98A3A; }
-    .preview-head .meta.sky { margin-top: 0.25rem; opacity: 1; font-size: 0.78rem; }
 
     .tile-strip { border-top: 1px solid #E4DAC6; padding: 0.6rem 0.9rem 0.75rem; }
     .strip-title { font-size: 0.75rem; font-weight: 700; color: #6B6357; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.45rem; font-style: italic; font-family: var(--brand-display), serif; }
@@ -359,7 +358,7 @@
                            box-shadow: 0 0 0 2px #C28A1A inset; }
     .go-center { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--indigo-bg); display: flex; flex-direction: column;
                  align-items: center; justify-content: center; text-align: center; padding: 0.5rem; gap: 0.25rem; }
-    .go-center .d1 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; color: var(--indigo); font-size: 1.05rem; }
+    .go-center .d1 { font-family: var(--brand-display); font-weight: 700; color: var(--indigo); font-size: 1.05rem; }
     .go-center .d2 { font-size: 0.72rem; color: #8E2A1F; }
     .go-g { display: inline-block; border-radius: 5px; padding: 0.05rem 0.35rem; font-size: 0.72rem; font-weight: 700;
             margin: 0.12rem 0.12rem 0 0; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); }
@@ -547,11 +546,8 @@
     .mcp-clients { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
     .mcp-client { font-size: 0.75rem; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.2rem 0.6rem; font-weight: 600; }
 
-    footer { text-align: center; font-size: 0.8rem; color: #746B5E; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 0.3rem; }
-    footer a { color: var(--indigo); }
-
     /* ---------- Mobile shell — only active under 620px via body[data-mode] ---------- */
-    #m-topbar, #m-drawer-scrim, #m-help-sheet { display: none; }
+    #m-topbar, #m-drawer-scrim { display: none; }
 
     body[data-mode="mobile"] {
       padding-top: 52px;
@@ -559,8 +555,7 @@
     }
     body[data-mode="mobile"] .page { padding-top: 0; }
     body[data-mode="mobile"] .hero,
-    body[data-mode="mobile"] > .page > .card .tool-tabs,
-    body[data-mode="mobile"] > .page > footer { display: none; }
+    body[data-mode="mobile"] > .page > .card .tool-tabs { display: none; }
 
     body[data-mode="mobile"] #m-topbar {
       display: flex; align-items: center; gap: 0.5rem;
@@ -583,10 +578,10 @@
       background: linear-gradient(90deg, var(--brand), #b83a2a);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    #m-topbar #m-nav-btn, #m-topbar .m-page-help-btn {
+    #m-topbar #m-nav-btn, #m-topbar .m-topbar-spacer {
       flex: none; width: 30px; height: 30px;
     }
-    #m-topbar #m-nav-btn, #m-topbar .m-page-help-btn {
+    #m-topbar #m-nav-btn {
       border: 0; background: transparent; padding: 0; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
     }
@@ -594,13 +589,6 @@
       font-size: 1.15rem; line-height: 1; color: #1F1A17;
     }
     #m-topbar #m-nav-btn:active { background: #E7DECC; border-radius: 8px; }
-    #m-topbar .m-page-help-btn .m-help-icon {
-      display: inline-flex; width: 22px; height: 22px;
-      border: 1.5px solid #746B5E; border-radius: 50%;
-      align-items: center; justify-content: center;
-      font-size: 0.78rem; font-weight: 800; color: #6B6357; line-height: 1;
-    }
-    #m-topbar .m-page-help-btn:active .m-help-icon { background: #E7DECC; }
 
     /* Per-screen title, just below the topbar */
     body[data-mode="mobile"] .m-page-title {
@@ -729,104 +717,6 @@
     body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector label { font-size: 0.68rem; }
     body[data-mode="mobile"] #panel-tarabalam > .preview-note { font-size: 0.74rem; }
 
-
-    /* ---------- Mobile contextual help — topbar hint + bottom sheet ---------- */
-
-    /* Hide the in-panel intros + read-more guides + their expanded panels on
-       mobile — the same content opens from the ? in the top bar instead. */
-    body[data-mode="mobile"] #panel-today > .preview-note,
-    body[data-mode="mobile"] #panel-gochara > .tb-intro,
-    body[data-mode="mobile"] #panel-gochara > .read-more,
-    body[data-mode="mobile"] #panel-gochara > #go-help,
-    body[data-mode="mobile"] #panel-gochara > .preview-note,
-    body[data-mode="mobile"] #panel-tarabalam > .tb-intro,
-    body[data-mode="mobile"] #panel-tarabalam > .read-more,
-    body[data-mode="mobile"] #panel-tarabalam > #tb-help,
-    body[data-mode="mobile"] #panel-tarabalam > .preview-note { display: none !important; }
-
-    body[data-mode="mobile"] #m-help-sheet {
-      display: flex; flex-direction: column;
-      position: fixed; left: 0; right: 0; bottom: 0;
-      max-height: 88vh; z-index: 80;
-      background: #fff; border-radius: 8px 8px 0 0;
-      box-shadow: 0 -12px 36px rgba(31,26,23,0.22);
-      transform: translateY(100%); transition: transform 0.24s ease;
-    }
-    body[data-mode="mobile"].m-help-open #m-help-sheet { transform: translateY(0); }
-    body[data-mode="mobile"].m-help-open #m-drawer-scrim { opacity: 1; pointer-events: auto; }
-
-    #m-help-sheet .m-sheet-handle {
-      width: 44px; height: 4px; background: #DDD2BC; border-radius: 999px;
-      margin: 0.55rem auto 0.3rem;
-    }
-    #m-help-sheet .m-sheet-head {
-      display: flex; align-items: center; padding: 0.75rem 1.1rem 0.85rem;
-      border-bottom: 1px solid #E7DECC;
-      font-family: var(--brand-display); font-size: 1.18rem; font-weight: 700;
-      color: #1F1A17; letter-spacing: 0.005em;
-    }
-    #m-help-sheet .m-sheet-close {
-      margin-left: auto; width: 32px; height: 32px; border-radius: 8px;
-      border: 0; background: transparent; color: #6B6357; cursor: pointer; font-size: 0.95rem;
-    }
-    #m-help-sheet .m-sheet-body {
-      padding: 1rem 1.1rem 1.1rem; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      font-size: 0.88rem; color: #58504A; line-height: 1.55; flex: 1 1 auto; min-height: 0;
-    }
-    #m-help-sheet .m-sheet-body > p { margin: 0.6rem 0; }
-    #m-help-sheet .m-sheet-body > p:first-child { margin-top: 0; }
-    #m-help-sheet .m-sheet-body strong { color: #1F1A17; }
-    #m-help-sheet .m-sheet-body em { color: #1F1A17; font-style: normal; font-weight: 600; }
-    #m-help-sheet .m-sheet-body a { color: var(--indigo); font-weight: 600; }
-    .m-help-mention { white-space: nowrap; color: #1F1A17; font-weight: 600;
-                      background: var(--indigo-bg); padding: 0.05rem 0.4rem; border-radius: 6px;
-                      border: 1px solid var(--indigo-border); font-size: 0.82rem; }
-
-    /* Help-sheet Stitch-pattern building blocks */
-    #m-help-sheet .help-lead {
-      margin: 0 0 0.85rem; font-size: 0.9rem; color: #58504A; line-height: 1.55;
-    }
-    #m-help-sheet .help-section-label {
-      font-size: 0.7rem; font-weight: 700; color: #6B6357;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      font-style: italic; font-family: var(--brand-display), serif;
-      margin: 1rem 0 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid #E7DECC;
-    }
-    #m-help-sheet .help-card {
-      background: #fff; border: 1px solid #E7DECC; border-radius: 8px;
-      padding: 0.75rem 0.85rem; margin: 0.5rem 0; display: flex; gap: 0.65rem;
-      align-items: flex-start;
-    }
-    #m-help-sheet .help-card.help-card-good { background: #f0fdf4; border-color: #bbf7d0; }
-    #m-help-sheet .help-card.help-card-bad  { background: #fef2f2; border-color: #fecaca; }
-    #m-help-sheet .help-card-icon {
-      flex: none; width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--indigo-bg); color: var(--indigo); font-size: 1rem; font-weight: 700;
-    }
-    #m-help-sheet .help-card.help-card-good .help-card-icon { background: #d1fae5; color: var(--green); }
-    #m-help-sheet .help-card.help-card-bad  .help-card-icon { background: #fee2e2; color: #b91c1c; }
-    #m-help-sheet .help-card-body { flex: 1 1 auto; min-width: 0; }
-    #m-help-sheet .help-card-title {
-      font-size: 0.92rem; font-weight: 700; color: #1F1A17; margin: 0 0 0.15rem;
-      line-height: 1.25;
-    }
-    #m-help-sheet .help-card-text {
-      font-size: 0.82rem; color: #58504A; line-height: 1.5; margin: 0;
-    }
-
-    #m-help-sheet .m-sheet-foot {
-      flex: none; padding: 0.7rem 1.1rem calc(0.8rem + env(safe-area-inset-bottom, 0));
-      border-top: 1px solid #E7DECC; background: #fff;
-    }
-    #m-help-sheet .m-sheet-cta {
-      width: 100%; border: 0; border-radius: 999px;
-      background: var(--indigo); color: #fff;
-      font-family: inherit; font-weight: 700; font-size: 0.92rem;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 0.85rem 1rem; cursor: pointer;
-    }
-    #m-help-sheet .m-sheet-cta:active { background: #6d1f16; }
 
     /* Mobile-only: hide the Tools & setup expansion in the Subscribe drawer
        (interested devotees can read this on PyPI). Desktop unchanged. */
@@ -1020,12 +910,6 @@
     body[data-tool="about"] #card-mcp,
     body[data-tool="about"] #card-system { display: none; }
 
-    /* Footer: only show on tool panels */
-    body[data-tool="festivals"] footer,
-    body[data-tool="subscribe"] footer,
-    body[data-tool="useinai"] footer,
-    body[data-tool="about"] footer { display: none; }
-
     /* Sidebar chrome */
     .sidebar-brand {
       display: flex; align-items: center; gap: 0.6rem;
@@ -1037,7 +921,8 @@
       color: #1F1A17; line-height: 1.2;
     }
     .sidebar-brand-name em { color: var(--brand); font-style: italic; }
-    .sidebar-nav { list-style: none; padding: 1rem 0.6rem 0.5rem; margin: 0; flex: 1 1 auto; }
+    .sidebar-nav-groups { padding: 1rem 0.6rem 0.5rem; flex: 1 1 auto; }
+    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
     .sidebar-item {
       display: flex; align-items: center; gap: 0.65rem; width: 100%;
       padding: 0.58rem 0.85rem; border: 1px solid transparent; border-radius: 8px;
@@ -1071,7 +956,6 @@
       padding: 0.6rem 1rem 0.9rem; border-top: 1px solid #E7DECC;
       font-size: 0.72rem; color: #746B5E; line-height: 1.5; flex: none;
     }
-    .sidebar-footer a { color: var(--indigo); }
     body[data-mode="mobile"] #special-days-card .preview-note { display: none; }
 
     /* ---------- Mobile Stitch aesthetic — Today screen ---------- */
@@ -1151,6 +1035,7 @@
     /* Flag-strip (festivals/specials chips) tighter */
     body[data-mode="mobile"] .flag-strip { padding: 0.55rem 0.85rem 0.2rem; gap: 0.35rem; }
   </style>
+  <link rel="stylesheet" href="/src/styles/ux-concept.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -1170,103 +1055,11 @@
     </svg>
     <span class="m-brand-word">Astro <em>Chaganti</em></span>
   </span>
-  <button class="m-page-help-btn" aria-controls="m-help-sheet" aria-expanded="false" aria-label="How to read this screen">
-    <span class="m-help-icon">?</span>
-  </button>
+  <span class="m-topbar-spacer" aria-hidden="true"></span>
 </header>
 
 
 <div id="m-drawer-scrim" aria-hidden="true"></div>
-
-
-<!-- Bottom-sheet help: contextual to the active screen -->
-<aside id="m-help-sheet" aria-hidden="true" aria-label="Help">
-  <div class="m-sheet-handle" aria-hidden="true"></div>
-  <div class="m-sheet-head">
-    <span id="m-help-title">How to read this</span>
-    <button class="m-sheet-close" id="m-help-close" aria-label="Close">✕</button>
-  </div>
-  <div class="m-sheet-body" id="m-help-body"></div>
-  <div class="m-sheet-foot">
-    <button class="m-sheet-cta" id="m-help-cta" type="button">Got it</button>
-  </div>
-</aside>
-
-<!-- Today guide content lives here (hidden); the help sheet pulls it in.
-     Gochara and Tarabalam guides reuse #go-help and #tb-help in-place. -->
-<div id="today-help-src" hidden>
-  <p class="help-lead">Panchangam relies on five anga (limbs) to describe the quality of a day.
-  Here's how to read each section of Today.</p>
-
-  <div class="help-section-label">The daily elements</div>
-
-  <div class="help-card">
-    <div class="help-card-icon">☾</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Tithi</div>
-      <p class="help-card-text">Lunar day. Determines auspiciousness for activities and rituals.</p>
-    </div>
-  </div>
-  <div class="help-card">
-    <div class="help-card-icon">⏰</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Nakshatra</div>
-      <p class="help-card-text">Lunar mansion. Influences the mental and emotional tone of the day.</p>
-    </div>
-  </div>
-  <div class="help-card">
-    <div class="help-card-icon">↻</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Nitya Yoga</div>
-      <p class="help-card-text">Sun–Moon relationship. Indicates the general nature and outcome of actions.</p>
-    </div>
-  </div>
-  <div class="help-card">
-    <div class="help-card-icon">◐</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Karana</div>
-      <p class="help-card-text">Half a Tithi. Used to find the exact right moment for an action.</p>
-    </div>
-  </div>
-
-  <div class="help-section-label">Time windows</div>
-
-  <div class="help-card help-card-good">
-    <div class="help-card-icon">✓</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Auspicious</div>
-      <p class="help-card-text">Favourable timings — Brahma Muhurta, Abhijit Muhurta, Amrita Kalam. Good for starting important work.</p>
-    </div>
-  </div>
-  <div class="help-card help-card-bad">
-    <div class="help-card-icon">✕</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Avoid</div>
-      <p class="help-card-text">Inauspicious windows — Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham. Best to defer new beginnings.</p>
-    </div>
-  </div>
-  <div class="help-card">
-    <div class="help-card-icon">⊕</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Choghadiya</div>
-      <p class="help-card-text">Day and night split into eight blocks. Amrit, Shubh, Labh and Char are favourable; the others are not.</p>
-    </div>
-  </div>
-
-  <div class="help-section-label">Special days</div>
-  <div class="help-card">
-    <div class="help-card-icon">⚡</div>
-    <div class="help-card-body">
-      <div class="help-card-title">Festivals &amp; observances</div>
-      <p class="help-card-text">Chips at the top of the day card flag Ekadashi, Pradosham, Pournami, Amavasya, eclipses and named festivals.</p>
-    </div>
-  </div>
-
-  <p style="font-size:0.82rem;color:#6B6357;margin-top:1rem;">
-    Change city, system or time format from <span class="m-help-mention">⚙ Settings</span>.
-    Subscribe to the calendar feed from <span class="m-help-mention">📅 Subscribe</span>.
-  </p>
-</div>
 
 <nav id="sidebar" aria-label="Main navigation">
   <div class="sidebar-brand">
@@ -1279,56 +1072,54 @@
     </svg>
     <span class="sidebar-brand-name">Astro <em>Chaganti</em></span>
   </div>
-  <ul class="sidebar-nav" role="list">
-    <li>
-      <button class="sidebar-item active" id="sidebar-today" onclick="switchTool('today')">
-        <span class="sidebar-icon">🔆</span>
-        <span class="sidebar-label">Panchangam</span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-item" id="sidebar-gochara" onclick="switchTool('gochara')">
-        <span class="sidebar-icon">🪐</span>
-        <span class="sidebar-label">Daily Horoscope</span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-item" id="sidebar-tarabalam" onclick="switchTool('tarabalam')">
-        <span class="sidebar-icon">⏰</span>
-        <span class="sidebar-label">Muhurtam</span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-item" id="sidebar-festivals" onclick="switchTool('festivals')">
-        <span class="sidebar-icon">🪔</span>
-        <span class="sidebar-label">Festivals</span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-item" id="sidebar-subscribe" onclick="switchTool('subscribe')">
-        <span class="sidebar-icon">📅</span>
-        <span class="sidebar-label">Subscribe</span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-item" id="sidebar-useinai" onclick="switchTool('useinai')">
-        <span class="sidebar-icon">🤖</span>
-        <span class="sidebar-label">Use in AI</span>
-      </button>
-    </li>
-    <li>
-      <a class="sidebar-item" href="/docs/">
-        <span class="sidebar-icon">📖</span>
-        <span class="sidebar-label">Documentation</span>
-      </a>
-    </li>
-    <li>
-      <button class="sidebar-item" id="sidebar-about" onclick="switchTool('about')">
-        <span class="sidebar-icon">ℹ️</span>
-        <span class="sidebar-label">About</span>
-      </button>
-    </li>
-  </ul>
+  <div class="sidebar-nav-groups">
+    <section class="sidebar-group" aria-labelledby="sidebar-tools-label">
+      <h2 class="sidebar-group-label" id="sidebar-tools-label">Tools</h2>
+      <ul class="sidebar-nav" role="list">
+        <li>
+          <button class="sidebar-item active" id="sidebar-today" onclick="switchTool('today')">
+            <span class="sidebar-icon">🔆</span>
+            <span class="sidebar-label">Panchangam</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-gochara" onclick="switchTool('gochara')">
+            <span class="sidebar-icon">🪐</span>
+            <span class="sidebar-label">Daily Horoscope</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-tarabalam" onclick="switchTool('tarabalam')">
+            <span class="sidebar-icon">⏰</span>
+            <span class="sidebar-label">Muhurtam</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-festivals" onclick="switchTool('festivals')">
+            <span class="sidebar-icon">🪔</span>
+            <span class="sidebar-label">Festivals</span>
+          </button>
+        </li>
+      </ul>
+    </section>
+    <section class="sidebar-group" aria-labelledby="sidebar-resources-label">
+      <h2 class="sidebar-group-label" id="sidebar-resources-label">Resources</h2>
+      <ul class="sidebar-nav" role="list">
+        <li>
+          <button class="sidebar-item" id="sidebar-subscribe" onclick="switchTool('subscribe')">
+            <span class="sidebar-icon">📅</span>
+            <span class="sidebar-label">Subscribe</span>
+          </button>
+        </li>
+        <li>
+          <a class="sidebar-item" href="/docs/">
+            <span class="sidebar-icon">📖</span>
+            <span class="sidebar-label">Documentation</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
   <div class="sidebar-shloka">
     <div class="sidebar-shloka-lines">
       <span>satyaṃ brūyāt priyaṃ brūyān</span>
@@ -1338,9 +1129,12 @@
     </div>
     <div class="sidebar-shloka-gist">Be truthful. Be kind.</div>
   </div>
-  <div class="sidebar-footer">
-    <a href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
-  </div>
+  <section class="sidebar-footer" aria-label="More">
+    <ul class="sidebar-footer-list" role="list">
+      <li><button class="sidebar-item sidebar-secondary" id="sidebar-useinai" onclick="switchTool('useinai')">Use in AI</button></li>
+      <li><button class="sidebar-item sidebar-secondary" id="sidebar-about" onclick="switchTool('about')">About</button></li>
+    </ul>
+  </section>
 </nav>
 
 <main class="page" id="main">
@@ -1372,7 +1166,7 @@
 
   <div id="settings-line">
     <svg class="sel-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-    <span id="settings-summary" aria-live="polite">Hyderabad · Drik Ganita · 12h</span>
+    <span id="settings-summary" aria-live="polite">Hyderabad · Drik Ganita · 12h · Local time</span>
     <button id="settings-toggle" aria-expanded="false" aria-controls="global-controls-bar" aria-label="Change city, system or time format" title="Change settings">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
     </button>
@@ -1411,11 +1205,8 @@
     </div>
     <div class="m-page-title" id="m-page-title"><span class="m-page-title-main" id="m-page-title-main">Today's Panchangam</span><span class="m-page-title-sub" id="m-page-title-sub">What is the day?</span></div>
     <div id="panel-today" role="tabpanel">
-    <h2 class="panel-heading">🔆 Panchangam</h2>
+    <h2 class="panel-heading">Today's Panchangam</h2>
     <div id="tp-result"><p class="preview-error">Loading…</p></div>
-    <p class="preview-note">Defaults to Hyderabad · Drik Ganita — try other cities and systems before you subscribe below.
-    Times marked <sup class="plus1" style="color:#8F5C18;">+1</sup> fall after midnight on the next day;
-    <sup class="plus1" style="color:#8F5C18;">−1</sup> means it began the previous day.</p>
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" style="display:none;">
@@ -1507,45 +1298,15 @@
       <div id="tb-result"></div>
       END TARABALAM HIDDEN -->
       <div id="mu-result"></div>
-      <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
-      <strong>Please note:</strong> The slot finder is guidance for everyday timing, not how formal muhurtams are fixed.
-      Tiers (Excellent/Good/Fair/Avoid) rank slots relative to each other within this search:
-      "Excellent" means the best of what turned up for these dates, not a universal guarantee, and
-      "Good" or "Fair" slots without a caution noted below them can be perfectly fine choices.
-      A slot carrying a named caution (Rikta tithi, Ashtama Chandra, Visha/Dagdha yoga, etc.) is
-      capped below Excellent and explained in its notes; read those regardless of tier.
-      Setting a muhurtam weighs many more factors (tithi, vara, yoga, lagna and planetary positions) together.
-      For weddings, gruhapravesham, upanayanam and other major events, or if a slot's notes raise a
-      caution you're unsure about, please consult your purohit,
-      or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
+      <p class="surface-boundary">
+        <strong>Use the ranking comparatively.</strong> Read any named cautions on a slot; for weddings,
+        gruhapravesham, upanayanam and other major ceremonies, consult your purohit.
+        <a href="/docs/computations/personal.muhurta-slot-ranking">How slots are ranked</a>
+      </p>
     </div><!-- /panel-tarabalam -->
 
     <div id="panel-gochara" role="tabpanel" style="display:none;">
       <h2 class="panel-heading">🪐 Daily Horoscope</h2>
-      <!-- HELP TEXT HIDDEN: intro + read-more guide removed per owner request (other tabs don't show it)
-      <p class="tb-intro">The sky as a South Indian chart — each graha in its rashi. By itself this shows the
-      <strong>transits</strong>; choose a person (or any rashi) under <em>Viewing</em> and every graha is
-      coloured by its gochara verdict for them.</p>
-      <button class="read-more" style="color: var(--indigo);" data-more="New to Gochara &amp; Rasi Phalalu? How to read this ▾" data-less="Hide guide ▴" onclick="toggleReadMore('go-help', this)">New to Gochara &amp; Rasi Phalalu? How to read this ▾</button>
-      <div class="expanded" id="go-help">
-        <strong>The chart.</strong> This is the fixed South Indian layout: Meena sits top-left, Mesha beside it,
-        and the rashis run clockwise around the centre. Each graha appears in the rashi it currently occupies;
-        ℞ marks a retrograde. The "Coming up" line lists when each graha next changes rashi.
-        <br/><br/>
-        <strong>Gochara.</strong> Pick a person or rashi under <em>Viewing</em> and every graha is judged from
-        that janma rashi. Brihat Samhita 104.4 supplies the favourable houses for the seven classical grahas.
-        A favourable transit can be <em>blocked</em> when another graha sits at its vedha (obstruction) point;
-        Phaladeepika 26.3–8 supplies the Vedha pairs and classical exemptions. Rahu/Ketu follow
-        Phaladeepika 26.2 and use Surya's favourable houses; node Vedha remains unestablished. Phaladeepika
-        26.1 and 26.22–23 support the Moon-sign reference and underlying adverse Shani houses. The condition
-        names, phase labels and advice are conventional presentation rather than quotations from those verses.
-        Box corners show the house number counted from your rashi.
-        <br/><br/>
-        <strong>Rasi Phalalu.</strong> The reading below the chart is composed line-by-line from these computed
-        verdicts — the Moon's position sets the day's tone, each graha contributes one sentence, and nothing is
-        invented. Share it with the green button; it sends the full reading.
-      </div>
-      END HELP TEXT HIDDEN -->
       <div class="tb-controls">
         <div class="selector-row" style="margin:0;">
           <div class="selector">
@@ -1560,31 +1321,24 @@
       <div id="go-note"></div>
       <div id="go-moves"></div>
       <div id="go-conditions"></div>
-      <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">Positions are the sky <strong>at sunrise</strong> on the chosen date — the chart's
-      snapshot convention, like the rest of this site. The Moon changes rashi every 2–2½ days, so by evening it
-      may already be in the next rashi (the "Coming up" line shows when); the slower grahas are unaffected.</p>
-      <p class="preview-note">Chart data covers about 18 months ahead and is refreshed monthly. The
-      <code>get_graha_positions</code> and <code>get_gochara</code> MCP tools (below) compute live for
-      <strong>any date</strong>, past or future.</p>
-      <p class="preview-note">Brihat Samhita 104.4 supplies the favourable houses for the seven classical grahas,
-      counted from the natal Moon sign (janma rashi). Phaladeepika 26.3–8 supplies the <strong>Vedha</strong>
-      (obstruction) pairs and its Surya–Shani and Chandra–Budha exemptions. Rahu/Ketu follow Phaladeepika 26.2:
-      both use Surya's favourable houses 3, 6, 10 and 11. That verse does not establish whether nodes cause or
-      receive Vedha, so this site applies none and discloses the boundary. Phaladeepika 26.1 and 26.22–23 support calculating
-      the highlighted Shani houses from the natal Moon. Names such as Sade Sati and the rising/peak/setting labels
-      are conventional presentation, not wording from those verses; they are never calculated from lagna.</p>
-      <p class="preview-note">When an AI-written daily interpretation is available, its declared graha positions
-      and verdicts are checked against the engine. The prose and guidance remain model interpretation and are
-      labelled separately; they do not inherit the scriptural authority of the cited transit rules.</p>
-      <p class="preview-note" style="border-top:1px dashed #DDD2BC; padding-top:0.5rem;">
-      <strong>Please note:</strong> Gochara is a background influence read from the Moon sign alone — it is
-      <strong>not</strong> a horoscope reading and not how muhurtams are fixed. For decisions, weigh it with the
-      day's panchangam above and consult your purohit — or ask <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">Dr&nbsp;Chaganti at astrochaganti.com</a>.</p>
+      <details class="surface-boundary evidence-boundary">
+        <summary>Evidence boundary</summary>
+        <p>
+          Positions use the selected day's <strong>sunrise</strong>. Phaladeepika 26.3–8 supplies the
+          transit-house rules; Rahu/Ketu follow Phaladeepika 26.2. Results are referenced to the natal
+          Moon and never calculated from lagna.
+        </p>
+        <p>
+          This is Moon-sign transit guidance, not a full birth-chart reading or formal Muhurtam.
+          Generated prose and guidance do not inherit the scriptural authority of the source rules.
+          <a href="/docs/computations/gochara.transit-verdicts">Method, evidence and limits</a>
+        </p>
+      </details>
     </div><!-- /panel-gochara -->
   </div>
 
   <div class="card" id="special-days-card">
-    <h2>🪔 Festivals</h2>
+    <h2>Festivals</h2>
     <div id="upcoming-result"><p class="preview-error">Loading…</p></div>
     <div class="upcoming-legend">
       <span>🪔 Named festival</span>
@@ -1596,7 +1350,7 @@
   </div>
 
   <div class="card" id="subscribe">
-    <h2>📅 Subscribe to your calendar</h2>
+    <h2>Subscribe to your calendar</h2>
     <div class="selector-row">
       <div class="selector">
         <label for="sub-city">City</label>
@@ -1653,14 +1407,6 @@
         <li>Paste the subscription URL above</li>
         <li>Click <strong>Add calendar</strong></li>
       </ol>
-      <p class="sub-step-divider">4 · Set up reminders</p>
-      <ol>
-        <li>In the left sidebar, click <strong>⋮</strong> next to this calendar's name</li>
-        <li>Select <strong>Settings and sharing</strong></li>
-        <li>Scroll to <strong>Event notifications</strong> → click <strong>Add notification</strong></li>
-        <li>Choose <strong>Push</strong> or <strong>Email</strong>, set to <strong>1 day</strong></li>
-        <li>Scroll to the bottom and click <strong>Save</strong></li>
-      </ol>
     </div>
     <div class="app-panel" data-app="apple">
       <ol>
@@ -1670,12 +1416,6 @@
         <li>Click <strong>Subscribe</strong></li>
         <li>Choose how often to refresh (Daily recommended)</li>
         <li>Click <strong>OK</strong></li>
-      </ol>
-      <p class="sub-step-divider">4 · Set up reminders</p>
-      <ol>
-        <li><strong>iPhone/iPad:</strong> Settings app → <strong>Calendar → Default Alert Times</strong> → All-Day Events → <strong>1 day before</strong></li>
-        <li><strong>Mac:</strong> Calendar → <strong>Settings</strong> (⌘,) → <strong>Alerts</strong> tab → All Day Events → <strong>1 day before</strong></li>
-        <li>Applies to all your subscribed calendars — no per-event setup needed</li>
       </ol>
     </div>
     <div class="app-panel" data-app="outlook">
@@ -1687,84 +1427,22 @@
         <li>Click <strong>Import</strong></li>
         <li>It refreshes automatically every few hours</li>
       </ol>
-      <p class="sub-step-divider">4 · Set up reminders</p>
-      <ol>
-        <li><strong>Outlook desktop:</strong> File → Options → Calendar → Default reminders → <strong>1 Day</strong></li>
-        <li><strong>Outlook web:</strong> Settings (⚙) → Calendar → Events and invitations → Default reminder time → <strong>1 day</strong></li>
-        <li>Note: Outlook applies one default reminder across all calendars</li>
-      </ol>
     </div>
 
     <p class="preview-note">Updated automatically on the 1st of every month, 18 months ahead. No account needed.</p>
   </div>
 
   <div class="card" id="card-system">
-    <h2>🧭 Calculation System</h2>
-    <p style="font-size:0.85rem;color:#58504A;">
-      <strong>Drik Ganita</strong>, the default, uses modern astronomy and matches drikpanchang.com.
-      <strong>Surya Siddhanta</strong> and <strong>Vakya</strong> are classical methods that intentionally
-      differ — by minutes for muhurtams, occasionally by a day for festivals. If your family follows a
-      printed panchangam, compare a few days in the preview above and pick what matches.
+    <h2>Calculation system</h2>
+    <p class="surface-lead">
+      Drik Ganita is the observational default. Surya Siddhanta and Vakya are classical alternatives
+      that intentionally produce different results; choose the method followed by your tradition.
     </p>
-    <button class="read-more" style="color: var(--indigo);" data-more="Compare the three systems in detail ▾" data-less="Hide comparison ▴" onclick="toggleReadMore('systems-more', this)">Compare the three systems in detail ▾</button>
-    <div class="expanded" id="systems-more">
-
-    <div class="sys-card drik">
-      <h3>☀️ Drik Ganita — Modern Observational Astronomy</h3>
-      <p>Calculated directly from real planetary positions using the Swiss Ephemeris with the Lahiri
-      ayanamsa — the same kind of engine used by professional astronomy software. Because it tracks the
-      sky as it actually is, it's the most accurate system for sunrise, sunset, moonrise, and moonset, and
-      is the default in most modern digital panchangam apps.</p>
-      <button class="read-more" data-more="Read more about Drik Ganita ▾" data-less="Show less ▴" onclick="toggleReadMore('drik-more', this)">Read more about Drik Ganita ▾</button>
-      <div class="expanded" id="drik-more">
-        <strong>What it computes:</strong> True geocentric positions of the Sun and Moon using the Swiss Ephemeris — the same engine that powers professional astronomy software. It applies the Lahiri ayanamsa (also called Chitrapaksha), which is India's government-adopted standard since 1955 and is specified by the Indian Astronomical Ephemeris. Because calculations are grounded in actual sky positions, sunrise and sunset times will match your weather app, and Tithi/Nakshatra boundaries reflect exactly when the sky transitions occur at your location.
-        <br/><br/>
-        <strong>Who uses it:</strong> The default for most modern digital panchangam apps and websites. If you're comparing against Prokerala, AstroSeek, or any app that doesn't specify a system, it's almost certainly Drik Ganita.
-        <br/><br/>
-        <strong>Gotcha:</strong> A small number of traditional institutions still associate "Drik" specifically with the Krishnamurti (KP) ayanamsa variant. If you hear someone say Drik results differ from what you see here, ask which ayanamsa they're using — this implementation uses Lahiri.
-      </div>
-    </div>
-
-    <div class="sys-card ss">
-      <h3>🛕 Surya Siddhanta — The Classical Siddhantic Method</h3>
-      <p>Computes positions using the mean-motion formulas of the Surya Siddhanta, the most influential
-      classical Sanskrit astronomy treatise. Timings follow the traditional siddhantic framework rather
-      than the observed sky, so Tithi and Nakshatra boundaries can differ from Drik Ganita by anywhere
-      from minutes to an hour or more. Choose it if your tradition is rooted in classical siddhantic
-      calculation rather than modern ephemerides.</p>
-      <button class="read-more" data-more="Read more about Surya Siddhanta ▾" data-less="Show less ▴" onclick="toggleReadMore('ss-more', this)">Read more about Surya Siddhanta ▾</button>
-      <div class="expanded" id="ss-more">
-        <strong>What it computes:</strong> Planetary longitudes from the mean-motion model codified in the Surya Siddhanta (the received text dates to roughly 400–800 CE, building on older material). Instead of tracking the actual sky, it counts long-period average orbital revolutions from the Kali epoch and applies the classical manda (equation-of-centre) correction. The result diverges from true positions — about half a degree for the Sun, up to ~4° for the Moon, since the classical model omits the Moon's evection and variation terms — which typically moves a Tithi boundary by 2–6 hours versus Drik Ganita, often enough to land an observance on a different calendar day.
-        <br/><br/>
-        <strong>Who it's for:</strong> Communities and almanac lineages that compute from the siddhantic framework. Important honesty note: there is no single "the" Surya Siddhanta panchangam — every traditional lineage applies its own bija (correction) constants and conventions, so two siddhantic panchangams rarely agree to the minute, and this feed won't exactly match any particular institution's published calendar either. Treat it as a faithful rendering of the classical method, and use the preview above to compare against the panchangam your family or temple actually follows.
-        <br/><br/>
-        <strong>Gotcha:</strong> For Tithi-sensitive observances (Ekadashi, Amavasya, Pournami) the siddhantic and observational boundaries can fall on different dates — which is why two families can fast on different days without either being "wrong."
-      </div>
-    </div>
-
-    <div class="sys-card vakya">
-      <h3>📜 Vakya — Traditional Printed Panchangam</h3>
-      <p>Builds on Surya Siddhanta with "Vakyas" — pre-computed correction tables passed down through
-      generations of traditional almanac-makers. Many printed Telugu and Tamil panchangams sold each year
-      descend from this tradition, so it suits households following a long-standing family or regional
-      printed panchangam.</p>
-      <button class="read-more" data-more="Read more about Vakya ▾" data-less="Show less ▴" onclick="toggleReadMore('vakya-more', this)">Read more about Vakya ▾</button>
-      <div class="expanded" id="vakya-more">
-        <strong>What it computes:</strong> Builds on Surya Siddhanta mean motions but layers in vakyas — pre-computed correction sequences that account for the Moon's variable speed (faster near perigee, slower near apogee). The word "vakya" means "sentence": each correction value was traditionally encoded as a memorable Sanskrit syllable sequence, attributed to the Vararuci and later Madhava traditions of South India. It let an almanac-maker produce a full panchangam by lookup and arithmetic, with no ephemeris needed.
-        <br/><br/>
-        <strong>Who it's for:</strong> Households that follow a traditional printed almanac. Many printed Telugu and Tamil panchangams descend from the vakya tradition, but publishers differ in which tables and corrections they use — two printed panchangams for the same year routinely disagree by 5–15 minutes on Tithi end-times. This feed implements the vakya approach as a correction layer over Surya Siddhanta; it represents the tradition's method, not any single publisher's booklet. Compare a few days in the preview against your printed panchangam to see how closely they align.
-        <br/><br/>
-        <strong>Gotcha:</strong> Vakya's lunar corrections improve on plain Surya Siddhanta for Moon-dependent timings, but it remains less precise than Drik Ganita for observable events like sunrise and moonrise. If your rule is "we follow our printed panchangam," pick whichever of Vakya or Surya Siddhanta matches it more closely in the preview.
-      </div>
-    </div>
-
-    <p class="tip">Not sure? Drik Ganita is a safe modern default — no two traditional panchangams agree
-    to the minute, and that's normal.</p>
-    </div><!-- /systems-more -->
+    <a class="docs-link" href="/docs/reference/02-engines-and-model">Compare methods, evidence and known limits</a>
   </div>
 
   <div class="card" id="card-mcp">
-    <h2>🤖 Use in AI Assistants</h2>
+    <h2>Use in AI assistants</h2>
     <p class="mcp-tagline">
       Everything this site computes is also an <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
       server — ask Claude or any MCP-compatible assistant for a muhurta, your family's good days, or today's
@@ -1821,7 +1499,7 @@
   </div>
 
   <div class="card" id="card-about">
-    <h2>ℹ️ About</h2>
+    <h2>About</h2>
     <p style="font-size:0.9rem;color:#58504A;margin:0 0 1rem;line-height:1.65;">
       <strong>Astro Chaganti's Panchangam</strong> is a free Telugu/Vedic panchangam built for the
       Telugu-speaking community. It delivers daily almanac data as subscribable calendar feeds, a daily
@@ -1829,20 +1507,13 @@
       an MCP server for AI assistants. Free, open source, no account needed.
     </p>
 
-    <h3 class="sub">Accuracy</h3>
-    <p style="font-size:0.85rem;color:#58504A;margin:0 0 1rem;line-height:1.6;">
-      All timings are verified against <a href="https://drikpanchang.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">drikpanchang.com</a>
-      across multiple cities and dates before each release. Three calculation systems are supported:
-      <strong>Drik Ganita</strong> (modern default, matches drikpanchang.com),
-      <strong>Surya Siddhanta</strong> (classical siddhantic method), and
-      <strong>Vakya</strong> (traditional printed panchangam method).
+    <h3 class="sub">Trust &amp; transparency</h3>
+    <p style="font-size:0.85rem;color:#58504A;margin:0 0 0.55rem;line-height:1.6;">
+      Each computation publishes its inputs, process, code owner, regression coverage, evidence state
+      and known limits. Verification strength varies by computation and calculation system, and is
+      stated explicitly rather than flattened into one accuracy claim.
     </p>
-
-    <h3 class="sub">Coverage</h3>
-    <p style="font-size:0.85rem;color:#58504A;margin:0 0 1rem;line-height:1.6;">
-      22 pre-configured cities across India and the diaspora. Calendar feeds regenerated monthly,
-      18 months ahead. The MCP server computes live for any city and any date, past or future.
-    </p>
+    <a class="docs-link" href="/docs/reference/09-computation-inventory">Read the methods and verification record</a>
 
     <h3 class="sub">Links</h3>
     <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.5rem;">
@@ -1856,11 +1527,6 @@
     </p>
   </div>
 
-  <footer>
-    <div>A free service from AstroChaganti — open source, feeds regenerated monthly, 18 months ahead.</div>
-    <div>For professional consultations: <a href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a></div>
-    <div><a href="https://github.com/socraticsurge/telugu-calendar-utilities">Source on GitHub</a></div>
-  </footer>
 </main>
 
 <!-- App entry: Vite module graph (src/main.ts imports the panels and libs). -->

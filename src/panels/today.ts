@@ -260,12 +260,32 @@ function renderPreview(container, event, events) {
   }
   const angaGrid = anga ? `<div class="anga-grid">${anga}</div>` : '';
 
-  // Header context lines: year context · month context · today's sky frame.
+  // Header context lines: year context · month context. The Sun/Moon timings
+  // become their own living day-cycle band immediately below the header.
   const metaLines = data.samvatsara
     ? `<div class="meta">${data.samvatsara} Nama Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
-       <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>
-       <div class="meta sky">🌅 ${fmtT(data.sunrise)} – ${fmtT(data.sunset)} &nbsp;·&nbsp; 🌙 ${fmtT(data.moonrise)} – ${fmtT(data.moonset)}</div>`
+       <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>`
     : `<div class="meta">${data.meta}</div>`;
+
+  const skyValue = value => value ? fmtT(value) : '—';
+  const skyCycle = (data.sunrise || data.sunset || data.moonrise || data.moonset)
+    ? `<div class="day-cycle" aria-label="Sun and Moon timings">
+         <div class="day-cycle-group day-cycle-sun">
+           <span class="day-cycle-icon" aria-hidden="true">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+           </span>
+           <dl class="day-cycle-time"><dt>Sunrise</dt><dd>${skyValue(data.sunrise)}</dd></dl>
+           <dl class="day-cycle-time"><dt>Sunset</dt><dd>${skyValue(data.sunset)}</dd></dl>
+         </div>
+         <div class="day-cycle-group day-cycle-moon">
+           <span class="day-cycle-icon" aria-hidden="true">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19.2 15.4A8 8 0 0 1 8.6 4.8a8 8 0 1 0 10.6 10.6z"/></svg>
+           </span>
+           <dl class="day-cycle-time"><dt>Moonrise</dt><dd>${skyValue(data.moonrise)}</dd></dl>
+           <dl class="day-cycle-time"><dt>Moonset</dt><dd>${skyValue(data.moonset)}</dd></dl>
+         </div>
+       </div>`
+    : '';
 
   // 3 · When to act or avoid — tile strips in the same language as Choghadiya,
   // in clock order so the day scans morning → evening.
@@ -295,7 +315,9 @@ function renderPreview(container, event, events) {
   const chogCell = c =>
     `<div class="chog-cell ${CHOG_GOOD.has(c.name) ? 'good' : 'bad'}"><div class="chog-name">${c.name}</div><div class="chog-time">${fmtRange(c.start, c.end, '–<wbr>')}</div></div>`;
   let chog = '';
+  const atSunrise = [];
   if (data.choghadiya.length) {
+    atSunrise.push(`${data.choghadiya[0].name} Choghadiya`);
     chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — day in 8 blocks</div><div class="chog-grid">${data.choghadiya.map(chogCell).join('')}</div></div>`;
   }
   // Prefer the feed's night section; compute it locally only for older feeds.
@@ -325,6 +347,7 @@ function renderPreview(container, event, events) {
   let horaHtml = '';
   if (data.sunrise && data.sunset && tomorrowSr) {
     const horas = computeHoras(selectedDate().getDay(), data.sunrise, data.sunset, tomorrowSr);
+    if (horas.day.length) atSunrise.push(`${horas.day[0].lord} Hora`);
     // Day horas live entirely within one calendar day; night horas
     // cross midnight, so feed them through the marker pass with
     // sunset as the "today" anchor.
@@ -337,13 +360,22 @@ function renderPreview(container, event, events) {
     + `<div class="strip-title">🌅 Lagna — rising sign</div>`
     + `<div class="lagna-ribbon" id="lagna-ribbon">`
     + `<div class="preview-note" style="grid-column:1/-1;margin:0;padding:0.4rem;text-align:center;">Loading lagna data…</div>`
-    + `</div>`
-    + `<p class="preview-note" style="margin:0.5rem 0 0;">`
-    + `Cells span sunrise to next sunrise. The first and last cells are often the `
-    + `<em>same rashi</em> — a short partial at sunrise and a longer wrap before `
-    + `next sunrise, because the lagna cycle (~23h 56m) is slightly shorter than `
-    + `the panchangam day (24h).`
-    + `</p></div>`;
+    + `</div></div>`;
+
+  const detailedMeta = atSunrise.length
+    ? `At sunrise · ${htmlEsc(atSunrise.join(' · '))}`
+    : 'Choghadiya · Hora · Lagna';
+
+  const detailedTimings = (chog || horaHtml || lagnaPlaceholder)
+    ? `<details class="daily-details">
+         <summary>
+           <span class="daily-details-title">Detailed timings</span>
+           <span class="daily-details-meta">${detailedMeta}</span>
+           <span class="daily-details-chevron" aria-hidden="true"></span>
+         </summary>
+         <div class="daily-details-body">${chog}${horaHtml}${lagnaPlaceholder}</div>
+       </details>`
+    : '';
 
   container.innerHTML = `
     <div class="preview-card">
@@ -355,12 +387,11 @@ function renderPreview(container, event, events) {
         <div class="date">${formatToday()}${special}<span style="position:relative;display:inline-block;vertical-align:middle;margin-left:0.4em;"><input type="date" class="tp-date-input" value="${_tpDateVal||''}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;" aria-label="Change date"><span aria-hidden="true" style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:5px;padding:2px 6px;font-size:0.75rem;pointer-events:none;">📅</span></span></div>
         ${metaLines}
       </div>
+      ${skyCycle}
       ${flagStrip}
       ${angaGrid}
       ${windows}
-      ${chog}
-      ${horaHtml}
-      ${lagnaPlaceholder}
+      ${detailedTimings}
     </div>
   `;
 

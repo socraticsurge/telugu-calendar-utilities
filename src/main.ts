@@ -94,16 +94,7 @@ import { stampOf } from './lib/format';
     document.getElementById('fmt-24').classList.toggle('active', f === '24');
   }
 
-  // --- Shell: section switching + contextual help sheet ---
-  // (mobile help bottom-sheet pulls in the guide for the active tab —
-  // Today has its own hidden source; Gochara and Tarabalam reuse the
-  // existing #go-help and #tb-help guides verbatim.)
-
-  const HELP_TITLES = {
-    today:     'How to read Today',
-    gochara:   'How to read Gochara · Rasi Phalalu',
-    tarabalam: 'How to use Tarabalam · Muhurtam',
-  };
+  // --- Shell: section switching + accessible navigation drawer ---
   const PAGE_TITLES = {
     today:     ["Today's Panchangam", 'What is the day?'],
     gochara:   ['Gochara · Rasi Phalalu', 'What does it mean for me?'],
@@ -114,7 +105,7 @@ import { stampOf } from './lib/format';
     about:     ['About', 'What this is and how it works'],
   };
   // --- Modal a11y: dialog semantics + focus containment (Phase 4) ---
-  // Applied to the two overlay surfaces (nav drawer, help sheet):
+  // Applied to the navigation drawer:
   // role="dialog"/aria-modal while open, focus moved in on open and
   // restored on close, Tab cycling contained within the surface.
   let _modalRestoreFocus = null;
@@ -144,31 +135,6 @@ import { stampOf } from './lib/format';
     const first = f[0], last = f[f.length - 1];
     if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
     else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
-  }
-
-  function openHelpSheet() {
-    // Help content exists for the three tool panels; other sections get Today's.
-    const cur = document.body.dataset.tool;
-    const tab = (cur === 'gochara' || cur === 'tarabalam') ? cur : 'today';
-    const src = tab === 'today'   ? document.getElementById('today-help-src')
-              : tab === 'gochara' ? document.getElementById('go-help')
-              :                     document.getElementById('tb-help');
-    document.getElementById('m-help-title').textContent = HELP_TITLES[tab];
-    document.getElementById('m-help-body').innerHTML = src ? src.innerHTML : '';
-    document.body.classList.add('m-help-open');
-    const sheet = document.getElementById('m-help-sheet');
-    sheet.setAttribute('aria-hidden', 'false');
-    modalOpen(sheet, document.getElementById('m-help-close'));
-    document.querySelectorAll('.m-page-help-btn').forEach(b => b.setAttribute('aria-expanded', 'true'));
-    if (typeof gcEvent === 'function') gcEvent('help-' + tab);
-  }
-  function closeHelpSheet() {
-    if (!document.body.classList.contains('m-help-open')) return;
-    document.body.classList.remove('m-help-open');
-    const sheet = document.getElementById('m-help-sheet');
-    sheet.setAttribute('aria-hidden', 'true');
-    modalClose(sheet);
-    document.querySelectorAll('.m-page-help-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
   }
 
   const TOOL_PANELS = ['today', 'tarabalam', 'gochara'];
@@ -202,7 +168,7 @@ import { stampOf } from './lib/format';
     if (!el) return;
     const sel = getSelection();
     const sysLabel = (SYSTEMS.find(([v]) => v === sel.system) || [])[1] || sel.system;
-    el.textContent = `${sel.city} · ${sysLabel} · ${sel.timeFmt}h`;
+    el.textContent = `${sel.city} · ${sysLabel} · ${sel.timeFmt}h · Local time`;
   }
   function toggleSettings(open?) {
     const bar = document.getElementById('global-controls-bar');
@@ -284,9 +250,11 @@ import { stampOf } from './lib/format';
   updateSubscribeUrl();
   loadPreview();
 
-  // ---------- Mobile shell — one nav: width flag + sidebar drawer + help sheet ----------
+  // ---------- Mobile shell — one nav: width flag + sidebar drawer ----------
   (function mobileShell() {
-    const mq = window.matchMedia('(max-width: 620px)');
+    // Keep the compact one-shell drawer through tablet widths. The earlier
+    // 620px split left too little room for the data canvas beside the sidebar.
+    const mq = window.matchMedia('(max-width: 839px)');
 
     function applyMode() {
       const mobile = mq.matches;
@@ -297,7 +265,6 @@ import { stampOf } from './lib/format';
     // --- sidebar drawer: the SAME #sidebar element as desktop, slid in ---
     const navBtn = document.getElementById('m-nav-btn');
     function openNav() {
-      closeHelpSheet();
       document.body.classList.add('m-nav-open');
       navBtn.setAttribute('aria-expanded', 'true');
       modalOpen(document.getElementById('sidebar'),
@@ -318,21 +285,11 @@ import { stampOf } from './lib/format';
       b.addEventListener('click', closeNav);
     });
 
-    document.querySelectorAll('.m-page-help-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        closeNav();
-        // toggle: tapping again closes the sheet
-        if (document.body.classList.contains('m-help-open')) closeHelpSheet();
-        else openHelpSheet();
-      });
-    });
-    document.getElementById('m-help-close').addEventListener('click', closeHelpSheet);
-    document.getElementById('m-help-cta').addEventListener('click', closeHelpSheet);
     document.getElementById('m-drawer-scrim').addEventListener('click', () => {
-      closeNav(); closeHelpSheet();
+      closeNav();
     });
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeNav(); closeHelpSheet(); }
+      if (e.key === 'Escape') closeNav();
     });
 
     // --- resize: debounced re-apply, don't thrash on edge widths ---

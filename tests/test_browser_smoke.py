@@ -173,6 +173,70 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
         page.close()
 
 
+@pytest.mark.parametrize(
+    ('width', 'height', 'expected_mode'),
+    (
+        (390, 844, 'mobile'),
+        (768, 1024, 'mobile'),
+        (1024, 768, 'desktop'),
+        (1440, 900, 'desktop'),
+    ),
+)
+def test_daily_surface_is_responsive_and_navigation_remains_usable(
+    docs_server, browser, width, height, expected_mode,
+):
+    """Guard the reviewed IA at the four product breakpoints.
+
+    The day-cycle presentation must not introduce horizontal overflow, and
+    Documentation must remain reachable from the same navigation in both the
+    fixed desktop shell and mobile drawer.
+    """
+    page = browser.new_page(viewport={'width': width, 'height': height})
+    try:
+        page.goto(docs_server, wait_until='networkidle', timeout=15000)
+        page.wait_for_selector('.day-cycle', timeout=10000)
+        metrics = page.evaluate(
+            """() => ({
+                mode: document.body.dataset.mode,
+                overflow: document.documentElement.scrollWidth
+                    - document.documentElement.clientWidth,
+                cycleGroups: document.querySelectorAll('.day-cycle-group').length,
+                helpButton: Boolean(document.querySelector('.m-page-help-btn')),
+            })"""
+        )
+        assert metrics['mode'] == expected_mode
+        assert metrics['overflow'] <= 0
+        assert metrics['cycleGroups'] == 2
+        assert metrics['helpButton'] is False
+
+        docs_link = page.locator('#sidebar a[href="/docs/"]')
+        if expected_mode == 'mobile':
+            nav_button = page.locator('#m-nav-btn')
+            box = nav_button.bounding_box()
+            assert box and box['width'] >= 44 and box['height'] >= 44
+            nav_button.click()
+            assert 'm-nav-open' in page.locator('body').get_attribute('class').split()
+            assert docs_link.is_visible()
+            page.keyboard.press('Escape')
+            assert 'm-nav-open' not in (page.locator('body').get_attribute('class') or '').split()
+        else:
+            assert docs_link.is_visible()
+
+        for control, expected_hash, expected_card in (
+            ('#sidebar-useinai', '#useinai', '#card-mcp'),
+            ('#sidebar-about', '#about', '#card-about'),
+        ):
+            if expected_mode == 'mobile':
+                nav_button.click()
+            page.locator(control).click()
+            assert page.evaluate('location.hash') == expected_hash
+            assert 'active' in page.locator(control).get_attribute('class').split()
+            assert page.locator(expected_card).is_visible()
+            assert page.evaluate('document.body.dataset.tool') == expected_hash[1:]
+    finally:
+        page.close()
+
+
 def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browser):
     """Exercise the muhurta search end-to-end with a populated
     profile and assert (a) no ReferenceError in the JS console and
