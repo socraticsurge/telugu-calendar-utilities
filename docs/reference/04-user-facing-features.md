@@ -137,6 +137,37 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
 
 Everything is shareable to WhatsApp.
 
+### Guest profiles and local data
+
+Guests can save up to **four profiles** for reuse in Daily Horoscope and
+Muhurtam. The Profiles destination supports create, edit, delete, and clear-all
+actions. A saved profile contains:
+
+| Field | Purpose and readiness |
+|-------|-----------------------|
+| **Name** | Required display label for recognizing the person. |
+| **Nakshatra** | Optional while drafting; required for Muhurtam and for deriving the Daily Horoscope's Janma Rashi. |
+| **Padam** | Optional for Muhurtam; needed for Daily Horoscope only when the selected Nakshatra spans two Rashis. |
+| **Lagna** | Optional; used only by journeys that support a Lagna view. |
+
+A profile is **Muhurtam-ready** once it has a Nakshatra. It is **Daily
+Horoscope-ready** once its Janma Rashi can be derived from the Nakshatra, with
+Padam supplied for a Nakshatra that crosses a Rashi boundary. Contextual create
+and edit actions return to the originating journey; a one-off Muhurtam person
+can remain limited to that search instead of becoming a saved profile.
+
+Profiles are stored only in this browser's origin-scoped `localStorage`. Anyone
+using the same browser profile and site origin can see them. They are isolated
+from other browsers, devices, domains, protocols, and ports (including a local
+test server running on a different port). Clearing site data or deleting a
+profile is permanent, and private-browsing storage may disappear when the
+private session ends. There is no account, cloud sync, cross-device transfer,
+or recovery.
+
+GoatCounter may receive fixed, content-free interface events. Analytics must
+never receive profile names, Nakshatra, Padam, Lagna, profile IDs, or stored
+journey selections.
+
 > MCP remains the complete computational interface. The website intentionally
 > presents a curated devotee-facing subset; its declared activity catalogue and
 > generated rule contract are protected by parity tests.

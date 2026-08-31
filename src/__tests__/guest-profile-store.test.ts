@@ -4,6 +4,7 @@ import {
   GUEST_PROFILE_STORAGE_KEY,
   GuestProfileStoreError,
   canonicalLegacyGuestProfileLagna,
+  browserProfileStorage,
   createGuestProfileStore,
   guestProfileReadiness,
   mergeLegacyGuestProfileRow,
@@ -295,6 +296,43 @@ describe('storage failures', () => {
     expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(future);
   });
 
+  test('never overwrites mixed v1 and future-schema bytes across reloads or attempted edits', () => {
+    const mixed = JSON.stringify([
+      {
+        id: 'guest_supported', schemaVersion: 1, name: 'Supported',
+        nak: 'Rohini', pada: '', lagna: '',
+      },
+      {
+        id: 'guest_future', schemaVersion: 2, name: 'Future',
+        nak: 'Hasta', pada: '', lagna: '', futureField: { keep: true },
+      },
+    ]);
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, mixed);
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_unused'),
+    });
+
+    expect(store.getSnapshot()).toMatchObject({
+      profiles: [{ id: 'guest_supported', name: 'Supported' }],
+      persistence: 'memory',
+      issue: 'unsupported-storage-version',
+    });
+    store.reload();
+    expect(store.update('guest_supported', { name: 'Session edit' }).name).toBe('Session edit');
+    expect(() => store.update('guest_future', { name: 'Downgrade attempt' })).toThrowError(
+      expect.objectContaining<Partial<GuestProfileStoreError>>({ code: 'profile-not-found' }),
+    );
+    store.reload();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(mixed);
+
+    const repeatedLoad = createGuestProfileStore(storage, {
+      idFactory: ids('guest_still_unused'),
+    });
+    expect(repeatedLoad.get('guest_supported')?.name).toBe('Supported');
+    expect(repeatedLoad.get('guest_future')).toBeNull();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(mixed);
+  });
+
   test('legacy form edits preserve future schema fields instead of downgrading them', () => {
     const merged = mergeLegacyGuestProfileRow({
       id: 'guest_future', schemaVersion: 2, extra: { future: true },
@@ -361,6 +399,22 @@ describe('storage failures', () => {
     const created = store.create({ name: 'Session only', nakshatra: 'Pushya' });
 
     expect(store.get(created.id)?.name).toBe('Session only');
+    expect(store.getSnapshot()).toMatchObject({
+      persistence: 'memory', issue: 'storage-unavailable',
+    });
+  });
+
+  test('falls back to memory when access to the browser storage property is denied', () => {
+    const lazyStorage = browserProfileStorage(() => {
+      throw new DOMException('denied', 'SecurityError');
+    });
+
+    const store = createGuestProfileStore(lazyStorage, {
+      idFactory: ids('guest_property_denied'),
+    });
+    const created = store.create({ name: 'Session profile' });
+
+    expect(store.get(created.id)?.name).toBe('Session profile');
     expect(store.getSnapshot()).toMatchObject({
       persistence: 'memory', issue: 'storage-unavailable',
     });

@@ -1,6 +1,7 @@
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../data/rasis';
 import {
   GUEST_PROFILE_SCHEMA_VERSION,
+  GUEST_PROFILE_STORAGE_KEY,
   MAX_GUEST_PROFILES,
   GuestProfileStore,
   GuestProfileStoreError,
@@ -16,6 +17,10 @@ export interface ProfilesPanelContext {
   requiredFor?: 'horoscope' | 'muhurta';
 }
 
+interface ResolvedProfilesPanelContext extends ProfilesPanelContext {
+  resolveFocusTarget?: () => HTMLElement | null;
+}
+
 export interface ProfilesPanelOptions {
   navigate: (tool: string) => void;
   root?: HTMLElement;
@@ -28,10 +33,26 @@ export interface ProfilesPanelController {
   destroy(): void;
 }
 
+/**
+ * Refresh guest profiles changed by another tab. Other browser preferences do
+ * not cause profile work; a null key represents localStorage.clear().
+ */
+export function listenForGuestProfileStorageChanges(
+  store: Pick<GuestProfileStore, 'reload'>,
+  target: Window = window,
+): () => void {
+  const onStorage = (event: StorageEvent): void => {
+    if (event.key !== null && event.key !== GUEST_PROFILE_STORAGE_KEY) return;
+    store.reload();
+  };
+  target.addEventListener('storage', onStorage);
+  return () => target.removeEventListener('storage', onStorage);
+}
+
 type PanelView =
   | { kind: 'list' }
-  | { kind: 'create'; context: ProfilesPanelContext }
-  | { kind: 'edit'; profileId: string; context: ProfilesPanelContext };
+  | { kind: 'create'; context: ResolvedProfilesPanelContext }
+  | { kind: 'edit'; profileId: string; context: ResolvedProfilesPanelContext };
 
 function element<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -89,6 +110,47 @@ function restoreFocus(node: HTMLElement | null): void {
   }
   const heading = document.querySelector<HTMLElement>('#profiles-title');
   heading?.focus();
+}
+
+function replacementFocusResolver(
+  target: HTMLElement | null | undefined,
+): (() => HTMLElement | null) | undefined {
+  if (!target) return undefined;
+
+  const gocharaKey = target.dataset.goProfileFocus;
+  if (gocharaKey) {
+    return () => Array.from(
+      document.querySelectorAll<HTMLElement>('[data-go-profile-focus]'),
+    ).find(candidate => candidate.dataset.goProfileFocus === gocharaKey) || null;
+  }
+
+  const action = target.dataset.action;
+  const profileId = target.closest<HTMLElement>('[data-profile-id]')?.dataset.profileId;
+  const scopeId = target.closest('#profiles-root')
+    ? 'profiles-root'
+    : target.closest('#tb-profiles')
+      ? 'tb-profiles'
+      : null;
+  if (!action || !scopeId) return undefined;
+
+  return () => {
+    const scope = document.getElementById(scopeId);
+    if (!scope) return null;
+    return Array.from(scope.querySelectorAll<HTMLElement>('[data-action]')).find(candidate => {
+      if (candidate.dataset.action !== action) return false;
+      if (!profileId) return true;
+      return candidate.closest<HTMLElement>('[data-profile-id]')?.dataset.profileId === profileId;
+    }) || null;
+  };
+}
+
+function resolvePanelContext(
+  context: ProfilesPanelContext,
+): ResolvedProfilesPanelContext {
+  return {
+    ...context,
+    resolveFocusTarget: replacementFocusResolver(context.focusTarget),
+  };
 }
 
 function showNativeDialog(dialog: HTMLDialogElement): void {
@@ -161,15 +223,59 @@ export function initProfilesPanel(
   let view: PanelView = { kind: 'list' };
 
   const returnToOrigin = (
-    context: ProfilesPanelContext,
+    context: ResolvedProfilesPanelContext,
     savedProfile?: GuestProfile,
   ): void => {
     if (context.returnTo) options.navigate(context.returnTo);
     // Select and focus only after the origin is visible again. Hidden controls
     // cannot reliably receive focus in real browsers.
     if (savedProfile) context.onSaved?.(savedProfile);
-    const focusTarget = context.focusTarget;
-    if (focusTarget && focusTarget.isConnected) focusTarget.focus();
+
+    // A completed contextual save changes the task state. Focus the selected
+    // result control instead of the now-stale creation/edit trigger.
+    if (savedProfile && context.returnTo === 'gochara') {
+      document.getElementById('go-view')?.focus();
+      return;
+    }
+    if (savedProfile && context.returnTo === 'tarabalam') {
+      const selectedProfile = Array.from(
+        document.querySelectorAll<HTMLInputElement>('[data-profile-selection]'),
+      ).find(candidate => candidate.dataset.profileSelection === savedProfile.id);
+      if (selectedProfile) {
+        selectedProfile.focus();
+        return;
+      }
+    }
+
+    const originalTarget = context.focusTarget;
+    const focusTarget = originalTarget?.isConnected
+      ? originalTarget
+      : context.resolveFocusTarget?.();
+    if (focusTarget && !(focusTarget instanceof HTMLButtonElement && focusTarget.disabled)) {
+      focusTarget.focus();
+      if (document.activeElement === focusTarget) return;
+    }
+
+    if (context.returnTo === 'gochara') {
+      document.getElementById('go-view')?.focus();
+      return;
+    }
+    if (context.returnTo === 'tarabalam') {
+      document.querySelector<HTMLElement>('#tb-profiles [data-action]')?.focus();
+      return;
+    }
+
+    if (savedProfile) {
+      const savedEdit = Array.from(
+        root.querySelectorAll<HTMLElement>('[data-profile-id] [data-action="edit-profile"]'),
+      ).find(candidate =>
+        candidate.closest<HTMLElement>('[data-profile-id]')?.dataset.profileId === savedProfile.id);
+      if (savedEdit) {
+        savedEdit.focus();
+        return;
+      }
+    }
+    restoreFocus(null);
   };
 
   const renderIssue = (snapshot: GuestProfileSnapshot): HTMLElement | null => {
@@ -247,10 +353,14 @@ export function initProfilesPanel(
     identity.append(name, details, renderReadiness(profile));
 
     const actions = element('div', 'profiles-roster__actions');
-    const edit = button(`Edit ${displayName(profile)}`, 'profiles-button profiles-button--secondary');
+    const edit = button('Edit', 'profiles-button profiles-button--secondary');
+    edit.setAttribute('aria-label', `Edit ${displayName(profile)}`);
     edit.dataset.action = 'edit-profile';
-    edit.addEventListener('click', () => controller.openEdit(profile.id));
-    const remove = button(`Delete ${displayName(profile)}`, 'profiles-button profiles-button--quiet');
+    edit.addEventListener('click', event => controller.openEdit(profile.id, {
+      focusTarget: event.currentTarget as HTMLElement,
+    }));
+    const remove = button('Delete', 'profiles-button profiles-button--quiet');
+    remove.setAttribute('aria-label', `Delete ${displayName(profile)}`);
     remove.dataset.action = 'delete-profile';
     remove.addEventListener('click', () => {
       createConfirmDialog({
@@ -296,7 +406,9 @@ export function initProfilesPanel(
       );
       const create = button('Create profile', 'profiles-button profiles-button--primary');
       create.dataset.action = 'create-profile';
-      create.addEventListener('click', () => controller.openCreate());
+      create.addEventListener('click', event => controller.openCreate({
+        focusTarget: event.currentTarget as HTMLElement,
+      }));
       empty.append(emptyTitle, emptyBody, create);
       fragment.append(empty);
       root.replaceChildren(fragment);
@@ -320,7 +432,9 @@ export function initProfilesPanel(
     create.dataset.action = 'create-profile';
     create.disabled = atLimit;
     if (atLimit) create.setAttribute('aria-describedby', 'profiles-limit-message');
-    create.addEventListener('click', () => controller.openCreate());
+    create.addEventListener('click', event => controller.openCreate({
+      focusTarget: event.currentTarget as HTMLElement,
+    }));
     const clear = button('Clear all profiles', 'profiles-button profiles-button--quiet');
     clear.dataset.action = 'clear-profiles';
     clear.addEventListener('click', () => {
@@ -351,7 +465,7 @@ export function initProfilesPanel(
 
   const renderForm = (
     mode: 'create' | 'edit',
-    context: ProfilesPanelContext,
+    context: ResolvedProfilesPanelContext,
     profile?: GuestProfile,
   ): void => {
     const fragment = document.createDocumentFragment();
@@ -630,23 +744,25 @@ export function initProfilesPanel(
 
   const controller: ProfilesPanelController = {
     openCreate(context = {}) {
+      const resolvedContext = resolvePanelContext(context);
       if (store.getSnapshot().profiles.length >= MAX_GUEST_PROFILES) {
         view = { kind: 'list' };
         renderList();
         return;
       }
-      view = { kind: 'create', context };
-      renderForm('create', context);
+      view = { kind: 'create', context: resolvedContext };
+      renderForm('create', resolvedContext);
     },
     openEdit(profileId, context = {}) {
+      const resolvedContext = resolvePanelContext(context);
       const profile = store.get(profileId);
       if (!profile) {
         view = { kind: 'list' };
         renderList();
         return;
       }
-      view = { kind: 'edit', profileId, context };
-      renderForm('edit', context, profile);
+      view = { kind: 'edit', profileId, context: resolvedContext };
+      renderForm('edit', resolvedContext, profile);
     },
     render() {
       if (view.kind === 'create') {
@@ -669,7 +785,12 @@ export function initProfilesPanel(
     },
   };
 
-  const unsubscribe = store.subscribe(() => controller.render());
+  const unsubscribe = store.subscribe(() => {
+    // An external tab may change persistence while this form is open. Keep the
+    // guest's unsaved fields and focus intact; Cancel or Save reconciles against
+    // the already-refreshed store snapshot.
+    if (view.kind === 'list') controller.render();
+  });
   controller.render();
   return controller;
 }

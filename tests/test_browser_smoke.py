@@ -126,6 +126,230 @@ def _capture_console(page):
     return captured
 
 
+PROFILE_VIEWPORTS = (
+    (390, 844, 'mobile'),
+    (768, 1024, 'mobile'),
+    (1024, 768, 'desktop'),
+    (1440, 900, 'desktop'),
+)
+
+HOSTILE_PROFILE_NAME = (
+    '<img src=x onerror="window.__hostileExecuted=true"> Ready'
+)
+LONG_PROFILE_NAME = 'N' * 80
+READY_PROFILE_ID = 'guest_ready_001'
+INCOMPLETE_PROFILE_ID = 'guest_needs_001'
+
+
+def _profile_rows():
+    """Exact persisted v1 shape used by the browser profile store.
+
+    The first name is deliberately executable if a renderer ever regresses to
+    innerHTML. Every personalized surface must preserve it as literal text.
+    """
+    return [
+        {
+            'id': READY_PROFILE_ID,
+            'schemaVersion': 1,
+            'name': HOSTILE_PROFILE_NAME,
+            'nak': 'Rohini',
+            'pada': '',
+            'lagna': 'Kanya',
+        },
+        {
+            'id': INCOMPLETE_PROFILE_ID,
+            'schemaVersion': 1,
+            'name': LONG_PROFILE_NAME,
+            'nak': '',
+            'pada': '',
+            'lagna': '',
+        },
+    ]
+
+
+def _keep_profile_smoke_offline(target):
+    """Make profile smoke deterministic without hiding local build failures."""
+    target.route(
+        'https://gc.zgo.at/**',
+        lambda route: route.fulfill(
+            status=200,
+            content_type='application/javascript',
+            body='',
+        ),
+    )
+    target.route(
+        'https://panchangam.goatcounter.com/**',
+        lambda route: route.fulfill(status=204, body=''),
+    )
+    target.route(
+        'https://panchangam.astrochaganti.com/**',
+        lambda route: route.fulfill(
+            status=404,
+            content_type='application/json',
+            body='{}',
+        ),
+    )
+
+
+def _wait_for_profile_app(page):
+    page.wait_for_function(
+        "typeof window.switchTool === 'function' && "
+        "['mobile', 'desktop'].includes(document.body.dataset.mode)",
+        timeout=10000,
+    )
+
+
+def _seed_profile_surfaces(page):
+    page.evaluate(
+        """profiles => {
+            localStorage.clear();
+            localStorage.setItem('tc-tb-profiles', JSON.stringify(profiles));
+            localStorage.setItem('tc-go-view', 'profile:guest_ready_001');
+            localStorage.setItem(
+                'tc-mu-profile-ids', JSON.stringify(['guest_ready_001'])
+            );
+        }""",
+        _profile_rows(),
+    )
+    page.reload(wait_until='domcontentloaded', timeout=15000)
+    _wait_for_profile_app(page)
+
+
+def _assert_no_horizontal_overflow(page, surface_name):
+    metrics = page.evaluate(
+        """() => ({
+            overflow: document.documentElement.scrollWidth
+                - document.documentElement.clientWidth,
+            offenders: Array.from(document.querySelectorAll('body *'))
+                .filter(element => {
+                    const style = getComputedStyle(element);
+                    if (style.display === 'none' || style.visibility === 'hidden') {
+                        return false;
+                    }
+                    const rect = element.getBoundingClientRect();
+                    return rect.right > innerWidth + 0.5;
+                })
+                .slice(0, 8)
+                .map(element => {
+                    const rect = element.getBoundingClientRect();
+                    return {
+                        node: `${element.tagName.toLowerCase()}#${element.id}`
+                            + `.${String(element.className).replaceAll(' ', '.')}`,
+                        left: Math.round(rect.left),
+                        right: Math.round(rect.right),
+                        width: Math.round(rect.width),
+                        scrollWidth: element.scrollWidth,
+                    };
+                }),
+            internalOverflow: Array.from(document.querySelectorAll('body *'))
+                .filter(element => {
+                    const style = getComputedStyle(element);
+                    return style.display !== 'none'
+                        && style.visibility !== 'hidden'
+                        && element.scrollWidth > element.clientWidth + 0.5;
+                })
+                .sort((a, b) => (b.scrollWidth - b.clientWidth)
+                    - (a.scrollWidth - a.clientWidth))
+                .slice(0, 8)
+                .map(element => {
+                    const rect = element.getBoundingClientRect();
+                    return {
+                        node: `${element.tagName.toLowerCase()}#${element.id}`
+                            + `.${String(element.className).replaceAll(' ', '.')}`,
+                        clientWidth: element.clientWidth,
+                        scrollWidth: element.scrollWidth,
+                        left: Math.round(rect.left),
+                        right: Math.round(rect.right),
+                    };
+                }),
+        })"""
+    )
+    overflow = metrics['overflow']
+    assert overflow <= 0, (
+        f'{surface_name} has {overflow}px of horizontal overflow at '
+        f'{page.viewport_size}; right-edge offenders: {metrics["offenders"]}; '
+        f'internal overflow: {metrics["internalOverflow"]}'
+    )
+
+
+def _assert_visible_targets_are_44px(locator, surface_name):
+    visible = [locator.nth(index) for index in range(locator.count())
+               if locator.nth(index).is_visible()]
+    assert visible, f'{surface_name} exposed no visible interaction targets'
+    for target in visible:
+        box = target.bounding_box()
+        assert box is not None
+        assert box['width'] >= 44 and box['height'] >= 44, (
+            f'{surface_name} target {target.get_attribute("aria-label") or target.inner_text()!r} '
+            f'is {box["width"]:.1f}x{box["height"]:.1f}px; expected at least 44x44px'
+        )
+
+
+def _assert_computed_contrast_aa(page, selector, label):
+    """Measure WCAG relative luminance from the rendered computed styles."""
+    result = page.locator(selector).first.evaluate(
+        """element => {
+            const parse = value => {
+                const colorPattern = new RegExp(
+                    'rgba?\\\\(\\\\s*([\\\\d.]+)[, ]+\\\\s*([\\\\d.]+)[, ]+'
+                    + '\\\\s*([\\\\d.]+)(?:\\\\s*[,/]\\\\s*([\\\\d.]+))?\\\\s*\\\\)'
+                );
+                const match = value.match(colorPattern);
+                if (!match) throw new Error(`Unsupported computed color: ${value}`);
+                return [Number(match[1]), Number(match[2]), Number(match[3]),
+                    match[4] === undefined ? 1 : Number(match[4])];
+            };
+            const luminance = channels => {
+                const linear = channels.slice(0, 3).map(channel => {
+                    const value = channel / 255;
+                    return value <= 0.04045
+                        ? value / 12.92
+                        : ((value + 0.055) / 1.055) ** 2.4;
+                });
+                return 0.2126 * linear[0] + 0.7152 * linear[1]
+                    + 0.0722 * linear[2];
+            };
+            const style = getComputedStyle(element);
+            const foreground = parse(style.color);
+            let backgroundNode = element;
+            let background = [255, 255, 255, 1];
+            while (backgroundNode) {
+                const candidate = parse(getComputedStyle(backgroundNode).backgroundColor);
+                if (candidate[3] > 0) {
+                    background = candidate;
+                    break;
+                }
+                backgroundNode = backgroundNode.parentElement;
+            }
+            if (background[3] < 1) {
+                background = background.slice(0, 3).map(
+                    value => value * background[3] + 255 * (1 - background[3])
+                ).concat(1);
+            }
+            const lighter = Math.max(luminance(foreground), luminance(background));
+            const darker = Math.min(luminance(foreground), luminance(background));
+            const ratio = (lighter + 0.05) / (darker + 0.05);
+            const fontSize = Number.parseFloat(style.fontSize);
+            const fontWeight = Number.parseInt(style.fontWeight, 10) || 400;
+            const large = fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 700);
+            return {
+                ratio,
+                required: large ? 3 : 4.5,
+                foreground: style.color,
+                background: getComputedStyle(backgroundNode || document.body).backgroundColor,
+                fontSize,
+                fontWeight,
+            };
+        }"""
+    )
+    assert result['ratio'] >= result['required'], (
+        f'{label} contrast is {result["ratio"]:.2f}:1 '
+        f'({result["foreground"]} on {result["background"]}); '
+        f'expected {result["required"]:.1f}:1 for '
+        f'{result["fontSize"]}px/{result["fontWeight"]} text'
+    )
+
+
 def test_index_loads_without_referenceerror(docs_server, browser):
     """The exact bug class of the v1.8.0 hotfix — a sidecar that
     404s makes every inline script call throw ReferenceError. If
@@ -235,6 +459,393 @@ def test_daily_surface_is_responsive_and_navigation_remains_usable(
             assert page.evaluate('document.body.dataset.tool') == expected_hash[1:]
     finally:
         page.close()
+
+
+@pytest.mark.parametrize(
+    ('width', 'height', 'expected_mode'),
+    PROFILE_VIEWPORTS,
+)
+def test_guest_profiles_and_consumers_are_responsive_safe_and_ordered(
+    docs_server, browser, width, height, expected_mode,
+):
+    """Exercise the built profile UI and both consumers at product breakpoints.
+
+    Hidden tool panels stay mounted in this app, so each query is anchored to
+    the panel that has just been made visible. This catches layout, ordering,
+    readiness, target-size and text-injection regressions in the bytes that
+    would actually be deployed.
+    """
+    page = browser.new_page(viewport={'width': width, 'height': height})
+    captured = _capture_console(page)
+    page.add_init_script('window.__hostileExecuted = false')
+    _keep_profile_smoke_offline(page)
+    try:
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        _seed_profile_surfaces(page)
+
+        assert page.locator('body').get_attribute('data-mode') == expected_mode
+        if expected_mode == 'mobile':
+            assert page.locator('#m-topbar').is_visible()
+            mobile_nav = page.locator('#m-nav-btn')
+            assert mobile_nav.is_visible()
+            _assert_visible_targets_are_44px(mobile_nav, 'mobile navigation')
+        else:
+            assert page.locator('#sidebar').is_visible()
+            assert not page.locator('#m-nav-btn').is_visible()
+
+        tool_labels = page.locator(
+            '#sidebar-tools-label + .sidebar-nav .sidebar-label'
+        ).all_inner_texts()
+        assert tool_labels == [
+            'Panchangam', 'Daily Horoscope', 'Muhurtam', 'Profiles', 'Festivals',
+        ]
+
+        # Profiles destination: stable order, explicit readiness and inert text.
+        page.evaluate("window.switchTool('profiles')")
+        profiles_panel = page.locator('#card-profiles')
+        assert profiles_panel.is_visible()
+        assert page.locator('body').get_attribute('data-tool') == 'profiles'
+        assert profiles_panel.locator('.profiles-roster__name').all_inner_texts() == [
+            HOSTILE_PROFILE_NAME, LONG_PROFILE_NAME,
+        ]
+        ready = profiles_panel.locator(
+            f'[data-profile-id="{READY_PROFILE_ID}"]'
+        )
+        incomplete = profiles_panel.locator(
+            f'[data-profile-id="{INCOMPLETE_PROFILE_ID}"]'
+        )
+        ready_text = ready.inner_text()
+        incomplete_text = incomplete.inner_text()
+        assert 'Muhurtam\nReady' in ready_text
+        assert 'Daily Horoscope\nReady · Vrishabha Janma Rashi' in ready_text
+        assert 'Muhurtam\nNeeds Nakshatra' in incomplete_text
+        assert 'Daily Horoscope\nNeeds Nakshatra' in incomplete_text
+        assert profiles_panel.locator('img').count() == 0
+        _assert_visible_targets_are_44px(
+            profiles_panel.locator('button'), 'Profiles',
+        )
+        for selector, label in (
+            ('.profiles-privacy', 'profile body text'),
+            ('.profiles-roster__details', 'muted profile detail'),
+            ('.profiles-button--primary', 'profile primary action'),
+            (
+                '.profiles-readiness__value--needs-details',
+                'profile readiness warning',
+            ),
+        ):
+            _assert_computed_contrast_aa(
+                page, f'#card-profiles {selector}', label,
+            )
+        profiles_panel.get_by_role(
+            'button', name='Create another profile', exact=True,
+        ).click()
+        profiles_panel.locator('button[type="submit"]').click()
+        assert profiles_panel.locator('#profile-name-error').is_visible()
+        _assert_computed_contrast_aa(
+            page, '#card-profiles #profile-name-error', 'profile form error',
+        )
+        profiles_panel.get_by_role('button', name='Cancel', exact=True).click()
+        _assert_no_horizontal_overflow(page, 'Profiles')
+
+        # Daily Horoscope: label and option groups retain source order; an
+        # incomplete profile stays visible but cannot be selected.
+        page.evaluate("window.switchTool('gochara')")
+        gochara_panel = page.locator('#panel-gochara')
+        assert gochara_panel.is_visible()
+        assert gochara_panel.locator('label[for="go-view"]').text_content() == (
+            'Horoscope for'
+        )
+        go_select = gochara_panel.locator('#go-view')
+        assert go_select.is_visible()
+        assert go_select.input_value() == f'profile:{READY_PROFILE_ID}'
+        assert go_select.locator('optgroup').evaluate_all(
+            'groups => groups.map(group => group.label)'
+        ) == ['Saved profiles', 'Any Rashi']
+        saved_options = go_select.locator('optgroup[label="Saved profiles"] option')
+        assert saved_options.all_inner_texts() == [
+            f'{HOSTILE_PROFILE_NAME} · Vrishabha Rashi + Kanya Lagna',
+            f'{LONG_PROFILE_NAME} · Needs Nakshatra',
+        ]
+        assert not saved_options.nth(0).is_disabled()
+        assert saved_options.nth(1).is_disabled()
+        assert HOSTILE_PROFILE_NAME in gochara_panel.locator(
+            '#go-profile-state'
+        ).inner_text()
+        assert gochara_panel.locator('#go-profile-state img').count() == 0
+        _assert_visible_targets_are_44px(go_select, 'Daily Horoscope selector')
+        _assert_visible_targets_are_44px(
+            gochara_panel.locator('#go-profile-state button'),
+            'Daily Horoscope profile actions',
+        )
+        _assert_no_horizontal_overflow(page, 'Daily Horoscope')
+
+        # Muhurtam: the ready choice remains selected while incomplete data is
+        # legible and disabled. The effective checkbox target is its 44px label.
+        page.evaluate("window.switchTool('tarabalam')")
+        muhurta_panel = page.locator('#panel-tarabalam')
+        assert muhurta_panel.is_visible()
+        assert muhurta_panel.locator('.tb-section-label').all_text_contents()[-1] == (
+            'Who is this for?'
+        )
+        muhurta_root = muhurta_panel.locator('#tb-profiles')
+        assert muhurta_root.locator('.muhurta-profile-option__name').all_inner_texts() == [
+            HOSTILE_PROFILE_NAME, LONG_PROFILE_NAME,
+        ]
+        mu_ready = muhurta_root.locator(
+            f'[data-profile-id="{READY_PROFILE_ID}"]'
+        )
+        mu_incomplete = muhurta_root.locator(
+            f'[data-profile-id="{INCOMPLETE_PROFILE_ID}"]'
+        )
+        assert mu_ready.locator('input[data-profile-selection]').is_checked()
+        assert not mu_ready.locator('input[data-profile-selection]').is_disabled()
+        assert mu_incomplete.locator('input[data-profile-selection]').is_disabled()
+        assert 'Needs Nakshatra before Muhurtam' in mu_incomplete.inner_text()
+        assert muhurta_root.locator('img').count() == 0
+        _assert_visible_targets_are_44px(
+            muhurta_root.locator('button'), 'Muhurtam profile actions',
+        )
+        _assert_visible_targets_are_44px(
+            muhurta_root.locator(
+                '.muhurta-profile-option__label:has(input:not([disabled]))'
+            ),
+            'Muhurtam profile choices',
+        )
+        _assert_no_horizontal_overflow(page, 'Muhurtam')
+
+        # The shared contextual form lists existing profiles before creating a
+        # duplicate. Its legal maximum-length names must wrap at every width.
+        create_from_muhurta = muhurta_root.locator(
+            '[data-action="create-profile"]'
+        )
+        create_from_muhurta.click()
+        contextual_profiles = page.locator('#card-profiles')
+        assert contextual_profiles.is_visible()
+        assert LONG_PROFILE_NAME in contextual_profiles.locator(
+            '.profiles-form__existing'
+        ).inner_text()
+        _assert_no_horizontal_overflow(page, 'Contextual profile form')
+        contextual_profiles.get_by_role(
+            'button', name='Cancel', exact=True,
+        ).click()
+        assert muhurta_panel.is_visible()
+        assert page.evaluate(
+            "document.activeElement?.dataset.action === 'create-profile'"
+        )
+
+        assert page.evaluate('window.__hostileExecuted') is False
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, (
+        f'profile surfaces raised page errors at {width}x{height}: '
+        f'{app_errors[:3]}'
+    )
+
+
+def test_guest_profile_keyboard_order_and_native_confirmation(
+    docs_server, browser,
+):
+    """Prove the real built form and destructive confirmation are keyboard-safe."""
+    page = browser.new_page(viewport={'width': 1024, 'height': 768})
+    captured = _capture_console(page)
+    _keep_profile_smoke_offline(page)
+    try:
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        _seed_profile_surfaces(page)
+
+        # Enter through a contextual journey action, not a test-only shortcut.
+        page.evaluate("window.switchTool('gochara')")
+        gochara_panel = page.locator('#panel-gochara')
+        gochara_panel.locator(
+            f'[data-go-profile-action="edit"]'
+            f'[data-go-profile-id="{READY_PROFILE_ID}"]'
+        ).click()
+        profiles_panel = page.locator('#card-profiles')
+        assert profiles_panel.is_visible()
+        assert page.evaluate('document.activeElement.id') == 'profile-name'
+
+        form = profiles_panel.locator('form.profiles-form')
+        assert form.locator('.profiles-field__label').all_text_contents() == [
+            'Name', 'Nakshatra', 'Padam', 'Lagna',
+        ]
+        for current_id, next_id in (
+            ('profile-name', 'profile-nakshatra'),
+            ('profile-nakshatra', 'profile-pada'),
+            ('profile-pada', 'profile-lagna'),
+        ):
+            assert page.evaluate('document.activeElement.id') == current_id
+            page.keyboard.press('Tab')
+            assert page.evaluate('document.activeElement.id') == next_id
+
+        # Leave the form, then verify native Escape/cancel restores the exact
+        # delete trigger before a second dialog confirmation performs deletion.
+        form.get_by_role('button', name='Cancel', exact=True).click()
+        assert page.evaluate(
+            "document.activeElement?.dataset.goProfileFocus "
+            "=== 'edit:guest_ready_001'"
+        )
+
+        # A direct edit returns focus to the replacement control in the
+        # re-rendered Profiles roster, not to the removed form or document body.
+        page.evaluate("window.switchTool('profiles')")
+        profiles_panel = page.locator('#card-profiles')
+        direct_edit = profiles_panel.locator(
+            f'[data-profile-id="{READY_PROFILE_ID}"] '
+            '[data-action="edit-profile"]'
+        )
+        direct_edit.click()
+        assert page.evaluate('document.activeElement.id') == 'profile-name'
+        profiles_panel.get_by_role('button', name='Cancel', exact=True).click()
+        assert page.evaluate(
+            "document.activeElement?.dataset.action === 'edit-profile' && "
+            "document.activeElement?.closest('[data-profile-id]')?.dataset.profileId "
+            "=== 'guest_ready_001'"
+        )
+
+        incomplete_row = profiles_panel.locator(
+            f'[data-profile-id="{INCOMPLETE_PROFILE_ID}"]'
+        )
+        delete_trigger = incomplete_row.locator('[data-action="delete-profile"]')
+        delete_trigger.click()
+        dialog = page.locator('dialog.profiles-dialog')
+        assert dialog.is_visible()
+        page.keyboard.press('Escape')
+        assert dialog.count() == 0
+        assert page.evaluate(
+            "document.activeElement?.dataset.action === 'delete-profile' && "
+            "document.activeElement?.closest('[data-profile-id]')?.dataset.profileId "
+            "=== 'guest_needs_001'"
+        )
+
+        incomplete_row.locator('[data-action="delete-profile"]').click()
+        page.locator('dialog.profiles-dialog').get_by_role(
+            'button', name='Delete profile', exact=True,
+        ).click()
+        assert profiles_panel.locator(
+            f'[data-profile-id="{INCOMPLETE_PROFILE_ID}"]'
+        ).count() == 0
+        assert profiles_panel.locator('[data-profile-id]').count() == 1
+        assert len(page.evaluate(
+            "JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]')"
+        )) == 1
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'profile keyboard flow raised page errors: {app_errors[:3]}'
+
+
+def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
+    docs_server, browser,
+):
+    """Two tabs reconcile profile writes without overwriting an open editor."""
+    context = browser.new_context(viewport={'width': 1024, 'height': 768})
+    _keep_profile_smoke_offline(context)
+    page_a = context.new_page()
+    page_b = context.new_page()
+    captured_a = _capture_console(page_a)
+    captured_b = _capture_console(page_b)
+    try:
+        page_a.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page_a)
+        page_a.evaluate('localStorage.clear()')
+        page_a.reload(wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page_a)
+
+        page_b.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page_b)
+
+        # Tab A starts a local draft and owns focus in the editor.
+        page_a.evaluate("window.switchTool('profiles')")
+        panel_a = page_a.locator('#card-profiles')
+        panel_a.get_by_role('button', name='Create profile', exact=True).click()
+        page_a.fill('#profile-name', 'Unsaved local draft')
+        assert page_a.evaluate('document.activeElement.id') == 'profile-name'
+
+        # Tab B saves a complete profile through the public UI. The native
+        # storage event refreshes Tab A's store and both mounted consumers.
+        page_b.evaluate("window.switchTool('profiles')")
+        panel_b = page_b.locator('#card-profiles')
+        panel_b.get_by_role('button', name='Create profile', exact=True).click()
+        page_b.fill('#profile-name', 'External Ready')
+        page_b.select_option('#profile-nakshatra', 'Rohini')
+        panel_b.locator('button[type="submit"]').click()
+        external_row = panel_b.locator('[data-profile-id]').filter(
+            has_text='External Ready'
+        )
+        external_id = external_row.get_attribute('data-profile-id')
+        assert external_id
+
+        page_a.wait_for_function(
+            "profileId => Boolean(document.querySelector("
+            "`#go-view option[value=\"profile:${profileId}\"]`)) && "
+            "Boolean(document.querySelector("
+            "`#tb-profiles [data-profile-id=\"${profileId}\"]`))",
+            arg=external_id,
+            timeout=10000,
+        )
+        assert page_a.input_value('#profile-name') == 'Unsaved local draft'
+        assert page_a.evaluate('document.activeElement.id') == 'profile-name'
+
+        # Inspect each consumer only after making its panel visible.
+        page_a.evaluate("window.switchTool('gochara')")
+        gochara_a = page_a.locator('#panel-gochara')
+        assert gochara_a.is_visible()
+        assert gochara_a.locator(
+            f'#go-view option[value="profile:{external_id}"]'
+        ).count() == 1
+
+        page_a.evaluate("window.switchTool('tarabalam')")
+        muhurta_a = page_a.locator('#panel-tarabalam')
+        assert muhurta_a.is_visible()
+        assert muhurta_a.locator(
+            f'#tb-profiles [data-profile-id="{external_id}"]'
+        ).is_visible()
+
+        # Returning to the still-open editor keeps the draft; Cancel then
+        # reconciles to the externally saved profile list.
+        page_a.evaluate("window.switchTool('profiles')")
+        assert page_a.input_value('#profile-name') == 'Unsaved local draft'
+        panel_a.get_by_role('button', name='Cancel', exact=True).click()
+        assert panel_a.locator(
+            f'[data-profile-id="{external_id}"]'
+        ).is_visible()
+        assert 'External Ready' in panel_a.inner_text()
+
+        # Clear from Tab B and require the destination plus both consumers in
+        # Tab A to converge through the same storage-event path.
+        panel_b.get_by_role(
+            'button', name='Clear all profiles', exact=True,
+        ).click()
+        page_b.locator('dialog').get_by_role(
+            'button', name='Clear all profiles', exact=True,
+        ).click()
+        assert panel_b.locator('.profiles-empty').is_visible()
+
+        page_a.wait_for_selector(
+            '#card-profiles .profiles-empty', state='visible', timeout=10000,
+        )
+        page_a.evaluate("window.switchTool('gochara')")
+        gochara_a = page_a.locator('#panel-gochara')
+        assert gochara_a.locator(
+            f'#go-view option[value="profile:{external_id}"]'
+        ).count() == 0
+        page_a.evaluate("window.switchTool('tarabalam')")
+        muhurta_a = page_a.locator('#panel-tarabalam')
+        assert muhurta_a.locator('#tb-profiles [data-profile-id]').count() == 0
+        assert muhurta_a.locator('.muhurta-profile-empty').is_visible()
+    finally:
+        context.close()
+
+    app_errors = [
+        msg for kind, msg in [*captured_a, *captured_b]
+        if kind == 'pageerror'
+    ]
+    assert not app_errors, f'two-tab profile flow raised page errors: {app_errors[:3]}'
 
 
 def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browser):

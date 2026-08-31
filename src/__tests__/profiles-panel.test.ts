@@ -9,6 +9,7 @@ import {
 } from '../lib/guest-profile-store';
 import {
   initProfilesPanel,
+  listenForGuestProfileStorageChanges,
   type ProfilesPanelController,
 } from '../panels/profiles';
 
@@ -90,7 +91,7 @@ describe('Profiles panel CRUD', () => {
     expect(query('.profiles-roster__name').textContent).toBe('Anu');
     expect(document.body.textContent).toContain('Ready · Vrishabha Janma Rashi');
 
-    buttonNamed('Edit Anu').click();
+    query<HTMLButtonElement>('button[aria-label="Edit Anu"]').click();
     inputValue('#profile-name', 'Anuradha');
     inputValue('#profile-nakshatra', 'Krittika');
     inputValue('#profile-pada', '2');
@@ -172,7 +173,7 @@ describe('safe destructive actions', () => {
   test('cancels deletion through the native dialog and restores trigger focus', () => {
     store.create({ name: 'Anu' });
     controller.render();
-    const trigger = buttonNamed('Delete Anu');
+    const trigger = query<HTMLButtonElement>('button[aria-label="Delete Anu"]');
     trigger.focus();
     trigger.click();
 
@@ -190,7 +191,7 @@ describe('safe destructive actions', () => {
     store.create({ name: 'Two' });
     controller.render();
 
-    buttonNamed('Delete One').click();
+    query<HTMLButtonElement>('button[aria-label="Delete One"]').click();
     buttonNamed('Delete profile').click();
     expect(store.getSnapshot().profiles.map(profile => profile.name)).toEqual(['Two']);
 
@@ -209,6 +210,76 @@ describe('safe destructive actions', () => {
 });
 
 describe('storage and contextual journeys', () => {
+  test('reloads only for guest-profile changes and localStorage clear events', () => {
+    const reload = vi.spyOn(store, 'reload');
+    const stop = listenForGuestProfileStorageChanges(store, window);
+
+    window.dispatchEvent(new StorageEvent('storage', { key: 'tc-city' }));
+    expect(reload).not.toHaveBeenCalled();
+
+    window.dispatchEvent(new StorageEvent('storage', { key: GUEST_PROFILE_STORAGE_KEY }));
+    window.dispatchEvent(new StorageEvent('storage', { key: null }));
+    expect(reload).toHaveBeenCalledTimes(2);
+
+    stop();
+    window.dispatchEvent(new StorageEvent('storage', { key: GUEST_PROFILE_STORAGE_KEY }));
+    expect(reload).toHaveBeenCalledTimes(2);
+  });
+
+  test('preserves an unsaved edit and focus while an external reload updates the store', () => {
+    const original = store.create({ name: 'Original', nakshatra: 'Rohini' });
+    controller.openEdit(original.id);
+    const name = query<HTMLInputElement>('#profile-name');
+    inputValue('#profile-name', 'Unsaved local edit');
+    name.focus();
+
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify([
+      {
+        id: original.id, schemaVersion: 1, name: 'Changed in another tab',
+        nak: 'Hasta', pada: '', lagna: '',
+      },
+      {
+        id: 'guest_external_2', schemaVersion: 1, name: 'Added elsewhere',
+        nak: 'Pushya', pada: '', lagna: '',
+      },
+    ]));
+    store.reload();
+
+    expect(query<HTMLInputElement>('#profile-name')).toBe(name);
+    expect(name.value).toBe('Unsaved local edit');
+    expect(document.activeElement).toBe(name);
+    expect(store.getSnapshot().profiles.map(profile => profile.name)).toEqual([
+      'Changed in another tab', 'Added elsewhere',
+    ]);
+
+    buttonNamed('Cancel').click();
+    expect(document.body.textContent).toContain('Changed in another tab');
+    expect(document.body.textContent).toContain('Added elsewhere');
+    expect(document.querySelector('form')).toBeNull();
+  });
+
+  test('preserves an unsaved create form across external clear, then shows the latest empty store', () => {
+    store.create({ name: 'Existing' });
+    controller.openCreate();
+    const name = query<HTMLInputElement>('#profile-name');
+    inputValue('#profile-name', 'Unsaved new person');
+    name.focus();
+    const stop = listenForGuestProfileStorageChanges(store, window);
+
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, '[]');
+    window.dispatchEvent(new StorageEvent('storage', { key: null }));
+
+    expect(query<HTMLInputElement>('#profile-name')).toBe(name);
+    expect(name.value).toBe('Unsaved new person');
+    expect(document.activeElement).toBe(name);
+    expect(store.getSnapshot().profiles).toHaveLength(0);
+
+    buttonNamed('Cancel').click();
+    expect(document.body.textContent).toContain('Save a person once');
+    expect(document.body.textContent).not.toContain('Existing');
+    stop();
+  });
+
   test('explains session-only storage failure and malformed-data recovery', () => {
     const root = query<HTMLElement>('#profiles-root');
     controller.destroy();

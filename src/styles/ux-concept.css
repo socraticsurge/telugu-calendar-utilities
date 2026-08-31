@@ -586,6 +586,7 @@ h2.panel-heading { display: none !important; }
   font-size: var(--ux-text-md);
   font-weight: 600;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .profiles-roster__details {
@@ -709,6 +710,11 @@ h2.panel-heading { display: none !important; }
   font-size: var(--ux-text-sm);
 }
 
+.profiles-form__existing-name,
+.profiles-form__existing-readiness {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .profiles-form__existing-name { font-weight: 600; }
 .profiles-form__existing-readiness { color: var(--ux-muted); }
 
@@ -826,6 +832,8 @@ h2.panel-heading { display: none !important; }
 
 .go-profile-action {
   display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
   min-height: 44px;
   align-items: center;
   justify-content: center;
@@ -835,6 +843,7 @@ h2.panel-heading { display: none !important; }
   background: transparent;
   color: var(--ux-brand);
   font: 600 var(--ux-text-sm)/1.2 var(--brand-sans);
+  overflow-wrap: anywhere;
   cursor: pointer;
 }
 
@@ -845,6 +854,28 @@ h2.panel-heading { display: none !important; }
 }
 
 .go-profile-action--secondary { background: transparent; }
+
+.go-phalalu-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ux-space-2);
+}
+
+.go-phalalu-title {
+  flex: 1 1 16rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.go-phalalu-share {
+  position: static;
+  flex: none;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  margin-left: auto;
+}
 
 /* Muhurtam participant selection is a quiet roster, not another dashboard. */
 #tb-profiles {
@@ -916,7 +947,10 @@ h2.panel-heading { display: none !important; }
 
 .muhurta-profile-option__identity { min-width: 0; }
 .muhurta-profile-option__name,
-.muhurta-profile-option__details { display: block; }
+.muhurta-profile-option__details {
+  display: block;
+  overflow-wrap: anywhere;
+}
 .muhurta-profile-option__name { color: var(--ux-ink); }
 .muhurta-profile-option__details {
   margin-top: 2px;
@@ -931,6 +965,8 @@ h2.panel-heading { display: none !important; }
 .muhurta-manual-profile .tb-remove {
   min-height: 44px;
 }
+
+.muhurta-profile-option__edit { min-width: 44px; }
 
 .muhurta-profile-actions {
   display: flex;
@@ -1172,6 +1208,21 @@ body[data-tool='about'] #global-controls-bar { display: none !important; }
   body[data-mode='mobile'] .profiles-actions { align-items: flex-start; }
   body[data-mode='mobile'] .profiles-button--primary { width: 100%; }
   body[data-mode='mobile'] .profiles-form__actions .profiles-button--primary { order: -1; }
+  body[data-mode='mobile'] .go-phalalu-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  body[data-mode='mobile'] .go-phalalu-title { grid-column: 1; }
+  body[data-mode='mobile'] .go-quality {
+    grid-column: 1;
+    justify-self: start;
+    margin-left: 0;
+  }
+  body[data-mode='mobile'] .go-phalalu-share {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-left: 0;
+  }
   body[data-mode='mobile'] .muhurta-profile-option {
     grid-template-columns: minmax(0, 1fr);
   }

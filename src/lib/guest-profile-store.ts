@@ -17,6 +17,23 @@ export interface ProfileStorage {
   setItem(key: string, value: string): void;
 }
 
+/**
+ * Lazily resolve browser storage so an origin that denies access to the
+ * `localStorage` property still reaches GuestProfileStore's in-memory fallback.
+ */
+export function browserProfileStorage(
+  storageProvider: () => ProfileStorage = () => globalThis.localStorage,
+): ProfileStorage {
+  return {
+    getItem(key) {
+      return storageProvider().getItem(key);
+    },
+    setItem(key, value) {
+      storageProvider().setItem(key, value);
+    },
+  };
+}
+
 export interface GuestProfile {
   id: string;
   schemaVersion: typeof GUEST_PROFILE_SCHEMA_VERSION;

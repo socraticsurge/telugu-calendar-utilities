@@ -25,8 +25,25 @@ import {
 } from './panels/tarabalam';
 import { loadLagna, lagnaDayFor } from './lib/lagna-loader';
 import { stampOf } from './lib/format';
-import { createGuestProfileStore } from './lib/guest-profile-store';
-import { initProfilesPanel } from './panels/profiles';
+import {
+  browserProfileStorage,
+  createGuestProfileStore,
+} from './lib/guest-profile-store';
+import {
+  initProfilesPanel,
+  listenForGuestProfileStorageChanges,
+} from './panels/profiles';
+
+  // Access to the localStorage property itself can throw on restricted origins.
+  // The lazy ProfileStorage adapter lets profile state degrade to memory, while
+  // these preference helpers keep the rest of the shell bootable.
+  const browserStorage = browserProfileStorage();
+  function readBrowserPreference(key) {
+    try { return browserStorage.getItem(key); } catch { return null; }
+  }
+  function writeBrowserPreference(key, value) {
+    try { browserStorage.setItem(key, value); } catch { /* session only */ }
+  }
 
   function populateCitySelect(select) {
     CITY_GROUPS.forEach(([label, cities]) => {
@@ -91,7 +108,7 @@ import { initProfilesPanel } from './panels/profiles';
 
   // Seed the store from persistence; fmtT (src/lib/format.ts) reads the
   // store on every call.
-  initSelection({ timeFmt: localStorage.getItem('tc-time-fmt') === '24' ? '24' : '12' });
+  initSelection({ timeFmt: readBrowserPreference('tc-time-fmt') === '24' ? '24' : '12' });
 
   function setTimeFmt(f) {
     setSelection({ timeFmt: f });
@@ -169,10 +186,12 @@ import { initProfilesPanel } from './panels/profiles';
     if (which === 'gochara') loadGochara();
   }
 
-  const profileStore = createGuestProfileStore(localStorage);
+  const profileStore = createGuestProfileStore(browserStorage);
   const profilesPanel = initProfilesPanel(profileStore, { navigate: switchTool });
+  listenForGuestProfileStorageChanges(profileStore);
   const gocharaProfiles = initGocharaProfiles(profileStore, {
     createProfile(trigger) {
+      switchTool('profiles');
       profilesPanel.openCreate({
         returnTo: 'gochara',
         requiredFor: 'horoscope',
@@ -181,9 +200,9 @@ import { initProfilesPanel } from './panels/profiles';
           gocharaProfiles.selectProfile(profile.id);
         },
       });
-      switchTool('profiles');
     },
     editProfile(id, trigger) {
+      switchTool('profiles');
       profilesPanel.openEdit(id, {
         returnTo: 'gochara',
         requiredFor: 'horoscope',
@@ -192,7 +211,6 @@ import { initProfilesPanel } from './panels/profiles';
           gocharaProfiles.selectProfile(profile.id);
         },
       });
-      switchTool('profiles');
     },
     manageProfiles() {
       switchTool('profiles');
@@ -200,6 +218,7 @@ import { initProfilesPanel } from './panels/profiles';
   });
   const tarabalamProfiles = initTarabalamProfiles(profileStore, {
     createProfile(trigger) {
+      switchTool('profiles');
       profilesPanel.openCreate({
         returnTo: 'tarabalam',
         requiredFor: 'muhurta',
@@ -208,9 +227,9 @@ import { initProfilesPanel } from './panels/profiles';
           tarabalamProfiles.selectProfile(profile.id);
         },
       });
-      switchTool('profiles');
     },
     editProfile(id, trigger) {
+      switchTool('profiles');
       profilesPanel.openEdit(id, {
         returnTo: 'tarabalam',
         requiredFor: 'muhurta',
@@ -219,7 +238,6 @@ import { initProfilesPanel } from './panels/profiles';
           tarabalamProfiles.selectProfile(profile.id);
         },
       });
-      switchTool('profiles');
     },
     manageProfiles() {
       switchTool('profiles');
@@ -261,8 +279,8 @@ import { initProfilesPanel } from './panels/profiles';
   {
     const citySel = selEl('tp-city') as HTMLSelectElement;
     const sysSel = selEl('tp-system') as HTMLSelectElement;
-    const savedCity = localStorage.getItem('tc-city');
-    const savedSystem = localStorage.getItem('tc-system');
+    const savedCity = readBrowserPreference('tc-city');
+    const savedSystem = readBrowserPreference('tc-system');
     if (savedCity && [...citySel.options].some(o => o.value === savedCity)) citySel.value = savedCity;
     if (savedSystem && [...sysSel.options].some(o => o.value === savedSystem)) sysSel.value = savedSystem;
   }
@@ -276,7 +294,7 @@ import { initProfilesPanel } from './panels/profiles';
     setSelection({ system: (e.target as HTMLSelectElement).value }));
   subscribeSelection((sel, changed) => {
     if (changed.includes('timeFmt')) {
-      localStorage.setItem('tc-time-fmt', sel.timeFmt);
+      writeBrowserPreference('tc-time-fmt', sel.timeFmt);
       applyTimeFmtUI();
       updateSettingsSummary();
       renderAll();
@@ -285,8 +303,8 @@ import { initProfilesPanel } from './panels/profiles';
       if (muHasLast()) renderMuhurta();
     }
     if (changed.includes('city') || changed.includes('system')) {
-      localStorage.setItem('tc-city', sel.city);
-      localStorage.setItem('tc-system', sel.system);
+      writeBrowserPreference('tc-city', sel.city);
+      writeBrowserPreference('tc-system', sel.system);
       updateSettingsSummary();
       const citySel = selEl('tp-city') as HTMLSelectElement;
       const sysSel = selEl('tp-system') as HTMLSelectElement;
