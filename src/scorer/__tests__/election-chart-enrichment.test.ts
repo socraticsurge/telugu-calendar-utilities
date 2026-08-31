@@ -554,4 +554,33 @@ describe('bounded election-chart enrichment', () => {
     const request = derive.mock.calls[0][0];
     expect(Object.keys(request).sort()).toEqual(['instants', 'location']);
   });
+
+  test('disabled screening preserves and review-gates the shortlist without deriving', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) => response(request));
+    const now = vi.spyOn(Date, 'now');
+    const base = slots(12);
+    try {
+      const result = await enrichElectionChartSlots(base, {
+        activity: 'wedding',
+        system: 'drik',
+        location: LOCATION,
+        derive,
+        activationFlag: 'false',
+        locationLike: { hostname: '127.0.0.1' } as Location,
+      });
+      expect(result.state).toBe('disabled');
+      expect(result.slots.map(slot => slot.score)).toEqual(
+        base.slice(0, 10).map(slot => slot.score),
+      );
+      expect(result.slots.every(slot => slot.tier !== 'Excellent')).toBe(true);
+      expect(result.slots.every(
+        slot => slot.dayDosha === 'practitioner_review',
+      )).toBe(true);
+      expect(result.message).toMatch(/not active in this public build/);
+      expect(derive).not.toHaveBeenCalled();
+      expect(now).not.toHaveBeenCalled();
+    } finally {
+      now.mockRestore();
+    }
+  });
 });

@@ -1473,9 +1473,11 @@ h2.panel-heading { display: none !important; }
 }
 .mu-chart-status--screened { border-left-color: var(--ux-good); }
 .mu-chart-status--screened strong { color: var(--ux-good); }
+.mu-chart-status--disabled,
 .mu-chart-status--unavailable,
 .mu-chart-status--unsupported-system,
 .mu-chart-status--not-run { border-left-color: #8a5518; }
+.mu-chart-status--disabled strong,
 .mu-chart-status--unavailable strong,
 .mu-chart-status--unsupported-system strong,
 .mu-chart-status--not-run strong { color: #8a5518; }

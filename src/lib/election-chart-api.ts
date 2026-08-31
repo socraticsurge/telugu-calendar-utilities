@@ -1,10 +1,16 @@
 import type { BirthChartPlanet, BirthProfileEngine } from './birth-profile-api';
-import { birthProfileApiBase } from './birth-profile-api';
 import { RASI_NAMES } from '../data/rasis';
+import {
+  electionChartCalculationEnabled,
+  isLoopbackHostname,
+  type ElectionChartLocation as ElectionChartBrowserLocation,
+} from './remote-calculation-activation';
 
 export const ELECTION_CHART_CONTRACT_VERSION = '1.0' as const;
 export const ELECTION_CHART_BATCH_LIMIT = 24;
 const DEFAULT_TIMEOUT_MS = 20_000;
+const PRODUCTION_API_BASE = 'https://astrochaganti.com/api/guest';
+const LOCAL_API_BASE = 'http://127.0.0.1:3000/api/guest';
 const CANONICAL_PLANET_ORDER = [
   'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
   'Shukra', 'Shani', 'Rahu', 'Ketu',
@@ -43,6 +49,7 @@ export interface ElectionChartRequest {
 }
 
 export type ElectionChartApiErrorCode =
+  | 'disabled'
   | 'invalid-request'
   | 'invalid-response'
   | 'network'
@@ -63,10 +70,53 @@ export class ElectionChartApiError extends Error {
 }
 
 export interface ElectionChartApiOptions {
+  activationFlag?: string;
   baseUrl?: string;
   fetcher?: typeof fetch;
+  locationLike?: ElectionChartBrowserLocation;
   timeoutMs?: number;
   signal?: AbortSignal;
+}
+
+function configuredElectionChartApiBase(): string | undefined {
+  return (
+    import.meta as ImportMeta & { env?: Record<string, string | undefined> }
+  ).env?.VITE_ELECTION_CHART_API_BASE;
+}
+
+function normalizedConfiguredBase(
+  configuredBase: string | undefined,
+  trust: (url: URL) => boolean,
+): string | null {
+  if (!configuredBase) return null;
+  try {
+    const url = new URL(configuredBase);
+    if (!trust(url)) return null;
+    return configuredBase.replace(/\/+$/, '');
+  } catch {
+    return null;
+  }
+}
+
+function isTrustedLoopbackBase(url: URL): boolean {
+  return url.protocol === 'http:'
+    && isLoopbackHostname(url.hostname)
+    && !url.username
+    && !url.password
+    && !url.search
+    && !url.hash;
+}
+
+function isTrustedProductionBase(url: URL): boolean {
+  const canonical = new URL(PRODUCTION_API_BASE);
+  return url.protocol === 'https:'
+    && url.hostname === canonical.hostname
+    && url.port === canonical.port
+    && url.pathname.replace(/\/+$/, '') === canonical.pathname
+    && !url.username
+    && !url.password
+    && !url.search
+    && !url.hash;
 }
 
 function record(value: unknown): Record<string, unknown> | null {
@@ -122,22 +172,14 @@ function parseSnapshot(value: unknown, expectedInstant: string): ElectionChartSn
 }
 
 export function electionChartApiBase(
-  configuredBase: string | undefined = (
-    import.meta as ImportMeta & { env?: Record<string, string | undefined> }
-  ).env?.VITE_ELECTION_CHART_API_BASE,
+  configuredBase: string | undefined = configuredElectionChartApiBase(),
+  locationLike: ElectionChartBrowserLocation = globalThis.location,
 ): string {
-  if (configuredBase) {
-    try {
-      const url = new URL(configuredBase);
-      const loopback = url.hostname === '127.0.0.1'
-        || url.hostname === 'localhost'
-        || url.hostname === '[::1]';
-      if (url.protocol === 'http:' && loopback) return configuredBase.replace(/\/+$/, '');
-    } catch {
-      // Invalid test-only configuration falls back to the canonical gateway.
-    }
+  if (locationLike && isLoopbackHostname(locationLike.hostname)) {
+    return normalizedConfiguredBase(configuredBase, isTrustedLoopbackBase) || LOCAL_API_BASE;
   }
-  return birthProfileApiBase();
+  return normalizedConfiguredBase(configuredBase, isTrustedProductionBase)
+    || PRODUCTION_API_BASE;
 }
 
 function validateRequest(input: ElectionChartRequest): void {
@@ -251,6 +293,14 @@ export async function deriveElectionCharts(
   options: ElectionChartApiOptions = {},
 ): Promise<ElectionChartDerivation> {
   validateRequest(input);
+  const locationLike = options.locationLike ?? globalThis.location;
+  if (!electionChartCalculationEnabled(locationLike, options.activationFlag)) {
+    throw new ElectionChartApiError(
+      'disabled',
+      'Exact election-chart screening is not active in this public build.',
+    );
+  }
+  const baseUrl = electionChartApiBase(options.baseUrl, locationLike);
   const fetcher = options.fetcher || globalThis.fetch;
   const controller = new AbortController();
   const onExternalAbort = (): void => controller.abort();
@@ -261,7 +311,7 @@ export async function deriveElectionCharts(
   );
   try {
     const response = await fetcher(
-      `${options.baseUrl || electionChartApiBase()}/muhurta/election-charts`,
+      `${baseUrl}/muhurta/election-charts`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

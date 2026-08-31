@@ -183,4 +183,85 @@ describe('election-chart gateway client', () => {
     }, { baseUrl: 'https://example.test/api/guest', fetcher }))
       .rejects.toMatchObject({ code: 'invalid-response' });
   });
+
+  test('trusts only the canonical HTTPS guest base on a public host', () => {
+    const publicLocation = {
+      hostname: 'panchangam.astrochaganti.com',
+    } as Location;
+    const canonical = 'https://astrochaganti.com/api/guest';
+    expect(electionChartApiBase(`${canonical}/`, publicLocation)).toBe(canonical);
+    for (const configured of [
+      'http://127.0.0.1:3000/api/guest',
+      'https://untrusted.example/api/guest',
+      'https://user:pass@astrochaganti.com/api/guest',
+      'https://astrochaganti.com:444/api/guest',
+      'https://astrochaganti.com/api/guest/extra',
+      'https://astrochaganti.com/api/guest?debug=1',
+      'https://astrochaganti.com/api/guest#debug',
+    ]) {
+      expect(electionChartApiBase(configured, publicLocation)).toBe(canonical);
+    }
+  });
+
+  test('allows local configuration only for credential-free HTTP loopback', () => {
+    const localLocation = { hostname: '127.0.0.1' } as Location;
+    const fallback = 'http://127.0.0.1:3000/api/guest';
+    expect(electionChartApiBase(
+      'http://localhost:19014/api/guest/',
+      localLocation,
+    )).toBe('http://localhost:19014/api/guest');
+    for (const configured of [
+      'https://localhost:19014/api/guest',
+      'http://user:pass@localhost:19014/api/guest',
+      'http://localhost:19014/api/guest?debug=1',
+      'http://localhost:19014/api/guest#debug',
+      'https://astrochaganti.com/api/guest',
+    ]) {
+      expect(electionChartApiBase(configured, localLocation)).toBe(fallback);
+    }
+  });
+
+  test('fails with typed disabled state before signal, timer, or fetch side effects', async () => {
+    const fetcher = vi.fn<typeof fetch>();
+    const addEventListener = vi.fn();
+    const removeEventListener = vi.fn();
+    const timeout = vi.spyOn(globalThis, 'setTimeout');
+    try {
+      await expect(deriveElectionCharts({
+        location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+        instants: ['2026-09-08T05:30:00.000Z'],
+      }, {
+        activationFlag: 'false',
+        locationLike: { hostname: '127.0.0.1' } as Location,
+        fetcher,
+        signal: { addEventListener, removeEventListener } as unknown as AbortSignal,
+        timeoutMs: 1,
+      })).rejects.toMatchObject({ code: 'disabled', status: null });
+      expect(fetcher).not.toHaveBeenCalled();
+      expect(addEventListener).not.toHaveBeenCalled();
+      expect(removeEventListener).not.toHaveBeenCalled();
+      expect(timeout).not.toHaveBeenCalled();
+    } finally {
+      timeout.mockRestore();
+    }
+  });
+
+  test('uses the canonical URL for an explicitly enabled public request', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(
+      JSON.stringify(validResponse()),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ));
+    await deriveElectionCharts({
+      location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, {
+      activationFlag: 'true',
+      baseUrl: 'http://127.0.0.1:3000/api/guest',
+      fetcher,
+      locationLike: { hostname: 'panchangam.astrochaganti.com' } as Location,
+    });
+    expect(fetcher.mock.calls[0][0]).toBe(
+      'https://astrochaganti.com/api/guest/muhurta/election-charts',
+    );
+  });
 });

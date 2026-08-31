@@ -9,6 +9,10 @@ import {
 } from '../lib/election-chart-api';
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../data/rasis';
 import {
+  electionChartCalculationEnabled,
+  type ElectionChartLocation as ElectionChartBrowserLocation,
+} from '../lib/remote-calculation-activation';
+import {
   automatedRulesFor,
   evaluateElectionSnapshots,
   type ElectionChartScreening,
@@ -42,6 +46,7 @@ export type ElectionChartEnrichmentState =
   | 'not-run'
   | 'manual-only'
   | 'unsupported-system'
+  | 'disabled'
   | 'unavailable';
 
 export interface ElectionChartEnrichment<TSlot extends EnrichableMuhurtamSlot> {
@@ -72,6 +77,8 @@ export interface ElectionChartEnrichmentOptions {
   personalParticipant?: PersonalElectionParticipant | null;
   boundarySupportAvailable?: boolean;
   screeningTimeoutMs?: number;
+  activationFlag?: string;
+  locationLike?: ElectionChartBrowserLocation;
 }
 
 const MAX_INSTANTS_PER_REQUEST = 24;
@@ -170,11 +177,12 @@ function baseResult<TSlot extends EnrichableMuhurtamSlot>(
   };
 }
 
-function unavailableResult<TSlot extends EnrichableMuhurtamSlot>(
+function reviewGatedResult<TSlot extends EnrichableMuhurtamSlot>(
+  state: 'disabled' | 'unavailable',
   slots: readonly TSlot[],
   message: string,
 ): ElectionChartEnrichment<TSlot> {
-  const result = baseResult('unavailable', slots, message);
+  const result = baseResult(state, slots, message);
   result.slots = result.slots.map(slot => ({
     ...slot,
     tier: slot.tier === 'Excellent' ? 'Good' : slot.tier,
@@ -183,7 +191,17 @@ function unavailableResult<TSlot extends EnrichableMuhurtamSlot>(
   return result;
 }
 
+function unavailableResult<TSlot extends EnrichableMuhurtamSlot>(
+  slots: readonly TSlot[],
+  message: string,
+): ElectionChartEnrichment<TSlot> {
+  return reviewGatedResult('unavailable', slots, message);
+}
+
 function unavailableMessage(error: unknown): string {
+  if (error instanceof ElectionChartApiError && error.code === 'disabled') {
+    return 'Panchangam-ranked; exact chart screening is not active in this public build.';
+  }
   if (error instanceof ElectionChartApiError && error.code === 'rate-limited') {
     const seconds = error.retryAfterSeconds === null
       ? null
@@ -253,6 +271,13 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
       'Exact election-chart screening currently uses Drik/Lahiri and was not blended into this selected system.',
     );
   }
+  if (!electionChartCalculationEnabled(options.locationLike, options.activationFlag)) {
+    return reviewGatedResult(
+      'disabled',
+      baseSlots,
+      'Panchangam-ranked; exact chart screening is not active in this public build.',
+    );
+  }
   if (options.boundarySupportAvailable === false) {
     return unavailableResult(
       baseSlots,
@@ -300,7 +325,12 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
       }
       const response = await derive(
         { location: options.location, instants },
-        { signal: options.signal, timeoutMs: remainingTimeoutMs },
+        {
+          activationFlag: options.activationFlag,
+          locationLike: options.locationLike,
+          signal: options.signal,
+          timeoutMs: remainingTimeoutMs,
+        },
       );
       requestCount += 1;
       engine = response.engine;

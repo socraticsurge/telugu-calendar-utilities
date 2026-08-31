@@ -55,6 +55,7 @@ import {
   chartManualRemaindersFor,
 } from '../scorer/election-chart-screening';
 import { localWallTimeToInstant } from '../lib/election-chart-api';
+import { electionChartCalculationEnabled } from '../lib/remote-calculation-activation';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
 // --- Tarabalam tool ---
@@ -2223,8 +2224,14 @@ async function findMuhurta() {
       muSetResultMessage(box, 'Search inputs changed · find slots again.');
       return;
     }
-    if (slots.length) {
+    const chartCalculationEnabled = electionChartCalculationEnabled();
+    if (slots.length && chartCalculationEnabled) {
       muSetResultMessage(box, 'Shortlist ready · screening exact election charts…');
+    } else if (slots.length) {
+      muSetResultMessage(
+        box,
+        'Shortlist ready · exact chart screening is not active in this build.',
+      );
     }
     const location = CITY_LOCATIONS[city];
     const chartEnrichment = location
@@ -2389,6 +2396,10 @@ function renderMuhurta() {
         title: 'Selected system kept separate',
         detail: 'Exact chart screening currently uses Drik/Lahiri, so it was not blended into this result.',
       },
+      disabled: {
+        title: 'Panchangam shortlist shown · review needed',
+        detail: 'Exact chart screening is intentionally not active in this public build; no slot is presented as chart-screened.',
+      },
       unavailable: {
         title: 'Panchangam shortlist shown',
         detail: 'Exact chart screening could not be reached; no slot is presented as chart-screened.',
@@ -2412,8 +2423,10 @@ function renderMuhurta() {
       ? `${roleProfile.name} · evaluated locally against the source-specific personal rules`
       : chartEnrichment?.state === 'unsupported-system'
         ? `${roleProfile.name} selected · source-specific personal checks were not run for this system`
-        : chartEnrichment?.state === 'not-run'
+      : chartEnrichment?.state === 'not-run'
           ? `${roleProfile.name} selected · there was no shortlisted slot to evaluate`
+          : chartEnrichment?.state === 'disabled'
+            ? `${roleProfile.name} selected · source-specific personal checks are not active in this build`
           : `${roleProfile.name} selected · source-specific personal checks could not run without exact chart facts`;
   const personalRoleHtml = roleRequirement
     ? `<div class="mu-personal-role">
