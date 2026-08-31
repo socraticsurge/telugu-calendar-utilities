@@ -23,7 +23,7 @@ PyPI version tracks this file's most recent release entry.
   pinned to the canonical HTTPS guest gateway, and a disabled build retains
   the shortlist with an honest rating cap and review state.
 - Keep the established 79-module computation-layer contract unchanged while
-  reporting four profile/activation modules as additive feature sources.
+  reporting twelve profile/activation modules as additive feature sources.
 - Align the dependency security gate with the environment installed from the
   same `requirements.txt` input used by CI and release workflows, and refresh
   the separate Python 3.11 reproducibility snapshot with current dependency
