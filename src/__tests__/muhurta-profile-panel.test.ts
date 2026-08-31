@@ -5,7 +5,18 @@ import {
   type GuestProfileStore,
   type ProfileStorage,
 } from '../lib/guest-profile-store';
-import { MUHURTAM_PROFILE_IDS_STORAGE_KEY } from '../lib/profile-selection';
+import {
+  MUHURTAM_PROFILE_IDS_STORAGE_KEY,
+  MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY,
+} from '../lib/profile-selection';
+import type {
+  ElectionChartRequest,
+  ElectionChartSnapshot,
+} from '../lib/election-chart-api';
+import {
+  enrichElectionChartSlots,
+  type EnrichableMuhurtamSlot,
+} from '../scorer/election-chart-enrichment';
 
 interface Participant {
   id: string;
@@ -16,10 +27,18 @@ interface Participant {
   lagna: string | null;
 }
 
+interface ManualCheckRow {
+  text: string;
+  display_section: 'chart' | 'information' | 'practical';
+  applicable_varas?: string[];
+  purpose?: string;
+}
+
 interface ProfilesController {
   destroy(): void;
   getParticipants(): Participant[];
   getSelectedIds(): string[];
+  getRoleParticipant(activity: string): Participant | null;
   selectProfile(id: string): boolean;
 }
 
@@ -37,6 +56,22 @@ interface TarabalamPanelModule {
   tbRenderProfileInputs(): void;
   tbSaveProfiles(): void;
   tbResetProfiles(): void;
+  muRelevantManualChecks(activity: string, vaaram: string): ManualCheckRow[];
+  muClassifyManualChecks(activity: string, rows?: ManualCheckRow[] | null): {
+    chart: string[];
+    information: string[];
+    practical: string[];
+  };
+  muSafetyOverrideFor(activity: string): string | null;
+  muChartCheckMinutes(
+    lagnaDay: unknown, startMinute: number, endMinute: number,
+  ): number[];
+  muChartLagnasForMinutes(lagnaDay: unknown, minutes: number[]): string[] | null;
+  muChartBoundaryNeedsReview(
+    lagnaDay: unknown, startMinute: number, endMinute: number,
+  ): boolean;
+  muValidLagnaDayData(lagnaDay: unknown): boolean;
+  muShareableMuhurtaReasons(slot: unknown): string[];
 }
 
 class MemoryStorage implements ProfileStorage {
@@ -97,7 +132,14 @@ function renderPanelFixture(): void {
     <div id="mu-result">old slots</div>
     <input id="tb-from" value="2026-08-28">
     <input id="tb-to" value="2026-09-04">
-    <select id="mu-activity"><option value="wedding" selected>Wedding</option></select>
+    <select id="mu-activity">
+      <option value="wedding" selected>Wedding</option>
+      <option value="gold">Gold</option>
+      <option value="travel">Travel</option>
+      <option value="gruhapravesha">Gruhapravesha</option>
+      <option value="seemantha">Seemantha</option>
+      <option value="surgery">Surgery</option>
+    </select>
   `;
 }
 
@@ -196,6 +238,267 @@ afterAll(() => {
 });
 
 describe('Muhurtam saved-profile participants', () => {
+  test('samples both sides of every Lagna transition inside a slot', () => {
+    const day = {
+      sunrise: '06:00',
+      lagna0: 0,
+      transitions: [
+        [10, 1], [20, 2], [30, 3], [40, 4], [50, 5], [70, 6],
+        [95, 7], [200, 8], [300, 9], [400, 10], [500, 11], [600, 0],
+      ],
+      cycleEnd: 1440,
+    };
+    const minutes = panel.muChartCheckMinutes(day, 420, 470);
+    expect(minutes).toEqual([
+      420, 429, 430, 431, 440, 450, 454, 455, 456, 460, 469,
+    ]);
+    expect(panel.muChartLagnasForMinutes(day, minutes)).toEqual([
+      'Kanya', 'Kanya', 'Tula', 'Tula', 'Tula',
+      'Tula', 'Tula', 'Vrischika', 'Vrischika', 'Vrischika', 'Vrischika',
+    ]);
+    expect(panel.muChartBoundaryNeedsReview(day, 420, 470)).toBe(false);
+    expect(panel.muChartBoundaryNeedsReview(day, 430, 470)).toBe(true);
+    expect(panel.muChartBoundaryNeedsReview(day, 420, 430)).toBe(true);
+  });
+
+  test('feeds the canonical Sydney boundary plan into conservative chart decisions', async () => {
+    const hyderabadDay = {
+      sunrise: '06:49',
+      lagna0: 10,
+      transitions: Array.from({ length: 12 }, (_, index) => [
+        210 + index * 100,
+        (11 + index) % 12,
+      ]),
+      cycleEnd: 1440,
+    };
+    const hyderabadMinutes = panel.muChartCheckMinutes(hyderabadDay, 619, 620);
+    expect(hyderabadMinutes).toEqual([619]);
+    expect(panel.muChartLagnasForMinutes(hyderabadDay, hyderabadMinutes))
+      .toEqual(['Meena']);
+    expect(panel.muChartBoundaryNeedsReview(hyderabadDay, 619, 620)).toBe(true);
+
+    const day = {
+      sunrise: '06:49',
+      lagna0: 5,
+      transitions: Array.from({ length: 12 }, (_, index) => [
+        466 + index * 80,
+        (6 + index) % 12,
+      ]),
+      cycleEnd: 1440,
+    };
+    const buildSlot = (
+      startMinute: number,
+      endMinute: number,
+    ): EnrichableMuhurtamSlot => {
+      const minutes = panel.muChartCheckMinutes(day, startMinute, endMinute);
+      return {
+        isoDate: '2026-05-28',
+        s0: startMinute,
+        e0: endMinute,
+        score: 12,
+        tier: 'Excellent',
+        dayDosha: null,
+        reasonGroups: {},
+        chartCheckMinutes: minutes,
+        chartCheckLagnas: panel.muChartLagnasForMinutes(day, minutes),
+        chartBoundarySupported: panel.muValidLagnaDayData(day),
+        chartBoundaryNeedsReview: panel.muChartBoundaryNeedsReview(
+          day, startMinute, endMinute,
+        ),
+      };
+    };
+    const planets = [
+      'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
+      'Shukra', 'Shani', 'Rahu', 'Ketu',
+    ];
+    const derive = vi.fn(async (request: ElectionChartRequest) => ({
+      contractVersion: '1.0' as const,
+      engine: {
+        name: 'DashaFlow', version: '1.1.0', ayanamsha: 'Lahiri',
+        ephemeris: 'swiss' as const, nodeConvention: 'mean' as const,
+      },
+      houseSystem: 'whole_sign' as const,
+      location: request.location,
+      charts: request.instants.map((instant, index): ElectionChartSnapshot => ({
+        instant,
+        // The sidecar changes two minutes after the canonical 14:35 boundary.
+        lagna: { rashi: index < request.instants.length - 1 ? 'Kanya' : 'Tula', degree: 29.5 },
+        planets: planets.map((name, planetIndex) => ({
+          name,
+          rashi: name === 'Kuja' ? 'Vrishabha' : 'Kanya',
+          degree: planetIndex + 0.25,
+          house: 12,
+          retrograde: name === 'Rahu' || name === 'Ketu',
+        })),
+      })),
+    }));
+
+    const edge = buildSlot(875, 876);
+    expect(edge.chartCheckLagnas).toEqual(['Tula']);
+    expect(edge.chartBoundaryNeedsReview).toBe(true);
+    const edgeResult = await enrichElectionChartSlots([edge], {
+      activity: 'wedding', system: 'drik',
+      location: { latitude: -33.8688, longitude: 151.2093, timezone: 'Australia/Sydney' },
+      derive,
+    });
+    expect(edgeResult.slots).toHaveLength(1);
+    expect(edgeResult.slots[0].tier).toBe('Good');
+    expect(edgeResult.slots[0].chartScreening).toEqual(expect.objectContaining({
+      boundaryConventionUncertain: true,
+      rejected: false,
+      needsReview: true,
+    }));
+
+    const fullBand = buildSlot(869, 882);
+    expect(fullBand.chartBoundaryNeedsReview).toBe(false);
+    expect(new Set(fullBand.chartCheckLagnas)).toEqual(new Set(['Kanya', 'Tula']));
+    const fullResult = await enrichElectionChartSlots([fullBand], {
+      activity: 'wedding', system: 'drik',
+      location: { latitude: -33.8688, longitude: 151.2093, timezone: 'Australia/Sydney' },
+      derive,
+    });
+    expect(fullResult.slots).toEqual([]);
+    expect(fullResult.chartRemovedCount).toBe(1);
+  });
+
+  test.each([
+    null,
+    { sunrise: '06:00', lagna0: 0, transitions: [], cycleEnd: 1440 },
+    {
+      sunrise: '06:00', lagna0: 0,
+      transitions: [
+        [10, 1], [20, 2], [30, 3], [40, 4], [50, 5], [60, 6],
+        [70, 7], [80, 8], [90, 9], [100, 10], [110, 11], [105, 0],
+      ],
+      cycleEnd: 1440,
+    },
+    {
+      sunrise: '06:00', lagna0: 0,
+      transitions: [
+        [10, 1], [20, 2], [30, 3], [40, 4], [50, 5], [60, 6],
+        [70, 7], [80, 8], [90, 9], [100, 10], [110, 11], [120, 2],
+      ],
+      cycleEnd: 1440,
+    },
+  ])('rejects malformed Lagna day evidence %#', malformed => {
+    expect(panel.muValidLagnaDayData(malformed)).toBe(false);
+    expect(panel.muChartCheckMinutes(malformed, 420, 470)).toEqual([420, 469]);
+    expect(panel.muChartLagnasForMinutes(malformed, [420, 469])).toBeNull();
+    expect(panel.muChartBoundaryNeedsReview(malformed, 420, 470)).toBe(true);
+  });
+
+  test('accepts a validated second-cycle tail from current generated data', () => {
+    const extended = {
+      sunrise: '06:00',
+      lagna0: 3,
+      transitions: Array.from({ length: 24 }, (_, index) => [
+        (index + 1) * 55,
+        (4 + index) % 12,
+      ]),
+      cycleEnd: 2880,
+    };
+    expect(panel.muValidLagnaDayData(extended)).toBe(true);
+  });
+
+  test('accepts a first transition rounded to the sunrise minute', () => {
+    const roundedAtSunrise = {
+      sunrise: '06:00',
+      lagna0: 3,
+      transitions: Array.from({ length: 13 }, (_, index) => [
+        index * 60,
+        (4 + index) % 12,
+      ]),
+      cycleEnd: 1440,
+    };
+    expect(panel.muValidLagnaDayData(roundedAtSunrise)).toBe(true);
+    expect(panel.muChartCheckMinutes(roundedAtSunrise, 360, 390)).toEqual([
+      360, 361, 370, 380, 389,
+    ]);
+    expect(panel.muChartBoundaryNeedsReview(roundedAtSunrise, 360, 390)).toBe(true);
+  });
+
+  test('keeps profile identity and natal evidence out of Muhurtam shares', () => {
+    expect(panel.muShareableMuhurtaReasons({
+      reasons: ['Tarabalam favourable for Private Person (+1)'],
+      reasonGroups: {
+        slot_quality: ['Amrit Choghadiya (+3)'],
+        day_quality: ['Siddhi Yoga (+1)'],
+        activity_match: ['Thursday favoured (+1)'],
+        group_fit: ['Tarabalam favourable for Private Person (+1)'],
+        personal_source: ['Chandra differs from Private Person’s Janma Rashi'],
+      },
+    })).toEqual([
+      'Amrit Choghadiya (+3)',
+      'Siddhi Yoga (+1)',
+      'Thursday favoured (+1)',
+    ]);
+  });
+
+  test('uses the generated contract instead of presentation-time regex inference', () => {
+    const surgery = panel.muClassifyManualChecks('surgery');
+    expect(surgery.practical.join(' ')).toMatch(/Medical urgency.*clinician/i);
+    expect(surgery.chart.join(' ')).toMatch(/Mangala.*8th house/i);
+
+    const home = panel.muClassifyManualChecks('gruhapravesha');
+    expect(home.chart).toContain(
+      'The owner’s Janma Rasi, Nakshatra or Lagna may strengthen the election.',
+    );
+    expect(home.information).toContain('Complete worship and Bhootabali before entry.');
+  });
+
+  test('filters only manual rows with explicit Vara applicability', () => {
+    const guidance = (activity: string, vaaram: string) =>
+      panel.muClassifyManualChecks(
+        activity,
+        panel.muRelevantManualChecks(activity, vaaram),
+      );
+
+    expect(guidance('upanayana', 'Budhavaram').chart.join(' '))
+      .toContain('Reject Wednesday when Budha is combust.');
+    expect(guidance('upanayana', 'Guruvaram').chart.join(' '))
+      .not.toContain('Reject Wednesday when Budha is combust.');
+
+    for (const vaaram of ['Somavaram', 'Shukravaram']) {
+      expect(guidance('home_repair', vaaram).chart.join(' '))
+        .toContain('Weekday-Lagna condition');
+    }
+    expect(guidance('home_repair', 'Budhavaram').chart.join(' '))
+      .not.toContain('Weekday-Lagna condition');
+
+    expect(guidance('business_inventory_purchase', 'Shanivaram').information)
+      .toContain('Saturday is described as passable, not preferred.');
+    expect(guidance('business_inventory_purchase', 'Somavaram').information)
+      .not.toContain('Saturday is described as passable, not preferred.');
+  });
+
+  test('keeps purchase and lineage rows visible regardless of weekday text', () => {
+    const mondayPurchase = panel.muClassifyManualChecks(
+      'purchase',
+      panel.muRelevantManualChecks('purchase', 'Somavaram'),
+    );
+    expect(mondayPurchase.chart.join(' ')).toContain(
+      'Marketplace check from verse 17: avoid Rikta Tithis, Tuesday',
+    );
+
+    for (const activity of ['lending_money', 'wedding', 'gruhapravesha']) {
+      const monday = panel.muClassifyManualChecks(
+        activity,
+        panel.muRelevantManualChecks(activity, 'Somavaram'),
+      );
+      expect(monday.information.join(' ')).toMatch(/Lineage warning:/);
+    }
+  });
+
+  test('selects safety overrides by structured purpose', () => {
+    expect(panel.muSafetyOverrideFor('surgery')).toMatch(
+      /^Medical urgency.*clinician/s,
+    );
+    expect(panel.muSafetyOverrideFor('court')).toMatch(
+      /^Legal deadlines, court rules/s,
+    );
+    expect(panel.muSafetyOverrideFor('purchase')).toBeNull();
+  });
+
   test('feeds only checked, ready stable-ID adapters to the existing calculation seam', () => {
     store = createGuestProfileStore(profileStorage, {
       idFactory: ids('guest_alpha', 'guest_bravo', 'guest_incomplete'),
@@ -267,6 +570,59 @@ describe('Muhurtam saved-profile participants', () => {
     expect((document.querySelector('#tb-from') as HTMLInputElement).value).toBe('2026-08-28');
     expect((document.querySelector('#tb-to') as HTMLInputElement).value).toBe('2026-09-04');
     expect((document.querySelector('#mu-activity') as HTMLSelectElement).value).toBe('wedding');
+  });
+
+  test('asks for the source-specific primary role and restores its stable saved ID', () => {
+    store = createGuestProfileStore(profileStorage, {
+      idFactory: ids('guest_alpha', 'guest_bravo'),
+    });
+    store.create({ name: 'Alpha', nakshatra: 'Rohini' });
+    store.create({ name: 'Bravo', nakshatra: 'Hasta' });
+    localStorage.setItem(
+      MUHURTAM_PROFILE_IDS_STORAGE_KEY,
+      '["guest_alpha","guest_bravo"]',
+    );
+    const active = initialize();
+    const activity = document.querySelector<HTMLSelectElement>('#mu-activity')!;
+    activity.value = 'surgery';
+    activity.dispatchEvent(new Event('change', { bubbles: true }));
+
+    const role = document.querySelector<HTMLSelectElement>('[data-muhurta-role]')!;
+    expect(role).toBeTruthy();
+    expect(role.closest('label')?.textContent).toContain('Patient');
+    expect(active.getRoleParticipant('surgery')?.id).toBe('guest_alpha');
+
+    role.value = 'guest_bravo';
+    role.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(active.getRoleParticipant('surgery')?.id).toBe('guest_bravo');
+    expect(JSON.parse(
+      localStorage.getItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY) || '{}',
+    )).toEqual({ version: 1, roles: { surgery: 'guest_bravo' } });
+
+    store.update('guest_bravo', { name: 'Bravo edited' });
+    expect(active.getRoleParticipant('surgery')).toMatchObject({
+      id: 'guest_bravo', name: 'Bravo edited',
+    });
+
+    controller?.destroy();
+    controller = null;
+    renderPanelFixture();
+    const activityAfterReload = document.querySelector<HTMLSelectElement>('#mu-activity')!;
+    activityAfterReload.value = 'surgery';
+    const restored = initialize();
+    expect(restored.getRoleParticipant('surgery')).toMatchObject({
+      id: 'guest_bravo', name: 'Bravo edited',
+    });
+
+    store.remove('guest_bravo');
+    expect(restored.getRoleParticipant('surgery')?.id).toBe('guest_alpha');
+    expect(JSON.parse(
+      localStorage.getItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY) || '{}',
+    )).toEqual({ version: 1, roles: { surgery: 'guest_alpha' } });
+
+    activityAfterReload.value = 'gold';
+    activityAfterReload.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(document.querySelector('[data-muhurta-role]')).toBeNull();
   });
 
   test('refuses missing and incomplete contextual profiles without persisting a choice', () => {

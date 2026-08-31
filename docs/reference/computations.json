@@ -1828,7 +1828,8 @@
         {"path": "telugu_panchangam/personal/activity_check_contract.py", "symbol": "build_activity_check_contract", "role": "owner"},
         {"path": "src/lib/election-chart-api.ts", "symbol": "deriveElectionCharts", "role": "mirror"},
         {"path": "src/scorer/election-chart-screening.ts", "symbol": "evaluateElectionWindow", "role": "mirror"},
-        {"path": "src/scorer/personal-election-screening.ts", "symbol": "evaluatePersonalElectionRules", "role": "mirror"}
+        {"path": "src/scorer/personal-election-screening.ts", "symbol": "evaluatePersonalElectionRules", "role": "mirror"},
+        {"path": "src/scorer/election-chart-enrichment.ts", "symbol": "enrichElectionChartSlots", "role": "mirror"}
       ],
       "inputs": ["Panchangam days", "activity profile", "birth profiles", "travel direction", "slot duration"],
       "outputs": ["day diagnosis", "candidate slots", "scores", "relative tiers", "reasons", "manual checks", "structured personal and election-chart pass/fail/unknown evidence"],
@@ -1836,7 +1837,7 @@
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["heuristic"], "claim_ids": ["muhurta.any.shared_scoring", "muhurta.relative_tiers"], "note": "Activity gates may have verified sources, but aggregate scores and relative tier bands are disclosed project heuristics."},
       "tests": ["tests/test_muhurta_finder.py", "tests/test_muhurta_lagna_integration.py", "tests/test_election_chart_screening.py", "tests/test_activity_check_contract.py", "src/scorer/__tests__/muhurta-scorer.test.ts", "src/scorer/__tests__/election-chart-screening.test.ts", "src/scorer/__tests__/activity-check-contract.test.ts"],
-      "limitations": ["Relative rankings mean best available under the inputs, not absolute scriptural quality or professional advice.", "This story defines pure source-backed personal and election-chart predicates plus the strict browser contract adapter; shortlist orchestration and user-facing chart enrichment land in dependent stories."],
+      "limitations": ["Relative rankings mean best available under the inputs, not absolute scriptural quality or professional advice.", "Automatic chart enrichment is website-only and Drik/Lahiri/Whole Sign only; pure Python evaluators provide parity, while Surya Siddhanta and Vakya results remain clearly unsupported for chart screening.", "Positive chart and personal source preferences are tie-break evidence only and never change the raw Panchangam score; unresolved facts cap a high result below Excellent."],
       "method": {
         "kind": "algorithm",
         "summary": "Apply profile day gates, remove candidate named Muhurtas that intersect hard windows, evaluate slot-time facts and personal/profile factors, then rank survivors with transparent additive scores and relative tiers.",
