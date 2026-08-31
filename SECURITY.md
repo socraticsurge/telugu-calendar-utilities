@@ -39,6 +39,12 @@ You will get an acknowledgement within 72 hours. Once a fix ships, the issue can
   `https://astrochaganti.com/api/guest` gateway and reject loopback or arbitrary
   base overrides. The server-side routes must remain independently disabled
   until licensing and place-provider approval are recorded.
+- Muhurtam election-chart projection has a separate public activation gate:
+  `VITE_ELECTION_CHART_API_ENABLED` must be the exact string `true`. An absent
+  flag permits only loopback development. Public requests use only the same
+  canonical HTTPS guest gateway and contain candidate coordinates, timezone,
+  and instants—never profile identity or birth data. This browser flag does
+  not activate or authorize the gateway or DashaFlow sidecar.
 - A browser can keep at most four guest profiles. People using the same browser
   profile on the same site origin can see, edit, delete, or clear them. Profiles
   do not follow the guest to another browser, device, domain, protocol, or port.

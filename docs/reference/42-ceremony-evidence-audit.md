@@ -19,11 +19,16 @@ publisher and date metadata, which the source register discloses.
 | Reject Sunday, Tuesday and Saturday | Four-day `allowed_varas` | Hard day gate |
 | Fifteen named Nakshatras | Exact `allowed_nakshatras` | Hard day gate |
 | Reject Sankramana | `skip_on_sankramana = true` | Hard day gate |
-| Surya in the 10th, Chandra in the 4th, Guru in Lagna | Manual chart check | `manual_prerequisites = true` caps results below Excellent |
+| Surya in the 10th, Chandra in the 4th, Guru in Lagna | `ELECTION_CHART_RULES[ceremony]` | Three independent Drik browser tie-break preferences, counted only across every sampled state (edges and both sides of known interior Lagna transitions); `manual_prerequisites = true` still caps unresolved review below Excellent |
 | Ideally avoid Guru/Shukra combustion and exceptional omens | Manual purity check | Not uniformly computable across all surfaces |
 
 The passage's examples are auspicious Puja, welfare-oriented Purashcharana and
 Mula-shanti. Those examples do not authorize a universal “ceremony” profile.
+
+Python/MCP retain the chart wording as `manual_checks`; only the Drik browser
+requests candidate-time charts. Combustion, exceptional omens, ritual scope and
+the remedial exception remain practitioner judgments. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 ## Remedial exception
 

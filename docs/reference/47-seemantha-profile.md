@@ -40,6 +40,17 @@ practitioner; the product does not call either pregnancy-month rule universal.
 | Pournami | Allowed only when Chandra is dignified | Conservatively omitted pending chart judgment |
 | Combustion | Pregnancy month takes precedence; Guru/Shukra combustion may be ignored | No combustion gate |
 
+## Browser-computed chart and personal checks
+
+For Drik browser results, the eighth house must be vacant and Chandra must stay
+outside the eighth across every sampled state. Selecting the mother also
+enables the inclusive birth-star count: the 3rd, 7th, 8th, 10th and 22nd
+candidate Nakshatras are rejected at any sample. Samples cover the window
+edges and both sides of every known interior Drik Lagna transition. Python/MCP
+continue to expose these as
+manual wording because they do not call the chart service. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
+
 ## Practitioner checks
 
 - Confirm that this is the first pregnancy and choose the pregnancy-month rule
@@ -47,9 +58,6 @@ practitioner; the product does not call either pregnancy-month rule universal.
   Chintamani verse 8 gives the sixth/eighth.
 - Ashwini, Anuradha and Moola are only unavoidable-circumstance alternatives;
   they are not included in automatic results.
-- Leave the eighth house vacant and keep Chandra out of the eighth.
-- Check the passage's 3rd, 7th, 8th, 10th and 22nd relative birth-Nakshatra
-  exclusions for the mother.
 - Admit Pournami only after judging Chandra dignified.
 
 ## Safety boundary
@@ -64,7 +72,7 @@ outcome.
 The Python rules are the source of truth. The generated browser contract and
 MCP `activity_profile` expose the same claim, hard gates and manual checks.
 Tests protect the exact source crosswalk, reject accidental generic samskara
-filters and require catalogue parity. Because the pregnancy-month, relative
-birth-Nakshatra and election-chart prerequisites cannot be computed from the
-finder inputs, `manual_prerequisites` caps every result below `Excellent` until
-practitioner review; a high relative score never hides that uncertainty.
+filters and require catalogue parity. Pregnancy-month, lineage and Pournami
+dignity prerequisites remain unresolved, so `manual_prerequisites` caps every
+result below `Excellent` until practitioner review; a high relative score never
+hides that uncertainty.

@@ -23,4 +23,7 @@ this claim.
 This negative boundary is part of the profile: attaching a relevant citation
 without delimiting its reach would make the evidence appear stronger than it
 is. Python, MCP, and the generated browser contract publish the same claim ID
-and manual check.
+and manual check. The inspected passage does not define an aspect model,
+benefic model, strength threshold or conflict resolution, so the browser does
+not invent a deterministic predicate and makes no chart API call for Gold. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).

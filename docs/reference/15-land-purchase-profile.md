@@ -24,13 +24,16 @@ Raman is a modern synthesis and secondary authority, not primary scripture.
 | Monday, Wednesday, Thursday and Saturday are good | p. 53 (PDF 57) | `allowed_varas`; `prefer_vara` | Only those four sunrise weekdays are admitted and the match remains visible in the score explanation. |
 | Tuesday is recommended by some writers, but Raman rejects it | p. 53 (PDF 57) | `allowed_varas` | Tuesday is outside the admitted list. The implementation does not erase the textual disagreement; it records that this is Raman's configured profile. |
 | At final negotiations, preferably use a fixed rising Rasi | p. 53 (PDF 57) | `prefer_lagna_class: Sthira` | Fixed Lagna receives the disclosed activity bonus; it is a preference, not a hard gate. |
-| Weekday lord in Lagna; Guru in Kendra/Trikona; Mangala in 11th and not Lagna; harmonious Lagna/7th lords; avoid 11th lord in 12th | p. 53 (PDF 57) | `manual_checks` | Preserved for practitioner review; the finder does not claim complete election-chart validation. |
+| Guru in Kendra/Trikona; Mangala in 11th and not Lagna | p. 53 (PDF 57) | `ELECTION_CHART_RULES[property]` | The Drik browser post-screen counts the first two as preferences only across every sampled state and rejects Mangala in Lagna at any sample (edges and both sides of known interior Lagna transitions). |
+| Weekday lord in Lagna; harmonious Lagna/7th lords; avoid 11th lord in 12th | p. 53 (PDF 57) | `manual_checks` | Lordship and relationship judgment remain for practitioner review. |
 
 ## Product contract and limitations
 
-Python, MCP, and browser consume the same generated profile. MCP exposes the
-stable `muhurta.land_purchase.building` claim identifier. Every surviving
-slot repeats the full election-chart checks that are not automated.
+Python, MCP, and browser consume the same generated activity profile. MCP
+exposes the stable `muhurta.land_purchase.building` claim identifier and keeps
+the complete chart wording in `manual_checks`. The Drik browser adds the
+bounded chart post-screen above; it does not make Python/MCP chart-aware. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 This profile must not be presented as an election for buying a completed
 house. Raman gives that a separate Nanda-Tithi, Thursday/Friday and Nakshatra

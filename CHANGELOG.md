@@ -17,6 +17,11 @@ PyPI version tracks this file's most recent release entry.
   the absent-flag development default; public requests use only the canonical
   Astro Chaganti HTTPS guest gateway, while saved calculations stay viewable
   and manual profile entry remains available.
+- Add source-backed Drik Muhurtam candidate-time chart screening behind an
+  independent fail-closed activation gate. Only the exact string `true`
+  enables public requests; an absent flag is loopback-only, public routing is
+  pinned to the canonical HTTPS guest gateway, and a disabled build retains
+  the shortlist with an honest rating cap and review state.
 - Keep the established 79-module computation-layer contract unchanged while
   reporting four profile/activation modules as additive feature sources.
 - Align the dependency security gate with the environment installed from the

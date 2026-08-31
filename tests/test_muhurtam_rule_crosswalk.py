@@ -1,0 +1,228 @@
+"""Coverage, provenance, and freshness tests for the Muhurtam crosswalk."""
+
+import json
+from copy import deepcopy
+from pathlib import Path
+
+import pytest
+
+from telugu_panchangam.personal.activity_catalog import BROWSER_ACTIVITIES
+from telugu_panchangam.personal.activity_check_contract import (
+    DETERMINISTIC_PANCHANGAM_FIELDS,
+    build_activity_check_contract,
+)
+from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
+from telugu_panchangam.personal.election_chart_rules import (
+    ELECTION_CHART_RULES,
+)
+from telugu_panchangam.personal.personal_election import (
+    PERSONAL_ELECTION_RULES,
+)
+from tools.export_muhurtam_rule_crosswalk import (
+    ACTIVITY_METADATA_FIELDS,
+    build_crosswalk,
+)
+
+ROOT = Path(__file__).resolve().parents[1]
+GENERATED = ROOT / 'docs/reference/muhurtam-rule-crosswalk.json'
+PROVENANCE = ROOT / 'docs/reference/provenance.json'
+
+
+def _rows_by_class(crosswalk, prefix):
+    return [
+        row for row in crosswalk['rows']
+        if row['predicate_class'].startswith(prefix)
+    ]
+
+
+def test_crosswalk_covers_every_browser_prerequisite_exactly():
+    crosswalk = build_crosswalk()
+    assert [
+        activity['activity'] for activity in crosswalk['activities']
+    ] == list(BROWSER_ACTIVITIES)
+
+    deterministic = _rows_by_class(crosswalk, 'panchangam.')
+    expected_deterministic = {
+        (activity, field)
+        for activity in BROWSER_ACTIVITIES
+        for field in set(ACTIVITY_RULES[activity]) - ACTIVITY_METADATA_FIELDS
+    }
+    actual_deterministic = {
+        (
+            row['activity'],
+            row['configured_inputs']['activity_rule_field'],
+        )
+        for row in deterministic
+    }
+    assert actual_deterministic == expected_deterministic
+    for row in deterministic:
+        field = row['configured_inputs']['activity_rule_field']
+        assert row['configured_inputs']['configured_value'] == (
+            json.loads(json.dumps(ACTIVITY_RULES[row['activity']][field])))
+
+    personal_ids = {
+        item[0]
+        for rules in PERSONAL_ELECTION_RULES.values()
+        for item in rules
+    }
+    assert {
+        row['rule_id']
+        for row in _rows_by_class(crosswalk, 'personal.')
+    } == personal_ids
+
+    election_ids = {
+        rule['id']
+        for rules in ELECTION_CHART_RULES.values()
+        for rule in rules
+    }
+    assert {
+        row['rule_id']
+        for row in _rows_by_class(crosswalk, 'election-chart.')
+    } == election_ids
+
+    contract = build_activity_check_contract()['activities']
+    manual_ids = {
+        row['id']
+        for activity in BROWSER_ACTIVITIES
+        for row in contract[activity]['manual_checks']
+    }
+    assert {
+        row['rule_id']
+        for row in crosswalk['rows']
+        if row['predicate_class'] == 'manual.display-row'
+    } == manual_ids
+
+
+def test_crosswalk_counts_and_rule_ids_are_stable_and_unique():
+    crosswalk = build_crosswalk()
+    assert crosswalk['counts']['activities'] == 30
+    assert crosswalk['counts']['rows'] == 318
+    assert crosswalk['counts']['deterministic_panchangam_rows'] == 175
+    assert crosswalk['counts']['personal_rule_rows'] == 5
+    assert crosswalk['counts']['election_chart_rule_rows'] == 23
+    assert crosswalk['counts']['manual_display_rows'] == 115
+    ids = [row['rule_id'] for row in crosswalk['rows']]
+    assert len(ids) == len(set(ids))
+    assert set(ids) == {
+        rule_id
+        for activity in crosswalk['activities']
+        for rule_id in activity['row_ids']
+    }
+
+
+def test_browser_and_python_only_implementation_status_is_honest():
+    crosswalk = build_crosswalk()
+    deterministic = _rows_by_class(crosswalk, 'panchangam.')
+    browser_fields = set(DETERMINISTIC_PANCHANGAM_FIELDS)
+    for row in deterministic:
+        field = row['configured_inputs']['activity_rule_field']
+        expected = (
+            'automated_browser_and_python'
+            if field in browser_fields
+            else 'automated_python_only_not_browser'
+        )
+        assert row['implementation_status'] == expected
+
+    assert {
+        row['configured_inputs']['activity_rule_field']
+        for row in deterministic
+        if row['implementation_status'] == (
+            'automated_python_only_not_browser')
+    } == {
+        'penalty_on_simha_stha_shukra',
+        'prefer_nakshatra_mukha',
+        'skip_on_adhika',
+        'skip_on_khar_maasa',
+        'skip_on_pitru_paksha',
+        'skip_on_simha_stha_guru',
+    }
+
+
+def test_every_row_contains_resolved_authority_and_automation_boundary():
+    crosswalk = build_crosswalk()
+    for row in crosswalk['rows']:
+        assert row['activity'] in BROWSER_ACTIVITIES
+        assert row['configured_inputs']
+        assert row['source_claim_id'] == row['source_claim']['id']
+        assert row['source_claim']['locator']
+        assert row['source_claim']['authority_status'] != 'provenance_gap'
+        assert row['source_claim']['evidence_class']
+        assert row['source_claim']['verification_state']
+        assert row['implementation_status']
+        assert row['ranking_effect']
+        assert row['automation_mode'] in {'automated', 'manual'}
+        assert row['automation_rationale']
+
+    any_activity = next(
+        item for item in crosswalk['activities']
+        if item['activity'] == 'any'
+    )
+    assert any_activity['row_count'] == 0
+    assert any_activity['source_claim']['authority_status'] == (
+        'explicit_project_heuristic')
+    assert any_activity['source_claim']['verification_state'] == 'heuristic'
+    assert any_activity['source_claim']['source_ids'] == []
+    assert any_activity['source_claim']['locator']
+
+
+def test_exact_personal_and_chart_predicate_values_are_exposed():
+    rows = {row['rule_id']: row for row in build_crosswalk()['rows']}
+    travel = rows['personal.travel.lagna-exclusions']
+    assert travel['configured_inputs']['operator'] == (
+        'inclusive_rashi_distance_not_in')
+    assert travel['configured_inputs']['excluded_positions'] == [1, 5, 7, 9]
+    assert travel['ranking_effect'] == 'candidate_exclusion'
+    assert 'any sampled state fails' in (
+        travel['configured_inputs']['sample_aggregation'])
+
+    property_rule = rows['property.guru-kendra-trikona']
+    assert property_rule['configured_inputs'] == {
+        'house_system': 'whole_sign',
+        'node_convention': 'mean',
+        'planet_set': [
+            'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
+            'Shukra', 'Shani', 'Rahu', 'Ketu',
+        ],
+        'predicate': 'planet_in_houses',
+        'predicate_inputs': {
+            'planet': 'Guru',
+            'houses': [1, 4, 5, 7, 9, 10],
+        },
+        'sample_aggregation': (
+            'pass only if every sampled state passes; fail only if every '
+            'sampled state fails; otherwise unknown'),
+    }
+    assert property_rule['ranking_effect'] == (
+        'post_screen_tie_break_preference')
+
+
+def test_manual_display_rows_preserve_exact_contract_values():
+    crosswalk = build_crosswalk()
+    rows = {row['rule_id']: row for row in crosswalk['rows']}
+    contract = build_activity_check_contract()['activities']
+    for activity in BROWSER_ACTIVITIES:
+        for source in contract[activity]['manual_checks']:
+            row = rows[source['id']]
+            assert row['configured_inputs'] == {
+                key: value for key, value in source.items() if key != 'id'
+            }
+            assert row['automation_mode'] == 'manual'
+            assert row['implementation_status'] == (
+                'manual_displayed_not_computed')
+
+
+def test_missing_claim_locator_fails_instead_of_inventing_authority():
+    provenance = json.loads(PROVENANCE.read_text(encoding='utf-8'))
+    broken = deepcopy(provenance)
+    claim = next(
+        item for item in broken['claims']
+        if item['id'] == 'muhurta.wedding'
+    )
+    claim['locator'] = None
+    with pytest.raises(ValueError, match='has no exact locator'):
+        build_crosswalk(broken)
+
+
+def test_generated_crosswalk_is_fresh():
+    assert json.loads(GENERATED.read_text(encoding='utf-8')) == (
+        build_crosswalk())

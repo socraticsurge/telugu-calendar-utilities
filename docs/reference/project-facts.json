@@ -38,9 +38,9 @@
   ],
   "computation_inventory": {
     "record_count": 62,
-    "implementation_count": 150,
-    "owner_count": 123,
-    "mirror_count": 27,
+    "implementation_count": 153,
+    "owner_count": 124,
+    "mirror_count": 29,
     "audited_source_file_count": 91
   },
   "muhurta_activities": {

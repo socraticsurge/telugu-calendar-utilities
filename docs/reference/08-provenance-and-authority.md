@@ -96,13 +96,15 @@ Until an edition and locator are recorded for the specific claim, it remains
 - The former generic “Property / Land purchase” option is now scoped narrowly
   to buying land for building, matching Raman's separate treatment of land and
   completed houses. Its weekday, Nakshatra and Rikta-Tithi rules have a precise
-  Chapter XII locator.
+  Chapter XII locator; the Drik browser also post-screens three deterministic
+  Guru/Kuja predicates while lordship relationships remain manual.
 - Namakarana now has a Chapter VIII rule-level profile: its Nakshatra,
   weekday and rejected-Tithi lists are automated, while birth-day timing and
   election-chart/name criteria remain visible manual checks.
 - Annaprasana has a Chapter VIII profile cross-referenced to Chapter V's
-  general Panchanga-Suddhi Tithis; age-month and election-chart requirements
-  remain explicit manual prerequisites.
+  general Panchanga-Suddhi Tithis; the Drik browser post-screens the vacant
+  10th and three named Graha-house exclusions, while age-month and qualitative
+  Lagna requirements remain explicit manual prerequisites.
 - Karnavedha now enforces Raman's daytime-only instruction across the Python
   and MCP night-slot path, plus exact weekday, Tithi and rising-Rasi gates;
   age, transition and election-house checks remain manual.
@@ -122,6 +124,23 @@ Until an edition and locator are recorded for the specific claim, it remains
 
 Activity-level coverage is tracked separately in
 [Muhurtam Activity Provenance Coverage](16-activity-provenance-coverage.md).
+The browser-only chart and personal-role subset is documented independently in
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md);
+it does not give Python/MCP or the unresolved qualitative clauses a stronger
+verification state.
+
+The candidate-time calculation has a deliberately split authority boundary.
+DashaFlow supplies Lahiri planetary Rashi and degree facts. The selected-city
+`lagna.json` data—generated and validated from this repository's frozen
+Drik/Lahiri calculation—supplies the canonical Lagna for each sampled civil
+minute, and the browser recomputes every Whole Sign house from those two facts.
+Sidecar Lagna and house fields are diagnostic only. Around a known local Lagna
+transition, a five-minute guard prevents the documented Drik Panchang/DashaFlow
+minute-level convention difference from becoming a false automated verdict:
+partially overlapping windows retain Lagna-dependent rules as `unknown` for
+review. This is a computation-assurance policy, not new textual authority for
+the underlying electional rule.
+
 It currently records **34 verified canonical profiles, no contradicted
 profiles and 1 explicit project heuristic across all 35 canonical profiles**.
 The accepted API catalogue also has the legacy `litigation` alias for `court`,

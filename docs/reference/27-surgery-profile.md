@@ -24,8 +24,15 @@ condition as the three corresponding Shukla Tithis.
 The source also says to avoid Chandra in the patient's natal Rasi and the Rasi
 governing the operated body part, particularly under malefic affliction. It
 calls for strong Mangala and a strong relevant house, a vacant 8th house, and
-no mutual Mangala-Shani aspect. These remain visible practitioner checks
-because the finder lacks the required patient and complete chart context.
+no mutual Mangala-Shani aspect.
+
+When a patient is selected, the Drik browser rejects Chandra in that person's
+Janma Rashi at any sampled state. It also rejects a candidate whose eighth
+house is occupied at any sampled state. Samples cover the window edges and both
+sides of every known interior Drik Lagna transition. The operated-body-part Rashi,
+malefic affliction, strength and Mangala-Shani aspect model remain visible
+practitioner checks. Python/MCP do not call the chart service. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 The existing Vishti-Karana rejection has separate project provenance and does
 not inherit authority from this passage. Python and MCP publish the stable

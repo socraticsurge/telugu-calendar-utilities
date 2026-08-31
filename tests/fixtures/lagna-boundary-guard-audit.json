@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "method": {
+    "artifact_generator": "scripts.build_lagna_json.build_for_city",
+    "published_boundary": "local HH:MM sunrise plus the emitted integer minute offset",
+    "comparison": "PySwissEph swe.houses_ex(jd, lat, lon, b'W', FLG_SIDEREAL | FLG_SPEED) with SIDM_LAHIRI",
+    "relationship_to_sidecar": "Matches the Ascendant primitive and flags in DashaFlow calculate_vedic_chart",
+    "dashaflow_reference_version": "1.1.0",
+    "continuous_search_resolution_seconds": 0.001,
+    "transition_selection": "first 12 emitted sign advances: one complete zodiac cycle with each distinct Lagna boundary represented once"
+  },
+  "scope": {
+    "city_count": 22,
+    "cities": [
+      "Hyderabad",
+      "Vijayawada",
+      "Visakhapatnam",
+      "Tirupati",
+      "Warangal",
+      "Guntur",
+      "Nizamabad",
+      "Rajahmundry",
+      "Kurnool",
+      "Nellore",
+      "Bengaluru",
+      "Chennai",
+      "Mumbai",
+      "Delhi",
+      "Dallas",
+      "San Jose",
+      "San Francisco",
+      "Edison",
+      "New York",
+      "London",
+      "Sydney",
+      "Dubai"
+    ],
+    "date_start": "2025-01-15",
+    "date_end": "2032-12-15",
+    "date_pattern": "15th of every month, inclusive",
+    "sampled_date_count": 96,
+    "city_date_count": 2112,
+    "sign_transitions_per_city_date": 12
+  },
+  "guard": {
+    "review_band_minutes_each_side": 5,
+    "first_new_lagna_deadline_minutes": 2
+  },
+  "results": {
+    "transition_count": 25344,
+    "first_new_minute_offsets": {
+      "0": 3331,
+      "1": 18865,
+      "2": 3148
+    },
+    "transitions_after_t_plus_2": 0,
+    "max_abs_boundary_delta_minutes": 1.61088,
+    "guard_margin_minutes": 3.38912,
+    "max_delta_case": {
+      "city": "Tirupati",
+      "date": "2028-05-15",
+      "published_local": "2028-05-15T16:15:00+05:30",
+      "published_new_lagna": "Tula",
+      "dashaflow_delta_minutes": 1.61088
+    },
+    "minimum_internal_dwell_minutes": 51,
+    "minimum_internal_dwell_case": {
+      "city": "London",
+      "date": "2025-01-15",
+      "minutes": 51,
+      "from_offset": 131,
+      "to_offset": 182
+    }
+  },
+  "runtime_seconds": 18.843272
+}

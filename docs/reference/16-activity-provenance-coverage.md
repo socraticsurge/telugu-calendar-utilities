@@ -18,8 +18,8 @@ python tools/check_activity_provenance.py
 | `bhumi_puja` | Bhumi Puja / foundation laying | `muhurta.bhumi_puja.foundation` | Verified rule-level profile |
 | `well_digging` | Well digging | `muhurta.well_digging` | Verified rule-level profile |
 | `home_repair` | Home repair / renovation commencement | `muhurta.home_repair.commencement` | Verified weekday profile; conditional chart rules remain manual |
-| `property` | Land purchase for building | `muhurta.land_purchase.building` | Verified rule-level profile |
-| `house_purchase` | Purchase of a completed new or old house | `muhurta.house_purchase.completed` | Verified house-specific profile; chart conditions remain manual |
+| `property` | Land purchase for building | `muhurta.land_purchase.building` | Verified profile; deterministic Guru/Kuja predicates have a Drik browser post-screen |
+| `house_purchase` | Purchase of a completed new or old house | `muhurta.house_purchase.completed` | Verified house-specific profile; Kuja-in-Lagna is browser-screened and the remaining chart condition stays manual |
 | `naming` | Naming ceremony (Namakarana) | `muhurta.namakarana` | Verified rule-level profile |
 | `annaprasana` | First feeding (Annaprasana) | `muhurta.annaprasana` | Verified rule-level profile |
 | `karnavedha` | Ear piercing (Karnavedha) | `muhurta.karnavedha` | Verified rule-level profile |
@@ -39,16 +39,16 @@ python tools/check_activity_provenance.py
 | `business_inventory_purchase` | Buying inventory for trade | `muhurta.trade_inventory.purchase` | Verified buyer-side inventory profile; chart checks remain manual |
 | `borrowing_money` | Borrowing money / taking a loan | `muhurta.borrowing_money` | Verified debtor-side profile; related Chintamani claim records the divergent formula |
 | `lending_money` | Lending money / giving a loan | `muhurta.lending_money` | Verified creditor-side Raman profile; related published-panchangam claim records the Wednesday divergence |
-| `wedding` | Wedding (Vivaha) | `muhurta.wedding` | Verified Raman-lineage profile; exact month/anga/Lagna gates, manual Pada/chart prerequisites and published-practice divergence disclosed |
+| `wedding` | Wedding (Vivaha) | `muhurta.wedding` | Verified Raman-lineage profile; three deterministic chart prohibitions are browser-screened while Pada and qualitative prerequisites remain manual |
 | `engagement` | Mutual engagement (Kanya-Varavarana) | `muhurta.kanya_varavarana` | Verified exact eight-star intersection; Shubha day/Tithi/Lagna remain manual |
 | `gruhapravesha` | First entry into a newly built home | `muhurta.gruhapravesha` | Verified Raman-lineage profile; exact day/anga/Lagna gates and published-practice divergence disclosed |
 | `court` | Filing a lawsuit / court action | `muhurta.court.filing_lawsuit` | Verified Raman-lineage filing profile; exact weekday, Tithi, Nakshatra and conservative Lagna gates, with chart prerequisites disclosed |
 | `litigation` | Legacy API alias for lawsuit filing | Alias of `court` | Compatibility name only; resolves to the verified filing profile and is not counted as a distinct election |
 | `cremation` | Deferred funeral rites (Pretakriya) | `muhurta.pretakriya.deferred` | Verified exact nine-star admission; immediate Antyeshti explicitly excluded |
 | `yajna` | Homa offering (Homahuti) | `muhurta.homahuti` | **Verified:** exact three-Nakshatra Homahuti and modulo-four Agnivasa hard gates |
-| `job` | Entering employment / starting service | `muhurta.service_entry` | Verified verse-26 profile; chart and employer/employee compatibility remain manual |
+| `job` | Entering employment / starting service | `muhurta.service_entry` | Verified verse-26 profile; Surya/Kuja placement is a browser tie-break while benefic and employer/employee compatibility remain manual |
 | `business` | Deploying capital / business investment | `muhurta.capital_deployment` | Verified verse-27 profile; benefic-house and empty-8th checks remain manual |
-| `ceremony` | Shantika / Paushtika rite | `muhurta.shantika_paushtika` | Verified exact verse-34 profile; chart prerequisites and remedial exception disclosed |
+| `ceremony` | Shantika / Paushtika rite | `muhurta.shantika_paushtika` | Verified exact verse-34 profile; three placements are browser tie-breaks while purity and the remedial exception remain practitioner-reviewed |
 | `beginning` | Dharma-kriya commencement | `muhurta.dharma_kriya.commencement` | Verified verse-30 profile; Varga, Guru placement and personal Guru-bala remain manual |
 | `any` | Anything auspicious | `muhurta.any.shared_scoring` | **Heuristic:** neutral shared-score explorer, not an election for an unspecified act |
 
@@ -59,6 +59,12 @@ printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
 not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.
+
+The chart-screen statements above refer only to the Drik browser post-screen.
+Python/MCP continue to return the source's full `manual_checks` without calling
+the chart service. The exact 23-predicate matrix, personal-role rules and
+remaining manual clauses are in
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 No activity profile remains in a contradicted state. See the verified
 [Engagement evidence audit](36-engagement-evidence-audit.md),

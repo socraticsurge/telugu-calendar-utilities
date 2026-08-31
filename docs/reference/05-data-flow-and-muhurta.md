@@ -92,8 +92,72 @@ flowchart TB
     D -->|"no"| F["Score intrinsic nature + dominant Choghadiya<br/>and personal/activity factors"]
     F --> G["Tier (absolute + relative bands)"]
     G --> H["Dosha tier-cap: personal/day dosha ⇒ max Good"]
-    H --> I["Sort by (tier, -score, dosha, time) → top slots"]
+    H --> I["Sort base candidates"]
+    I --> J{"Drik activity has<br/>deterministic chart rules?"}
+    J -->|"yes"| K["Resolve canonical local Lagna<br/>and recompute Whole Sign houses"]
+    K --> K2["Screen every sampled state<br/>edges + cadence + interior transitions"]
+    J -->|"no candidates, unsupported or unavailable"| L["Keep base shortlist<br/>show exact disclosure state"]
+    K2 --> M["Refill survivors and return top 10"]
+    L --> M
 ```
+
+### Browser election-chart post-screen
+
+For Drik searches, 12 source-backed activity profiles have an additional
+browser-only post-ranking screen. The browser sends only candidate city
+coordinates/timezone and candidate UTC instants to the Astro guest gateway;
+profile identity, birth data, activity and selected role do not leave the
+browser. The authenticated DashaFlow sidecar returns Lahiri candidate-time
+planetary positions. For every sample, the browser resolves the validated
+selected-city Lagna from its local Drik/Lahiri transition map and recomputes
+all nine Whole Sign houses from planetary Rashi relative to that Lagna before
+applying the generated deterministic rule table. Returned sidecar house
+numbers cannot override this frame. Every computed outcome retains its
+claim-specific source locator.
+
+The browser samples each half-open window at its start, final represented
+minute and 10-minute cadence, then at the minute before, at, and after every
+known interior Drik/Lahiri Lagna transition. It dynamically packs no more than 24 unique instants into
+each request and makes at most five requests per search. If the selected
+city/date lacks the precomputed Lagna boundary support, the chart screen is
+`unavailable`; it does not claim endpoint-only whole-window assurance.
+
+External boundary checks found minute-level Drik Panchang/DashaFlow Lagna
+differences. A window that only partly overlaps the five-minute guard around a
+local transition is therefore retained below Excellent with Lagna-dependent
+general, Travel and Gruhapravesha rules marked `unknown`. A window spanning the
+complete guard evaluates both canonical local Lagna states. Moon/Nakshatra-only
+personal rules for Seemantha and Surgery remain computable.
+
+A failed `reject` predicate removes a window. A passed `prefer` predicate is a
+tie-break only and never changes the raw heuristic score. A supported unresolved
+boundary outcome is retained as `unknown`, requires review, and caps an
+otherwise Excellent result to Good. A malformed or incomplete network response
+instead rejects the whole batch and preserves the base shortlist with an
+explicit `unavailable` state. Activities without a deterministic chart
+predicate, including Gold / jewelry purchase, make no chart request.
+An empty base shortlist is `not-run` and likewise makes no chart request.
+Surya Siddhanta and Vakya searches likewise remain separate rather than
+silently receiving a Drik/Lahiri chart.
+
+Travel, Gruhapravesha, Seemantha and Surgery also identify a primary traveller,
+householder, mother or patient respectively. Existing generic group scoring is
+preserved. The additional source-specific natal rule is evaluated locally from
+the exact returned Chandra facts and canonical local Lagna for every sampled state; an exact
+prohibition can reject a window and an exact preference is only a tie-break.
+Stable saved-profile role IDs can persist as a versioned browser-local
+preference, while one-off participants remain session-only. Names, role IDs and
+profile IDs are never sent, shared or exported.
+
+Personal removals are applied first and chart removals second, so their counts
+are mutually exclusive. The result's remaining manual rows come from the
+generated structured activity-check contract: all 30 browser activities map
+their deterministic Panchangam fields, personal/chart rule IDs and each manual
+row's display section explicitly, without regex-based prose classification.
+
+See [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md)
+for the complete 23-rule matrix, sampled-state semantics, personal-role formulas,
+privacy contract, source locators and manual remainder.
 
 ### What `_evaluate_slot()` adds up (`slot_scorers.py` + `muhurta.py`)
 

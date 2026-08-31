@@ -131,7 +131,21 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
   combustion flags, allowing browser Muhurtam searches to enforce the same
   Maudhya exclusions declared by the Python activity profile. If those flags
   are absent, affected browser searches fail closed instead of returning
-  unscreened dates.
+  unscreened dates. Travel, Gruhapravesha, Seemantha and Surgery name a primary
+  participant for source-specific local checks. Drik activities with one of 23
+  deterministic chart predicates receive a privacy-minimal DashaFlow
+  candidate-time planetary-position post-screen. The browser uses its validated
+  local Drik/Lahiri Lagna at each sampled minute to recompute Whole Sign houses;
+  a partial five-minute transition guard is retained for review instead of
+  receiving a false pass or rejection. Preferences are tie-breaks, not score
+  inflation, and qualitative clauses remain explicit. See
+  [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
+  This post-screen is independently disabled in public builds unless
+  `VITE_ELECTION_CHART_API_ENABLED` is the exact string `true`; an absent flag
+  enables it only on loopback. Disabled searches keep the Panchangam shortlist,
+  cap any `Excellent` label at `Good`, require review, and make no chart request.
+  Public requests can use only the canonical Astro Chaganti HTTPS guest gateway;
+  browser activation does not activate the gateway or sidecar.
 - **Gochara + Rasi Phalalu** — South Indian chart, transit verdicts, computed
   daily reading.
 
