@@ -3,7 +3,6 @@ from pathlib import Path
 
 from scripts.generate_llm_phalalu import write_outputs
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
