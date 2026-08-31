@@ -1995,17 +1995,20 @@ function renderMuhurta() {
   const renderSlot = (s, i) => {
     const rg = s.reasonGroups;
     const groupsHtml = rg
-      ? `<div class="mu-rgroups">
-           ${renderGroup('Slot quality', rg.slot_quality)}
-           ${renderGroup('Day quality', rg.day_quality)}
-           ${renderGroup('Group fit', rg.group_fit)}
-           ${renderGroup('Activity', rg.activity_match)}
-           ${renderChartValidation(rg.chart_validation)}
-           ${renderGroup('About this election', rg.information, 'mu-rg-information')}
-           ${renderGroup('Practical checks', rg.practical, 'mu-rg-practical')}
-           ${renderGroup('Important nuance', rg.notes, 'mu-rg-notes')}
-         </div>`
-      : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
+      ? `<details class="mu-reason-details">
+           <summary>Why this slot earned its ${s.tier || muScoreTier(s.score)} rating</summary>
+           <div class="mu-rgroups">
+             ${renderGroup('Slot quality', rg.slot_quality)}
+             ${renderGroup('Day quality', rg.day_quality)}
+             ${renderGroup('Group fit', rg.group_fit)}
+             ${renderGroup('Activity', rg.activity_match)}
+             ${renderChartValidation(rg.chart_validation)}
+             ${renderGroup('About this election', rg.information, 'mu-rg-information')}
+             ${renderGroup('Practical checks', rg.practical, 'mu-rg-practical')}
+             ${renderGroup('Important nuance', rg.notes, 'mu-rg-notes')}
+           </div>
+         </details>`
+      : `<details class="mu-reason-details"><summary>Why this slot ranked here</summary><span class="mu-reasons">${s.reasons.join(' · ')}</span></details>`;
     const tier = s.tier || muScoreTier(s.score);
     const tierClass = `mu-tier-${tier.toLowerCase()}`;
     const dc = s.dayCtx;
@@ -2043,7 +2046,8 @@ function renderMuhurta() {
             </div>`;
   };
   box.innerHTML =
-    `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found · best first${share}</div>`
+    `<div class="tb-summary"><span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found · ranked by tier, then score${share}</div>`
+    + `<p class="mu-ranking-note">Excellent slots appear before Good ones; score orders slots within each tier. A named caution can cap a high-scoring slot below Excellent.</p>`
     + top.map(renderSlot).join('')
     + droppedHtml
     + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across

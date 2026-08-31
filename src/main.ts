@@ -16,7 +16,10 @@ import {
   shareGocharaOnWhatsApp,
   goHasData,
 } from './panels/gochara';
-import { loadPreview, renderAll, toggleFestivalMonth, shareTodayOnWhatsApp, initTodayPanel } from './panels/today';
+import {
+  loadPreview, renderAll, toggleFestivalMonth, openFestivalDate,
+  shareTodayOnWhatsApp, initTodayPanel,
+} from './panels/today';
 import {
   calcTarabalam, renderTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
   tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
@@ -81,16 +84,34 @@ import {
   function copyUrl() {
     if (typeof gcEvent === 'function') gcEvent('subscribe-copy');
     const url = document.getElementById('sub-url').textContent;
-    navigator.clipboard.writeText(url).then(() => {
-      const el = document.getElementById('copy-confirm');
+    const el = document.getElementById('copy-confirm');
+    const write = navigator.clipboard?.writeText
+      ? navigator.clipboard.writeText(url)
+      : Promise.reject(new Error('Clipboard unavailable'));
+    write.then(() => {
+      el.textContent = 'Copied!';
+      el.dataset.state = 'success';
       el.style.display = 'inline';
-      setTimeout(() => { el.style.display = 'none'; }, 2000);
+      setTimeout(() => { el.style.display = 'none'; el.textContent = ''; }, 2000);
+    }).catch(() => {
+      el.textContent = 'Could not copy. Select the URL and copy it manually.';
+      el.dataset.state = 'error';
+      el.style.display = 'inline';
     });
   }
 
   function showAppTab(name) {
-    document.querySelectorAll<HTMLElement>('.app-tab').forEach(t => t.classList.toggle('active', t.dataset.app === name));
-    document.querySelectorAll<HTMLElement>('.app-panel').forEach(p => p.classList.toggle('active', p.dataset.app === name));
+    document.querySelectorAll<HTMLElement>('.app-tab').forEach(t => {
+      const active = t.dataset.app === name;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+      t.setAttribute('tabindex', active ? '0' : '-1');
+    });
+    document.querySelectorAll<HTMLElement>('.app-panel').forEach(p => {
+      const active = p.dataset.app === name;
+      p.classList.toggle('active', active);
+      p.hidden = !active;
+    });
   }
 
   // --- Choosing a system card ---
@@ -98,6 +119,8 @@ import {
   function toggleReadMore(id, btn) {
     const el = document.getElementById(id);
     const open = el.classList.toggle('open');
+    el.hidden = !open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     btn.textContent = open ? btn.dataset.less : btn.dataset.more;
   }
 
@@ -116,8 +139,12 @@ import {
   }
   function applyTimeFmtUI() {
     const f = getSelection().timeFmt;
-    document.getElementById('fmt-12').classList.toggle('active', f === '12');
-    document.getElementById('fmt-24').classList.toggle('active', f === '24');
+    const fmt12 = document.getElementById('fmt-12');
+    const fmt24 = document.getElementById('fmt-24');
+    fmt12.classList.toggle('active', f === '12');
+    fmt24.classList.toggle('active', f === '24');
+    fmt12.setAttribute('aria-pressed', f === '12' ? 'true' : 'false');
+    fmt24.setAttribute('aria-pressed', f === '24' ? 'true' : 'false');
   }
 
   // --- Shell: section switching + accessible navigation drawer ---
@@ -167,29 +194,55 @@ import {
   const TOOL_PANELS = ['today', 'tarabalam', 'gochara'];
 
   function switchTool(which) {
+    const activeTrigger = document.activeElement;
+    const focusHeading = activeTrigger instanceof Element
+      && activeTrigger.matches('#sidebar .sidebar-item, .tool-tab');
     // Tool panels: show/hide the three original panels
     for (const t of TOOL_PANELS) {
-      document.getElementById('panel-' + t).style.display = t === which ? '' : 'none';
-      document.getElementById('tab-' + t).classList.toggle('active', t === which);
-      document.getElementById('tab-' + t).setAttribute('aria-selected', t === which ? 'true' : 'false');
+      const active = t === which;
+      const panel = document.getElementById('panel-' + t);
+      const tab = document.getElementById('tab-' + t);
+      panel.style.display = active ? '' : 'none';
+      panel.setAttribute('aria-hidden', active ? 'false' : 'true');
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      tab.setAttribute('tabindex', active ? '0' : '-1');
     }
     document.body.dataset.tool = which;
     // sidebar stays in sync on desktop
     document.querySelectorAll('#sidebar .sidebar-item[id]').forEach(b => {
-      b.classList.toggle('active', b.id === 'sidebar-' + which);
+      const active = b.id === 'sidebar-' + which;
+      b.classList.toggle('active', active);
+      if (active) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
     });
     const titles = PAGE_TITLES[which];
     document.getElementById('m-page-title-main').textContent = titles ? titles[0] : '';
     document.getElementById('m-page-title-sub').textContent = titles ? titles[1] : '';
+    if (focusHeading && TOOL_PANELS.includes(which)) {
+      queueMicrotask(() => document.getElementById('m-page-title')?.focus());
+    }
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
     if (typeof gcEvent === 'function') gcEvent('tab-' + which);
     if (which === 'gochara') loadGochara();
   }
 
   const profileStore = createGuestProfileStore(browserStorage);
-  const profilesPanel = initProfilesPanel(profileStore, { navigate: switchTool });
+  let gocharaProfiles: ReturnType<typeof initGocharaProfiles> | null = null;
+  let tarabalamProfiles: ReturnType<typeof initTarabalamProfiles> | null = null;
+  const profilesPanel = initProfilesPanel(profileStore, {
+    navigate: switchTool,
+    onViewDailyHoroscope(profileId) {
+      switchTool('gochara');
+      queueMicrotask(() => gocharaProfiles?.selectProfile(profileId));
+    },
+    onFindMuhurtam(profileId) {
+      switchTool('tarabalam');
+      queueMicrotask(() => tarabalamProfiles?.selectProfile(profileId));
+    },
+  });
   listenForGuestProfileStorageChanges(profileStore);
-  const gocharaProfiles = initGocharaProfiles(profileStore, {
+  gocharaProfiles = initGocharaProfiles(profileStore, {
     createProfile(trigger) {
       switchTool('profiles');
       profilesPanel.openCreate({
@@ -197,7 +250,7 @@ import {
         requiredFor: 'horoscope',
         focusTarget: trigger,
         onSaved(profile) {
-          gocharaProfiles.selectProfile(profile.id);
+          gocharaProfiles?.selectProfile(profile.id);
         },
       });
     },
@@ -208,7 +261,7 @@ import {
         requiredFor: 'horoscope',
         focusTarget: trigger,
         onSaved(profile) {
-          gocharaProfiles.selectProfile(profile.id);
+          gocharaProfiles?.selectProfile(profile.id);
         },
       });
     },
@@ -216,7 +269,7 @@ import {
       switchTool('profiles');
     },
   });
-  const tarabalamProfiles = initTarabalamProfiles(profileStore, {
+  tarabalamProfiles = initTarabalamProfiles(profileStore, {
     createProfile(trigger) {
       switchTool('profiles');
       profilesPanel.openCreate({
@@ -224,7 +277,7 @@ import {
         requiredFor: 'muhurta',
         focusTarget: trigger,
         onSaved(profile) {
-          tarabalamProfiles.selectProfile(profile.id);
+          tarabalamProfiles?.selectProfile(profile.id);
         },
       });
     },
@@ -235,7 +288,7 @@ import {
         requiredFor: 'muhurta',
         focusTarget: trigger,
         onSaved(profile) {
-          tarabalamProfiles.selectProfile(profile.id);
+          tarabalamProfiles?.selectProfile(profile.id);
         },
       });
     },
@@ -316,6 +369,24 @@ import {
   const _d = new Date();
   const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   initTodayPanel(todayISO);
+  document.querySelectorAll('.sidebar-icon').forEach(icon => {
+    icon.setAttribute('aria-hidden', 'true');
+  });
+  document.querySelectorAll<HTMLElement>('.app-tab').forEach(tab => {
+    tab.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      const tabs = [...document.querySelectorAll<HTMLElement>('.app-tab')];
+      const current = tabs.indexOf(tab);
+      const next = event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? tabs.length - 1
+          : (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      event.preventDefault();
+      showAppTab(tabs[next].dataset.app);
+      tabs[next].focus();
+    });
+  });
   document.getElementById('settings-toggle').addEventListener('click', () => toggleSettings());
   selEl('sub-city').addEventListener('change', updateSubscribeUrl);
   selEl('sub-system').addEventListener('change', updateSubscribeUrl);
@@ -338,30 +409,51 @@ import {
 
   // ---------- Mobile shell — one nav: width flag + sidebar drawer ----------
   (function mobileShell() {
-    // Keep the compact one-shell drawer through tablet widths. The earlier
-    // 620px split left too little room for the data canvas beside the sidebar.
-    const mq = window.matchMedia('(max-width: 839px)');
+    // Keep the compact one-shell drawer through narrow laptop/tablet widths.
+    // Below 960px the 232px sidebar leaves too little room for Panchangam's
+    // four-column evidence grid, even though the outer viewport looks wide.
+    const mq = window.matchMedia('(max-width: 959px)');
+
+    // --- sidebar drawer: the SAME #sidebar element as desktop, slid in ---
+    const navBtn = document.getElementById('m-nav-btn');
+    const sidebar = document.getElementById('sidebar') as HTMLElement;
+
+    function setClosedDrawerState() {
+      if (mq.matches && !document.body.classList.contains('m-nav-open')) {
+        sidebar.inert = true;
+        sidebar.setAttribute('aria-hidden', 'true');
+      } else {
+        sidebar.inert = false;
+        sidebar.removeAttribute('aria-hidden');
+      }
+    }
+
+    function openNav() {
+      sidebar.inert = false;
+      sidebar.removeAttribute('aria-hidden');
+      document.body.classList.add('m-nav-open');
+      navBtn.setAttribute('aria-expanded', 'true');
+      navBtn.setAttribute('aria-label', 'Close navigation');
+      modalOpen(sidebar,
+                document.querySelector('#sidebar .sidebar-item.active') || undefined);
+      if (typeof gcEvent === 'function') gcEvent('nav-open');
+    }
+    function closeNav() {
+      const wasOpen = document.body.classList.contains('m-nav-open');
+      if (wasOpen) {
+        document.body.classList.remove('m-nav-open');
+        modalClose(sidebar);
+      }
+      navBtn.setAttribute('aria-expanded', 'false');
+      navBtn.setAttribute('aria-label', 'Open navigation');
+      setClosedDrawerState();
+    }
 
     function applyMode() {
       const mobile = mq.matches;
       document.body.dataset.mode = mobile ? 'mobile' : 'desktop';
       if (!mobile) closeNav();
-    }
-
-    // --- sidebar drawer: the SAME #sidebar element as desktop, slid in ---
-    const navBtn = document.getElementById('m-nav-btn');
-    function openNav() {
-      document.body.classList.add('m-nav-open');
-      navBtn.setAttribute('aria-expanded', 'true');
-      modalOpen(document.getElementById('sidebar'),
-                document.querySelector('#sidebar .sidebar-item.active') || undefined);
-      if (typeof gcEvent === 'function') gcEvent('nav-open');
-    }
-    function closeNav() {
-      if (!document.body.classList.contains('m-nav-open')) return;
-      document.body.classList.remove('m-nav-open');
-      navBtn.setAttribute('aria-expanded', 'false');
-      modalClose(document.getElementById('sidebar'));
+      else setClosedDrawerState();
     }
     navBtn.addEventListener('click', () => {
       if (document.body.classList.contains('m-nav-open')) closeNav(); else openNav();
@@ -390,6 +482,7 @@ import {
     // Modules are scoped; inline event attributes look up names on window.
     Object.assign(window, {
       switchTool, showAppTab, setTimeFmt, toggleReadMore, toggleFestivalMonth,
+      openFestivalDate,
       calcTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
       tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
       findMuhurta,

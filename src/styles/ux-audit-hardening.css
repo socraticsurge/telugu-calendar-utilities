@@ -1,0 +1,67 @@
+/* Product-wide UX audit hardening.
+ *
+ * Kept separate from the reviewed concept layer so these accessibility and
+ * state-contract fixes can be audited without changing the visual system.
+ */
+
+:root {
+  --ux-audit-muted-label: #475569;
+  --ux-audit-success: #15803d;
+  --ux-audit-error: #8e2a1f;
+  --ux-audit-guidance: #6f5638;
+}
+
+h1.m-page-title {
+  margin: 0;
+}
+
+body[data-mode='mobile'] h1.m-page-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 1rem 0 0.7rem;
+}
+
+.preview-head .tp-date-picker {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.4em;
+  vertical-align: middle;
+  border-radius: 5px;
+}
+
+.preview-head .tp-date-picker:focus-within {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(31, 26, 23, 0.32);
+}
+
+.preview-head .tp-date-picker__trigger {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+/* The audit found these status/category labels below AA contrast at their
+ * rendered small sizes. These darker values keep the same semantic hues. */
+.mu-tim-toggle,
+.mu-rg-label {
+  color: var(--ux-audit-muted-label);
+}
+
+.copy-confirm {
+  color: var(--ux-audit-success);
+}
+
+.copy-confirm[data-state='error'] {
+  color: var(--ux-audit-error);
+}
+
+.go-guidance-label {
+  color: var(--ux-audit-guidance);
+}

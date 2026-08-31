@@ -1336,6 +1336,71 @@ h2.panel-heading { display: none !important; }
   margin-left: auto;
 }
 
+.go-phalalu-opener {
+  font-size: var(--ux-text-md) !important;
+  font-weight: 650;
+}
+
+.go-phalalu-summary {
+  color: var(--ux-ink) !important;
+  font-weight: 600;
+}
+
+.go-phalalu-condition {
+  color: var(--amber) !important;
+}
+
+.go-phalalu-details {
+  margin-top: var(--ux-space-3);
+  border-top: 1px solid var(--ux-line);
+}
+
+.go-phalalu-details > summary,
+.go-interpretation-details > summary,
+.mu-reason-details > summary {
+  min-height: 44px;
+  padding: 0.7rem 0;
+  color: var(--ux-brand);
+  font: 650 var(--ux-text-sm)/1.35 var(--brand-sans);
+  cursor: pointer;
+}
+
+.go-phalalu-detail-lines {
+  padding-bottom: var(--ux-space-2);
+}
+
+.go-interpretation-details {
+  border-top: 1px solid var(--ux-line);
+}
+
+.go-interpretation-content {
+  padding-bottom: var(--ux-space-2);
+}
+
+.go-phalalu-boundary {
+  color: var(--ux-muted) !important;
+  font-size: var(--ux-text-xs) !important;
+}
+
+.mu-ranking-note {
+  max-width: 68ch;
+  margin: var(--ux-space-3) 0;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-sm);
+  line-height: 1.55;
+}
+
+.mu-reason-details {
+  width: 100%;
+  margin-top: var(--ux-space-1);
+  border-top: 1px solid var(--ux-line-soft);
+}
+
+.mu-reason-details .mu-rgroups,
+.mu-reason-details .mu-reasons {
+  margin: 0 0 var(--ux-space-2);
+}
+
 /* Muhurtam participant selection is a quiet roster, not another dashboard. */
 #tb-profiles {
   display: grid;
@@ -1478,6 +1543,50 @@ h2.panel-heading { display: none !important; }
   font-size: var(--ux-text-xs);
 }
 
+/* Festivals start with the next decision, then preserve the full year below. */
+.upcoming-next {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ux-space-4);
+  align-items: center;
+  margin-bottom: var(--ux-space-4);
+  padding: var(--ux-space-4);
+  border: 1px solid var(--ux-line);
+  border-radius: 8px;
+  background: var(--ux-surface-muted);
+}
+
+.upcoming-next-kicker {
+  margin: 0 0 var(--ux-space-1);
+  color: var(--ux-brand);
+  font: 700 var(--ux-text-xs)/1.35 var(--brand-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.upcoming-next h3 {
+  margin: 0 0 var(--ux-space-2);
+  color: var(--ux-ink);
+  font: 600 var(--ux-text-lg)/1.2 var(--brand-display);
+}
+
+.upcoming-next-action {
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--ux-brand);
+  border-radius: 6px;
+  background: var(--ux-brand);
+  color: var(--ux-surface);
+  cursor: pointer;
+  font: 700 var(--ux-text-sm)/1.2 var(--brand-sans);
+}
+
+.upcoming-next-action:hover { background: var(--ux-brand-deep); }
+.upcoming-next-action:focus-visible {
+  outline: 3px solid var(--ux-brand);
+  outline-offset: 3px;
+}
+
 /* Settings only appear where they change the result on screen. */
 body[data-tool='profiles'] #settings-line,
 body[data-tool='profiles'] #global-controls-bar,
@@ -1488,7 +1597,7 @@ body[data-tool='useinai'] #global-controls-bar,
 body[data-tool='about'] #settings-line,
 body[data-tool='about'] #global-controls-bar { display: none !important; }
 
-@media (min-width: 840px) {
+@media (min-width: 960px) {
   body { padding-left: 232px; }
 
   #sidebar { width: 232px; }
@@ -1505,7 +1614,7 @@ body[data-tool='about'] #global-controls-bar { display: none !important; }
   }
 }
 
-@media (max-width: 839px) {
+@media (max-width: 959px) {
   body[data-mode='mobile'] {
     padding: 52px 0.85rem 1.5rem;
   }
@@ -1697,6 +1806,9 @@ body[data-tool='about'] #global-controls-bar { display: none !important; }
     grid-row: 1 / span 2;
     margin-left: 0;
   }
+  body[data-mode='mobile'] #panel-gochara {
+    display: block;
+  }
   body[data-mode='mobile'] .muhurta-profile-option {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1713,6 +1825,8 @@ body[data-tool='about'] #global-controls-bar { display: none !important; }
   body[data-mode='mobile'] .muhurta-profile-actions > * {
     width: 100%;
   }
+  body[data-mode='mobile'] .upcoming-next { grid-template-columns: 1fr; }
+  body[data-mode='mobile'] .upcoming-next-action { width: 100%; }
 }
 
 @media (max-width: 520px) {
@@ -1723,7 +1837,7 @@ body[data-tool='about'] #global-controls-bar { display: none !important; }
   }
 }
 
-@media (min-width: 600px) and (max-width: 839px) {
+@media (min-width: 600px) and (max-width: 959px) {
   body[data-mode='mobile'] .win-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }

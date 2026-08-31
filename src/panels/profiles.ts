@@ -33,6 +33,8 @@ interface ResolvedProfilesPanelContext extends ProfilesPanelContext {
 
 export interface ProfilesPanelOptions {
   navigate: (tool: string) => void;
+  onViewDailyHoroscope?: (profileId: string) => void;
+  onFindMuhurtam?: (profileId: string) => void;
   root?: HTMLElement;
   searchPlaces?: typeof searchBirthPlaces;
   deriveProfile?: typeof deriveBirthProfile;
@@ -733,6 +735,40 @@ export function initProfilesPanel(
       'These checks show which personalized journeys can use the saved details as they are.',
     );
     readinessSection.append(readinessTitle, readinessIntro, renderReadiness(profile));
+
+    const readiness = guestProfileReadiness(profile);
+    const journeyActions = element('div', 'profiles-form__actions');
+    if (readiness.horoscope) {
+      const horoscope = button(
+        'View Daily Horoscope',
+        'profiles-button profiles-button--primary',
+      );
+      horoscope.dataset.action = 'view-daily-horoscope';
+      horoscope.addEventListener('click', () => {
+        if (options.onViewDailyHoroscope) {
+          options.onViewDailyHoroscope(profile.id);
+        } else {
+          options.navigate('gochara');
+        }
+      });
+      journeyActions.append(horoscope);
+    }
+    if (readiness.muhurta) {
+      const muhurta = button(
+        'Find Muhurtam',
+        'profiles-button profiles-button--secondary',
+      );
+      muhurta.dataset.action = 'find-muhurtam';
+      muhurta.addEventListener('click', () => {
+        if (options.onFindMuhurtam) {
+          options.onFindMuhurtam(profile.id);
+        } else {
+          options.navigate('tarabalam');
+        }
+      });
+      journeyActions.append(muhurta);
+    }
+    if (journeyActions.childElementCount > 0) readinessSection.append(journeyActions);
     detail.append(readinessSection);
 
     if (natalDetails) {

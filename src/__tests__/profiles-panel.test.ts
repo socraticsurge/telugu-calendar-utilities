@@ -482,6 +482,47 @@ describe('saved profile detail view', () => {
       link.textContent === 'How this is calculated and verified')).toBe(false);
   });
 
+  test('offers ready profiles direct Daily Horoscope and Muhurtam actions', () => {
+    const onViewDailyHoroscope = vi.fn<(profileId: string) => void>();
+    const onFindMuhurtam = vi.fn<(profileId: string) => void>();
+    controller.destroy();
+    controller = initProfilesPanel(store, {
+      navigate,
+      onViewDailyHoroscope,
+      onFindMuhurtam,
+    });
+    const profile = store.create({
+      name: 'Anu',
+      nakshatra: 'Rohini',
+      pada: 2,
+    });
+
+    query<HTMLButtonElement>('button[aria-label="View Anu"]').click();
+    buttonNamed('View Daily Horoscope').click();
+    buttonNamed('Find Muhurtam').click();
+
+    expect(onViewDailyHoroscope).toHaveBeenCalledOnce();
+    expect(onViewDailyHoroscope).toHaveBeenCalledWith(profile.id);
+    expect(onFindMuhurtam).toHaveBeenCalledOnce();
+    expect(onFindMuhurtam).toHaveBeenCalledWith(profile.id);
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  test('shows only journeys supported by the profile readiness state', () => {
+    store.create({ name: 'Name only' });
+    store.create({ name: 'Muhurtam only', nakshatra: 'Krittika' });
+    controller.render();
+
+    query<HTMLButtonElement>('button[aria-label="View Name only"]').click();
+    expect(document.body.textContent).not.toContain('View Daily Horoscope');
+    expect(document.body.textContent).not.toContain('Find Muhurtam');
+
+    buttonNamed('Back to profiles').click();
+    query<HTMLButtonElement>('button[aria-label="View Muhurtam only"]').click();
+    expect(document.body.textContent).not.toContain('View Daily Horoscope');
+    expect(buttonNamed('Find Muhurtam')).toBeTruthy();
+  });
+
   test('gives every saved profile an accessible View action', () => {
     store.create({ name: 'Anu' });
     store.create({ name: 'Bala' });

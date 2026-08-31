@@ -130,6 +130,7 @@ def _capture_console(page):
 PROFILE_VIEWPORTS = (
     (390, 844, 'mobile'),
     (768, 1024, 'mobile'),
+    (853, 900, 'mobile'),
     (1024, 768, 'desktop'),
     (1440, 900, 'desktop'),
 )
@@ -387,13 +388,18 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
         # Wait until the bundle had time to evaluate.
         for marker in ('switchTool', 'setTimeFmt', 'calcTarabalam',
                        'findMuhurta', 'renderGochara',
-                       'shareTodayOnWhatsApp'):
+                       'shareTodayOnWhatsApp', 'openFestivalDate'):
             kind = page.evaluate(f"typeof window.{marker}")
             assert kind == 'function', (
                 f'window.{marker} is {kind!r}, expected "function". '
                 f'Check the Object.assign(window, {{...}}) block in '
                 f'src/main.ts — inline onclick handlers depend on it.'
             )
+        page.evaluate("window.openFestivalDate('2026-08-31')")
+        page.wait_for_function(
+            "document.querySelector('input.tp-date-input')?.value === '2026-08-31'"
+        )
+        assert 'Monday, August 31, 2026' in page.locator('#tp-result').inner_text()
     finally:
         page.close()
 
@@ -403,6 +409,7 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
     (
         (390, 844, 'mobile'),
         (768, 1024, 'mobile'),
+        (853, 900, 'mobile'),
         (1024, 768, 'desktop'),
         (1440, 900, 'desktop'),
     ),
@@ -433,19 +440,36 @@ def test_daily_surface_is_responsive_and_navigation_remains_usable(
         assert metrics['overflow'] <= 0
         assert metrics['cycleGroups'] == 2
         assert metrics['helpButton'] is False
+        assert page.locator('#m-page-title').evaluate('node => node.tagName') == 'H1'
+        assert page.locator('#sidebar-today').get_attribute('aria-current') == 'page'
+
+        if expected_mode == 'mobile':
+            title_box = page.locator('#m-page-title-main').bounding_box()
+            subtitle_box = page.locator('#m-page-title-sub').bounding_box()
+            assert title_box is not None and subtitle_box is not None
+            assert subtitle_box['y'] >= title_box['y'] + title_box['height']
 
         docs_link = page.locator('#sidebar a[href="/docs/"]')
         if expected_mode == 'mobile':
             nav_button = page.locator('#m-nav-btn')
+            sidebar = page.locator('#sidebar')
+            assert sidebar.get_attribute('aria-hidden') == 'true'
+            assert sidebar.evaluate('node => node.inert') is True
             box = nav_button.bounding_box()
             assert box and box['width'] >= 44 and box['height'] >= 44
             nav_button.click()
             assert 'm-nav-open' in page.locator('body').get_attribute('class').split()
+            assert sidebar.get_attribute('aria-hidden') is None
+            assert sidebar.evaluate('node => node.inert') is False
             assert docs_link.is_visible()
             page.keyboard.press('Escape')
             assert 'm-nav-open' not in (page.locator('body').get_attribute('class') or '').split()
+            assert sidebar.get_attribute('aria-hidden') == 'true'
+            assert sidebar.evaluate('node => node.inert') is True
         else:
             assert docs_link.is_visible()
+            assert page.locator('#sidebar').get_attribute('aria-hidden') is None
+            assert page.locator('#sidebar').evaluate('node => node.inert') is False
 
         for control, expected_hash, expected_card in (
             ('#sidebar-useinai', '#useinai', '#card-mcp'),
@@ -458,6 +482,38 @@ def test_daily_surface_is_responsive_and_navigation_remains_usable(
             assert 'active' in page.locator(control).get_attribute('class').split()
             assert page.locator(expected_card).is_visible()
             assert page.evaluate('document.body.dataset.tool') == expected_hash[1:]
+    finally:
+        page.close()
+
+
+@pytest.mark.parametrize(
+    ('route', 'tool', 'visible_surface'),
+    (
+        ('#gochara', 'gochara', '#panel-gochara'),
+        ('#tarabalam', 'tarabalam', '#panel-tarabalam'),
+        ('#muhurta', 'tarabalam', '#panel-tarabalam'),
+        ('#profiles', 'profiles', '#card-profiles'),
+        ('#festivals', 'festivals', '#special-days-card'),
+        ('#subscribe', 'subscribe', '#subscribe'),
+        ('#useinai', 'useinai', '#card-mcp'),
+        ('#about', 'about', '#card-about'),
+    ),
+)
+def test_direct_hash_routes_open_the_expected_surface(
+    docs_server, browser, route, tool, visible_surface,
+):
+    """A bookmarked tool must restore its shell state on a fresh load."""
+    page = browser.new_page(viewport={'width': 853, 'height': 900})
+    captured = _capture_console(page)
+    try:
+        page.goto(f'{docs_server}{route}', wait_until='domcontentloaded', timeout=15000)
+        page.wait_for_function(f"document.body.dataset.tool === '{tool}'")
+        assert page.locator(visible_surface).is_visible()
+        assert page.locator('#m-page-title').evaluate('node => node.tagName') == 'H1'
+        sidebar_item = page.locator(f'#sidebar-{tool}')
+        if sidebar_item.count():
+            assert sidebar_item.get_attribute('aria-current') == 'page'
+        assert captured == []
     finally:
         page.close()
 
@@ -700,6 +756,50 @@ def test_guest_profiles_and_consumers_are_responsive_safe_and_ordered(
         f'profile surfaces raised page errors at {width}x{height}: '
         f'{app_errors[:3]}'
     )
+
+
+def test_profile_detail_onward_actions_carry_the_selected_person(
+    docs_server, browser,
+):
+    """A ready profile should activate both personalized journeys directly."""
+    page = browser.new_page(viewport={'width': 1024, 'height': 768})
+    captured = _capture_console(page)
+    _keep_profile_smoke_offline(page)
+    try:
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        _seed_profile_surfaces(page)
+
+        page.evaluate("window.switchTool('profiles')")
+        page.locator(
+            f'#card-profiles [data-profile-id="{READY_PROFILE_ID}"] '
+            '[data-action="view-profile"]'
+        ).click()
+        page.get_by_role(
+            'button', name='View Daily Horoscope', exact=True,
+        ).click()
+        page.wait_for_function("document.body.dataset.tool === 'gochara'")
+        assert page.input_value('#go-view') == f'profile:{READY_PROFILE_ID}'
+
+        page.reload(wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        _seed_profile_surfaces(page)
+        page.evaluate("window.switchTool('profiles')")
+        page.locator(
+            f'#card-profiles [data-profile-id="{READY_PROFILE_ID}"] '
+            '[data-action="view-profile"]'
+        ).click()
+        page.get_by_role('button', name='Find Muhurtam', exact=True).click()
+        page.wait_for_function("document.body.dataset.tool === 'tarabalam'")
+        assert page.locator(
+            f'#tb-profiles input[data-profile-selection]'
+            f'[value="{READY_PROFILE_ID}"]'
+        ).is_checked()
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'profile onward actions raised errors: {app_errors[:3]}'
 
 
 def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
@@ -1209,6 +1309,18 @@ def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browse
             'muhurta search rendered neither tier badges nor a no-slots '
             f'message. First 300 chars: {result_html[:300]!r}'
         )
+        if page.locator('#mu-result .mu-slot').count():
+            assert 'ranked by tier, then score' in page.locator(
+                '#mu-result .tb-summary'
+            ).inner_text()
+            assert 'Excellent slots appear before Good ones' in page.locator(
+                '#mu-result .mu-ranking-note'
+            ).inner_text()
+            first_reason = page.locator(
+                '#mu-result .mu-slot .mu-reason-details'
+            ).first
+            assert first_reason.count() == 1
+            assert first_reason.evaluate('node => node.open') is False
     finally:
         page.close()
     ref_errors = [
@@ -1384,6 +1496,11 @@ def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build,
         ph = page.locator('#go-phalalu').inner_text()
         assert 'rasi phalalu' in ph.lower(), (
             f'phalalu box rendered but without a reading: {ph[:200]!r}')
+        assert 'from lagna' not in ph.lower()
+        details = page.locator('#go-phalalu .go-phalalu-details')
+        assert details.count() == 1
+        assert details.evaluate('node => node.open') is False
+        assert details.locator('.go-phalalu-detail-lines p').count() == 8
         legend = page.locator('#go-legend').inner_text()
         assert 'favourable' in legend, 'verdict legend missing for a rasi view'
     finally:
