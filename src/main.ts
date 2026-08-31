@@ -21,7 +21,7 @@ import {
   calcTarabalam, renderTarabalam, tbAddRow, tbRemoveRow, tbResetProfiles,
   tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
   findMuhurta, renderMuhurta, shareTarabalamOnWhatsApp, shareMuhurtaOnWhatsApp,
-  tbHasDays, muHasLast, initTarabalamPanel,
+  tbHasDays, muHasLast, initTarabalamPanel, initTarabalamProfiles,
 } from './panels/tarabalam';
 import { loadLagna, lagnaDayFor } from './lib/lagna-loader';
 import { stampOf } from './lib/format';
@@ -178,6 +178,19 @@ import { initProfilesPanel } from './panels/profiles';
     },
     editProfile(id) {
       profilesPanel.openEdit(id, { returnTo: 'gochara' });
+      switchTool('profiles');
+    },
+    manageProfiles() {
+      switchTool('profiles');
+    },
+  });
+  initTarabalamProfiles(profileStore, {
+    createProfile() {
+      profilesPanel.openCreate({ returnTo: 'tarabalam' });
+      switchTool('profiles');
+    },
+    editProfile(id) {
+      profilesPanel.openEdit(id, { returnTo: 'tarabalam' });
       switchTool('profiles');
     },
     manageProfiles() {

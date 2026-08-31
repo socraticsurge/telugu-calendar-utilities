@@ -804,6 +804,143 @@ h2.panel-heading { display: none !important; }
 
 .go-profile-action--secondary { background: transparent; }
 
+/* Muhurtam participant selection is a quiet roster, not another dashboard. */
+#tb-profiles {
+  display: grid;
+  gap: var(--ux-space-4);
+  margin-top: var(--ux-space-3);
+}
+
+.muhurta-profile-intro,
+.muhurta-profile-summary,
+.muhurta-profile-empty,
+.muhurta-profile-notice {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-sm);
+  line-height: 1.55;
+}
+
+.muhurta-profile-summary {
+  color: var(--ux-ink);
+  font-weight: 600;
+}
+
+.muhurta-saved-profiles {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.muhurta-saved-profiles__legend,
+.muhurta-manual-profiles__title {
+  margin: 0 0 var(--ux-space-2);
+  color: var(--ux-ink);
+  font: 600 var(--ux-text-sm)/1.35 var(--brand-sans);
+}
+
+.muhurta-saved-profiles__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ux-line);
+}
+
+.muhurta-profile-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ux-space-3);
+  align-items: center;
+  padding: var(--ux-space-3) 0;
+  border-bottom: 1px solid var(--ux-line);
+}
+
+.muhurta-profile-option__label {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.muhurta-profile-option__label input {
+  width: 20px;
+  height: 20px;
+  margin: 0 12px;
+  accent-color: var(--ux-brand);
+}
+
+.muhurta-profile-option__identity { min-width: 0; }
+.muhurta-profile-option__name,
+.muhurta-profile-option__details { display: block; }
+.muhurta-profile-option__name { color: var(--ux-ink); }
+.muhurta-profile-option__details {
+  margin-top: 2px;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-xs);
+  line-height: 1.45;
+}
+
+.muhurta-profile-option__edit,
+.muhurta-profile-actions .tb-add,
+.muhurta-profile-actions .tb-reset,
+.muhurta-manual-profile .tb-remove {
+  min-height: 44px;
+}
+
+.muhurta-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ux-space-2);
+}
+
+.muhurta-manual-profiles {
+  display: grid;
+  gap: var(--ux-space-3);
+}
+
+.muhurta-manual-profile {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ux-space-3);
+  margin: 0;
+  padding: var(--ux-space-4) 0;
+  border: 0;
+  border-top: 1px solid var(--ux-line);
+}
+
+.muhurta-manual-profile__legend {
+  grid-column: 1 / -1;
+  color: var(--ux-ink);
+  font-weight: 600;
+}
+
+.muhurta-manual-field {
+  display: grid;
+  gap: var(--ux-space-1);
+  min-width: 0;
+}
+
+.muhurta-manual-field__label {
+  color: var(--ux-muted);
+  font: 600 var(--ux-text-xs)/1.35 var(--brand-sans);
+}
+
+.muhurta-manual-field input,
+.muhurta-manual-field select {
+  width: 100%;
+  min-height: 44px;
+}
+
+.muhurta-manual-profile__readiness {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-xs);
+}
+
 /* Settings only appear where they change the result on screen. */
 body[data-tool='profiles'] #settings-line,
 body[data-tool='profiles'] #global-controls-bar,
@@ -993,6 +1130,22 @@ body[data-tool='about'] #global-controls-bar { display: none !important; }
   body[data-mode='mobile'] .profiles-actions { align-items: flex-start; }
   body[data-mode='mobile'] .profiles-button--primary { width: 100%; }
   body[data-mode='mobile'] .profiles-form__actions .profiles-button--primary { order: -1; }
+  body[data-mode='mobile'] .muhurta-profile-option {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-mode='mobile'] .muhurta-profile-option__edit {
+    justify-self: start;
+  }
+  body[data-mode='mobile'] .muhurta-manual-profile {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-mode='mobile'] .muhurta-manual-profile__legend,
+  body[data-mode='mobile'] .muhurta-manual-profile__readiness {
+    grid-column: 1;
+  }
+  body[data-mode='mobile'] .muhurta-profile-actions > * {
+    width: 100%;
+  }
 }
 
 @media (max-width: 520px) {
