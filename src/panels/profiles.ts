@@ -1230,11 +1230,15 @@ export function initProfilesPanel(
 
       formError.hidden = true;
       formError.textContent = '';
-      const draft = {
+      const draft: GuestProfileDraft = {
+        source: 'manual',
         name,
         nakshatra: nakshatraSelect.value,
         pada: padaSelect.value,
         lagna: lagnaSelect.value,
+        birthDetails: null,
+        natalChart: null,
+        calculation: null,
       };
       const padaValue = Number(padaSelect.value);
       const candidate: GuestProfile = {

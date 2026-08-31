@@ -461,6 +461,47 @@ describe('saved profile detail view', () => {
     expect(document.activeElement).toBe(query('#profile-name'));
   });
 
+  test('converts a calculated profile to manual without retaining birth provenance', () => {
+    installBirthApi();
+    const result = calculatedProfile();
+    const profile = store.create({
+      source: 'birth-details',
+      name: 'Anu',
+      nakshatra: result.nakshatra,
+      pada: result.pada,
+      janmaRasi: result.janmaRashi,
+      lagna: result.lagna,
+      birthDetails: {
+        dateOfBirth: '1990-05-12',
+        timeOfBirth: '14:35',
+        placeLabel: VIJAYAWADA.label,
+        latitude: VIJAYAWADA.latitude,
+        longitude: VIJAYAWADA.longitude,
+        timezone: VIJAYAWADA.timezone,
+      },
+      natalChart: { lagnaDegree: result.lagnaDegree, planets: result.planets },
+      calculation: { contractVersion: result.contractVersion, engine: result.engine },
+    });
+    controller.render();
+
+    controller.openEdit(profile.id);
+    buttonNamed('Enter astrology details manually').click();
+    inputValue('#profile-name', 'Manual Anu');
+    submit();
+
+    expect(store.get(profile.id)).toMatchObject({
+      source: 'manual',
+      name: 'Manual Anu',
+      birthDetails: null,
+      natalChart: null,
+      calculation: null,
+    });
+    const extensions = JSON.parse(
+      storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) || '{}',
+    ) as { profiles?: Record<string, unknown> };
+    expect(extensions.profiles).not.toHaveProperty(profile.id);
+  });
+
   test('shows only known facts for a manual profile and does not fabricate a chart or provenance', () => {
     store.create({ name: 'Manual Meera', nakshatra: 'Krittika', lagna: 'Tula' });
     controller.render();
