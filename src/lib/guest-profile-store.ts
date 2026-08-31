@@ -153,6 +153,56 @@ export function readLegacyGuestProfileRows(storage: ProfileStorage): LegacyGuest
   }
 }
 
+/**
+ * Writes only the form-controlled prefix of the legacy array.  The Tarabalam
+ * form still has fewer visible rows than the shared store can contain, so a
+ * compatibility edit must leave hidden lagna-only rows and newer-schema rows
+ * (including arbitrary future payload values) unchanged.
+ */
+export function writeLegacyGuestProfileRows(
+  storage: ProfileStorage,
+  fields: readonly LegacyGuestProfileFields[],
+): void {
+  let previous: unknown[] = [];
+  try {
+    const parsed: unknown = JSON.parse(storage.getItem(GUEST_PROFILE_STORAGE_KEY) || '[]');
+    if (Array.isArray(parsed)) previous = parsed;
+  } catch {
+    // Match the legacy writer's recovery: a fresh editable prefix replaces an
+    // unreadable payload, while valid trailing values are never discarded.
+  }
+
+  const next = previous.slice();
+  fields.forEach((row, index) => {
+    const current = previous[index];
+    next[index] = mergeLegacyGuestProfileRow(
+      current && typeof current === 'object' && !Array.isArray(current)
+        ? current as LegacyGuestProfileRow
+        : {},
+      row,
+    );
+  });
+  storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify(next));
+}
+
+/** Remove one legacy row without filtering or rebuilding unrelated rows. */
+export function removeLegacyGuestProfileRow(storage: ProfileStorage, index: number): void {
+  let previous: unknown[] = [];
+  try {
+    const parsed: unknown = JSON.parse(storage.getItem(GUEST_PROFILE_STORAGE_KEY) || '[]');
+    if (Array.isArray(parsed)) previous = parsed;
+  } catch {
+    // An unreadable payload has no compatible row to retain.
+  }
+  previous.splice(index, 1);
+  storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify(previous));
+}
+
+/** Compatibility data is deliberately permissive; consumers must validate it. */
+export function canonicalLegacyGuestProfileLagna(value: unknown): string | null {
+  return canonical(value, RASI_NAMES);
+}
+
 /** Preserve additive/future fields while the legacy Muhurtam form still writes this key. */
 export function mergeLegacyGuestProfileRow(
   previous: LegacyGuestProfileRow,
@@ -261,10 +311,16 @@ export class GuestProfileStore {
   }
 
   clear(): void {
-    const changed = this.profiles.length > 0;
+    const profilesChanged = this.profiles.length > 0;
+    const previousPersistence = this.persistence;
+    const previousIssue = this.issue;
     this.profiles = [];
     this.persist();
-    if (changed) this.emit();
+    if (
+      profilesChanged
+      || this.persistence !== previousPersistence
+      || this.issue !== previousIssue
+    ) this.emit();
   }
 
   reload(): void {
@@ -400,7 +456,16 @@ export class GuestProfileStore {
   private emit(): void {
     const snapshot = this.getSnapshot();
     const listeners = Array.from(this.listeners);
-    for (const listener of listeners) listener(snapshot);
+    for (const listener of listeners) {
+      // Store mutations have already been persisted. A faulty UI observer must
+      // neither turn that successful mutation into an exception nor prevent
+      // other subscribers from receiving the same immutable snapshot.
+      try {
+        listener(snapshot);
+      } catch {
+        // Subscriber failures belong to the subscriber, not the store.
+      }
+    }
   }
 }
 

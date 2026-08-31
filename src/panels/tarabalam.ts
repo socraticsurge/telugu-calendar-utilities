@@ -26,7 +26,9 @@ import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
 import {
   mergeLegacyGuestProfileRow,
+  removeLegacyGuestProfileRow,
   readLegacyGuestProfileRows,
+  writeLegacyGuestProfileRows,
 } from '../lib/guest-profile-store';
 import { RASI_NAMES, NAKSHATRA_NAMES, rasiFromStar } from '../data/rasis';
 import { MUHURTA_DAY } from '../data/muhurtas';
@@ -102,8 +104,10 @@ function tbProfiles() {
 }
 
 function tbSaveProfiles() {
+  // Keep this safe reader at the panel boundary for older/corrupt payloads;
+  // the whole-array writer below independently retains unrendered raw rows.
   const existing = readLegacyGuestProfileRows(localStorage);
-  const raw = [];
+  const fields = [];
   for (let i = 0; i < TB_ROWS; i++) {
     const lagnaInput = selEl(`tb-lagna-${i}`);
     const previous = existing[i] || {};
@@ -113,9 +117,14 @@ function tbSaveProfiles() {
       pada: selEl(`tb-pada-${i}`).value,
       lagna: lagnaInput ? lagnaInput.value : '',
     });
-    raw.push(row);
+    fields.push({
+      name: row.name || '',
+      nak: row.nak || '',
+      pada: row.pada || '',
+      lagna: row.lagna || '',
+    });
   }
-  localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
+  writeLegacyGuestProfileRows(localStorage, fields);
 }
 
 let TB_ROWS = 1;  // visible person rows (1..4)
@@ -170,9 +179,11 @@ function tbAddRow() {
 }
 
 function tbRemoveRow(i) {
+  // Retain the compatibility reader here as well: it makes a corrupt or
+  // already-empty legacy form a harmless no-op rather than rewriting it.
   const saved = readLegacyGuestProfileRows(localStorage);
-  saved.splice(i, 1);
-  localStorage.setItem('tc-tb-profiles', JSON.stringify(saved));
+  if (i >= saved.length) return;
+  removeLegacyGuestProfileRow(localStorage, i);
   TB_ROWS = Math.max(1, TB_ROWS - 1);
   tbRenderProfileInputs();
 }

@@ -16,6 +16,11 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Keep legacy Tarabalam profile edits compatible with hidden and future-schema
+  rows, isolate faulty store listeners, and fail closed for malformed legacy
+  Lagna values in Gochara.
+- Notify profile-store subscribers when an otherwise empty clear operation
+  loses persistence or changes its reported storage issue.
 - Constrain the MCP SDK to the tested 1.x API so fresh installations cannot
   resolve the incompatible 2.x package while the server uses
   `mcp.server.fastmcp`.

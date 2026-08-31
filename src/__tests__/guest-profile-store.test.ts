@@ -3,10 +3,12 @@ import {
   GUEST_PROFILE_SCHEMA_VERSION,
   GUEST_PROFILE_STORAGE_KEY,
   GuestProfileStoreError,
+  canonicalLegacyGuestProfileLagna,
   createGuestProfileStore,
   guestProfileReadiness,
   mergeLegacyGuestProfileRow,
   readLegacyGuestProfileRows,
+  writeLegacyGuestProfileRows,
   type GuestProfile,
   type ProfileStorage,
 } from '../lib/guest-profile-store';
@@ -220,6 +222,19 @@ describe('CRUD and subscriptions', () => {
     expect(calls).toEqual(['first', 'first', 'later']);
   });
 
+  test('isolates faulty listeners after a persisted mutation', () => {
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_listener_failure'),
+    });
+    const received: string[] = [];
+    store.subscribe(() => { throw new Error('render failed'); });
+    store.subscribe(snapshot => received.push(snapshot.profiles[0].name));
+
+    expect(() => store.create({ name: 'Persisted' })).not.toThrow();
+    expect(rawProfiles()).toMatchObject([{ name: 'Persisted' }]);
+    expect(received).toEqual(['Persisted']);
+  });
+
   test('rejects empty records, unknown IDs and a fifth profile', () => {
     const store = createGuestProfileStore(storage, {
       idFactory: ids(
@@ -294,6 +309,47 @@ describe('storage failures', () => {
     });
   });
 
+  test('whole-array legacy writes retain hidden and future rows across reload', () => {
+    const futureBytes = 'future\u0000payload::do-not-rewrite';
+    const futureRow = {
+      id: 'guest_future', schemaVersion: 2, name: 'Future', nak: 'Rohini',
+      extension: { bytes: futureBytes, enabled: true },
+    };
+    const hiddenLagnaOnly = {
+      id: 'guest_hidden', schemaVersion: 1, name: '', nak: '', pada: '',
+      lagna: 'Karka', privateNote: 'lagna-only row',
+    };
+    storage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify([
+      { id: 'guest_visible', schemaVersion: 1, name: 'Before', nak: 'Hasta', pada: 3, lagna: '' },
+      hiddenLagnaOnly,
+      futureRow,
+    ]));
+
+    writeLegacyGuestProfileRows(storage, [{
+      name: 'After', nak: 'Hasta', pada: '3', lagna: 'Mesha',
+    }]);
+    const afterEdit = storage.getItem(GUEST_PROFILE_STORAGE_KEY)!;
+    expect(JSON.parse(afterEdit)).toEqual([
+      { id: 'guest_visible', schemaVersion: 1, name: 'After', nak: 'Hasta', pada: '3', lagna: 'Mesha' },
+      hiddenLagnaOnly,
+      futureRow,
+    ]);
+    expect(afterEdit).toContain(JSON.stringify(hiddenLagnaOnly));
+    expect(afterEdit).toContain(JSON.stringify(futureRow));
+
+    const store = createGuestProfileStore(storage, {
+      idFactory: ids('guest_unused'),
+    });
+    store.reload();
+    expect(storage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(afterEdit);
+  });
+
+  test('Gochara compatibility fails closed for a noncanonical legacy lagna', () => {
+    expect(canonicalLegacyGuestProfileLagna('Mesha')).toBe('Mesha');
+    expect(canonicalLegacyGuestProfileLagna('not-a-rasi')).toBeNull();
+    expect(canonicalLegacyGuestProfileLagna(-1)).toBeNull();
+  });
+
   test('falls back to in-memory use when storage reads are denied', () => {
     const denied: ProfileStorage = {
       getItem: () => { throw new DOMException('denied', 'SecurityError'); },
@@ -332,5 +388,26 @@ describe('storage failures', () => {
     expect(store.getSnapshot()).toMatchObject({
       persistence: 'memory', issue: 'storage-unavailable',
     });
+  });
+
+  test('clear notifies when an empty store loses persistence', () => {
+    let denyWrites = false;
+    const flaky: ProfileStorage = {
+      getItem: () => null,
+      setItem: () => {
+        if (denyWrites) throw new DOMException('full', 'QuotaExceededError');
+      },
+    };
+    const store = createGuestProfileStore(flaky);
+    const listener = vi.fn();
+    store.subscribe(listener);
+
+    denyWrites = true;
+    store.clear();
+
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({
+      profiles: [], persistence: 'memory', issue: 'storage-unavailable',
+    }));
   });
 });

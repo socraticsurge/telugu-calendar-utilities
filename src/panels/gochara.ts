@@ -10,7 +10,10 @@ import { RASI_NAMES, rasiFromStar } from '../data/rasis';
 import { MU_CHANDRA_GOOD, MU_CHANDRA_PUJA } from '../muhurta-scorer';
 import { selEl } from '../lib/dom';
 import { shaniConditionFromMoonHouse, shaniConditionLine } from '../shani-conditions';
-import { readLegacyGuestProfileRows } from '../lib/guest-profile-store';
+import {
+  canonicalLegacyGuestProfileLagna,
+  readLegacyGuestProfileRows,
+} from '../lib/guest-profile-store';
 
 // Chandrabalam house sets — same classical table the muhurta scorer pins.
 const CHANDRA_GOOD = MU_CHANDRA_GOOD;
@@ -89,7 +92,7 @@ function goSavedPeople() {
     if (!rasi) return null;
     // Janma lagna is optional — only surfaced as a separate view
     // option when the user has filled it on the Tarabalam profile.
-    const lagna = v.lagna || null;
+    const lagna = canonicalLegacyGuestProfileLagna(v.lagna);
     return {
       name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)),
       rasi,
