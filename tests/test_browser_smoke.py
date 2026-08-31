@@ -217,6 +217,67 @@ def _seed_profile_surfaces(page):
     _wait_for_profile_app(page)
 
 
+def _install_direct_route_runtime_assets(page):
+    """Keep bookmarked-route smoke independent of generated local files."""
+    feed_text = (
+        REPO_ROOT / 'tests/fixtures/golden_hyderabad_drik_2026-06-11_3d.ics'
+    ).read_text(encoding='utf-8')
+    rashis = [
+        'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+        'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena',
+    ]
+    grahas = [
+        'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
+        'Shukra', 'Shani', 'Rahu', 'Ketu',
+    ]
+    lagna = {
+        'start': '2026-06-11',
+        'days': [{
+            'date': date,
+            'sunrise': '05:41',
+            'lagna0': 3,
+            'transitions': [
+                [60, 4], [120, 5], [180, 6], [240, 7], [300, 8], [360, 9],
+                [410, 10], [480, 11], [540, 0], [600, 1], [660, 2], [720, 3],
+            ],
+            'cycleEnd': 1440,
+        } for date in ('2026-06-11', '2026-06-12', '2026-06-13')],
+    }
+    page.route(
+        '**/feeds/*.ics',
+        lambda route: route.fulfill(
+            status=200, content_type='text/calendar', body=feed_text,
+        ),
+    )
+    page.route(
+        '**/feeds/*-lagna.json',
+        lambda route: route.fulfill(
+            status=200, content_type='application/json', body=json.dumps(lagna),
+        ),
+    )
+    page.route(
+        '**/gochara.json',
+        lambda route: route.fulfill(
+            status=200,
+            content_type='application/json',
+            body=json.dumps({
+                'start': time.strftime('%Y-%m-%d'),
+                'grahas': grahas,
+                'rasis': rashis,
+                'days': [[0, 1, 2, 3, 4, 5, 6, 7, 8]],
+                'retro': [[False, False, False, False, False, False, True, True, True]],
+            }),
+        ),
+    )
+    page.route(
+        '**/rasi_phalalu/latest.json',
+        lambda route: route.fulfill(
+            status=200, content_type='application/json',
+            body=json.dumps({'date': '', 'rashis': {}}),
+        ),
+    )
+
+
 def _assert_no_horizontal_overflow(page, surface_name):
     metrics = page.evaluate(
         """() => ({
@@ -505,6 +566,7 @@ def test_direct_hash_routes_open_the_expected_surface(
     """A bookmarked tool must restore its shell state on a fresh load."""
     page = browser.new_page(viewport={'width': 853, 'height': 900})
     captured = _capture_console(page)
+    _install_direct_route_runtime_assets(page)
     try:
         page.goto(f'{docs_server}{route}', wait_until='domcontentloaded', timeout=15000)
         page.wait_for_function(f"document.body.dataset.tool === '{tool}'")

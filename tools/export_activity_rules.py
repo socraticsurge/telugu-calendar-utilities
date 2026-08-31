@@ -8,9 +8,8 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import sys
-
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'src' / 'data' / 'activity-rules.generated.json'
@@ -40,7 +39,11 @@ CONSUMED_FIELDS = (
 def build_export() -> dict:
     sys.path.insert(0, str(ROOT))
     from telugu_panchangam.personal.activity_catalog import (
-        BROWSER_ACTIVITIES, BROWSER_ACTIVITY_GROUPS,
+        BROWSER_ACTIVITIES,
+        BROWSER_ACTIVITY_GROUPS,
+    )
+    from telugu_panchangam.personal.activity_check_contract import (
+        build_activity_check_contract,
     )
     from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 
@@ -65,6 +68,7 @@ def build_export() -> dict:
             for label, activities in BROWSER_ACTIVITY_GROUPS
         ],
         'rules': rules,
+        'check_contract': build_activity_check_contract(),
     }
 
 

@@ -1348,5 +1348,1384 @@
       ],
       "source_claim": "muhurta.travel"
     }
+  },
+  "check_contract": {
+    "schema_version": 2,
+    "manual_check_class": "manual-only",
+    "display_sections": [
+      "chart",
+      "information",
+      "practical"
+    ],
+    "purposes": [
+      "safety_override"
+    ],
+    "activities": {
+      "any": {
+        "deterministic_panchangam_fields": [],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": []
+      },
+      "wedding": {
+        "deterministic_panchangam_fields": [
+          "avoid_karana",
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_vara",
+          "allowed_maasams",
+          "allowed_maasa_solar_pairs",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "avoid_nitya_yogas",
+          "allowed_lagnas",
+          "prefer_lagnas",
+          "allowed_tithi_names",
+          "skip_on_combust"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "wedding.house-7-vacant",
+          "wedding.kuja-not-8",
+          "wedding.shukra-not-6"
+        ],
+        "manual_checks": [
+          {
+            "id": "wedding.manual-1",
+            "source_index": 0,
+            "source_text": "Nakshatra Pada gate: reject Magha and Moola Pada 1 and Revati Pada 4. Pada is not computed across every surface, so the automated profile admits the star only subject to this mandatory check.",
+            "text": "Nakshatra Pada gate: reject Magha and Moola Pada 1 and Revati Pada 4. Pada is not computed across every surface, so the automated profile admits the star only subject to this mandatory check.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "wedding.manual-2",
+            "source_index": 1,
+            "source_text": "Yoga vocabulary: Raman also rejects a named Mrityu Yoga that is not one of the engine’s 27 Nitya Yogas; verify the applicable lineage definition manually.",
+            "text": "Yoga vocabulary: Raman also rejects a named Mrityu Yoga that is not one of the engine’s 27 Nitya Yogas; verify the applicable lineage definition manually.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "wedding.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: keep the 7th house unoccupied; Mangala out of the 8th; Shukra out of the 6th; Lagna free from malefics and not hemmed between them; and Chandra unassociated with another Graha.",
+            "text": "Election chart: keep the 7th house unoccupied; Mangala out of the 8th; Shukra out of the 6th; Lagna free from malefics and not hemmed between them; and Chandra unassociated with another Graha.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "wedding.manual-4",
+            "source_index": 3,
+            "source_text": "Fortification: consider Guru, Budha or Shukra in Lagna and malefics in the 3rd or 11th, or one of the source’s named marriage-election Yogas.",
+            "text": "Fortification: consider Guru, Budha or Shukra in Lagna and malefics in the 3rd or 11th, or one of the source’s named marriage-election Yogas.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "wedding.manual-5",
+            "source_index": 4,
+            "source_text": "Couple-specific prerequisites: complete horoscope compatibility review, Tarabala, Chandrabala and Panchaka review for both partners; an election cannot substitute for consent or relationship judgment.",
+            "text": "Couple-specific prerequisites: complete horoscope compatibility review, Tarabala, Chandrabala and Panchaka review for both partners; an election cannot substitute for consent or relationship judgment.",
+            "class": "manual-only",
+            "display_section": "practical"
+          },
+          {
+            "id": "wedding.manual-6",
+            "source_index": 5,
+            "source_text": "Lineage warning: current Drik Panchang Hyderabad dates admit some Tuesdays and Tithis Raman rejects. This profile follows Raman’s named method rather than silently blending published practices.",
+            "text": "Lineage warning: current Drik Panchang Hyderabad dates admit some Tuesdays and Tithis Raman rejects. This profile follows Raman’s named method rather than silently blending published practices.",
+            "class": "manual-only",
+            "display_section": "information"
+          }
+        ]
+      },
+      "engagement": {
+        "deterministic_panchangam_fields": [
+          "allowed_nakshatras"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "engagement.manual-1",
+            "source_index": 0,
+            "source_text": "Verse 11 additionally requires a Shubha day, Tithi and Lagna for Varavarana but does not enumerate them in this passage; the officiating practitioner must establish those three conditions.",
+            "text": "Verse 11 additionally requires a Shubha day, Tithi and Lagna for Varavarana but does not enumerate them in this passage; the officiating practitioner must establish those three conditions.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "engagement.manual-2",
+            "source_index": 1,
+            "source_text": "Scope: automation uses the intersection of the Kanyavarana and Varavarana star lists for a mutual engagement. A one-sided bride- or groom-selection rite may use its own broader verse-specific list.",
+            "text": "Scope: automation uses the intersection of the Kanyavarana and Varavarana star lists for a mutual engagement. A one-sided bride- or groom-selection rite may use its own broader verse-specific list.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "engagement.manual-3",
+            "source_index": 2,
+            "source_text": "Complete consent, family and couple-specific compatibility review; this election cannot assess the relationship or promise a marriage outcome.",
+            "text": "Complete consent, family and couple-specific compatibility review; this election cannot assess the relationship or promise a marriage outcome.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "naming": {
+        "deterministic_panchangam_fields": [
+          "prefer_lagna_class",
+          "prefer_choghadiya",
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "avoid_tithi_numbers"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "naming.manual-1",
+            "source_index": 0,
+            "source_text": "Prefer the 10th, 12th or 16th day after birth; otherwise elect an auspicious day.",
+            "text": "Prefer the 10th, 12th or 16th day after birth; otherwise elect an auspicious day.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "naming.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: strengthen Lagna and leave the 8th house unoccupied.",
+            "text": "Election chart: strengthen Lagna and leave the 8th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "naming.manual-3",
+            "source_index": 2,
+            "source_text": "A common Lagna is acceptable only when occupied by benefics.",
+            "text": "A common Lagna is acceptable only when occupied by benefics.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "naming.manual-4",
+            "source_index": 3,
+            "source_text": "Prefer Guru in a Kendra or Trikona with a malefic in the 11th.",
+            "text": "Prefer Guru in a Kendra or Trikona with a malefic in the 11th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "naming.manual-5",
+            "source_index": 4,
+            "source_text": "Alternative chart: benefic-sign Lagna, malefic in the 3rd, Shukra in the 12th and Chandra dignified.",
+            "text": "Alternative chart: benefic-sign Lagna, malefic in the 3rd, Shukra in the 12th and Chandra dignified.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "naming.manual-6",
+            "source_index": 5,
+            "source_text": "Choose a name appropriate to the ruling Nakshatra.",
+            "text": "Choose a name appropriate to the ruling Nakshatra.",
+            "class": "manual-only",
+            "display_section": "information"
+          }
+        ]
+      },
+      "annaprasana": {
+        "deterministic_panchangam_fields": [
+          "prefer_choghadiya",
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "avoid_tithi_numbers",
+          "allowed_lagnas"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "annaprasana.house-10-vacant",
+          "annaprasana.budha-not-7",
+          "annaprasana.kuja-not-8",
+          "annaprasana.shukra-not-9"
+        ],
+        "manual_checks": [
+          {
+            "id": "annaprasana.manual-1",
+            "source_index": 0,
+            "source_text": "Perform first feeding in the child’s 6th, 8th, 9th or 12th month; the age-month is the most important criterion.",
+            "text": "Perform first feeding in the child’s 6th, 8th, 9th or 12th month; the age-month is the most important criterion.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "annaprasana.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: leave the 10th house unoccupied.",
+            "text": "Election chart: leave the 10th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "annaprasana.manual-3",
+            "source_index": 2,
+            "source_text": "Budha, Mangala and Shukra should not occupy the 7th, 8th and 9th houses respectively.",
+            "text": "Budha, Mangala and Shukra should not occupy the 7th, 8th and 9th houses respectively.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "annaprasana.manual-4",
+            "source_index": 3,
+            "source_text": "Budha, Guru or Shukra in Lagna is highly commended; no malefic should occupy Lagna.",
+            "text": "Budha, Guru or Shukra in Lagna is highly commended; no malefic should occupy Lagna.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "karnavedha": {
+        "deterministic_panchangam_fields": [
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "avoid_tithi_numbers",
+          "allowed_lagnas",
+          "daytime_only"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "karnavedha.manual-1",
+            "source_index": 0,
+            "source_text": "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month.",
+            "text": "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "karnavedha.manual-2",
+            "source_index": 1,
+            "source_text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
+            "text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "karnavedha.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: leave the 8th house unoccupied.",
+            "text": "Election chart: leave the 8th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "mundana": {
+        "deterministic_panchangam_fields": [
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "prefer_nakshatras",
+          "allowed_tithi_numbers",
+          "allowed_lagnas",
+          "forenoon_only",
+          "allowed_pakshams",
+          "skip_on_combust"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "mundana.manual-1",
+            "source_index": 0,
+            "source_text": "Perform in the child’s 3rd or 5th year, and not while the child’s mother is pregnant.",
+            "text": "Perform in the child’s 3rd or 5th year, and not while the child’s mother is pregnant.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "mundana.manual-2",
+            "source_index": 1,
+            "source_text": "Confirm the source’s stated Surya-in-Karkataka seasonal condition with the officiating astrologer.",
+            "text": "Confirm the source’s stated Surya-in-Karkataka seasonal condition with the officiating astrologer.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "mundana.manual-3",
+            "source_index": 2,
+            "source_text": "Other rising Rasis require a strong benefic in Lagna; Kumbha must still be rejected.",
+            "text": "Other rising Rasis require a strong benefic in Lagna; Kumbha must still be rejected.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "mundana.manual-4",
+            "source_index": 3,
+            "source_text": "Election chart: place benefics in the 4th, 5th, 7th, 9th, 10th and 11th; malefics in the 3rd, 6th and 11th.",
+            "text": "Election chart: place benefics in the 4th, 5th, 7th, 9th, 10th and 11th; malefics in the 3rd, 6th and 11th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "mundana.manual-5",
+            "source_index": 4,
+            "source_text": "Leave the 8th house unoccupied and avoid Surya, Mangala or preferably any malefic in the 7th.",
+            "text": "Leave the 8th house unoccupied and avoid Surya, Mangala or preferably any malefic in the 7th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "upanayana": {
+        "deterministic_panchangam_fields": [
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_maasams",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "allowed_lagnas",
+          "forenoon_only",
+          "allowed_solar_signs",
+          "allowed_tithi_names"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "upanayana.manual-1",
+            "source_index": 0,
+            "source_text": "Perform in the 5th or 8th year; if delayed, apply the source’s age limits and exception rules.",
+            "text": "Perform in the 5th or 8th year; if delayed, apply the source’s age limits and exception rules.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "upanayana.manual-2",
+            "source_index": 1,
+            "source_text": "Reject Wednesday when Budha is combust.",
+            "text": "Reject Wednesday when Budha is combust.",
+            "class": "manual-only",
+            "display_section": "chart",
+            "applicable_varas": [
+              "Budhavaram"
+            ]
+          },
+          {
+            "id": "upanayana.manual-3",
+            "source_index": 2,
+            "source_text": "Chandra must not occupy the 6th, 8th or 12th from Lagna; avoid malefics in Kendras.",
+            "text": "Chandra must not occupy the 6th, 8th or 12th from Lagna; avoid malefics in Kendras.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "upanayana.manual-4",
+            "source_index": 3,
+            "source_text": "Leave the 8th house unoccupied; fortify the 3rd and keep the 6th free of a benefic.",
+            "text": "Leave the 8th house unoccupied; fortify the 3rd and keep the 6th free of a benefic.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "upanayana.manual-5",
+            "source_index": 4,
+            "source_text": "Avoid Mangala and Shani in the 2nd, 5th or 12th.",
+            "text": "Avoid Mangala and Shani in the 2nd, 5th or 12th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "upanayana.manual-6",
+            "source_index": 5,
+            "source_text": "Avoid Chandra in Lagna except the source’s stated Karka-Lagna Guru conjunction exception.",
+            "text": "Avoid Chandra in Lagna except the source’s stated Karka-Lagna Guru conjunction exception.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "upanayana.manual-7",
+            "source_index": 6,
+            "source_text": "Review the named adverse and favorable election Yogas listed in the remainder of the passage.",
+            "text": "Review the named adverse and favorable election Yogas listed in the remainder of the passage.",
+            "class": "manual-only",
+            "display_section": "information"
+          }
+        ]
+      },
+      "vidyarambha": {
+        "deterministic_panchangam_fields": [
+          "prefer_choghadiya",
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "allowed_lagnas"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "vidyarambha.manual-1",
+            "source_index": 0,
+            "source_text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+            "text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "vidyarambha.manual-2",
+            "source_index": 1,
+            "source_text": "Prefer the forenoon or noon for the ceremony.",
+            "text": "Prefer the forenoon or noon for the ceremony.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "vidyarambha.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: leave the 8th house unoccupied.",
+            "text": "Election chart: leave the 8th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "vidyarambha.manual-4",
+            "source_index": 3,
+            "source_text": "Budha, Shukra and Guru together in the 9th are stated to counteract adverse influences.",
+            "text": "Budha, Shukra and Guru together in the 9th are stated to counteract adverse influences.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "seemantha": {
+        "deterministic_panchangam_fields": [
+          "allowed_varas",
+          "allowed_nakshatras",
+          "allowed_lagnas",
+          "allowed_tithi_names"
+        ],
+        "personal_rule_ids": [
+          "personal.seemantha.birth-star-exclusions"
+        ],
+        "election_chart_rule_ids": [
+          "seemantha.house-8-vacant",
+          "seemantha.chandra-not-8"
+        ],
+        "manual_checks": [
+          {
+            "id": "seemantha.manual-1",
+            "source_index": 0,
+            "source_text": "Pregnancy timing: the cited passage ordains Seemantha for the first pregnancy, in the 5th or 7th month; if that schedule is missed, perform it before delivery under practitioner guidance. Muhurta Chintamani verse 8 instead specifies the 6th or 8th month; choose the family’s tradition with a qualified practitioner.",
+            "text": "Pregnancy timing: the cited passage ordains Seemantha for the first pregnancy, in the 5th or 7th month; if that schedule is missed, perform it before delivery under practitioner guidance. Muhurta Chintamani verse 8 instead specifies the 6th or 8th month; choose the family’s tradition with a qualified practitioner.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "seemantha.manual-2",
+            "source_index": 1,
+            "source_text": "Under unavoidable circumstances, Ashwini, Anuradha or Moola may be considered; the automated profile admits only the primary Nakshatra list.",
+            "text": "Under unavoidable circumstances, Ashwini, Anuradha or Moola may be considered; the automated profile admits only the primary Nakshatra list.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "seemantha.manual-3",
+            "source_index": 2,
+            "source_text": "Pournami is admissible only when Chandra is dignified; the automated profile conservatively omits it pending chart judgment.",
+            "text": "Pournami is admissible only when Chandra is dignified; the automated profile conservatively omits it pending chart judgment.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "seemantha.manual-4",
+            "source_index": 3,
+            "source_text": "Election chart: leave the 8th house vacant and do not place Chandra in the 8th.",
+            "text": "Election chart: leave the 8th house vacant and do not place Chandra in the 8th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "seemantha.manual-5",
+            "source_index": 4,
+            "source_text": "Personal star check: avoid the 3rd, 7th, 8th, 10th and 22nd Nakshatras counted from the mother’s birth Nakshatra.",
+            "text": "Personal star check: avoid the 3rd, 7th, 8th, 10th and 22nd Nakshatras counted from the mother’s birth Nakshatra.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "seemantha.manual-6",
+            "source_index": 5,
+            "source_text": "The source makes the pregnancy month primary and permits Guru or Shukra combustion to be ignored for this rite; no combustion gate is applied.",
+            "text": "The source makes the pregnancy month primary and permits Guru or Shukra combustion to be ignored for this rite; no combustion gate is applied.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "seemantha.manual-7",
+            "source_index": 6,
+            "source_text": "Maternal comfort, clinician instructions and medical care always take precedence over electional timing.",
+            "text": "Maternal comfort, clinician instructions and medical care always take precedence over electional timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "gruhapravesha": {
+        "deterministic_panchangam_fields": [
+          "prefer_lagna_class",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "allowed_lagnas",
+          "allowed_solar_signs",
+          "allowed_tithi_names"
+        ],
+        "personal_rule_ids": [
+          "personal.gruhapravesha.natal-anchor-match"
+        ],
+        "election_chart_rule_ids": [
+          "gruhapravesha.house-8-vacant"
+        ],
+        "manual_checks": [
+          {
+            "id": "gruhapravesha.manual-1",
+            "source_index": 0,
+            "source_text": "Ritual scope: first ceremonial entry into a newly built home only; buying a completed house, moving rental, or re-entering after repairs are separate elections.",
+            "text": "Ritual scope: first ceremonial entry into a newly built home only; buying a completed house, moving rental, or re-entering after repairs are separate elections.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "gruhapravesha.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: Guru, Shukra and Chandra should be strong; leave the 8th house vacant, place malefics in Upachayas and benefics in Kendras, and preferably use a Guru- or Shukra-owned rising Rasi.",
+            "text": "Election chart: Guru, Shukra and Chandra should be strong; leave the 8th house vacant, place malefics in Upachayas and benefics in Kendras, and preferably use a Guru- or Shukra-owned rising Rasi.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "gruhapravesha.manual-3",
+            "source_index": 2,
+            "source_text": "Lagna lineage: fixed Rasis are preferred and dual Rasis are ordinary. Raman permits a movable Rasi only with Vrishabha Navamsa; the automated profile conservatively omits that uncomputed exception.",
+            "text": "Lagna lineage: fixed Rasis are preferred and dual Rasis are ordinary. Raman permits a movable Rasi only with Vrishabha Navamsa; the automated profile conservatively omits that uncomputed exception.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "gruhapravesha.manual-4a",
+            "source_index": 3,
+            "source_text": "Personal and ritual checks: the owner’s Janma Rasi, Nakshatra or Lagna may strengthen the election; complete worship and Bhootabali before entry.",
+            "text": "The owner’s Janma Rasi, Nakshatra or Lagna may strengthen the election.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "gruhapravesha.manual-4b",
+            "source_index": 3,
+            "source_text": "Personal and ritual checks: the owner’s Janma Rasi, Nakshatra or Lagna may strengthen the election; complete worship and Bhootabali before entry.",
+            "text": "Complete worship and Bhootabali before entry.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "gruhapravesha.manual-5",
+            "source_index": 4,
+            "source_text": "Pregnancy safety: Raman advises avoiding entry after six months of the wife’s pregnancy. Maternal comfort, clinician instructions and medical care always take precedence over timing.",
+            "text": "Pregnancy safety: Raman advises avoiding entry after six months of the wife’s pregnancy. Maternal comfort, clinician instructions and medical care always take precedence over timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          },
+          {
+            "id": "gruhapravesha.manual-6",
+            "source_index": 5,
+            "source_text": "Lineage warning: current Drik Panchang practice also admits some Saturdays and applies additional month filters; this profile follows Raman’s four weekdays rather than silently blending methodologies.",
+            "text": "Lineage warning: current Drik Panchang practice also admits some Saturdays and applies additional month filters; this profile follows Raman’s four weekdays rather than silently blending methodologies.",
+            "class": "manual-only",
+            "display_section": "information"
+          }
+        ]
+      },
+      "vehicle": {
+        "deterministic_panchangam_fields": [
+          "prefer_lagna_class",
+          "prefer_choghadiya",
+          "prefer_vara",
+          "prefer_tithi_class",
+          "prefer_nakshatras"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": []
+      },
+      "property": {
+        "deterministic_panchangam_fields": [
+          "prefer_lagna_class",
+          "prefer_vara",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "avoid_tithi_numbers"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "property.guru-kendra-trikona",
+          "property.kuja-11",
+          "property.kuja-not-lagna"
+        ],
+        "manual_checks": [
+          {
+            "id": "property.manual-1",
+            "source_index": 0,
+            "source_text": "Election chart: the weekday lord should preferably occupy Lagna.",
+            "text": "Election chart: the weekday lord should preferably occupy Lagna.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "property.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: Guru should occupy a Kendra or Trikona.",
+            "text": "Election chart: Guru should occupy a Kendra or Trikona.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "property.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: Mangala should occupy the 11th and not Lagna.",
+            "text": "Election chart: Mangala should occupy the 11th and not Lagna.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "property.manual-4",
+            "source_index": 3,
+            "source_text": "Election chart: Lagna and 7th lords should be harmonious; avoid the 11th lord in the 12th.",
+            "text": "Election chart: Lagna and 7th lords should be harmonious; avoid the 11th lord in the 12th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "house_purchase": {
+        "deterministic_panchangam_fields": [
+          "allowed_varas",
+          "allowed_nakshatras",
+          "allowed_tithi_numbers",
+          "prefer_lagnas"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "house-purchase.kuja-not-lagna"
+        ],
+        "manual_checks": [
+          {
+            "id": "house_purchase.manual-1",
+            "source_index": 0,
+            "source_text": "Scope: use this profile for buying a completed new or old house; it is not land purchase, construction commencement, rental moving or Gruhapravesha.",
+            "text": "Scope: use this profile for buying a completed new or old house; it is not land purchase, construction commencement, rental moving or Gruhapravesha.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "house_purchase.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: keep malefics out of the 7th house.",
+            "text": "Election chart: keep malefics out of the 7th house.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "house_purchase.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: do not place Mangala in Lagna.",
+            "text": "Election chart: do not place Mangala in Lagna.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "house_purchase.manual-4",
+            "source_index": 3,
+            "source_text": "Legal title, structural inspection, financing and contract advice take precedence over electional timing.",
+            "text": "Legal title, structural inspection, financing and contract advice take precedence over electional timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "gold": {
+        "deterministic_panchangam_fields": [
+          "prefer_lagna_class",
+          "prefer_choghadiya",
+          "prefer_vara",
+          "prefer_tithi_class"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "gold.manual-1",
+            "source_index": 0,
+            "source_text": "Election chart: Surya and Chandra should be well situated and aspected; the cited passage leaves this as a chart judgment rather than a fixed weekday, Tithi, Nakshatra or Lagna list.",
+            "text": "Election chart: Surya and Chandra should be well situated and aspected; the cited passage leaves this as a chart judgment rather than a fixed weekday, Tithi, Nakshatra or Lagna list.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "business_inventory_purchase": {
+        "deterministic_panchangam_fields": [
+          "prefer_vara",
+          "allowed_varas",
+          "prefer_nakshatras",
+          "prefer_tithi_numbers"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "business_inventory_purchase.manual-1",
+            "source_index": 0,
+            "source_text": "Transaction role: buying stock, raw materials or goods for resale or business use; do not reuse this profile for selling inventory, launching a business or deploying capital.",
+            "text": "Transaction role: buying stock, raw materials or goods for resale or business use; do not reuse this profile for selling inventory, launching a business or deploying capital.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "business_inventory_purchase.manual-2",
+            "source_index": 1,
+            "source_text": "Saturday is described as passable, not preferred.",
+            "text": "Saturday is described as passable, not preferred.",
+            "class": "manual-only",
+            "display_section": "information",
+            "applicable_varas": [
+              "Shanivaram"
+            ]
+          },
+          {
+            "id": "business_inventory_purchase.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: Budha, the 2nd lord and the 2nd house should be fortified.",
+            "text": "Election chart: Budha, the 2nd lord and the 2nd house should be fortified.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "business_inventory_purchase.manual-4",
+            "source_index": 3,
+            "source_text": "Election chart: avoid Budha afflicted by Mangala; Budha and Guru together in Lagna or in mutual aspect are described as highly favourable.",
+            "text": "Election chart: avoid Budha afflicted by Mangala; Budha and Guru together in Lagna or in mutual aspect are described as highly favourable.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "business_inventory_purchase.manual-5",
+            "source_index": 4,
+            "source_text": "Commercial need, stock quality, supplier terms, cash flow, tax and legal advice take precedence over electional timing.",
+            "text": "Commercial need, stock quality, supplier terms, cash flow, tax and legal advice take precedence over electional timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "purchase": {
+        "deterministic_panchangam_fields": [
+          "prefer_choghadiya",
+          "prefer_nakshatras"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "purchase.chandra-lagna",
+          "purchase.shukra-lagna"
+        ],
+        "manual_checks": [
+          {
+            "id": "purchase.manual-1",
+            "source_index": 0,
+            "source_text": "Transaction role: verse 16 distinguishes purchase from sale Muhurtas; this profile evaluates the buyer’s side and must not be reused as a seller election.",
+            "text": "Transaction role: verse 16 distinguishes purchase from sale Muhurtas; this profile evaluates the buyer’s side and must not be reused as a seller election.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "purchase.manual-2",
+            "source_index": 1,
+            "source_text": "Marketplace check from verse 17: avoid Rikta Tithis, Tuesday and Kumbha Lagna; prefer Chandra and Shukra in Lagna, no malefics in the 8th or 12th, and benefics in the 2nd, 10th or 11th.",
+            "text": "Marketplace check from verse 17: avoid Rikta Tithis, Tuesday and Kumbha Lagna; prefer Chandra and Shukra in Lagna, no malefics in the 8th or 12th, and benefics in the 2nd, 10th or 11th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "purchase.manual-3",
+            "source_index": 2,
+            "source_text": "Use the dedicated vehicle, building-land or gold profile when the object is known; their narrower rules take precedence over generic purchase.",
+            "text": "Use the dedicated vehicle, building-land or gold profile when the object is known; their narrower rules take precedence over generic purchase.",
+            "class": "manual-only",
+            "display_section": "information"
+          }
+        ]
+      },
+      "borrowing_money": {
+        "deterministic_panchangam_fields": [
+          "avoid_nakshatras",
+          "avoid_janma_nakshatra"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "borrowing_money.manual-1",
+            "source_index": 0,
+            "source_text": "Transaction role: this is the borrower/debtor side only; do not reuse it for lending, receiving repayment or deploying capital.",
+            "text": "Transaction role: this is the borrower/debtor side only; do not reuse it for lending, receiving repayment or deploying capital.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "borrowing_money.manual-2",
+            "source_index": 1,
+            "source_text": "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+            "text": "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "borrowing_money.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: avoid Chandra conjoined with Mangala or Shani.",
+            "text": "Election chart: avoid Chandra conjoined with Mangala or Shani.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "borrowing_money.manual-4",
+            "source_index": 3,
+            "source_text": "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
+            "text": "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "borrowing_money.manual-5",
+            "source_index": 4,
+            "source_text": "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing.",
+            "text": "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "lending_money": {
+        "deterministic_panchangam_fields": [
+          "allowed_varas",
+          "avoid_nakshatras",
+          "avoid_janma_nakshatra",
+          "avoid_vara_tithi_names"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "lending_money.manual-1",
+            "source_index": 0,
+            "source_text": "Transaction role: this is making a loan from the lender/creditor side; receiving repayment and borrowing money are separate elections.",
+            "text": "Transaction role: this is making a loan from the lender/creditor side; receiving repayment and borrowing money are separate elections.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "lending_money.manual-2",
+            "source_index": 1,
+            "source_text": "Personal-star gate: supply the lender’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+            "text": "Personal-star gate: supply the lender’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "lending_money.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: Lagna and 7th lords should be harmoniously disposed.",
+            "text": "Election chart: Lagna and 7th lords should be harmoniously disposed.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "lending_money.manual-4",
+            "source_index": 3,
+            "source_text": "Election chart: Chandra in Vrischika is described as adverse for the lender.",
+            "text": "Election chart: Chandra in Vrischika is described as adverse for the lender.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "lending_money.manual-5",
+            "source_index": 4,
+            "source_text": "Lineage warning: current Drik Panchang loan-giving practice excludes Wednesday, while this Raman-lineage profile admits it and excludes Tuesday and Friday.",
+            "text": "Lineage warning: current Drik Panchang loan-giving practice excludes Wednesday, while this Raman-lineage profile admits it and excludes Tuesday and Friday.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "lending_money.manual-6",
+            "source_index": 5,
+            "source_text": "Credit assessment, affordability, documentation, interest and collateral law, concentration risk and qualified financial or legal advice take precedence over timing.",
+            "text": "Credit assessment, affordability, documentation, interest and collateral law, concentration risk and qualified financial or legal advice take precedence over timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "bhumi_puja": {
+        "deterministic_panchangam_fields": [
+          "skip_on_yoga",
+          "prefer_vara",
+          "required_lagna_class",
+          "allowed_maasams",
+          "allowed_varas",
+          "avoid_vara_paksha",
+          "allowed_solar_classes",
+          "allowed_nakshatras",
+          "prefer_nakshatras",
+          "allowed_tithi_numbers"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "bhumi_puja.manual-1",
+            "source_index": 0,
+            "source_text": "Election chart: 8th house from Lagna must be vacant and free of malefic aspect.",
+            "text": "Election chart: 8th house from Lagna must be vacant and free of malefic aspect.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "bhumi_puja.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: malefics should occupy 3rd, 6th or 11th; benefics should fortify Kendras and Trikonas.",
+            "text": "Election chart: malefics should occupy 3rd, 6th or 11th; benefics should fortify Kendras and Trikonas.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "bhumi_puja.manual-3",
+            "source_index": 2,
+            "source_text": "Site ritual: after Puja, the first foundation stone is placed at the north-eastern corner.",
+            "text": "Site ritual: after Puja, the first foundation stone is placed at the north-eastern corner.",
+            "class": "manual-only",
+            "display_section": "information"
+          }
+        ]
+      },
+      "well_digging": {
+        "deterministic_panchangam_fields": [
+          "allowed_nakshatras",
+          "allowed_lagnas",
+          "caution_lagna_solar"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "well_digging.manual-1",
+            "source_index": 0,
+            "source_text": "Election chart: Shukra and Chandra should occupy Kendras.",
+            "text": "Election chart: Shukra and Chandra should occupy Kendras.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "well_digging.manual-2",
+            "source_index": 1,
+            "source_text": "For abundant sweet water, Chandra or Shukra should occupy a Kendra in a full watery Rasi.",
+            "text": "For abundant sweet water, Chandra or Shukra should occupy a Kendra in a full watery Rasi.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "home_repair": {
+        "deterministic_panchangam_fields": [
+          "prefer_vara",
+          "allowed_varas"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "home_repair.manual-1",
+            "source_index": 0,
+            "source_text": "Scope: commencement of repairs or renovation to an existing home only; painting/whitewashing, dismantling, new construction and post-work re-entry are separate elections.",
+            "text": "Scope: commencement of repairs or renovation to an existing home only; painting/whitewashing, dismantling, new construction and post-work re-entry are separate elections.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "home_repair.manual-2",
+            "source_index": 1,
+            "source_text": "Weekday-Lagna condition: Friday is especially suitable with Vrishabha or Tula Lagna; Monday is especially suitable with Karka Lagna.",
+            "text": "Weekday-Lagna condition: Friday is especially suitable with Vrishabha or Tula Lagna; Monday is especially suitable with Karka Lagna.",
+            "class": "manual-only",
+            "display_section": "chart",
+            "applicable_varas": [
+              "Somavaram",
+              "Shukravaram"
+            ]
+          },
+          {
+            "id": "home_repair.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: Lagna should be occupied by a benefic and Chandra should be in an aquatic Rasi.",
+            "text": "Election chart: Lagna should be occupied by a benefic and Chandra should be in an aquatic Rasi.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "home_repair.manual-4",
+            "source_index": 3,
+            "source_text": "Mangala transit: if Chandra is in Krittika, Magha, Pushya, Purva Phalguni, Hasta, Moola or Revati, confirm Mangala is not transiting that same Nakshatra.",
+            "text": "Mangala transit: if Chandra is in Krittika, Magha, Pushya, Purva Phalguni, Hasta, Moola or Revati, confirm Mangala is not transiting that same Nakshatra.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "home_repair.manual-5",
+            "source_index": 4,
+            "source_text": "Building permits, structural engineering, utility safety and contractor readiness take precedence over electional timing.",
+            "text": "Building permits, structural engineering, utility safety and contractor readiness take precedence over electional timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "business": {
+        "deterministic_panchangam_fields": [
+          "required_lagna_class",
+          "allowed_nakshatras"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "business.manual-1",
+            "source_index": 0,
+            "source_text": "Scope: Dravyaprayoga means putting funds to work or investing capital in an enterprise; founding a company, opening a marketplace, buying inventory and making a loan are separate acts.",
+            "text": "Scope: Dravyaprayoga means putting funds to work or investing capital in an enterprise; founding a company, opening a marketplace, buying inventory and making a loan are separate acts.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "business.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: place benefics in the 5th and 9th houses and leave the 8th house unoccupied.",
+            "text": "Election chart: place benefics in the 5th and 9th houses and leave the 8th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "business.manual-3",
+            "source_index": 2,
+            "source_text": "Commercial viability, diversification, liquidity, contracts, tax and securities law, due diligence and qualified financial or legal advice take precedence over electional timing.",
+            "text": "Commercial viability, diversification, liquidity, contracts, tax and securities law, due diligence and qualified financial or legal advice take precedence over electional timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "job": {
+        "deterministic_panchangam_fields": [
+          "allowed_varas",
+          "allowed_nakshatras"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "job.surya-or-kuja-10-11"
+        ],
+        "manual_checks": [
+          {
+            "id": "job.manual-1",
+            "source_index": 0,
+            "source_text": "Scope: this is the employee-side act of entering service or starting employment; offer acceptance, contract signing, incorporation and hiring staff are separate acts.",
+            "text": "Scope: this is the employee-side act of entering service or starting employment; offer acceptance, contract signing, incorporation and hiring staff are separate acts.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "job.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: place a benefic in Lagna and place Surya or Mangala in the 10th or 11th house.",
+            "text": "Election chart: place a benefic in Lagna and place Surya or Mangala in the 10th or 11th house.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "job.manual-3",
+            "source_index": 2,
+            "source_text": "Employer/employee compatibility: compare both birth-Nakshatra Yonis and the friendship between their Janma-Rasi lords.",
+            "text": "Employer/employee compatibility: compare both birth-Nakshatra Yonis and the friendship between their Janma-Rasi lords.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "job.manual-4",
+            "source_index": 3,
+            "source_text": "Employment terms, labour law, compensation, benefits, workplace safety and professional judgment take precedence over timing.",
+            "text": "Employment terms, labour law, compensation, benefits, workplace safety and professional judgment take precedence over timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "yajna": {
+        "deterministic_panchangam_fields": [
+          "require_homa_election"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "yajna.manual-1",
+            "source_index": 0,
+            "source_text": "Ritual scope: this is the source’s Homahuti election, not a universal election for every Yajna. Follow the officiating priest and the specific Kalpa or Sampradaya requirements.",
+            "text": "Ritual scope: this is the source’s Homahuti election, not a universal election for every Yajna. Follow the officiating priest and the specific Kalpa or Sampradaya requirements.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "yajna.manual-2",
+            "source_index": 1,
+            "source_text": "Arrange a qualified officiant, a suitable venue and all required fire-safety precautions.",
+            "text": "Arrange a qualified officiant, a suitable venue and all required fire-safety precautions.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      },
+      "pilgrimage": {
+        "deterministic_panchangam_fields": [
+          "avoid_karana",
+          "prefer_lagna_class",
+          "prefer_nakshatras",
+          "avoid_tithi_numbers",
+          "skip_on_combust"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "pilgrimage.guru-lagna-or-9"
+        ],
+        "manual_checks": [
+          {
+            "id": "pilgrimage.manual-1",
+            "source_index": 0,
+            "source_text": "Election chart: place Guru in Lagna or the 9th house, as required by the pilgrimage-specific passage.",
+            "text": "Election chart: place Guru in Lagna or the 9th house, as required by the pilgrimage-specific passage.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "ceremony": {
+        "deterministic_panchangam_fields": [
+          "skip_on_sankramana",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "avoid_tithi_numbers"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "ceremony.surya-10",
+          "ceremony.chandra-4",
+          "ceremony.guru-lagna"
+        ],
+        "manual_checks": [
+          {
+            "id": "ceremony.manual-1",
+            "source_index": 0,
+            "source_text": "Scope: this profile covers Shantika rites that pacify an affliction and Paushtika rites for welfare, including the passage’s examples of auspicious Puja, Purashcharana and Mula-shanti; it is not a universal ceremony election.",
+            "text": "Scope: this profile covers Shantika rites that pacify an affliction and Paushtika rites for welfare, including the passage’s examples of auspicious Puja, Purashcharana and Mula-shanti; it is not a universal ceremony election.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "ceremony.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: place Surya in the 10th from Lagna, Chandra in the 4th and Guru in Lagna.",
+            "text": "Election chart: place Surya in the 10th from Lagna, Chandra in the 4th and Guru in Lagna.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "ceremony.manual-3",
+            "source_index": 2,
+            "source_text": "Ideal purity: the commentary prefers avoiding Guru or Shukra combustion and exceptional omens such as Ketu-rise; a practitioner must judge these conditions.",
+            "text": "Ideal purity: the commentary prefers avoiding Guru or Shukra combustion and exceptional omens such as Ketu-rise; a practitioner must judge these conditions.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "ceremony.manual-4",
+            "source_index": 3,
+            "source_text": "Remedial exception: when an ominous event itself creates the need for Shanti, the commentary says ordinary timing defects need not delay the rite; follow the officiating practitioner.",
+            "text": "Remedial exception: when an ominous event itself creates the need for Shanti, the commentary says ordinary timing defects need not delay the rite; follow the officiating practitioner.",
+            "class": "manual-only",
+            "display_section": "information"
+          }
+        ]
+      },
+      "court": {
+        "deterministic_panchangam_fields": [
+          "allowed_varas",
+          "allowed_nakshatras",
+          "avoid_tithi_numbers",
+          "allowed_lagnas"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "court.manual-1",
+            "source_index": 0,
+            "source_text": "Scope: this election is for filing or initiating a lawsuit, not a hearing, response, settlement, appeal or prediction of the case outcome.",
+            "text": "Scope: this election is for filing or initiating a lawsuit, not a hearing, response, settlement, appeal or prediction of the case outcome.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "court.manual-2",
+            "source_index": 1,
+            "source_text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same edition.",
+            "text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same edition.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "court.manual-3",
+            "source_index": 2,
+            "source_text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
+            "text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "court.manual-4",
+            "source_index": 3,
+            "source_text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
+            "text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "court.manual-5",
+            "source_index": 4,
+            "source_text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+            "text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "court.manual-6",
+            "source_index": 5,
+            "source_text": "Legal deadlines, court rules, counsel, evidence and personal safety always take precedence over electional timing.",
+            "text": "Legal deadlines, court rules, counsel, evidence and personal safety always take precedence over electional timing.",
+            "class": "manual-only",
+            "display_section": "practical",
+            "purpose": "safety_override"
+          }
+        ]
+      },
+      "surgery": {
+        "deterministic_panchangam_fields": [
+          "avoid_karana",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "allowed_tithi_names"
+        ],
+        "personal_rule_ids": [
+          "personal.surgery.chandra-outside-janma-rashi"
+        ],
+        "election_chart_rule_ids": [
+          "surgery.house-8-vacant"
+        ],
+        "manual_checks": [
+          {
+            "id": "surgery.manual-1",
+            "source_index": 0,
+            "source_text": "Medical urgency and the treating clinician’s instructions always override Muhurtam; never delay necessary care for an astrological window.",
+            "text": "Medical urgency and the treating clinician’s instructions always override Muhurtam; never delay necessary care for an astrological window.",
+            "class": "manual-only",
+            "display_section": "practical",
+            "purpose": "safety_override"
+          },
+          {
+            "id": "surgery.manual-2",
+            "source_index": 1,
+            "source_text": "Avoid Chandra in the patient’s natal Rasi and in the Rasi governing the body part being operated on, especially when afflicted by malefics.",
+            "text": "Avoid Chandra in the patient’s natal Rasi and in the Rasi governing the body part being operated on, especially when afflicted by malefics.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "surgery.manual-3",
+            "source_index": 2,
+            "source_text": "Strengthen Mangala and the house governing the body part; leave the 8th house unoccupied and avoid mutual aspects between Mangala and Shani.",
+            "text": "Strengthen Mangala and the house governing the body part; leave the 8th house unoccupied and avoid mutual aspects between Mangala and Shani.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      },
+      "travel": {
+        "deterministic_panchangam_fields": [
+          "avoid_karana",
+          "prefer_lagna_class",
+          "avoid_nakshatras",
+          "prefer_nakshatras"
+        ],
+        "personal_rule_ids": [
+          "personal.travel.lagna-exclusions",
+          "personal.travel.janma-rashi-lagna"
+        ],
+        "election_chart_rule_ids": [
+          "travel.kuja-not-8"
+        ],
+        "manual_checks": [
+          {
+            "id": "travel.manual-1",
+            "source_index": 0,
+            "source_text": "Election chart: fortify Lagna; Guru or Shukra well placed in Lagna is stated to support a successful journey.",
+            "text": "Election chart: fortify Lagna; Guru or Shukra well placed in Lagna is stated to support a successful journey.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "travel.manual-2",
+            "source_index": 1,
+            "source_text": "For long-distance journeys, prefer waxing Chandra, avoid Mangala in the 8th and avoid malefics in the 7th.",
+            "text": "For long-distance journeys, prefer waxing Chandra, avoid Mangala in the 8th and avoid malefics in the 7th.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      }
+    }
   }
 }

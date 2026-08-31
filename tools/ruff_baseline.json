@@ -392,9 +392,6 @@
     "tools/check_activity_provenance.py": {
       "I001": 1
     },
-    "tools/export_activity_rules.py": {
-      "I001": 2
-    },
     "tools/verify_project.py": {
       "I001": 1
     }

@@ -39,21 +39,28 @@ _PANCHANGAM_NAMES = 'telugu_panchangam/panchangam_names.py'
 _TARABALAM_PANEL = 'src/panels/tarabalam.ts'
 
 # ``scope.source_files`` is the established computation-layer contract. New
-# profile-journey helpers are additions around that layer: they still appear in
+# feature-side helpers are additions around that layer: they still appear in
 # the module graph, history, and blast-radius evidence, but are reported
-# separately so an additive UI adapter does not masquerade as core expansion.
+# separately so an additive adapter does not masquerade as core expansion.
 _ADDITIVE_FEATURE_SOURCES = frozenset({
     'src/lib/birth-profile-api.ts',
+    'src/lib/election-chart-api.ts',
     'src/lib/profile-selection.ts',
     'src/lib/remote-calculation-activation.ts',
     'src/panels/profiles.ts',
+    'src/scorer/election-chart-enrichment.ts',
+    'src/scorer/election-chart-screening.ts',
+    'src/scorer/personal-election-screening.ts',
+    'telugu_panchangam/personal/activity_check_contract.py',
+    'telugu_panchangam/personal/election_chart.py',
+    'telugu_panchangam/personal/election_chart_rules.py',
+    'telugu_panchangam/personal/personal_election.py',
 })
 
 
 def source_scope_class(path: str) -> str:
     """Classify a production module without hiding it from report evidence."""
     return 'additive-feature' if path in _ADDITIVE_FEATURE_SOURCES else 'established'
-
 _DUPLICATE_CONTRACTS = {
     'activity_profiles': {
         'strategy': 'generated-from-python',
