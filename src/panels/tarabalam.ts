@@ -101,9 +101,9 @@ function chandraOf(janmaRasi, dayRasi) {
 }
 
 export interface TarabalamProfileActions {
-  createProfile(): void;
-  editProfile(id: string): void;
-  manageProfiles(): void;
+  createProfile(trigger: HTMLElement): void;
+  editProfile(id: string, trigger: HTMLElement): void;
+  manageProfiles(trigger: HTMLElement): void;
 }
 
 export interface TarabalamProfilesController {
@@ -111,6 +111,7 @@ export interface TarabalamProfilesController {
   destroy(): void;
   getParticipants(): JourneyGuestProfile[];
   getSelectedIds(): string[];
+  selectProfile(id: string): boolean;
 }
 
 interface ManualParticipant {
@@ -271,6 +272,22 @@ export function initTarabalamProfiles(
 
   const occupiedSlots = (): number => selection.selectedIds.length + manualParticipants.length;
 
+  const restoreProfileSelectionFocus = (profileId: string): void => {
+    const target = Array.from(
+      root.querySelectorAll<HTMLInputElement>('input[data-profile-selection]'),
+    ).find(candidate => candidate.dataset.profileSelection === profileId);
+    target?.focus();
+  };
+
+  const restoreManualFieldFocus = (participantId: string, field: string): void => {
+    const target = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-manual-participant][data-manual-field]'),
+    ).find(candidate =>
+      candidate.dataset.manualParticipant === participantId &&
+      candidate.dataset.manualField === field);
+    target?.focus();
+  };
+
   const selectionSummary = (): string => {
     const saved = selection.profiles.length;
     const manual = manualParticipants.filter((candidate, index) =>
@@ -326,10 +343,13 @@ export function initTarabalamProfiles(
         : `Complete ${tbDisplayName(profile)} profile`,
     );
     edit.dataset.action = 'edit-profile';
-    edit.addEventListener('click', () => actions.editProfile(profile.id));
+    edit.addEventListener('click', event => {
+      actions.editProfile(profile.id, event.currentTarget as HTMLElement);
+    });
     item.append(label, edit);
 
     checkbox.addEventListener('change', () => {
+      const shouldRestoreFocus = document.activeElement === checkbox;
       if (checkbox.checked && occupiedSlots() >= MAX_GUEST_PROFILES) {
         transientIssue = `Choose up to ${MAX_GUEST_PROFILES} participants for one Muhurtam search.`;
       } else {
@@ -343,6 +363,7 @@ export function initTarabalamProfiles(
         );
       }
       controller.render();
+      if (shouldRestoreFocus) restoreProfileSelectionFocus(profile.id);
     });
 
     return item;
@@ -353,6 +374,8 @@ export function initTarabalamProfiles(
     value: string,
     values: ReadonlyArray<readonly [string, string]>,
     onChange: (value: string) => void,
+    participantId: string,
+    field: string,
   ): HTMLLabelElement => {
     const label = tbNode('label', 'muhurta-manual-field');
     const text = tbNode('span', 'muhurta-manual-field__label', labelText);
@@ -361,7 +384,14 @@ export function initTarabalamProfiles(
       tbAppendOption(select, optionValue, optionLabel);
     }
     select.value = value;
-    select.addEventListener('change', () => onChange(select.value));
+    select.dataset.manualParticipant = participantId;
+    select.dataset.manualField = field;
+    select.addEventListener('change', () => {
+      const shouldRestoreFocus = document.activeElement === select;
+      onChange(select.value);
+      controller.render();
+      if (shouldRestoreFocus) restoreManualFieldFocus(participantId, field);
+    });
     label.append(text, select);
     return label;
   };
@@ -381,6 +411,8 @@ export function initTarabalamProfiles(
     nameInput.value = participant.name;
     nameInput.placeholder = 'Optional';
     nameInput.autocomplete = 'off';
+    nameInput.dataset.manualParticipant = participant.id;
+    nameInput.dataset.manualField = 'name';
     nameInput.addEventListener('input', () => {
       participant.name = nameInput.value;
       const summary = root.querySelector<HTMLElement>('[data-muhurta-selection-summary]');
@@ -396,8 +428,9 @@ export function initTarabalamProfiles(
         participant.nak = value;
         if (!value) participant.pada = null;
         transientIssue = null;
-        controller.render();
       },
+      participant.id,
+      'nakshatra',
     );
     const padam = labelledSelect(
       'Padam',
@@ -405,8 +438,9 @@ export function initTarabalamProfiles(
       [['', 'Not known'], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']],
       value => {
         participant.pada = value ? Number(value) as 1 | 2 | 3 | 4 : null;
-        controller.render();
       },
+      participant.id,
+      'pada',
     );
     const lagna = labelledSelect(
       'Lagna',
@@ -414,8 +448,9 @@ export function initTarabalamProfiles(
       [['', 'Not known'], ...TB_RASIS.map(value => [value, value] as const)],
       value => {
         participant.lagna = value || null;
-        controller.render();
       },
+      participant.id,
+      'lagna',
     );
 
     const adapted = tbManualProfile(participant, index);
@@ -548,10 +583,14 @@ export function initTarabalamProfiles(
       const create = tbButton('Create saved profile', 'tb-add muhurta-profile-create');
       create.dataset.action = 'create-profile';
       create.disabled = snapshot.profiles.length >= MAX_GUEST_PROFILES;
-      create.addEventListener('click', () => actions.createProfile());
+      create.addEventListener('click', event => {
+        actions.createProfile(event.currentTarget as HTMLElement);
+      });
       const manage = tbButton('Manage profiles', 'tb-reset muhurta-profile-manage');
       manage.dataset.action = 'manage-profiles';
-      manage.addEventListener('click', () => actions.manageProfiles());
+      manage.addEventListener('click', event => {
+        actions.manageProfiles(event.currentTarget as HTMLElement);
+      });
       actionsRow.append(addManual, create, manage);
       root.append(actionsRow);
 
@@ -572,6 +611,45 @@ export function initTarabalamProfiles(
     },
     getSelectedIds(): string[] {
       return [...selection.selectedIds];
+    },
+    selectProfile(id: string): boolean {
+      snapshot = store.getSnapshot();
+      const profile = snapshot.profiles.find(candidate => candidate.id === id);
+      if (!profile) {
+        transientIssue = 'That saved profile is no longer available.';
+        controller.render();
+        return false;
+      }
+      if (!guestProfileReadiness(profile).muhurta) {
+        transientIssue = 'Complete this profile with a birth star before using it for Muhurtam.';
+        controller.render();
+        return false;
+      }
+      if (selection.selectedIds.includes(id)) {
+        transientIssue = null;
+        controller.render();
+        return true;
+      }
+      if (occupiedSlots() >= MAX_GUEST_PROFILES) {
+        transientIssue = `Choose up to ${MAX_GUEST_PROFILES} participants for one Muhurtam search.`;
+        controller.render();
+        return false;
+      }
+
+      selection = toggleMuhurtamProfileSelection(
+        selectionStorage,
+        selection.selectedIds,
+        id,
+        true,
+        snapshot.profiles,
+      );
+      const selected = selection.selectedIds.includes(id);
+      transientIssue = selected
+        ? null
+        : selection.message || 'That profile could not be added to this Muhurtam search.';
+      controller.render();
+      if (selected) restoreProfileSelectionFocus(id);
+      return selected;
     },
     addManualParticipant,
     removeManualParticipant(index: number): void {

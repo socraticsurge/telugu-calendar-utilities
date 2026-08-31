@@ -1,5 +1,6 @@
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../data/rasis';
 import {
+  GUEST_PROFILE_SCHEMA_VERSION,
   MAX_GUEST_PROFILES,
   GuestProfileStore,
   GuestProfileStoreError,
@@ -10,6 +11,9 @@ import {
 
 export interface ProfilesPanelContext {
   returnTo?: string;
+  onSaved?: (profile: GuestProfile) => void;
+  focusTarget?: HTMLElement | null;
+  requiredFor?: 'horoscope' | 'muhurta';
 }
 
 export interface ProfilesPanelOptions {
@@ -156,8 +160,16 @@ export function initProfilesPanel(
 
   let view: PanelView = { kind: 'list' };
 
-  const returnToOrigin = (context: ProfilesPanelContext): void => {
+  const returnToOrigin = (
+    context: ProfilesPanelContext,
+    savedProfile?: GuestProfile,
+  ): void => {
     if (context.returnTo) options.navigate(context.returnTo);
+    // Select and focus only after the origin is visible again. Hidden controls
+    // cannot reliably receive focus in real browsers.
+    if (savedProfile) context.onSaved?.(savedProfile);
+    const focusTarget = context.focusTarget;
+    if (focusTarget && focusTarget.isConnected) focusTarget.focus();
   };
 
   const renderIssue = (snapshot: GuestProfileSnapshot): HTMLElement | null => {
@@ -193,6 +205,27 @@ export function initProfilesPanel(
     );
     list.append(muhurtaTerm, muhurtaValue, horoscopeTerm, horoscopeValue);
     return list;
+  };
+
+  const contextualReadinessText = (
+    profile: GuestProfile,
+    requiredFor?: ProfilesPanelContext['requiredFor'],
+  ): string => {
+    const readiness = guestProfileReadiness(profile);
+    if (requiredFor === 'muhurta') {
+      return readiness.muhurta ? 'Ready for Muhurtam' : 'Needs Nakshatra';
+    }
+    if (requiredFor === 'horoscope') {
+      if (readiness.horoscope) return 'Ready for Daily Horoscope';
+      return readiness.missingForHoroscope === 'pada' ? 'Needs Padam' : 'Needs Nakshatra';
+    }
+    if (readiness.muhurta && readiness.horoscope) return 'Ready for both journeys';
+    if (readiness.muhurta) {
+      return readiness.missingForHoroscope === 'pada'
+        ? 'Ready for Muhurtam · Needs Padam for Daily Horoscope'
+        : 'Ready for Muhurtam';
+    }
+    return 'Needs Nakshatra';
   };
 
   const renderProfile = (profile: Readonly<GuestProfile>): HTMLLIElement => {
@@ -325,10 +358,17 @@ export function initProfilesPanel(
     const heading = element('h1', 'profiles-title', mode === 'create' ? 'Create profile' : 'Edit profile');
     heading.id = 'profiles-title';
     heading.tabIndex = -1;
+    let introText = 'Start with a name. Nakshatra makes the profile ready for Muhurtam; Padam may be needed to derive Janma Rashi for Daily Horoscope.';
+    if (context.requiredFor === 'horoscope') {
+      introText = 'Add the birth details needed for Daily Horoscope. Nakshatra is required; Padam is required only when the birth star spans two Rashis. Lagna remains optional.';
+    }
+    if (context.requiredFor === 'muhurta') {
+      introText = 'Add a name and Nakshatra to use this profile in Muhurtam. Padam and Lagna are optional for this journey.';
+    }
     const intro = element(
       'p',
       'profiles-form__intro',
-      'Start with a name. Nakshatra makes the profile ready for Muhurtam; Padam may be needed to derive Janma Rashi for Daily Horoscope.',
+      introText,
     );
     const privacy = element(
       'p',
@@ -336,8 +376,35 @@ export function initProfilesPanel(
       'Saved only in this browser. No account, cloud sync, or recovery.',
     );
     fragment.append(heading, intro, privacy);
-    const issue = renderIssue(store.getSnapshot());
+    const snapshot = store.getSnapshot();
+    const issue = renderIssue(snapshot);
     if (issue) fragment.append(issue);
+
+    if (mode === 'create' && (context.returnTo || context.requiredFor) && snapshot.profiles.length > 0) {
+      const existing = element('section', 'profiles-form__existing');
+      existing.setAttribute('aria-labelledby', 'profiles-existing-title');
+      const existingTitle = element('h2', 'profiles-form__existing-title', 'Already saved');
+      existingTitle.id = 'profiles-existing-title';
+      const existingHint = element(
+        'p',
+        'profiles-form__existing-hint',
+        'If this person is already listed, cancel and edit that profile instead of creating a duplicate.',
+      );
+      const existingList = element('ul', 'profiles-form__existing-list');
+      for (const existingProfile of snapshot.profiles) {
+        const item = element('li', 'profiles-form__existing-item');
+        const name = element('span', 'profiles-form__existing-name', displayName(existingProfile));
+        const readiness = element(
+          'span',
+          'profiles-form__existing-readiness',
+          contextualReadinessText(existingProfile, context.requiredFor),
+        );
+        item.append(name, readiness);
+        existingList.append(item);
+      }
+      existing.append(existingTitle, existingHint, existingList);
+      fragment.append(existing);
+    }
 
     const form = element('form', 'profiles-form');
     form.noValidate = true;
@@ -371,17 +438,24 @@ export function initProfilesPanel(
     const nakshatraSelect = element('select', 'profiles-field__control');
     nakshatraSelect.id = 'profile-nakshatra';
     nakshatraSelect.name = 'nakshatra';
-    nakshatraSelect.setAttribute('aria-describedby', 'profile-nakshatra-help');
+    nakshatraSelect.setAttribute('aria-describedby', 'profile-nakshatra-help profile-nakshatra-error');
     appendOption(nakshatraSelect, '', 'Not added yet');
     for (const nakshatra of NAKSHATRA_NAMES) appendOption(nakshatraSelect, nakshatra, nakshatra);
     nakshatraSelect.value = profile?.nakshatra || '';
     const nakshatraHelp = element(
       'p',
       'profiles-field__help',
-      'Required for Muhurtam and for deriving Janma Rashi.',
+      context.requiredFor === 'horoscope'
+        ? 'Required to derive Janma Rashi for Daily Horoscope.'
+        : context.requiredFor === 'muhurta'
+          ? 'Required for Muhurtam.'
+          : 'Required for Muhurtam and for deriving Janma Rashi.',
     );
     nakshatraHelp.id = 'profile-nakshatra-help';
-    nakshatraGroup.append(nakshatraLabel, nakshatraSelect, nakshatraHelp);
+    const nakshatraError = element('p', 'profiles-field__error');
+    nakshatraError.id = 'profile-nakshatra-error';
+    nakshatraError.hidden = true;
+    nakshatraGroup.append(nakshatraLabel, nakshatraSelect, nakshatraHelp, nakshatraError);
 
     const padaGroup = element('div', 'profiles-field');
     const padaLabel = element('label', 'profiles-field__label', 'Padam');
@@ -389,7 +463,7 @@ export function initProfilesPanel(
     const padaSelect = element('select', 'profiles-field__control');
     padaSelect.id = 'profile-pada';
     padaSelect.name = 'pada';
-    padaSelect.setAttribute('aria-describedby', 'profile-pada-help');
+    padaSelect.setAttribute('aria-describedby', 'profile-pada-help profile-pada-error');
     appendOption(padaSelect, '', 'Not known');
     for (let value = 1; value <= 4; value += 1) appendOption(padaSelect, String(value), `Padam ${value}`);
     padaSelect.value = profile?.pada ? String(profile.pada) : '';
@@ -397,10 +471,15 @@ export function initProfilesPanel(
     const padaHelp = element(
       'p',
       'profiles-field__help',
-      'Needed only when the Nakshatra spans two Rashis.',
+      context.requiredFor === 'muhurta'
+        ? 'Optional for Muhurtam.'
+        : 'Needed only when the Nakshatra spans two Rashis.',
     );
     padaHelp.id = 'profile-pada-help';
-    padaGroup.append(padaLabel, padaSelect, padaHelp);
+    const padaError = element('p', 'profiles-field__error');
+    padaError.id = 'profile-pada-error';
+    padaError.hidden = true;
+    padaGroup.append(padaLabel, padaSelect, padaHelp, padaError);
 
     const lagnaGroup = element('div', 'profiles-field');
     const lagnaLabel = element('label', 'profiles-field__label', 'Lagna');
@@ -450,8 +529,22 @@ export function initProfilesPanel(
       updateDuplicateWarning();
     });
     nakshatraSelect.addEventListener('change', () => {
+      if (nakshatraSelect.value) {
+        nakshatraSelect.removeAttribute('aria-invalid');
+        nakshatraError.hidden = true;
+        nakshatraError.textContent = '';
+      }
       padaSelect.disabled = !nakshatraSelect.value;
       if (padaSelect.disabled) padaSelect.value = '';
+      padaSelect.removeAttribute('aria-invalid');
+      padaError.hidden = true;
+      padaError.textContent = '';
+    });
+    padaSelect.addEventListener('change', () => {
+      if (!padaSelect.value) return;
+      padaSelect.removeAttribute('aria-invalid');
+      padaError.hidden = true;
+      padaError.textContent = '';
     });
     updateDuplicateWarning();
 
@@ -480,15 +573,44 @@ export function initProfilesPanel(
         pada: padaSelect.value,
         lagna: lagnaSelect.value,
       };
+      const padaValue = Number(padaSelect.value);
+      const candidate: GuestProfile = {
+        id: profile?.id || 'profile-preview',
+        schemaVersion: GUEST_PROFILE_SCHEMA_VERSION,
+        name,
+        nakshatra: nakshatraSelect.value || null,
+        pada: padaValue === 1 || padaValue === 2 || padaValue === 3 || padaValue === 4
+          ? padaValue
+          : null,
+        lagna: lagnaSelect.value || null,
+      };
+      const readiness = guestProfileReadiness(candidate);
+      if (context.requiredFor && !readiness.muhurta) {
+        nakshatraSelect.setAttribute('aria-invalid', 'true');
+        nakshatraError.textContent = context.requiredFor === 'horoscope'
+          ? 'Add a Nakshatra to use this profile in Daily Horoscope.'
+          : 'Add a Nakshatra to use this profile in Muhurtam.';
+        nakshatraError.hidden = false;
+        nakshatraSelect.focus();
+        return;
+      }
+      if (context.requiredFor === 'horoscope' && readiness.missingForHoroscope === 'pada') {
+        padaSelect.setAttribute('aria-invalid', 'true');
+        padaError.textContent = `Select a Padam because ${nakshatraSelect.value} spans two Rashis.`;
+        padaError.hidden = false;
+        padaSelect.focus();
+        return;
+      }
       view = { kind: 'list' };
       try {
+        let savedProfile: GuestProfile;
         if (mode === 'edit' && profile) {
-          store.update(profile.id, draft);
+          savedProfile = store.update(profile.id, draft);
         } else {
-          store.create(draft);
+          savedProfile = store.create(draft);
         }
         renderList();
-        returnToOrigin(context);
+        returnToOrigin(context, savedProfile);
       } catch (error) {
         view = mode === 'edit' && profile
           ? { kind: 'edit', profileId: profile.id, context }

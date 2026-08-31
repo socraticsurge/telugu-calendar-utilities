@@ -20,15 +20,16 @@ interface ProfilesController {
   destroy(): void;
   getParticipants(): Participant[];
   getSelectedIds(): string[];
+  selectProfile(id: string): boolean;
 }
 
 interface TarabalamPanelModule {
   initTarabalamProfiles(
     store: GuestProfileStore,
     actions: {
-      createProfile(): void;
-      editProfile(id: string): void;
-      manageProfiles(): void;
+      createProfile(trigger: HTMLElement): void;
+      editProfile(id: string, trigger: HTMLElement): void;
+      manageProfiles(trigger: HTMLElement): void;
     },
   ): ProfilesController;
   tbAddRow(): void;
@@ -94,6 +95,9 @@ function renderPanelFixture(): void {
     <div id="tb-result">old result</div>
     <div id="mu-context">old context</div>
     <div id="mu-result">old slots</div>
+    <input id="tb-from" value="2026-08-28">
+    <input id="tb-to" value="2026-09-04">
+    <select id="mu-activity"><option value="wedding" selected>Wedding</option></select>
   `;
 }
 
@@ -106,10 +110,11 @@ function changeCheckbox(id: string, checked: boolean): void {
   checkbox.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
-function clickAction(action: string): void {
+function clickAction(action: string): HTMLButtonElement {
   const button = document.querySelector<HTMLButtonElement>(`button[data-action="${action}"]`);
   if (!button) throw new Error(`Missing action ${action}`);
   button.click();
+  return button;
 }
 
 function chooseManualValues(values: {
@@ -149,9 +154,9 @@ let controller: ProfilesController | null = null;
 let profileStorage: MemoryStorage;
 let browserStorage: BrowserMemoryStorage;
 let store: GuestProfileStore;
-let createProfile: Mock<() => void>;
-let editProfile: Mock<(id: string) => void>;
-let manageProfiles: Mock<() => void>;
+let createProfile: Mock<(trigger: HTMLElement) => void>;
+let editProfile: Mock<(id: string, trigger: HTMLElement) => void>;
+let manageProfiles: Mock<(trigger: HTMLElement) => void>;
 
 function initialize(): ProfilesController {
   controller = panel.initTarabalamProfiles(
@@ -174,9 +179,9 @@ beforeEach(() => {
   renderPanelFixture();
   profileStorage = new MemoryStorage();
   store = createGuestProfileStore(profileStorage);
-  createProfile = vi.fn<() => void>();
-  editProfile = vi.fn<(id: string) => void>();
-  manageProfiles = vi.fn<() => void>();
+  createProfile = vi.fn<(trigger: HTMLElement) => void>();
+  editProfile = vi.fn<(id: string, trigger: HTMLElement) => void>();
+  manageProfiles = vi.fn<(trigger: HTMLElement) => void>();
 });
 
 afterEach(() => {
@@ -209,6 +214,12 @@ describe('Muhurtam saved-profile participants', () => {
     expect(document.querySelector<HTMLInputElement>(
       'input[data-profile-selection="guest_incomplete"]',
     )?.disabled).toBe(true);
+    const incompleteRow = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-profile-id]'),
+    ).find(row => row.dataset.profileId === 'guest_incomplete');
+    expect(incompleteRow?.querySelector<HTMLButtonElement>(
+      'button[data-action="edit-profile"]',
+    )?.textContent).toBe('Complete profile');
 
     changeCheckbox('guest_bravo', true);
     changeCheckbox('guest_alpha', false);
@@ -218,6 +229,128 @@ describe('Muhurtam saved-profile participants', () => {
       rasi: 'Kanya', lagna: 'Karka',
     }]);
     expect(controller?.getSelectedIds()).toEqual(['guest_bravo']);
+  });
+
+  test('contextually selects a ready profile without disturbing the current search', () => {
+    store = createGuestProfileStore(profileStorage, {
+      idFactory: ids('guest_alpha', 'guest_bravo'),
+    });
+    store.create({ name: 'Alpha', nakshatra: 'Rohini' });
+    store.create({ name: 'Bravo', nakshatra: 'Hasta' });
+    localStorage.setItem(MUHURTAM_PROFILE_IDS_STORAGE_KEY, '["guest_bravo"]');
+    localStorage.setItem('tc-go-view', 'profile:guest_bravo');
+    localStorage.setItem('unrelated-preference', 'keep');
+    const active = initialize();
+    clickAction('add-manual');
+    chooseManualValues({ name: 'One-off', nakshatra: 'Revati', pada: '3' });
+    const manualId = panel.tbProfiles().find(profile => profile.id.startsWith('manual_'))?.id;
+    const profileRowsBefore = profileStorage.getItem(GUEST_PROFILE_STORAGE_KEY);
+    const write = vi.spyOn(browserStorage, 'setItem');
+    write.mockClear();
+
+    expect(active.selectProfile('guest_alpha')).toBe(true);
+
+    expect(active.getSelectedIds()).toEqual(['guest_bravo', 'guest_alpha']);
+    expect(panel.tbProfiles().map(profile => profile.id)).toEqual([
+      'guest_bravo',
+      'guest_alpha',
+      manualId,
+    ]);
+    expect(write).toHaveBeenCalledOnce();
+    expect(write).toHaveBeenCalledWith(
+      MUHURTAM_PROFILE_IDS_STORAGE_KEY,
+      '["guest_bravo","guest_alpha"]',
+    );
+    expect(localStorage.getItem('tc-go-view')).toBe('profile:guest_bravo');
+    expect(localStorage.getItem('unrelated-preference')).toBe('keep');
+    expect(profileStorage.getItem(GUEST_PROFILE_STORAGE_KEY)).toBe(profileRowsBefore);
+    expect((document.querySelector('#tb-from') as HTMLInputElement).value).toBe('2026-08-28');
+    expect((document.querySelector('#tb-to') as HTMLInputElement).value).toBe('2026-09-04');
+    expect((document.querySelector('#mu-activity') as HTMLSelectElement).value).toBe('wedding');
+  });
+
+  test('refuses missing and incomplete contextual profiles without persisting a choice', () => {
+    store = createGuestProfileStore(profileStorage, {
+      idFactory: ids('guest_incomplete'),
+    });
+    store.create({ name: 'Needs star' });
+    localStorage.setItem(MUHURTAM_PROFILE_IDS_STORAGE_KEY, '[]');
+    const active = initialize();
+    const write = vi.spyOn(browserStorage, 'setItem');
+    write.mockClear();
+
+    expect(active.selectProfile('guest_missing')).toBe(false);
+    expect(active.selectProfile('guest_incomplete')).toBe(false);
+
+    expect(active.getSelectedIds()).toEqual([]);
+    expect(write).not.toHaveBeenCalled();
+    expect(document.querySelector('#tb-profiles')?.textContent).toContain(
+      'Complete this profile with a birth star',
+    );
+  });
+
+  test('enforces the aggregate four-person limit during contextual selection', () => {
+    store = createGuestProfileStore(profileStorage, {
+      idFactory: ids('guest_one', 'guest_two', 'guest_three', 'guest_four'),
+    });
+    for (const name of ['One', 'Two', 'Three', 'Four']) {
+      store.create({ name, nakshatra: 'Rohini' });
+    }
+    localStorage.setItem(
+      MUHURTAM_PROFILE_IDS_STORAGE_KEY,
+      '["guest_one","guest_two","guest_three"]',
+    );
+    const active = initialize();
+    clickAction('add-manual');
+    const write = vi.spyOn(browserStorage, 'setItem');
+    write.mockClear();
+
+    expect(active.selectProfile('guest_four')).toBe(false);
+
+    expect(active.getSelectedIds()).toEqual(['guest_one', 'guest_two', 'guest_three']);
+    expect(document.querySelectorAll('[data-manual-id]')).toHaveLength(1);
+    expect(localStorage.getItem(MUHURTAM_PROFILE_IDS_STORAGE_KEY)).toBe(
+      '["guest_one","guest_two","guest_three"]',
+    );
+    expect(write).not.toHaveBeenCalled();
+    expect(document.querySelector('#tb-profiles')?.textContent).toContain(
+      'Choose up to 4 participants',
+    );
+  });
+
+  test('restores keyboard focus after saved and manual selection rerenders', () => {
+    store = createGuestProfileStore(profileStorage, {
+      idFactory: ids('guest_alpha'),
+    });
+    store.create({ name: 'Alpha', nakshatra: 'Rohini' });
+    localStorage.setItem(MUHURTAM_PROFILE_IDS_STORAGE_KEY, '[]');
+    initialize();
+
+    const checkbox = document.querySelector<HTMLInputElement>(
+      'input[data-profile-selection="guest_alpha"]',
+    )!;
+    checkbox.focus();
+    changeCheckbox('guest_alpha', true);
+    expect(document.activeElement).toBe(document.querySelector(
+      'input[data-profile-selection="guest_alpha"]',
+    ));
+
+    clickAction('add-manual');
+    for (const [field, value] of [
+      ['nakshatra', 'Hasta'],
+      ['pada', '2'],
+      ['lagna', 'Karka'],
+    ] as const) {
+      const select = document.querySelector<HTMLSelectElement>(
+        `select[data-manual-field="${field}"]`,
+      )!;
+      select.focus();
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      expect(document.activeElement).toBe(document.querySelector(
+        `select[data-manual-field="${field}"]`,
+      ));
+    }
   });
 
   test('keeps the no-profile path and supports a labelled, session-only person', () => {
@@ -353,12 +486,12 @@ describe('Muhurtam saved-profile participants', () => {
     expect(root.querySelector('img')).toBeNull();
     expect(root.textContent).toContain(hostile);
 
-    clickAction('edit-profile');
-    clickAction('create-profile');
-    clickAction('manage-profiles');
-    expect(editProfile).toHaveBeenCalledWith('guest_hostile');
-    expect(createProfile).toHaveBeenCalledOnce();
-    expect(manageProfiles).toHaveBeenCalledOnce();
+    const editTrigger = clickAction('edit-profile');
+    const createTrigger = clickAction('create-profile');
+    const manageTrigger = clickAction('manage-profiles');
+    expect(editProfile).toHaveBeenCalledWith('guest_hostile', editTrigger);
+    expect(createProfile).toHaveBeenCalledWith(createTrigger);
+    expect(manageProfiles).toHaveBeenCalledWith(manageTrigger);
   });
 
   test('clear selection never deletes profiles or Gochara preferences', () => {

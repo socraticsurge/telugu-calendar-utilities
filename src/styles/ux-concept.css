@@ -670,6 +670,48 @@ h2.panel-heading { display: none !important; }
 
 .profiles-form .profiles-title { font-size: 1.25rem; }
 
+.profiles-form__existing {
+  display: grid;
+  gap: var(--ux-space-2);
+  margin-top: var(--ux-space-4);
+  padding: var(--ux-space-3) 0;
+  border-block: 1px solid var(--ux-line);
+}
+
+.profiles-form__existing-title {
+  margin: 0;
+  color: var(--ux-ink);
+  font: 600 var(--ux-text-sm)/1.35 var(--brand-sans);
+}
+
+.profiles-form__existing-hint {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-xs);
+  line-height: 1.5;
+}
+
+.profiles-form__existing-list {
+  display: grid;
+  gap: var(--ux-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profiles-form__existing-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--ux-space-2);
+  color: var(--ux-ink);
+  font-size: var(--ux-text-sm);
+}
+
+.profiles-form__existing-name { font-weight: 600; }
+.profiles-form__existing-readiness { color: var(--ux-muted); }
+
 .profiles-field {
   display: grid;
   gap: var(--ux-space-2);

@@ -245,4 +245,171 @@ describe('storage and contextual journeys', () => {
     submit();
     expect(navigate).toHaveBeenLastCalledWith('tarabalam');
   });
+
+  test('returns the exact created profile to the originating journey', () => {
+    const onSaved = vi.fn();
+    controller.openCreate({ returnTo: 'gochara', onSaved });
+    inputValue('#profile-name', 'Anu');
+    inputValue('#profile-nakshatra', 'Rohini');
+    submit();
+
+    const created = store.getSnapshot().profiles[0];
+    expect(onSaved).toHaveBeenCalledOnce();
+    expect(onSaved).toHaveBeenCalledWith(created);
+    expect(onSaved.mock.calls[0][0]).toEqual({
+      id: 'guest_panel_1',
+      schemaVersion: 1,
+      name: 'Anu',
+      nakshatra: 'Rohini',
+      pada: null,
+      lagna: null,
+    });
+    expect(navigate).toHaveBeenLastCalledWith('gochara');
+  });
+
+  test('returns an updated profile without changing its stable ID', () => {
+    const original = store.create({ name: 'Anu', nakshatra: 'Rohini' });
+    const onSaved = vi.fn();
+    controller.openEdit(original.id, { returnTo: 'tarabalam', onSaved });
+    inputValue('#profile-name', 'Anuradha');
+    submit();
+
+    expect(onSaved).toHaveBeenCalledOnce();
+    expect(onSaved.mock.calls[0][0]).toMatchObject({
+      id: original.id,
+      name: 'Anuradha',
+      nakshatra: 'Rohini',
+    });
+    expect(store.getSnapshot().profiles[0].id).toBe(original.id);
+    expect(navigate).toHaveBeenLastCalledWith('tarabalam');
+  });
+
+  test('does not report a saved profile when contextual editing is cancelled', () => {
+    const onSaved = vi.fn();
+    controller.openCreate({ returnTo: 'gochara', onSaved });
+    inputValue('#profile-name', 'Discard me');
+    buttonNamed('Cancel').click();
+
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(store.getSnapshot().profiles).toHaveLength(0);
+    expect(navigate).toHaveBeenLastCalledWith('gochara');
+  });
+
+  test('restores focus to the originating trigger after contextual navigation', () => {
+    const trigger = document.createElement('button');
+    trigger.textContent = 'Originating action';
+    document.body.prepend(trigger);
+    const focus = vi.spyOn(trigger, 'focus');
+    navigate.mockImplementation(() => {
+      expect(focus).toHaveBeenCalledTimes(navigate.mock.calls.length - 1);
+    });
+
+    controller.openCreate({ returnTo: 'gochara', focusTarget: trigger });
+    buttonNamed('Cancel').click();
+    expect(navigate).toHaveBeenLastCalledWith('gochara');
+    expect(focus).toHaveBeenCalledOnce();
+    expect(document.activeElement).toBe(trigger);
+
+    controller.openCreate({ returnTo: 'tarabalam', focusTarget: trigger });
+    inputValue('#profile-name', 'Anu');
+    submit();
+    expect(navigate).toHaveBeenLastCalledWith('tarabalam');
+    expect(focus).toHaveBeenCalledTimes(2);
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  test('requires the birth details that Daily Horoscope readiness reports missing', () => {
+    controller.openCreate({ returnTo: 'gochara', requiredFor: 'horoscope' });
+    expect(query('.profiles-form__intro').textContent).toContain('Lagna remains optional');
+    inputValue('#profile-name', 'Anu');
+    submit();
+
+    const nakshatra = query<HTMLSelectElement>('#profile-nakshatra');
+    const nakshatraError = query<HTMLElement>('#profile-nakshatra-error');
+    expect(nakshatra.getAttribute('aria-invalid')).toBe('true');
+    expect(nakshatra.getAttribute('aria-describedby')).toContain(nakshatraError.id);
+    expect(nakshatraError.textContent).toContain('Daily Horoscope');
+    expect(document.activeElement).toBe(nakshatra);
+    expect(store.getSnapshot().profiles).toHaveLength(0);
+
+    inputValue('#profile-nakshatra', 'Krittika');
+    submit();
+
+    const pada = query<HTMLSelectElement>('#profile-pada');
+    const padaError = query<HTMLElement>('#profile-pada-error');
+    expect(pada.getAttribute('aria-invalid')).toBe('true');
+    expect(pada.getAttribute('aria-describedby')).toContain(padaError.id);
+    expect(padaError.textContent).toContain('Krittika spans two Rashis');
+    expect(document.activeElement).toBe(pada);
+    expect(store.getSnapshot().profiles).toHaveLength(0);
+
+    inputValue('#profile-pada', '2');
+    submit();
+    expect(store.getSnapshot().profiles[0]).toMatchObject({
+      name: 'Anu', nakshatra: 'Krittika', pada: 2,
+    });
+    expect(navigate).toHaveBeenLastCalledWith('gochara');
+  });
+
+  test('allows Daily Horoscope save without Padam when readiness can derive a Rashi', () => {
+    controller.openCreate({ returnTo: 'gochara', requiredFor: 'horoscope' });
+    inputValue('#profile-name', 'Rohini profile');
+    inputValue('#profile-nakshatra', 'Rohini');
+    submit();
+
+    expect(store.getSnapshot().profiles[0]).toMatchObject({
+      nakshatra: 'Rohini', pada: null,
+    });
+    expect(navigate).toHaveBeenLastCalledWith('gochara');
+  });
+
+  test('requires only Nakshatra for a contextual Muhurtam profile', () => {
+    controller.openCreate({ returnTo: 'tarabalam', requiredFor: 'muhurta' });
+    expect(query('.profiles-form__intro').textContent).toContain('Padam and Lagna are optional');
+    inputValue('#profile-name', 'Anu');
+    submit();
+
+    const nakshatra = query<HTMLSelectElement>('#profile-nakshatra');
+    const error = query<HTMLElement>('#profile-nakshatra-error');
+    expect(nakshatra.getAttribute('aria-invalid')).toBe('true');
+    expect(error.textContent).toContain('Muhurtam');
+    expect(document.activeElement).toBe(nakshatra);
+
+    inputValue('#profile-nakshatra', 'Krittika');
+    submit();
+    expect(store.getSnapshot().profiles[0]).toMatchObject({
+      name: 'Anu', nakshatra: 'Krittika', pada: null,
+    });
+    expect(navigate).toHaveBeenLastCalledWith('tarabalam');
+  });
+
+  test('keeps birth details optional in the normal Profiles destination', () => {
+    controller.openCreate();
+    inputValue('#profile-name', 'Name only');
+    submit();
+
+    expect(store.getSnapshot().profiles[0]).toMatchObject({
+      name: 'Name only', nakshatra: null, pada: null, lagna: null,
+    });
+    expect(document.body.textContent).toContain('Needs Nakshatra');
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  test('shows existing profiles and journey readiness before contextual creation', () => {
+    const hostileName = '<img src=x onerror=alert(1)>';
+    store.create({ name: hostileName });
+    store.create({ name: 'Ready person', nakshatra: 'Rohini' });
+
+    controller.openCreate({ returnTo: 'gochara', requiredFor: 'horoscope' });
+
+    const existing = query<HTMLElement>('.profiles-form__existing');
+    const form = query<HTMLFormElement>('.profiles-form');
+    expect(existing.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(existing.textContent).toContain(hostileName);
+    expect(existing.textContent).toContain('Needs Nakshatra');
+    expect(existing.textContent).toContain('Ready for Daily Horoscope');
+    expect(existing.textContent).toContain('edit that profile instead');
+    expect(existing.querySelector('img')).toBeNull();
+    expect(existing.querySelector('dialog')).toBeNull();
+  });
 });

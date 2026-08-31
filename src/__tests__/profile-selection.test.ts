@@ -302,14 +302,21 @@ describe('Muhurtam stable participant selection', () => {
     ]);
   });
 
-  test('returns a safe no-profile state without creating a storage key', () => {
+  test('persists a safe empty state so later contextual creation stays isolated', () => {
     const result = loadMuhurtamProfileSelection(storage, []);
 
     expect(result).toMatchObject({
       selectedIds: [], profiles: [], initializedFromProfiles: false,
       storageIssue: null, selectionIssue: null,
     });
-    expect(storage.getItem(MUHURTAM_PROFILE_IDS_STORAGE_KEY)).toBeNull();
+    expect(storage.getItem(MUHURTAM_PROFILE_IDS_STORAGE_KEY)).toBe('[]');
+
+    const afterHoroscopeCreation = loadMuhurtamProfileSelection(
+      storage,
+      [profile('guest_created_elsewhere')],
+    );
+    expect(afterHoroscopeCreation.selectedIds).toEqual([]);
+    expect(afterHoroscopeCreation.initializedFromProfiles).toBe(false);
   });
 
   test('tolerates read and write denial without losing the current-page selection', () => {

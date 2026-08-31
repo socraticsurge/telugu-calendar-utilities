@@ -43,13 +43,14 @@ let GO_DATA = null;
 let LLM_PHALALU = null;
 
 export interface GocharaProfileActions {
-  createProfile(): void;
-  editProfile(id: string): void;
-  manageProfiles(): void;
+  createProfile(trigger: HTMLElement): void;
+  editProfile(id: string, trigger: HTMLElement): void;
+  manageProfiles(trigger: HTMLElement): void;
 }
 
 export interface GocharaProfilesController {
   refresh(): void;
+  selectProfile(id: string): boolean;
   destroy(): void;
 }
 
@@ -98,15 +99,18 @@ function option(
 function stateAction(
   label: string,
   action: 'create' | 'edit' | 'manage',
-  callback: () => void,
+  callback: (trigger: HTMLButtonElement) => void,
   primary = false,
+  profileId: string | null = null,
 ): HTMLButtonElement {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = `go-profile-action go-profile-action--${primary ? 'primary' : 'secondary'}`;
   button.dataset.goProfileAction = action;
+  button.dataset.goProfileFocus = profileId ? `${action}:${profileId}` : action;
+  if (profileId) button.dataset.goProfileId = profileId;
   button.textContent = label;
-  button.addEventListener('click', callback);
+  button.addEventListener('click', () => callback(button));
   return button;
 }
 
@@ -121,6 +125,10 @@ function renderGocharaProfileState(
 ): void {
   const root = document.getElementById('go-profile-state');
   if (!root) return;
+  const active = document.activeElement;
+  const focusKey = active instanceof HTMLElement && root.contains(active)
+    ? active.dataset.goProfileFocus || null
+    : null;
   root.replaceChildren();
 
   const snapshot = gocharaProfileStore?.getSnapshot();
@@ -150,6 +158,30 @@ function renderGocharaProfileState(
     actions.append(...buttons);
     root.append(actions);
   };
+  const addIncompleteProfileActions = (excludeId: string | null = null): void => {
+    if (!gocharaProfileActions) return;
+    const buttons = profiles.flatMap(profile => {
+      if (profile.id === excludeId) return [];
+      const readiness = guestProfileReadiness(profile);
+      if (readiness.horoscope) return [];
+      const missing = readiness.missingForHoroscope === 'pada' ? 'Padam' : 'Nakshatra';
+      return [stateAction(
+        `Complete ${profileDisplayName(profile)} · Needs ${missing}`,
+        'edit',
+        trigger => gocharaProfileActions?.editProfile(profile.id, trigger),
+        false,
+        profile.id,
+      )];
+    });
+    addActions(...buttons);
+  };
+  const restoreActionFocus = (): void => {
+    if (!focusKey) return;
+    const replacement = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-go-profile-focus]'),
+    ).find(candidate => candidate.dataset.goProfileFocus === focusKey);
+    replacement?.focus();
+  };
 
   if (resolution.fallback) addNotice(resolution.fallback.message);
   if (
@@ -165,14 +197,17 @@ function renderGocharaProfileState(
     if (gocharaProfileActions) {
       addActions(
         stateAction(
-          `Edit ${profileDisplayName(requestedProfile)}`,
+          `Complete ${profileDisplayName(requestedProfile)}`,
           'edit',
-          () => gocharaProfileActions?.editProfile(requestedProfile.id),
+          trigger => gocharaProfileActions?.editProfile(requestedProfile.id, trigger),
           true,
+          requestedProfile.id,
         ),
-        stateAction('Manage profiles', 'manage', () => gocharaProfileActions?.manageProfiles()),
+        stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
       );
     }
+    addIncompleteProfileActions(requestedProfile.id);
+    restoreActionFocus();
     return;
   }
 
@@ -183,19 +218,24 @@ function renderGocharaProfileState(
         stateAction(
           `Edit ${resolution.profile.name || 'profile'}`,
           'edit',
-          () => gocharaProfileActions?.editProfile(resolution.profile!.id),
+          trigger => gocharaProfileActions?.editProfile(resolution.profile!.id, trigger),
+          false,
+          resolution.profile.id,
         ),
-        stateAction('Manage profiles', 'manage', () => gocharaProfileActions?.manageProfiles()),
+        stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
       );
     }
+    addIncompleteProfileActions();
+    restoreActionFocus();
     return;
   }
 
   if (profiles.length === 0) {
     addContext('Create a profile to reuse a birth star here and in Muhurtam. It stays only in this browser.');
     if (gocharaProfileActions) {
-      addActions(stateAction('Create profile', 'create', () => gocharaProfileActions?.createProfile(), true));
+      addActions(stateAction('Create profile', 'create', trigger => gocharaProfileActions?.createProfile(trigger), true));
     }
+    restoreActionFocus();
     return;
   }
 
@@ -205,8 +245,10 @@ function renderGocharaProfileState(
     addContext('Choose a saved profile above for a personal Daily Horoscope, or select any Rashi for a one-off view.');
   }
   if (gocharaProfileActions) {
-    addActions(stateAction('Manage profiles', 'manage', () => gocharaProfileActions?.manageProfiles()));
+    addActions(stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)));
   }
+  addIncompleteProfileActions();
+  restoreActionFocus();
 }
 
 async function loadGochara() {
@@ -402,6 +444,17 @@ export function initGocharaProfiles(
   select.addEventListener('change', handleChange);
   const unsubscribe = store.subscribe(refresh);
 
+  const selectProfile = (id: string): boolean => {
+    if (destroyed) return false;
+    const profile = store.get(id);
+    if (!profile || !guestProfileReadiness(profile).horoscope) return false;
+    const resolution = goBuildViewSelect(gocharaProfileValue(id));
+    if (resolution?.kind !== 'profile' || resolution.profile?.id !== id) return false;
+    if (GO_DATA) renderGochara();
+    select.focus();
+    return true;
+  };
+
   const destroy = (): void => {
     if (destroyed) return;
     destroyed = true;
@@ -415,7 +468,7 @@ export function initGocharaProfiles(
   };
   destroyGocharaProfiles = destroy;
 
-  const controller: GocharaProfilesController = { refresh, destroy };
+  const controller: GocharaProfilesController = { refresh, selectProfile, destroy };
   refresh();
   return controller;
 }

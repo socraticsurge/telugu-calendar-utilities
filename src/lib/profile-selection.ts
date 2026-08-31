@@ -389,9 +389,10 @@ export function loadMuhurtamProfileSelection(
       .map(profile => profile.id);
     const resolved = resolveMuhurtamIds(defaults, profiles);
     const initialized = resolved.selectedIds.length > 0;
-    const storageIssue = initialized
-      ? persistMuhurtamIds(storage, resolved.selectedIds)
-      : null;
+    // Persist even the empty initial state. Otherwise the first profile later
+    // created from Daily Horoscope would look like a legacy Muhurtam startup
+    // and be auto-selected in the wrong journey.
+    const storageIssue = persistMuhurtamIds(storage, resolved.selectedIds);
     return asMuhurtamSelection(resolved, initialized, storageIssue);
   }
 

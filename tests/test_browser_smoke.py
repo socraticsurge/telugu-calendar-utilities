@@ -305,6 +305,119 @@ def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browse
     )
 
 
+def test_daily_horoscope_contextual_profile_returns_and_stays_isolated(
+    docs_server, browser,
+):
+    """A first-time guest can create the exact profile Daily Horoscope needs.
+
+    The new profile must become the active Horoscope view without silently
+    becoming a Muhurtam participant, and analytics must remain content-free.
+    """
+    page = browser.new_page()
+    captured = _capture_console(page)
+    try:
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        page.evaluate('localStorage.clear()')
+        page.reload(wait_until='domcontentloaded', timeout=15000)
+        page.evaluate(
+            "window.__profileEvents = []; window.goatcounter = {"
+            "count: event => window.__profileEvents.push(event)}"
+        )
+
+        page.evaluate("window.switchTool('gochara')")
+        page.locator('[data-go-profile-action="create"]').click()
+        assert page.locator('body').get_attribute('data-tool') == 'profiles'
+
+        page.fill('#profile-name', 'Browser Ananya')
+        page.locator('button[type="submit"]').click()
+        assert page.locator('#profile-nakshatra-error').is_visible()
+        assert 'Nakshatra' in page.locator('#profile-nakshatra-error').inner_text()
+
+        page.select_option('#profile-nakshatra', 'Krittika')
+        page.locator('button[type="submit"]').click()
+        assert page.locator('#profile-pada-error').is_visible()
+        assert 'spans two Rashis' in page.locator('#profile-pada-error').inner_text()
+
+        page.select_option('#profile-pada', '2')
+        page.locator('button[type="submit"]').click()
+        page.wait_for_function("document.body.dataset.tool === 'gochara'")
+
+        selected = page.input_value('#go-view')
+        assert selected.startswith('profile:')
+        assert "Using Browser Ananya's saved birth star" in page.locator(
+            '#go-profile-state'
+        ).inner_text()
+        assert page.evaluate(
+            "localStorage.getItem('tc-mu-profile-ids')"
+        ) == '[]'
+        assert page.evaluate('document.activeElement.id') == 'go-view'
+
+        events = page.evaluate('window.__profileEvents')
+        event_text = str(events)
+        assert 'Browser Ananya' not in event_text
+        assert 'Krittika' not in event_text
+        assert selected.removeprefix('profile:') not in event_text
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'contextual Horoscope surfaced errors: {app_errors[:3]}'
+
+
+def test_muhurta_contextual_profile_preserves_task_and_other_journey(
+    docs_server, browser,
+):
+    """Muhurtam contextual create/select is origin-scoped and cancellable."""
+    page = browser.new_page()
+    captured = _capture_console(page)
+    try:
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
+        page.evaluate('localStorage.clear()')
+        page.reload(wait_until='domcontentloaded', timeout=15000)
+        page.evaluate("window.switchTool('tarabalam')")
+        page.select_option('#mu-activity', 'wedding')
+
+        page.locator('#tb-profiles [data-action="create-profile"]').click()
+        page.fill('#profile-name', 'Browser Ravi')
+        page.locator('button[type="submit"]').click()
+        assert page.locator('#profile-nakshatra-error').is_visible()
+        page.select_option('#profile-nakshatra', 'Ashvini')
+        page.locator('button[type="submit"]').click()
+        page.wait_for_function("document.body.dataset.tool === 'tarabalam'")
+
+        checked = page.locator('input[data-profile-selection]:checked')
+        assert checked.count() == 1
+        selected_id = checked.get_attribute('value')
+        assert selected_id
+        assert page.evaluate(
+            "localStorage.getItem('tc-mu-profile-ids')"
+        ) == f'["{selected_id}"]'
+        assert not (page.evaluate(
+            "localStorage.getItem('tc-go-view') || ''"
+        )).startswith('profile:')
+        assert page.input_value('#mu-activity') == 'wedding'
+        assert page.evaluate(
+            "document.activeElement.dataset.profileSelection"
+        ) == selected_id
+
+        page.locator('#tb-profiles [data-action="create-profile"]').click()
+        page.fill('#profile-name', 'Do not save')
+        page.get_by_role('button', name='Cancel').click()
+        page.wait_for_function("document.body.dataset.tool === 'tarabalam'")
+
+        assert page.input_value('#mu-activity') == 'wedding'
+        assert page.locator('input[data-profile-selection]:checked').count() == 1
+        assert page.locator('#tb-profiles [data-profile-id]').count() == 1
+        assert page.evaluate(
+            "localStorage.getItem('tc-mu-profile-ids')"
+        ) == f'["{selected_id}"]'
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'contextual Muhurtam surfaced errors: {app_errors[:3]}'
+
+
 def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build, browser):
     """The regression class this guards: a module-scoped constant left
     behind by the panel extraction turns the gochara RASI view into a

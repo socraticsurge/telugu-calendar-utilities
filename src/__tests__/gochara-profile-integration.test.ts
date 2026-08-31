@@ -10,13 +10,14 @@ import {
 import { GOCHARA_SELECTION_STORAGE_KEY } from '../lib/profile-selection';
 
 interface GocharaProfileActions {
-  createProfile(): void;
-  editProfile(id: string): void;
-  manageProfiles(): void;
+  createProfile(trigger: HTMLElement): void;
+  editProfile(id: string, trigger: HTMLElement): void;
+  manageProfiles(trigger: HTMLElement): void;
 }
 
 interface GocharaProfilesController {
   refresh(): void;
+  selectProfile(id: string): boolean;
   destroy(): void;
 }
 
@@ -217,9 +218,9 @@ describe('Daily Horoscope profile selector', () => {
     expect(document.querySelector('.go-profile-notice')?.textContent)
       .toContain('Padam is needed');
     const edit = document.querySelector<HTMLButtonElement>('[data-go-profile-action="edit"]');
-    expect(edit?.textContent).toBe('Edit Active');
+    expect(edit?.textContent).toBe('Complete Active');
     edit?.click();
-    expect(actions.editProfile).toHaveBeenCalledWith('guest_active');
+    expect(actions.editProfile).toHaveBeenCalledWith('guest_active', edit);
   });
 
   test('keeps an HTML-like profile name inert while rebuilding options and context', () => {
@@ -258,11 +259,90 @@ describe('Daily Horoscope profile selector', () => {
 
   test('routes empty and managed states through the supplied journey actions', () => {
     controller = initGocharaProfiles(store, actions);
-    document.querySelector<HTMLButtonElement>('[data-go-profile-action="create"]')?.click();
-    expect(actions.createProfile).toHaveBeenCalledTimes(1);
+    const create = document.querySelector<HTMLButtonElement>('[data-go-profile-action="create"]');
+    create?.click();
+    expect(actions.createProfile).toHaveBeenCalledWith(create);
 
     store.create({ name: 'Ready', nakshatra: 'Rohini' });
-    document.querySelector<HTMLButtonElement>('[data-go-profile-action="manage"]')?.click();
-    expect(actions.manageProfiles).toHaveBeenCalledTimes(1);
+    const manage = document.querySelector<HTMLButtonElement>('[data-go-profile-action="manage"]');
+    manage?.click();
+    expect(actions.manageProfiles).toHaveBeenCalledWith(manage);
+  });
+
+  test('makes every disabled incomplete profile reachable through an explicit Complete action', () => {
+    writeProfiles(profileStorage, [
+      row('guest_no_star', 'No star', { nak: '' }),
+      row('guest_no_pada', 'No Padam', { nak: 'Krittika', pada: '' }),
+    ]);
+    store.reload();
+
+    controller = initGocharaProfiles(store, actions);
+
+    expect(profileOption('guest_no_star').textContent).toBe('No star · Needs Nakshatra');
+    expect(profileOption('guest_no_star').disabled).toBe(true);
+    expect(profileOption('guest_no_pada').textContent).toBe('No Padam · Needs Padam');
+    expect(profileOption('guest_no_pada').disabled).toBe(true);
+    const complete = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('[data-go-profile-action="edit"]'),
+    );
+    expect(complete.map(button => button.textContent)).toEqual([
+      'Complete No star · Needs Nakshatra',
+      'Complete No Padam · Needs Padam',
+    ]);
+    complete[1].click();
+    expect(actions.editProfile).toHaveBeenCalledWith('guest_no_pada', complete[1]);
+  });
+
+  test('selectProfile persists and renders an existing Horoscope-ready profile only', () => {
+    writeProfiles(profileStorage, [
+      row('guest_ready', 'Ready'),
+      row('guest_incomplete', 'Incomplete', { nak: '' }),
+    ]);
+    store.reload();
+    controller = initGocharaProfiles(store, actions);
+
+    expect(controller.selectProfile('guest_ready')).toBe(true);
+    expect(select().value).toBe('profile:guest_ready');
+    expect(selectionStorage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe('profile:guest_ready');
+    expect(document.querySelector('.go-profile-context')?.textContent)
+      .toContain("Using Ready's saved birth star");
+    expect(document.activeElement).toBe(select());
+
+    expect(controller.selectProfile('guest_incomplete')).toBe(false);
+    expect(controller.selectProfile('guest_missing')).toBe(false);
+    expect(select().value).toBe('profile:guest_ready');
+    expect(selectionStorage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe('profile:guest_ready');
+  });
+
+  test('selectProfile never changes the independent Muhurtam participant selection', () => {
+    const muhurtaKey = 'tc-mu-profile-ids';
+    writeProfiles(profileStorage, [row('guest_ready', 'Ready')]);
+    store.reload();
+    selectionStorage.setItem(muhurtaKey, JSON.stringify(['guest_other']));
+    controller = initGocharaProfiles(store, actions);
+
+    expect(controller.selectProfile('guest_ready')).toBe(true);
+    expect(selectionStorage.getItem(muhurtaKey)).toBe(JSON.stringify(['guest_other']));
+  });
+
+  test('restores focus to the equivalent action after a subscribed rerender', () => {
+    writeProfiles(profileStorage, [
+      row('guest_ready', 'Ready'),
+      row('guest_incomplete', 'Incomplete', { nak: '' }),
+    ]);
+    store.reload();
+    controller = initGocharaProfiles(store, actions);
+    const before = document.querySelector<HTMLButtonElement>(
+      '[data-go-profile-focus="edit:guest_incomplete"]',
+    );
+    before?.focus();
+
+    store.update('guest_ready', { name: 'Renamed' });
+
+    const after = document.querySelector<HTMLButtonElement>(
+      '[data-go-profile-focus="edit:guest_incomplete"]',
+    );
+    expect(after).not.toBe(before);
+    expect(document.activeElement).toBe(after);
   });
 });

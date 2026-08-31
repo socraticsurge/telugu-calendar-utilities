@@ -171,26 +171,54 @@ import { initProfilesPanel } from './panels/profiles';
 
   const profileStore = createGuestProfileStore(localStorage);
   const profilesPanel = initProfilesPanel(profileStore, { navigate: switchTool });
-  initGocharaProfiles(profileStore, {
-    createProfile() {
-      profilesPanel.openCreate({ returnTo: 'gochara' });
+  const gocharaProfiles = initGocharaProfiles(profileStore, {
+    createProfile(trigger) {
+      profilesPanel.openCreate({
+        returnTo: 'gochara',
+        requiredFor: 'horoscope',
+        focusTarget: trigger,
+        onSaved(profile) {
+          gocharaProfiles.selectProfile(profile.id);
+        },
+      });
       switchTool('profiles');
     },
-    editProfile(id) {
-      profilesPanel.openEdit(id, { returnTo: 'gochara' });
+    editProfile(id, trigger) {
+      profilesPanel.openEdit(id, {
+        returnTo: 'gochara',
+        requiredFor: 'horoscope',
+        focusTarget: trigger,
+        onSaved(profile) {
+          gocharaProfiles.selectProfile(profile.id);
+        },
+      });
       switchTool('profiles');
     },
     manageProfiles() {
       switchTool('profiles');
     },
   });
-  initTarabalamProfiles(profileStore, {
-    createProfile() {
-      profilesPanel.openCreate({ returnTo: 'tarabalam' });
+  const tarabalamProfiles = initTarabalamProfiles(profileStore, {
+    createProfile(trigger) {
+      profilesPanel.openCreate({
+        returnTo: 'tarabalam',
+        requiredFor: 'muhurta',
+        focusTarget: trigger,
+        onSaved(profile) {
+          tarabalamProfiles.selectProfile(profile.id);
+        },
+      });
       switchTool('profiles');
     },
-    editProfile(id) {
-      profilesPanel.openEdit(id, { returnTo: 'tarabalam' });
+    editProfile(id, trigger) {
+      profilesPanel.openEdit(id, {
+        returnTo: 'tarabalam',
+        requiredFor: 'muhurta',
+        focusTarget: trigger,
+        onSaved(profile) {
+          tarabalamProfiles.selectProfile(profile.id);
+        },
+      });
       switchTool('profiles');
     },
     manageProfiles() {
