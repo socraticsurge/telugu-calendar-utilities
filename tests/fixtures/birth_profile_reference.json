@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.0",
+  "assurance": "reproduction-checked",
+  "generatedAt": "2026-08-29",
+  "generator": "DashaFlow 1.1.0 through the local profile-derivation contract",
+  "notes": [
+    "These are synthetic regression cells, not real guest data.",
+    "An independent raw PySwissEph implementation reproduces every value in test_birth_profile_reference.py.",
+    "Both paths use the same underlying astronomical library, so this is not an independent published-source comparison.",
+    "The actual ephemeris selected in these cells is Moshier."
+  ],
+  "cases": [
+    {
+      "id": "hyderabad-1990",
+      "input": {
+        "date_of_birth": "1990-04-15",
+        "time_of_birth": "14:30",
+        "latitude": 17.385,
+        "longitude": 78.4867,
+        "timezone": "Asia/Kolkata"
+      },
+      "expected": {
+        "nakshatra": "Jyeshtha",
+        "pada": 4,
+        "janma_rashi": "Vrischika",
+        "lagna": "Simha",
+        "lagna_degree": 4.69,
+        "ephemeris": "moshier",
+        "planets": [
+          {"name": "Surya", "rashi": "Mesha", "degree": 1.41, "house": 9, "retrograde": false},
+          {"name": "Chandra", "rashi": "Vrischika", "degree": 28.66, "house": 4, "retrograde": false},
+          {"name": "Kuja", "rashi": "Kumbha", "degree": 2.13, "house": 7, "retrograde": false},
+          {"name": "Budha", "rashi": "Mesha", "degree": 20.67, "house": 9, "retrograde": false},
+          {"name": "Guru", "rashi": "Mithuna", "degree": 10.8, "house": 11, "retrograde": false},
+          {"name": "Shukra", "rashi": "Kumbha", "degree": 15.69, "house": 7, "retrograde": false},
+          {"name": "Shani", "rashi": "Makara", "degree": 1.3, "house": 6, "retrograde": false},
+          {"name": "Rahu", "rashi": "Makara", "degree": 19.21, "house": 6, "retrograde": true},
+          {"name": "Ketu", "rashi": "Karka", "degree": 19.21, "house": 12, "retrograde": true}
+        ]
+      }
+    },
+    {
+      "id": "new-york-1985",
+      "input": {
+        "date_of_birth": "1985-11-05",
+        "time_of_birth": "06:45",
+        "latitude": 40.7128,
+        "longitude": -74.006,
+        "timezone": "America/New_York"
+      },
+      "expected": {
+        "nakshatra": "Pushya",
+        "pada": 4,
+        "janma_rashi": "Karka",
+        "lagna": "Tula",
+        "lagna_degree": 21.15,
+        "ephemeris": "moshier",
+        "planets": [
+          {"name": "Surya", "rashi": "Tula", "degree": 19.35, "house": 1, "retrograde": false},
+          {"name": "Chandra", "rashi": "Karka", "degree": 15.2, "house": 10, "retrograde": false},
+          {"name": "Kuja", "rashi": "Kanya", "degree": 11.89, "house": 12, "retrograde": false},
+          {"name": "Budha", "rashi": "Vrischika", "degree": 12.14, "house": 2, "retrograde": false},
+          {"name": "Guru", "rashi": "Makara", "degree": 15.23, "house": 4, "retrograde": false},
+          {"name": "Shukra", "rashi": "Tula", "degree": 1.17, "house": 1, "retrograde": false},
+          {"name": "Shani", "rashi": "Vrischika", "degree": 4.98, "house": 2, "retrograde": false},
+          {"name": "Rahu", "rashi": "Mesha", "degree": 15.16, "house": 7, "retrograde": true},
+          {"name": "Ketu", "rashi": "Tula", "degree": 15.16, "house": 1, "retrograde": true}
+        ]
+      }
+    },
+    {
+      "id": "london-1972",
+      "input": {
+        "date_of_birth": "1972-07-20",
+        "time_of_birth": "23:15",
+        "latitude": 51.5074,
+        "longitude": -0.1278,
+        "timezone": "Europe/London"
+      },
+      "expected": {
+        "nakshatra": "Vishakha",
+        "pada": 4,
+        "janma_rashi": "Vrischika",
+        "lagna": "Meena",
+        "lagna_degree": 12.28,
+        "ephemeris": "moshier",
+        "planets": [
+          {"name": "Surya", "rashi": "Karka", "degree": 4.78, "house": 5, "retrograde": false},
+          {"name": "Chandra", "rashi": "Vrischika", "degree": 3.28, "house": 9, "retrograde": false},
+          {"name": "Kuja", "rashi": "Karka", "degree": 20.61, "house": 5, "retrograde": false},
+          {"name": "Budha", "rashi": "Karka", "degree": 28.22, "house": 5, "retrograde": false},
+          {"name": "Guru", "rashi": "Dhanu", "degree": 6.88, "house": 10, "retrograde": true},
+          {"name": "Shukra", "rashi": "Vrishabha", "degree": 27.16, "house": 3, "retrograde": false},
+          {"name": "Shani", "rashi": "Vrishabha", "degree": 22.68, "house": 3, "retrograde": false},
+          {"name": "Rahu", "rashi": "Makara", "degree": 2.46, "house": 11, "retrograde": true},
+          {"name": "Ketu", "rashi": "Karka", "degree": 2.46, "house": 5, "retrograde": true}
+        ]
+      }
+    }
+  ]
+}

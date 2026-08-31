@@ -24,10 +24,30 @@ import { fmtT, dayMark, fmtRange, fmtPlain, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
+import {
+  GUEST_BIRTH_PROFILE_STORAGE_KEY,
+  GUEST_PROFILE_COMMIT_STORAGE_KEY,
+  GUEST_PROFILE_STORAGE_KEY,
+  MAX_GUEST_PROFILES,
+  guestProfileReadiness,
+  mergeLegacyGuestProfileRow,
+  removeLegacyGuestProfileRow,
+  readLegacyGuestProfileRows,
+  writeLegacyGuestProfileRows,
+  type GuestProfile,
+  type GuestProfileSnapshot,
+  type GuestProfileStore,
+  type ProfileStorage,
+} from '../lib/guest-profile-store';
+import {
+  loadMuhurtamProfileSelection,
+  saveMuhurtamProfileSelection,
+  toggleMuhurtamProfileSelection,
+  type JourneyGuestProfile,
+} from '../lib/profile-selection';
 import { RASI_NAMES, NAKSHATRA_NAMES, rasiFromStar } from '../data/rasis';
 import { MUHURTA_DAY } from '../data/muhurtas';
 import activityContract from '../data/activity-rules.generated.json';
-import { goHasData, goBuildViewSelect, renderGochara } from './gochara';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
 // --- Tarabalam tool ---
@@ -83,88 +103,705 @@ function chandraOf(janmaRasi, dayRasi) {
   return { pos, verdict: CHANDRA_GOOD.has(pos) ? 'good' : (CHANDRA_PUJA.has(pos) ? 'puja' : 'bad') };
 }
 
-function tbProfiles() {
-  const out = [];
-  for (let i = 0; i < TB_ROWS; i++) {
-    const nak = selEl(`tb-nak-${i}`).value;
-    if (!nak) continue;
-    const name = inpEl(`tb-name-${i}`).value.trim() || (i === 0 ? 'You' : `Person ${i+1}`);
-    const pada = Number(selEl(`tb-pada-${i}`).value) || null;
-    const lagnaInput = selEl(`tb-lagna-${i}`);
-    const lagna = (lagnaInput && lagnaInput.value) ? lagnaInput.value : null;
-    out.push({ name, nak, pada, rasi: rasiFromStar(nak, pada), lagna });
-  }
-  return out;
+export interface TarabalamProfileActions {
+  createProfile(trigger: HTMLElement): void;
+  editProfile(id: string, trigger: HTMLElement): void;
+  manageProfiles(trigger: HTMLElement): void;
 }
 
-function tbSaveProfiles() {
-  const raw = [];
-  for (let i = 0; i < TB_ROWS; i++) {
-    const lagnaInput = selEl(`tb-lagna-${i}`);
-    raw.push({ name: inpEl(`tb-name-${i}`).value,
-               nak: selEl(`tb-nak-${i}`).value,
-               pada: selEl(`tb-pada-${i}`).value,
-               lagna: lagnaInput ? lagnaInput.value : '' });
-  }
-  localStorage.setItem('tc-tb-profiles', JSON.stringify(raw));
+export interface TarabalamProfilesController {
+  render(): void;
+  destroy(): void;
+  getParticipants(): JourneyGuestProfile[];
+  getSelectedIds(): string[];
+  selectProfile(id: string): boolean;
 }
 
-let TB_ROWS = 1;  // visible person rows (1..4)
+interface ManualParticipant {
+  id: string;
+  name: string;
+  nak: string;
+  pada: 1 | 2 | 3 | 4 | null;
+  lagna: string | null;
+}
 
-function tbRenderProfileInputs() {
-  const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
-  TB_ROWS = Math.max(TB_ROWS, Math.min(4, saved.filter(v => v && (v.nak || v.name)).length || 1));
-  const wrap = document.getElementById('tb-profiles');
-  let html = '';
-  for (let i = 0; i < TB_ROWS; i++) {
-    const v = saved[i] || { name: '', nak: '', pada: '', lagna: '' };
-    const opts = ['<option value="">birth star</option>']
-      .concat(TB_NAKSHATRAS.map(n => `<option value="${n}" ${n === v.nak ? 'selected' : ''}>${n}</option>`)).join('');
-    const padaOpts = ['<option value="">padam?</option>']
-      .concat([1,2,3,4].map(q => `<option value="${q}" ${String(q) === String(v.pada) ? 'selected' : ''}>${q}</option>`)).join('');
-    const lagnaOpts = ['<option value="">lagna? (optional)</option>']
-      .concat(TB_RASIS.map(r => `<option value="${r}" ${r === v.lagna ? 'selected' : ''}>${r}</option>`)).join('');
-    const rasi = v.nak ? rasiFromStar(v.nak, Number(v.pada) || null) : null;
-    const rasiNote = (v.nak && !rasi)
-      ? '<span class="tb-you" style="color:#8A5518;">add padam for rashi</span>'
+interface InternalTarabalamProfilesController extends TarabalamProfilesController {
+  addManualParticipant(): void;
+  removeManualParticipant(index: number): void;
+  clearParticipants(): void;
+}
+
+let TB_PROFILE_CONTROLLER: InternalTarabalamProfilesController | null = null;
+let TB_MANUAL_SEQUENCE = 0;
+let TB_LEGACY_ROWS = 1;
+
+function tbNode<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className?: string,
+  text?: string,
+): HTMLElementTagNameMap[K] {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function tbButton(text: string, className = 'tb-add'): HTMLButtonElement {
+  const node = tbNode('button', className, text);
+  node.type = 'button';
+  return node;
+}
+
+function tbAppendOption(select: HTMLSelectElement, value: string, label: string): void {
+  const option = tbNode('option', undefined, label);
+  option.value = value;
+  select.append(option);
+}
+
+function tbDisplayName(profile: Readonly<GuestProfile>): string {
+  return profile.name || 'Unnamed profile';
+}
+
+function tbSelectionStorage(): ProfileStorage {
+  try {
+    return globalThis.localStorage;
+  } catch {
+    return {
+      getItem: () => { throw new Error('storage unavailable'); },
+      setItem: () => { throw new Error('storage unavailable'); },
+    };
+  }
+}
+
+function tbProfileStoreIssue(snapshot: GuestProfileSnapshot): string | null {
+  if (snapshot.issue === 'malformed-storage') {
+    return 'Saved profile data was unreadable and has been reset safely.';
+  }
+  if (snapshot.issue === 'uncommitted-birth-storage') {
+    return 'A saved birth calculation could not be verified. Manual profile details remain available.';
+  }
+  if (snapshot.issue === 'unsupported-storage-version') {
+    return 'These profiles use a newer or unrecognized format. They are available for this session, but changes cannot be saved here.';
+  }
+  if (snapshot.persistence === 'memory' || snapshot.issue === 'storage-unavailable') {
+    return 'Browser storage is unavailable. Profile choices work for this page only.';
+  }
+  return null;
+}
+
+function tbManualProfile(
+  participant: ManualParticipant,
+  index: number,
+): JourneyGuestProfile | null {
+  if (!participant.nak) return null;
+  return {
+    id: participant.id,
+    name: participant.name.trim() || `Person ${index + 1}`,
+    nak: participant.nak,
+    pada: participant.pada,
+    rasi: rasiFromStar(participant.nak, participant.pada),
+    lagna: participant.lagna,
+  };
+}
+
+/** The exact participant adapter consumed by Tarabalam and findMuhurta. */
+export function tbProfiles(): JourneyGuestProfile[] {
+  if (TB_PROFILE_CONTROLLER) return TB_PROFILE_CONTROLLER.getParticipants();
+
+  // A controller is installed during normal application startup. Keep the
+  // former inline form usable for older embed/bootstrap entry points without
+  // making it the owner of stable profile records again.
+  const saved = readLegacyGuestProfileRows(localStorage);
+  const participants: JourneyGuestProfile[] = [];
+  for (let index = 0; index < TB_LEGACY_ROWS; index += 1) {
+    const previous = saved[index] || {};
+    const nameInput = document.getElementById(`tb-name-${index}`) as HTMLInputElement | null;
+    const nakshatraInput = document.getElementById(`tb-nak-${index}`) as HTMLSelectElement | null;
+    const padaInput = document.getElementById(`tb-pada-${index}`) as HTMLSelectElement | null;
+    const lagnaInput = document.getElementById(`tb-lagna-${index}`) as HTMLSelectElement | null;
+    const rawNakshatra = nakshatraInput?.value ?? previous.nak;
+    const nakshatra = typeof rawNakshatra === 'string' && TB_NAKSHATRAS.includes(rawNakshatra)
+      ? rawNakshatra
       : '';
+    if (!nakshatra) continue;
+    const rawPada = padaInput?.value ?? previous.pada;
+    const padaNumber = Number(rawPada);
+    const pada = ([1, 2, 3, 4] as const).includes(padaNumber as 1 | 2 | 3 | 4)
+      ? padaNumber as 1 | 2 | 3 | 4
+      : null;
+    const rawLagna = lagnaInput?.value ?? previous.lagna;
+    const lagna = typeof rawLagna === 'string' && TB_RASIS.includes(rawLagna)
+      ? rawLagna
+      : null;
+    const rawName = nameInput?.value ?? previous.name;
+    const name = typeof rawName === 'string' && rawName.trim()
+      ? rawName.trim()
+      : (index === 0 ? 'You' : `Person ${index + 1}`);
+    participants.push({
+      id: typeof previous.id === 'string' ? previous.id : `legacy_${index}`,
+      name,
+      nak: nakshatra,
+      pada,
+      rasi: rasiFromStar(nakshatra, pada),
+      lagna,
+    });
+  }
+  return participants;
+}
+
+/**
+ * Bind stable local guest profiles to the existing Muhurtam participant root.
+ * Saved-profile choices persist by ID; one-off participants live only in this
+ * controller and are deliberately never written to the profile store.
+ */
+export function initTarabalamProfiles(
+  store: GuestProfileStore,
+  actions: TarabalamProfileActions,
+): TarabalamProfilesController {
+  TB_PROFILE_CONTROLLER?.destroy();
+
+  const root = document.querySelector<HTMLElement>('#tb-profiles');
+  if (!root) throw new Error('Muhurtam profile root #tb-profiles was not found');
+
+  const section = root.closest<HTMLElement>('.tb-section');
+  const legacyAddButton = section?.querySelector<HTMLButtonElement>('#tb-add-btn') || null;
+  const clearButton = section?.querySelector<HTMLButtonElement>('.tb-reset') || null;
+  const selectionStorage = tbSelectionStorage();
+  let snapshot = store.getSnapshot();
+  let selection = loadMuhurtamProfileSelection(selectionStorage, snapshot.profiles);
+  let manualParticipants: ManualParticipant[] = [];
+  let transientIssue: string | null = null;
+
+  const participantCount = (): number =>
+    selection.profiles.length + manualParticipants.filter((manual, index) =>
+      Boolean(tbManualProfile(manual, index))).length;
+
+  const occupiedSlots = (): number => selection.selectedIds.length + manualParticipants.length;
+
+  const restoreProfileSelectionFocus = (profileId: string): void => {
+    const target = Array.from(
+      root.querySelectorAll<HTMLInputElement>('input[data-profile-selection]'),
+    ).find(candidate => candidate.dataset.profileSelection === profileId);
+    target?.focus();
+  };
+
+  const restoreManualFieldFocus = (participantId: string, field: string): void => {
+    const target = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-manual-participant][data-manual-field]'),
+    ).find(candidate =>
+      candidate.dataset.manualParticipant === participantId &&
+      candidate.dataset.manualField === field);
+    target?.focus();
+  };
+
+  const selectionSummary = (): string => {
+    const saved = selection.profiles.length;
+    const manual = manualParticipants.filter((candidate, index) =>
+      Boolean(tbManualProfile(candidate, index))).length;
+    const total = saved + manual;
+    if (!total) return 'No participant screening is selected. Slots will use general Muhurtam rules.';
+    const parts: string[] = [];
+    if (saved) parts.push(`${saved} saved`);
+    if (manual) parts.push(`${manual} just for this search`);
+    return `${total} ${total === 1 ? 'participant' : 'participants'} selected · ${parts.join(', ')}.`;
+  };
+
+  const renderSavedProfile = (profile: Readonly<GuestProfile>): HTMLLIElement => {
+    const readiness = guestProfileReadiness(profile);
+    const item = tbNode('li', 'muhurta-profile-option');
+    item.dataset.profileId = profile.id;
+
+    const label = tbNode('label', 'muhurta-profile-option__label');
+    const checkbox = tbNode('input') as HTMLInputElement;
+    checkbox.type = 'checkbox';
+    checkbox.value = profile.id;
+    checkbox.checked = selection.selectedIds.includes(profile.id);
+    checkbox.disabled = !readiness.muhurta ||
+      (!checkbox.checked && occupiedSlots() >= MAX_GUEST_PROFILES);
+    checkbox.dataset.profileSelection = profile.id;
+
+    const identity = tbNode('span', 'muhurta-profile-option__identity');
+    const name = tbNode('strong', 'muhurta-profile-option__name', tbDisplayName(profile));
+    const details: string[] = [];
+    if (!readiness.muhurta) {
+      details.push('Needs Nakshatra before Muhurtam');
+    } else {
+      details.push(profile.pada
+        ? `${profile.nakshatra}, Padam ${profile.pada}`
+        : String(profile.nakshatra));
+      details.push(readiness.janmaRasi
+        ? `${readiness.janmaRasi} Janma Rashi`
+        : 'Add Padam to derive Janma Rashi');
+      if (profile.lagna) details.push(`${profile.lagna} Lagna`);
+    }
+    const detail = tbNode('span', 'muhurta-profile-option__details', details.join(' · '));
+    identity.append(name, detail);
+    label.append(checkbox, identity);
+
+    const edit = tbButton(
+      readiness.muhurta ? 'Edit' : 'Complete profile',
+      'tb-reset muhurta-profile-option__edit',
+    );
+    edit.setAttribute(
+      'aria-label',
+      readiness.muhurta
+        ? `Edit ${tbDisplayName(profile)}`
+        : `Complete ${tbDisplayName(profile)} profile`,
+    );
+    edit.dataset.action = 'edit-profile';
+    edit.addEventListener('click', event => {
+      actions.editProfile(profile.id, event.currentTarget as HTMLElement);
+    });
+    item.append(label, edit);
+
+    checkbox.addEventListener('change', () => {
+      const shouldRestoreFocus = document.activeElement === checkbox;
+      if (checkbox.checked && occupiedSlots() >= MAX_GUEST_PROFILES) {
+        transientIssue = `Choose up to ${MAX_GUEST_PROFILES} participants for one Muhurtam search.`;
+      } else {
+        transientIssue = null;
+        selection = toggleMuhurtamProfileSelection(
+          selectionStorage,
+          selection.selectedIds,
+          profile.id,
+          checkbox.checked,
+          snapshot.profiles,
+        );
+      }
+      controller.render();
+      if (shouldRestoreFocus) restoreProfileSelectionFocus(profile.id);
+    });
+
+    return item;
+  };
+
+  const labelledSelect = (
+    labelText: string,
+    value: string,
+    values: ReadonlyArray<readonly [string, string]>,
+    onChange: (value: string) => void,
+    participantId: string,
+    field: string,
+  ): HTMLLabelElement => {
+    const label = tbNode('label', 'muhurta-manual-field');
+    const text = tbNode('span', 'muhurta-manual-field__label', labelText);
+    const select = tbNode('select') as HTMLSelectElement;
+    for (const [optionValue, optionLabel] of values) {
+      tbAppendOption(select, optionValue, optionLabel);
+    }
+    select.value = value;
+    select.dataset.manualParticipant = participantId;
+    select.dataset.manualField = field;
+    select.addEventListener('change', () => {
+      const shouldRestoreFocus = document.activeElement === select;
+      onChange(select.value);
+      controller.render();
+      if (shouldRestoreFocus) restoreManualFieldFocus(participantId, field);
+    });
+    label.append(text, select);
+    return label;
+  };
+
+  const renderManualParticipant = (
+    participant: ManualParticipant,
+    index: number,
+  ): HTMLFieldSetElement => {
+    const fields = tbNode('fieldset', 'tb-profile-row muhurta-manual-profile');
+    fields.dataset.manualId = participant.id;
+    const legend = tbNode('legend', 'muhurta-manual-profile__legend', `Person ${index + 1} · just for this search`);
+
+    const nameLabel = tbNode('label', 'muhurta-manual-field');
+    const nameText = tbNode('span', 'muhurta-manual-field__label', 'Name');
+    const nameInput = tbNode('input') as HTMLInputElement;
+    nameInput.type = 'text';
+    nameInput.value = participant.name;
+    nameInput.placeholder = 'Optional';
+    nameInput.autocomplete = 'off';
+    nameInput.dataset.manualParticipant = participant.id;
+    nameInput.dataset.manualField = 'name';
+    nameInput.addEventListener('input', () => {
+      participant.name = nameInput.value;
+      const summary = root.querySelector<HTMLElement>('[data-muhurta-selection-summary]');
+      if (summary) summary.textContent = selectionSummary();
+    });
+    nameLabel.append(nameText, nameInput);
+
+    const nakshatra = labelledSelect(
+      'Birth star',
+      participant.nak,
+      [['', 'Choose Nakshatra'], ...TB_NAKSHATRAS.map(value => [value, value] as const)],
+      value => {
+        participant.nak = value;
+        if (!value) participant.pada = null;
+        transientIssue = null;
+      },
+      participant.id,
+      'nakshatra',
+    );
+    const padam = labelledSelect(
+      'Padam',
+      participant.pada ? String(participant.pada) : '',
+      [['', 'Not known'], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']],
+      value => {
+        participant.pada = value ? Number(value) as 1 | 2 | 3 | 4 : null;
+      },
+      participant.id,
+      'pada',
+    );
+    const lagna = labelledSelect(
+      'Lagna',
+      participant.lagna || '',
+      [['', 'Not known'], ...TB_RASIS.map(value => [value, value] as const)],
+      value => {
+        participant.lagna = value || null;
+      },
+      participant.id,
+      'lagna',
+    );
+
+    const adapted = tbManualProfile(participant, index);
+    let readinessText = 'Add a birth star to include this person in the search.';
+    if (adapted) {
+      const facts = ['Ready for Muhurtam'];
+      facts.push(adapted.rasi
+        ? `${adapted.rasi} Janma Rashi`
+        : 'Add Padam to derive Janma Rashi');
+      if (adapted.lagna) facts.push(`${adapted.lagna} Lagna`);
+      readinessText = facts.join(' · ');
+    }
+    const readiness = tbNode('p', 'muhurta-manual-profile__readiness', readinessText);
+    readiness.setAttribute('aria-live', 'polite');
+
+    const remove = tbButton(`Remove person ${index + 1}`, 'tb-remove');
+    remove.dataset.action = 'remove-manual';
+    remove.addEventListener('click', () => controller.removeManualParticipant(index));
+    fields.append(legend, nameLabel, nakshatra, padam, lagna, readiness, remove);
+    return fields;
+  };
+
+  const addManualParticipant = (): void => {
+    if (occupiedSlots() >= MAX_GUEST_PROFILES) {
+      transientIssue = `Choose up to ${MAX_GUEST_PROFILES} participants for one Muhurtam search.`;
+      controller.render();
+      return;
+    }
+    TB_MANUAL_SEQUENCE += 1;
+    manualParticipants.push({
+      id: `manual_${TB_MANUAL_SEQUENCE}`,
+      name: '',
+      nak: '',
+      pada: null,
+      lagna: null,
+    });
+    transientIssue = null;
+    controller.render();
+  };
+
+  const clearParticipants = (): void => {
+    selection = saveMuhurtamProfileSelection(selectionStorage, [], snapshot.profiles);
+    manualParticipants = [];
+    transientIssue = null;
+    TB_DAYS = null;
+    TB_EVENTS = null;
+    MU_LAST = null;
+    for (const id of ['tb-summary', 'tb-result', 'mu-context', 'mu-result']) {
+      const target = document.getElementById(id);
+      if (target) target.replaceChildren();
+    }
+    controller.render();
+  };
+
+  const onLegacyAdd = (event: Event): void => {
+    event.preventDefault();
+    addManualParticipant();
+  };
+  const onClear = (event: Event): void => {
+    event.preventDefault();
+    clearParticipants();
+  };
+
+  // The old inline controls remain in the HTML for compatibility while the
+  // panel markup is being migrated. Their behaviour is now session-scoped.
+  if (legacyAddButton) {
+    legacyAddButton.removeAttribute('onclick');
+    legacyAddButton.hidden = true;
+    legacyAddButton.addEventListener('click', onLegacyAdd);
+  }
+  if (clearButton) {
+    clearButton.removeAttribute('onclick');
+    clearButton.textContent = 'clear selection';
+    clearButton.title = 'Clear participants from this search';
+    clearButton.addEventListener('click', onClear);
+  }
+
+  const controller: InternalTarabalamProfilesController = {
+    render(): void {
+      snapshot = store.getSnapshot();
+      root.replaceChildren();
+
+      const intro = tbNode(
+        'p',
+        'muhurta-profile-intro',
+        'Choose saved profiles, or add someone just for this search. Saved profiles stay only in this browser.',
+      );
+      const summary = tbNode('p', 'muhurta-profile-summary', selectionSummary());
+      summary.dataset.muhurtaSelectionSummary = '';
+      summary.setAttribute('aria-live', 'polite');
+      root.append(intro, summary);
+
+      const storeIssue = tbProfileStoreIssue(snapshot);
+      for (const message of [storeIssue, selection.message, transientIssue].filter(Boolean)) {
+        const notice = tbNode('p', 'preview-error muhurta-profile-notice', message as string);
+        notice.setAttribute('role', 'status');
+        root.append(notice);
+      }
+
+      if (snapshot.profiles.length) {
+        const fieldset = tbNode('fieldset', 'muhurta-saved-profiles');
+        const legend = tbNode('legend', 'muhurta-saved-profiles__legend', 'Saved profiles');
+        const list = tbNode('ul', 'muhurta-saved-profiles__list');
+        for (const profile of snapshot.profiles) list.append(renderSavedProfile(profile));
+        fieldset.append(legend, list);
+        root.append(fieldset);
+      } else {
+        root.append(tbNode(
+          'p',
+          'muhurta-profile-empty',
+          'No saved profiles yet. You can still search without personal screening or add someone for this search.',
+        ));
+      }
+
+      if (manualParticipants.length) {
+        const manual = tbNode('div', 'muhurta-manual-profiles');
+        const heading = tbNode('h3', 'muhurta-manual-profiles__title', 'Just for this search');
+        manual.append(heading);
+        manualParticipants.forEach((participant, index) => {
+          manual.append(renderManualParticipant(participant, index));
+        });
+        root.append(manual);
+      }
+
+      const actionsRow = tbNode('div', 'muhurta-profile-actions');
+      const addManual = tbButton('Add someone for this search');
+      addManual.dataset.action = 'add-manual';
+      addManual.disabled = occupiedSlots() >= MAX_GUEST_PROFILES;
+      addManual.addEventListener('click', addManualParticipant);
+      const create = tbButton('Create saved profile', 'tb-add muhurta-profile-create');
+      create.dataset.action = 'create-profile';
+      create.disabled = snapshot.profiles.length >= MAX_GUEST_PROFILES;
+      create.addEventListener('click', event => {
+        actions.createProfile(event.currentTarget as HTMLElement);
+      });
+      const manage = tbButton('Manage profiles', 'tb-reset muhurta-profile-manage');
+      manage.dataset.action = 'manage-profiles';
+      manage.addEventListener('click', event => {
+        actions.manageProfiles(event.currentTarget as HTMLElement);
+      });
+      actionsRow.append(addManual, create, manage);
+      root.append(actionsRow);
+
+      root.dataset.selectedCount = String(participantCount());
+    },
+    destroy(): void {
+      unsubscribe();
+      legacyAddButton?.removeEventListener('click', onLegacyAdd);
+      clearButton?.removeEventListener('click', onClear);
+      if (TB_PROFILE_CONTROLLER === controller) TB_PROFILE_CONTROLLER = null;
+    },
+    getParticipants(): JourneyGuestProfile[] {
+      const saved = selection.profiles.map(profile => ({ ...profile }));
+      const manual = manualParticipants
+        .map(tbManualProfile)
+        .filter((profile): profile is JourneyGuestProfile => profile !== null);
+      return [...saved, ...manual].slice(0, MAX_GUEST_PROFILES);
+    },
+    getSelectedIds(): string[] {
+      return [...selection.selectedIds];
+    },
+    selectProfile(id: string): boolean {
+      snapshot = store.getSnapshot();
+      const profile = snapshot.profiles.find(candidate => candidate.id === id);
+      if (!profile) {
+        transientIssue = 'That saved profile is no longer available.';
+        controller.render();
+        return false;
+      }
+      if (!guestProfileReadiness(profile).muhurta) {
+        transientIssue = 'Complete this profile with a birth star before using it for Muhurtam.';
+        controller.render();
+        return false;
+      }
+      if (selection.selectedIds.includes(id)) {
+        transientIssue = null;
+        controller.render();
+        return true;
+      }
+      if (occupiedSlots() >= MAX_GUEST_PROFILES) {
+        transientIssue = `Choose up to ${MAX_GUEST_PROFILES} participants for one Muhurtam search.`;
+        controller.render();
+        return false;
+      }
+
+      selection = toggleMuhurtamProfileSelection(
+        selectionStorage,
+        selection.selectedIds,
+        id,
+        true,
+        snapshot.profiles,
+      );
+      const selected = selection.selectedIds.includes(id);
+      transientIssue = selected
+        ? null
+        : selection.message || 'That profile could not be added to this Muhurtam search.';
+      controller.render();
+      if (selected) restoreProfileSelectionFocus(id);
+      return selected;
+    },
+    addManualParticipant,
+    removeManualParticipant(index: number): void {
+      if (index < 0 || index >= manualParticipants.length) return;
+      manualParticipants.splice(index, 1);
+      transientIssue = null;
+      controller.render();
+    },
+    clearParticipants,
+  };
+
+  const unsubscribe = store.subscribe(nextSnapshot => {
+    snapshot = nextSnapshot;
+    selection = loadMuhurtamProfileSelection(selectionStorage, snapshot.profiles);
+    const availableManualSlots = Math.max(0, MAX_GUEST_PROFILES - selection.selectedIds.length);
+    if (manualParticipants.length > availableManualSlots) {
+      manualParticipants = manualParticipants.slice(0, availableManualSlots);
+      transientIssue = `Choose up to ${MAX_GUEST_PROFILES} participants for one Muhurtam search.`;
+    }
+    controller.render();
+  });
+
+  TB_PROFILE_CONTROLLER = controller;
+  controller.render();
+  return controller;
+}
+
+// Compatibility exports for the existing main.ts globals while the static
+// inline form is retired. Normal startup delegates to the stable-ID
+// controller; a narrowly scoped fallback keeps older bootstrap entry points
+// functional without rewriting hidden or future-schema legacy rows.
+function tbRenderProfileInputs(): void {
+  if (TB_PROFILE_CONTROLLER) {
+    TB_PROFILE_CONTROLLER.render();
+    return;
+  }
+
+  const saved = readLegacyGuestProfileRows(localStorage);
+  TB_LEGACY_ROWS = Math.max(
+    TB_LEGACY_ROWS,
+    Math.min(MAX_GUEST_PROFILES, saved.filter(value => value && (value.nak || value.name)).length || 1),
+  );
+  const root = document.getElementById('tb-profiles');
+  if (!root) return;
+  let html = '';
+  for (let index = 0; index < TB_LEGACY_ROWS; index += 1) {
+    const v = saved[index] || { name: '', nak: '', pada: '', lagna: '' };
+    const nakshatraOptions = ['<option value="">birth star</option>']
+      .concat(TB_NAKSHATRAS.map(value =>
+        `<option value="${value}" ${value === v.nak ? 'selected' : ''}>${value}</option>`))
+      .join('');
+    const padaOptions = ['<option value="">padam?</option>']
+      .concat([1, 2, 3, 4].map(value =>
+        `<option value="${value}" ${String(value) === String(v.pada) ? 'selected' : ''}>${value}</option>`))
+      .join('');
+    const lagnaOptions = ['<option value="">lagna? (optional)</option>']
+      .concat(TB_RASIS.map(value =>
+        `<option value="${value}" ${value === v.lagna ? 'selected' : ''}>${value}</option>`))
+      .join('');
     html += `<div class="tb-profile-row">
-      <input type="text" id="tb-name-${i}" placeholder="${i === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${v.name || ''}" onchange="tbSaveProfiles()">
-      <select id="tb-nak-${i}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${opts}</select>
-      <select id="tb-pada-${i}" style="min-width:90px;" title="Padam (quarter) of the birth star, needed only when the star spans two rashis" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOpts}</select>
-      <select id="tb-lagna-${i}" style="min-width:130px;" title="Janma Lagna: the rising sign at the moment of birth. Leave blank if you don't know it; we'll use your janma rashi instead for muhurta scoring." onchange="tbSaveProfiles();">${lagnaOpts}</select>
-      ${rasiNote}
-      ${i === 0 ? '' : `<button class="tb-remove" title="Remove" onclick="tbRemoveRow(${i})">✕</button>`}
+      <input type="text" id="tb-name-${index}" placeholder="${index === 0 ? 'Your name (optional)' : 'Name (optional)'}" value="${htmlEsc(v.name || '')}" onchange="tbSaveProfiles()">
+      <select id="tb-nak-${index}" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${nakshatraOptions}</select>
+      <select id="tb-pada-${index}" title="Padam (quarter) of the birth star" onchange="tbSaveProfiles(); tbRenderProfileInputs();">${padaOptions}</select>
+      <select id="tb-lagna-${index}" title="Janma Lagna (optional)" onchange="tbSaveProfiles();">${lagnaOptions}</select>
+      ${index === 0 ? '' : `<button type="button" class="tb-remove" title="Remove" onclick="tbRemoveRow(${index})">Remove</button>`}
     </div>`;
   }
-  wrap.innerHTML = html;
-  document.getElementById('tb-add-btn').style.display = TB_ROWS < 4 ? '' : 'none';
+  root.innerHTML = html;
+  const addButton = document.getElementById('tb-add-btn');
+  if (addButton) addButton.style.display = TB_LEGACY_ROWS < MAX_GUEST_PROFILES ? '' : 'none';
 }
 
-function tbResetProfiles() {
-  if (!confirm('Forget all saved people and choices on this device?')) return;
-  localStorage.removeItem('tc-tb-profiles');
-  localStorage.removeItem('tc-go-view');
-  localStorage.removeItem('tc-go-rasi');
-  TB_ROWS = 1;
+function tbSaveProfiles(): boolean {
+  if (TB_PROFILE_CONTROLLER) return true;
+
+  if (tbHasBirthProfileStorage()) return false;
+
+  const existing = readLegacyGuestProfileRows(localStorage);
+  const fields = [];
+  for (let index = 0; index < TB_LEGACY_ROWS; index += 1) {
+    const previous = existing[index] || {};
+    const lagnaInput = document.getElementById(`tb-lagna-${index}`) as HTMLSelectElement | null;
+    const row = mergeLegacyGuestProfileRow(previous, {
+      name: (document.getElementById(`tb-name-${index}`) as HTMLInputElement | null)?.value || '',
+      nak: (document.getElementById(`tb-nak-${index}`) as HTMLSelectElement | null)?.value || '',
+      pada: (document.getElementById(`tb-pada-${index}`) as HTMLSelectElement | null)?.value || '',
+      lagna: lagnaInput?.value || '',
+    });
+    fields.push({
+      name: row.name || '',
+      nak: row.nak || '',
+      pada: row.pada || '',
+      lagna: row.lagna || '',
+    });
+  }
+  writeLegacyGuestProfileRows(localStorage, fields);
+  return true;
+}
+
+function tbHasBirthProfileStorage(): boolean {
+  try {
+    return localStorage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY) !== null
+      || localStorage.getItem(GUEST_PROFILE_COMMIT_STORAGE_KEY) !== null;
+  } catch {
+    return true;
+  }
+}
+
+function tbResetProfiles(): void {
+  if (TB_PROFILE_CONTROLLER) {
+    TB_PROFILE_CONTROLLER.clearParticipants();
+    return;
+  }
+  localStorage.removeItem(GUEST_BIRTH_PROFILE_STORAGE_KEY);
+  localStorage.removeItem(GUEST_PROFILE_COMMIT_STORAGE_KEY);
+  localStorage.removeItem(GUEST_PROFILE_STORAGE_KEY);
+  TB_LEGACY_ROWS = 1;
   TB_DAYS = null;
+  TB_EVENTS = null;
+  MU_LAST = null;
   tbRenderProfileInputs();
-  document.getElementById('tb-summary').innerHTML = '';
-  document.getElementById('tb-result').innerHTML = '';
-  if (goHasData()) { goBuildViewSelect(); renderGochara(); }
+  for (const id of ['tb-summary', 'tb-result', 'mu-context', 'mu-result']) {
+    document.getElementById(id)?.replaceChildren();
+  }
 }
 
-function tbAddRow() {
-  tbSaveProfiles();
-  TB_ROWS = Math.min(4, TB_ROWS + 1);
+function tbAddRow(): void {
+  if (TB_PROFILE_CONTROLLER) {
+    TB_PROFILE_CONTROLLER.addManualParticipant();
+    return;
+  }
+  if (!tbSaveProfiles()) return;
+  TB_LEGACY_ROWS = Math.min(MAX_GUEST_PROFILES, TB_LEGACY_ROWS + 1);
   tbRenderProfileInputs();
 }
 
-function tbRemoveRow(i) {
-  const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
-  saved.splice(i, 1);
-  localStorage.setItem('tc-tb-profiles', JSON.stringify(saved));
-  TB_ROWS = Math.max(1, TB_ROWS - 1);
+function tbRemoveRow(index: number): void {
+  if (TB_PROFILE_CONTROLLER) {
+    TB_PROFILE_CONTROLLER.removeManualParticipant(index);
+    return;
+  }
+  const saved = readLegacyGuestProfileRows(localStorage);
+  if (index < 0 || index >= saved.length) return;
+  if (tbHasBirthProfileStorage()) return;
+  removeLegacyGuestProfileRow(localStorage, index);
+  TB_LEGACY_ROWS = Math.max(1, TB_LEGACY_ROWS - 1);
   tbRenderProfileInputs();
 }
 
@@ -213,11 +850,19 @@ async function calcTarabalam() {
 }
 
 let TB_SHOW_ALL = false;  // default: only favourable days
-let TB_MODE = localStorage.getItem('tc-tb-mode') || 'stars';
+let TB_MODE = (() => {
+  try {
+    return typeof window === 'undefined'
+      ? 'stars'
+      : window.localStorage?.getItem('tc-tb-mode') || 'stars';
+  } catch {
+    return 'stars';
+  }
+})();
 
 function tbSetMode(m) {
   TB_MODE = m;
-  localStorage.setItem('tc-tb-mode', m);
+  try { window.localStorage?.setItem('tc-tb-mode', m); } catch { /* session only */ }
   if (TB_DAYS) renderTarabalam();
 }
 
@@ -1371,17 +2016,20 @@ function renderMuhurta() {
   const renderSlot = (s, i) => {
     const rg = s.reasonGroups;
     const groupsHtml = rg
-      ? `<div class="mu-rgroups">
-           ${renderGroup('Slot quality', rg.slot_quality)}
-           ${renderGroup('Day quality', rg.day_quality)}
-           ${renderGroup('Group fit', rg.group_fit)}
-           ${renderGroup('Activity', rg.activity_match)}
-           ${renderChartValidation(rg.chart_validation)}
-           ${renderGroup('About this election', rg.information, 'mu-rg-information')}
-           ${renderGroup('Practical checks', rg.practical, 'mu-rg-practical')}
-           ${renderGroup('Important nuance', rg.notes, 'mu-rg-notes')}
-         </div>`
-      : `<span class="mu-reasons">${s.reasons.join(' · ')}</span>`;
+      ? `<details class="mu-reason-details">
+           <summary>Why this slot earned its ${s.tier || muScoreTier(s.score)} rating</summary>
+           <div class="mu-rgroups">
+             ${renderGroup('Slot quality', rg.slot_quality)}
+             ${renderGroup('Day quality', rg.day_quality)}
+             ${renderGroup('Group fit', rg.group_fit)}
+             ${renderGroup('Activity', rg.activity_match)}
+             ${renderChartValidation(rg.chart_validation)}
+             ${renderGroup('About this election', rg.information, 'mu-rg-information')}
+             ${renderGroup('Practical checks', rg.practical, 'mu-rg-practical')}
+             ${renderGroup('Important nuance', rg.notes, 'mu-rg-notes')}
+           </div>
+         </details>`
+      : `<details class="mu-reason-details"><summary>Why this slot ranked here</summary><span class="mu-reasons">${s.reasons.join(' · ')}</span></details>`;
     const tier = s.tier || muScoreTier(s.score);
     const tierClass = `mu-tier-${tier.toLowerCase()}`;
     const dc = s.dayCtx;
@@ -1419,7 +2067,8 @@ function renderMuhurta() {
             </div>`;
   };
   box.innerHTML =
-    `<div class="tb-summary">⏱ <span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found · best first${share}</div>`
+    `<div class="tb-summary"><span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found · ranked by tier, then score${share}</div>`
+    + `<p class="mu-ranking-note">Excellent slots appear before Good ones; score orders slots within each tier. A named caution can cap a high-scoring slot below Excellent.</p>`
     + top.map(renderSlot).join('')
     + droppedHtml
     + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across

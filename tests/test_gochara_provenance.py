@@ -75,6 +75,16 @@ def test_browser_named_shani_conditions_use_only_the_moon_reference():
     assert 'shaniConditionFromMoonHouse(houseFromRef(shaniIdx, jl))' not in frontend
 
 
+def test_browser_daily_horoscope_uses_only_the_documented_moon_reference():
+    frontend = (ROOT / 'src/panels/gochara.ts').read_text(encoding='utf-8')
+    assert 'Daily Horoscope is Moon-sign based' in frontend
+    assert 'from your lagna' not in frontend.lower()
+    assert 'from lagna' not in frontend.lower()
+    assert 'occLagna' not in frontend
+    assert 'verdictsBoth' not in frontend
+    assert 'Janma-Rashi transit rules' in frontend
+
+
 def test_llm_prose_cannot_inherit_transit_authority():
     claim = _claims()[LLM_PHALALU_PROVENANCE]
     assert claim['surface'] == 'daily_horoscope'

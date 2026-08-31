@@ -15,6 +15,11 @@ Visit the landing page to pick your city and calculation system and copy your `w
 The site is also a daily toolkit: **Today's Panchangam** (any date, any city), **Tarabalam · Muhurtam**
 (good days and ranked time slots for up to four people by birth star, with Chandrabalam), and the
 **Gochara chart with Rasi Phalalu** (South Indian chart, transit verdicts and a computed daily reading).
+Guests can also create browser-local profiles from known astrology details. Local development and an
+explicitly activated public build can calculate Nakshatra, Padam, Janma Rashi, Lagna, and a reviewable
+D1 chart from date, exact time, and birthplace. Public builds fail closed until the licensed calculation
+service and place provider are approved; saved calculated profiles remain viewable. The name never leaves
+the browser. See the [calculation and privacy contract](docs/reference/53-birth-profile-calculation.md).
 Everything is shareable to WhatsApp.
 
 <details>

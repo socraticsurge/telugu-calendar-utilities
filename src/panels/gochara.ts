@@ -10,6 +10,21 @@ import { RASI_NAMES, rasiFromStar } from '../data/rasis';
 import { MU_CHANDRA_GOOD, MU_CHANDRA_PUJA } from '../muhurta-scorer';
 import { selEl } from '../lib/dom';
 import { shaniConditionFromMoonHouse, shaniConditionLine } from '../shani-conditions';
+import {
+  canonicalLegacyGuestProfileLagna,
+  guestProfileReadiness,
+  readLegacyGuestProfileRows,
+  type GuestProfile,
+  type GuestProfileStore,
+  type ProfileStorage,
+} from '../lib/guest-profile-store';
+import {
+  GOCHARA_SELECTION_STORAGE_KEY,
+  gocharaProfileValue,
+  loadGocharaSelection,
+  resolveGocharaSelection,
+  type GocharaSelectionResolution,
+} from '../lib/profile-selection';
 
 // Chandrabalam house sets — same classical table the muhurta scorer pins.
 const CHANDRA_GOOD = MU_CHANDRA_GOOD;
@@ -27,6 +42,218 @@ const GO_NODES = new Set(['Rahu','Ketu']);
 let GO_DATA = null;
 let LLM_PHALALU = null;
 
+export interface GocharaProfileActions {
+  createProfile(trigger: HTMLElement): void;
+  editProfile(id: string, trigger: HTMLElement): void;
+  manageProfiles(trigger: HTMLElement): void;
+}
+
+export interface GocharaProfilesController {
+  refresh(): void;
+  selectProfile(id: string): boolean;
+  destroy(): void;
+}
+
+let gocharaProfileStore: GuestProfileStore | null = null;
+let gocharaProfileActions: GocharaProfileActions | null = null;
+let destroyGocharaProfiles: (() => void) | null = null;
+
+const unavailableSelectionStorage: ProfileStorage = {
+  getItem() { throw new Error('storage unavailable'); },
+  setItem() { throw new Error('storage unavailable'); },
+};
+
+function goSelectionStorage(): ProfileStorage {
+  try {
+    return globalThis.localStorage || unavailableSelectionStorage;
+  } catch {
+    return unavailableSelectionStorage;
+  }
+}
+
+function persistGocharaSelection(value: string): boolean {
+  try {
+    goSelectionStorage().setItem(GOCHARA_SELECTION_STORAGE_KEY, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function profileDisplayName(profile: Readonly<GuestProfile>): string {
+  return profile.name || 'Unnamed profile';
+}
+
+function option(
+  value: string,
+  label: string,
+  disabled = false,
+): HTMLOptionElement {
+  const node = document.createElement('option');
+  node.value = value;
+  node.textContent = label;
+  node.disabled = disabled;
+  return node;
+}
+
+function stateAction(
+  label: string,
+  action: 'create' | 'edit' | 'manage',
+  callback: (trigger: HTMLButtonElement) => void,
+  primary = false,
+  profileId: string | null = null,
+): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `go-profile-action go-profile-action--${primary ? 'primary' : 'secondary'}`;
+  button.dataset.goProfileAction = action;
+  button.dataset.goProfileFocus = profileId ? `${action}:${profileId}` : action;
+  if (profileId) button.dataset.goProfileId = profileId;
+  button.textContent = label;
+  button.addEventListener('click', () => callback(button));
+  return button;
+}
+
+function profileIdFromSelection(value: string | null): string | null {
+  const match = value?.match(/^profile:(.+)$/);
+  return match ? match[1] : null;
+}
+
+function renderGocharaProfileState(
+  resolution: GocharaSelectionResolution,
+  selectionStorageUnavailable = false,
+): void {
+  const root = document.getElementById('go-profile-state');
+  if (!root) return;
+  const active = document.activeElement;
+  const focusKey = active instanceof HTMLElement && root.contains(active)
+    ? active.dataset.goProfileFocus || null
+    : null;
+  root.replaceChildren();
+
+  const snapshot = gocharaProfileStore?.getSnapshot();
+  const profiles = snapshot?.profiles || [];
+  const requestedProfileId = profileIdFromSelection(resolution.requestedValue);
+  const requestedProfile = requestedProfileId
+    ? profiles.find(profile => profile.id === requestedProfileId) || null
+    : null;
+
+  const addNotice = (message: string): void => {
+    const notice = document.createElement('p');
+    notice.className = 'go-profile-notice';
+    notice.setAttribute('role', 'status');
+    notice.textContent = message;
+    root.append(notice);
+  };
+  const addContext = (message: string): void => {
+    const context = document.createElement('p');
+    context.className = 'go-profile-context';
+    context.textContent = message;
+    root.append(context);
+  };
+  const addActions = (...buttons: HTMLButtonElement[]): void => {
+    if (!buttons.length) return;
+    const actions = document.createElement('div');
+    actions.className = 'go-profile-actions';
+    actions.append(...buttons);
+    root.append(actions);
+  };
+  const addIncompleteProfileActions = (excludeId: string | null = null): void => {
+    if (!gocharaProfileActions) return;
+    const buttons = profiles.flatMap(profile => {
+      if (profile.id === excludeId) return [];
+      const readiness = guestProfileReadiness(profile);
+      if (readiness.horoscope) return [];
+      const missing = readiness.missingForHoroscope === 'pada' ? 'Padam' : 'Nakshatra';
+      return [stateAction(
+        `Complete ${profileDisplayName(profile)} · Needs ${missing}`,
+        'edit',
+        trigger => gocharaProfileActions?.editProfile(profile.id, trigger),
+        false,
+        profile.id,
+      )];
+    });
+    addActions(...buttons);
+  };
+  const restoreActionFocus = (): void => {
+    if (!focusKey) return;
+    const replacement = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-go-profile-focus]'),
+    ).find(candidate => candidate.dataset.goProfileFocus === focusKey);
+    replacement?.focus();
+  };
+
+  if (resolution.fallback) addNotice(resolution.fallback.message);
+  if (
+    !resolution.fallback &&
+    (selectionStorageUnavailable || snapshot?.persistence === 'memory')
+  ) {
+    addNotice('Your horoscope choice works for this page, but this browser cannot save it.');
+  }
+
+  if (requestedProfile && resolution.fallback?.code === 'profile-not-horoscope-ready') {
+    const missing = resolution.fallback.missingField === 'pada' ? 'Padam' : 'Nakshatra';
+    addContext(`Add ${missing} to ${profileDisplayName(requestedProfile)} before using this profile here.`);
+    if (gocharaProfileActions) {
+      addActions(
+        stateAction(
+          `Complete ${profileDisplayName(requestedProfile)}`,
+          'edit',
+          trigger => gocharaProfileActions?.editProfile(requestedProfile.id, trigger),
+          true,
+          requestedProfile.id,
+        ),
+        stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
+      );
+    }
+    addIncompleteProfileActions(requestedProfile.id);
+    restoreActionFocus();
+    return;
+  }
+
+  if (resolution.kind === 'profile' && resolution.profile) {
+    addContext(
+      `Using ${resolution.profile.name || 'this profile'}'s saved birth star: ${resolution.profile.rasi} Janma Rashi. ` +
+      'Daily Horoscope is Moon-sign based; Lagna stays with the profile for supported natal-chart details and Muhurtam.',
+    );
+    if (gocharaProfileActions) {
+      addActions(
+        stateAction(
+          `Edit ${resolution.profile.name || 'profile'}`,
+          'edit',
+          trigger => gocharaProfileActions?.editProfile(resolution.profile!.id, trigger),
+          false,
+          resolution.profile.id,
+        ),
+        stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
+      );
+    }
+    addIncompleteProfileActions();
+    restoreActionFocus();
+    return;
+  }
+
+  if (profiles.length === 0) {
+    addContext('Create a profile to reuse a birth star here and in Muhurtam. It stays only in this browser.');
+    if (gocharaProfileActions) {
+      addActions(stateAction('Create profile', 'create', trigger => gocharaProfileActions?.createProfile(trigger), true));
+    }
+    restoreActionFocus();
+    return;
+  }
+
+  if (resolution.kind === 'rashi') {
+    addContext('This is a one-off Rashi view. Choose a saved profile above to return to a personal horoscope faster.');
+  } else {
+    addContext('Choose a saved profile above for a personal Daily Horoscope, or select any Rashi for a one-off view.');
+  }
+  if (gocharaProfileActions) {
+    addActions(stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)));
+  }
+  addIncompleteProfileActions();
+  restoreActionFocus();
+}
+
 async function loadGochara() {
   const firstLoad = !GO_DATA;
   if (firstLoad) {
@@ -40,24 +267,21 @@ async function loadGochara() {
     }
     // date input removed — always show today
 
-    // Fetch today's LLM-generated phalalu — silently skip if unavailable
+    // Fetch the stable latest artifact and use it only when it belongs to
+    // today. Requesting a date-shaped path made the normal deterministic
+    // fallback emit a browser 404 on every day without an interpretation.
     try {
       const d = new Date();
       const todayISO = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const pr = await fetch(`rasi_phalalu/${todayISO}.json`, { cache: 'no-cache' });
-      if (pr.ok) LLM_PHALALU = await pr.json();
+      const pr = await fetch('rasi_phalalu/latest.json', { cache: 'no-cache' });
+      if (pr.ok) {
+        const candidate = await pr.json();
+        if (candidate?.date === todayISO) LLM_PHALALU = candidate;
+      }
     } catch (_) { /* no LLM phalalu today — computed fallback will be used */ }
   }
-  // people may have changed in the Tarabalam tab — rebuild, keep selection
-  const sel = selEl('go-view');
-  let keep = firstLoad ? localStorage.getItem('tc-go-view') : sel.value;
-  // An earlier iteration of this PR had separate 'p<i>r' / 'p<i>l'
-  // options; we collapsed those into a single 'p<i>' combined
-  // option. Strip the suffix on load so test users who saved a
-  // suffixed value during the iteration don't end up unselected.
-  if (keep && /^p\d+[rl]$/.test(keep)) keep = keep.slice(0, -1);
+  // Profiles may have changed elsewhere; rebuild from the subscribed store.
   goBuildViewSelect();
-  if (keep && [...sel.options].some(o => o.value === keep)) sel.value = keep;
   renderGochara();
 }
 
@@ -81,14 +305,21 @@ function goTill(idx, gi) {
 }
 
 function goSavedPeople() {
-  const saved = JSON.parse(localStorage.getItem('tc-tb-profiles') || '[]');
+  let saved: ReturnType<typeof readLegacyGuestProfileRows>;
+  try {
+    // Keep the compatibility boundary explicit for corrupt legacy payloads;
+    // the outer guard also covers browsers that deny the localStorage getter.
+    saved = readLegacyGuestProfileRows(localStorage);
+  } catch {
+    saved = [];
+  }
   return saved.map((v, i) => {
     if (!v || !v.nak) return null;
     const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
     if (!rasi) return null;
-    // Janma lagna is optional — only surfaced as a separate view
-    // option when the user has filled it on the Tarabalam profile.
-    const lagna = v.lagna || null;
+    // Lagna remains a factual profile detail in the selector; the surrounding
+    // context makes clear that Daily Horoscope itself uses Janma Rashi only.
+    const lagna = canonicalLegacyGuestProfileLagna(v.lagna);
     return {
       name: (v.name || (i === 0 ? 'You' : `Person ${i+1}`)),
       rasi,
@@ -97,48 +328,201 @@ function goSavedPeople() {
   }).filter(Boolean);
 }
 
-function goBuildViewSelect() {
-  const sel = selEl('go-view');
-  const people = goSavedPeople();
-  let html = '<option value="">Transits only — whole sky</option>';
-  if (people.length) {
-    // One row per person — when janma lagna is also on the profile,
-    // the row label says so. The chart then uses BOTH references to
-    // verdict each graha; you don't pick rashi-or-lagna, you get
-    // the personalised combined view.
-    const rows = people.map((k, i) => {
-      const refs = k.lagna
-        ? `${htmlEsc(k.rasi)} rashi + ${htmlEsc(k.lagna)} lagna`
-        : `${htmlEsc(k.rasi)} rashi`;
-      return `<option value="p${i}">${htmlEsc(k.name)} · ${refs}</option>`;
-    });
-    html += '<optgroup label="Your saved people">' + rows.join('') + '</optgroup>';
+function stableProfileOption(profile: Readonly<GuestProfile>): HTMLOptionElement {
+  const readiness = guestProfileReadiness(profile);
+  const name = profileDisplayName(profile);
+  if (!readiness.horoscope) {
+    const missing = readiness.missingForHoroscope === 'pada' ? 'Padam' : 'Nakshatra';
+    return option(gocharaProfileValue(profile.id), `${name} · Needs ${missing}`, true);
   }
-  html += '<optgroup label="Any rashi">' +
-    GO_DATA.rasis.map((r, i) => `<option value="${i}">${r}</option>`).join('') + '</optgroup>';
-  sel.innerHTML = html;
+  const refs = profile.lagna
+    ? `${readiness.janmaRasi} Rashi + ${profile.lagna} Lagna`
+    : `${readiness.janmaRasi} Rashi`;
+  return option(gocharaProfileValue(profile.id), `${name} · ${refs}`);
+}
+
+function buildStableViewSelect(preferredValue?: string): GocharaSelectionResolution {
+  const sel = selEl('go-view');
+  const snapshot = gocharaProfileStore!.getSnapshot();
+  const hadOptions = sel.options.length > 0;
+  let selectionStorageUnavailable = false;
+  let resolution: GocharaSelectionResolution;
+
+  if (preferredValue === undefined && !hadOptions) {
+    const loaded = loadGocharaSelection(goSelectionStorage(), snapshot.profiles);
+    resolution = loaded;
+    selectionStorageUnavailable = loaded.storageIssue === 'storage-unavailable';
+  } else {
+    const requestedValue = preferredValue === undefined ? sel.value : preferredValue;
+    resolution = resolveGocharaSelection(requestedValue, snapshot.profiles);
+    selectionStorageUnavailable = !persistGocharaSelection(resolution.value);
+  }
+
+  const wholeSky = option('', 'Transits only — whole sky');
+  const nodes: Array<HTMLOptionElement | HTMLOptGroupElement> = [wholeSky];
+  if (snapshot.profiles.length) {
+    const saved = document.createElement('optgroup');
+    saved.label = 'Saved profiles';
+    for (const profile of snapshot.profiles) saved.append(stableProfileOption(profile));
+    nodes.push(saved);
+  }
+  const anyRashi = document.createElement('optgroup');
+  anyRashi.label = 'Any Rashi';
+  RASI_NAMES.forEach((rasi, index) => anyRashi.append(option(String(index), rasi)));
+  nodes.push(anyRashi);
+  sel.replaceChildren(...nodes);
+  sel.value = [...sel.options].some(candidate => candidate.value === resolution.value)
+    ? resolution.value
+    : '';
+  renderGocharaProfileState(resolution, selectionStorageUnavailable);
+  return resolution;
+}
+
+function buildLegacyViewSelect(): void {
+  const sel = selEl('go-view');
+  const hadOptions = sel.options.length > 0;
+  let keep = hadOptions ? sel.value : null;
+  if (!hadOptions) {
+    try {
+      keep = goSelectionStorage().getItem(GOCHARA_SELECTION_STORAGE_KEY);
+    } catch {
+      keep = null;
+    }
+  }
+  // An earlier iteration stored separate rashi/lagna suffixes. The combined
+  // legacy option remains available until the profile store initializes.
+  if (keep && /^p\d+[rl]$/.test(keep)) keep = keep.slice(0, -1);
+  const people = goSavedPeople();
+  const nodes: Array<HTMLOptionElement | HTMLOptGroupElement> = [
+    option('', 'Transits only — whole sky'),
+  ];
+  if (people.length) {
+    const saved = document.createElement('optgroup');
+    saved.label = 'Your saved people';
+    people.forEach((person, index) => {
+      const refs = person.lagna
+        ? `${person.rasi} Rashi + ${person.lagna} Lagna`
+        : `${person.rasi} Rashi`;
+      saved.append(option(`p${index}`, `${person.name} · ${refs}`));
+    });
+    nodes.push(saved);
+  }
+  const anyRashi = document.createElement('optgroup');
+  anyRashi.label = 'Any Rashi';
+  RASI_NAMES.forEach((rasi, index) => anyRashi.append(option(String(index), rasi)));
+  nodes.push(anyRashi);
+  sel.replaceChildren(...nodes);
+  if (keep && [...sel.options].some(candidate => candidate.value === keep)) sel.value = keep;
+}
+
+function goBuildViewSelect(preferredValue?: string) {
+  if (gocharaProfileStore) return buildStableViewSelect(preferredValue);
+  buildLegacyViewSelect();
+  return null;
+}
+
+/**
+ * Connect the Daily Horoscope selector to the shared guest-profile store.
+ * The subscription is intentionally owned here so profile edits made from
+ * any journey update this panel without relying on Tarabalam to rebuild it.
+ */
+export function initGocharaProfiles(
+  store: GuestProfileStore,
+  actions: GocharaProfileActions,
+): GocharaProfilesController {
+  destroyGocharaProfiles?.();
+  gocharaProfileStore = store;
+  gocharaProfileActions = actions;
+
+  const select = document.getElementById('go-view') as HTMLSelectElement | null;
+  if (!select) throw new Error('Daily Horoscope selector #go-view was not found');
+  let destroyed = false;
+
+  const refresh = (): void => {
+    if (destroyed) return;
+    goBuildViewSelect();
+    if (GO_DATA) renderGochara();
+  };
+  const handleChange = (): void => {
+    if (destroyed) return;
+    goBuildViewSelect(select.value);
+    if (GO_DATA) renderGochara();
+  };
+
+  select.addEventListener('change', handleChange);
+  const unsubscribe = store.subscribe(refresh);
+
+  const selectProfile = (id: string): boolean => {
+    if (destroyed) return false;
+    const profile = store.get(id);
+    if (!profile || !guestProfileReadiness(profile).horoscope) return false;
+    const resolution = goBuildViewSelect(gocharaProfileValue(id));
+    if (resolution?.kind !== 'profile' || resolution.profile?.id !== id) return false;
+    if (GO_DATA) renderGochara();
+    select.focus();
+    return true;
+  };
+
+  const destroy = (): void => {
+    if (destroyed) return;
+    destroyed = true;
+    select.removeEventListener('change', handleChange);
+    unsubscribe();
+    if (destroyGocharaProfiles === destroy) {
+      destroyGocharaProfiles = null;
+      gocharaProfileStore = null;
+      gocharaProfileActions = null;
+    }
+  };
+  destroyGocharaProfiles = destroy;
+
+  const controller: GocharaProfilesController = { refresh, selectProfile, destroy };
+  refresh();
+  return controller;
 }
 
 function goCurrentView() {
   const val = selEl('go-view').value;
   if (val === '') return { jr: null, jl: null, label: null };
-  // 'p<i>' — profile-keyed combined view. We carry BOTH the rashi
-  // index (jr, used to lay out the chart and number houses) AND the
-  // optional lagna index (jl, used as a second reference for graha
-  // verdicts and the conditions banner).
+  if (gocharaProfileStore) {
+    const resolved = resolveGocharaSelection(
+      val,
+      gocharaProfileStore.getSnapshot().profiles,
+    );
+    if (resolved.kind === 'profile' && resolved.profile?.rasi) {
+      const jr = RASI_NAMES.indexOf(resolved.profile.rasi);
+      return {
+        jr,
+        jl: null,
+        label: `${resolved.profile.rasi} Janma Rashi (${resolved.profile.name})`,
+      };
+    }
+    if (resolved.kind === 'rashi' && resolved.rasiIndex !== null) {
+      return {
+        jr: resolved.rasiIndex,
+        jl: null,
+        label: `${RASI_NAMES[resolved.rasiIndex]} rashi`,
+      };
+    }
+    return { jr: null, jl: null, label: null };
+  }
+  // 'p<i>' — legacy profile-keyed view. Daily Horoscope is deliberately
+  // anchored only to Janma Rashi; a saved Lagna remains a profile fact for
+  // the natal chart and Muhurtam, not a second Gochara reference.
   const profMatch = val.match(/^p(\d+)$/);
   if (profMatch) {
     const k = goSavedPeople()[Number(profMatch[1])];
     if (!k) return { jr: null, jl: null, label: null };
     const jr = RASI_NAMES.indexOf(k.rasi);
-    const jl = k.lagna ? RASI_NAMES.indexOf(k.lagna) : null;
-    const refLabel = k.lagna
-      ? `${k.rasi} rashi + ${k.lagna} lagna (${k.name})`
-      : `${k.rasi} rashi (${k.name})`;
-    return { jr, jl, label: refLabel };
+    return { jr, jl: null, label: `${k.rasi} Janma Rashi (${k.name})` };
   }
   // Bare rashi-index option from the "Any rashi" group.
-  return { jr: Number(val), jl: null, label: GO_DATA.rasis[Number(val)] + ' rashi' };
+  const rasiIndex = Number(val);
+  return {
+    jr: rasiIndex,
+    jl: null,
+    label: `${RASI_NAMES[rasiIndex]} rashi`,
+  };
 }
 
 // South Indian chart: fixed rasi positions on a 4x4 grid (row, col)
@@ -146,22 +530,20 @@ const GO_LAYOUT = { 11:[1,1], 0:[1,2], 1:[1,3], 2:[1,4], 3:[2,4], 4:[3,4],
                     5:[4,4], 6:[4,3], 7:[4,2], 8:[4,1], 9:[3,1], 10:[2,1] };
 
 function renderGochara() {
+  // A denied browser-storage write must never prevent the chart from rendering.
+  persistGocharaSelection(selEl('go-view').value);
   if (!GO_DATA) return;
   const idx = goDateIndex();
   const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
   const view = goCurrentView();
   const jr = view.jr;
-  const jl = (typeof view.jl === 'number') ? view.jl : null;
-  localStorage.setItem('tc-go-view', selEl('go-view').value);
-
   const dateShown = new Date(GO_DATA.start + 'T00:00:00');
   dateShown.setDate(dateShown.getDate() + idx);
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
-  // Per-graha verdicts using a chosen reference index (rashi index
-  // 0..11). Works for both janma rashi and janma lagna — same
-  // Janma-Chandra transit frame. Brihat Samhita 104.4 supports the seven
-  // classical favourable-house sets; Vedha and node policy are separate.
+  // Per-graha verdicts are computed from Janma Rashi (the natal Moon sign).
+  // This keeps the implementation aligned with the documented Gochara
+  // evidence contract; Lagna is not used as a second reference here.
   const houseFrom = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
   const occupantsFor = (ref) => {
     const o = {};
@@ -183,33 +565,17 @@ function renderGochara() {
     return 'good';
   };
 
-  // Pre-compute occupants for each reference we'll use.
+  // Pre-compute occupants for the Moon-sign reference.
   const occRashi = (jr !== null) ? occupantsFor(jr) : null;
-  const occLagna = (jl !== null) ? occupantsFor(jl) : null;
-
-  // House numbering for the chart stays anchored to janma RASHI —
-  // that's what users have always seen. The lagna lens is an extra
-  // verdict layer, not a chart re-anchoring.
   const houseOf = gi => jr === null ? null : houseFrom(gi, jr);
 
-  // Chart colour is anchored to the janma RASHI verdict — the
-  // traditional Janma-Chandra gochara frame. The lagna lens is
-  // surfaced separately (tooltip + prose) without judgement;
-  // classical texts don't prescribe a single rule for merging the
-  // two into one verdict, so we don't invent one.
+  // Chart colour is anchored to the documented Janma-Chandra frame.
   const verdictOf = gi => {
     if (jr === null) return null;
     return verdictFrom(gi, jr, occRashi);
   };
-  const verdictsBoth = gi => {
-    if (jr === null) return null;
-    const vr = verdictFrom(gi, jr, occRashi);
-    const vl = (jl !== null) ? verdictFrom(gi, jl, occLagna) : null;
-    return { vr, vl };
-  };
 
-  // Named Shani conditions are reckoned only from Janma Chandra. Lagna can be
-  // a useful second lens for ordinary gochara, but it does not define Sade Sati.
+  // Named Shani conditions are reckoned only from Janma Chandra.
   const condBox = document.getElementById('go-conditions');
   const shaniIdx = GO_DATA.grahas.indexOf('Shani');
   const conds = [];
@@ -232,39 +598,21 @@ function renderGochara() {
     const [gr, gc] = GO_LAYOUT[r];
     const grahas = (byRasi[r] || []).map(gi => {
       const v = verdictOf(gi);
-      const both = verdictsBoth(gi);
       const t = goTill(idx, gi);
-      // Tooltip surfaces BOTH references when lagna is set so the
-      // user can see exactly why a combined verdict landed where it
-      // did (e.g. "good from rashi · adverse from lagna" → adverse).
       let perRef = '';
-      if (both) {
+      if (jr !== null) {
         const hr = houseFrom(gi, jr);
-        const partR = `${ord(hr)} from rashi (${verdictLabel(both.vr)})`;
-        if (both.vl !== null) {
-          const hl = houseFrom(gi, jl);
-          perRef = ` — ${partR} · ${ord(hl)} from lagna (${verdictLabel(both.vl)})`;
-        } else {
-          perRef = ` — ${partR}`;
-        }
+        perRef = ` — ${ord(hr)} from Janma Rashi (${verdictLabel(v)})`;
       }
       const tip = `${GO_DATA.grahas[gi]} in ${GO_DATA.rasis[r]}${perRef}` +
         (t ? ` · till ${t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '');
       return `<span class="go-g ${v || ''}" title="${htmlEsc(tip)}">${GO_DATA.grahas[gi]}${retro[gi] ? '<span class="go-retro">℞</span>' : ''}</span>`;
     }).join('');
     const house = jr !== null ? `<span class="house">${((r - jr + 12) % 12) + 1}</span>` : '';
-    // Highlight both natal cells when known. When they coincide
-    // (janma rashi == janma lagna) we render a single combined
-    // label rather than 'janma · lagna' which would look odd.
     const isJanma = (jr === r);
-    const isLagna = (jl !== null && jl === r);
     const classes = ['go-box'];
     if (isJanma) classes.push('janma');
-    if (isLagna) classes.push('lagna');
-    let label = '';
-    if (isJanma && isLagna) label = ' · janma + lagna';
-    else if (isJanma) label = ' · janma';
-    else if (isLagna) label = ' · lagna';
+    const label = isJanma ? ' · janma' : '';
     boxes += `<div class="${classes.join(' ')}" style="grid-row:${gr};grid-column:${gc};">
       <span class="rname">${GO_DATA.rasis[r]}${label}</span>${house}<br>${grahas}</div>`;
   }
@@ -287,9 +635,9 @@ function renderGochara() {
   const phBox = document.getElementById('go-phalalu');
   if (jr === null) { phBox.innerHTML = ''; }
   else {
-    const ph = buildPhalalu(jr, jl, row, view, idx);
-    const phShare = `<button class="wa-share-mini" style="position:static;width:26px;height:26px;margin-left:auto;flex:none;" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
-    const llmRasiKey = view.label.replace(/ (rashi|lagna)$/i, '').trim();
+    const ph = buildPhalalu(jr, row);
+    const phShare = `<button class="wa-share-mini go-phalalu-share" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
+    const llmRasiKey = RASI_NAMES[jr];
     const llmEntry = LLM_PHALALU?.rashis?.[llmRasiKey];
     const llmForToday = !!llmEntry;
     const interpretationBoundary = llmForToday
@@ -297,15 +645,24 @@ function renderGochara() {
       : '';
     const adviceBlock = llmForToday && llmEntry.advice
       ? `<div style="margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;">` +
-        `<span style="font-size:0.68rem;color:#8B7355;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;">Today's guidance</span>` +
+        `<span class="go-guidance-label" style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;">Today's guidance</span>` +
         `<span style="font-size:0.84rem;color:#44403c;line-height:1.5;">${htmlEsc(llmEntry.advice)}</span></div>`
       : '';
-    phBox.innerHTML = `<div class="go-phalalu"><h4 style="display:flex;align-items:center;gap:0.4rem;">Rasi Phalalu — ${htmlEsc(view.label)}
+    const computedDetails =
+      `<details class="go-phalalu-details"><summary>Why this guidance? View ${ph.detailLines.length} computed transit checks</summary>` +
+      `<div class="go-phalalu-detail-lines">${ph.detailLines.map(line => `<p>${line}</p>`).join('')}</div></details>`;
+    const computationBoundary =
+      `<p class="go-phalalu-boundary">The detailed checks are deterministic outputs from the documented Janma-Rashi transit rules.</p>`;
+    const interpretationDetails = llmForToday
+      ? `<details class="go-interpretation-details"><summary>Read today's interpretive guidance</summary>` +
+        `<div class="go-interpretation-content"><p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}${interpretationBoundary}</div></details>`
+      : '';
+    phBox.innerHTML = `<div class="go-phalalu"><h4 class="go-phalalu-heading"><span class="go-phalalu-title">Rasi Phalalu — ${htmlEsc(view.label)}</span>
       <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
-      (llmForToday
-        ? `<p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}${interpretationBoundary}`
-        : ph.lines.map(l => `<p>${l}</p>`).join('') +
-          `<p style="font-size:0.72rem;color:#746B5E;">Every line above is rendered from the chart's computed verdicts — nothing is invented.</p>`) +
+      `<p class="go-phalalu-opener">${ph.opener}</p>` +
+      (ph.condition ? `<p class="go-phalalu-condition">${ph.condition}</p>` : '') +
+      `<p class="go-phalalu-summary">${ph.summary}</p>` +
+      `${computedDetails}${interpretationDetails}${computationBoundary}` +
       `</div>`;
   }
 
@@ -329,12 +686,8 @@ const PHALALU_OPENERS = {
 const PHALALU_ORDER = ['Shani','Guru','Rahu','Ketu','Kuja','Surya','Shukra','Budha'];
 const ordinal = n => n + (['st','nd','rd'][n-1] || 'th');
 
-function buildPhalalu(jr, jl, row, view, idx) {
-  // Two independent verdicts per graha — one from each reference.
-  // No "combine into one" judgement; classical Jyotisha doesn't
-  // prescribe a merge rule, so we surface both lenses side by side
-  // when janma lagna is set. Chart colour and the count tally
-  // stay anchored to janma rashi (matches the chart visual).
+function buildPhalalu(jr, row) {
+  // Daily Horoscope is a single-reference Janma-Rashi computation.
   const houseFromRef = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
   const occFor = (ref) => {
     const o = {};
@@ -356,54 +709,40 @@ function buildPhalalu(jr, jl, row, view, idx) {
     return { v: 'favourable' };
   };
   const occR = occFor(jr);
-  const occL = (jl !== null) ? occFor(jl) : null;
-  const houseOf = gi => houseFromRef(gi, jr);     // chart anchor stays rashi
+  const houseOf = gi => houseFromRef(gi, jr);
   const moonPos = houseOf(GO_DATA.grahas.indexOf('Chandra'));
   const mv = CHANDRA_GOOD.has(moonPos) ? 'good' : (CHANDRA_PUJA.has(moonPos) ? 'puja' : 'bad');
   let fav = 0, blocked = 0;
   const detail = {};
   GO_DATA.grahas.forEach((g, gi) => {
-    // Rashi verdict drives the tally (and the chart colours).
     const r = verdictForRef(gi, jr, occR);
-    const l = (occL !== null) ? verdictForRef(gi, jl, occL) : null;
-    detail[g] = { ...r, lagna: l, posR: houseOf(gi),
-                  posL: (jl !== null) ? houseFromRef(gi, jl) : null };
+    detail[g] = { ...r, posR: houseOf(gi) };
     if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++;
   });
   const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
-  const lines = [PHALALU_OPENERS[mv]];
+  const opener = PHALALU_OPENERS[mv];
 
-  // Named Shani conditions are Moon-sign constructs, even when the chart also
-  // displays lagna as a secondary reference for ordinary transit verdicts.
+  // Named Shani conditions are Moon-sign constructs.
   const shaniIdx = GO_DATA.grahas.indexOf('Shani');
   const condition = shaniConditionFromMoonHouse(houseFromRef(shaniIdx, jr));
-  if (condition) lines.push(shaniConditionLine(condition));
-
-  const verdictClause = (v, pos, m) => v === 'favourable' ? `favours ${m}`
-    : v === 'blocked' ? `is under vedha — ${m} arrives with friction`
-    : `tests ${m}; don't force matters there`;
+  const conditionLine = condition ? shaniConditionLine(condition) : null;
+  const detailLines = [];
   for (const g of PHALALU_ORDER) {
     const d = detail[g];
-    if (d.lagna === null) {
-      const m = HOUSE_MEANINGS[d.posR];
-      lines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.posR)} house favours ${m}.`
-        : d.v === 'blocked' ? `${g}'s good ${ordinal(d.posR)}-house transit is under vedha by ${d.by} — gains in ${m} may arrive with friction.`
-        : `${g} in the ${ordinal(d.posR)} house tests ${m}; avoid forcing matters there.`);
-      continue;
-    }
-    // Both lenses set. If they agree, one clean line. If they
-    // differ, two clauses: "X from your rashi … and from your lagna …".
-    const mR = HOUSE_MEANINGS[d.posR];
-    const mL = HOUSE_MEANINGS[d.posL];
-    if (d.v === d.lagna.v && d.posR === d.posL) {
-      // Same house, same verdict → one line.
-      lines.push(`${g} in your ${ordinal(d.posR)} house ${verdictClause(d.v, d.posR, mR)}.`);
-    } else {
-      lines.push(`${g}: from your rashi, ${ordinal(d.posR)} house — ${verdictClause(d.v, d.posR, mR)}; from your lagna, ${ordinal(d.posL)} house — ${verdictClause(d.lagna.v, d.posL, mL)}.`);
-    }
+    const meaning = HOUSE_MEANINGS[d.posR];
+    detailLines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.posR)} house favours ${meaning}.`
+      : d.v === 'blocked' ? `${g}'s good ${ordinal(d.posR)}-house transit is under vedha by ${d.by} — ${meaning} may face friction.`
+      : `${g} in the ${ordinal(d.posR)} house tests ${meaning}; avoid forcing matters there.`);
   }
-  lines.push(`${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''} (from your rashi).`);
-  return { quality, lines };
+  const summary = `${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''} (from your Janma Rashi).`;
+  return {
+    quality,
+    opener,
+    condition: conditionLine,
+    detailLines,
+    summary,
+    lines: [opener, ...(conditionLine ? [conditionLine] : []), ...detailLines, summary],
+  };
 }
 
 function shareGocharaOnWhatsApp() {
@@ -411,12 +750,10 @@ function shareGocharaOnWhatsApp() {
   const view = goCurrentView();
   if (view.jr === null) return;
   const jr = view.jr;
-  const jl = (typeof view.jl === 'number') ? view.jl : null;
   const idx = goDateIndex();
-  const row = GO_DATA.days[idx], retro = GO_DATA.retro[idx];
+  const row = GO_DATA.days[idx];
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  const ord = n => n + (['st','nd','rd'][n-1] || 'th');
-  const ph = buildPhalalu(jr, jl, row, view, idx);
+  const ph = buildPhalalu(jr, row);
   const lines = [];
   const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
   lines.push(`📜 *Rasi Phalalu — ${fmtD(shown)}*`);

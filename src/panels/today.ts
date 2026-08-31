@@ -225,7 +225,7 @@ function eclipseChip(e) {
   return `<span class="special-chip">${txt}</span>`;
 }
 
-function renderPreview(container, event, events) {
+function renderPreview(container, event, events, renderSequence, renderKey) {
   const data = parseDescription(event.description);
   const special = event.summary.includes('🪔')
     ? '<span class="badge">Festival</span>'
@@ -260,12 +260,32 @@ function renderPreview(container, event, events) {
   }
   const angaGrid = anga ? `<div class="anga-grid">${anga}</div>` : '';
 
-  // Header context lines: year context · month context · today's sky frame.
+  // Header context lines: year context · month context. The Sun/Moon timings
+  // become their own living day-cycle band immediately below the header.
   const metaLines = data.samvatsara
     ? `<div class="meta">${data.samvatsara} Nama Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
-       <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>
-       <div class="meta sky">🌅 ${fmtT(data.sunrise)} – ${fmtT(data.sunset)} &nbsp;·&nbsp; 🌙 ${fmtT(data.moonrise)} – ${fmtT(data.moonset)}</div>`
+       <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>`
     : `<div class="meta">${data.meta}</div>`;
+
+  const skyValue = value => value ? fmtT(value) : '—';
+  const skyCycle = (data.sunrise || data.sunset || data.moonrise || data.moonset)
+    ? `<div class="day-cycle" aria-label="Sun and Moon timings">
+         <div class="day-cycle-group day-cycle-sun">
+           <span class="day-cycle-icon" aria-hidden="true">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+           </span>
+           <dl class="day-cycle-time"><dt>Sunrise</dt><dd>${skyValue(data.sunrise)}</dd></dl>
+           <dl class="day-cycle-time"><dt>Sunset</dt><dd>${skyValue(data.sunset)}</dd></dl>
+         </div>
+         <div class="day-cycle-group day-cycle-moon">
+           <span class="day-cycle-icon" aria-hidden="true">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19.2 15.4A8 8 0 0 1 8.6 4.8a8 8 0 1 0 10.6 10.6z"/></svg>
+           </span>
+           <dl class="day-cycle-time"><dt>Moonrise</dt><dd>${skyValue(data.moonrise)}</dd></dl>
+           <dl class="day-cycle-time"><dt>Moonset</dt><dd>${skyValue(data.moonset)}</dd></dl>
+         </div>
+       </div>`
+    : '';
 
   // 3 · When to act or avoid — tile strips in the same language as Choghadiya,
   // in clock order so the day scans morning → evening.
@@ -295,7 +315,9 @@ function renderPreview(container, event, events) {
   const chogCell = c =>
     `<div class="chog-cell ${CHOG_GOOD.has(c.name) ? 'good' : 'bad'}"><div class="chog-name">${c.name}</div><div class="chog-time">${fmtRange(c.start, c.end, '–<wbr>')}</div></div>`;
   let chog = '';
+  const atSunrise = [];
   if (data.choghadiya.length) {
+    atSunrise.push(`${data.choghadiya[0].name} Choghadiya`);
     chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — day in 8 blocks</div><div class="chog-grid">${data.choghadiya.map(chogCell).join('')}</div></div>`;
   }
   // Prefer the feed's night section; compute it locally only for older feeds.
@@ -325,6 +347,7 @@ function renderPreview(container, event, events) {
   let horaHtml = '';
   if (data.sunrise && data.sunset && tomorrowSr) {
     const horas = computeHoras(selectedDate().getDay(), data.sunrise, data.sunset, tomorrowSr);
+    if (horas.day.length) atSunrise.push(`${horas.day[0].lord} Hora`);
     // Day horas live entirely within one calendar day; night horas
     // cross midnight, so feed them through the marker pass with
     // sunset as the "today" anchor.
@@ -333,17 +356,26 @@ function renderPreview(container, event, events) {
     horaHtml += `<div class="tile-strip"><div class="strip-title">🌙 Horas — night</div><div class="hora-grid">${nightFlagged.map(horaCell).join('')}</div></div>`;
   }
   const isoDate = `${selectedDate().getFullYear()}-${String(selectedDate().getMonth()+1).padStart(2,'0')}-${String(selectedDate().getDate()).padStart(2,'0')}`;
-  const lagnaPlaceholder = `<div class="tile-strip" id="lagna-strip" data-iso="${isoDate}">`
+  const lagnaPlaceholder = `<div class="tile-strip" id="lagna-strip" data-iso="${isoDate}" data-render-sequence="${renderSequence}">`
     + `<div class="strip-title">🌅 Lagna — rising sign</div>`
     + `<div class="lagna-ribbon" id="lagna-ribbon">`
     + `<div class="preview-note" style="grid-column:1/-1;margin:0;padding:0.4rem;text-align:center;">Loading lagna data…</div>`
-    + `</div>`
-    + `<p class="preview-note" style="margin:0.5rem 0 0;">`
-    + `Cells span sunrise to next sunrise. The first and last cells are often the `
-    + `<em>same rashi</em> — a short partial at sunrise and a longer wrap before `
-    + `next sunrise, because the lagna cycle (~23h 56m) is slightly shorter than `
-    + `the panchangam day (24h).`
-    + `</p></div>`;
+    + `</div></div>`;
+
+  const detailedMeta = atSunrise.length
+    ? `At sunrise · ${htmlEsc(atSunrise.join(' · '))}`
+    : 'Choghadiya · Hora · Lagna';
+
+  const detailedTimings = (chog || horaHtml || lagnaPlaceholder)
+    ? `<details class="daily-details">
+         <summary>
+           <span class="daily-details-title">Detailed timings</span>
+           <span class="daily-details-meta">${detailedMeta}</span>
+           <span class="daily-details-chevron" aria-hidden="true"></span>
+         </summary>
+         <div class="daily-details-body">${chog}${horaHtml}${lagnaPlaceholder}</div>
+       </details>`
+    : '';
 
   container.innerHTML = `
     <div class="preview-card">
@@ -352,26 +384,31 @@ function renderPreview(container, event, events) {
                 title="Share this day's panchangam on WhatsApp" aria-label="Share on WhatsApp">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
         </button>
-        <div class="date">${formatToday()}${special}<span style="position:relative;display:inline-block;vertical-align:middle;margin-left:0.4em;"><input type="date" class="tp-date-input" value="${_tpDateVal||''}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;" aria-label="Change date"><span aria-hidden="true" style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:5px;padding:2px 6px;font-size:0.75rem;pointer-events:none;">📅</span></span></div>
+        <div class="date">${formatToday()}${special}<span class="tp-date-picker"><input type="date" class="tp-date-input" value="${_tpDateVal||''}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;" aria-label="Change date"><span class="tp-date-picker__trigger" aria-hidden="true">📅</span></span></div>
         ${metaLines}
       </div>
+      ${skyCycle}
       ${flagStrip}
       ${angaGrid}
       ${windows}
-      ${chog}
-      ${horaHtml}
-      ${lagnaPlaceholder}
+      ${detailedTimings}
     </div>
   `;
 
-  // Async lagna fetch — guarded by the strip's data-iso so a quick
-  // date change before the fetch resolves doesn't paint stale data.
+  // Async lagna fetch — guarded by date, city/system and render sequence so a
+  // quick context change before the fetch resolves cannot paint stale data.
   const cityForLagna = getSelection().city;
   if (cityForLagna) {
     loadLagna(cityForLagna).then(d => {
       const ribbon = document.getElementById('lagna-ribbon');
       const strip = document.getElementById('lagna-strip');
-      if (!ribbon || !strip || strip.dataset.iso !== isoDate) return;
+      if (
+        !ribbon
+        || !strip
+        || strip.dataset.iso !== isoDate
+        || strip.dataset.renderSequence !== String(renderSequence)
+        || currentPreviewKey() !== renderKey
+      ) return;
       const dayData = lagnaDayFor(d, isoDate);
       const segs = lagnaSegments(dayData);
       if (segs.length) {
@@ -410,6 +447,7 @@ function renderUpcoming(events) {
                        'July','August','September','October','November','December'];
 
   const buckets: Map<number, string[]> = new Map();
+  let nextObservance = '';
 
   const d = new Date(year, 0, 1);
   const yearEnd = new Date(year, 11, 31);
@@ -433,12 +471,22 @@ function renderUpcoming(events) {
         let cls = 'upcoming-row';
         if (isFestival) cls += ' upcoming-festival';
         if (isToday)   cls += ' upcoming-today';
-        buckets.get(m).push(
-          `<div class="${cls}">
+        const isoDate = `${year}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const row = `<div class="${cls}">
             <span class="upcoming-date"><span class="dow">${dow}</span> ${monthAbbr} ${day}${isToday ? '<span class="upcoming-today-badge">today</span>' : ''}</span>
             <span class="upcoming-chips">${chips}</span>
-          </div>`
-        );
+          </div>`;
+        buckets.get(m).push(row);
+        if (!nextObservance && d >= today) {
+          nextObservance = `<section class="upcoming-next" aria-labelledby="upcoming-next-title">
+            <div class="upcoming-next-copy">
+              <p class="upcoming-next-kicker">Next observance</p>
+              <h3 id="upcoming-next-title">${dow}, ${monthAbbr} ${day}</h3>
+              <div class="upcoming-chips">${chips}</div>
+            </div>
+            <button class="upcoming-next-action" onclick="switchTool('today'); openFestivalDate('${isoDate}')">View Panchangam</button>
+          </section>`;
+        }
       }
     }
     d.setDate(d.getDate() + 1);
@@ -462,7 +510,7 @@ function renderUpcoming(events) {
       </div>
     </div>`;
   }
-  container.innerHTML = html;
+  container.innerHTML = nextObservance + html;
 }
 
 function toggleFestivalMonth(btn) {
@@ -471,16 +519,37 @@ function toggleFestivalMonth(btn) {
   btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
+function openFestivalDate(isoDate) {
+  _tpDateVal = isoDate;
+  const input = document.querySelector('input.tp-date-input') as HTMLInputElement | null;
+  if (input) input.value = isoDate;
+  loadPreview();
+}
+
 let LAST_EVENTS = null;
+let LAST_EVENTS_KEY = null;
+let PREVIEW_REQUEST_SEQUENCE = 0;
+let PREVIEW_RENDER_SEQUENCE = 0;
+
+function currentFeedKey() {
+  const { city, system } = getSelection();
+  return `${city}|${system}`;
+}
+
+function currentPreviewKey() {
+  return `${currentFeedKey()}|${_tpDateVal || ''}`;
+}
 
 function renderAll() {
-  if (!LAST_EVENTS) return;
+  if (!LAST_EVENTS || LAST_EVENTS_KEY !== currentFeedKey()) return;
   const container = document.getElementById('tp-result');
   const event = LAST_EVENTS.get(stampOf(selectedDate()));
   if (event) {
-    renderPreview(container, event, LAST_EVENTS);
+    const renderSequence = ++PREVIEW_RENDER_SEQUENCE;
+    const renderKey = currentPreviewKey();
+    renderPreview(container, event, LAST_EVENTS, renderSequence, renderKey);
   } else {
-    container.innerHTML = '<p class="preview-error">Preview unavailable for this date — try the subscription link below.</p>';
+    container.innerHTML = '<p class="preview-error" role="status">Preview unavailable for this date — try the subscription link below.</p>';
   }
   renderUpcoming(LAST_EVENTS);
 }
@@ -489,17 +558,35 @@ function renderAll() {
 async function loadPreview() {
   const city = getSelection().city;
   const system = getSelection().system;
-  document.getElementById('tp-result').innerHTML = '<p class="preview-error">Loading…</p>';
+  const requestSequence = ++PREVIEW_REQUEST_SEQUENCE;
+  const requestKey = currentPreviewKey();
+  const feedKey = `${city}|${system}`;
+  const result = document.getElementById('tp-result');
+  const upcoming = document.getElementById('upcoming-result');
+  result.setAttribute('aria-busy', 'true');
+  result.innerHTML = '<p class="preview-error" role="status">Loading…</p>';
+  upcoming.setAttribute('aria-busy', 'true');
+  upcoming.innerHTML = '<p class="preview-note" role="status">Updating upcoming dates…</p>';
   try {
-    LAST_EVENTS = await loadFeed(city, system);
+    const events = await loadFeed(city, system);
+    if (requestSequence !== PREVIEW_REQUEST_SEQUENCE || requestKey !== currentPreviewKey()) return;
+    LAST_EVENTS = events;
+    LAST_EVENTS_KEY = feedKey;
     renderAll();
   } catch (e) {
+    if (requestSequence !== PREVIEW_REQUEST_SEQUENCE || requestKey !== currentPreviewKey()) return;
     // Surface the real failure: this catch also swallows render bugs,
     // not just fetch errors, and a silent one masks regressions.
     console.error('loadPreview failed:', e);
     LAST_EVENTS = null;
-    document.getElementById('tp-result').innerHTML = '<p class="preview-error">Preview unavailable — try the subscription link below.</p>';
-    document.getElementById('upcoming-result').innerHTML = '<p class="preview-error">Unavailable — try the subscription link below.</p>';
+    LAST_EVENTS_KEY = null;
+    document.getElementById('tp-result').innerHTML = '<p class="preview-error" role="status">Preview unavailable — try the subscription link below.</p>';
+    upcoming.innerHTML = '<p class="preview-error" role="status">Unavailable — try the subscription link below.</p>';
+  } finally {
+    if (requestSequence === PREVIEW_REQUEST_SEQUENCE && requestKey === currentPreviewKey()) {
+      result.setAttribute('aria-busy', 'false');
+      upcoming.setAttribute('aria-busy', 'false');
+    }
   }
 }
 
@@ -574,12 +661,14 @@ function shareTodayOnWhatsApp() {
 
 
 export {
-  loadPreview, renderAll, renderUpcoming, toggleFestivalMonth,
+  loadPreview, renderAll, renderUpcoming, toggleFestivalMonth, openFestivalDate,
   shareTodayOnWhatsApp, selectedDate, ekadashiName, festivalNames,
 };
 
 /** Events map of the currently loaded feed (null before first load). */
-export function getLoadedEvents() { return LAST_EVENTS; }
+export function getLoadedEvents() {
+  return LAST_EVENTS_KEY === currentFeedKey() ? LAST_EVENTS : null;
+}
 
 /** Wire panel-internal listeners; called once from Init. */
 export function initTodayPanel(todayISO) {
