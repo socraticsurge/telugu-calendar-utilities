@@ -5,11 +5,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_profile_page_does_not_execute_third_party_analytics() -> None:
+def test_profile_page_does_not_load_third_party_subresources() -> None:
     landing = (ROOT / "index.html").read_text(encoding="utf-8")
 
     assert "gc.zgo.at/count.js" not in landing
     assert "data-goatcounter" not in landing
+    assert "fonts.googleapis.com" not in landing
+    assert "fonts.gstatic.com" not in landing
 
 
 def test_legacy_tarabalam_templates_escape_profile_names() -> None:
