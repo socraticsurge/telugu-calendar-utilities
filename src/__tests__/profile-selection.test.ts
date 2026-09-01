@@ -7,12 +7,15 @@ import {
 import {
   GOCHARA_SELECTION_STORAGE_KEY,
   MUHURTAM_PROFILE_IDS_STORAGE_KEY,
+  MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY,
   adaptGuestProfile,
   gocharaProfileValue,
   loadGocharaSelection,
   loadMuhurtamProfileSelection,
+  loadMuhurtamRoleSelections,
   resolveGocharaSelection,
   saveMuhurtamProfileSelection,
+  saveMuhurtamRoleSelection,
   toggleMuhurtamProfileSelection,
 } from '../lib/profile-selection';
 
@@ -99,7 +102,7 @@ describe('Gochara stable selection', () => {
     expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe('profile:guest_second');
   });
 
-  test('uses the exact legacy row only when it is Horoscope-ready', () => {
+  test('recreates the legacy ready-profile order before assigning a stable ID', () => {
     const profiles = [
       profile('guest_incomplete', { nakshatra: 'Krittika', pada: null }),
       profile('guest_ready'),
@@ -108,13 +111,31 @@ describe('Gochara stable selection', () => {
 
     const result = loadGocharaSelection(storage, profiles);
 
-    expect(result.value).toBe('');
-    expect(result.fallback).toMatchObject({
-      code: 'profile-not-horoscope-ready', missingField: 'pada',
-    });
+    expect(result.value).toBe(gocharaProfileValue('guest_ready'));
+    expect(result.profile).toMatchObject({ id: 'guest_ready' });
+    expect(result.fallback).toBeNull();
     expect(result.legacySelectionDetected).toBe(true);
-    expect(result.migratedFromLegacy).toBe(false);
-    expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe('');
+    expect(result.migratedFromLegacy).toBe(true);
+    expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe(
+      'profile:guest_ready',
+    );
+  });
+
+  test('does not shift a later legacy selection when an incomplete row precedes it', () => {
+    const profiles = [
+      profile('guest_incomplete', { nakshatra: 'Krittika', pada: null }),
+      profile('guest_alice'),
+      profile('guest_bob'),
+    ];
+    storage.setItem(GOCHARA_SELECTION_STORAGE_KEY, 'p1');
+
+    const result = loadGocharaSelection(storage, profiles);
+
+    expect(result.value).toBe(gocharaProfileValue('guest_bob'));
+    expect(result.profile).toMatchObject({ id: 'guest_bob' });
+    expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe(
+      'profile:guest_bob',
+    );
   });
 
   test('survives profile reorder and edit after the legacy value is migrated', () => {
@@ -345,6 +366,71 @@ describe('Muhurtam stable participant selection', () => {
     expect(fromDeniedWrite).toMatchObject({
       selectedIds: ['guest_ready'], persistence: 'memory',
       storageIssue: 'storage-unavailable',
+    });
+  });
+});
+
+describe('Muhurtam stable role selection', () => {
+  test('persists a bounded saved-profile role by stable ID and restores edits', () => {
+    const profiles = [
+      profile('guest_a', { name: 'A' }),
+      profile('guest_b', { name: 'B' }),
+    ];
+    const saved = saveMuhurtamRoleSelection(
+      storage, {}, 'surgery', 'guest_b', profiles,
+    );
+    expect(saved.selections).toEqual({ surgery: 'guest_b' });
+    expect(JSON.parse(storage.getItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY) || '{}'))
+      .toEqual({ version: 1, roles: { surgery: 'guest_b' } });
+
+    const restored = loadMuhurtamRoleSelections(storage, [
+      profile('guest_b', { name: 'B edited' }),
+      profile('guest_a', { name: 'A' }),
+    ]);
+    expect(restored.selections).toEqual({ surgery: 'guest_b' });
+  });
+
+  test('repairs deleted, incomplete, unknown-activity and malformed role state', () => {
+    storage.setItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY, JSON.stringify({
+      version: 1,
+      roles: {
+        travel: 'guest_ready',
+        surgery: 'guest_deleted',
+        seemantha: 'guest_incomplete',
+        invented: 'guest_ready',
+      },
+    }));
+    const result = loadMuhurtamRoleSelections(storage, [
+      profile('guest_ready'),
+      profile('guest_incomplete', { nakshatra: null }),
+    ]);
+    expect(result.selections).toEqual({ travel: 'guest_ready' });
+    expect(JSON.parse(storage.getItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY) || '{}'))
+      .toEqual({ version: 1, roles: { travel: 'guest_ready' } });
+
+    storage.setItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY, '{broken');
+    expect(loadMuhurtamRoleSelections(storage, [profile('guest_ready')]))
+      .toMatchObject({ selections: {}, storageIssue: 'malformed-storage' });
+  });
+
+  test('keeps transient participant IDs and denied storage out of persistence', () => {
+    const profiles = [profile('guest_ready')];
+    const transient = saveMuhurtamRoleSelection(
+      storage, {}, 'travel', 'manual_1', profiles,
+    );
+    expect(transient.selections).toEqual({});
+
+    storage.denyRead = true;
+    expect(loadMuhurtamRoleSelections(storage, profiles)).toMatchObject({
+      selections: {}, persistence: 'memory', storageIssue: 'storage-unavailable',
+    });
+    storage.denyRead = false;
+    storage.denyWrite = true;
+    expect(saveMuhurtamRoleSelection(
+      storage, {}, 'travel', 'guest_ready', profiles,
+    )).toMatchObject({
+      selections: { travel: 'guest_ready' },
+      persistence: 'memory', storageIssue: 'storage-unavailable',
     });
   });
 });

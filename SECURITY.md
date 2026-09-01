@@ -39,15 +39,25 @@ You will get an acknowledgement within 72 hours. Once a fix ships, the issue can
   `https://astrochaganti.com/api/guest` gateway and reject loopback or arbitrary
   base overrides. The server-side routes must remain independently disabled
   until licensing and place-provider approval are recorded.
+- Muhurtam election-chart projection has a separate public activation gate:
+  `VITE_ELECTION_CHART_API_ENABLED` must be the exact string `true`. An absent
+  flag permits only loopback development. Public requests use only the same
+  canonical HTTPS guest gateway and contain candidate coordinates, timezone,
+  and instants—never profile identity or birth data. This browser flag does
+  not activate or authorize the gateway or DashaFlow sidecar.
 - A browser can keep at most four guest profiles. People using the same browser
   profile on the same site origin can see, edit, delete, or clear them. Profiles
   do not follow the guest to another browser, device, domain, protocol, or port.
   Clearing site data removes them, private-browsing storage may disappear when
   the private session ends, and there is no account, cloud sync, or recovery.
-- Analytics events must use fixed, content-free identifiers. Profile names,
-  birth details, profile IDs, and stored selections must never be sent to
-  GoatCounter or any other analytics service. Reports of profile content
-  reaching analytics are in scope.
+- The profile-bearing page and documentation shell do not load third-party
+  scripts, stylesheets, or font files. The application's optional analytics
+  hook accepts only fixed, content-free identifiers and is inert unless a
+  trusted first-party integration is deliberately supplied.
+  Profile names, birth details, profile IDs, and stored selections must never be sent to
+  GoatCounter or any other analytics service. Built-in share text also omits
+  profile names. Reports of profile content leaving either boundary are in
+  scope.
 - The MCP server runs locally on the user's machine and makes no network calls at runtime; its inputs are date/city strings validated at the tool layer. Input-validation bypasses there are still welcome reports.
 
 ## Past findings

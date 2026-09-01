@@ -19,6 +19,7 @@ import {
   type GuestProfileDraft,
   type GuestProfileSnapshot,
 } from '../lib/guest-profile-store';
+import { ElectionChartApiError, localWallTimeToInstant } from '../lib/election-chart-api';
 import { birthProfileCalculationEnabled } from '../lib/remote-calculation-activation';
 
 export interface ProfilesPanelContext {
@@ -76,6 +77,26 @@ type PanelView =
   | { kind: 'detail'; profileId: string; context: ResolvedProfilesPanelContext }
   | { kind: 'create'; context: ResolvedProfilesPanelContext }
   | { kind: 'edit'; profileId: string; context: ResolvedProfilesPanelContext };
+
+function isoDateInTimeZone(now: Date, timeZone: string): string | null {
+  try {
+    const formatter = new Intl.DateTimeFormat('en-CA-u-ca-gregory-nu-latn', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const values: Record<string, string> = {};
+    for (const part of formatter.formatToParts(now)) {
+      if (part.type !== 'literal') values[part.type] = part.value;
+    }
+    return values.year && values.month && values.day
+      ? `${values.year}-${values.month}-${values.day}`
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 function element<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -1065,7 +1086,6 @@ export function initProfilesPanel(
       useBirthDetails.addEventListener('click', () => renderBirthForm(mode, context, profile));
       methodActions.append(useBirthDetails, useManualDetails);
       methods.append(methodsTitle, methodActions);
-      fragment.append(methods);
     }
     const snapshot = store.getSnapshot();
     const issue = renderIssue(snapshot);
@@ -1096,6 +1116,7 @@ export function initProfilesPanel(
       existing.append(existingTitle, existingHint, existingList);
       fragment.append(existing);
     }
+    if (methods) fragment.append(methods);
 
     const form = element('form', 'profiles-form');
     form.noValidate = true;
@@ -1195,7 +1216,7 @@ export function initProfilesPanel(
     const save = element('button', 'profiles-button profiles-button--primary', mode === 'create' ? 'Save profile' : 'Save changes');
     save.type = 'submit';
     const cancel = button('Cancel', 'profiles-button profiles-button--secondary');
-    actions.append(save, cancel);
+    actions.append(cancel, save);
     form.append(nameGroup, nakshatraGroup, padaGroup, lagnaGroup, formError, actions);
     fragment.append(form);
     root.replaceChildren(fragment);
@@ -1474,7 +1495,6 @@ export function initProfilesPanel(
     dateInput.type = 'date';
     dateInput.required = true;
     dateInput.setAttribute('autocomplete', 'bday');
-    dateInput.max = new Date().toISOString().slice(0, 10);
     dateInput.value = profile?.birthDetails?.dateOfBirth || '';
     dateInput.setAttribute('aria-describedby', 'profile-birth-date-error');
     const dateError = element('p', 'profiles-field__error');
@@ -1618,7 +1638,7 @@ export function initProfilesPanel(
     );
     saveHelp.id = 'profile-save-help';
     const cancel = button('Cancel', 'profiles-button profiles-button--secondary');
-    actions.append(save, cancel);
+    actions.append(cancel, save);
 
     form.append(
       nameGroup,
@@ -1638,6 +1658,11 @@ export function initProfilesPanel(
       selectedPlaceText.textContent = selectedPlace
         ? `Selected: ${selectedPlace.label} · ${selectedPlace.timezone}`
         : '';
+      const maxDate = selectedPlace
+        ? isoDateInTimeZone(new Date(), selectedPlace.timezone)
+        : null;
+      if (maxDate) dateInput.max = maxDate;
+      else dateInput.removeAttribute('max');
     };
     const updateReview = (): void => {
       reviewHost.replaceChildren();
@@ -1647,6 +1672,8 @@ export function initProfilesPanel(
         ? 'Review complete. Saving keeps these details only in this browser.'
         : 'Calculate and review the astrology details before saving.';
       calculateButton.textContent = calculated ? 'Recalculate details' : 'Calculate details';
+      calculateButton.classList.toggle('profiles-button--primary', !calculated);
+      calculateButton.classList.toggle('profiles-button--secondary', Boolean(calculated));
     };
     const invalidateCalculation = (): void => {
       calculationSequence += 1;
@@ -1695,6 +1722,8 @@ export function initProfilesPanel(
           placeResults.replaceChildren();
           placeStatus.textContent = 'Birthplace selected.';
           invalidateCalculation();
+          clearFieldError(dateInput, dateError);
+          clearFieldError(timeInput, timeError);
           updateSelectedPlace();
           calculateButton.focus();
         });
@@ -1767,7 +1796,7 @@ export function initProfilesPanel(
 
     calculateButton.addEventListener('click', async () => {
       let invalid: HTMLElement | null = null;
-      if (!dateInput.value || dateInput.value > dateInput.max) {
+      if (!dateInput.value) {
         dateInput.setAttribute('aria-invalid', 'true');
         dateError.textContent = 'Enter a valid birth date that is not in the future.';
         dateError.hidden = false;
@@ -1787,6 +1816,60 @@ export function initProfilesPanel(
       }
       if (invalid || !selectedPlace) {
         invalid?.focus();
+        return;
+      }
+
+      const now = new Date();
+      const maxDate = isoDateInTimeZone(now, selectedPlace.timezone);
+      if (!maxDate) {
+        placeInput.setAttribute('aria-invalid', 'true');
+        placeError.textContent = 'The selected birthplace has an invalid time zone.';
+        placeError.hidden = false;
+        placeInput.focus();
+        return;
+      }
+      dateInput.max = maxDate;
+      if (dateInput.value > maxDate) {
+        dateInput.setAttribute('aria-invalid', 'true');
+        dateError.textContent = 'Enter a valid birth date that is not in the future.';
+        dateError.hidden = false;
+        dateInput.focus();
+        return;
+      }
+      const [birthHour, birthMinute] = timeInput.value.split(':').map(Number);
+      let birthInstant: string;
+      try {
+        birthInstant = localWallTimeToInstant(
+          dateInput.value,
+          birthHour * 60 + birthMinute,
+          selectedPlace.timezone,
+        );
+      } catch (error) {
+        if (error instanceof ElectionChartApiError && error.message.includes('ambiguous')) {
+          timeError.textContent = 'This local time occurred twice at the selected birthplace. Enter known astrology details manually instead.';
+          timeInput.setAttribute('aria-invalid', 'true');
+          timeError.hidden = false;
+          timeInput.focus();
+          return;
+        }
+        if (error instanceof ElectionChartApiError && error.message.includes('does not exist')) {
+          timeError.textContent = 'This local time did not occur at the selected birthplace because the clocks changed. Enter known astrology details manually instead.';
+          timeInput.setAttribute('aria-invalid', 'true');
+          timeError.hidden = false;
+          timeInput.focus();
+          return;
+        }
+        placeInput.setAttribute('aria-invalid', 'true');
+        placeError.textContent = 'The selected birthplace or time zone is invalid.';
+        placeError.hidden = false;
+        placeInput.focus();
+        return;
+      }
+      if (Date.parse(birthInstant) > now.getTime()) {
+        timeInput.setAttribute('aria-invalid', 'true');
+        timeError.textContent = 'Birth date and time cannot be in the future at the selected birthplace.';
+        timeError.hidden = false;
+        timeInput.focus();
         return;
       }
 

@@ -757,7 +757,7 @@ function shareGocharaOnWhatsApp() {
   const lines = [];
   const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
   lines.push(`📜 *Rasi Phalalu — ${fmtD(shown)}*`);
-  lines.push(`${view.label} · ${ph.quality} day`);
+  lines.push(`${RASI_NAMES[jr]} Janma Rashi · ${ph.quality} day`);
   lines.push('');
   ph.lines.forEach(l => lines.push('• ' + l));
   lines.push('');

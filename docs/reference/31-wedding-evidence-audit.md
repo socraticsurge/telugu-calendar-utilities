@@ -30,19 +30,22 @@ Adhika and Pitru Paksha, Sankramana, Guru/Shukra combustion, Simha-Stha and the
 shared Visha/Dagdha layer. The Raman claim does not falsely attribute those
 extra filters to this passage.
 
-## Mandatory manual prerequisites
+## Computed and mandatory manual prerequisites
 
 Reject Magha and Moola Pada 1 and Revati Pada 4. Pada is not computed across
 every product surface, so these remain explicit mandatory checks. The same is
 true for Raman's named “Mrityu Yoga,” whose definition is not represented in
 the 27-Nitya-Yoga model.
 
-The 7th house must be unoccupied; Mangala must avoid the 8th; Shukra must avoid
-the 6th; malefics must avoid and not hem Lagna; and Chandra must be
-unassociated with another Graha. Guru, Budha or Shukra in Lagna and malefics
-in the 3rd or 11th may fortify the election. Compatibility, Tarabala,
-Chandrabala and Panchaka require couple-specific review. These unresolved
-facts cap every automated result below `Excellent`.
+The Drik browser chart post-screen rejects an occupied 7th, Mangala in the 8th,
+or Shukra in the 6th at any sampled state (the window edges and both sides of
+every known interior Drik Lagna transition). Malefics around Lagna,
+Chandra's association with another Graha, the named fortifications,
+compatibility, Tarabala, Chandrabala and Panchaka still require couple-specific
+review. Those unresolved facts cap every automated result below `Excellent`.
+Python/MCP retain the complete list as `manual_checks` because they do not call
+the chart service. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 ## Published-practice divergence
 

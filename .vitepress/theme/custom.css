@@ -26,7 +26,7 @@
   --vp-c-danger-2: #742118;
   --vp-c-danger-3: #5f1a13;
   --vp-c-danger-soft: rgba(142, 42, 31, 0.1);
-  --vp-font-family-base: 'Inter', system-ui, sans-serif;
+  --vp-font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --vp-font-family-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --vp-sidebar-bg-color: #ebe2d1;
   --vp-nav-bg-color: rgba(242, 236, 223, 0.96);
@@ -54,7 +54,7 @@ html {
 
 .VPNavBarTitle .title,
 .vp-doc h1 {
-  font-family: 'Libre Baskerville', Georgia, serif;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
 .VPNavBarTitle .title {
@@ -80,12 +80,19 @@ html {
 }
 
 .vp-doc table {
-  display: table;
+  display: block;
   width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
 
 .vp-doc .mermaid {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
   margin: 1.5rem 0;
   padding: 1rem;
   border: 1px solid var(--vp-c-divider);
@@ -96,6 +103,26 @@ html {
 .vp-doc .mermaid svg {
   min-width: 920px;
   margin: 0 auto;
+}
+
+/* VitePress shows the desktop menu at 768px but keeps the sidebar in its
+   compact mode until 960px. This documentation title and menu need the same
+   breakpoint so the 768–959px tablet band never widens the page. */
+@media (min-width: 768px) and (max-width: 959px) {
+  .VPNavBarMenu,
+  .VPNavBarSocialLinks,
+  .VPNavBarExtra {
+    display: none !important;
+  }
+
+  .VPNavBarHamburger,
+  .VPNavScreen {
+    display: flex !important;
+  }
+
+  .VPNavScreen {
+    flex-direction: column;
+  }
 }
 
 .reference-intro {

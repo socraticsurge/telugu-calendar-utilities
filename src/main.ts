@@ -25,6 +25,7 @@ import {
   tbSaveProfiles, tbSetMode, tbToggleShowAll, tbExtendTo,
   findMuhurta, renderMuhurta, shareTarabalamOnWhatsApp, shareMuhurtaOnWhatsApp,
   tbHasDays, muHasLast, initTarabalamPanel, initTarabalamProfiles,
+  invalidateMuhurtaSearch,
 } from './panels/tarabalam';
 import { loadLagna, lagnaDayFor } from './lib/lagna-loader';
 import { stampOf } from './lib/format';
@@ -356,6 +357,7 @@ import {
       if (muHasLast()) renderMuhurta();
     }
     if (changed.includes('city') || changed.includes('system')) {
+      invalidateMuhurtaSearch();
       writeBrowserPreference('tc-city', sel.city);
       writeBrowserPreference('tc-system', sel.system);
       updateSettingsSummary();

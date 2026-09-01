@@ -127,14 +127,6 @@ export default defineConfig({
     hostname: 'https://panchangam.astrochaganti.com/docs/',
   },
   head: [
-    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
-    [
-      'link',
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600;700&display=swap',
-      },
-    ],
     ['meta', { name: 'theme-color', content: '#F2ECDF' }],
   ],
   markdown: {
@@ -171,6 +163,7 @@ export default defineConfig({
           { text: 'Derived computations', link: '/reference/03-computational-features' },
           { text: 'Data flow and Muhurtam', link: '/reference/05-data-flow-and-muhurta' },
           { text: 'Birth profiles and D1 chart', link: '/reference/53-birth-profile-calculation' },
+          { text: 'Muhurtam election-chart screening', link: '/reference/54-muhurtam-election-chart-screening' },
         ],
       },
       {

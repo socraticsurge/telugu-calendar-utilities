@@ -82,6 +82,8 @@ PyPI MCP package.
 | 50 | [Trade-inventory purchase profile](50-trade-inventory-purchase-profile.md) | Buyer-side inventory scope, exact preference semantics, and commercial safeguards |
 | 51 | [Borrowing-money source profile](51-borrowing-money-profile.md) | Debtor-side Nakshatra gates, Chintamani divergence, and financial-safety boundary |
 | 52 | [Lending-money source profile](52-lending-money-profile.md) | Creditor-side conditional gates, published-practice conflict, and financial safeguards |
+| 53 | [Guest birth profiles and D1 chart](53-birth-profile-calculation.md) | Birth-instant conversion, Lahiri/Whole Sign formula path, privacy boundary, fixtures and release gates |
+| 54 | [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md) | Privacy-minimal DashaFlow enrichment, exact source-rule matrix, personal-role precedence, boundary semantics and manual remainder |
 
 ## How to read the diagrams
 

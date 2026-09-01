@@ -34,10 +34,17 @@ so the implementation uses a preference instead of a hard admission gate.
 Verse 16 expressly distinguishes buying from selling. This profile is for the
 buyer; a seller election cannot silently inherit it.
 
-Verse 17 adds marketplace-chart criteria that remain practitioner checks:
-reject Rikta Tithis, Tuesday and Kumbha Lagna; prefer Chandra and Shukra in
-Lagna; keep malefics out of the 8th and 12th; place benefics in the 2nd, 10th
-or 11th.
+Verse 17 adds marketplace-chart criteria: reject Rikta Tithis, Tuesday and
+Kumbha Lagna; prefer Chandra and Shukra in Lagna; keep malefics out of the 8th
+and 12th; place benefics in the 2nd, 10th or 11th.
+
+The Drik browser post-screen now computes the two exact Chandra/Shukra-in-Lagna
+preferences only when they pass across every sampled state: the window edges
+and both sides of every known interior Drik Lagna transition. They are
+tie-break evidence only.
+The other marketplace clauses and buyer/seller scope remain manual; Python/MCP
+do not call the chart service. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 ## Non-inherited heuristics and narrower profiles
 

@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "source": "telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES",
+  "house_system": "whole_sign",
+  "node_convention": "mean",
+  "vacancy_includes": [
+    "Surya",
+    "Chandra",
+    "Kuja",
+    "Budha",
+    "Guru",
+    "Shukra",
+    "Shani",
+    "Rahu",
+    "Ketu"
+  ],
+  "rules": {
+    "wedding": [
+      {
+        "id": "wedding.house-7-vacant",
+        "label": "7th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.wedding",
+        "source_locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
+        "house": 7
+      },
+      {
+        "id": "wedding.kuja-not-8",
+        "label": "Mangala (Kuja) is outside the 8th house",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.wedding",
+        "source_locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
+        "planet": "Kuja",
+        "house": 8
+      },
+      {
+        "id": "wedding.shukra-not-6",
+        "label": "Shukra is outside the 6th house",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.wedding",
+        "source_locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
+        "planet": "Shukra",
+        "house": 6
+      }
+    ],
+    "annaprasana": [
+      {
+        "id": "annaprasana.house-10-vacant",
+        "label": "10th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.annaprasana",
+        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "house": 10
+      },
+      {
+        "id": "annaprasana.budha-not-7",
+        "label": "Budha is outside the 7th house",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.annaprasana",
+        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "planet": "Budha",
+        "house": 7
+      },
+      {
+        "id": "annaprasana.kuja-not-8",
+        "label": "Mangala (Kuja) is outside the 8th house",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.annaprasana",
+        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "planet": "Kuja",
+        "house": 8
+      },
+      {
+        "id": "annaprasana.shukra-not-9",
+        "label": "Shukra is outside the 9th house",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.annaprasana",
+        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "planet": "Shukra",
+        "house": 9
+      }
+    ],
+    "seemantha": [
+      {
+        "id": "seemantha.house-8-vacant",
+        "label": "8th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.seemantha",
+        "source_locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
+        "house": 8
+      },
+      {
+        "id": "seemantha.chandra-not-8",
+        "label": "Chandra is outside the 8th house",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.seemantha",
+        "source_locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
+        "planet": "Chandra",
+        "house": 8
+      }
+    ],
+    "gruhapravesha": [
+      {
+        "id": "gruhapravesha.house-8-vacant",
+        "label": "8th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.gruhapravesha",
+        "source_locator": "Chapter XII, 'Entering a new house,' printed pp. 52-54 (PDF pp. 56-58)",
+        "house": 8
+      }
+    ],
+    "property": [
+      {
+        "id": "property.guru-kendra-trikona",
+        "label": "Guru occupies a Kendra or Trikona",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.land_purchase.building",
+        "source_locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+        "planet": "Guru",
+        "houses": [
+          1,
+          4,
+          5,
+          7,
+          9,
+          10
+        ]
+      },
+      {
+        "id": "property.kuja-11",
+        "label": "Mangala (Kuja) occupies the 11th house",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.land_purchase.building",
+        "source_locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+        "planet": "Kuja",
+        "houses": [
+          11
+        ]
+      },
+      {
+        "id": "property.kuja-not-lagna",
+        "label": "Mangala (Kuja) is outside Lagna",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.land_purchase.building",
+        "source_locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+        "planet": "Kuja",
+        "house": 1
+      }
+    ],
+    "house_purchase": [
+      {
+        "id": "house-purchase.kuja-not-lagna",
+        "label": "Mangala (Kuja) is outside Lagna",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.house_purchase.completed",
+        "source_locator": "Chapter XII, 'Buying Houses,' printed p. 53 (PDF p. 57)",
+        "planet": "Kuja",
+        "house": 1
+      }
+    ],
+    "purchase": [
+      {
+        "id": "purchase.chandra-lagna",
+        "label": "Chandra occupies Lagna",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.purchase.general",
+        "source_locator": "Nakshatra-prakarana, purchase Muhurta verse 16, printed pp. 33-34, and marketplace verse 17, printed pp. 34-35",
+        "planet": "Chandra",
+        "houses": [
+          1
+        ]
+      },
+      {
+        "id": "purchase.shukra-lagna",
+        "label": "Shukra occupies Lagna",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.purchase.general",
+        "source_locator": "Nakshatra-prakarana, purchase Muhurta verse 16, printed pp. 33-34, and marketplace verse 17, printed pp. 34-35",
+        "planet": "Shukra",
+        "houses": [
+          1
+        ]
+      }
+    ],
+    "job": [
+      {
+        "id": "job.surya-or-kuja-10-11",
+        "label": "Surya or Mangala (Kuja) occupies the 10th or 11th house",
+        "kind": "any_planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.service_entry",
+        "source_locator": "Nakshatra-prakarana, 'Entering the service of a master,' verse 26, printed p. 38",
+        "planets": [
+          "Surya",
+          "Kuja"
+        ],
+        "houses": [
+          10,
+          11
+        ]
+      }
+    ],
+    "ceremony": [
+      {
+        "id": "ceremony.surya-10",
+        "label": "Surya occupies the 10th house",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.shantika_paushtika",
+        "source_locator": "Nakshatra-prakarana, 'Shantika and Paushtika Muhurta,' verse 34, printed pp. 42-43",
+        "planet": "Surya",
+        "houses": [
+          10
+        ]
+      },
+      {
+        "id": "ceremony.chandra-4",
+        "label": "Chandra occupies the 4th house",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.shantika_paushtika",
+        "source_locator": "Nakshatra-prakarana, 'Shantika and Paushtika Muhurta,' verse 34, printed pp. 42-43",
+        "planet": "Chandra",
+        "houses": [
+          4
+        ]
+      },
+      {
+        "id": "ceremony.guru-lagna",
+        "label": "Guru occupies Lagna",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.shantika_paushtika",
+        "source_locator": "Nakshatra-prakarana, 'Shantika and Paushtika Muhurta,' verse 34, printed pp. 42-43",
+        "planet": "Guru",
+        "houses": [
+          1
+        ]
+      }
+    ],
+    "pilgrimage": [
+      {
+        "id": "pilgrimage.guru-lagna-or-9",
+        "label": "Guru occupies Lagna or the 9th house",
+        "kind": "planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.pilgrimage",
+        "source_locator": "Chapter XIV, 'Journeys' and 'Pilgrimage,' printed pp. 60-62 (PDF pp. 64-66)",
+        "planet": "Guru",
+        "houses": [
+          1,
+          9
+        ]
+      }
+    ],
+    "travel": [
+      {
+        "id": "travel.kuja-not-8",
+        "label": "Mangala (Kuja) is outside the 8th house",
+        "kind": "planet_not_house",
+        "effect": "reject",
+        "source_claim": "muhurta.travel",
+        "source_locator": "Chapter XIV, 'Journeys' and 'Long-distance Journeys,' printed pp. 60-61 (PDF pp. 64-65)",
+        "planet": "Kuja",
+        "house": 8
+      }
+    ],
+    "surgery": [
+      {
+        "id": "surgery.house-8-vacant",
+        "label": "8th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.surgery",
+        "source_locator": "Chapter XV, 'Surgical Operations,' printed pp. 64-65 (PDF pp. 68-69)",
+        "house": 8
+      }
+    ]
+  },
+  "manual_remainders": {
+    "wedding": [
+      "Assess malefic occupancy or hemming around Lagna and any Chandra-Graha association.",
+      "Review the optional fortification combinations and both partners’ compatibility, Tarabala, Chandrabala and Panchaka."
+    ],
+    "annaprasana": [
+      "Assess whether Budha, Guru or Shukra strengthens Lagna and whether a malefic occupies Lagna."
+    ],
+    "seemantha": [
+      "If relying on Pournami, assess the source’s qualitative Chandra-dignity condition."
+    ],
+    "gruhapravesha": [
+      "Assess Guru, Shukra and Chandra strength, benefic/malefic placement, rising-Rasi ownership and the Navamsa exception."
+    ],
+    "property": [
+      "Assess the weekday lord in Lagna, harmony between Lagna and 7th lords, and whether the 11th lord occupies the 12th."
+    ],
+    "house_purchase": [
+      "Assess whether a malefic occupies the 7th house."
+    ],
+    "purchase": [
+      "Keep malefics outside the 8th and 12th houses, and assess whether benefics occupy the 2nd, 10th or 11th."
+    ],
+    "job": [
+      "Assess whether a benefic strengthens Lagna and complete the employer/employee compatibility checks."
+    ],
+    "ceremony": [
+      "Assess combustion, exceptional omens and whether the remedial-urgency exception applies."
+    ],
+    "pilgrimage": [],
+    "travel": [
+      "Assess general Lagna fortification, whether Guru or Shukra is well placed in Lagna, waxing Chandra and malefic occupancy of the 7th house."
+    ],
+    "surgery": [
+      "Assess the operated-body-part Rasi and house, malefic affliction, Mangala strength and Mangala-Shani aspects."
+    ]
+  }
+}

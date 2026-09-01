@@ -28,9 +28,12 @@ turning a textual preference into an unsupported hard prohibition.
 
 ## Practitioner and practical checks
 
-The source also says to keep malefics out of the 7th house and not place
-Mangala in Lagna. Those chart conditions remain visible manual prerequisites,
-so an automated result cannot receive the `Excellent` tier.
+The Drik browser post-screen rejects Mangala in Lagna at any sampled state
+(the window edges and both sides of every known interior Drik Lagna
+transition). Keeping malefics out of the 7th remains a qualitative practitioner check,
+so unresolved review still caps the result below `Excellent`. Python/MCP retain
+both clauses as manual wording because they do not call the chart service. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 Legal title, structural inspection, finance affordability and qualified
 contract advice always take precedence over electional timing. The profile

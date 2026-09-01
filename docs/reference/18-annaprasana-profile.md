@@ -23,7 +23,8 @@ the family's ritual tradition.
 | Avoid usual unfavorable Tithis | `avoid_tithi_numbers` | Cross-referenced to Chapter V's 4th, 6th, 8th, 12th, 14th, Purnima and Amavasya list; terminal days both map to 15. |
 | Monday, Wednesday, Thursday and Friday are good | `allowed_varas` | Other weekdays reject the day with an explicit reason. |
 | Mesha, Vrischika and Meena rising are inauspicious | `allowed_lagnas` | The other nine Rasis form the conservative slot-time allow-list. |
-| Leave the 10th vacant; specified Budha/Mangala/Shukra placements; benefic Lagna and no malefic there | `manual_checks` | Full election-chart occupancy and benefic/malefic judgment remain practitioner checks. |
+| Leave the 10th vacant; keep Budha/Mangala/Shukra out of the 7th/8th/9th respectively | `ELECTION_CHART_RULES[annaprasana]` | The Drik browser rejects a failure at any sampled state (edges and both sides of known interior Lagna transitions). Vacancy counts all nine projected grahas. |
+| Budha, Guru or Shukra in Lagna; no malefic in Lagna | `manual_checks` | Benefic/malefic classification and the remaining fortification judgment stay manual. |
 
 ## Product contract and limitations
 
@@ -31,4 +32,6 @@ The existing samskara filters, hard avoid windows, Shubh-Choghadiya and
 Tithi-family ranking preferences, personal scoring and relative tiers are
 shared project rules and are not established by this locator. MCP exposes the
 stable `muhurta.annaprasana` claim and all manual checks; the browser consumes
-the same generated contract.
+the same generated activity contract and adds a Drik-only chart post-screen.
+The chart service does not run in Python/MCP. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).

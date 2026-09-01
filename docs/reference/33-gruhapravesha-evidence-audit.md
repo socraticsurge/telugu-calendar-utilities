@@ -26,13 +26,18 @@ Omitting the movable-Rasi exception is conservative: it can reject a source
 exception, but it cannot admit a time Raman rejects. The UI and MCP response
 state that boundary explicitly.
 
-## Manual prerequisites
+## Browser-computed and manual prerequisites
 
-The automated result cannot receive `Excellent`. A practitioner must still
-review Guru, Shukra and Chandra strength; an empty 8th; malefics in Upachayas;
-benefics in Kendras; and preferably a Guru- or Shukra-owned rising Rasi. The
-owner's Janma Rasi, Nakshatra or Lagna may strengthen the election. Worship and
-Bhootabali precede entry.
+The Drik browser post-screen rejects an occupied 8th at any sampled state.
+Selecting a primary householder also turns a match to that person's Janma
+Rasi, Nakshatra or Lagna across every sampled state into one source preference
+without a raw-score bonus. Samples cover the window edges and both sides of
+every known interior Drik Lagna transition.
+A practitioner must still review Guru, Shukra and Chandra strength; malefics in
+Upachayas; benefics in Kendras; and preferably a Guru- or Shukra-owned rising
+Rasi. Worship and Bhootabali precede entry. Python/MCP retain the full list as
+manual checks because they do not call the chart service. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 Raman advises against the entry after six months of the wife's pregnancy.
 Maternal comfort, clinician instructions and medical care always take

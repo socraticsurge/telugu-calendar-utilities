@@ -17,8 +17,13 @@ PyPI version tracks this file's most recent release entry.
   the absent-flag development default; public requests use only the canonical
   Astro Chaganti HTTPS guest gateway, while saved calculations stay viewable
   and manual profile entry remains available.
-- Keep the established 79-module computation-layer contract unchanged while
-  reporting four profile/activation modules as additive feature sources.
+- Add source-backed Drik Muhurtam candidate-time chart screening behind an
+  independent fail-closed activation gate. Only the exact string `true`
+  enables public requests; an absent flag is loopback-only, public routing is
+  pinned to the canonical HTTPS guest gateway, and a disabled build retains
+  the shortlist with an honest rating cap and review state.
+- Keep the established 78-module computation-layer contract unchanged while
+  reporting thirteen profile/activation modules as additive feature sources.
 - Align the dependency security gate with the environment installed from the
   same `requirements.txt` input used by CI and release workflows, and refresh
   the separate Python 3.11 reproducibility snapshot with current dependency
@@ -26,6 +31,21 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Validate calculated birth-profile responses and restored browser records
+  against the exact `1.0` DashaFlow/Lahiri contract, canonical ordered
+  nine-graha tuple, Whole Sign houses, fixed node facts, and
+  Moon/Nakshatra/Padam/Janma-Rashi relationships while allowing only the
+  service's explicit two-decimal rounding interval; validate future, ambiguous
+  and nonexistent civil times in the birthplace timezone.
+- Preserve conclusive removals and survivors from completed Muhurtam chart
+  batches when a later batch fails, withhold every unscreened candidate, reject
+  incompatible cross-batch engine provenance, and disclose differing accepted
+  ephemerides as `mixed`; reject election snapshots that contradict the same
+  two-decimal, Whole Sign, and fixed-graha projection contract.
+- Remove third-party executable analytics and cross-origin font resources from
+  the profile-bearing page and documentation shell, omit saved profile names
+  from built-in share text, and keep documentation diagrams, evidence tables,
+  and tablet navigation inside the viewport with intentional local scrolling.
 - Keep published Lagna-transition and Hora feeds within the requested
   sunrise-to-next-sunrise cycle, including date-city combinations where a
   Julian-day seed could previously skip the first following sunrise.

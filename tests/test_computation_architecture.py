@@ -15,7 +15,7 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     report = build_report('HEAD', commit_limit=20)
 
     assert report['schema_version'] == 1
-    assert report['scope']['source_files'] == 79
+    assert report['scope']['source_files'] == 78
     assert report['scope']['computation_records'] == 62
     assert len(report['output_consumer_map']) == 62
     assert len({item['id'] for item in report['output_consumer_map']}) == 62
@@ -25,6 +25,10 @@ def test_architecture_report_maps_modules_consumers_and_layers():
 
 def test_profiles_panel_extends_architecture_additively():
     assert source_scope_class('src/panels/profiles.ts') == 'additive-feature'
+
+
+def test_guest_profile_store_extends_architecture_additively():
+    assert source_scope_class('src/lib/guest-profile-store.ts') == 'additive-feature'
 
 
 def test_profile_selection_extends_architecture_additively():

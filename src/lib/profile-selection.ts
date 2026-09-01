@@ -8,6 +8,11 @@ import {
 
 export const GOCHARA_SELECTION_STORAGE_KEY = 'tc-go-view';
 export const MUHURTAM_PROFILE_IDS_STORAGE_KEY = 'tc-mu-profile-ids';
+export const MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY = 'tc-mu-role-selections';
+
+const MUHURTAM_ROLE_ACTIVITIES = new Set([
+  'travel', 'gruhapravesha', 'seemantha', 'surgery',
+]);
 
 export type GocharaSelectionValue = '' | `${number}` | `profile:${string}`;
 export type GocharaSelectionKind = 'whole-sky' | 'rashi' | 'profile';
@@ -83,6 +88,12 @@ export interface MuhurtamProfileSelection {
   message: string | null;
 }
 
+export interface MuhurtamRoleSelections {
+  selections: Record<string, string>;
+  persistence: ProfilePersistence;
+  storageIssue: SelectionStorageIssue;
+}
+
 interface ResolvedMuhurtamIds {
   selectedIds: string[];
   profiles: JourneyGuestProfile[];
@@ -149,9 +160,9 @@ function incompleteProfileFallback(profile: GuestProfile): ProfileSelectionFallb
 /**
  * Resolve a Gochara selection without touching storage or the DOM.
  *
- * Legacy pN/pNr/pNl values intentionally use the stored profile index once,
- * then callers persist the returned stable profile:<id> value. We do not bind
- * an old index to a different person when that exact row is incomplete.
+ * Legacy pN/pNr/pNl values indexed the old Gochara-ready profile list, which
+ * omitted incomplete rows before assigning pN. Recreate that filtered order
+ * once, then persist the returned stable profile:<id> value.
  */
 export function resolveGocharaSelection(
   rawValue: unknown,
@@ -199,12 +210,12 @@ export function resolveGocharaSelection(
 
   const legacyMatch = requestedValue.match(LEGACY_GOCHARA_SELECTION);
   if (legacyMatch) {
-    const profile = profiles[Number(legacyMatch[1])];
+    const legacyReadyProfiles = profiles.filter(
+      profile => guestProfileReadiness(profile).horoscope,
+    );
+    const profile = legacyReadyProfiles[Number(legacyMatch[1])];
     if (!profile) {
       return wholeSky(requestedValue, missingProfileFallback(), true);
-    }
-    if (!guestProfileReadiness(profile).horoscope) {
-      return wholeSky(requestedValue, incompleteProfileFallback(profile), true);
     }
     return {
       requestedValue,
@@ -477,4 +488,103 @@ export function toggleMuhurtamProfileSelection(
     [...current.selectedIds, profileId],
     profiles,
   );
+}
+
+function resolveMuhurtamRoleSelections(
+  value: unknown,
+  profiles: ReadonlyArray<Readonly<GuestProfile>>,
+): Record<string, string> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const envelope = value as Record<string, unknown>;
+  if (envelope.version !== 1 || !envelope.roles
+      || typeof envelope.roles !== 'object' || Array.isArray(envelope.roles)) return {};
+  const roles = envelope.roles as Record<string, unknown>;
+  const readyIds = new Set(
+    profiles.filter(profile => guestProfileReadiness(profile).muhurta)
+      .map(profile => profile.id),
+  );
+  const selections: Record<string, string> = {};
+  for (const activity of MUHURTAM_ROLE_ACTIVITIES) {
+    const profileId = roles[activity];
+    if (typeof profileId === 'string' && readyIds.has(profileId)) {
+      selections[activity] = profileId;
+    }
+  }
+  return selections;
+}
+
+function persistMuhurtamRoleSelections(
+  storage: ProfileStorage,
+  selections: Readonly<Record<string, string>>,
+): 'storage-unavailable' | null {
+  try {
+    storage.setItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY, JSON.stringify({
+      version: 1,
+      roles: selections,
+    }));
+    return null;
+  } catch {
+    return 'storage-unavailable';
+  }
+}
+
+/** Restore only ready, stable saved-profile IDs for source-specific roles. */
+export function loadMuhurtamRoleSelections(
+  storage: ProfileStorage,
+  profiles: ReadonlyArray<Readonly<GuestProfile>>,
+): MuhurtamRoleSelections {
+  let rawText: string | null;
+  try {
+    rawText = storage.getItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY);
+  } catch {
+    return { selections: {}, persistence: 'memory', storageIssue: 'storage-unavailable' };
+  }
+  if (rawText === null) {
+    return { selections: {}, persistence: 'persistent', storageIssue: null };
+  }
+  let parsed: unknown;
+  let storageIssue: SelectionStorageIssue = null;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch {
+    parsed = null;
+    storageIssue = 'malformed-storage';
+  }
+  const selections = resolveMuhurtamRoleSelections(parsed, profiles);
+  const normalized = JSON.stringify({ version: 1, roles: selections });
+  if (normalized !== rawText) {
+    const writeIssue = persistMuhurtamRoleSelections(storage, selections);
+    if (writeIssue) storageIssue = writeIssue;
+  }
+  return {
+    selections,
+    persistence: storageIssue === 'storage-unavailable' ? 'memory' : 'persistent',
+    storageIssue,
+  };
+}
+
+/** Persist one role assignment; transient manual participants remain session-only. */
+export function saveMuhurtamRoleSelection(
+  storage: ProfileStorage,
+  current: Readonly<Record<string, string>>,
+  activity: string,
+  profileId: string | null,
+  profiles: ReadonlyArray<Readonly<GuestProfile>>,
+): MuhurtamRoleSelections {
+  const requested: Record<string, string> = { ...current };
+  if (MUHURTAM_ROLE_ACTIVITIES.has(activity) && profileId) {
+    requested[activity] = profileId;
+  } else {
+    delete requested[activity];
+  }
+  const selections = resolveMuhurtamRoleSelections(
+    { version: 1, roles: requested },
+    profiles,
+  );
+  const storageIssue = persistMuhurtamRoleSelections(storage, selections);
+  return {
+    selections,
+    persistence: storageIssue ? 'memory' : 'persistent',
+    storageIssue,
+  };
 }

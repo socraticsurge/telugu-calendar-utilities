@@ -181,31 +181,31 @@ surface; they are not all viewport-height screenshots.
 
 | ID | File | Evidence purpose |
 |---:|---|---|
-| 01 | `01-profile-detail-desktop.png` | Initial desktop profile surface and fixture state. |
-| 02 | `02-panchangam-desktop.png` | Desktop daily-glance hierarchy. |
-| 03 | `03-panchangam-settings-desktop.png` | Expanded city, system, and time-format settings. |
-| 04 | `04-horoscope-desktop.png` | Whole-sky Daily Horoscope baseline. |
-| 05 | `05-horoscope-profile-desktop.png` | Personalized Horoscope density and chart relationship. |
-| 06 | `06-muhurtam-desktop.png` | Muhurtam entry form and profile selection. |
-| 07 | `07-muhurtam-results-desktop.png` | Expanded result reasons and total page length. |
-| 08 | `08-festivals-desktop.png` | Festival ordering and current dead-end behavior. |
-| 09 | `09-subscribe-desktop.png` | Feed choice, copy action, and instructions. |
-| 10 | `10-documentation-landing-desktop.png` | Documentation discovery and landing hierarchy. |
-| 11 | `11-profile-view-desktop.png` | Saved-profile detail, natal facts, and missing onward actions. |
-| 12 | `12-profile-view-mobile.png` | Saved-profile detail at phone width. |
-| 13 | `13-panchangam-mobile.png` | Direct-hash navigation-state diagnostic. This capture alone is not treated as proof of a user-facing navigation defect. |
-| 14 | `14-panchangam-mobile-navigation.png` | Panchangam reached through the actual mobile navigation journey. |
-| 15 | `15-horoscope-profile-mobile.png` | Personalized Horoscope title collision, density, and content/chart collision. |
-| 16 | `16-muhurtam-mobile.png` | Muhurtam entry at phone width. |
-| 17 | `17-mobile-navigation-drawer.png` | Drawer presentation; focus-order behavior requires DOM/keyboard evidence, not this image alone. |
-| 18 | `18-panchangam-tablet.png` | Tablet shell and title collision. |
-| 19 | `19-horoscope-surface-options.png` | Baseline-versus-recommended hierarchy comparison; mock only. |
-| 20 | `20-profile-detail-actions-mobile.png` | Ready profile with direct Daily Horoscope and Muhurtam actions. |
-| 21 | `21-horoscope-profile-mobile-after.png` | Concise Janma-Rashi answer before the closed deterministic evidence disclosure. |
-| 22 | `22-muhurtam-results-mobile-after.png` | Tier-first ranking explanation and closed per-slot evidence at the compact-shell width. |
-| 23 | `23-muhurtam-results-midwidth-full-after.png` | Full Muhurtam journey at the audited 853 px failure width; fixed chrome in a long capture is not used for positional judgment. |
-| 24 | `24-panchangam-responsive-after.png` | Corrected 853 px Panchangam shell with no sidebar squeeze or horizontal overflow. |
-| 25 | `25-festivals-next-observance-after.png` | Next observance promoted above the year archive with a direct Panchangam action. |
+| 01 | `01-profile-detail-desktop.jpg` | Initial desktop profile surface and fixture state. |
+| 02 | `02-panchangam-desktop.jpg` | Desktop daily-glance hierarchy. |
+| 03 | `03-panchangam-settings-desktop.jpg` | Expanded city, system, and time-format settings. |
+| 04 | `04-horoscope-desktop.jpg` | Whole-sky Daily Horoscope baseline. |
+| 05 | `05-horoscope-profile-desktop.jpg` | Personalized Horoscope density and chart relationship. |
+| 06 | `06-muhurtam-desktop.jpg` | Muhurtam entry form and profile selection. |
+| 07 | `07-muhurtam-results-desktop.jpg` | Expanded result reasons and total page length. |
+| 08 | `08-festivals-desktop.jpg` | Festival ordering and current dead-end behavior. |
+| 09 | `09-subscribe-desktop.jpg` | Feed choice, copy action, and instructions. |
+| 10 | `10-documentation-landing-desktop.jpg` | Documentation discovery and landing hierarchy. |
+| 11 | `11-profile-view-desktop.jpg` | Saved-profile detail, natal facts, and missing onward actions. |
+| 12 | `12-profile-view-mobile.jpg` | Saved-profile detail at phone width. |
+| 13 | `13-panchangam-mobile.jpg` | Direct-hash navigation-state diagnostic. This capture alone is not treated as proof of a user-facing navigation defect. |
+| 14 | `14-panchangam-mobile-navigation.jpg` | Panchangam reached through the actual mobile navigation journey. |
+| 15 | `15-horoscope-profile-mobile.jpg` | Personalized Horoscope title collision, density, and content/chart collision. |
+| 16 | `16-muhurtam-mobile.jpg` | Muhurtam entry at phone width. |
+| 17 | `17-mobile-navigation-drawer.jpg` | Drawer presentation; focus-order behavior requires DOM/keyboard evidence, not this image alone. |
+| 18 | `18-panchangam-tablet.jpg` | Tablet shell and title collision. |
+| 19 | `19-horoscope-surface-options.jpg` | Baseline-versus-recommended hierarchy comparison; mock only. |
+| 20 | `20-profile-detail-actions-mobile.jpg` | Ready profile with direct Daily Horoscope and Muhurtam actions. |
+| 21 | `21-horoscope-profile-mobile-after.jpg` | Concise Janma-Rashi answer before the closed deterministic evidence disclosure. |
+| 22 | `22-muhurtam-results-mobile-after.jpg` | Tier-first ranking explanation and closed per-slot evidence at the compact-shell width. |
+| 23 | `23-muhurtam-results-midwidth-full-after.jpg` | Full Muhurtam journey at the audited 853 px failure width; fixed chrome in a long capture is not used for positional judgment. |
+| 24 | `24-panchangam-responsive-after.jpg` | Corrected 853 px Panchangam shell with no sidebar squeeze or horizontal overflow. |
+| 25 | `25-festivals-next-observance-after.jpg` | Next observance promoted above the year archive with a direct Panchangam action. |
 
 ## Re-audit record
 

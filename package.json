@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.panels.json --noEmit",
     "activity:export": "python3 tools/export_activity_rules.py",
-    "activity:check": "python3 tools/export_activity_rules.py --check"
+    "activity:check": "python3 tools/export_activity_rules.py --check && python3 tools/export_election_chart_rules.py --check && python3 tools/export_muhurtam_rule_crosswalk.py --check"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

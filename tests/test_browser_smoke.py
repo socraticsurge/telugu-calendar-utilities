@@ -30,7 +30,10 @@ import socketserver
 import subprocess
 import threading
 import time
+from datetime import datetime
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -228,6 +231,346 @@ def _seed_profile_surfaces(page):
     )
     page.reload(wait_until='domcontentloaded', timeout=15000)
     _wait_for_profile_app(page)
+
+
+MUHURTA_FIXTURE_DATE = '2026-06-11'
+MUHURTA_FEED_FIXTURE = (
+    REPO_ROOT / 'tests/fixtures/golden_hyderabad_drik_2026-06-11_3d.ics'
+)
+MUHURTA_PLANET_NAMES = (
+    'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
+    'Shukra', 'Shani', 'Rahu', 'Ketu',
+)
+MUHURTA_PLANET_RASHIS = (
+    'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
+    'Kanya', 'Tula', 'Vrischika', 'Dhanu',
+)
+PRIVATE_TRAVELLER_ID = 'guest_private_traveller'
+OTHER_TRAVELLER_ID = 'guest_other_traveller'
+
+
+def _muhurta_lagna_fixture():
+    """Known per-day boundary map used by exact-window browser checks."""
+    return {
+        'start': MUHURTA_FIXTURE_DATE,
+        'days': [
+            {
+                'date': date,
+                'sunrise': '05:41',
+                'lagna0': 3,
+                'transitions': [
+                    [60, 4], [120, 5], [180, 6], [240, 7],
+                    [300, 8], [360, 9], [410, 10], [480, 11],
+                    [540, 0], [600, 1], [660, 2], [720, 3],
+                ],
+                'cycleEnd': 1440,
+            }
+            for date in ('2026-06-11', '2026-06-12', '2026-06-13')
+        ],
+    }
+
+
+def _install_direct_route_runtime_assets(page):
+    """Stage production-generated dependencies for direct-route smoke tests."""
+    feed_text = MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8')
+    today = time.strftime('%Y-%m-%d')
+    gochara = {
+        'start': today,
+        'grahas': list(MUHURTA_PLANET_NAMES),
+        'rasis': list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena'],
+        'days': [[0, 1, 2, 3, 4, 5, 6, 7, 8]],
+        'retro': [[False, False, False, False, False, False, True, True, True]],
+    }
+    page.route(
+        '**/feeds/*.ics',
+        lambda route: route.fulfill(
+            status=200, content_type='text/calendar', body=feed_text,
+        ),
+    )
+    page.route(
+        '**/feeds/*-lagna.json',
+        lambda route: route.fulfill(
+            status=200,
+            content_type='application/json',
+            body=json.dumps(_muhurta_lagna_fixture()),
+        ),
+    )
+    page.route(
+        '**/gochara.json',
+        lambda route: route.fulfill(
+            status=200, content_type='application/json',
+            body=json.dumps(gochara),
+        ),
+    )
+    page.route(
+        '**/rasi_phalalu/latest.json',
+        lambda route: route.fulfill(
+            status=200, content_type='application/json',
+            body=json.dumps({'date': '', 'rashis': {}}),
+        ),
+    )
+
+
+def _fixture_lagna_for_instant(instant):
+    """Resolve the same canonical fixture Lagna the browser will project."""
+    local = datetime.fromisoformat(instant.replace('Z', '+00:00')).astimezone(
+        ZoneInfo('Asia/Kolkata')
+    )
+    minute = local.hour * 60 + local.minute
+    day = _muhurta_lagna_fixture()['days'][0]
+    sunrise_hour, sunrise_minute = map(int, day['sunrise'].split(':'))
+    offset = minute - (sunrise_hour * 60 + sunrise_minute)
+    starts = [(0, day['lagna0']), *day['transitions']]
+    rashi_index = day['lagna0']
+    for start, candidate in starts:
+        if start > offset:
+            break
+        rashi_index = candidate
+    return (
+        list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
+    )[rashi_index]
+
+
+def _muhurta_planets(scenario, chart_index, canonical_lagna):
+    """Return strict planets whose Rashis encode scenario-specific houses."""
+    houses = {name: 2 for name in MUHURTA_PLANET_NAMES}
+    if scenario in {'positive', 'profile'}:
+        # Both generic-purchase preferences pass; travel's Kuja exclusion also
+        # passes. Other houses deliberately stay compact and deterministic.
+        houses.update({'Chandra': 1, 'Shukra': 1, 'Kuja': 2})
+    elif scenario == 'failure':
+        houses['Kuja'] = 8
+    elif scenario == 'mixed':
+        # Every slot has at least its first and last minute sampled. Alternating
+        # Chandra across those snapshots makes the source preference genuinely
+        # mixed within the offered window without inventing a hard rejection.
+        houses.update({
+            'Chandra': 1 if chart_index % 2 == 0 else 2,
+            'Shukra': 1,
+        })
+    houses['Ketu'] = (houses['Rahu'] + 5) % 12 + 1
+    rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
+    lagna_index = rashis.index(canonical_lagna)
+    return [
+        {
+            'name': name,
+            'rashi': rashis[(lagna_index + houses[name] - 1) % 12],
+            'degree': 10 if name in {'Rahu', 'Ketu'} else index + 0.25,
+            'house': houses[name],
+            'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
+        }
+        for index, name in enumerate(MUHURTA_PLANET_NAMES)
+    ]
+
+
+def _muhurta_chart_payload(request_payload, scenario):
+    location = request_payload['location']
+    return {
+        'contract_version': '1.0',
+        'engine': {
+            'name': 'DashaFlow',
+            'version': '1.1.0-test',
+            'ayanamsha': 'Lahiri',
+            'ephemeris': 'swiss',
+            'node_convention': 'mean',
+        },
+        'house_system': 'whole_sign',
+        'location': location,
+        'data': {
+            'charts': [
+                {
+                    'instant': instant,
+                    'lagna': {
+                        'rashi': _fixture_lagna_for_instant(instant),
+                        'degree': 12.5,
+                    },
+                    'planets': _muhurta_planets(
+                        scenario,
+                        index,
+                        _fixture_lagna_for_instant(instant),
+                    ),
+                }
+                for index, instant in enumerate(request_payload['instants'])
+            ],
+        },
+    }
+
+
+def _install_muhurta_routes(page, docs_server, scenario):
+    """Intercept every mutable Muhurtam dependency for a built-site test."""
+    calls = []
+    feed_text = MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8')
+
+    page.route(
+        'https://gc.zgo.at/**',
+        lambda route: route.fulfill(
+            status=200, content_type='application/javascript', body='',
+        ),
+    )
+    page.route(
+        'https://panchangam.goatcounter.com/**',
+        lambda route: route.fulfill(status=204, body=''),
+    )
+    page.route(
+        '**/feeds/*.ics',
+        lambda route: route.fulfill(
+            status=200, content_type='text/calendar', body=feed_text,
+        ),
+    )
+    page.route(
+        '**/feeds/*-lagna.json',
+        lambda route: route.fulfill(
+            status=200,
+            content_type='application/json',
+            body=json.dumps(_muhurta_lagna_fixture()),
+        ),
+    )
+
+    def fulfill_chart_gateway(route):
+        request = route.request
+        if scenario == 'offline':
+            route.abort('failed')
+            return
+        headers = {
+            'Access-Control-Allow-Origin': docs_server,
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Cache-Control': 'private, no-store',
+        }
+        if request.method == 'OPTIONS':
+            route.fulfill(status=204, headers=headers, body='')
+            return
+        payload = request.post_data_json
+        calls.append(payload)
+        body = (
+            {'contract_version': '1.0', 'data': {'charts': []}}
+            if scenario == 'malformed'
+            else _muhurta_chart_payload(payload, scenario)
+        )
+        route.fulfill(
+            status=200,
+            headers=headers,
+            content_type='application/json',
+            body=json.dumps(body),
+        )
+
+    page.route(
+        'http://127.0.0.1:3000/api/guest/muhurta/election-charts',
+        fulfill_chart_gateway,
+    )
+    return calls
+
+
+def _seed_private_muhurta_profiles(page):
+    rows = [
+        {
+            'id': OTHER_TRAVELLER_ID,
+            'schemaVersion': 1,
+            'name': 'Other Private Traveller',
+            'nak': 'Ashvini',
+            'pada': 2,
+            'lagna': 'Mesha',
+        },
+        {
+            'id': PRIVATE_TRAVELLER_ID,
+            'schemaVersion': 1,
+            'name': 'Private Ananya',
+            'nak': 'Rohini',
+            'pada': 2,
+            'lagna': 'Kanya',
+        },
+    ]
+    natal_planets = [
+        {
+            'name': name,
+            'rashi': 'Vrishabha' if name == 'Ketu' else MUHURTA_PLANET_RASHIS[index],
+            'degree': 15 if name == 'Chandra' else 10 if name in {'Rahu', 'Ketu'} else index + 0.5,
+            'house': ((1 if name == 'Ketu' else index) - 5) % 12 + 1,
+            'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
+        }
+        for index, name in enumerate(MUHURTA_PLANET_NAMES)
+    ]
+    extension = {
+        'schemaVersion': 1,
+        'profiles': {
+            PRIVATE_TRAVELLER_ID: {
+                'source': 'birth-details',
+                'nakshatra': 'Rohini',
+                'pada': 2,
+                'lagna': 'Kanya',
+                'janmaRasi': 'Vrishabha',
+                'birthDetails': {
+                    'dateOfBirth': '1990-04-15',
+                    'timeOfBirth': '14:30',
+                    'placeLabel': 'Private Birthplace, India',
+                    'latitude': 17.385,
+                    'longitude': 78.4867,
+                    'timezone': 'Asia/Kolkata',
+                },
+                'natalChart': {
+                    'lagnaDegree': 4.69,
+                    'planets': natal_planets,
+                },
+                'calculation': {
+                    'contractVersion': '1.0',
+                    'engine': {
+                        'name': 'DashaFlow',
+                        'version': '1.1.0-test',
+                        'ayanamsha': 'Lahiri',
+                        'ephemeris': 'swiss',
+                    },
+                },
+            },
+        },
+    }
+    page.evaluate(
+        """state => {
+            localStorage.clear();
+            localStorage.setItem('tc-tb-profiles', JSON.stringify(state.rows));
+            localStorage.setItem(
+                'tc-mu-profile-ids', JSON.stringify(state.selectedIds)
+            );
+            localStorage.setItem(
+                'tc-birth-profile-data', JSON.stringify(state.extension)
+            );
+        }""",
+        {
+            'rows': rows,
+            'selectedIds': [OTHER_TRAVELLER_ID, PRIVATE_TRAVELLER_ID],
+            'extension': extension,
+        },
+    )
+
+
+def _run_muhurta_browser_search(
+    page, docs_server, scenario, activity='purchase', system='drik',
+):
+    calls = _install_muhurta_routes(page, docs_server, scenario)
+    page.goto(
+        f'{docs_server}#tarabalam',
+        wait_until='domcontentloaded',
+        timeout=15000,
+    )
+    _wait_for_profile_app(page)
+    # The settings form is intentionally collapsed in the product shell. Set
+    # the real select and dispatch its public change event without forcing the
+    # hidden control visible solely for a test.
+    page.locator('#tp-system').evaluate(
+        """(select, value) => {
+            select.value = value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        }""",
+        system,
+    )
+    page.select_option('#mu-activity', activity)
+    page.fill('#tb-from', MUHURTA_FIXTURE_DATE)
+    page.fill('#tb-to', MUHURTA_FIXTURE_DATE)
+    page.get_by_role('button', name='Show Slots', exact=True).click()
+    page.locator('#mu-result .mu-chart-status').wait_for(
+        state='visible', timeout=20000,
+    )
+    assert page.locator('#mu-result').get_attribute('aria-busy') == 'false'
+    return calls
 
 
 def _assert_no_horizontal_overflow(page, surface_name):
@@ -518,6 +861,7 @@ def test_direct_hash_routes_open_the_expected_surface(
     """A bookmarked tool must restore its shell state on a fresh load."""
     page = browser.new_page(viewport={'width': 853, 'height': 900})
     captured = _capture_console(page)
+    _install_direct_route_runtime_assets(page)
     try:
         page.goto(f'{docs_server}{route}', wait_until='domcontentloaded', timeout=15000)
         page.wait_for_function(f"document.body.dataset.tool === '{tool}'")
@@ -833,15 +1177,15 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
         {
             'name': name,
             'rashi': rashi,
-            'degree': index + 0.25,
-            'house': index + 1,
+            'degree': 15 if name == 'Chandra' else 10 if name in {'Rahu', 'Ketu'} else index + 0.25,
+            'house': ((1 if name == 'Ketu' else index) - 4) % 12 + 1,
             'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
         }
         for index, (name, rashi) in enumerate((
             ('Surya', 'Mesha'), ('Chandra', 'Vrishabha'),
             ('Kuja', 'Mithuna'), ('Budha', 'Karka'), ('Guru', 'Simha'),
             ('Shukra', 'Kanya'), ('Shani', 'Tula'),
-            ('Rahu', 'Vrischika'), ('Ketu', 'Dhanu'),
+            ('Rahu', 'Vrischika'), ('Ketu', 'Vrishabha'),
         ))
     ]
 
@@ -911,6 +1255,108 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
 
         panel = page.locator('#card-profiles')
         panel.get_by_role('button', name='Create profile', exact=True).click()
+
+        desktop_layout = page.evaluate("""() => {
+            const rect = selector => document.querySelector(selector).getBoundingClientRect();
+            const panel = rect('#card-profiles');
+            const root = rect('#profiles-root');
+            const form = rect('.profiles-form');
+            const methods = rect('.profiles-methods');
+            const date = rect('#profile-birth-date');
+            const time = rect('#profile-birth-time');
+            const choices = [...document.querySelectorAll('.profiles-methods__choice')]
+                .map(choice => choice.getBoundingClientRect());
+            const calculation = document.querySelector('.profiles-calculation');
+            const calculationStyle = getComputedStyle(calculation);
+            return {
+                panelCenter: panel.left + panel.width / 2,
+                rootCenter: root.left + root.width / 2,
+                formCenter: form.left + form.width / 2,
+                methodsCenter: methods.left + methods.width / 2,
+                dateTop: date.top,
+                dateHeight: date.height,
+                timeTop: time.top,
+                timeHeight: time.height,
+                choiceWidths: choices.map(choice => choice.width),
+                calculationBorderTop: parseFloat(calculationStyle.borderTopWidth),
+                calculationBorderLeft: parseFloat(calculationStyle.borderLeftWidth),
+            };
+        }""")
+        assert abs(desktop_layout['panelCenter'] - desktop_layout['rootCenter']) <= 1
+        assert abs(desktop_layout['rootCenter'] - desktop_layout['formCenter']) <= 1
+        assert abs(desktop_layout['formCenter'] - desktop_layout['methodsCenter']) <= 1
+        assert abs(desktop_layout['dateTop'] - desktop_layout['timeTop']) <= 1
+        assert abs(desktop_layout['dateHeight'] - desktop_layout['timeHeight']) <= 1
+        assert abs(
+            desktop_layout['choiceWidths'][0] - desktop_layout['choiceWidths'][1]
+        ) <= 1
+        assert desktop_layout['calculationBorderTop'] == 1
+        assert desktop_layout['calculationBorderLeft'] == 1
+        assert panel.locator('.profiles-form__actions button').all_inner_texts() == [
+            'Cancel', 'Save calculated profile',
+        ]
+
+        page.set_viewport_size({'width': 768, 'height': 1024})
+        page.wait_for_function("document.body.dataset.mode === 'mobile'")
+        tablet_layout = page.evaluate("""() => {
+            const rect = selector => document.querySelector(selector).getBoundingClientRect();
+            const panel = rect('#card-profiles');
+            const root = rect('#profiles-root');
+            const date = rect('#profile-birth-date');
+            const time = rect('#profile-birth-time');
+            const place = rect('#profile-birth-place');
+            const findPlace = rect('[data-action="search-birth-place"]');
+            const choices = [...document.querySelectorAll('.profiles-methods__choice')]
+                .map(choice => choice.getBoundingClientRect());
+            return {
+                panelCenter: panel.left + panel.width / 2,
+                rootCenter: root.left + root.width / 2,
+                dateTop: date.top,
+                timeTop: time.top,
+                placeTop: place.top,
+                findPlaceTop: findPlace.top,
+                choiceTops: choices.map(choice => choice.top),
+                overflow: document.documentElement.scrollWidth - window.innerWidth,
+            };
+        }""")
+        assert abs(tablet_layout['panelCenter'] - tablet_layout['rootCenter']) <= 1
+        assert abs(tablet_layout['dateTop'] - tablet_layout['timeTop']) <= 1
+        assert abs(tablet_layout['placeTop'] - tablet_layout['findPlaceTop']) <= 1
+        assert abs(
+            tablet_layout['choiceTops'][0] - tablet_layout['choiceTops'][1]
+        ) <= 1
+        assert tablet_layout['overflow'] <= 0
+
+        page.set_viewport_size({'width': 390, 'height': 844})
+        mobile_layout = page.evaluate("""() => {
+            const dateGroup = document.querySelector('#profile-birth-date')
+                .closest('.profiles-field').getBoundingClientRect();
+            const timeGroup = document.querySelector('#profile-birth-time')
+                .closest('.profiles-field').getBoundingClientRect();
+            const choices = [...document.querySelectorAll('.profiles-methods__choice')]
+                .map(choice => choice.getBoundingClientRect());
+            const actions = [...document.querySelectorAll('.profiles-form__actions button')]
+                .map(action => ({
+                    text: action.textContent.trim(),
+                    top: action.getBoundingClientRect().top,
+                }));
+            return {
+                birthFieldGap: timeGroup.top - dateGroup.bottom,
+                choiceTops: choices.map(choice => choice.top),
+                actions,
+                overflow: document.documentElement.scrollWidth - window.innerWidth,
+            };
+        }""")
+        assert 15 <= mobile_layout['birthFieldGap'] <= 17
+        assert mobile_layout['choiceTops'][1] > mobile_layout['choiceTops'][0]
+        assert [action['text'] for action in mobile_layout['actions']] == [
+            'Cancel', 'Save calculated profile',
+        ]
+        assert mobile_layout['actions'][0]['top'] < mobile_layout['actions'][1]['top']
+        assert mobile_layout['overflow'] <= 0
+
+        page.set_viewport_size({'width': 1024, 'height': 900})
+        page.wait_for_function("document.body.dataset.mode === 'desktop'")
         page.fill('#profile-name', 'Browser Ananya')
         page.fill('#profile-birth-date', '1990-04-15')
         page.fill('#profile-birth-time', '14:30')
@@ -922,6 +1368,32 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
         place_choice.click()
         panel.get_by_role('button', name='Calculate details', exact=True).click()
         panel.locator('.profiles-birth-review').wait_for(state='visible')
+
+        recalculate = panel.get_by_role(
+            'button', name='Recalculate details', exact=True,
+        )
+        assert recalculate.get_attribute('class').find('profiles-button--secondary') >= 0
+        assert recalculate.get_attribute('class').find('profiles-button--primary') == -1
+
+        page.set_viewport_size({'width': 390, 'height': 844})
+        page.wait_for_function("document.body.dataset.mode === 'mobile'")
+        post_calculation_actions = page.evaluate("""() => (
+            [...document.querySelectorAll('.profiles-form__actions button')].map(action => ({
+                text: action.textContent.trim(),
+                top: action.getBoundingClientRect().top,
+            }))
+        )""")
+        assert [action['text'] for action in post_calculation_actions] == [
+            'Cancel', 'Save calculated profile',
+        ]
+        assert post_calculation_actions[0]['top'] < post_calculation_actions[1]['top']
+        panel.get_by_role('button', name='Cancel', exact=True).focus()
+        page.keyboard.press('Tab')
+        assert page.evaluate("document.activeElement.textContent.trim()") == (
+            'Save calculated profile'
+        )
+        page.set_viewport_size({'width': 1024, 'height': 900})
+        page.wait_for_function("document.body.dataset.mode === 'desktop'")
 
         assert panel.locator('.profiles-birth-facts').inner_text().find('Rohini') >= 0
         assert panel.locator('.profiles-chart__cell').count() == 12
@@ -1265,6 +1737,285 @@ def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
     assert not app_errors, f'two-tab profile flow raised page errors: {app_errors[:3]}'
 
 
+@pytest.mark.parametrize(
+    ('scenario', 'activity', 'system', 'expected_state'),
+    (
+        ('positive', 'purchase', 'drik', 'screened'),
+        ('failure', 'travel', 'drik', 'screened'),
+        ('mixed', 'purchase', 'drik', 'screened'),
+        ('unsupported', 'purchase', 'surya-siddhanta', 'unsupported-system'),
+        ('offline', 'purchase', 'drik', 'unavailable'),
+        ('malformed', 'purchase', 'drik', 'unavailable'),
+        ('manual-only', 'gold', 'drik', 'manual-only'),
+        ('not-run', 'wedding', 'drik', 'not-run'),
+    ),
+)
+@pytest.mark.parametrize(
+    ('width', 'height', 'expected_mode'),
+    ((390, 844, 'mobile'), (1440, 900, 'desktop')),
+)
+def test_chart_aware_muhurta_built_browser_state_matrix(
+    docs_server, browser, scenario, activity, system, expected_state,
+    width, height, expected_mode,
+):
+    """Prove every chart-aware result state in the deployable bundle.
+
+    Feed, Lagna boundaries and gateway responses are intercepted independently,
+    so failures identify the UI/API boundary instead of a mutable live service.
+    The same state matrix runs at the two layout extremes requested for review.
+    """
+    page = browser.new_page(viewport={'width': width, 'height': height})
+    captured = _capture_console(page)
+    try:
+        calls = _run_muhurta_browser_search(
+            page, docs_server, scenario, activity=activity, system=system,
+        )
+        result = page.locator('#mu-result')
+        status = result.locator(f'.mu-chart-status--{expected_state}')
+        assert status.is_visible()
+        assert page.locator('body').get_attribute('data-mode') == expected_mode
+
+        if scenario == 'positive':
+            assert 'Exact chart screening applied' in status.inner_text()
+            assert result.locator('.mu-slot').count() > 0
+            assert result.locator('.mu-rg-computed').count() > 0
+            assert result.locator('.mu-chart-rule--pass').count() > 0
+            assert calls
+        elif scenario == 'failure':
+            assert 'failed an exact chart requirement' in result.inner_text()
+            assert 'No clear slots found' in result.inner_text()
+            assert result.locator('.mu-slot').count() == 0
+            assert calls
+        elif scenario == 'mixed':
+            assert result.locator('.mu-slot').count() > 0
+            assert result.locator('.mu-chart-rule--unknown').count() > 0
+            assert 'changed within this window' in result.locator(
+                '.mu-chart-boundary'
+            ).first.text_content()
+            assert result.locator('.mu-tier-excellent').count() == 0
+            assert calls
+        elif scenario == 'unsupported':
+            assert 'Selected system kept separate' in status.inner_text()
+            assert 'was not blended into this result' in status.inner_text()
+            assert result.locator('.mu-slot').count() > 0
+            assert calls == []
+        elif scenario == 'manual-only':
+            assert 'chart review remains manual' in status.inner_text()
+            assert 'no exact chart request was needed' in status.inner_text()
+            assert result.locator('.mu-slot').count() > 0
+            assert calls == []
+        elif scenario == 'not-run':
+            assert 'Chart screening not run' in status.inner_text()
+            assert 'No clear slots found' in result.inner_text()
+            assert result.locator('.mu-slot').count() == 0
+            assert calls == []
+        else:
+            assert 'Panchangam shortlist shown' in status.inner_text()
+            assert 'no slot is presented as chart-screened' in status.inner_text()
+            assert result.locator('.mu-slot').count() > 0
+            assert result.locator('.mu-tier-excellent').count() == 0
+            if scenario == 'malformed':
+                assert calls
+
+        details = result.locator('.mu-reason-details')
+        if details.count():
+            details.first.locator('summary').click()
+        _assert_no_horizontal_overflow(
+            page, f'{scenario} chart-aware Muhurtam at {width}px',
+        )
+    finally:
+        page.close()
+
+    page_errors = [
+        message for kind, message in captured if kind == 'pageerror'
+    ]
+    reference_errors = [
+        message for _, message in captured
+        if 'ReferenceError' in message or 'is not defined' in message
+    ]
+    assert not page_errors, (
+        f'{scenario} chart-aware Muhurtam raised page errors at '
+        f'{width}x{height}: {page_errors[:3]}'
+    )
+    assert not reference_errors, (
+        f'{scenario} chart-aware Muhurtam raised reference errors at '
+        f'{width}x{height}: {reference_errors[:3]}'
+    )
+
+
+@pytest.mark.parametrize(
+    ('scenario', 'system', 'expected_state', 'expected_copy'),
+    (
+        (
+            'offline', 'drik', 'unavailable',
+            'source-specific personal checks could not run without exact chart facts',
+        ),
+        (
+            'unsupported', 'surya-siddhanta', 'unsupported-system',
+            'source-specific personal checks were not run for this system',
+        ),
+    ),
+)
+def test_role_copy_never_claims_evaluation_when_chart_facts_were_not_used(
+    docs_server, browser, scenario, system, expected_state, expected_copy,
+):
+    page = browser.new_page(viewport={'width': 1024, 'height': 768})
+    captured = _capture_console(page)
+    try:
+        _install_muhurta_routes(page, docs_server, scenario)
+        page.goto(
+            f'{docs_server}#tarabalam',
+            wait_until='domcontentloaded',
+            timeout=15000,
+        )
+        _wait_for_profile_app(page)
+        _seed_private_muhurta_profiles(page)
+        page.reload(wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        page.locator('#tp-system').evaluate(
+            """(select, value) => {
+                select.value = value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }""",
+            system,
+        )
+        page.select_option('#mu-activity', 'travel')
+        page.locator('[data-muhurta-role="traveller"]').select_option(
+            PRIVATE_TRAVELLER_ID
+        )
+        page.fill('#tb-from', MUHURTA_FIXTURE_DATE)
+        page.fill('#tb-to', MUHURTA_FIXTURE_DATE)
+        page.get_by_role('button', name='Show Slots', exact=True).click()
+        page.locator(
+            f'#mu-result .mu-chart-status--{expected_state}'
+        ).wait_for(state='visible', timeout=20000)
+
+        role_copy = page.locator('#mu-result .mu-personal-role').inner_text()
+        assert 'evaluated locally' not in role_copy
+        assert expected_copy in role_copy
+    finally:
+        page.close()
+
+    page_errors = [message for kind, message in captured if kind == 'pageerror']
+    assert not page_errors, (
+        f'{scenario} role-state flow raised page errors: {page_errors[:3]}'
+    )
+
+
+@pytest.mark.parametrize(
+    ('width', 'height', 'expected_mode'),
+    ((390, 844, 'mobile'), (1440, 900, 'desktop')),
+)
+def test_chart_aware_muhurta_profile_role_and_share_stay_private(
+    docs_server, browser, width, height, expected_mode,
+):
+    """A chosen source-specific role survives screening but not sharing.
+
+    The fixture includes two names plus a calculated profile's birth details
+    and natal chart. Only the stable role ID is kept locally; the gateway sees
+    location and instants, and WhatsApp receives no profile or natal evidence.
+    """
+    page = browser.new_page(viewport={'width': width, 'height': height})
+    captured = _capture_console(page)
+    try:
+        calls = _install_muhurta_routes(page, docs_server, 'profile')
+        page.goto(
+            f'{docs_server}#tarabalam',
+            wait_until='domcontentloaded',
+            timeout=15000,
+        )
+        _wait_for_profile_app(page)
+        _seed_private_muhurta_profiles(page)
+        page.reload(wait_until='domcontentloaded', timeout=15000)
+        _wait_for_profile_app(page)
+        page.select_option('#mu-activity', 'travel')
+
+        role_select = page.locator('[data-muhurta-role="traveller"]')
+        assert role_select.is_visible()
+        assert role_select.locator('option').all_inner_texts() == [
+            'Other Private Traveller', 'Private Ananya',
+        ]
+        role_select.select_option(PRIVATE_TRAVELLER_ID)
+        assert role_select.input_value() == PRIVATE_TRAVELLER_ID
+        assert page.evaluate(
+            "JSON.parse(localStorage.getItem('tc-mu-role-selections')).roles.travel"
+        ) == PRIVATE_TRAVELLER_ID
+
+        page.fill('#tb-from', MUHURTA_FIXTURE_DATE)
+        page.fill('#tb-to', MUHURTA_FIXTURE_DATE)
+        page.get_by_role('button', name='Show Slots', exact=True).click()
+        page.locator(
+            '#mu-result .mu-chart-status--screened'
+        ).wait_for(state='visible', timeout=20000)
+
+        result = page.locator('#mu-result')
+        assert page.locator('body').get_attribute('data-mode') == expected_mode
+        assert 'Private Ananya · evaluated locally' in result.locator(
+            '.mu-personal-role'
+        ).inner_text()
+        assert result.locator('.mu-slot').count() > 0
+        assert result.locator('.mu-rg-personal-computed').count() > 0
+
+        # The stateless chart request has no activity, role, profile, birth or
+        # natal-chart field. Only public city coordinates and exact instants
+        # cross the browser boundary.
+        assert calls
+        for payload in calls:
+            assert set(payload) == {'contract_version', 'location', 'instants'}
+            serialized = json.dumps(payload)
+            for private_value in (
+                'Private Ananya', 'Other Private Traveller', '1990-04-15',
+                '14:30', 'Private Birthplace', 'Rohini', 'Vrishabha', 'Kanya',
+            ):
+                assert private_value not in serialized
+
+        page.evaluate(
+            """() => {
+                window.__muhurtaShareOpen = null;
+                window.open = (url, target) => {
+                    window.__muhurtaShareOpen = { url, target };
+                    return null;
+                };
+            }"""
+        )
+        result.locator(
+            'button[aria-label="Share on WhatsApp"]'
+        ).click()
+        opened = page.evaluate('window.__muhurtaShareOpen')
+        assert opened['target'] == '_blank'
+        share_text = parse_qs(urlparse(opened['url']).query)['text'][0]
+        assert 'profile details are intentionally omitted' in share_text
+        for private_value in (
+            'Private Ananya', 'Other Private Traveller', '1990-04-15',
+            '14:30', 'Private Birthplace', 'Rohini', 'Vrishabha', 'Kanya',
+            '4.69', 'DashaFlow 1.1.0-test',
+        ):
+            assert private_value not in share_text
+
+        result.locator('.mu-reason-details').first.locator('summary').click()
+        _assert_no_horizontal_overflow(
+            page, f'profile-role chart-aware Muhurtam at {width}px',
+        )
+    finally:
+        page.close()
+
+    page_errors = [
+        message for kind, message in captured if kind == 'pageerror'
+    ]
+    reference_errors = [
+        message for _, message in captured
+        if 'ReferenceError' in message or 'is not defined' in message
+    ]
+    assert not page_errors, (
+        f'profile-role chart-aware Muhurtam raised page errors at '
+        f'{width}x{height}: {page_errors[:3]}'
+    )
+    assert not reference_errors, (
+        f'profile-role chart-aware Muhurtam raised reference errors at '
+        f'{width}x{height}: {reference_errors[:3]}'
+    )
+
+
 def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browser):
     """Exercise the muhurta search end-to-end with a populated
     profile and assert (a) no ReferenceError in the JS console and
@@ -1462,6 +2213,67 @@ def test_muhurta_contextual_profile_preserves_task_and_other_journey(
 
     app_errors = [msg for kind, msg in captured if kind == 'pageerror']
     assert not app_errors, f'contextual Muhurtam surfaced errors: {app_errors[:3]}'
+
+
+def test_gochara_unavailable_state_spans_the_chart(docs_server, browser):
+    """An unavailable feed is one chart-level state, not one chart cell."""
+    page = browser.new_page(viewport={'width': 390, 'height': 844})
+    captured = _capture_console(page)
+    try:
+        page.route('**/gochara.json', lambda route: route.abort())
+        page.goto(f'{docs_server}/#gochara', wait_until='networkidle', timeout=15000)
+        error = page.locator('#go-chart > .preview-error')
+        error.wait_for(state='visible')
+        chart_box = page.locator('#go-chart').bounding_box()
+        error_box = error.bounding_box()
+        assert chart_box is not None and error_box is not None
+        assert error_box['width'] >= chart_box['width'] * 0.8
+        assert page.evaluate(
+            'document.documentElement.scrollWidth === '
+            'document.documentElement.clientWidth'
+        )
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'Gochara empty state surfaced errors: {app_errors[:3]}'
+
+
+@pytest.mark.parametrize(
+    ('route', 'viewports'),
+    (
+        ('53-birth-profile-calculation', ((390, 844), (768, 1024))),
+        (
+            '54-muhurtam-election-chart-screening',
+            ((390, 844), (768, 1024), (1024, 768)),
+        ),
+    ),
+)
+def test_documentation_diagrams_and_tables_do_not_overflow_page(
+    docs_server, browser, route, viewports,
+):
+    """Wide evidence stays locally scrollable without widening the page."""
+    page = browser.new_page()
+    captured = _capture_console(page)
+    try:
+        for width, height in viewports:
+            page.set_viewport_size({'width': width, 'height': height})
+            page.goto(
+                f'{docs_server}/docs/reference/{route}.html',
+                wait_until='networkidle',
+                timeout=15000,
+            )
+            page.locator('.vp-doc .mermaid svg').first.wait_for(state='visible')
+            if width == 768:
+                assert page.locator('.VPNavBarHamburger').is_visible()
+            _assert_no_horizontal_overflow(
+                page, f'Documentation {route} at {width}x{height}',
+            )
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'Documentation surfaced errors: {app_errors[:3]}'
 
 
 def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build, browser):
