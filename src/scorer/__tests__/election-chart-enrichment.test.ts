@@ -202,6 +202,57 @@ describe('bounded election-chart enrichment', () => {
     expect(derive).toHaveBeenCalledTimes(2);
   });
 
+  test('aggregates differing batch ephemerides without changing stable engine provenance', async () => {
+    let call = 0;
+    const derive = vi.fn(async (request: ElectionChartRequest) => {
+      call += 1;
+      const result = response(request, call === 1 ? new Set([0, 1, 2]) : new Set());
+      return {
+        ...result,
+        engine: { ...result.engine, ephemeris: call === 1 ? 'moshier' : 'swiss' },
+      } as ElectionChartDerivation;
+    });
+
+    const result = await enrichElectionChartSlots(slots(18), {
+      activity: 'wedding', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.state).toBe('screened');
+    expect(derive).toHaveBeenCalledTimes(2);
+    expect(result.engine).toEqual({
+      name: 'DashaFlow', version: '1.2.3', ayanamsha: 'Lahiri',
+      ephemeris: 'mixed', nodeConvention: 'mean',
+    });
+  });
+
+  test.each([
+    ['name', (engine: ElectionChartDerivation['engine']) => ({ ...engine, name: 'Other' })],
+    ['version', (engine: ElectionChartDerivation['engine']) => ({ ...engine, version: '9.9.9' })],
+    ['ayanamsha', (engine: ElectionChartDerivation['engine']) => ({ ...engine, ayanamsha: 'Raman' })],
+    ['node convention', (engine: ElectionChartDerivation['engine']) => ({
+      ...engine, nodeConvention: 'true' as unknown as 'mean',
+    })],
+  ])('withholds an incompatible later batch when %s changes', async (_field, changeEngine) => {
+    let call = 0;
+    const derive = vi.fn(async (request: ElectionChartRequest) => {
+      call += 1;
+      const result = response(request, call === 1 ? new Set([0, 1, 2]) : new Set());
+      return call === 1 ? result : { ...result, engine: changeEngine(result.engine) };
+    });
+
+    const result = await enrichElectionChartSlots(slots(18), {
+      activity: 'wedding', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.state).toBe('unavailable');
+    expect(result.screenedCount).toBe(12);
+    expect(result.removedCount).toBe(3);
+    expect(result.slots).toHaveLength(9);
+    expect(result.engine).toMatchObject({
+      name: 'DashaFlow', version: '1.2.3', ayanamsha: 'Lahiri', nodeConvention: 'mean',
+    });
+  });
+
   test('shares one deadline across every request in a search', async () => {
     let now = 1_000;
     const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
@@ -246,6 +297,29 @@ describe('bounded election-chart enrichment', () => {
     } finally {
       clock.mockRestore();
     }
+  });
+
+  test('never restores conclusively rejected slots when a later batch fails', async () => {
+    const base = slots(18);
+    let call = 0;
+    const derive = vi.fn(async (request: ElectionChartRequest) => {
+      call += 1;
+      if (call === 1) return response(request, new Set([0, 1, 2]));
+      throw new ElectionChartApiError('timeout', 'Chart screening timed out.');
+    });
+
+    const result = await enrichElectionChartSlots(base, {
+      activity: 'wedding', system: 'drik', location: LOCATION, derive,
+    });
+    const rejected = new Set(base.slice(0, 3).map(slot => `${slot.isoDate}:${slot.s0}`));
+
+    expect(result.state).toBe('unavailable');
+    expect(result.screenedCount).toBe(12);
+    expect(result.removedCount).toBe(3);
+    expect(result.candidateLimitReached).toBe(true);
+    expect(result.slots).toHaveLength(9);
+    expect(result.slots.every(slot => !rejected.has(`${slot.isoDate}:${slot.s0}`))).toBe(true);
+    expect(result.message).toMatch(/stopped early/i);
   });
 
   test('checks an interior Lagna-transition state and rejects a hidden failure', async () => {
@@ -419,6 +493,44 @@ describe('bounded election-chart enrichment', () => {
     expect(result.personalRemovedCount).toBe(1);
     expect(result.personalRemovedRules[0]?.ruleId)
       .toBe('personal.seemantha.birth-star-exclusions');
+  });
+
+  test.each([
+    [13.33, NAKSHATRA_NAMES[25]],
+    [26.67, NAKSHATRA_NAMES[0]],
+  ])('review-gates Seemantha when rounded Chandra %.2f spans a Nakshatra boundary', async (
+    degree,
+    motherNakshatra,
+  ) => {
+    const derive = vi.fn(async (request: ElectionChartRequest) => {
+      const result = response(request);
+      return {
+        ...result,
+        charts: result.charts.map(chart => ({
+          ...chart,
+          planets: chart.planets.map(planet => planet.name === 'Chandra'
+            ? { ...planet, rashi: 'Mesha', degree }
+            : planet),
+        })),
+      };
+    });
+    const result = await enrichElectionChartSlots(slots(1), {
+      activity: 'seemantha', system: 'drik', location: LOCATION, derive,
+      personalParticipant: {
+        id: 'mother-boundary', name: 'Mother',
+        nakshatra: motherNakshatra, janmaRashi: null, janmaLagna: null,
+      },
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.personalRemovedCount).toBe(0);
+    expect(result.slots[0].tier).toBe('Good');
+    expect(result.slots[0].dayDosha).toBe('practitioner_review');
+    expect(result.slots[0].reasonGroups.personal_outcomes).toContainEqual(
+      expect.objectContaining({
+        ruleId: 'personal.seemantha.birth-star-exclusions', status: 'unknown',
+      }),
+    );
   });
 
   test('uses exact returned Lagna for the Travel prohibition', async () => {

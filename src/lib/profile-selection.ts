@@ -160,9 +160,9 @@ function incompleteProfileFallback(profile: GuestProfile): ProfileSelectionFallb
 /**
  * Resolve a Gochara selection without touching storage or the DOM.
  *
- * Legacy pN/pNr/pNl values intentionally use the stored profile index once,
- * then callers persist the returned stable profile:<id> value. We do not bind
- * an old index to a different person when that exact row is incomplete.
+ * Legacy pN/pNr/pNl values indexed the old Gochara-ready profile list, which
+ * omitted incomplete rows before assigning pN. Recreate that filtered order
+ * once, then persist the returned stable profile:<id> value.
  */
 export function resolveGocharaSelection(
   rawValue: unknown,
@@ -210,12 +210,12 @@ export function resolveGocharaSelection(
 
   const legacyMatch = requestedValue.match(LEGACY_GOCHARA_SELECTION);
   if (legacyMatch) {
-    const profile = profiles[Number(legacyMatch[1])];
+    const legacyReadyProfiles = profiles.filter(
+      profile => guestProfileReadiness(profile).horoscope,
+    );
+    const profile = legacyReadyProfiles[Number(legacyMatch[1])];
     if (!profile) {
       return wholeSky(requestedValue, missingProfileFallback(), true);
-    }
-    if (!guestProfileReadiness(profile).horoscope) {
-      return wholeSky(requestedValue, incompleteProfileFallback(profile), true);
     }
     return {
       requestedValue,

@@ -18,6 +18,12 @@ from tools.audit_lagna_boundary_guard import (
 )
 
 FIXTURE = Path(__file__).parent / 'fixtures' / 'lagna-boundary-guard-audit.json'
+METHOD_PAGE = (
+    Path(__file__).parents[1]
+    / 'docs'
+    / 'reference'
+    / '54-muhurtam-election-chart-screening.md'
+)
 
 
 def test_exhaustive_audit_reproduces_the_committed_report():
@@ -61,6 +67,20 @@ def test_committed_audit_report_covers_the_supported_product_envelope():
     assert results['max_delta_case']['date'] == '2028-05-15'
     # Guard bands around adjacent boundaries cannot overlap in this audit.
     assert results['minimum_internal_dwell_minutes'] > 2 * GUARD_MINUTES
+
+
+def test_method_page_publishes_the_committed_transition_counts():
+    """Keep the public evidence table synchronized with the audit fixture."""
+
+    report = json.loads(FIXTURE.read_text(encoding='utf-8'))
+    offsets = report['results']['first_new_minute_offsets']
+    documented_counts = ' / '.join(f'{offsets[str(index)]:,}' for index in range(3))
+    method_page = METHOD_PAGE.read_text(encoding='utf-8')
+
+    assert (
+        '| DashaFlow first carried the published new Lagna at '
+        f'`T` / `T+1` / `T+2` | {documented_counts} |'
+    ) in method_page
 
 
 @pytest.mark.parametrize(

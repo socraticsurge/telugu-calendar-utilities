@@ -49,9 +49,9 @@
   "results": {
     "transition_count": 25344,
     "first_new_minute_offsets": {
-      "0": 3331,
+      "0": 3334,
       "1": 18865,
-      "2": 3148
+      "2": 3145
     },
     "transitions_after_t_plus_2": 0,
     "max_abs_boundary_delta_minutes": 1.61088,

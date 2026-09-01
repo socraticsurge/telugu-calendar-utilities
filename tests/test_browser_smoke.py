@@ -348,13 +348,14 @@ def _muhurta_planets(scenario, chart_index, canonical_lagna):
             'Chandra': 1 if chart_index % 2 == 0 else 2,
             'Shukra': 1,
         })
+    houses['Ketu'] = (houses['Rahu'] + 5) % 12 + 1
     rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
     lagna_index = rashis.index(canonical_lagna)
     return [
         {
             'name': name,
             'rashi': rashis[(lagna_index + houses[name] - 1) % 12],
-            'degree': index + 0.25,
+            'degree': 10 if name in {'Rahu', 'Ketu'} else index + 0.25,
             'house': houses[name],
             'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
         }
@@ -482,9 +483,9 @@ def _seed_private_muhurta_profiles(page):
     natal_planets = [
         {
             'name': name,
-            'rashi': MUHURTA_PLANET_RASHIS[index],
-            'degree': index + 0.5,
-            'house': index + 1,
+            'rashi': 'Vrishabha' if name == 'Ketu' else MUHURTA_PLANET_RASHIS[index],
+            'degree': 15 if name == 'Chandra' else 10 if name in {'Rahu', 'Ketu'} else index + 0.5,
+            'house': ((1 if name == 'Ketu' else index) - 5) % 12 + 1,
             'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
         }
         for index, name in enumerate(MUHURTA_PLANET_NAMES)
@@ -1176,15 +1177,15 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
         {
             'name': name,
             'rashi': rashi,
-            'degree': index + 0.25,
-            'house': index + 1,
+            'degree': 15 if name == 'Chandra' else 10 if name in {'Rahu', 'Ketu'} else index + 0.25,
+            'house': ((1 if name == 'Ketu' else index) - 4) % 12 + 1,
             'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
         }
         for index, (name, rashi) in enumerate((
             ('Surya', 'Mesha'), ('Chandra', 'Vrishabha'),
             ('Kuja', 'Mithuna'), ('Budha', 'Karka'), ('Guru', 'Simha'),
             ('Shukra', 'Kanya'), ('Shani', 'Tula'),
-            ('Rahu', 'Vrischika'), ('Ketu', 'Dhanu'),
+            ('Rahu', 'Vrischika'), ('Ketu', 'Vrishabha'),
         ))
     ]
 
@@ -2212,6 +2213,67 @@ def test_muhurta_contextual_profile_preserves_task_and_other_journey(
 
     app_errors = [msg for kind, msg in captured if kind == 'pageerror']
     assert not app_errors, f'contextual Muhurtam surfaced errors: {app_errors[:3]}'
+
+
+def test_gochara_unavailable_state_spans_the_chart(docs_server, browser):
+    """An unavailable feed is one chart-level state, not one chart cell."""
+    page = browser.new_page(viewport={'width': 390, 'height': 844})
+    captured = _capture_console(page)
+    try:
+        page.route('**/gochara.json', lambda route: route.abort())
+        page.goto(f'{docs_server}/#gochara', wait_until='networkidle', timeout=15000)
+        error = page.locator('#go-chart > .preview-error')
+        error.wait_for(state='visible')
+        chart_box = page.locator('#go-chart').bounding_box()
+        error_box = error.bounding_box()
+        assert chart_box is not None and error_box is not None
+        assert error_box['width'] >= chart_box['width'] * 0.8
+        assert page.evaluate(
+            'document.documentElement.scrollWidth === '
+            'document.documentElement.clientWidth'
+        )
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'Gochara empty state surfaced errors: {app_errors[:3]}'
+
+
+@pytest.mark.parametrize(
+    ('route', 'viewports'),
+    (
+        ('53-birth-profile-calculation', ((390, 844), (768, 1024))),
+        (
+            '54-muhurtam-election-chart-screening',
+            ((390, 844), (768, 1024), (1024, 768)),
+        ),
+    ),
+)
+def test_documentation_diagrams_and_tables_do_not_overflow_page(
+    docs_server, browser, route, viewports,
+):
+    """Wide evidence stays locally scrollable without widening the page."""
+    page = browser.new_page()
+    captured = _capture_console(page)
+    try:
+        for width, height in viewports:
+            page.set_viewport_size({'width': width, 'height': height})
+            page.goto(
+                f'{docs_server}/docs/reference/{route}.html',
+                wait_until='networkidle',
+                timeout=15000,
+            )
+            page.locator('.vp-doc .mermaid svg').first.wait_for(state='visible')
+            if width == 768:
+                assert page.locator('.VPNavBarHamburger').is_visible()
+            _assert_no_horizontal_overflow(
+                page, f'Documentation {route} at {width}x{height}',
+            )
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'Documentation surfaced errors: {app_errors[:3]}'
 
 
 def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build, browser):

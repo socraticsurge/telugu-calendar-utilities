@@ -46,7 +46,9 @@ When the capability is active, the browser calls the server only after
 Application code does not create an Astro Chaganti account, database row, or
 analytics event from these values. Network and hosting providers necessarily
 process requests in transit; do not interpret “browser-local profile” as “no
-network calculation.” There is no cloud sync or recovery.
+network calculation.” The application does not load third-party executable
+analytics code on this profile-bearing origin, and built-in share text omits
+the saved profile name. There is no cloud sync or recovery.
 
 ```mermaid
 flowchart LR
@@ -100,6 +102,37 @@ pinned in
 
 ## Calculation process
 
+### Response and saved-record validation
+
+The browser accepts contract version `1.0`, engine name `DashaFlow`, a
+non-empty engine version, and `Lahiri` ayanamsha. It requires the canonical
+Rashi and Nakshatra spellings and exactly this ordered nine-graha tuple:
+
+```text
+Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu
+```
+
+The fields are also checked against each other rather than trusted as
+independent labels. The reported Nakshatra and Padam must derive the reported
+Janma Rashi, and Chandra's Rashi must equal that Janma Rashi. Because the
+service projects Chandra's degree within its Rashi to two decimals, the browser
+treats that displayed degree as a closed ±0.005° interval, clipped to the
+Rashi. The reported Nakshatra-Padam cell is accepted only when at least one
+longitude in that interval belongs to the cell. This admits an honestly rounded
+boundary value without allowing an incompatible Moon position.
+
+Each graha's reported house must also equal the Whole Sign house derived from
+the reported Lagna and graha Rashi. Surya and Chandra must be direct; Rahu and
+Ketu must be retrograde; and the rounded Rahu/Ketu positions must remain
+opposite within the maximum 0.01° separation error introduced by rounding both
+ends to two decimals.
+
+The same canonical metadata, graha order, and cross-field relationships are
+checked before a calculated extension read from `localStorage` is attached to
+its base profile. Malformed, reordered, future-contract, or internally
+inconsistent calculated data fails closed to the manual-profile view; it is
+not silently presented as a verified D1 result.
+
 ### 1. Resolve the birth instant
 
 The exact `YYYY-MM-DD` date and `HH:MM` time are interpreted as local civil time
@@ -115,6 +148,12 @@ local civil date/time + IANA timezone
 
 The IANA identifier matters because a numeric offset alone cannot represent
 historical daylight-saving and government rule changes.
+
+Before sending a calculation request, the browser resolves that same wall time
+in the selected birthplace timezone. Its latest selectable date is the current
+civil date there, not the computer's UTC or local date. A future instant, an
+invalid timezone, or an ambiguous or nonexistent daylight-saving wall time is
+rejected in the form instead of being silently assigned an offset.
 
 ### 2. Select the astronomical convention
 

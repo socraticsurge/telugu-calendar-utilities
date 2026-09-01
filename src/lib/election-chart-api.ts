@@ -1,4 +1,10 @@
-import type { BirthChartPlanet, BirthProfileEngine } from './birth-profile-api';
+import {
+  fixedGrahaFactsMatch,
+  isContractRoundedDegree,
+  wholeSignHousesMatch,
+  type BirthChartPlanet,
+  type BirthProfileEngine,
+} from './birth-profile-api';
 import { RASI_NAMES } from '../data/rasis';
 import {
   electionChartCalculationEnabled,
@@ -131,6 +137,15 @@ function nonEmpty(value: unknown, maxLength = 200): string | null {
     : null;
 }
 
+function exactNonEmpty(value: unknown, maxLength = 200): string | null {
+  return typeof value === 'string'
+    && value.length > 0
+    && value.length <= maxLength
+    && value === value.trim()
+    ? value
+    : null;
+}
+
 function finite(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
@@ -138,13 +153,13 @@ function finite(value: unknown): number | null {
 function parsePlanet(value: unknown): BirthChartPlanet | null {
   const item = record(value);
   if (!item) return null;
-  const name = nonEmpty(item.name, 40);
-  const rashi = nonEmpty(item.rashi, 40);
+  const name = exactNonEmpty(item.name, 40);
+  const rashi = exactNonEmpty(item.rashi, 40);
   const degree = finite(item.degree);
   const house = finite(item.house);
   if (
     !name || !CANONICAL_PLANETS.has(name) || !rashi || !CANONICAL_RASHIS.has(rashi)
-    || degree === null || degree < 0 || degree >= 30
+    || degree === null || !isContractRoundedDegree(degree)
     || house === null || !Number.isInteger(house) || house < 1 || house > 12
     || typeof item.retrograde !== 'boolean'
   ) return null;
@@ -154,8 +169,8 @@ function parsePlanet(value: unknown): BirthChartPlanet | null {
 function parseSnapshot(value: unknown, expectedInstant: string): ElectionChartSnapshot | null {
   const item = record(value);
   const lagna = item ? record(item.lagna) : null;
-  const instant = item ? nonEmpty(item.instant, 40) : null;
-  const rashi = lagna ? nonEmpty(lagna.rashi, 40) : null;
+  const instant = item ? exactNonEmpty(item.instant, 40) : null;
+  const rashi = lagna ? exactNonEmpty(lagna.rashi, 40) : null;
   const degree = lagna ? finite(lagna.degree) : null;
   const rawPlanets = item && Array.isArray(item.planets) ? item.planets : null;
   const planets = rawPlanets?.map(parsePlanet).filter(
@@ -163,10 +178,12 @@ function parseSnapshot(value: unknown, expectedInstant: string): ElectionChartSn
   ) || [];
   if (
     instant !== expectedInstant || !rashi || !CANONICAL_RASHIS.has(rashi)
-    || degree === null || degree < 0 || degree >= 30
+    || degree === null || !isContractRoundedDegree(degree)
     || !rawPlanets || rawPlanets.length !== 9 || planets.length !== rawPlanets.length
     || new Set(planets.map(planet => planet.name)).size !== 9
     || planets.some((planet, index) => planet.name !== CANONICAL_PLANET_ORDER[index])
+    || !wholeSignHousesMatch(rashi, planets)
+    || !fixedGrahaFactsMatch(planets)
   ) return null;
   return { instant, lagna: { rashi, degree }, planets };
 }
@@ -344,14 +361,14 @@ export async function deriveElectionCharts(
     const data = result ? record(result.data) : null;
     const rawCharts = data && Array.isArray(data.charts) ? data.charts : null;
     const charts = rawCharts?.map((chart, index) => parseSnapshot(chart, input.instants[index])) || [];
-    const engineName = engine ? nonEmpty(engine.name, 60) : null;
-    const engineVersion = engine ? nonEmpty(engine.version, 40) : null;
-    const ayanamsha = engine ? nonEmpty(engine.ayanamsha, 40) : null;
-    const ephemeris = engine ? nonEmpty(engine.ephemeris, 20) : null;
-    const nodeConvention = engine ? nonEmpty(engine.node_convention, 20) : null;
+    const engineName = engine ? exactNonEmpty(engine.name, 60) : null;
+    const engineVersion = engine ? exactNonEmpty(engine.version, 40) : null;
+    const ayanamsha = engine ? exactNonEmpty(engine.ayanamsha, 40) : null;
+    const ephemeris = engine ? exactNonEmpty(engine.ephemeris, 20) : null;
+    const nodeConvention = engine ? exactNonEmpty(engine.node_convention, 20) : null;
     const latitude = location ? finite(location.latitude) : null;
     const longitude = location ? finite(location.longitude) : null;
-    const timezone = location ? nonEmpty(location.timezone, 80) : null;
+    const timezone = location ? exactNonEmpty(location.timezone, 80) : null;
     if (
       result?.contract_version !== ELECTION_CHART_CONTRACT_VERSION
       || result.house_system !== 'whole_sign'

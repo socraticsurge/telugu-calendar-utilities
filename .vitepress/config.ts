@@ -127,14 +127,6 @@ export default defineConfig({
     hostname: 'https://panchangam.astrochaganti.com/docs/',
   },
   head: [
-    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
-    [
-      'link',
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600;700&display=swap',
-      },
-    ],
     ['meta', { name: 'theme-color', content: '#F2ECDF' }],
   ],
   markdown: {

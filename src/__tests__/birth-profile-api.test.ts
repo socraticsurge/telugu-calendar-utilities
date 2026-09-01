@@ -15,9 +15,13 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
 }
 
 function derivationPayload(): Record<string, unknown> {
+  const rashiOrder = [
+    'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+    'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena',
+  ];
   const rashis = [
     'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
-    'Kanya', 'Tula', 'Vrischika', 'Dhanu',
+    'Kanya', 'Tula', 'Vrischika', 'Vrishabha',
   ];
   return {
     contract_version: '1.0',
@@ -32,13 +36,13 @@ function derivationPayload(): Record<string, unknown> {
       pada: 2,
       janma_rashi: 'Vrishabha',
       lagna: 'Karka',
-      lagna_degree: 12.345,
+      lagna_degree: 12.35,
       planets: rashis.map((rashi, index) => ({
-        name: ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'][index],
+        name: ['Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani', 'Rahu', 'Ketu'][index],
         rashi,
-        degree: index + 0.25,
-        house: index + 1,
-        retrograde: index === 6,
+        degree: index === 1 ? 15 : index >= 7 ? 10 : index + 0.25,
+        house: ((rashiOrder.indexOf(rashi) - 3 + 12) % 12) + 1,
+        retrograde: index >= 6,
       })),
     },
   };
@@ -228,6 +232,186 @@ describe('birth profile derivation contract', () => {
       longitude: 80.648,
       timezone: 'Asia/Kolkata',
     }, { fetcher })).rejects.toMatchObject({ code: 'invalid-response' });
+  });
+
+  test('rejects noncanonical engine, chart vocabulary, ordering, and cross-field facts', async () => {
+    const invalidPayloads: Array<Record<string, unknown>> = [];
+
+    const wrongEngine = derivationPayload();
+    (wrongEngine.engine as Record<string, unknown>).name = 'UnknownEngine';
+    invalidPayloads.push(wrongEngine);
+
+    const wrongAyanamsha = derivationPayload();
+    (wrongAyanamsha.engine as Record<string, unknown>).ayanamsha = 'Raman';
+    invalidPayloads.push(wrongAyanamsha);
+
+    const wrongNakshatra = derivationPayload();
+    (wrongNakshatra.data as Record<string, unknown>).nakshatra = 'NotAStar';
+    invalidPayloads.push(wrongNakshatra);
+
+    const inconsistentRashi = derivationPayload();
+    (inconsistentRashi.data as Record<string, unknown>).janma_rashi = 'Mesha';
+    invalidPayloads.push(inconsistentRashi);
+
+    const wrongLagna = derivationPayload();
+    (wrongLagna.data as Record<string, unknown>).lagna = 'NotARashi';
+    invalidPayloads.push(wrongLagna);
+
+    const duplicatePlanet = derivationPayload();
+    const duplicatePlanets = (duplicatePlanet.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    duplicatePlanets[1].name = 'Surya';
+    invalidPayloads.push(duplicatePlanet);
+
+    const reorderedPlanets = derivationPayload();
+    const planets = (reorderedPlanets.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    [planets[0], planets[1]] = [planets[1], planets[0]];
+    invalidPayloads.push(reorderedPlanets);
+
+    const wrongPlanetRashi = derivationPayload();
+    const wrongRashiPlanets = (wrongPlanetRashi.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    wrongRashiPlanets[0].rashi = 'NotARashi';
+    invalidPayloads.push(wrongPlanetRashi);
+
+    const moonRashiMismatch = derivationPayload();
+    const mismatchedMoon = (moonRashiMismatch.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    mismatchedMoon[1].rashi = 'Mesha';
+    invalidPayloads.push(moonRashiMismatch);
+
+    const moonPositionMismatch = derivationPayload();
+    const misplacedMoon = (moonPositionMismatch.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    misplacedMoon[1].degree = 5;
+    invalidPayloads.push(moonPositionMismatch);
+
+    const wrongWholeSignHouse = derivationPayload();
+    const wronglyHousedPlanets = (wrongWholeSignHouse.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    wronglyHousedPlanets[0].house = 1;
+    invalidPayloads.push(wrongWholeSignHouse);
+
+    const retrogradeSurya = derivationPayload();
+    const retrogradeSuryaPlanets = (retrogradeSurya.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    retrogradeSuryaPlanets[0].retrograde = true;
+    invalidPayloads.push(retrogradeSurya);
+
+    const retrogradeChandra = derivationPayload();
+    const retrogradeChandraPlanets = (retrogradeChandra.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    retrogradeChandraPlanets[1].retrograde = true;
+    invalidPayloads.push(retrogradeChandra);
+
+    const directRahu = derivationPayload();
+    const directRahuPlanets = (directRahu.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    directRahuPlanets[7].retrograde = false;
+    invalidPayloads.push(directRahu);
+
+    const directKetu = derivationPayload();
+    const directKetuPlanets = (directKetu.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    directKetuPlanets[8].retrograde = false;
+    invalidPayloads.push(directKetu);
+
+    const nonOppositeKetu = derivationPayload();
+    const nonOppositeNodePlanets = (nonOppositeKetu.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    nonOppositeNodePlanets[8].degree = 10.02;
+    invalidPayloads.push(nonOppositeKetu);
+
+    const paddedVersion = derivationPayload();
+    paddedVersion.contract_version = ' 1.0 ';
+    invalidPayloads.push(paddedVersion);
+
+    const paddedEngine = derivationPayload();
+    (paddedEngine.engine as Record<string, unknown>).name = ' DashaFlow ';
+    invalidPayloads.push(paddedEngine);
+
+    const paddedNakshatra = derivationPayload();
+    (paddedNakshatra.data as Record<string, unknown>).nakshatra = ' Rohini ';
+    invalidPayloads.push(paddedNakshatra);
+
+    const paddedPlanetName = derivationPayload();
+    const paddedNamePlanets = (paddedPlanetName.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    paddedNamePlanets[0].name = ' Surya ';
+    invalidPayloads.push(paddedPlanetName);
+
+    const unroundedMoon = derivationPayload();
+    const unroundedMoonData = unroundedMoon.data as Record<string, unknown>;
+    unroundedMoonData.pada = 1;
+    const unroundedMoonPlanets = unroundedMoonData.planets as Array<Record<string, unknown>>;
+    unroundedMoonPlanets[1].degree = 13.338;
+    invalidPayloads.push(unroundedMoon);
+
+    const unroundedLagna = derivationPayload();
+    (unroundedLagna.data as Record<string, unknown>).lagna_degree = 12.345;
+    invalidPayloads.push(unroundedLagna);
+
+    for (const payload of invalidPayloads) {
+      const fetcher = vi.fn(async () => jsonResponse(payload)) as unknown as typeof fetch;
+      await expect(deriveBirthProfile({
+        dateOfBirth: '1990-05-12',
+        timeOfBirth: '14:35',
+        latitude: 16.5062,
+        longitude: 80.648,
+        timezone: 'Asia/Kolkata',
+      }, { fetcher })).rejects.toMatchObject({ code: 'invalid-response' });
+    }
+  });
+
+  test.each([13.33, 16.67])(
+    'accepts a Chandra degree rounded to %s at a Rohini Pada 2 boundary',
+    async degree => {
+      const payload = derivationPayload();
+      const planets = (payload.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+      planets[1].degree = degree;
+      const fetcher = vi.fn(async () => jsonResponse(payload)) as unknown as typeof fetch;
+
+      await expect(deriveBirthProfile({
+        dateOfBirth: '1990-05-12',
+        timeOfBirth: '14:35',
+        latitude: 16.5062,
+        longitude: 80.648,
+        timezone: 'Asia/Kolkata',
+      }, { fetcher })).resolves.toMatchObject({
+        nakshatra: 'Rohini',
+        pada: 2,
+        janmaRashi: 'Vrishabha',
+      });
+    },
+  );
+
+  test('accepts rounded node degrees whose intervals still permit exact opposition', async () => {
+    const payload = derivationPayload();
+    const planets = (payload.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    planets[8].degree = 10.01;
+    const fetcher = vi.fn(async () => jsonResponse(payload)) as unknown as typeof fetch;
+
+    await expect(deriveBirthProfile({
+      dateOfBirth: '1990-05-12',
+      timeOfBirth: '14:35',
+      latitude: 16.5062,
+      longitude: 80.648,
+      timezone: 'Asia/Kolkata',
+    }, { fetcher })).resolves.toMatchObject({
+      planets: expect.arrayContaining([
+        expect.objectContaining({ name: 'Rahu', degree: 10 }),
+        expect.objectContaining({ name: 'Ketu', degree: 10.01 }),
+      ]),
+    });
+  });
+
+  test('accepts the normalized representable value below a rounded 30-degree boundary', async () => {
+    const payload = derivationPayload();
+    const planets = (payload.data as Record<string, unknown>).planets as Array<Record<string, unknown>>;
+    planets[0].degree = 29.999999999999996;
+    (payload.data as Record<string, unknown>).lagna_degree = 29.999999999999996;
+    const fetcher = vi.fn(async () => jsonResponse(payload)) as unknown as typeof fetch;
+
+    await expect(deriveBirthProfile({
+      dateOfBirth: '1990-05-12',
+      timeOfBirth: '14:35',
+      latitude: 16.5062,
+      longitude: 80.648,
+      timezone: 'Asia/Kolkata',
+    }, { fetcher })).resolves.toMatchObject({
+      planets: expect.arrayContaining([
+        expect.objectContaining({ name: 'Surya', degree: 29.999999999999996 }),
+      ]),
+    });
   });
 
   test('surfaces rate limits and bounded server messages', async () => {

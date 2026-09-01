@@ -102,7 +102,7 @@ describe('Gochara stable selection', () => {
     expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe('profile:guest_second');
   });
 
-  test('uses the exact legacy row only when it is Horoscope-ready', () => {
+  test('recreates the legacy ready-profile order before assigning a stable ID', () => {
     const profiles = [
       profile('guest_incomplete', { nakshatra: 'Krittika', pada: null }),
       profile('guest_ready'),
@@ -111,13 +111,31 @@ describe('Gochara stable selection', () => {
 
     const result = loadGocharaSelection(storage, profiles);
 
-    expect(result.value).toBe('');
-    expect(result.fallback).toMatchObject({
-      code: 'profile-not-horoscope-ready', missingField: 'pada',
-    });
+    expect(result.value).toBe(gocharaProfileValue('guest_ready'));
+    expect(result.profile).toMatchObject({ id: 'guest_ready' });
+    expect(result.fallback).toBeNull();
     expect(result.legacySelectionDetected).toBe(true);
-    expect(result.migratedFromLegacy).toBe(false);
-    expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe('');
+    expect(result.migratedFromLegacy).toBe(true);
+    expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe(
+      'profile:guest_ready',
+    );
+  });
+
+  test('does not shift a later legacy selection when an incomplete row precedes it', () => {
+    const profiles = [
+      profile('guest_incomplete', { nakshatra: 'Krittika', pada: null }),
+      profile('guest_alice'),
+      profile('guest_bob'),
+    ];
+    storage.setItem(GOCHARA_SELECTION_STORAGE_KEY, 'p1');
+
+    const result = loadGocharaSelection(storage, profiles);
+
+    expect(result.value).toBe(gocharaProfileValue('guest_bob'));
+    expect(result.profile).toMatchObject({ id: 'guest_bob' });
+    expect(storage.getItem(GOCHARA_SELECTION_STORAGE_KEY)).toBe(
+      'profile:guest_bob',
+    );
   });
 
   test('survives profile reorder and edit after the legacy value is migrated', () => {

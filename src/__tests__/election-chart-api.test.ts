@@ -10,6 +10,11 @@ const PLANETS = [
   'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
   'Shukra', 'Shani', 'Rahu', 'Ketu',
 ] as const;
+const PLANET_RASHIS = [
+  'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
+  'Kanya', 'Tula', 'Vrischika', 'Vrishabha',
+] as const;
+const PLANET_HOUSES = [8, 9, 10, 11, 12, 1, 2, 3, 9] as const;
 
 function validResponse() {
   return {
@@ -25,8 +30,11 @@ function validResponse() {
         instant,
         lagna: { rashi: 'Kanya', degree: 12.5 },
         planets: PLANETS.map((name, index) => ({
-          name, rashi: 'Mesha', degree: index + 0.25,
-          house: index + 1, retrograde: name === 'Rahu' || name === 'Ketu',
+          name,
+          rashi: PLANET_RASHIS[index],
+          degree: name === 'Ketu' ? 7.25 : index + 0.25,
+          house: PLANET_HOUSES[index],
+          retrograde: name === 'Rahu' || name === 'Ketu',
         })),
       })),
     },
@@ -96,6 +104,25 @@ describe('election-chart gateway client', () => {
       const planets = payload.data.charts[0].planets;
       [planets[0], planets[1]] = [planets[1], planets[0]];
     }],
+    ['unrounded planet degree', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[1].degree = 13.338;
+    }],
+    ['unrounded Lagna degree', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].lagna.degree = 12.345;
+    }],
+    ['inconsistent Whole Sign house', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[0].house = 1;
+    }],
+    ['retrograde Surya', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[0].retrograde = true;
+    }],
+    ['direct Rahu', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[7].retrograde = false;
+    }],
+    ['non-opposite Ketu', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[8].rashi = 'Mesha';
+      payload.data.charts[0].planets[8].house = 8;
+    }],
   ])('rejects %s chart responses', async (_label, mutate) => {
     const payload = validResponse();
     mutate(payload);
@@ -159,6 +186,9 @@ describe('election-chart gateway client', () => {
   test.each([
     ['wrong engine', (payload: ReturnType<typeof validResponse>) => {
       payload.engine.name = 'OtherEngine';
+    }],
+    ['padded engine', (payload: ReturnType<typeof validResponse>) => {
+      payload.engine.name = ' DashaFlow ';
     }],
     ['wrong ayanamsha', (payload: ReturnType<typeof validResponse>) => {
       payload.engine.ayanamsha = 'Tropical';

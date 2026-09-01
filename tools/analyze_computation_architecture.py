@@ -45,6 +45,7 @@ _TARABALAM_PANEL = 'src/panels/tarabalam.ts'
 _ADDITIVE_FEATURE_SOURCES = frozenset({
     'src/lib/birth-profile-api.ts',
     'src/lib/election-chart-api.ts',
+    'src/lib/guest-profile-store.ts',
     'src/lib/profile-selection.ts',
     'src/lib/remote-calculation-activation.ts',
     'src/panels/profiles.ts',

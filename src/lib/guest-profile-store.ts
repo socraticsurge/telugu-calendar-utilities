@@ -1,5 +1,16 @@
 import { NAKSHATRA_NAMES, RASI_NAMES, rasiFromStar } from '../data/rasis';
-import type { BirthChartPlanet, BirthProfileEngine } from './birth-profile-api';
+import {
+  BIRTH_CHART_PLANET_NAMES,
+  BIRTH_PROFILE_AYANAMSHA,
+  BIRTH_PROFILE_CONTRACT_VERSION,
+  BIRTH_PROFILE_ENGINE_NAME,
+  fixedGrahaFactsMatch,
+  isContractRoundedDegree,
+  roundedMoonMatchesBirthFacts,
+  wholeSignHousesMatch,
+  type BirthChartPlanet,
+  type BirthProfileEngine,
+} from './birth-profile-api';
 
 export const GUEST_PROFILE_STORAGE_KEY = 'tc-tb-profiles';
 export const GUEST_BIRTH_PROFILE_STORAGE_KEY = 'tc-birth-profile-data';
@@ -189,12 +200,30 @@ function canonical(value: unknown, allowed: readonly string[]): string | null {
   return allowed.includes(candidate) ? candidate : null;
 }
 
+function exactText(value: unknown, maxLength: number): string | null {
+  return typeof value === 'string'
+    && value.length > 0
+    && value.length <= maxLength
+    && value.trim() === value
+    ? value
+    : null;
+}
+
+function exactCanonical(value: unknown, allowed: readonly string[]): string | null {
+  const candidate = exactText(value, 80);
+  return candidate && allowed.includes(candidate) ? candidate : null;
+}
+
 function pada(value: unknown): 1 | 2 | 3 | 4 | null {
   if (value === '' || value === null || value === undefined) return null;
   const candidate = Number(value);
   return candidate === 1 || candidate === 2 || candidate === 3 || candidate === 4
     ? candidate
     : null;
+}
+
+function exactPada(value: unknown): 1 | 2 | 3 | 4 | null {
+  return typeof value === 'number' ? pada(value) : null;
 }
 
 function validStoredId(value: unknown): value is string {
@@ -225,10 +254,10 @@ function isOwnedBirthDetails(value: unknown): boolean {
     && record.timezone === normalized.timezone;
 }
 
-function isOwnedPlanet(value: unknown): boolean {
+function isOwnedPlanet(value: unknown, expectedName: string): boolean {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
-  const normalized = normalizePlanet(record);
+  const normalized = normalizePlanet(record, expectedName);
   return normalized !== null
     && hasExactKeys(record, ['name', 'rashi', 'degree', 'house', 'retrograde'])
     && record.name === normalized.name
@@ -246,7 +275,8 @@ function isOwnedNatalChart(value: unknown): boolean {
     && hasExactKeys(record, ['lagnaDegree', 'planets'])
     && Object.is(record.lagnaDegree, normalized.lagnaDegree)
     && Array.isArray(record.planets)
-    && record.planets.every(isOwnedPlanet);
+    && record.planets.every((planet, index) =>
+      isOwnedPlanet(planet, BIRTH_CHART_PLANET_NAMES[index] || ''));
 }
 
 function isOwnedCalculation(value: unknown): boolean {
@@ -272,18 +302,36 @@ function isOwnedCalculation(value: unknown): boolean {
 function isOwnedBirthProfileRecord(value: unknown): value is StoredBirthProfileRecord {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
+  const nakshatra = canonical(record.nakshatra, NAKSHATRA_NAMES);
+  const padaValue = pada(record.pada);
+  const lagna = canonical(record.lagna, RASI_NAMES);
+  const janmaRasi = canonical(record.janmaRasi, RASI_NAMES);
+  const natalChart = normalizeNatalChart(record.natalChart);
   return hasExactKeys(record, [
     'source', 'nakshatra', 'pada', 'lagna', 'birthDetails',
     'janmaRasi', 'natalChart', 'calculation',
   ])
     && record.source === 'birth-details'
-    && canonical(record.nakshatra, NAKSHATRA_NAMES) === record.nakshatra
-    && pada(record.pada) === record.pada
-    && canonical(record.lagna, RASI_NAMES) === record.lagna
-    && canonical(record.janmaRasi, RASI_NAMES) === record.janmaRasi
+    && nakshatra === record.nakshatra
+    && padaValue === record.pada
+    && lagna === record.lagna
+    && janmaRasi === record.janmaRasi
     && isOwnedBirthDetails(record.birthDetails)
     && isOwnedNatalChart(record.natalChart)
-    && isOwnedCalculation(record.calculation);
+    && isOwnedCalculation(record.calculation)
+    && nakshatra !== null
+    && padaValue !== null
+    && janmaRasi !== null
+    && natalChart !== null
+    && lagna !== null
+    && wholeSignHousesMatch(lagna, natalChart.planets)
+    && fixedGrahaFactsMatch(natalChart.planets)
+    && roundedMoonMatchesBirthFacts(
+      nakshatra,
+      padaValue,
+      janmaRasi,
+      natalChart.planets[1],
+    );
 }
 
 function hasProfileContent(value: Record<string, unknown>): boolean {
@@ -364,15 +412,15 @@ function normalizeBirthDetails(value: unknown): GuestBirthDetails | null {
   return { dateOfBirth, timeOfBirth, placeLabel, latitude, longitude, timezone };
 }
 
-function normalizePlanet(value: unknown): BirthChartPlanet | null {
+function normalizePlanet(value: unknown, expectedName: string): BirthChartPlanet | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
-  const name = text(record.name, 40);
-  const rashi = canonical(record.rashi, RASI_NAMES);
+  const name = exactText(record.name, 40);
+  const rashi = exactCanonical(record.rashi, RASI_NAMES);
   const degree = finite(record.degree);
   const house = finite(record.house);
   if (
-    !name || !rashi || degree === null || degree < 0 || degree >= 30
+    name !== expectedName || !rashi || degree === null || !isContractRoundedDegree(degree)
     || house === null || !Number.isInteger(house) || house < 1 || house > 12
     || typeof record.retrograde !== 'boolean'
   ) return null;
@@ -384,8 +432,10 @@ function normalizeNatalChart(value: unknown): GuestNatalChart | null {
   const record = value as Record<string, unknown>;
   const lagnaDegree = finite(record.lagnaDegree);
   const rawPlanets = Array.isArray(record.planets) ? record.planets : null;
-  if (lagnaDegree === null || lagnaDegree < 0 || lagnaDegree >= 30 || !rawPlanets) return null;
-  const planets = rawPlanets.map(normalizePlanet).filter((item): item is BirthChartPlanet => item !== null);
+  if (lagnaDegree === null || !isContractRoundedDegree(lagnaDegree) || !rawPlanets) return null;
+  const planets = rawPlanets
+    .map((planet, index) => normalizePlanet(planet, BIRTH_CHART_PLANET_NAMES[index] || ''))
+    .filter((item): item is BirthChartPlanet => item !== null);
   return planets.length === 9 && planets.length === rawPlanets.length
     ? { lagnaDegree, planets }
     : null;
@@ -397,13 +447,16 @@ function normalizeCalculation(value: unknown): GuestProfileCalculation | null {
   const engineValue = record.engine;
   if (!engineValue || typeof engineValue !== 'object' || Array.isArray(engineValue)) return null;
   const engineRecord = engineValue as Record<string, unknown>;
-  const contractVersion = text(record.contractVersion, 20);
-  const name = text(engineRecord.name, 60);
-  const version = text(engineRecord.version, 40);
-  const ayanamsha = text(engineRecord.ayanamsha, 40);
-  const ephemeris = text(engineRecord.ephemeris, 20);
+  const contractVersion = exactText(record.contractVersion, 20);
+  const name = exactText(engineRecord.name, 60);
+  const version = exactText(engineRecord.version, 40);
+  const ayanamsha = exactText(engineRecord.ayanamsha, 40);
+  const ephemeris = exactText(engineRecord.ephemeris, 20);
   if (
-    !contractVersion || !name || !version || !ayanamsha
+    contractVersion !== BIRTH_PROFILE_CONTRACT_VERSION
+    || name !== BIRTH_PROFILE_ENGINE_NAME
+    || !version
+    || ayanamsha !== BIRTH_PROFILE_AYANAMSHA
     || (ephemeris !== 'swiss' && ephemeris !== 'moshier' && ephemeris !== 'unknown')
   ) return null;
   return { contractVersion, engine: { name, version, ayanamsha, ephemeris } };
@@ -702,8 +755,33 @@ export class GuestProfileStore {
     const calculation = normalizeCalculation(draft.calculation);
     const suppliedRasi = canonical(draft.janmaRasi, RASI_NAMES);
     const derivedRasi = nakshatra ? rasiFromStar(nakshatra, padaValue) : null;
+    const exactBirthNakshatra = exactCanonical(draft.nakshatra, NAKSHATRA_NAMES);
+    const exactBirthPada = exactPada(draft.pada);
+    const exactBirthLagna = exactCanonical(draft.lagna, RASI_NAMES);
+    const exactBirthRasi = exactCanonical(draft.janmaRasi, RASI_NAMES);
     const isBirthDerived = draft.source === 'birth-details'
-      && Boolean(birthDetails && natalChart && calculation && suppliedRasi && nakshatra && padaValue && lagna);
+      && Boolean(
+        birthDetails
+        && natalChart
+        && calculation
+        && suppliedRasi
+        && suppliedRasi === derivedRasi
+        && exactBirthNakshatra === nakshatra
+        && exactBirthPada === padaValue
+        && exactBirthLagna === lagna
+        && exactBirthRasi === suppliedRasi
+        && nakshatra
+        && padaValue
+        && lagna
+        && wholeSignHousesMatch(lagna, natalChart.planets)
+        && fixedGrahaFactsMatch(natalChart.planets)
+        && roundedMoonMatchesBirthFacts(
+          nakshatra,
+          padaValue,
+          suppliedRasi,
+          natalChart.planets[1],
+        )
+      );
     return {
       id,
       schemaVersion: GUEST_PROFILE_SCHEMA_VERSION,

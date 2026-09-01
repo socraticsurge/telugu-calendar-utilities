@@ -138,6 +138,7 @@ test('keeps deterministic Janma-Rashi evidence available when interpretive prose
   panel.shareGocharaOnWhatsApp();
   const shareUrl = String(open.mock.calls[0]?.[0] || '');
   expect(decodeURIComponent(shareUrl).toLowerCase()).not.toContain('from lagna');
+  expect(decodeURIComponent(shareUrl)).not.toContain('Reference profile');
   controller.destroy();
 });
 

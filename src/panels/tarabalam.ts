@@ -1053,7 +1053,7 @@ function renderTarabalam(profiles?) {
   const goodDays = TB_DAYS.filter(r => r.allGood);
   const next = goodDays[0];
   const who = group ? 'everyone' : (profiles[0] ? profiles[0].name : 'you');
-  let summary = `<span class="count">${goodDays.length} of ${TB_DAYS.length}</span>&nbsp;days are favourable for ${who}`;
+  let summary = `<span class="count">${goodDays.length} of ${TB_DAYS.length}</span>&nbsp;days are favourable for ${htmlEsc(who)}`;
   if (next) {
     summary += ` · next: <span class="count">${next.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>`;
   }
@@ -1083,7 +1083,7 @@ function renderTarabalam(profiles?) {
          or tick "show all days".</p>`;
     } else {
       document.getElementById('tb-result').innerHTML =
-        `<p class="preview-error">No favourable days for ${who} in this range, and none found in the months ahead.
+        `<p class="preview-error">No favourable days for ${htmlEsc(who)} in this range, and none found in the months ahead.
          Tick "show all days" to plan by individual taras.</p>`;
     }
     return;
@@ -1200,7 +1200,7 @@ function shareTarabalamOnWhatsApp() {
   const anyRasi = profiles.some(pr => pr.rasi);
   lines.push(`✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`);
   lines.push(`📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} to ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`);
-  lines.push(profiles.map(pr => `${pr.name}: ${pr.nak}`).join(' · '));
+  lines.push('Saved profile names and birth-star details are intentionally omitted from this share.');
   lines.push(`Standard: ${{ stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE]}`);
   lines.push('');
   goodDays.forEach(r => lines.push(`✅ ${fmtD(r.date)} · ${r.nak} · ${r.tithi}`));
@@ -2422,8 +2422,12 @@ function renderMuhurta() {
         detail: 'Exact chart screening is intentionally not active in this public build; no slot is presented as chart-screened.',
       },
       unavailable: {
-        title: 'Panchangam shortlist shown',
-        detail: 'Exact chart screening could not be reached; no slot is presented as chart-screened.',
+        title: chartEnrichment.screenedCount
+          ? 'Partial exact chart screening applied'
+          : 'Panchangam shortlist shown',
+        detail: chartEnrichment.screenedCount
+          ? 'Only already-screened survivors are shown; every unprocessed candidate was withheld.'
+          : 'Exact chart screening could not be reached; no slot is presented as chart-screened.',
       },
     }[chartEnrichment.state]
     : null;
@@ -2440,7 +2444,7 @@ function renderMuhurta() {
   const roleRequirement = roleForActivity(activity);
   const roleStatus = !roleProfile
     ? 'No participant selected · source-specific personal checks remain unknown'
-    : chartEnrichment?.state === 'screened'
+    : chartEnrichment?.state === 'screened' || chartEnrichment?.screenedCount
       ? `${roleProfile.name} · evaluated locally against the source-specific personal rules`
       : chartEnrichment?.state === 'unsupported-system'
         ? `${roleProfile.name} selected · source-specific personal checks were not run for this system`
@@ -2671,6 +2675,21 @@ export function muShareableMuhurtaReasons(slot) {
   ].filter(reason => reason !== 'clear of all inauspicious windows').slice(0, 3);
 }
 
+export function muChartShareScreeningLine(chartEnrichment) {
+  if (chartEnrichment?.state === 'screened') {
+    return 'The automated, source-backed election-chart subset was checked across every sampled Lagna-stable state.';
+  }
+  if (chartEnrichment?.state === 'unavailable' && chartEnrichment.screenedCount > 0) {
+    return `Partial exact chart screening was applied to ${chartEnrichment.screenedCount} candidate${chartEnrichment.screenedCount === 1 ? '' : 's'}; only already-screened survivors are included, and unprocessed candidates were withheld.`;
+  }
+  return 'Panchangam-ranked; exact election-chart screening was not applied.';
+}
+
+export function muChartShareIncludesRemainder(chartEnrichment) {
+  return chartEnrichment?.state === 'screened'
+    || (chartEnrichment?.state === 'unavailable' && chartEnrichment.screenedCount > 0);
+}
+
 function shareMuhurtaOnWhatsApp() {
   if (!MU_LAST || !MU_LAST.top.length) return;
   const { top, activity, chartEnrichment, context } = MU_LAST;
@@ -2681,14 +2700,12 @@ function shareMuhurtaOnWhatsApp() {
   if (roleForActivity(activity)) {
     lines.push('Source-specific personal checks were applied locally when possible; profile details are intentionally omitted from this share.');
   }
-  if (chartEnrichment?.state === 'screened') {
-    lines.push('The automated, source-backed election-chart subset was checked across every sampled Lagna-stable state.');
+  lines.push(muChartShareScreeningLine(chartEnrichment));
+  if (muChartShareIncludesRemainder(chartEnrichment)) {
     const remainder = chartManualRemaindersFor(activity) || [];
     if (remainder.length) {
       lines.push('Qualitative chart or ritual checks still require practitioner review; see the result details.');
     }
-  } else {
-    lines.push('Panchangam-ranked; exact election-chart screening was not applied.');
   }
   lines.push('');
   top.slice(0, 5).forEach(s => {
