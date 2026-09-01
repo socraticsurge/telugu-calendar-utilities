@@ -38,6 +38,30 @@ _ACTIVITY_RULES_ARTIFACT = 'src/data/activity-rules.generated.json'
 _PANCHANGAM_NAMES = 'telugu_panchangam/panchangam_names.py'
 _TARABALAM_PANEL = 'src/panels/tarabalam.ts'
 
+# ``scope.source_files`` is the established computation-layer contract. New
+# feature-side helpers are additions around that layer: they still appear in
+# the module graph, history, and blast-radius evidence, but are reported
+# separately so an additive adapter does not masquerade as core expansion.
+_ADDITIVE_FEATURE_SOURCES = frozenset({
+    'src/lib/birth-profile-api.ts',
+    'src/lib/election-chart-api.ts',
+    'src/lib/guest-profile-store.ts',
+    'src/lib/profile-selection.ts',
+    'src/lib/remote-calculation-activation.ts',
+    'src/panels/profiles.ts',
+    'src/scorer/election-chart-enrichment.ts',
+    'src/scorer/election-chart-screening.ts',
+    'src/scorer/personal-election-screening.ts',
+    'telugu_panchangam/personal/activity_check_contract.py',
+    'telugu_panchangam/personal/election_chart.py',
+    'telugu_panchangam/personal/election_chart_rules.py',
+    'telugu_panchangam/personal/personal_election.py',
+})
+
+
+def source_scope_class(path: str) -> str:
+    """Classify a production module without hiding it from report evidence."""
+    return 'additive-feature' if path in _ADDITIVE_FEATURE_SOURCES else 'established'
 _DUPLICATE_CONTRACTS = {
     'activity_profiles': {
         'strategy': 'generated-from-python',
@@ -457,6 +481,12 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
     tree_paths = _tree_paths(commit)
     all_paths = set(tree_paths)
     source_paths = [path for path in tree_paths if _is_source(path)]
+    additive_feature_paths = [
+        path for path in source_paths if source_scope_class(path) == 'additive-feature'
+    ]
+    established_source_paths = [
+        path for path in source_paths if source_scope_class(path) == 'established'
+    ]
     test_paths = [path for path in tree_paths if _is_test(path)]
     registry = _registry_at(commit)
     graph, private_imports, private_attributes = _module_graph(
@@ -514,6 +544,7 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
         modules.append({
             'path': path,
             'layer': layer,
+            'scope_class': source_scope_class(path),
             'nonblank_lines': nonblank,
             'definitions': definitions,
             'largest_definition_lines': largest,
@@ -571,7 +602,9 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
         'schema_version': 1,
         'source_commit': commit,
         'scope': {
-            'source_files': len(source_paths),
+            'source_files': len(established_source_paths),
+            'additive_feature_source_files': len(additive_feature_paths),
+            'total_source_files': len(source_paths),
             'test_files': len(test_paths),
             'computation_records': len(registry['computations']),
             'history_requested_non_merge_commits': commit_limit,
@@ -626,7 +659,12 @@ def _summary(report: dict) -> str:
     )
     lines = [
         f"Source commit: {report['source_commit']}",
-        f"Production modules: {report['scope']['source_files']}",
+        f"Established production modules: {report['scope']['source_files']}",
+        (
+            'Additive feature modules: '
+            f"{report['scope']['additive_feature_source_files']} "
+            f"(total {report['scope']['total_source_files']})"
+        ),
         f"Computation records: {report['scope']['computation_records']}",
         f'Manual duplicate-contract groups: {manual}',
         'Largest modules by nonblank lines:',

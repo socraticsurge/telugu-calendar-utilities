@@ -1,0 +1,137 @@
+{
+  "capturedAt": "2026-09-01T04:06:19+00:00",
+  "source": "tools/capture_muhurta_chart_screenshots.py",
+  "liveServicesUsed": false,
+  "captures": [
+    {
+      "file": "fixture-positive-purchase-desktop-1440x900.png",
+      "scenario": "positive",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Exact chart screening applied",
+      "sha256": "1ab8c558d5f271c874790d29d71069bc52371374a51c47e6af96e180ad3a4623"
+    },
+    {
+      "file": "fixture-positive-purchase-mobile-390x844.png",
+      "scenario": "positive",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Exact chart screening applied",
+      "sha256": "541524fa30aa4fbc972455de40f82d13eb4dbcf09793103e71004d25bbc1ee6f"
+    },
+    {
+      "file": "fixture-mixed-rule-unknown-tablet-768x1024.png",
+      "scenario": "mixed",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "expectedState": "screened",
+      "expectedCopy": "changed within this window",
+      "sha256": "1cc0e4d5c92a9c65389fec9381bb177df78f6a7130fdc731118e00f094fd452c"
+    },
+    {
+      "file": "fixture-travel-mandatory-failure-desktop-1440x900.png",
+      "scenario": "failure",
+      "activity": "travel",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "failed an exact chart requirement",
+      "sha256": "7fba72af335e639bb15c736bd5bed95b7fc6c00021defe365df725d54e38fd46"
+    },
+    {
+      "file": "fixture-gold-manual-only-desktop-1440x900.png",
+      "scenario": "manual-only",
+      "activity": "gold",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "manual-only",
+      "expectedCopy": "chart review remains manual",
+      "sha256": "2b7e3068ed654b1b04a393dd8f75575d47d5e60009882ee6943b678ce650bc21"
+    },
+    {
+      "file": "fixture-unsupported-system-tablet-landscape-1024x768.png",
+      "scenario": "unsupported",
+      "activity": "purchase",
+      "system": "surya-siddhanta",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "expectedState": "unsupported-system",
+      "expectedCopy": "Selected system kept separate",
+      "sha256": "63c33ec2d160365ed4841d562ef6c97e159aae91b7691bdf5bdf8c67c176fa5a"
+    },
+    {
+      "file": "fixture-offline-unavailable-mobile-390x844.png",
+      "scenario": "offline",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "unavailable",
+      "expectedCopy": "Panchangam shortlist shown",
+      "sha256": "d40d262f76616c601dc8e3a8f0f44ce2c126cd1b35d753531406aa59d78b3ffe"
+    },
+    {
+      "file": "fixture-malformed-response-unavailable-desktop-1440x900.png",
+      "scenario": "malformed",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "unavailable",
+      "expectedCopy": "Panchangam shortlist shown",
+      "sha256": "c4ec73e56f8d6084b95b1da2dc0a0f4b9a89f8d5846be4da90292ff22f781a21"
+    },
+    {
+      "file": "fixture-chart-screening-loading-desktop-1440x900.png",
+      "scenario": "loading",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "loading",
+      "expectedCopy": "screening exact election charts",
+      "sha256": "abb8cd20528bbd84a236fd96cc073856edf6bcbaa5c8264f9ab5e5f2b6d9e889"
+    },
+    {
+      "file": "fixture-timeout-unavailable-tablet-768x1024.png",
+      "scenario": "timeout",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "expectedState": "unavailable",
+      "expectedCopy": "Panchangam shortlist shown",
+      "sha256": "b5bee7ef745b77e7fd231fb3ea711dfc7542bc57263e25510aad7fe1f7779f29"
+    }
+  ]
+}

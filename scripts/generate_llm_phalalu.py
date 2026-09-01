@@ -24,6 +24,26 @@ from telugu_panchangam.personal.llm_phalalu import VerificationError, generate_r
 
 HYD_GEO = [78.4744, 17.3850, 0.0]
 
+
+def write_outputs(result, iso_date, out_dir):
+    """Write the dated archive and the stable browser lookup atomically enough
+    for the static publishing job.
+
+    The dated file remains the audit trail. ``latest.json`` lets the browser
+    discover whether today's optional interpretation exists without making a
+    predictable 404 request on every fallback day.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    paths = [
+        os.path.join(out_dir, f'{iso_date}.json'),
+        os.path.join(out_dir, 'latest.json'),
+    ]
+    for path in paths:
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+    return paths
+
+
 if __name__ == '__main__':
     if not os.environ.get('rasiphalalu'):
         print('Error: rasiphalalu environment variable not set.', file=sys.stderr)
@@ -40,8 +60,5 @@ if __name__ == '__main__':
         sys.exit(1)
 
     out_dir = os.environ.get('PHALALU_OUT', 'data/llm_phalalu')
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, f'{today.isoformat()}.json')
-    with open(out_path, 'w', encoding='utf-8') as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
-    print(f'Wrote {out_path}')
+    out_paths = write_outputs(result, today.isoformat(), out_dir)
+    print(f'Wrote {", ".join(out_paths)}')

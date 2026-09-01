@@ -17,8 +17,13 @@ The incorporated journey section says Chaturdashi and Full/New Chandra days
 must be avoided, so the profile rejects Tithi numbers 14 and 15. It calls ten
 Nakshatras the best for satisfactory completion and early return; these earn
 a preference rather than becoming an exclusive admission list. Guru
-combustion is a hard exclusion. Guru in Lagna or the 9th remains a visible
-manual chart check.
+combustion is a hard exclusion. Guru in Lagna or the 9th is a source-backed
+tie-break preference in the Drik browser chart post-screen only when it passes
+across every sampled state (the window edges and both sides of every known
+interior Drik Lagna transition); its absence does not reject a slot. Python/MCP
+retain this as a visible manual check because
+they do not call the chart service. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 The existing Vishti-Karana exclusion agrees with the separately cited general
 Panchanga-Suddhi rule. The existing Chara-Lagna bonus remains a project

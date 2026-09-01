@@ -18,13 +18,17 @@ Nakshatra-prakarana, “Entering the service of a master,” verse 26, printed p
 | Ashwini, Pushya, Hasta, Chitra, Anuradha, Mrigashira and Revati | Exact `allowed_nakshatras` | Hard day gate |
 | Wednesday, Friday, Sunday and Thursday | Exact `allowed_varas` | Hard day gate |
 | Benefic in Lagna | Manual check | Mandatory chart review |
-| Surya or Mangala in the 10th or 11th | Manual check | Mandatory chart review |
+| Surya or Mangala in the 10th or 11th | `ELECTION_CHART_RULES[job]` | Drik browser tie-break preference only when it passes across every sampled state (edges and both sides of known interior Lagna transitions); absence does not reject |
 | Employer/employee Yoni friendship | Manual check | Requires both birth Nakshatras |
 | Friendship between both Janma-Rasi lords | Manual check | Requires both natal Rasis |
 
 `manual_prerequisites = true` caps results below Excellent until the chart and
 two-person compatibility checks are complete. The former Amrit Choghadiya,
 Nanda Tithi and Sthira-Lagna proxies have been removed.
+
+Python/MCP retain all chart wording as `manual_checks`; only the Drik browser
+performs the bounded candidate-time chart post-screen. See
+[Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 
 The separately inspected Sandhana verse concerns peace, alliance or friendship
 and is not treated as authority for a modern contract. Employment terms,

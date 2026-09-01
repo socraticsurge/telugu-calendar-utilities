@@ -18,7 +18,7 @@ export function fmtT(t: string): string {
 export function dayMark(flag: string | null | undefined): string {
   if (!flag) return '';
   const title = flag === '+1' ? 'after midnight, on the next day' : 'on the previous day';
-  return `<sup class="plus1" title="${title}">${flag === '+1' ? '+1' : '\u22121'}</sup>`;
+  return `<sup class="plus1" title="${title}" aria-label="${title}" tabindex="0">${flag === '+1' ? '+1' : '\u22121'}</sup>`;
 }
 
 export function fmtRange(start: string, end: string, sep?: string, sflag?: string | null, eflag?: string | null): string {

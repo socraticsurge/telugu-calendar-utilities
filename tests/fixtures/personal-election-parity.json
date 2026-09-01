@@ -1,0 +1,82 @@
+[
+  {
+    "label": "Travel rejects the fifth Lagna",
+    "activity": "travel",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Hasta", "lunar_rashi": "Kanya", "lagna": "Simha"},
+    "end": {"nakshatra": "Hasta", "lunar_rashi": "Kanya", "lagna": "Simha"},
+    "expected": {"rejected": true, "needs_review": false, "preference_passes": 0, "stable": true, "statuses": ["fail", "fail"]}
+  },
+  {
+    "label": "Gruhapravesha natal anchor persists",
+    "activity": "gruhapravesha",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Rohini", "lunar_rashi": "Mithuna", "lagna": "Kanya"},
+    "end": {"nakshatra": "Rohini", "lunar_rashi": "Mithuna", "lagna": "Kanya"},
+    "expected": {"rejected": false, "needs_review": false, "preference_passes": 1, "stable": true, "statuses": ["pass"]}
+  },
+  {
+    "label": "Admitted Seemantha star passes the source-specific overlay",
+    "activity": "seemantha",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": "Kanya"},
+    "end": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": "Kanya"},
+    "expected": {"rejected": false, "needs_review": false, "preference_passes": 0, "stable": true, "statuses": ["pass"]}
+  },
+  {
+    "label": "Surgery boundary enters Janma Rashi",
+    "activity": "surgery",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Magha", "lunar_rashi": "Simha", "lagna": "Kanya"},
+    "end": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": "Tula"},
+    "expected": {"rejected": true, "needs_review": false, "preference_passes": 0, "stable": false, "statuses": ["fail"]}
+  },
+  {
+    "label": "Missing surgery Rashi is unknown",
+    "activity": "surgery",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": null, "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Magha", "lunar_rashi": "Simha", "lagna": "Kanya"},
+    "end": {"nakshatra": "Magha", "lunar_rashi": "Simha", "lagna": "Kanya"},
+    "expected": {"rejected": false, "needs_review": true, "preference_passes": 0, "stable": true, "statuses": ["unknown"]}
+  },
+  {
+    "label": "Travel preference at one boundary is unknown",
+    "activity": "travel",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": "Vrishabha"},
+    "end": {"nakshatra": "Mrigashira", "lunar_rashi": "Mithuna", "lagna": "Mithuna"},
+    "expected": {"rejected": false, "needs_review": true, "preference_passes": 0, "stable": false, "statuses": ["pass", "unknown"]}
+  },
+  {
+    "label": "Travel preference resolves without Janma Lagna",
+    "activity": "travel",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": null},
+    "start": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": "Vrishabha"},
+    "end": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": "Vrishabha"},
+    "expected": {"rejected": false, "needs_review": true, "preference_passes": 1, "stable": true, "statuses": ["unknown", "pass"]}
+  },
+  {
+    "label": "Travel candidate Lagna missing leaves both rules unknown",
+    "activity": "travel",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": null},
+    "end": {"nakshatra": "Rohini", "lunar_rashi": "Vrishabha", "lagna": null},
+    "expected": {"rejected": false, "needs_review": true, "preference_passes": 0, "stable": true, "statuses": ["unknown", "unknown"]}
+  },
+  {
+    "label": "Gruhapravesha partial natal anchors cannot prove failure",
+    "activity": "gruhapravesha",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": null},
+    "start": {"nakshatra": "Hasta", "lunar_rashi": "Kanya", "lagna": "Tula"},
+    "end": {"nakshatra": "Hasta", "lunar_rashi": "Kanya", "lagna": "Tula"},
+    "expected": {"rejected": false, "needs_review": true, "preference_passes": 0, "stable": true, "statuses": ["unknown"]}
+  },
+  {
+    "label": "Gruhapravesha missing candidate anchor cannot prove failure",
+    "activity": "gruhapravesha",
+    "participant": {"id": "p1", "name": "Lakshmi", "nakshatra": "Rohini", "janma_rashi": "Vrishabha", "janma_lagna": "Mesha"},
+    "start": {"nakshatra": "Hasta", "lunar_rashi": null, "lagna": "Tula"},
+    "end": {"nakshatra": "Hasta", "lunar_rashi": null, "lagna": "Tula"},
+    "expected": {"rejected": false, "needs_review": true, "preference_passes": 0, "stable": true, "statuses": ["unknown"]}
+  }
+]

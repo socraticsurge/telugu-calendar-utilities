@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily Horoscope surface options</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4efe4;
+      --surface: #fffdf7;
+      --ink: #1f1a17;
+      --muted: #655d52;
+      --line: #ded4c2;
+      --brand: #8e2a1f;
+      --brand-soft: #f5e8e4;
+      --green: #355e3b;
+      --green-soft: #edf2e8;
+      --amber: #76521b;
+      --amber-soft: #fbf2dc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.55 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { width: min(1280px, calc(100% - 40px)); margin: 0 auto; padding: 36px 0 56px; }
+    h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+    h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.05; }
+    .intro { max-width: 72ch; margin: 12px 0 30px; color: var(--muted); }
+    .comparison { display: grid; grid-template-columns: minmax(300px, 0.82fr) minmax(430px, 1.18fr); gap: 28px; align-items: start; }
+    .option {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 253, 247, 0.72);
+      box-shadow: 0 12px 32px rgba(31, 26, 23, 0.08);
+    }
+    .option-head { padding: 18px 20px; border-bottom: 1px solid var(--line); }
+    .option-kicker { color: var(--brand); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .option h2 { margin: 4px 0 0; font-size: 1.45rem; }
+    .option-note { margin: 6px 0 0; color: var(--muted); font-size: 0.88rem; }
+    .baseline { padding: 16px; }
+    .baseline img { display: block; width: 100%; height: auto; border: 1px solid var(--line); }
+    .prototype { padding: 20px; }
+    .profile-context {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding-bottom: 16px; border-bottom: 1px solid var(--line);
+    }
+    .profile-context strong { display: block; font-size: 1.05rem; }
+    .profile-context span { color: var(--muted); font-size: 0.82rem; }
+    .quiet-button {
+      min-height: 42px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 6px;
+      background: transparent; color: var(--brand); font: inherit; font-weight: 650;
+    }
+    .guidance { padding: 24px 0 20px; }
+    .guidance-top { display: flex; align-items: start; justify-content: space-between; gap: 18px; }
+    .guidance h3 { margin: 4px 0 8px; font-size: 1.75rem; line-height: 1.15; }
+    .date { color: var(--muted); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .quality { flex: none; padding: 5px 9px; border: 1px solid #e6b7ad; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-size: 0.72rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
+    .lead { max-width: 60ch; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 1.14rem; line-height: 1.55; }
+    .focus-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+    .focus-item { min-height: 116px; padding: 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); }
+    .focus-item b { display: block; margin-bottom: 6px; color: var(--green); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .focus-item p { margin: 0; color: var(--ink); font-size: 0.9rem; line-height: 1.45; }
+    details { border-top: 1px solid var(--line); }
+    summary { padding: 16px 0; color: var(--brand); font-weight: 700; cursor: pointer; }
+    details p { margin: 0 0 14px; color: var(--muted); font-size: 0.9rem; }
+    .continuation { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .continuation h3 { margin: 0; font-size: 1.15rem; }
+    .continuation p { margin: 5px 0 0; color: var(--muted); font-size: 0.86rem; }
+    .decision { margin-top: 28px; padding: 20px; border-left: 4px solid var(--brand); background: var(--surface); }
+    .decision strong { color: var(--brand); }
+    @media (max-width: 900px) {
+      main { width: min(100% - 24px, 720px); padding-top: 24px; }
+      .comparison { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .focus-grid { grid-template-columns: 1fr; }
+      .profile-context, .guidance-top { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Daily Horoscope hierarchy check</h1>
+    <p class="intro">A visual comparison grounded in the current product. The recommendation uses progressive disclosure to keep the daily decision layer within roughly five chunks while preserving the computed chart and evidence below.</p>
+
+    <section class="comparison" aria-label="Current and proposed Daily Horoscope surfaces">
+      <article class="option">
+        <header class="option-head">
+          <span class="option-kicker">Current baseline</span>
+          <h2>All interpretation first</h2>
+          <p class="option-note">Eight planetary paragraphs precede the chart and compete for the first screen.</p>
+        </header>
+        <div class="baseline">
+          <img src="../screenshots/ux-audit-2026-08-29/15-horoscope-profile-mobile.jpg" alt="Current mobile Daily Horoscope showing dense interpretation before the chart">
+        </div>
+      </article>
+
+      <article class="option">
+        <header class="option-head">
+          <span class="option-kicker">Recommended</span>
+          <h2>Decision first, evidence on demand</h2>
+          <p class="option-note">Miller and Hick reduce the opening load; information scent keeps every computed detail findable.</p>
+        </header>
+        <div class="prototype">
+          <div class="profile-context">
+            <div><strong>Hyderabad test</strong><span>Vrischika Janma Rashi · saved in this browser</span></div>
+            <button class="quiet-button" type="button">Change person</button>
+          </div>
+
+          <section class="guidance">
+            <div class="guidance-top">
+              <div><span class="date">Saturday, August 29</span><h3>Keep today light and routine</h3></div>
+              <span class="quality">Difficult day</span>
+            </div>
+            <p class="lead">The Moon sits heavily for your Janma Rashi today. Protect your energy, favour familiar work, and avoid forcing uncertain decisions.</p>
+
+            <div class="focus-grid" aria-label="Today's three focus areas">
+              <article class="focus-item"><b>Favour</b><p>Steady gains and practical conversations that already have momentum.</p></article>
+              <article class="focus-item"><b>Take care</b><p>Home, comfort, and partnership matters may carry more friction than usual.</p></article>
+              <article class="focus-item"><b>Timing</b><p>Use Panchangam windows for an action that cannot wait.</p></article>
+            </div>
+
+            <details>
+              <summary>Why this guidance? View 8 computed transit checks</summary>
+              <p>The detailed graha-by-graha verdicts remain available here, referenced only to the Janma Rashi and separated from interpretive guidance.</p>
+            </details>
+
+            <div class="continuation">
+              <h3>Transit chart and evidence</h3>
+              <p>The existing South Indian chart, legend, upcoming moves, and evidence boundary continue immediately below.</p>
+            </div>
+          </section>
+        </div>
+      </article>
+    </section>
+
+    <p class="decision"><strong>Recommendation:</strong> preserve the current visual system, replace the paragraph wall with a concise decision layer, and put the full computed narration behind a clearly named disclosure. The strongest accent remains on the day verdict, following Von Restorff.</p>
+  </main>
+</body>
+</html>

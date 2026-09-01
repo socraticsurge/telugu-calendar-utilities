@@ -9,6 +9,21 @@ PyPI version tracks this file's most recent release entry.
 
 ### Changed
 
+- Add browser-local guest profiles with manual entry, optional birth-derived
+  Nakshatra, Padam, Janma Rashi, Lagna and D1 review, stable reuse in Daily
+  Horoscope and Muhurtam, and non-destructive calculated-profile detail views.
+- Fail public birth-profile network calculation closed unless
+  `VITE_BIRTH_PROFILE_API_ENABLED` is the exact string `true`. Loopback keeps
+  the absent-flag development default; public requests use only the canonical
+  Astro Chaganti HTTPS guest gateway, while saved calculations stay viewable
+  and manual profile entry remains available.
+- Add source-backed Drik Muhurtam candidate-time chart screening behind an
+  independent fail-closed activation gate. Only the exact string `true`
+  enables public requests; an absent flag is loopback-only, public routing is
+  pinned to the canonical HTTPS guest gateway, and a disabled build retains
+  the shortlist with an honest rating cap and review state.
+- Keep the established 78-module computation-layer contract unchanged while
+  reporting thirteen profile/activation modules as additive feature sources.
 - Align the dependency security gate with the environment installed from the
   same `requirements.txt` input used by CI and release workflows, and refresh
   the separate Python 3.11 reproducibility snapshot with current dependency
@@ -16,9 +31,33 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Validate calculated birth-profile responses and restored browser records
+  against the exact `1.0` DashaFlow/Lahiri contract, canonical ordered
+  nine-graha tuple, Whole Sign houses, fixed node facts, and
+  Moon/Nakshatra/Padam/Janma-Rashi relationships while allowing only the
+  service's explicit two-decimal rounding interval; validate future, ambiguous
+  and nonexistent civil times in the birthplace timezone.
+- Preserve conclusive removals and survivors from completed Muhurtam chart
+  batches when a later batch fails, withhold every unscreened candidate, reject
+  incompatible cross-batch engine provenance, and disclose differing accepted
+  ephemerides as `mixed`; reject election snapshots that contradict the same
+  two-decimal, Whole Sign, and fixed-graha projection contract.
+- Remove third-party executable analytics and cross-origin font resources from
+  the profile-bearing page and documentation shell, omit saved profile names
+  from built-in share text, and keep documentation diagrams, evidence tables,
+  and tablet navigation inside the viewport with intentional local scrolling.
 - Keep published Lagna-transition and Hora feeds within the requested
   sunrise-to-next-sunrise cycle, including date-city combinations where a
   Julian-day seed could previously skip the first following sunrise.
+- Bind browser-local birth profiles to the exact committed base revision, keep
+  torn writes detached behind a marker, never automatically delete or roll back
+  failed writes across tabs, and limit recovery to recognized current-format
+  orphans.
+- Keep legacy Tarabalam profile edits compatible with hidden and future-schema
+  rows, isolate faulty store listeners, and fail closed for malformed legacy
+  Lagna values in Gochara.
+- Notify profile-store subscribers when an otherwise empty clear operation
+  loses persistence or changes its reported storage issue.
 - Constrain the MCP SDK to the tested 1.x API so fresh installations cannot
   resolve the incompatible 2.x package while the server uses
   `mcp.server.fastmcp`.

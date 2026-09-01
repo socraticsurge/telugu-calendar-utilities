@@ -1,0 +1,297 @@
+import { describe, expect, test, vi } from 'vitest';
+
+import {
+  deriveElectionCharts,
+  electionChartApiBase,
+  localWallTimeToInstant,
+} from '../lib/election-chart-api';
+
+const PLANETS = [
+  'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
+  'Shukra', 'Shani', 'Rahu', 'Ketu',
+] as const;
+const PLANET_RASHIS = [
+  'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
+  'Kanya', 'Tula', 'Vrischika', 'Vrishabha',
+] as const;
+const PLANET_HOUSES = [8, 9, 10, 11, 12, 1, 2, 3, 9] as const;
+
+function validResponse() {
+  return {
+    contract_version: '1.0',
+    engine: {
+      name: 'DashaFlow', version: '1.2.3', ayanamsha: 'Lahiri', ephemeris: 'swiss',
+      node_convention: 'mean',
+    },
+    house_system: 'whole_sign',
+    location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+    data: {
+      charts: ['2026-09-08T05:30:00.000Z'].map(instant => ({
+        instant,
+        lagna: { rashi: 'Kanya', degree: 12.5 },
+        planets: PLANETS.map((name, index) => ({
+          name,
+          rashi: PLANET_RASHIS[index],
+          degree: name === 'Ketu' ? 7.25 : index + 0.25,
+          house: PLANET_HOUSES[index],
+          retrograde: name === 'Rahu' || name === 'Ketu',
+        })),
+      })),
+    },
+  };
+}
+
+describe('election-chart gateway client', () => {
+  test('allows only a loopback HTTP override for isolated local chart testing', () => {
+    expect(electionChartApiBase('http://127.0.0.1:19014/api/guest/')).toBe(
+      'http://127.0.0.1:19014/api/guest',
+    );
+    expect(electionChartApiBase('https://untrusted.example/api/guest')).not.toContain(
+      'untrusted.example',
+    );
+  });
+
+  test('converts city wall time to the correct UTC instant across DST', () => {
+    expect(localWallTimeToInstant('2026-01-15', 9 * 60 + 30, 'America/New_York'))
+      .toBe('2026-01-15T14:30:00.000Z');
+    expect(localWallTimeToInstant('2026-07-15', 9 * 60 + 30, 'America/New_York'))
+      .toBe('2026-07-15T13:30:00.000Z');
+  });
+
+  test('rejects nonexistent and ambiguous DST civil minutes', () => {
+    expect(() => localWallTimeToInstant(
+      '2026-03-08', 2 * 60 + 30, 'America/New_York',
+    )).toThrow(/does not exist/);
+    expect(() => localWallTimeToInstant(
+      '2026-11-01', 1 * 60 + 30, 'America/New_York',
+    )).toThrow(/ambiguous/);
+  });
+
+  test('rejects normalized impossible dates while accepting a real leap day', () => {
+    expect(localWallTimeToInstant('2028-02-29', 0, 'UTC'))
+      .toBe('2028-02-29T00:00:00.000Z');
+    for (const invalidDate of ['2026-02-29', '2026-02-31', '2026-04-31', '2026-13-01']) {
+      expect(() => localWallTimeToInstant(invalidDate, 0, 'UTC'))
+        .toThrow(/local chart date is invalid/);
+    }
+  });
+
+  test('sends only location and candidate instants with no credentials', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(
+      JSON.stringify(validResponse()),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ));
+    await deriveElectionCharts({
+      location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, { baseUrl: 'https://example.test/api/guest', fetcher });
+
+    const [, init] = fetcher.mock.calls[0];
+    expect(JSON.parse(String(init?.body))).toEqual({
+      contract_version: '1.0',
+      location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+      instants: ['2026-09-08T05:30:00.000Z'],
+    });
+    expect(init?.credentials).toBe('omit');
+    expect(init?.cache).toBe('no-store');
+  });
+
+  test.each([
+    ['incomplete', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets.pop();
+    }],
+    ['reordered', (payload: ReturnType<typeof validResponse>) => {
+      const planets = payload.data.charts[0].planets;
+      [planets[0], planets[1]] = [planets[1], planets[0]];
+    }],
+    ['unrounded planet degree', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[1].degree = 13.338;
+    }],
+    ['unrounded Lagna degree', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].lagna.degree = 12.345;
+    }],
+    ['inconsistent Whole Sign house', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[0].house = 1;
+    }],
+    ['retrograde Surya', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[0].retrograde = true;
+    }],
+    ['direct Rahu', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[7].retrograde = false;
+    }],
+    ['non-opposite Ketu', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].planets[8].rashi = 'Mesha';
+      payload.data.charts[0].planets[8].house = 8;
+    }],
+  ])('rejects %s chart responses', async (_label, mutate) => {
+    const payload = validResponse();
+    mutate(payload);
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(
+      JSON.stringify(payload),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ));
+    await expect(deriveElectionCharts({
+      location: payload.location,
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, { baseUrl: 'https://example.test/api/guest', fetcher }))
+      .rejects.toMatchObject({ code: 'invalid-response' });
+  });
+
+  test('accepts a valid mixed-ephemeris batch', async () => {
+    const payload = validResponse();
+    payload.engine.ephemeris = 'mixed';
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(
+      JSON.stringify(payload),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ));
+
+    await expect(deriveElectionCharts({
+      location: payload.location,
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, { baseUrl: 'https://example.test/api/guest', fetcher }))
+      .resolves.toMatchObject({ engine: { ephemeris: 'mixed' } });
+  });
+
+  test('classifies the browser deadline as unavailable timeout evidence', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockImplementation((_input, init) => (
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(new DOMException('Aborted', 'AbortError'));
+        }, { once: true });
+      })
+    ));
+
+    await expect(deriveElectionCharts({
+      location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, { baseUrl: 'https://example.test/api/guest', fetcher, timeoutMs: 5 }))
+      .rejects.toMatchObject({ code: 'timeout', status: null });
+  });
+
+  test('preserves rate-limit status and bounded retry guidance', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(
+      JSON.stringify({ error: 'Busy' }),
+      { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '12' } },
+    ));
+
+    await expect(deriveElectionCharts({
+      location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, { baseUrl: 'https://example.test/api/guest', fetcher }))
+      .rejects.toMatchObject({
+        code: 'rate-limited', status: 429, retryAfterSeconds: 12,
+      });
+  });
+
+  test.each([
+    ['wrong engine', (payload: ReturnType<typeof validResponse>) => {
+      payload.engine.name = 'OtherEngine';
+    }],
+    ['padded engine', (payload: ReturnType<typeof validResponse>) => {
+      payload.engine.name = ' DashaFlow ';
+    }],
+    ['wrong ayanamsha', (payload: ReturnType<typeof validResponse>) => {
+      payload.engine.ayanamsha = 'Tropical';
+    }],
+    ['wrong node convention', (payload: ReturnType<typeof validResponse>) => {
+      payload.engine.node_convention = 'true';
+    }],
+    ['non-canonical Rashi', (payload: ReturnType<typeof validResponse>) => {
+      payload.data.charts[0].lagna.rashi = 'Virgo';
+    }],
+  ])('rejects %s rather than blending it into Drik/Lahiri', async (_label, mutate) => {
+    const payload = validResponse();
+    mutate(payload);
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(
+      JSON.stringify(payload),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ));
+
+    await expect(deriveElectionCharts({
+      location: payload.location,
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, { baseUrl: 'https://example.test/api/guest', fetcher }))
+      .rejects.toMatchObject({ code: 'invalid-response' });
+  });
+
+  test('trusts only the canonical HTTPS guest base on a public host', () => {
+    const publicLocation = {
+      hostname: 'panchangam.astrochaganti.com',
+    } as Location;
+    const canonical = 'https://astrochaganti.com/api/guest';
+    expect(electionChartApiBase(`${canonical}/`, publicLocation)).toBe(canonical);
+    for (const configured of [
+      'http://127.0.0.1:3000/api/guest',
+      'https://untrusted.example/api/guest',
+      'https://user:pass@astrochaganti.com/api/guest',
+      'https://astrochaganti.com:444/api/guest',
+      'https://astrochaganti.com/api/guest/extra',
+      'https://astrochaganti.com/api/guest?debug=1',
+      'https://astrochaganti.com/api/guest#debug',
+    ]) {
+      expect(electionChartApiBase(configured, publicLocation)).toBe(canonical);
+    }
+  });
+
+  test('allows local configuration only for credential-free HTTP loopback', () => {
+    const localLocation = { hostname: '127.0.0.1' } as Location;
+    const fallback = 'http://127.0.0.1:3000/api/guest';
+    expect(electionChartApiBase(
+      'http://localhost:19014/api/guest/',
+      localLocation,
+    )).toBe('http://localhost:19014/api/guest');
+    for (const configured of [
+      'https://localhost:19014/api/guest',
+      'http://user:pass@localhost:19014/api/guest',
+      'http://localhost:19014/api/guest?debug=1',
+      'http://localhost:19014/api/guest#debug',
+      'https://astrochaganti.com/api/guest',
+    ]) {
+      expect(electionChartApiBase(configured, localLocation)).toBe(fallback);
+    }
+  });
+
+  test('fails with typed disabled state before signal, timer, or fetch side effects', async () => {
+    const fetcher = vi.fn<typeof fetch>();
+    const addEventListener = vi.fn();
+    const removeEventListener = vi.fn();
+    const timeout = vi.spyOn(globalThis, 'setTimeout');
+    try {
+      await expect(deriveElectionCharts({
+        location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+        instants: ['2026-09-08T05:30:00.000Z'],
+      }, {
+        activationFlag: 'false',
+        locationLike: { hostname: '127.0.0.1' } as Location,
+        fetcher,
+        signal: { addEventListener, removeEventListener } as unknown as AbortSignal,
+        timeoutMs: 1,
+      })).rejects.toMatchObject({ code: 'disabled', status: null });
+      expect(fetcher).not.toHaveBeenCalled();
+      expect(addEventListener).not.toHaveBeenCalled();
+      expect(removeEventListener).not.toHaveBeenCalled();
+      expect(timeout).not.toHaveBeenCalled();
+    } finally {
+      timeout.mockRestore();
+    }
+  });
+
+  test('uses the canonical URL for an explicitly enabled public request', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(
+      JSON.stringify(validResponse()),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ));
+    await deriveElectionCharts({
+      location: { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' },
+      instants: ['2026-09-08T05:30:00.000Z'],
+    }, {
+      activationFlag: 'true',
+      baseUrl: 'http://127.0.0.1:3000/api/guest',
+      fetcher,
+      locationLike: { hostname: 'panchangam.astrochaganti.com' } as Location,
+    });
+    expect(fetcher.mock.calls[0][0]).toBe(
+      'https://astrochaganti.com/api/guest/muhurta/election-charts',
+    );
+  });
+});
