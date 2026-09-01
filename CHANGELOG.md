@@ -43,8 +43,9 @@ PyPI version tracks this file's most recent release entry.
   ephemerides as `mixed`; reject election snapshots that contradict the same
   two-decimal, Whole Sign, and fixed-graha projection contract.
 - Remove third-party executable analytics and cross-origin font resources from
-  the profile-bearing page, and omit saved profile names from built-in share
-  text.
+  the profile-bearing page and documentation shell, omit saved profile names
+  from built-in share text, and keep documentation diagrams, evidence tables,
+  and tablet navigation inside the viewport with intentional local scrolling.
 - Keep published Lagna-transition and Hora feeds within the requested
   sunrise-to-next-sunrise cycle, including date-city combinations where a
   Julian-day seed could previously skip the first following sunrise.

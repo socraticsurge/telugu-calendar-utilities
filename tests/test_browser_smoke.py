@@ -2239,6 +2239,43 @@ def test_gochara_unavailable_state_spans_the_chart(docs_server, browser):
     assert not app_errors, f'Gochara empty state surfaced errors: {app_errors[:3]}'
 
 
+@pytest.mark.parametrize(
+    ('route', 'viewports'),
+    (
+        ('53-birth-profile-calculation', ((390, 844), (768, 1024))),
+        (
+            '54-muhurtam-election-chart-screening',
+            ((390, 844), (768, 1024), (1024, 768)),
+        ),
+    ),
+)
+def test_documentation_diagrams_and_tables_do_not_overflow_page(
+    docs_server, browser, route, viewports,
+):
+    """Wide evidence stays locally scrollable without widening the page."""
+    page = browser.new_page()
+    captured = _capture_console(page)
+    try:
+        for width, height in viewports:
+            page.set_viewport_size({'width': width, 'height': height})
+            page.goto(
+                f'{docs_server}/docs/reference/{route}.html',
+                wait_until='networkidle',
+                timeout=15000,
+            )
+            page.locator('.vp-doc .mermaid svg').first.wait_for(state='visible')
+            if width == 768:
+                assert page.locator('.VPNavBarHamburger').is_visible()
+            _assert_no_horizontal_overflow(
+                page, f'Documentation {route} at {width}x{height}',
+            )
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'Documentation surfaced errors: {app_errors[:3]}'
+
+
 def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build, browser):
     """The regression class this guards: a module-scoped constant left
     behind by the panel extraction turns the gochara RASI view into a

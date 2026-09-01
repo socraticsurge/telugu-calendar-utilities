@@ -14,6 +14,16 @@ def test_profile_page_does_not_load_third_party_subresources() -> None:
     assert "fonts.gstatic.com" not in landing
 
 
+def test_documentation_uses_only_local_font_stacks() -> None:
+    config = (ROOT / ".vitepress/config.ts").read_text(encoding="utf-8")
+    theme = (ROOT / ".vitepress/theme/custom.css").read_text(encoding="utf-8")
+
+    assert "fonts.googleapis.com" not in config
+    assert "fonts.gstatic.com" not in config
+    assert "Libre Baskerville" not in theme
+    assert "'Inter'" not in theme
+
+
 def test_legacy_tarabalam_templates_escape_profile_names() -> None:
     panel = (ROOT / "src/panels/tarabalam.ts").read_text(encoding="utf-8")
 

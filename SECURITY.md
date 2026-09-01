@@ -50,10 +50,10 @@ You will get an acknowledgement within 72 hours. Once a fix ships, the issue can
   do not follow the guest to another browser, device, domain, protocol, or port.
   Clearing site data removes them, private-browsing storage may disappear when
   the private session ends, and there is no account, cloud sync, or recovery.
-- The profile-bearing page does not load third-party scripts, stylesheets, or
-  font files. Its optional analytics hook accepts only fixed, content-free
-  identifiers and is inert unless a trusted first-party integration is
-  deliberately supplied.
+- The profile-bearing page and documentation shell do not load third-party
+  scripts, stylesheets, or font files. The application's optional analytics
+  hook accepts only fixed, content-free identifiers and is inert unless a
+  trusted first-party integration is deliberately supplied.
   Profile names, birth details, profile IDs, and stored selections must never be sent to
   GoatCounter or any other analytics service. Built-in share text also omits
   profile names. Reports of profile content leaving either boundary are in

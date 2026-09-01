@@ -23,7 +23,7 @@ async function renderMermaid(): Promise<void> {
       lineColor: '#6B6357',
       secondaryColor: '#EEF2E7',
       tertiaryColor: '#F2ECDF',
-      fontFamily: 'Inter, system-ui, sans-serif',
+      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',
     },
   })
   await mermaid.run({ nodes })
