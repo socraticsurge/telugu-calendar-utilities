@@ -2215,6 +2215,30 @@ def test_muhurta_contextual_profile_preserves_task_and_other_journey(
     assert not app_errors, f'contextual Muhurtam surfaced errors: {app_errors[:3]}'
 
 
+def test_gochara_unavailable_state_spans_the_chart(docs_server, browser):
+    """An unavailable feed is one chart-level state, not one chart cell."""
+    page = browser.new_page(viewport={'width': 390, 'height': 844})
+    captured = _capture_console(page)
+    try:
+        page.route('**/gochara.json', lambda route: route.abort())
+        page.goto(f'{docs_server}/#gochara', wait_until='networkidle', timeout=15000)
+        error = page.locator('#go-chart > .preview-error')
+        error.wait_for(state='visible')
+        chart_box = page.locator('#go-chart').bounding_box()
+        error_box = error.bounding_box()
+        assert chart_box is not None and error_box is not None
+        assert error_box['width'] >= chart_box['width'] * 0.8
+        assert page.evaluate(
+            'document.documentElement.scrollWidth === '
+            'document.documentElement.clientWidth'
+        )
+    finally:
+        page.close()
+
+    app_errors = [msg for kind, msg in captured if kind == 'pageerror']
+    assert not app_errors, f'Gochara empty state surfaced errors: {app_errors[:3]}'
+
+
 def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build, browser):
     """The regression class this guards: a module-scoped constant left
     behind by the panel extraction turns the gochara RASI view into a
