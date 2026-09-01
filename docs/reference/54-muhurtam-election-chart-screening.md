@@ -211,7 +211,7 @@ envelope is all 22 supported cities on the 15th of every month from January
 |---|---:|
 | City-dates | 2,112 |
 | Distinct first-cycle Lagna transitions | 25,344 |
-| DashaFlow first carried the published new Lagna at `T` / `T+1` / `T+2` | 3,331 / 18,865 / 3,148 |
+| DashaFlow first carried the published new Lagna at `T` / `T+1` / `T+2` | 3,334 / 18,865 / 3,145 |
 | Later than `T+2` | 0 |
 | Maximum continuous boundary delta | 1.61088 minutes |
 | Remaining margin inside the ±5-minute guard | 3.38912 minutes |

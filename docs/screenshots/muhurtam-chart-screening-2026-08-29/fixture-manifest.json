@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-08-29T13:34:23+00:00",
+  "capturedAt": "2026-09-01T04:06:19+00:00",
   "source": "tools/capture_muhurta_chart_screenshots.py",
   "liveServicesUsed": false,
   "captures": [
@@ -14,7 +14,7 @@
       },
       "expectedState": "screened",
       "expectedCopy": "Exact chart screening applied",
-      "sha256": "77abdaf3932f422f060c33dc0d13487b3d210be326529e59c0d54b791af344bb"
+      "sha256": "1ab8c558d5f271c874790d29d71069bc52371374a51c47e6af96e180ad3a4623"
     },
     {
       "file": "fixture-positive-purchase-mobile-390x844.png",
@@ -27,7 +27,7 @@
       },
       "expectedState": "screened",
       "expectedCopy": "Exact chart screening applied",
-      "sha256": "14f991063fe96de54a9523ce2608a059b8c6450594a510577b0a35eabbba1a4f"
+      "sha256": "541524fa30aa4fbc972455de40f82d13eb4dbcf09793103e71004d25bbc1ee6f"
     },
     {
       "file": "fixture-mixed-rule-unknown-tablet-768x1024.png",
@@ -40,7 +40,7 @@
       },
       "expectedState": "screened",
       "expectedCopy": "changed within this window",
-      "sha256": "8a870e224523c86d80546c6413adef5c82a4397b6ef02040d5341c0c9c148182"
+      "sha256": "1cc0e4d5c92a9c65389fec9381bb177df78f6a7130fdc731118e00f094fd452c"
     },
     {
       "file": "fixture-travel-mandatory-failure-desktop-1440x900.png",
@@ -53,7 +53,7 @@
       },
       "expectedState": "screened",
       "expectedCopy": "failed an exact chart requirement",
-      "sha256": "65097a905c17d2596997806775ea57e913b30b4a65c0438e3e87d1ef36fc8caf"
+      "sha256": "7fba72af335e639bb15c736bd5bed95b7fc6c00021defe365df725d54e38fd46"
     },
     {
       "file": "fixture-gold-manual-only-desktop-1440x900.png",
@@ -66,7 +66,7 @@
       },
       "expectedState": "manual-only",
       "expectedCopy": "chart review remains manual",
-      "sha256": "fb8865a607315f08d70f8a9ffe5348b4aa1d5f257ed25e8b4f9b75f267e9a83d"
+      "sha256": "2b7e3068ed654b1b04a393dd8f75575d47d5e60009882ee6943b678ce650bc21"
     },
     {
       "file": "fixture-unsupported-system-tablet-landscape-1024x768.png",
@@ -79,7 +79,7 @@
       },
       "expectedState": "unsupported-system",
       "expectedCopy": "Selected system kept separate",
-      "sha256": "1d0cb8669ad5665c18daa7525ebe2ec5bdcdb847d15aa5019041d65bc9e3a5ef"
+      "sha256": "63c33ec2d160365ed4841d562ef6c97e159aae91b7691bdf5bdf8c67c176fa5a"
     },
     {
       "file": "fixture-offline-unavailable-mobile-390x844.png",
@@ -92,7 +92,7 @@
       },
       "expectedState": "unavailable",
       "expectedCopy": "Panchangam shortlist shown",
-      "sha256": "6af6a878dad484062b52a2c6d42acd625583ea6465e97c60705fc7012852673b"
+      "sha256": "d40d262f76616c601dc8e3a8f0f44ce2c126cd1b35d753531406aa59d78b3ffe"
     },
     {
       "file": "fixture-malformed-response-unavailable-desktop-1440x900.png",
@@ -105,7 +105,7 @@
       },
       "expectedState": "unavailable",
       "expectedCopy": "Panchangam shortlist shown",
-      "sha256": "3a6bd0b8a25ceacc99b4ef78570bbf4f23abead9ddb5e60552d48e4e2e97ac3c"
+      "sha256": "c4ec73e56f8d6084b95b1da2dc0a0f4b9a89f8d5846be4da90292ff22f781a21"
     },
     {
       "file": "fixture-chart-screening-loading-desktop-1440x900.png",
@@ -118,7 +118,7 @@
       },
       "expectedState": "loading",
       "expectedCopy": "screening exact election charts",
-      "sha256": "9655996b48e2dddc8d9bd30e21e35f2e403b51db66af0c58666ca4e0ede73539"
+      "sha256": "abb8cd20528bbd84a236fd96cc073856edf6bcbaa5c8264f9ab5e5f2b6d9e889"
     },
     {
       "file": "fixture-timeout-unavailable-tablet-768x1024.png",
@@ -131,7 +131,7 @@
       },
       "expectedState": "unavailable",
       "expectedCopy": "Panchangam shortlist shown",
-      "sha256": "a93051bb7601da04089069ad57e792f7ad445734275832b080a9c7747a07fded"
+      "sha256": "b5bee7ef745b77e7fd231fb3ea711dfc7542bc57263e25510aad7fe1f7779f29"
     }
   ]
 }

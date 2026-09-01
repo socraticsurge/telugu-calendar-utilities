@@ -14,6 +14,11 @@ expected state/copy, and SHA-256 for every deterministic image. Identical safe
 fallback screens remain attributable to their offline, timeout, or malformed
 response trigger through that manifest.
 
+The deterministic matrix was recaptured from the assembled release candidate
+on 2026-09-01 after the final font, responsive-layout, and unavailable-state
+hardening. The manifest timestamp and checksums identify those post-change
+captures; owner release sign-off is recorded on PR #442.
+
 Recreate the fixture matrix from a local production build:
 
 ```bash
