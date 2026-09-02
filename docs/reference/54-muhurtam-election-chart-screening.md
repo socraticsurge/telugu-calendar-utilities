@@ -61,6 +61,14 @@ capability. With no flag, requests are enabled only on `localhost`,
 `VITE_BIRTH_PROFILE_API_ENABLED`; enabling one calculation journey does not
 enable the other.
 
+The current public build does not set that flag, and the production Astro
+deployment does not yet contain the guest election route. Activation remains
+blocked by #443, #445, #446, #447, and #449, followed by the exact pair-bound
+Preview certification in #448. That hosted Preview cannot run with the current
+client allowlists, CORS policy, and protected service-to-service deployments.
+See the
+[production activation runbook](../operations/guest-calculation-production-activation.md).
+
 When disabled, the browser does not create a request controller, register a
 timeout or call `fetch`. It retains the Panchangam shortlist, caps any
 `Excellent` label at `Good`, marks the result for review, and states that exact
@@ -68,6 +76,8 @@ chart screening is not active in that build. Public requests, when explicitly
 enabled, can use only the canonical
 `https://astrochaganti.com/api/guest` HTTPS base. Loopback, arbitrary-host,
 credential-bearing, query, fragment, port and path overrides are rejected.
+`VITE_ELECTION_CHART_API_BASE` therefore cannot point a deployed client at an
+Astro Preview today.
 The browser flag is not server authorization; the gateway and sidecar must be
 activated independently under their own release approval.
 
@@ -92,10 +102,13 @@ The request uses `credentials: omit` and `cache: no-store`. The public gateway
 also enforces a 4 KiB body cap, strict origin policy, rate limiting and exact
 response validation. Network and hosting providers still process the narrow
 request in transit; “data-minimized” does not mean “no network calculation.”
-In Production, the election-chart route combines its process-local guard with
-an atomic Upstash Redis limit shared across Vercel instances and fails closed
-if that shared layer is missing or unavailable. This is scoped to this route;
-it is not a claim that every Astro Chaganti endpoint has distributed limiting.
+The reviewed gateway candidate makes the election-chart route combine its
+process-local guard with an atomic Upstash Redis limit shared across Vercel
+instances and fail closed if that layer is missing or unavailable. A later
+local remediation candidate expands shared limits to all three guest routes.
+Neither statement is evidence that the code is merged, configured, deployed,
+or operationally certified, and Upstash limiting is not a shared geocoder
+cache.
 
 ## Astronomical contract
 
@@ -594,6 +607,15 @@ Sanskrit text with Hindi commentary and incomplete publication metadata.
 | Browser journey and disclosure | `src/panels/tarabalam.ts` | `src/__tests__/muhurta-profile-panel.test.ts` plus browser journey verification |
 | Public stateless gateway | `astro-unified-core` guest route | Contract, CORS, body-cap, rate-limit and redaction tests in that repository |
 | Authenticated chart projection | `dashaflow-sidecar` election-chart route | Validation, order, nine-graha, 2/24-chart, streamed-body, three interior Drik Panchang comparisons and two negative boundary-equivalence fixtures in that repository |
+
+Independent release review found that the original sidecar mock success
+fixtures did not satisfy the browser's node/opposition and related cross-field
+invariants, even though current real-engine probes were coherent. Candidate
+commit `97eece13` adds producer validation and coherent fixtures and passes the
+local 103-test suite, but it is not yet a merged or deployed release. The gate
+remains tracked in
+[#443](https://github.com/socraticsurge/telugu-calendar-utilities/issues/443),
+not a reason to relax the browser validator.
 
 The Python table is the source of truth for the 23 chart predicates. The
 Python personal module and TypeScript mirror carry the same five personal rule
