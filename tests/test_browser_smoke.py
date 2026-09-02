@@ -754,7 +754,11 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
             )
         page.evaluate(f"window.openFestivalDate('{MUHURTA_FIXTURE_DATE}')")
         page.wait_for_function(
-            "document.querySelector('input.tp-date-input')?.value === '2026-06-11'"
+            """document.querySelector('input.tp-date-input')?.value === '2026-06-11'
+            && document.querySelector('#tp-result')?.getAttribute('aria-busy') === 'false'
+            && document.querySelector('#tp-result')?.textContent?.includes(
+              'Thursday, June 11, 2026'
+            )"""
         )
         assert 'Thursday, June 11, 2026' in page.locator('#tp-result').inner_text()
     finally:
