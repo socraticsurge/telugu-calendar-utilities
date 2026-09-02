@@ -740,6 +740,7 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
     (src/scorer/__tests__/muhurta-scorer.test.ts)."""
     page = browser.new_page()
     try:
+        _install_direct_route_runtime_assets(page)
         page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
         # Wait until the bundle had time to evaluate.
         for marker in ('switchTool', 'setTimeFmt', 'calcTarabalam',
@@ -751,11 +752,11 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
                 f'Check the Object.assign(window, {{...}}) block in '
                 f'src/main.ts — inline onclick handlers depend on it.'
             )
-        page.evaluate("window.openFestivalDate('2026-08-31')")
+        page.evaluate(f"window.openFestivalDate('{MUHURTA_FIXTURE_DATE}')")
         page.wait_for_function(
-            "document.querySelector('input.tp-date-input')?.value === '2026-08-31'"
+            "document.querySelector('input.tp-date-input')?.value === '2026-06-11'"
         )
-        assert 'Monday, August 31, 2026' in page.locator('#tp-result').inner_text()
+        assert 'Thursday, June 11, 2026' in page.locator('#tp-result').inner_text()
     finally:
         page.close()
 
