@@ -69,7 +69,7 @@ deployment IDs rather than mutable aliases.
 
 | Layer | Current Production commit | Candidate commit | Restore ref | Preview deployment ID | Production deployment ID | CI/security evidence |
 |---|---|---|---|---|---|---|
-| Panchangam | `eec464e871afdce9268716233fed2eecc91ae17a` | activation-readiness branch; final SHA unrecorded | `archive/release-2026-09-01-master-profile-muhurtam-eec464e` | required; unrecorded | required; unrecorded | required; unrecorded |
+| Panchangam | `eec464e871afdce9268716233fed2eecc91ae17a` | `cbf7ea8476a8e0da123b405c269f351a91bbdc51` | code checkpoint `archive/guest-attribution-contract-2026-09-03-cbf7ea8`; Production baseline `archive/release-2026-09-01-master-profile-muhurtam-eec464e` | required; unrecorded | required; unrecorded | local: 406 frontend and 1,464 Python tests, both TypeScript configurations, production/docs build, 62 computation routes, 11 Mermaid diagrams, and 3 landing artifacts passed; UI owner sign-off and hosted checks required |
 | Astro | `519d686` (`main` assessment baseline) | `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315` | `archive/astro-managed-geocoder-controls-2026-09-03-e7fb3fe` | required; unrecorded | required; unrecorded | local: 683 tests, TypeScript, lint (one inherited warning), palette, routes, production build, and independent no-P0/P1/P2 review passed; hosted checks required |
 | DashaFlow | `2c98ee8` (`master` assessment baseline) | `97eece13f524cc70bf995ae27620068a7d6aad44` | `archive/dashaflow-contract-remediation-2026-09-03-97eece1` | required; unrecorded | required; unrecorded | local: 103 tests and compileall passed; hosted checks required and unrecorded |
 
