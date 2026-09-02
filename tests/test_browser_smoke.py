@@ -1218,6 +1218,10 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
                         'timezone': 'Asia/Kolkata',
                     }],
                     'attribution': 'OpenStreetMap contributors',
+                    'attributions': [{
+                        'label': '© OpenStreetMap contributors',
+                        'url': 'https://www.openstreetmap.org/copyright',
+                    }],
                 },
             }
         else:
@@ -1370,6 +1374,12 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
         place_choice = panel.locator('.profiles-place-results__choice')
         place_choice.wait_for(state='visible')
         assert 'Hyderabad, Telangana, India' in place_choice.inner_text()
+        attribution_link = panel.locator('.profiles-place-attribution a')
+        assert attribution_link.count() == 1
+        assert attribution_link.get_attribute('href') == (
+            'https://www.openstreetmap.org/copyright'
+        )
+        assert attribution_link.get_attribute('rel') == 'noopener noreferrer'
         place_choice.click()
         panel.get_by_role('button', name='Calculate details', exact=True).click()
         panel.locator('.profiles-birth-review').wait_for(state='visible')

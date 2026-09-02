@@ -1008,6 +1008,19 @@ h2.panel-heading { display: none !important; }
   line-height: 1.5;
 }
 
+.profiles-place-attribution {
+  margin: 0;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-xs);
+  line-height: 1.5;
+}
+
+.profiles-place-attribution a {
+  color: var(--ux-brand);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
 .profiles-place-results {
   display: grid;
   gap: var(--ux-space-2);

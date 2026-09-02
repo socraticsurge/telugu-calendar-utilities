@@ -20,10 +20,10 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 | Component | State |
 |---|---|
 | Panchangam profile/Muhurtam UI | Live with both remote client flags off |
-| Astro guest routes | Open PR #161; absent from Production |
-| DashaFlow authenticated contracts | Candidate commit `97eece13`; not the released baseline |
-| Licensing | Blocked by #231 and its children |
-| Production geocoder/shared controls | Blocked by #233 and its children |
+| Astro guest routes | PR #161 base plus local hardening commit `e7fb3fe6`; absent from Production and not pushed |
+| DashaFlow authenticated contracts | Local candidate `97eece13`; not pushed or released |
+| Licensing | Technical inventory `dd90f800` completed; legal/rights-holder decision remains blocked by #231, #444, #445, and #449 |
+| Production geocoder/shared controls | Fixed adapters, shared cache, privacy controls, guest budgets, and gated authenticated migration exist at `e7fb3fe6`; provider/Redis terms, credentials, Preview certification, and owner approval remain blocked by #233 and its children |
 | Authenticated three-service Preview | **Blocked:** no exact pair-bound hosted Preview path exists yet |
 
 ## Hard gates
@@ -42,12 +42,17 @@ All boxes must be supported by links to evidence.
       guest activation does not leave a second ungoverned provider path.
 - [ ] An exact, owner-approved, pair-bound hosted Preview mechanism is
       implemented for all three services and their protected deployments.
-- [ ] Logs, analytics, and server/shared cache contain no profile name, birth
-      payload, natal chart, raw IP, provider key, or bearer token.
+- [ ] Logs, analytics, and application-controlled server/shared cache contain
+      no profile name, birth payload, natal chart, raw place-search text, raw
+      IP, provider key, or bearer token. Provider transit of the submitted
+      city/town query is separately disclosed and governed by approved terms.
 - [ ] Browser requests contain no profile name or cookies. Calculation
       responses may contain the documented narrow natal- or election-chart
       results, but must not echo birth inputs, raw IPs, provider credentials,
       bearer credentials, or raw upstream diagnostics.
+- [ ] Place-search responses carry only allowlisted structured provider/data
+      attribution links, and the Panchangam UI visibly renders those links
+      beside returned results at desktop and mobile widths.
 - [ ] #448 records exact deployment/check IDs, probes, privacy evidence,
       screenshots, and rollback rehearsal **after** #443, #445, #446, #447,
       and #449 are complete.
@@ -65,8 +70,8 @@ deployment IDs rather than mutable aliases.
 | Layer | Current Production commit | Candidate commit | Restore ref | Preview deployment ID | Production deployment ID | CI/security evidence |
 |---|---|---|---|---|---|---|
 | Panchangam | `eec464e871afdce9268716233fed2eecc91ae17a` | activation-readiness branch; final SHA unrecorded | `archive/release-2026-09-01-master-profile-muhurtam-eec464e` | required; unrecorded | required; unrecorded | required; unrecorded |
-| Astro | `519d686` (`main` assessment baseline) | PR #161 `77e9c356` plus remediation; final SHA unrecorded | required; unrecorded | required; unrecorded | required; unrecorded | required; unrecorded |
-| DashaFlow | `2c98ee8` (`master` assessment baseline) | `97eece13` | required; unrecorded | required; unrecorded | required; unrecorded | local: 103 tests passed; hosted checks required and unrecorded |
+| Astro | `519d686` (`main` assessment baseline) | `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315` | `archive/astro-managed-geocoder-controls-2026-09-03-e7fb3fe` | required; unrecorded | required; unrecorded | local: 683 tests, TypeScript, lint (one inherited warning), palette, routes, production build, and independent no-P0/P1/P2 review passed; hosted checks required |
+| DashaFlow | `2c98ee8` (`master` assessment baseline) | `97eece13f524cc70bf995ae27620068a7d6aad44` | `archive/dashaflow-contract-remediation-2026-09-03-97eece1` | required; unrecorded | required; unrecorded | local: 103 tests and compileall passed; hosted checks required and unrecorded |
 
 ## Environment names and implementation state
 
@@ -83,15 +88,37 @@ These are names only. Never record values here, in issues, or in browser code.
 | Astro | `DASHAFLOW_SIDECAR_URL` | approved HTTPS service only when deployed |
 | Astro | `DASHAFLOW_SIDECAR_TOKEN` | server-only credential sent by Astro |
 | DashaFlow | `DASHAFLOW_API_TOKEN` | server-only verifier; its value must match Astro's differently named token |
-| Astro | `GEOCODER_BASE_URL` | current guest adapter configuration; Production provider is not yet selected or approved |
-| Astro | `GEOCODER_USER_AGENT` | current non-secret provider identity; not a provider credential |
-| Astro | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | candidate shared guest rate-limit dependency; not a certified shared geocoder cache |
+| Astro | `GEOCODER_PROVIDER`, `GEOCODER_API_KEY` | implemented fixed-adapter pair; one owner-approved provider and server-only key are required when deployed; no provider/key is selected or configured |
+| Astro | `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` | separate exact-`true` migration gate; omission/false preserves the existing signed-in profile path while guest work is reviewed; activation requires its own Preview and owner approval |
+| Astro | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | preferred complete pair for shared guest limits, activated authenticated per-user/fleet limits, and 24-hour normalized geocoder cache |
+| Astro | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | complete compatibility pair only; never combine a URL/token across namespaces |
+| Astro runtime | `VERCEL_ENV`, `VERCEL`, `NODE_ENV` | implementation classifies only consistent explicit local or deployed markers; missing, unknown, self-hosted-production, or contradictory markers fail closed |
 
-`GEOCODER_PROVIDER` and `GEOCODER_API_KEY` describe a possible future
-provider-adapter design only; they are **not implemented environment names** in
-the current candidate. Likewise, no current environment variable makes the
-TCU/Astro/DashaFlow hosted Preview chain safe or reachable. Any such variables
-must be added only as part of the reviewed pair-bound mechanism.
+The named provider and shared-cache contracts are implemented in local Astro
+candidate `e7fb3fe6`, but provider selection, terms, quota/billing posture,
+credentials, and hosted certification remain unapproved. Existing signed-in
+profiles remain isolated from that migration unless its separate flag is exact
+`true`. No current environment variable makes the TCU/Astro/DashaFlow hosted
+Preview chain safe or reachable. Any such variables must be added only as part
+of the reviewed pair-bound mechanism.
+
+### Place-search retention and quota contract
+
+| Boundary | Permitted data | Retention / verification gate |
+|---|---|---|
+| Panchangam browser request | Trimmed city/town query only; no profile name, cookie, birth date/time, or chart | Transient request state; browser network evidence required |
+| Astro process state | Ephemeral HMAC client pseudonym; SHA-256 request key; normalized provider rows while pending | Per-process limiter window or bounded process lifetime; raw query/IP inspection required |
+| Redis REST | HMAC cache/rate-limit key; at most five normalized provider rows | Geocoder rows expire after 24 hours; rate limits after one minute; GET/SET response and value are bounded |
+| Managed geocoder | Submitted city/town query, provider credential, and Astro's server egress metadata | Provider-controlled; select the exact plan/region only after terms, privacy, attribution, and deletion/retention review |
+| Sentry / application analytics | No request bodies, raw place query, provider URL query/key, birth payload, or chart | Verify configuration and inspect Preview events before activation |
+
+The current geocoder fleet ceiling is 60 calls per minute, shared by guest
+place search and the separately activated authenticated migration. The managed
+authenticated path also applies a 10-call-per-user minute limit. In the worst
+case of unique cache misses, the shared fleet ceiling permits 86,400 provider
+calls in 24 hours. Provider approval must either select a plan that safely
+covers this bound or lower/add a daily fleet budget; the minute limiter alone
+must not be mistaken for a purchased-plan quota.
 
 ## Hosted Preview blocker and future sequence
 
@@ -120,7 +147,8 @@ After that prerequisite and all hard gates are complete:
 3. Configure the distinct Astro/DashaFlow token names with one approved
    Preview-only value; verify missing/bad credentials and sanitized errors.
 4. Configure the owner-approved geocoder and shared controls at Astro. Keep both
-   guest flags off while dependencies and destination restrictions are probed.
+   guest flags and `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` off while
+   dependencies and destination restrictions are probed.
 5. Enable the Astro birth route only, then build the bound Panchangam Preview
    with only the birth flag. Verify place search, calculation, save, reload,
    profile detail, and Daily Horoscope reuse.
@@ -131,9 +159,12 @@ After that prerequisite and all hard gates are complete:
    verify 1/24-chart batches, rating evidence, unknown/failure behavior, and
    Muhurtam reuse.
 8. Only after both isolated observations, test both capabilities together.
-9. Attach browser network evidence, screenshots, application/platform/provider
+9. Separately test signed-in profile create/edit while the authenticated
+   migration flag is off, then on in Preview. Verify the per-user/shared fleet
+   limits and restore it off before completing the guest-only evidence.
+10. Attach browser network evidence, screenshots, application/platform/provider
    log checks, cache-key inspection, and negative cross-pair tests to #448.
-10. Rehearse rollback at every layer before requesting any merge approval.
+11. Rehearse rollback at every layer before requesting any merge approval.
 
 ## Failure matrix
 
@@ -143,8 +174,10 @@ After that prerequisite and all hard gates are complete:
 | Astro route flag off | Fixed 503; no geocoder/sidecar call |
 | Shared limiter missing/unavailable in Preview/Production | Fixed 503; no expensive calculation/provider call |
 | Geocoder missing/unavailable | Place search 503; no fallback to public Nominatim |
+| Authenticated migration flag absent/false | Existing signed-in Nominatim path remains available; managed adapter and Redis are not consulted |
+| Authenticated migration exact `true`, dependency/limit unavailable | Signed-in place-changing operation fails closed; no public-Nominatim fallback and no DB mutation |
 | Sidecar token missing/bad | Fixed gateway error; no upstream diagnostic or token in response |
-| Sidecar timeout/transient error | One bounded attempt within the browser deadline, then a fixed unavailable result; no undocumented retry |
+| Sidecar timeout/transient error | Up to two bounded attempts within the browser deadline, with one retry only for 502/503/504, then a fixed unavailable result |
 | Malformed/inconsistent chart | 502/invalid response; never save or score as verified |
 | Unsupported or ambiguous civil time | 422; offer manual entry |
 
@@ -160,8 +193,9 @@ and feature activation approval are separate decisions.
    either merely because its PR merged.
 2. With separate deployment approval, deploy the exact recorded DashaFlow commit
    with both new consumers still inactive; smoke the authenticated v1 routes.
-3. Deploy the exact recorded Astro commit with both guest route flags off;
-   verify fixed disabled responses and all dependencies without public traffic.
+3. Deploy the exact recorded Astro commit with both guest route flags and the
+   authenticated migration flag off; verify fixed disabled guest responses and
+   unchanged signed-in profile create/edit before dependency probes.
 4. With a distinct activation approval, enable Astro birth only and publish the
    Panchangam build with only `VITE_BIRTH_PROFILE_API_ENABLED=true`.
 5. Smoke and observe birth profiles for the recorded window. Keep both election
@@ -192,8 +226,10 @@ not sufficient.
   `eec464e`; verify the ref again at release time.
 - **Astro/DashaFlow:** restore the separately recorded immutable deployment IDs
   and commits. Do not assume a Vercel alias still points to the reviewed build.
-- **Provider/control failure:** keep server flags off; do not fall back to public
-  Nominatim when managed geocoding or shared controls fail.
+- **Provider/control failure:** keep guest server flags and the authenticated
+  migration flag off. Guest search and an activated authenticated migration do
+  not fall back to public Nominatim; the explicitly disabled authenticated
+  migration preserves only the pre-existing signed-in path.
 - **Browser data:** preserve the profile schema and stored records; disabling
   remote calculation must not make existing profiles unreadable.
 - **GitHub Pages:** preserve and compare the complete published `gh-pages` tip

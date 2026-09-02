@@ -29,9 +29,15 @@ export interface BirthPlaceCandidate {
   timezone: string;
 }
 
+export interface BirthPlaceAttribution {
+  label: string;
+  url: string;
+}
+
 export interface BirthPlaceSearchResult {
   results: BirthPlaceCandidate[];
   attribution: string;
+  attributions: BirthPlaceAttribution[];
 }
 
 export interface BirthProfileDerivationInput {
@@ -263,6 +269,21 @@ function parsePlace(value: unknown): BirthPlaceCandidate | null {
   return { id, label, latitude, longitude, timezone };
 }
 
+const TRUSTED_ATTRIBUTION_URLS = new Set([
+  'https://locationiq.com/',
+  'https://www.geoapify.com/',
+  'https://www.openstreetmap.org/copyright',
+]);
+
+function parseAttribution(value: unknown): BirthPlaceAttribution | null {
+  const item = record(value);
+  if (!item) return null;
+  const label = exactNonEmpty(item.label, 120);
+  const url = exactNonEmpty(item.url, 160);
+  if (!label || !url || !TRUSTED_ATTRIBUTION_URLS.has(url)) return null;
+  return { label, url };
+}
+
 function parsePlanet(value: unknown, expectedName: string): BirthChartPlanet | null {
   const item = record(value);
   if (!item) return null;
@@ -355,14 +376,30 @@ export async function searchBirthPlaces(
   const data = payload ? record(payload.data) : null;
   const rawResults = data && Array.isArray(data.results) ? data.results : null;
   const attribution = data ? nonEmpty(data.attribution, 240) : null;
-  if (!rawResults || !attribution) {
+  const rawAttributions = data && Array.isArray(data.attributions)
+    ? data.attributions
+    : null;
+  const attributions = rawAttributions
+    ? rawAttributions
+      .map(parseAttribution)
+      .filter((value): value is BirthPlaceAttribution => value !== null)
+    : [];
+  if (
+    !rawResults
+    || !attribution
+    || !rawAttributions
+    || attributions.length !== rawAttributions.length
+    || attributions.length < 1
+    || attributions.length > 3
+    || new Set(attributions.map(({ url }) => url)).size !== attributions.length
+  ) {
     throw new BirthProfileApiError('invalid-response', 'Place search returned an invalid response.');
   }
   const results = rawResults.map(parsePlace).filter((value): value is BirthPlaceCandidate => value !== null);
   if (results.length !== rawResults.length || results.length > 5) {
     throw new BirthProfileApiError('invalid-response', 'Place search returned an invalid response.');
   }
-  return { results, attribution };
+  return { results, attribution, attributions };
 }
 
 export async function deriveBirthProfile(
