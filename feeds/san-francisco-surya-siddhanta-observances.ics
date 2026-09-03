@@ -1,0 +1,3182 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Telugu Panchangam//EN
+X-WR-CALDESC:Telugu Panchangam — Tithi Observances only. Slim feed\; sub
+ scribe to the dense feed for full daily detail.
+X-WR-CALNAME:AstroChaganti's Panchangam — San Francisco (Surya Siddhanta
+ \, Tithi Observances)
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+X-PUBLISHED-TTL:PT12H
+X-WR-TIMEZONE:America/Los_Angeles
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Ashlesha · Parigha
+DTSTART;VALUE=DATE:20260908
+DTEND;VALUE=DATE:20260909
+UID:2026-09-08-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Shravana Maasam  ·  Krishna Pa
+ ksham  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunris
+ e 06:45  ·  Sunset 19:27  ·  Moonrise 03:52  ·  Moonset 18:15\nSolar si
+ gn: Simha  ·  Lunar sign: Karka\n\nTithi:     Krishna Trayodashi 02:14 
+ – 00:04 (+1)\nNakshatra: Ashlesha           05:15 – 03:53 (+1)\nYoga: 
+      Parigha            17:09 (-1) – 14:14\nKarana:    Garaja 02:14–13
+ :08  /  Vanija 13:08–00:04 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:09 – 05:57\n  Abhijit Muhurta  12:41 – 13:32\n  Amrita Kalam     
+ 02:23 (+1) – 03:53 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       16:1
+ 7 – 17:52\n  Gulika Kalam     13:06 – 14:42\n  Yamagandam       09:56 
+ – 11:31\n  Varjyam          17:19 – 18:50\n  Durmuhurtham     09:18 
+ – 10:09\n  Durmuhurtham     23:59 – 00:44 (+1)\n\n─ Choghadiya ─\n
+   06:45 – 08:21  Rog\n  08:21 – 09:56  Udveg\n  09:56 – 11:31  Char\
+ n  11:31 – 13:06  Labh\n  13:06 – 14:42  Amrit\n  14:42 – 16:17  Kaa
+ l\n  16:17 – 17:52  Shubh\n  17:52 – 19:27  Rog\n\n─ Night Choghadiy
+ a ─\n  19:27 – 23:52  Kaal\n  23:52 – 04:17 (+1)  Labh\n  04:17 (+1)
+  – 08:42 (+1)  Udveg\n  08:42 (+1) – 13:07 (+1)  Shubh\n  13:07 (+1) 
+ – 17:32 (+1)  Amrit\n  17:32 (+1) – 21:57 (+1)  Char\n  21:57 (+1) –
+  02:22 (+1)  Rog\n  02:22 (+1) – 06:47 (+1)  Kaal\n\n─ Special Yogas 
+ ─\n  Sarvartha Siddhi Yoga\n  Siddha Yoga\n\n⚡ Masa Shivaratri  ·  Ga
+ nda Moola (Ashlesha)  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Purva Phalguni · Siddha
+DTSTART;VALUE=DATE:20260910
+DTEND;VALUE=DATE:20260911
+UID:2026-09-10-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Shravana Maasam  ·  Krishna Pa
+ ksham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 0
+ 6:47  ·  Sunset 19:24  ·  Moonrise 06:16  ·  Moonset 19:11\nSolar sign:
+  Simha  ·  Lunar sign: Simha\n\nTithi:     Amavasya           22:09 (-1) 
+ – 20:33\nNakshatra: Purva Phalguni     02:46 – 01:59 (+1)\nYoga:      
+ Siddha             11:29 (-1) – 08:57\nKarana:    Chatushpada 22:09 (-1)
+ –09:18  /  Naga 09:18–20:33\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 05:11 – 05:59\n  Abhijit Muhurta  12:40 – 13:31\n  Amrita Kalam     19
+ :48 – 21:20\n\n─ Inauspicious ─\n  Rahu Kalam       14:40 – 16:15\
+ n  Gulika Kalam     09:56 – 11:31\n  Yamagandam       06:47 – 08:22\n 
+  Varjyam          10:31 – 12:03\n  Durmuhurtham     11:00 – 11:50\n  D
+ urmuhurtham     16:02 – 16:53\n\n─ Choghadiya ─\n  06:47 – 08:22  
+ Shubh\n  08:22 – 09:56  Rog\n  09:56 – 11:31  Udveg\n  11:31 – 13:06
+   Char\n  13:06 – 14:40  Labh\n  14:40 – 16:15  Amrit\n  16:15 – 17:
+ 50  Kaal\n  17:50 – 19:24  Shubh\n\n─ Night Choghadiya ─\n  19:24 
+ – 02:51 (+1)  Amrit\n  02:51 (+1) – 10:17 (+1)  Char\n  10:17 (+1) –
+  17:44 (+1)  Rog\n  17:44 (+1) – 01:10 (+1)  Kaal\n  01:10 (+1) – 08:3
+ 7 (+1)  Labh\n  08:37 (+1) – 16:03 (+1)  Udveg\n  16:03 (+1) – 23:30 (
+ +1)  Shubh\n  23:30 (+1) – 06:56 (+1)  Amrit\n\n─ Special Yogas ─\n 
+  Siddha Yoga\n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Parivartini Ekadashi · Uttara Ashadha · Atiganda
+DTSTART;VALUE=DATE:20260921
+DTEND;VALUE=DATE:20260922
+UID:2026-09-21-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla P
+ aksham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 
+ 06:56  ·  Sunset 19:07  ·  Moonrise 16:43  ·  Moonset 01:40\nSolar sign
+ : Kanya  ·  Lunar sign: Makara\n\nTithi:     Parivartini Ekadashi 04:01 
+ – 05:52 (+1)\nNakshatra: Uttara Ashadha     14:10 (-1) – 16:41\nYoga: 
+      Atiganda           02:58 – 03:25 (+1)\nKarana:    Vanija 04:01–16
+ :59  /  Vishti 16:59–05:52 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:20 – 06:08\n  Abhijit Muhurta  12:37 – 13:26\n  Amrita Kalam     
+ 09:37 – 11:23\n\n─ Inauspicious ─\n  Rahu Kalam       08:28 – 09:5
+ 9\n  Gulika Kalam     14:33 – 16:05\n  Yamagandam       11:30 – 13:02\
+ n  Varjyam          21:04 – 22:49\n  Durmuhurtham     13:26 – 14:15\n 
+  Durmuhurtham     15:52 – 16:41\n\n─ Choghadiya ─\n  06:56 – 08:28
+   Amrit\n  08:28 – 09:59  Kaal\n  09:59 – 11:30  Shubh\n  11:30 – 13
+ :02  Rog\n  13:02 – 14:33  Udveg\n  14:33 – 16:05  Char\n  16:05 – 1
+ 7:36  Labh\n  17:36 – 19:07  Amrit\n\n─ Night Choghadiya ─\n  19:07 
+ – 23:36  Char\n  23:36 – 04:05 (+1)  Rog\n  04:05 (+1) – 08:34 (+1) 
+  Kaal\n  08:34 (+1) – 13:03 (+1)  Labh\n  13:03 (+1) – 17:32 (+1)  Udv
+ eg\n  17:32 (+1) – 22:00 (+1)  Shubh\n  22:00 (+1) – 02:29 (+1)  Amrit
+ \n  02:29 (+1) – 06:58 (+1)  Char\n\n─ Special Yogas ─\n  Dagdha Yog
+ a\n\n⚡ Parivartini Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Dhanishtha · Dhriti
+DTSTART;VALUE=DATE:20260923
+DTEND;VALUE=DATE:20260924
+UID:2026-09-23-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla P
+ aksham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise
+  06:58  ·  Sunset 19:04  ·  Moonrise 17:39  ·  Moonset 03:47\nSolar sig
+ n: Kanya  ·  Lunar sign: Makara\n\nTithi:     Shukla Dwadashi    05:52 (-
+ 1) – 07:24\nNakshatra: Dhanishtha         18:57 (-1) – 20:52\nYoga:   
+    Dhriti             03:38 – 03:31 (+1)\nKarana:    Kaulava 07:24–20:
+ 01\n\n─ Auspicious ─\n  Brahma Muhurta   05:22 – 06:10\n  Amrita Kal
+ am     09:38 – 11:22\n\n─ Inauspicious ─\n  Rahu Kalam       13:01 
+ – 14:32\n  Gulika Kalam     11:30 – 13:01\n  Yamagandam       08:29 
+ – 10:00\n  Varjyam          04:30 (+1) – 06:11 (+1)\n  Durmuhurtham   
+   12:37 – 13:25\n\n─ Choghadiya ─\n  06:58 – 08:29  Labh\n  08:29 
+ – 10:00  Amrit\n  10:00 – 11:30  Kaal\n  11:30 – 13:01  Shubh\n  13:
+ 01 – 14:32  Rog\n  14:32 – 16:03  Udveg\n  16:03 – 17:33  Char\n  17
+ :33 – 19:04  Labh\n\n─ Night Choghadiya ─\n  19:04 – 20:34  Udveg\
+ n  20:34 – 22:03  Shubh\n  22:03 – 23:32  Amrit\n  23:32 – 01:02 (+1
+ )  Char\n  01:02 (+1) – 02:31 (+1)  Rog\n  02:31 (+1) – 04:00 (+1)  Ka
+ al\n  04:00 (+1) – 05:30 (+1)  Labh\n  05:30 (+1) – 06:59 (+1)  Udveg\
+ n\n─ Special Yogas ─\n  Siddha Yoga\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Shatabhisha · Shoola
+DTSTART;VALUE=DATE:20260924
+DTEND;VALUE=DATE:20260925
+UID:2026-09-24-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla P
+ aksham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 
+ 06:59  ·  Sunset 19:03  ·  Moonrise 18:04  ·  Moonset 04:50\nSolar sign
+ : Kanya  ·  Lunar sign: Kumbha\n\nTithi:     Shukla Trayodashi  07:24 (-1
+ ) – 08:31\nNakshatra: Shatabhisha        20:52 (-1) – 22:19\nYoga:    
+   Shoola             03:31 – 03:02 (+1)\nKarana:    Taitila 20:01 (-1)
+ –08:31  /  Garaja 08:31–20:53\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:23 – 06:11\n  Abhijit Muhurta  12:37 – 13:25\n  Amrita Kalam     
+ 14:40 – 16:22\n\n─ Inauspicious ─\n  Rahu Kalam       14:31 – 16:0
+ 2\n  Gulika Kalam     10:00 – 11:30\n  Yamagandam       06:59 – 08:29\
+ n  Varjyam          04:58 (+1) – 06:38 (+1)\n  Durmuhurtham     11:00 
+ – 11:48\n  Durmuhurtham     15:50 – 16:38\n\n─ Choghadiya ─\n  06:
+ 59 – 08:29  Shubh\n  08:29 – 10:00  Rog\n  10:00 – 11:30  Udveg\n  1
+ 1:30 – 13:01  Char\n  13:01 – 14:31  Labh\n  14:31 – 16:02  Amrit\n 
+  16:02 – 17:32  Kaal\n  17:32 – 19:03  Shubh\n\n─ Night Choghadiya 
+ ─\n  19:03 – 23:32  Amrit\n  23:32 – 04:02 (+1)  Char\n  04:02 (+1) 
+ – 08:32 (+1)  Rog\n  08:32 (+1) – 13:02 (+1)  Kaal\n  13:02 (+1) – 1
+ 7:31 (+1)  Labh\n  17:31 (+1) – 22:01 (+1)  Udveg\n  22:01 (+1) – 02:3
+ 1 (+1)  Shubh\n  02:31 (+1) – 07:01 (+1)  Amrit\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Uttara Bhadrapada · Vriddhi
+DTSTART;VALUE=DATE:20260926
+DTEND;VALUE=DATE:20260927
+UID:2026-09-26-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla P
+ aksham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise
+  07:01  ·  Sunset 19:00  ·  Moonrise 18:53  ·  Moonset 07:00\nSolar sig
+ n: Kanya  ·  Lunar sign: Meena\n\nTithi:     Pournami           09:08 (-1
+ ) – 09:14\nNakshatra: Uttara Bhadrapada  23:16 (-1) – 23:44\nYoga:    
+   Vriddhi            02:09 – 00:53 (+1)\nKarana:    Bava 21:15 (-1)–09
+ :14  /  Balava 09:14–21:06\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 25 – 06:13\n  Abhijit Muhurta  12:36 – 13:24\n  Amrita Kalam     18:50
+  – 20:28\n\n─ Inauspicious ─\n  Rahu Kalam       10:00 – 11:30\n  
+ Gulika Kalam     07:01 – 08:30\n  Yamagandam       14:30 – 16:00\n  Va
+ rjyam          09:03 – 10:41\n  Durmuhurtham     07:01 – 07:49\n  Durm
+ uhurtham     07:49 – 08:36\n\n─ Choghadiya ─\n  07:01 – 08:30  Kaa
+ l\n  08:30 – 10:00  Shubh\n  10:00 – 11:30  Rog\n  11:30 – 13:00  Ud
+ veg\n  13:00 – 14:30  Char\n  14:30 – 16:00  Labh\n  16:00 – 17:30  
+ Amrit\n  17:30 – 19:00  Kaal\n\n─ Night Choghadiya ─\n  19:00 – 23
+ :31 (+1)  Labh\n  23:31 (+1) – 04:02 (+1)  Udveg\n  04:02 (+1) – 08:33
+  (+1)  Shubh\n  08:33 (+1) – 13:05 (+1)  Amrit\n  13:05 (+1) – 17:36 (
+ +1)  Char\n  17:36 (+1) – 22:07 (+1)  Rog\n  22:07 (+1) – 02:38 (+1)  
+ Kaal\n  02:38 (+1) – 07:09 (+1)  Labh\n\n⚡ Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Indira Ekadashi · Ashlesha · Sadhya
+DTSTART;VALUE=DATE:20261006
+DTEND;VALUE=DATE:20261007
+UID:2026-10-06-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Krishna 
+ Paksham  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunr
+ ise 07:09  ·  Sunset 18:44  ·  Moonrise 02:52  ·  Moonset 16:46\nSolar 
+ sign: Kanya  ·  Lunar sign: Karka\n\nTithi:     Indira Ekadashi    15:22 
+ (-1) – 13:14\nNakshatra: Ashlesha           13:23 (-1) – 11:58\nYoga: 
+      Sadhya             22:11 (-1) – 19:22\nKarana:    Balava 02:16–13
+ :14  /  Kaulava 13:14–00:15 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta
+    05:33 – 06:21\n  Abhijit Muhurta  12:34 – 13:20\n  Amrita Kalam    
+  10:28 – 11:58\n\n─ Inauspicious ─\n  Rahu Kalam       15:51 – 17:
+ 17\n  Gulika Kalam     12:57 – 14:24\n  Yamagandam       10:03 – 11:30
+ \n  Varjyam          23:23 – 00:54 (+1)\n  Durmuhurtham     09:28 – 10
+ :15\n  Durmuhurtham     23:43 – 00:32 (+1)\n\n─ Choghadiya ─\n  07:0
+ 9 – 08:36  Rog\n  08:36 – 10:03  Udveg\n  10:03 – 11:30  Char\n  11:
+ 30 – 12:57  Labh\n  12:57 – 14:24  Amrit\n  14:24 – 15:51  Kaal\n  1
+ 5:51 – 17:17  Shubh\n  17:17 – 18:44  Rog\n\n─ Night Choghadiya ─\
+ n  18:44 – 20:18  Kaal\n  20:18 – 21:51  Labh\n  21:51 – 23:24  Udve
+ g\n  23:24 – 00:57 (+1)  Shubh\n  00:57 (+1) – 02:31 (+1)  Amrit\n  02
+ :31 (+1) – 04:04 (+1)  Char\n  04:04 (+1) – 05:37 (+1)  Rog\n  05:37 (
+ +1) – 07:10 (+1)  Kaal\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga
+ \n\n⚡ Ganda Moola (Ashlesha)  ·  Indira Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Magha · Shubha
+DTSTART;VALUE=DATE:20261007
+DTEND;VALUE=DATE:20261008
+UID:2026-10-07-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Krishna 
+ Paksham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunris
+ e 07:10  ·  Sunset 18:43  ·  Moonrise 04:01  ·  Moonset 17:13\nSolar si
+ gn: Kanya  ·  Lunar sign: Simha\n\nTithi:     Krishna Dwadashi   13:14 (-
+ 1) – 11:20\nNakshatra: Magha              11:58 (-1) – 10:47\nYoga:   
+    Shubha             19:22 (-1) – 16:45\nKarana:    Taitila 00:15–11:
+ 20  /  Garaja 11:20–22:30\n\n─ Auspicious ─\n  Brahma Muhurta   05:3
+ 4 – 06:22\n  Amrita Kalam     08:30 – 10:02\n  Amrita Kalam     03:45 
+ (+1) – 05:18 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       12:57 – 
+ 14:23\n  Gulika Kalam     11:30 – 12:57\n  Yamagandam       08:37 – 10
+ :03\n  Varjyam          18:30 – 20:02\n  Durmuhurtham     12:34 – 13:2
+ 0\n\n─ Choghadiya ─\n  07:10 – 08:37  Labh\n  08:37 – 10:03  Amrit
+ \n  10:03 – 11:30  Kaal\n  11:30 – 12:57  Shubh\n  12:57 – 14:23  Ro
+ g\n  14:23 – 15:50  Udveg\n  15:50 – 17:16  Char\n  17:16 – 18:43  L
+ abh\n\n─ Night Choghadiya ─\n  18:43 – 20:16  Udveg\n  20:16 – 21:
+ 50  Shubh\n  21:50 – 23:24  Amrit\n  23:24 – 00:57 (+1)  Char\n  00:57
+  (+1) – 02:31 (+1)  Rog\n  02:31 (+1) – 04:04 (+1)  Kaal\n  04:04 (+1)
+  – 05:38 (+1)  Labh\n  05:38 (+1) – 07:11 (+1)  Udveg\n\n─ Special Y
+ ogas ─\n  Siddha Yoga\n\n⚡ Ganda Moola (Magha)  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Purva Phalguni · S
+ hukla
+DTSTART;VALUE=DATE:20261008
+DTEND;VALUE=DATE:20261009
+UID:2026-10-08-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Krishna 
+ Paksham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise
+  07:11  ·  Sunset 18:41  ·  Moonrise 05:09  ·  Moonset 17:37\nSolar sig
+ n: Kanya  ·  Lunar sign: Simha\n\nTithi:     Krishna Trayodashi 11:20 (-1
+ ) – 09:46\nNakshatra: Purva Phalguni     10:47 (-1) – 09:55\nYoga:    
+   Shukla             16:45 (-1) – 14:25\nKarana:    Vanija 22:30 (-1)–
+ 09:46  /  Vishti 09:46–21:07\n\n─ Auspicious ─\n  Brahma Muhurta   0
+ 5:35 – 06:23\n  Abhijit Muhurta  12:33 – 13:19\n  Amrita Kalam     02:
+ 22 (+1) – 03:57 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       14:23 
+ – 15:49\n  Gulika Kalam     10:04 – 11:30\n  Yamagandam       07:11 
+ – 08:38\n  Varjyam          16:58 – 18:32\n  Durmuhurtham     11:01 
+ – 11:47\n  Durmuhurtham     15:37 – 16:23\n\n─ Choghadiya ─\n  07:
+ 11 – 08:38  Shubh\n  08:38 – 10:04  Rog\n  10:04 – 11:30  Udveg\n  1
+ 1:30 – 12:56  Char\n  12:56 – 14:23  Labh\n  14:23 – 15:49  Amrit\n 
+  15:49 – 17:15  Kaal\n  17:15 – 18:41  Shubh\n\n─ Night Choghadiya 
+ ─\n  18:41 – 23:15  Amrit\n  23:15 – 03:49 (+1)  Char\n  03:49 (+1) 
+ – 08:23 (+1)  Rog\n  08:23 (+1) – 12:57 (+1)  Kaal\n  12:57 (+1) – 1
+ 7:31 (+1)  Labh\n  17:31 (+1) – 22:05 (+1)  Udveg\n  22:05 (+1) – 02:3
+ 9 (+1)  Shubh\n  02:39 (+1) – 07:13 (+1)  Amrit\n\n⚡ Masa Shivaratri  
+ ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Mahalaya Amavasya — Amavasya · Hasta · Indra
+DTSTART;VALUE=DATE:20261010
+DTEND;VALUE=DATE:20261011
+UID:2026-10-10-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Bhadrapada Maasam  ·  Krishna 
+ Paksham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunris
+ e 07:13  ·  Sunset 18:38  ·  Moonrise 07:20  ·  Moonset 18:27\nSolar si
+ gn: Kanya  ·  Lunar sign: Kanya\n\nTithi:     Amavasya           08:34 (-
+ 1) – 07:49\nNakshatra: Hasta              09:26 (-1) – 09:22\nYoga:   
+    Indra              12:23 (-1) – 10:43\nKarana:    Naga 20:08 (-1)–0
+ 7:49  /  Kinstughna 07:49–19:37\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:37 – 06:25\n  Abhijit Muhurta  12:33 – 13:19\n  Amrita Kalam     
+ 03:17 (+1) – 04:54 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       10:0
+ 4 – 11:30\n  Gulika Kalam     07:13 – 08:39\n  Yamagandam       14:21 
+ – 15:47\n  Varjyam          17:31 – 19:08\n  Durmuhurtham     07:13 
+ – 07:59\n  Durmuhurtham     07:59 – 08:44\n\n─ Choghadiya ─\n  07:
+ 13 – 08:39  Kaal\n  08:39 – 10:04  Shubh\n  10:04 – 11:30  Rog\n  11
+ :30 – 12:56  Udveg\n  12:56 – 14:21  Char\n  14:21 – 15:47  Labh\n  
+ 15:47 – 17:13  Amrit\n  17:13 – 18:38  Kaal\n\n─ Night Choghadiya 
+ ─\n  18:38 – 02:14 (+1)  Labh\n  02:14 (+1) – 09:50 (+1)  Udveg\n  0
+ 9:50 (+1) – 17:25 (+1)  Shubh\n  17:25 (+1) – 01:01 (+1)  Amrit\n  01:
+ 01 (+1) – 08:37 (+1)  Char\n  08:37 (+1) – 16:12 (+1)  Rog\n  16:12 (+
+ 1) – 23:48 (+1)  Kaal\n  23:48 (+1) – 07:24 (+1)  Labh\n\n⚡ Mahalaya
+  Amavasya  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Papankusha Ekadashi · Shatabhisha · Ganda
+DTSTART;VALUE=DATE:20261021
+DTEND;VALUE=DATE:20261022
+UID:2026-10-21-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Ashvina Maasam  ·  Shukla Paks
+ ham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 07
+ :24  ·  Sunset 18:23  ·  Moonrise 16:04  ·  Moonset 02:34\nSolar sign: 
+ Tula  ·  Lunar sign: Kumbha\n\nTithi:     Papankusha Ekadashi 21:03 (-1) 
+ – 22:11\nNakshatra: Shatabhisha        04:15 – 05:48 (+1)\nYoga:      
+ Ganda              10:23 (-1) – 10:20\nKarana:    Vanija 21:03 (-1)–09
+ :41  /  Vishti 09:41–22:11\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 48 – 06:36\n  Amrita Kalam     22:08 – 23:50\n\n─ Inauspicious ─\n
+   Rahu Kalam       12:53 – 14:16\n  Gulika Kalam     11:31 – 12:53\n  
+ Yamagandam       08:46 – 10:09\n  Varjyam          11:55 – 13:37\n  Du
+ rmuhurtham     12:32 – 13:15\n\n─ Choghadiya ─\n  07:24 – 08:46  L
+ abh\n  08:46 – 10:09  Amrit\n  10:09 – 11:31  Kaal\n  11:31 – 12:53 
+  Shubh\n  12:53 – 14:16  Rog\n  14:16 – 15:38  Udveg\n  15:38 – 17:0
+ 1  Char\n  17:01 – 18:23  Labh\n\n─ Night Choghadiya ─\n  18:23 – 
+ 23:01  Udveg\n  23:01 – 03:39 (+1)  Shubh\n  03:39 (+1) – 08:17 (+1)  
+ Amrit\n  08:17 (+1) – 12:54 (+1)  Char\n  12:54 (+1) – 17:32 (+1)  Rog
+ \n  17:32 (+1) – 22:10 (+1)  Kaal\n  22:10 (+1) – 02:48 (+1)  Labh\n  
+ 02:48 (+1) – 07:26 (+1)  Udveg\n\n⚡ Papankusha Ekadashi — fasting da
+ y
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Uttara Bhadrapada · Dhruva
+DTSTART;VALUE=DATE:20261023
+DTEND;VALUE=DATE:20261024
+UID:2026-10-23-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Ashvina Maasam  ·  Shukla Paks
+ ham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 
+ 07:26  ·  Sunset 18:21  ·  Moonrise 16:53  ·  Moonset 04:41\nSolar sign
+ : Tula  ·  Lunar sign: Meena\n\nTithi:     Shukla Trayodashi  22:50 (-1) 
+ – 22:58\nNakshatra: Uttara Bhadrapada  06:53 – 07:27 (+1)\nYoga:      
+ Dhruva             09:56 (-1) – 09:08\nKarana:    Kaulava 22:50 (-1)–1
+ 0:58  /  Taitila 10:58–22:58\n\n─ Auspicious ─\n  Brahma Muhurta   0
+ 5:50 – 06:38\n  Abhijit Muhurta  12:31 – 13:15\n  Amrita Kalam     02:
+ 32 (+1) – 04:11 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       11:31 
+ – 12:53\n  Gulika Kalam     08:48 – 10:09\n  Yamagandam       15:37 
+ – 16:59\n  Varjyam          16:43 – 18:21\n  Durmuhurtham     09:37 
+ – 10:20\n  Durmuhurtham     13:15 – 13:59\n\n─ Choghadiya ─\n  07:
+ 26 – 08:48  Char\n  08:48 – 10:09  Labh\n  10:09 – 11:31  Amrit\n  1
+ 1:31 – 12:53  Kaal\n  12:53 – 14:15  Shubh\n  14:15 – 15:37  Rog\n  
+ 15:37 – 16:59  Udveg\n  16:59 – 18:21  Char\n\n─ Night Choghadiya 
+ ─\n  18:21 – 22:59  Rog\n  22:59 – 03:38 (+1)  Kaal\n  03:38 (+1) 
+ – 08:16 (+1)  Labh\n  08:16 (+1) – 12:54 (+1)  Udveg\n  12:54 (+1) –
+  17:33 (+1)  Shubh\n  17:33 (+1) – 22:11 (+1)  Amrit\n  22:11 (+1) – 0
+ 2:49 (+1)  Char\n  02:49 (+1) – 07:28 (+1)  Rog\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Revati · Vajra
+DTSTART;VALUE=DATE:20261025
+DTEND;VALUE=DATE:20261026
+UID:2026-10-25-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Ashvina Maasam  ·  Shukla Paks
+ ham  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 07:
+ 28  ·  Sunset 18:18  ·  Moonrise 17:49  ·  Moonset 06:58\nSolar sign: T
+ ula  ·  Lunar sign: Meena\n\nTithi:     Pournami           22:35 (-1) –
+  21:44\nNakshatra: Revati             07:27 (-1) – 07:33\nYoga:      Vaj
+ ra              06:21 – 04:24 (+1)\nKarana:    Vishti 22:35 (-1)–10:13
+   /  Bava 10:13–21:44\n\n─ Auspicious ─\n  Brahma Muhurta   05:52 
+ – 06:40\n  Abhijit Muhurta  12:31 – 13:15\n  Amrita Kalam     00:06 (+
+ 1) – 01:40 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       16:57 – 18
+ :18\n  Gulika Kalam     15:36 – 16:57\n  Yamagandam       12:53 – 14:1
+ 4\n  Varjyam          03:15 (+1) – 04:49 (+1)\n  Durmuhurtham     16:52 
+ – 17:35\n\n─ Choghadiya ─\n  07:28 – 08:49  Udveg\n  08:49 – 10:
+ 10  Char\n  10:10 – 11:32  Labh\n  11:32 – 12:53  Amrit\n  12:53 – 1
+ 4:14  Kaal\n  14:14 – 15:36  Shubh\n  15:36 – 16:57  Rog\n  16:57 – 
+ 18:18  Udveg\n\n─ Night Choghadiya ─\n  18:18 – 22:58 (+1)  Shubh\n 
+  22:58 (+1) – 03:38 (+1)  Amrit\n  03:38 (+1) – 08:18 (+1)  Char\n  08
+ :18 (+1) – 12:58 (+1)  Rog\n  12:58 (+1) – 17:38 (+1)  Kaal\n  17:38 (
+ +1) – 21:18 (+1)  Labh\n  21:18 (+1) – 01:58 (+1)  Udveg\n  01:58 (+1)
+  – 06:38 (+1)  Shubh\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n
+ \n⚡ Ganda Moola (Revati)  ·  Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Rama Ekadashi · Purva Phalguni · Indra
+DTSTART;VALUE=DATE:20261104
+DTEND;VALUE=DATE:20261105
+UID:2026-11-04-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Ashvina Maasam  ·  Krishna Pak
+ sham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 
+ 06:38  ·  Sunset 17:07  ·  Moonrise 02:00  ·  Moonset 14:41\nSolar sign
+ : Tula  ·  Lunar sign: Simha\n\nTithi:     Rama Ekadashi      00:23 – 2
+ 2:51\nNakshatra: Purva Phalguni     17:49 (-1) – 16:52\nYoga:      Indra
+               22:50 (-1) – 20:23\nKarana:    Bava 00:23–11:34  /  Bala
+ va 11:34–22:51\n\n─ Auspicious ─\n  Brahma Muhurta   05:02 – 05:50
+ \n  Amrita Kalam     10:44 – 12:16\n\n─ Inauspicious ─\n  Rahu Kalam
+        11:53 – 13:11\n  Gulika Kalam     10:34 – 11:53\n  Yamagandam  
+      07:57 – 09:15\n  Varjyam          23:54 – 01:28 (+1)\n  Durmuhurt
+ ham     11:32 – 12:13\n\n─ Choghadiya ─\n  06:38 – 07:57  Labh\n  
+ 07:57 – 09:15  Amrit\n  09:15 – 10:34  Kaal\n  10:34 – 11:53  Shubh\
+ n  11:53 – 13:11  Rog\n  13:11 – 14:30  Udveg\n  14:30 – 15:48  Char
+ \n  15:48 – 17:07  Labh\n\n─ Night Choghadiya ─\n  17:07 – 21:49  
+ Udveg\n  21:49 – 02:30 (+1)  Shubh\n  02:30 (+1) – 07:12 (+1)  Amrit\n
+   07:12 (+1) – 11:54 (+1)  Char\n  11:54 (+1) – 16:35 (+1)  Rog\n  16:
+ 35 (+1) – 21:17 (+1)  Kaal\n  21:17 (+1) – 01:58 (+1)  Labh\n  01:58 (
+ +1) – 06:40 (+1)  Udveg\n\n⚡ Rama Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Hasta · Vishkambha
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261107
+UID:2026-11-06-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Ashvina Maasam  ·  Krishna Pak
+ sham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise
+  06:40  ·  Sunset 17:05  ·  Moonrise 04:09  ·  Moonset 15:30\nSolar sig
+ n: Tula  ·  Lunar sign: Kanya\n\nTithi:     Krishna Trayodashi 21:42 (-1)
+  – 21:00\nNakshatra: Hasta              16:17 (-1) – 16:08\nYoga:     
+  Vishkambha         18:14 (-1) – 16:26\nKarana:    Garaja 21:42 (-1)–0
+ 9:17  /  Vanija 09:17–21:00\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :04 – 05:52\n  Abhijit Muhurta  11:32 – 12:13\n  Amrita Kalam     10:1
+ 0 – 11:45\n\n─ Inauspicious ─\n  Rahu Kalam       10:34 – 11:53\n 
+  Gulika Kalam     07:58 – 09:16\n  Yamagandam       14:29 – 15:47\n  V
+ arjyam          00:14 (+1) – 01:51 (+1)\n  Durmuhurtham     08:45 – 09
+ :27\n  Durmuhurtham     12:13 – 12:55\n\n─ Choghadiya ─\n  06:40 –
+  07:58  Char\n  07:58 – 09:16  Labh\n  09:16 – 10:34  Amrit\n  10:34 
+ – 11:53  Kaal\n  11:53 – 13:11  Shubh\n  13:11 – 14:29  Rog\n  14:29
+  – 15:47  Udveg\n  15:47 – 17:05  Char\n\n─ Night Choghadiya ─\n  
+ 17:05 – 21:47  Rog\n  21:47 – 02:29 (+1)  Kaal\n  02:29 (+1) – 07:12
+  (+1)  Labh\n  07:12 (+1) – 11:54 (+1)  Udveg\n  11:54 (+1) – 16:36 (+
+ 1)  Shubh\n  16:36 (+1) – 21:18 (+1)  Amrit\n  21:18 (+1) – 02:00 (+1)
+   Char\n  02:00 (+1) – 06:42 (+1)  Rog\n\n⚡ Masa Shivaratri  ·  Prado
+ sham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Deepavali — Amavasya · Swati · Ayushman
+DTSTART;VALUE=DATE:20261108
+DTEND;VALUE=DATE:20261109
+UID:2026-11-08-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Ashvina Maasam  ·  Krishna Pak
+ sham  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 06
+ :42  ·  Sunset 17:03  ·  Moonrise 06:16  ·  Moonset 16:26\nSolar sign: 
+ Tula  ·  Lunar sign: Tula\n\nTithi:     Amavasya           20:47 (-1) –
+  21:05\nNakshatra: Swati              16:26 (-1) – 17:14\nYoga:      Ayu
+ shman           15:00 (-1) – 13:58\nKarana:    Chatushpada 20:47 (-1)–
+ 08:52  /  Naga 08:52–21:05\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 06 – 05:54\n  Abhijit Muhurta  11:32 – 12:13\n  Amrita Kalam     08:09
+  – 09:48\n\n─ Inauspicious ─\n  Rahu Kalam       15:46 – 17:03\n  
+ Gulika Kalam     14:28 – 15:46\n  Yamagandam       11:53 – 13:10\n  Va
+ rjyam          23:09 – 00:50 (+1)\n  Durmuhurtham     15:40 – 16:22\n\
+ n─ Choghadiya ─\n  06:42 – 08:00  Udveg\n  08:00 – 09:17  Char\n  
+ 09:17 – 10:35  Labh\n  10:35 – 11:53  Amrit\n  11:53 – 13:10  Kaal\n
+   13:10 – 14:28  Shubh\n  14:28 – 15:46  Rog\n  15:46 – 17:03  Udveg
+ \n\n─ Night Choghadiya ─\n  17:03 – 03:47 (+1)  Shubh\n  03:47 (+1) 
+ – 14:31 (+1)  Amrit\n  14:31 (+1) – 01:15 (+1)  Char\n  01:15 (+1) –
+  11:59 (+1)  Rog\n  11:59 (+1) – 22:43 (+1)  Kaal\n  22:43 (+1) – 09:2
+ 7 (+1)  Labh\n  09:27 (+1) – 20:11 (+1)  Udveg\n  20:11 (+1) – 06:55 (
+ +1)  Shubh\n\n⚡ Deepavali  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Prabodhini Ekadashi · Uttara Bhadrapada · Vajra
+DTSTART;VALUE=DATE:20261120
+DTEND;VALUE=DATE:20261121
+UID:2026-11-20-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Shukla Paks
+ ham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 
+ 06:55  ·  Sunset 16:54  ·  Moonrise 14:17  ·  Moonset 02:27\nSolar sign
+ : Vrischika  ·  Lunar sign: Meena\n\nTithi:     Prabodhini Ekadashi 12:27
+  (-1) – 12:35\nNakshatra: Uttara Bhadrapada  13:28 (-1) – 14:09\nYoga:
+       Vajra              14:20 (-1) – 13:14\nKarana:    Vishti 00:35–1
+ 2:35  /  Bava 12:35–00:27 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta  
+  05:19 – 06:07\n  Abhijit Muhurta  11:35 – 12:15\n  Amrita Kalam     0
+ 9:13 – 10:52\n\n─ Inauspicious ─\n  Rahu Kalam       10:40 – 11:55
+ \n  Gulika Kalam     08:10 – 09:25\n  Yamagandam       14:25 – 15:40\n
+   Varjyam          02:15 (+1) – 03:52 (+1)\n  Durmuhurtham     08:55 –
+  09:35\n  Durmuhurtham     12:15 – 12:55\n\n─ Choghadiya ─\n  06:55 
+ – 08:10  Char\n  08:10 – 09:25  Labh\n  09:25 – 10:40  Amrit\n  10:4
+ 0 – 11:55  Kaal\n  11:55 – 13:10  Shubh\n  13:10 – 14:25  Rog\n  14:
+ 25 – 15:40  Udveg\n  15:40 – 16:54  Char\n\n─ Night Choghadiya ─\n
+   16:54 – 18:40  Rog\n  18:40 – 20:25  Kaal\n  20:25 – 22:10  Labh\n
+   22:10 – 23:55  Udveg\n  23:55 – 01:40 (+1)  Shubh\n  01:40 (+1) – 
+ 03:26 (+1)  Amrit\n  03:26 (+1) – 05:11 (+1)  Char\n  05:11 (+1) – 06:
+ 56 (+1)  Rog\n\n─ Special Yogas ─\n  Siddha Yoga\n\n⚡ Prabodhini Eka
+ dashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Revati · Siddhi
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261122
+UID:2026-11-21-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Shukla Paks
+ ham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 0
+ 6:56  ·  Sunset 16:54  ·  Moonrise 14:45  ·  Moonset 03:34\nSolar sign:
+  Vrischika  ·  Lunar sign: Meena\n\nTithi:     Shukla Dwadashi    12:35 (
+ -1) – 12:13\nNakshatra: Revati             14:09 (-1) – 14:21\nYoga:  
+     Siddhi             13:14 (-1) – 11:44\nKarana:    Balava 00:27–12:
+ 13  /  Kaulava 12:13–23:50\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 20 – 06:08\n  Abhijit Muhurta  11:35 – 12:15\n  Amrita Kalam     11:56
+  – 13:33\n\n─ Inauspicious ─\n  Rahu Kalam       09:25 – 10:40\n  
+ Gulika Kalam     06:56 – 08:11\n  Yamagandam       13:10 – 14:24\n  Du
+ rmuhurtham     06:56 – 07:36\n  Durmuhurtham     07:36 – 08:16\n\n─ 
+ Choghadiya ─\n  06:56 – 08:11  Kaal\n  08:11 – 09:25  Shubh\n  09:25
+  – 10:40  Rog\n  10:40 – 11:55  Udveg\n  11:55 – 13:10  Char\n  13:1
+ 0 – 14:24  Labh\n  14:24 – 15:39  Amrit\n  15:39 – 16:54  Kaal\n\n
+ ─ Night Choghadiya ─\n  16:54 – 18:39  Labh\n  18:39 – 20:25  Udve
+ g\n  20:25 – 22:10  Shubh\n  22:10 – 23:55  Amrit\n  23:55 – 01:41 (
+ +1)  Char\n  01:41 (+1) – 03:26 (+1)  Rog\n  03:26 (+1) – 05:12 (+1)  
+ Kaal\n  05:12 (+1) – 06:57 (+1)  Labh\n\n⚡ Ganda Moola (Revati)  ·  S
+ hani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Ashvini · Vyatipata
+DTSTART;VALUE=DATE:20261122
+DTEND;VALUE=DATE:20261123
+UID:2026-11-22-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Shukla Paks
+ ham  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 06:
+ 57  ·  Sunset 16:53  ·  Moonrise 15:17  ·  Moonset 04:46\nSolar sign: V
+ rischika  ·  Lunar sign: Mesha\n\nTithi:     Shukla Trayodashi  12:13 (-1
+ ) – 11:22\nNakshatra: Ashvini            14:21 (-1) – 14:06\nYoga:    
+   Vyatipata          11:44 (-1) – 09:52\nKarana:    Taitila 23:50 (-1)
+ –11:22  /  Garaja 11:22–22:46\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:21 – 06:09\n  Abhijit Muhurta  11:35 – 12:15\n  Amrita Kalam     
+ 06:58 – 08:33\n\n─ Inauspicious ─\n  Rahu Kalam       15:39 – 16:5
+ 3\n  Gulika Kalam     14:24 – 15:39\n  Yamagandam       11:55 – 13:10\
+ n  Varjyam          10:08 – 11:43\n  Varjyam          23:25 – 00:59 (+
+ 1)\n  Durmuhurtham     15:34 – 16:14\n\n─ Choghadiya ─\n  06:57 – 
+ 08:12  Udveg\n  08:12 – 09:26  Char\n  09:26 – 10:41  Labh\n  10:41 
+ – 11:55  Amrit\n  11:55 – 13:10  Kaal\n  13:10 – 14:24  Shubh\n  14:
+ 24 – 15:39  Rog\n  15:39 – 16:53  Udveg\n\n─ Night Choghadiya ─\n 
+  16:53 – 21:39  Shubh\n  21:39 – 02:25 (+1)  Amrit\n  02:25 (+1) – 0
+ 7:11 (+1)  Char\n  07:11 (+1) – 11:56 (+1)  Rog\n  11:56 (+1) – 16:42 
+ (+1)  Kaal\n  16:42 (+1) – 21:28 (+1)  Labh\n  21:28 (+1) – 02:13 (+1)
+   Udveg\n  02:13 (+1) – 06:59 (+1)  Shubh\n\n─ Special Yogas ─\n  Sa
+ rvartha Siddhi Yoga\n\n⚡ Ganda Moola (Ashvini)  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Karthika Pournami — Pournami · Krittika · Shiva
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261125
+UID:2026-11-24-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Shukla Paks
+ ham  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise
+  06:59  ·  Sunset 16:53  ·  Moonrise 16:47  ·  Moonset 07:18\nSolar sig
+ n: Vrischika  ·  Lunar sign: Vrishabha\n\nTithi:     Pournami           1
+ 0:05 (-1) – 08:27\nNakshatra: Krittika           13:25 (-1) – 12:24\nY
+ oga:      Shiva              05:10 – 02:25 (+1)\nKarana:    Bava 21:18 (
+ -1)–08:27  /  Balava 08:27–19:31\n\n─ Auspicious ─\n  Brahma Muhur
+ ta   05:23 – 06:11\n  Abhijit Muhurta  11:36 – 12:16\n  Amrita Kalam  
+    10:06 – 11:38\n\n─ Inauspicious ─\n  Rahu Kalam       14:24 – 1
+ 5:38\n  Gulika Kalam     11:56 – 13:10\n  Yamagandam       09:27 – 10:
+ 42\n  Varjyam          03:32 (+1) – 05:03 (+1)\n  Durmuhurtham     08:58
+  – 09:37\n  Durmuhurtham     22:32 – 23:28\n\n─ Choghadiya ─\n  06
+ :59 – 08:13  Rog\n  08:13 – 09:27  Udveg\n  09:27 – 10:42  Char\n  1
+ 0:42 – 11:56  Labh\n  11:56 – 13:10  Amrit\n  13:10 – 14:24  Kaal\n 
+  14:24 – 15:38  Shubh\n  15:38 – 16:53  Rog\n\n─ Night Choghadiya 
+ ─\n  16:53 – 21:40 (+1)  Kaal\n  21:40 (+1) – 02:27 (+1)  Labh\n  02
+ :27 (+1) – 07:14 (+1)  Udveg\n  07:14 (+1) – 12:01 (+1)  Shubh\n  12:0
+ 1 (+1) – 16:48 (+1)  Amrit\n  16:48 (+1) – 21:35 (+1)  Char\n  21:35 (
+ +1) – 02:22 (+1)  Rog\n  02:22 (+1) – 07:09 (+1)  Kaal\n\n─ Special 
+ Yogas ─\n  Sarvartha Siddhi Yoga\n\n⚡ Karthika Pournami  ·  Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Utpanna Ekadashi · Chitra · Saubhagya
+DTSTART;VALUE=DATE:20261204
+DTEND;VALUE=DATE:20261205
+UID:2026-12-04-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Krishna Pak
+ sham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise
+  07:09  ·  Sunset 16:50  ·  Moonrise 03:05  ·  Moonset 14:00\nSolar sig
+ n: Vrischika  ·  Lunar sign: Kanya\n\nTithi:     Utpanna Ekadashi   12:37
+  (-1) – 11:58\nNakshatra: Chitra             23:55 (-1) – 00:06 (+1)\n
+ Yoga:      Saubhagya          22:32 (-1) – 20:57\nKarana:    Balava 00:1
+ 4–11:58  /  Kaulava 11:58–23:49\n\n─ Auspicious ─\n  Brahma Muhurt
+ a   05:33 – 06:21\n  Abhijit Muhurta  11:40 – 12:19\n  Amrita Kalam   
+   17:39 – 19:16\n\n─ Inauspicious ─\n  Rahu Kalam       10:47 – 11
+ :59\n  Gulika Kalam     08:21 – 09:34\n  Yamagandam       14:25 – 15:3
+ 7\n  Varjyam          07:59 – 09:35\n  Varjyam          05:52 (+1) – 0
+ 7:31 (+1)\n  Durmuhurtham     09:05 – 09:44\n  Durmuhurtham     12:19 
+ – 12:58\n\n─ Choghadiya ─\n  07:09 – 08:21  Char\n  08:21 – 09:3
+ 4  Labh\n  09:34 – 10:47  Amrit\n  10:47 – 11:59  Kaal\n  11:59 – 13
+ :12  Shubh\n  13:12 – 14:25  Rog\n  14:25 – 15:37  Udveg\n  15:37 – 
+ 16:50  Char\n\n─ Night Choghadiya ─\n  16:50 – 18:37  Rog\n  18:37 
+ – 20:25  Kaal\n  20:25 – 22:12  Labh\n  22:12 – 00:00 (+1)  Udveg\n 
+  00:00 (+1) – 01:47 (+1)  Shubh\n  01:47 (+1) – 03:35 (+1)  Amrit\n  0
+ 3:35 (+1) – 05:22 (+1)  Char\n  05:22 (+1) – 07:10 (+1)  Rog\n\n─ Sp
+ ecial Yogas ─\n  Siddha Yoga\n\n⚡ Utpanna Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Swati · Shobhana
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261206
+UID:2026-12-05-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Krishna Pak
+ sham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 
+ 07:10  ·  Sunset 16:50  ·  Moonrise 04:08  ·  Moonset 14:28\nSolar sign
+ : Vrischika  ·  Lunar sign: Tula\n\nTithi:     Krishna Dwadashi   11:58 (
+ -1) – 11:49\nNakshatra: Swati              00:06 – 00:48 (+1)\nYoga:  
+     Shobhana           20:57 (-1) – 19:46\nKarana:    Taitila 23:49 (-1)
+ –11:49  /  Garaja 11:49–23:56\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:34 – 06:22\n  Abhijit Muhurta  11:40 – 12:19\n  Amrita Kalam     
+ 15:45 – 17:23\n\n─ Inauspicious ─\n  Rahu Kalam       09:35 – 10:4
+ 7\n  Gulika Kalam     07:10 – 08:22\n  Yamagandam       13:12 – 14:25\
+ n  Varjyam          06:40 (+1) – 08:21 (+1)\n  Durmuhurtham     07:10 
+ – 07:48\n  Durmuhurtham     07:48 – 08:27\n\n─ Choghadiya ─\n  07:
+ 10 – 08:22  Kaal\n  08:22 – 09:35  Shubh\n  09:35 – 10:47  Rog\n  10
+ :47 – 12:00  Udveg\n  12:00 – 13:12  Char\n  13:12 – 14:25  Labh\n  
+ 14:25 – 15:37  Amrit\n  15:37 – 16:50  Kaal\n\n─ Night Choghadiya 
+ ─\n  16:50 – 18:38  Labh\n  18:38 – 20:25  Udveg\n  20:25 – 22:13 
+  Shubh\n  22:13 – 00:00 (+1)  Amrit\n  00:00 (+1) – 01:48 (+1)  Char\n
+   01:48 (+1) – 03:35 (+1)  Rog\n  03:35 (+1) – 05:23 (+1)  Kaal\n  05:
+ 23 (+1) – 07:11 (+1)  Labh\n\n─ Special Yogas ─\n  Sarvartha Siddhi 
+ Yoga\n\n⚡ Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Vishakha · Atigand
+ a
+DTSTART;VALUE=DATE:20261206
+DTEND;VALUE=DATE:20261207
+UID:2026-12-06-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Krishna Pak
+ sham  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 07
+ :11  ·  Sunset 16:50  ·  Moonrise 05:11  ·  Moonset 15:01\nSolar sign: 
+ Vrischika  ·  Lunar sign: Tula\n\nTithi:     Krishna Trayodashi 11:49 (-1
+ ) – 12:10\nNakshatra: Vishakha           00:48 – 01:59 (+1)\nYoga:    
+   Atiganda           19:46 (-1) – 18:59\nKarana:    Vanija 23:56 (-1)–
+ 12:10  /  Vishti 12:10–00:33 (+1)\n\n─ Auspicious ─\n  Brahma Muhurt
+ a   05:35 – 06:23\n  Abhijit Muhurta  11:41 – 12:20\n  Amrita Kalam   
+   16:45 – 18:26\n\n─ Inauspicious ─\n  Rahu Kalam       15:38 – 16
+ :50\n  Gulika Kalam     14:25 – 15:38\n  Yamagandam       12:00 – 13:1
+ 3\n  Varjyam          06:16 (+1) – 07:58 (+1)\n  Durmuhurtham     15:33 
+ – 16:11\n\n─ Choghadiya ─\n  07:11 – 08:23  Udveg\n  08:23 – 09:
+ 35  Char\n  09:35 – 10:48  Labh\n  10:48 – 12:00  Amrit\n  12:00 – 1
+ 3:13  Kaal\n  13:13 – 14:25  Shubh\n  14:25 – 15:38  Rog\n  15:38 – 
+ 16:50  Udveg\n\n─ Night Choghadiya ─\n  16:50 – 21:38  Shubh\n  21:3
+ 8 – 02:26 (+1)  Amrit\n  02:26 (+1) – 07:13 (+1)  Char\n  07:13 (+1) 
+ – 12:01 (+1)  Rog\n  12:01 (+1) – 16:49 (+1)  Kaal\n  16:49 (+1) – 2
+ 1:37 (+1)  Labh\n  21:37 (+1) – 02:24 (+1)  Udveg\n  02:24 (+1) – 07:1
+ 2 (+1)  Shubh\n\n⚡ Masa Shivaratri  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Jyeshtha · Dhriti
+DTSTART;VALUE=DATE:20261208
+DTEND;VALUE=DATE:20261209
+UID:2026-12-08-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Kartika Maasam  ·  Krishna Pak
+ sham  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunris
+ e 07:12  ·  Sunset 16:50  ·  Moonrise 07:13  ·  Moonset 16:23\nSolar si
+ gn: Vrischika  ·  Lunar sign: Vrischika\n\nTithi:     Amavasya           
+ 13:03 (-1) – 14:24\nNakshatra: Jyeshtha           03:39 – 05:44 (+1)\n
+ Yoga:      Dhriti             18:35 (-1) – 18:32\nKarana:    Naga 01:40
+ –14:24  /  Kinstughna 14:24–03:14 (+1)\n\n─ Auspicious ─\n  Brahma
+  Muhurta   05:36 – 06:24\n  Abhijit Muhurta  11:42 – 12:20\n  Amrita K
+ alam     20:10 – 21:54\n\n─ Inauspicious ─\n  Rahu Kalam       14:26
+  – 15:38\n  Gulika Kalam     12:01 – 13:13\n  Yamagandam       09:37 
+ – 10:49\n  Varjyam          09:44 – 11:28\n  Durmuhurtham     09:08 
+ – 09:46\n  Durmuhurtham     22:35 – 23:33\n\n─ Choghadiya ─\n  07:
+ 12 – 08:24  Rog\n  08:24 – 09:37  Udveg\n  09:37 – 10:49  Char\n  10
+ :49 – 12:01  Labh\n  12:01 – 13:13  Amrit\n  13:13 – 14:26  Kaal\n  
+ 14:26 – 15:38  Shubh\n  15:38 – 16:50  Rog\n\n─ Night Choghadiya ─
+ \n  16:50 – 00:39 (+1)  Kaal\n  00:39 (+1) – 08:28 (+1)  Labh\n  08:28
+  (+1) – 16:16 (+1)  Udveg\n  16:16 (+1) – 00:05 (+1)  Shubh\n  00:05 (
+ +1) – 07:54 (+1)  Amrit\n  07:54 (+1) – 15:42 (+1)  Char\n  15:42 (+1)
+  – 23:31 (+1)  Rog\n  23:31 (+1) – 07:20 (+1)  Kaal\n\n⚡ Ganda Moola
+  (Jyeshtha)  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Mokshada (Vaikunta) Ekadashi · Ashvini · Parigha
+DTSTART;VALUE=DATE:20261219
+DTEND;VALUE=DATE:20261220
+UID:2026-12-19-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Margashira Maasam  ·  Shukla P
+ aksham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunris
+ e 07:20  ·  Sunset 16:53  ·  Moonrise 13:11  ·  Moonset 02:22\nSolar si
+ gn: Dhanu  ·  Lunar sign: Mesha\n\nTithi:     Mokshada (Vaikunta) Ekadash
+ i 03:28 – 02:35 (+1)\nNakshatra: Ashvini            22:08 (-1) – 21:59
+ \nYoga:      Parigha            17:33 (-1) – 15:48\nKarana:    Vanija 03
+ :28–15:05  /  Vishti 15:05–02:35 (+1)\n\n─ Auspicious ─\n  Brahma 
+ Muhurta   05:44 – 06:32\n  Abhijit Muhurta  11:47 – 12:26\n  Amrita Ka
+ lam     14:49 – 16:25\n\n─ Inauspicious ─\n  Rahu Kalam       09:43 
+ – 10:55\n  Gulika Kalam     07:20 – 08:32\n  Yamagandam       13:18 
+ – 14:30\n  Varjyam          18:00 – 19:36\n  Durmuhurtham     07:20 
+ – 07:58\n  Durmuhurtham     07:58 – 08:36\n\n─ Choghadiya ─\n  07:
+ 20 – 08:32  Kaal\n  08:32 – 09:43  Shubh\n  09:43 – 10:55  Rog\n  10
+ :55 – 12:06  Udveg\n  12:06 – 13:18  Char\n  13:18 – 14:30  Labh\n  
+ 14:30 – 15:41  Amrit\n  15:41 – 16:53  Kaal\n\n─ Night Choghadiya 
+ ─\n  16:53 – 21:41  Labh\n  21:41 – 02:30 (+1)  Udveg\n  02:30 (+1) 
+ – 07:18 (+1)  Shubh\n  07:18 (+1) – 12:07 (+1)  Amrit\n  12:07 (+1) 
+ – 16:55 (+1)  Char\n  16:55 (+1) – 21:44 (+1)  Rog\n  21:44 (+1) – 0
+ 2:32 (+1)  Kaal\n  02:32 (+1) – 07:21 (+1)  Labh\n\n─ Special Yogas 
+ ─\n  Visha Yoga\n\n⚡ Ganda Moola (Ashvini)  ·  Mokshada (Vaikunta) Ek
+ adashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Krittika · Siddha
+DTSTART;VALUE=DATE:20261221
+DTEND;VALUE=DATE:20261222
+UID:2026-12-21-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Margashira Maasam  ·  Shukla P
+ aksham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise
+  07:21  ·  Sunset 16:54  ·  Moonrise 14:30  ·  Moonset 04:49\nSolar sig
+ n: Dhanu  ·  Lunar sign: Vrishabha\n\nTithi:     Shukla Trayodashi  01:18
+  – 23:39\nNakshatra: Krittika           21:24 (-1) – 20:27\nYoga:     
+  Siddha             13:41 (-1) – 11:16\nKarana:    Kaulava 01:18–12:31
+   /  Taitila 12:31–23:39\n\n─ Auspicious ─\n  Brahma Muhurta   05:45
+  – 06:33\n  Abhijit Muhurta  11:48 – 12:27\n  Amrita Kalam     18:09 
+ – 19:41\n\n─ Inauspicious ─\n  Rahu Kalam       08:33 – 09:44\n  G
+ ulika Kalam     13:19 – 14:31\n  Yamagandam       10:56 – 12:07\n  Var
+ jyam          08:55 – 10:28\n  Durmuhurtham     12:27 – 13:05\n  Durmu
+ hurtham     14:21 – 14:59\n\n─ Choghadiya ─\n  07:21 – 08:33  Amri
+ t\n  08:33 – 09:44  Kaal\n  09:44 – 10:56  Shubh\n  10:56 – 12:07  R
+ og\n  12:07 – 13:19  Udveg\n  13:19 – 14:31  Char\n  14:31 – 15:42  
+ Labh\n  15:42 – 16:54  Amrit\n\n─ Night Choghadiya ─\n  16:54 – 21
+ :42  Char\n  21:42 – 02:31 (+1)  Rog\n  02:31 (+1) – 07:19 (+1)  Kaal\
+ n  07:19 (+1) – 12:08 (+1)  Labh\n  12:08 (+1) – 16:56 (+1)  Udveg\n  
+ 16:56 (+1) – 21:45 (+1)  Shubh\n  21:45 (+1) – 02:33 (+1)  Amrit\n  02
+ :33 (+1) – 07:22 (+1)  Char\n\n⚡ Soma Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Mrigashira · Shukla
+DTSTART;VALUE=DATE:20261223
+DTEND;VALUE=DATE:20261224
+UID:2026-12-23-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Margashira Maasam  ·  Shukla P
+ aksham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunri
+ se 07:22  ·  Sunset 16:55  ·  Moonrise 16:33  ·  Moonset 07:16\nSolar s
+ ign: Dhanu  ·  Lunar sign: Mithuna\n\nTithi:     Pournami           21:42
+  (-1) – 19:33\nNakshatra: Mrigashira         19:13 (-1) – 17:45\nYoga:
+       Shukla             05:42 – 02:40 (+1)\nKarana:    Vishti 21:42 (-1
+ )–08:39  /  Bava 08:39–19:33\n\n─ Auspicious ─\n  Brahma Muhurta  
+  05:46 – 06:34\n  Amrita Kalam     09:29 – 10:59\n  Amrita Kalam     0
+ 6:49 (+1) – 08:18 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       12:08
+  – 13:20\n  Gulika Kalam     10:57 – 12:08\n  Yamagandam       08:34 
+ – 09:45\n  Varjyam          01:35 (+1) – 03:05 (+1)\n  Durmuhurtham   
+   11:49 – 12:28\n\n─ Choghadiya ─\n  07:22 – 08:34  Labh\n  08:34 
+ – 09:45  Amrit\n  09:45 – 10:57  Kaal\n  10:57 – 12:08  Shubh\n  12:
+ 08 – 13:20  Rog\n  13:20 – 14:32  Udveg\n  14:32 – 15:43  Char\n  15
+ :43 – 16:55  Labh\n\n─ Night Choghadiya ─\n  16:55 – 21:44 (+1)  U
+ dveg\n  21:44 (+1) – 02:32 (+1)  Shubh\n  02:32 (+1) – 07:21 (+1)  Amr
+ it\n  07:21 (+1) – 12:10 (+1)  Char\n  12:10 (+1) – 16:59 (+1)  Rog\n 
+  16:59 (+1) – 21:47 (+1)  Kaal\n  21:47 (+1) – 02:36 (+1)  Labh\n  02:
+ 36 (+1) – 07:25 (+1)  Udveg\n\n─ Special Yogas ─\n  Sarvartha Siddhi
+  Yoga\n\n⚡ Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Saphala Ekadashi · Swati · Dhriti
+DTSTART;VALUE=DATE:20270102
+DTEND;VALUE=DATE:20270103
+UID:2027-01-02-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Margashira Maasam  ·  Krishna 
+ Paksham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunr
+ ise 07:25  ·  Sunset 17:02  ·  Moonrise 03:05  ·  Moonset 13:02\nSolar 
+ sign: Dhanu  ·  Lunar sign: Tula\n\nTithi:     Saphala Ekadashi   03:19 
+ – 03:44 (+1)\nNakshatra: Swati              07:48 (-1) – 08:23\nYoga: 
+      Dhriti             01:13 – 00:18 (+1)\nKarana:    Bava 03:19–15:2
+ 8  /  Balava 15:28–03:44 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 05:49 – 06:37\n  Abhijit Muhurta  11:54 – 12:33\n  Amrita Kalam     00
+ :15 (+1) – 01:56 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       09:49 
+ – 11:01\n  Gulika Kalam     07:25 – 08:37\n  Yamagandam       13:25 
+ – 14:38\n  Varjyam          14:14 – 15:54\n  Durmuhurtham     07:25 
+ – 08:03\n  Durmuhurtham     08:03 – 08:42\n\n─ Choghadiya ─\n  07:
+ 25 – 08:37  Kaal\n  08:37 – 09:49  Shubh\n  09:49 – 11:01  Rog\n  11
+ :01 – 12:13  Udveg\n  12:13 – 13:25  Char\n  13:25 – 14:38  Labh\n  
+ 14:38 – 15:50  Amrit\n  15:50 – 17:02  Kaal\n\n─ Night Choghadiya 
+ ─\n  17:02 – 21:50  Labh\n  21:50 – 02:38 (+1)  Udveg\n  02:38 (+1) 
+ – 07:26 (+1)  Shubh\n  07:26 (+1) – 12:13 (+1)  Amrit\n  12:13 (+1) 
+ – 17:01 (+1)  Char\n  17:01 (+1) – 21:49 (+1)  Rog\n  21:49 (+1) – 0
+ 2:37 (+1)  Kaal\n  02:37 (+1) – 07:25 (+1)  Labh\n\n─ Special Yogas 
+ ─\n  Sarvartha Siddhi Yoga\n  Visha Yoga\n\n⚡ Saphala Ekadashi — fas
+ ting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Trayodashi · Anuradha · Ganda
+DTSTART;VALUE=DATE:20270104
+DTEND;VALUE=DATE:20270105
+UID:2027-01-04-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Margashira Maasam  ·  Krishna 
+ Paksham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunri
+ se 07:25  ·  Sunset 17:04  ·  Moonrise 05:07  ·  Moonset 14:20\nSolar s
+ ign: Dhanu  ·  Lunar sign: Vrischika\n\nTithi:     Krishna Trayodashi 04:
+ 40 – 06:05 (+1)\nNakshatra: Anuradha           09:27 (-1) – 11:01\nYog
+ a:      Ganda              23:45 (-1) – 23:35\nKarana:    Garaja 04:40
+ –17:19\n\n─ Auspicious ─\n  Brahma Muhurta   05:49 – 06:37\n  Abhi
+ jit Muhurta  11:55 – 12:34\n  Amrita Kalam     03:28 (+1) – 05:12 (+1)
+ \n\n─ Inauspicious ─\n  Rahu Kalam       08:37 – 09:50\n  Gulika Kal
+ am     13:27 – 14:39\n  Yamagandam       11:02 – 12:14\n  Varjyam     
+      17:04 – 18:48\n  Durmuhurtham     12:34 – 13:12\n  Durmuhurtham  
+    14:29 – 15:08\n\n─ Choghadiya ─\n  07:25 – 08:37  Amrit\n  08:3
+ 7 – 09:50  Kaal\n  09:50 – 11:02  Shubh\n  11:02 – 12:14  Rog\n  12:
+ 14 – 13:27  Udveg\n  13:27 – 14:39  Char\n  14:39 – 15:51  Labh\n  1
+ 5:51 – 17:04  Amrit\n\n─ Night Choghadiya ─\n  17:04 – 00:51 (+1) 
+  Char\n  00:51 (+1) – 08:39 (+1)  Rog\n  08:39 (+1) – 16:27 (+1)  Kaal
+ \n  16:27 (+1) – 00:14 (+1)  Labh\n  00:14 (+1) – 08:02 (+1)  Udveg\n 
+  08:02 (+1) – 15:50 (+1)  Shubh\n  15:50 (+1) – 23:37 (+1)  Amrit\n  2
+ 3:37 (+1) – 07:25 (+1)  Char\n\n─ Special Yogas ─\n  Sarvartha Siddh
+ i Yoga\n\n⚡ Soma Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Purva Ashadha · Vyaghata
+DTSTART;VALUE=DATE:20270107
+DTEND;VALUE=DATE:20270108
+UID:2027-01-07-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Margashira Maasam  ·  Krishna 
+ Paksham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunri
+ se 07:25  ·  Sunset 17:06  ·  Moonrise 07:35  ·  Moonset 17:02\nSolar s
+ ign: Dhanu  ·  Lunar sign: Dhanu\n\nTithi:     Amavasya           07:52 (
+ -1) – 09:56\nNakshatra: Purva Ashadha      15:20 (-1) – 17:54\nYoga:  
+     Vyaghata           00:06 – 00:37 (+1)\nKarana:    Naga 20:53 (-1)–
+ 09:56  /  Kinstughna 09:56–23:02\n\n─ Auspicious ─\n  Brahma Muhurta
+    05:49 – 06:37\n  Abhijit Muhurta  11:56 – 12:35\n  Amrita Kalam    
+  12:35 – 14:21\n\n─ Inauspicious ─\n  Rahu Kalam       13:28 – 14:
+ 41\n  Gulika Kalam     09:50 – 11:03\n  Yamagandam       07:25 – 08:38
+ \n  Varjyam          02:46 (+1) – 04:33 (+1)\n  Durmuhurtham     10:39 
+ – 11:17\n  Durmuhurtham     14:31 – 15:10\n\n─ Choghadiya ─\n  07:
+ 25 – 08:38  Shubh\n  08:38 – 09:50  Rog\n  09:50 – 11:03  Udveg\n  1
+ 1:03 – 12:16  Char\n  12:16 – 13:28  Labh\n  13:28 – 14:41  Amrit\n 
+  14:41 – 15:54  Kaal\n  15:54 – 17:06  Shubh\n\n─ Night Choghadiya 
+ ─\n  17:06 – 00:53 (+1)  Amrit\n  00:53 (+1) – 08:40 (+1)  Char\n  0
+ 8:40 (+1) – 16:27 (+1)  Rog\n  16:27 (+1) – 00:14 (+1)  Kaal\n  00:14 
+ (+1) – 08:01 (+1)  Labh\n  08:01 (+1) – 15:48 (+1)  Udveg\n  15:48 (+1
+ ) – 23:35 (+1)  Shubh\n  23:35 (+1) – 07:22 (+1)  Amrit\n\n─ Special
+  Yogas ─\n  Siddha Yoga\n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Putrada Ekadashi · Rohini · Shukla
+DTSTART;VALUE=DATE:20270118
+DTEND;VALUE=DATE:20270119
+UID:2027-01-18-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Pushya Maasam  ·  Shukla Paksh
+ am  ·  Somavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:2
+ 2  ·  Sunset 17:17  ·  Moonrise 13:06  ·  Moonset 03:39\nSolar sign: Ma
+ kara  ·  Lunar sign: Vrishabha\n\nTithi:     Putrada Ekadashi   16:44 (-1
+ ) – 15:03\nNakshatra: Rohini             04:29 – 03:18 (+1)\nYoga:    
+   Shukla             17:10 (-1) – 14:34\nKarana:    Vishti 03:55–15:03
+   /  Bava 15:03–02:05 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 46 – 06:34\n  Abhijit Muhurta  12:00 – 12:40\n  Amrita Kalam     00:16
+  (+1) – 01:47 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       08:37 –
+  09:51\n  Gulika Kalam     13:34 – 14:49\n  Yamagandam       11:05 – 1
+ 2:20\n  Varjyam          19:42 – 21:13\n  Durmuhurtham     12:40 – 13:
+ 19\n  Durmuhurtham     14:39 – 15:18\n\n─ Choghadiya ─\n  07:22 – 
+ 08:37  Amrit\n  08:37 – 09:51  Kaal\n  09:51 – 11:05  Shubh\n  11:05 
+ – 12:20  Rog\n  12:20 – 13:34  Udveg\n  13:34 – 14:49  Char\n  14:49
+  – 16:03  Labh\n  16:03 – 17:17  Amrit\n\n─ Night Choghadiya ─\n  
+ 17:17 – 19:03  Char\n  19:03 – 20:48  Rog\n  20:48 – 22:34  Kaal\n  
+ 22:34 – 00:20 (+1)  Labh\n  00:20 (+1) – 02:05 (+1)  Udveg\n  02:05 (+
+ 1) – 03:51 (+1)  Shubh\n  03:51 (+1) – 05:36 (+1)  Amrit\n  05:36 (+1)
+  – 07:22 (+1)  Char\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n 
+  Dagdha Yoga\n\n⚡ Putrada Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Mrigashira · Brahma
+DTSTART;VALUE=DATE:20270119
+DTEND;VALUE=DATE:20270120
+UID:2027-01-19-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Pushya Maasam  ·  Shukla Paksh
+ am  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 0
+ 7:22  ·  Sunset 17:18  ·  Moonrise 14:06  ·  Moonset 04:51\nSolar sign:
+  Makara  ·  Lunar sign: Vrishabha\n\nTithi:     Shukla Dwadashi    15:03 
+ (-1) – 13:04\nNakshatra: Mrigashira         03:18 – 01:53 (+1)\nYoga: 
+      Brahma             14:34 (-1) – 11:45\nKarana:    Balava 02:05–13
+ :04  /  Kaulava 13:04–00:00 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta
+    05:46 – 06:34\n  Abhijit Muhurta  12:00 – 12:40\n  Amrita Kalam    
+  17:37 – 19:07\n\n─ Inauspicious ─\n  Rahu Kalam       14:49 – 16:
+ 04\n  Gulika Kalam     12:20 – 13:35\n  Yamagandam       09:51 – 11:06
+ \n  Varjyam          08:35 – 10:05\n  Durmuhurtham     09:21 – 10:01\n
+   Durmuhurtham     22:56 – 23:52\n\n─ Choghadiya ─\n  07:22 – 08:3
+ 6  Rog\n  08:36 – 09:51  Udveg\n  09:51 – 11:06  Char\n  11:06 – 12:
+ 20  Labh\n  12:20 – 13:35  Amrit\n  13:35 – 14:49  Kaal\n  14:49 – 1
+ 6:04  Shubh\n  16:04 – 17:18  Rog\n\n─ Night Choghadiya ─\n  17:18 
+ – 19:04  Kaal\n  19:04 – 20:49  Labh\n  20:49 – 22:34  Udveg\n  22:3
+ 4 – 00:20 (+1)  Shubh\n  00:20 (+1) – 02:05 (+1)  Amrit\n  02:05 (+1) 
+ – 03:51 (+1)  Char\n  03:51 (+1) – 05:36 (+1)  Rog\n  05:36 (+1) – 0
+ 7:21 (+1)  Kaal\n\n─ Special Yogas ─\n  Dvipushkara Yoga\n\n⚡ Prados
+ ham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Ardra · Indra
+DTSTART;VALUE=DATE:20270120
+DTEND;VALUE=DATE:20270121
+UID:2027-01-20-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Pushya Maasam  ·  Shukla Paksh
+ am  ·  Budhavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:
+ 21  ·  Sunset 17:19  ·  Moonrise 15:18  ·  Moonset 05:56\nSolar sign: M
+ akara  ·  Lunar sign: Mithuna\n\nTithi:     Shukla Trayodashi  13:04 (-1)
+  – 10:54\nNakshatra: Ardra              01:53 – 00:19 (+1)\nYoga:     
+  Indra              11:45 (-1) – 08:45\nKarana:    Taitila 00:00–10:54
+   /  Garaja 10:54–21:45\n\n─ Auspicious ─\n  Brahma Muhurta   05:45 
+ – 06:33\n  Amrita Kalam     14:58 – 16:28\n\n─ Inauspicious ─\n  R
+ ahu Kalam       12:20 – 13:35\n  Gulika Kalam     11:06 – 12:20\n  Yam
+ agandam       08:36 – 09:51\n  Varjyam          09:44 – 11:14\n  Durmu
+ hurtham     12:00 – 12:40\n\n─ Choghadiya ─\n  07:21 – 08:36  Labh
+ \n  08:36 – 09:51  Amrit\n  09:51 – 11:06  Kaal\n  11:06 – 12:20  Sh
+ ubh\n  12:20 – 13:35  Rog\n  13:35 – 14:50  Udveg\n  14:50 – 16:05  
+ Char\n  16:05 – 17:19  Labh\n\n─ Night Choghadiya ─\n  17:19 – 04:
+ 04 (+1)  Udveg\n  04:04 (+1) – 14:48 (+1)  Shubh\n  14:48 (+1) – 01:32
+  (+1)  Amrit\n  01:32 (+1) – 12:16 (+1)  Char\n  12:16 (+1) – 23:01 (+
+ 1)  Rog\n  23:01 (+1) – 09:45 (+1)  Kaal\n  09:45 (+1) – 20:29 (+1)  L
+ abh\n  20:29 (+1) – 07:13 (+1)  Udveg\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shattila Ekadashi · Jyeshtha · Vyaghata
+DTSTART;VALUE=DATE:20270201
+DTEND;VALUE=DATE:20270202
+UID:2027-02-01-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Pushya Maasam  ·  Krishna Paks
+ ham  ·  Somavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:
+ 13  ·  Sunset 17:33  ·  Moonrise 03:58  ·  Moonset 13:04\nSolar sign: M
+ akara  ·  Lunar sign: Vrischika\n\nTithi:     Shattila Ekadashi  20:16 (-
+ 1) – 21:41\nNakshatra: Jyeshtha           18:24 (-1) – 20:18\nYoga:   
+    Vyaghata           04:43 – 04:46 (+1)\nKarana:    Bava 20:16 (-1)–0
+ 8:55  /  Balava 08:55–21:41\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :37 – 06:25\n  Abhijit Muhurta  12:02 – 12:44\n  Amrita Kalam     10:4
+ 8 – 12:31\n\n─ Inauspicious ─\n  Rahu Kalam       08:31 – 09:48\n 
+  Gulika Kalam     13:40 – 14:58\n  Yamagandam       11:06 – 12:23\n  D
+ urmuhurtham     12:44 – 13:25\n  Durmuhurtham     14:48 – 15:29\n\n─
+  Choghadiya ─\n  07:13 – 08:31  Amrit\n  08:31 – 09:48  Kaal\n  09:4
+ 8 – 11:06  Shubh\n  11:06 – 12:23  Rog\n  12:23 – 13:40  Udveg\n  13
+ :40 – 14:58  Char\n  14:58 – 16:15  Labh\n  16:15 – 17:33  Amrit\n\n
+ ─ Night Choghadiya ─\n  17:33 – 22:15  Char\n  22:15 – 02:57 (+1) 
+  Rog\n  02:57 (+1) – 07:40 (+1)  Kaal\n  07:40 (+1) – 12:22 (+1)  Labh
+ \n  12:22 (+1) – 17:04 (+1)  Udveg\n  17:04 (+1) – 21:47 (+1)  Shubh\n
+   21:47 (+1) – 02:29 (+1)  Amrit\n  02:29 (+1) – 07:11 (+1)  Char\n\n
+ ─ Special Yogas ─\n  Dagdha Yoga\n\n⚡ Ganda Moola (Jyeshtha)  ·  Sh
+ attila Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Trayodashi · Purva Ashadha · Vajra
+DTSTART;VALUE=DATE:20270203
+DTEND;VALUE=DATE:20270204
+UID:2027-02-03-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Pushya Maasam  ·  Krishna Paks
+ ham  ·  Budhavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07
+ :11  ·  Sunset 17:35  ·  Moonrise 05:34  ·  Moonset 14:54\nSolar sign: 
+ Makara  ·  Lunar sign: Dhanu\n\nTithi:     Krishna Trayodashi 23:30 (-1) 
+ – 01:34 (+1)\nNakshatra: Purva Ashadha      22:34 (-1) – 01:05 (+1)\nY
+ oga:      Vajra              05:05 – 05:35 (+1)\nKarana:    Garaja 23:30
+  (-1)–12:31  /  Vanija 12:31–01:34 (+1)\n\n─ Auspicious ─\n  Brahm
+ a Muhurta   05:35 – 06:23\n  Amrita Kalam     19:47 – 21:33\n\n─ Ina
+ uspicious ─\n  Rahu Kalam       12:23 – 13:41\n  Gulika Kalam     11:0
+ 5 – 12:23\n  Yamagandam       08:29 – 09:47\n  Varjyam          09:10 
+ – 10:56\n  Durmuhurtham     12:02 – 12:44\n\n─ Choghadiya ─\n  07:
+ 11 – 08:29  Labh\n  08:29 – 09:47  Amrit\n  09:47 – 11:05  Kaal\n  1
+ 1:05 – 12:23  Shubh\n  12:23 – 13:41  Rog\n  13:41 – 14:59  Udveg\n 
+  14:59 – 16:17  Char\n  16:17 – 17:35  Labh\n\n─ Night Choghadiya 
+ ─\n  17:35 – 22:17  Udveg\n  22:17 – 02:59 (+1)  Shubh\n  02:59 (+1)
+  – 07:40 (+1)  Amrit\n  07:40 (+1) – 12:22 (+1)  Char\n  12:22 (+1) 
+ – 17:04 (+1)  Rog\n  17:04 (+1) – 21:46 (+1)  Kaal\n  21:46 (+1) – 0
+ 2:28 (+1)  Labh\n  02:28 (+1) – 07:10 (+1)  Udveg\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Shravana · Vyatipata
+DTSTART;VALUE=DATE:20270205
+DTEND;VALUE=DATE:20270206
+UID:2027-02-05-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Pushya Maasam  ·  Krishna Paks
+ ham  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 0
+ 7:10  ·  Sunset 17:37  ·  Moonrise 06:46  ·  Moonset 16:56\nSolar sign:
+  Makara  ·  Lunar sign: Makara\n\nTithi:     Amavasya           03:45 –
+  05:50 (+1)\nNakshatra: Shravana           03:42 – 06:15 (+1)\nYoga:    
+   Vyatipata          06:07 – 06:36 (+1)\nKarana:    Chatushpada 03:45–
+ 16:49  /  Naga 16:49–05:50 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:34 – 06:22\n  Abhijit Muhurta  12:02 – 12:44\n  Amrita Kalam     
+ 18:45 – 20:31\n\n─ Inauspicious ─\n  Rahu Kalam       11:05 – 12:2
+ 3\n  Gulika Kalam     08:28 – 09:46\n  Yamagandam       15:00 – 16:19\
+ n  Varjyam          08:08 – 09:54\n  Durmuhurtham     09:15 – 09:57\n 
+  Durmuhurtham     12:44 – 13:26\n\n─ Choghadiya ─\n  07:10 – 08:28
+   Char\n  08:28 – 09:46  Labh\n  09:46 – 11:05  Amrit\n  11:05 – 12:
+ 23  Kaal\n  12:23 – 13:42  Shubh\n  13:42 – 15:00  Rog\n  15:00 – 16
+ :19  Udveg\n  16:19 – 17:37  Char\n\n─ Night Choghadiya ─\n  17:37 
+ – 01:17 (+1)  Rog\n  01:17 (+1) – 08:57 (+1)  Kaal\n  08:57 (+1) – 1
+ 6:37 (+1)  Labh\n  16:37 (+1) – 00:17 (+1)  Udveg\n  00:17 (+1) – 07:5
+ 7 (+1)  Shubh\n  07:57 (+1) – 15:38 (+1)  Amrit\n  15:38 (+1) – 23:18 
+ (+1)  Char\n  23:18 (+1) – 06:58 (+1)  Rog\n\n─ Special Yogas ─\n  S
+ arvartha Siddhi Yoga\n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Jaya Ekadashi · Mrigashira · Vishkambha
+DTSTART;VALUE=DATE:20270216
+DTEND;VALUE=DATE:20270217
+UID:2027-02-16-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Magha Maasam  ·  Shukla Paksha
+ m  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 06
+ :58  ·  Sunset 17:49  ·  Moonrise 12:55  ·  Moonset 03:40\nSolar sign: 
+ Kumbha  ·  Lunar sign: Mithuna\n\nTithi:     Jaya Ekadashi      04:09 –
+  01:57 (+1)\nNakshatra: Mrigashira         11:23 (-1) – 10:01\nYoga:    
+   Vishkambha         18:01 (-1) – 15:06\nKarana:    Vanija 04:09–15:04
+   /  Vishti 15:04–01:57 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   0
+ 5:22 – 06:10\n  Abhijit Muhurta  12:02 – 12:45\n  Amrita Kalam     23:
+ 07 – 00:37 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       15:06 – 16
+ :28\n  Gulika Kalam     12:23 – 13:45\n  Yamagandam       09:41 – 11:0
+ 2\n  Varjyam          17:53 – 19:22\n  Durmuhurtham     09:08 – 09:51\
+ n  Durmuhurtham     23:04 – 23:57\n\n─ Choghadiya ─\n  06:58 – 08:
+ 19  Rog\n  08:19 – 09:41  Udveg\n  09:41 – 11:02  Char\n  11:02 – 12
+ :23  Labh\n  12:23 – 13:45  Amrit\n  13:45 – 15:06  Kaal\n  15:06 – 
+ 16:28  Shubh\n  16:28 – 17:49  Rog\n\n─ Night Choghadiya ─\n  17:49 
+ – 22:27  Kaal\n  22:27 – 03:06 (+1)  Labh\n  03:06 (+1) – 07:44 (+1)
+   Udveg\n  07:44 (+1) – 12:22 (+1)  Shubh\n  12:22 (+1) – 17:00 (+1)  
+ Amrit\n  17:00 (+1) – 21:39 (+1)  Char\n  21:39 (+1) – 02:17 (+1)  Rog
+ \n  02:17 (+1) – 06:55 (+1)  Kaal\n\n⚡ Jaya Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Pushya · Ayushman
+DTSTART;VALUE=DATE:20270218
+DTEND;VALUE=DATE:20270219
+UID:2027-02-18-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Magha Maasam  ·  Shukla Paksha
+ m  ·  Guruvaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 06:55
+   ·  Sunset 17:51  ·  Moonrise 15:26  ·  Moonset 05:27\nSolar sign: Kum
+ bha  ·  Lunar sign: Karka\n\nTithi:     Shukla Trayodashi  23:37 (-1) –
+  21:13\nNakshatra: Pushya             06:49 – 05:09 (+1)\nYoga:      Ayu
+ shman           12:02 (-1) – 08:54\nKarana:    Kaulava 23:37 (-1)–10:2
+ 5  /  Taitila 10:25–21:13\n\n─ Auspicious ─\n  Brahma Muhurta   05:1
+ 9 – 06:07\n  Abhijit Muhurta  12:01 – 12:45\n  Amrita Kalam     23:11 
+ – 00:41 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       13:45 – 15:07
+ \n  Gulika Kalam     09:39 – 11:01\n  Yamagandam       06:55 – 08:17\n
+   Varjyam          14:16 – 15:45\n  Durmuhurtham     10:34 – 11:18\n  
+ Durmuhurtham     14:56 – 15:40\n\n─ Choghadiya ─\n  06:55 – 08:17 
+  Shubh\n  08:17 – 09:39  Rog\n  09:39 – 11:01  Udveg\n  11:01 – 12:2
+ 3  Char\n  12:23 – 13:45  Labh\n  13:45 – 15:07  Amrit\n  15:07 – 16
+ :29  Kaal\n  16:29 – 17:51  Shubh\n\n─ Night Choghadiya ─\n  17:51 
+ – 22:29  Amrit\n  22:29 – 03:07 (+1)  Char\n  03:07 (+1) – 07:44 (+1
+ )  Rog\n  07:44 (+1) – 12:22 (+1)  Kaal\n  12:22 (+1) – 17:00 (+1)  La
+ bh\n  17:00 (+1) – 21:37 (+1)  Udveg\n  21:37 (+1) – 02:15 (+1)  Shubh
+ \n  02:15 (+1) – 06:53 (+1)  Amrit\n\n─ Special Yogas ─\n  Sarvartha
+  Siddhi Yoga\n  Amrita Siddhi Yoga\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Magha · Atiganda
+DTSTART;VALUE=DATE:20270220
+DTEND;VALUE=DATE:20270221
+UID:2027-02-20-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Magha Maasam  ·  Shukla Paksha
+ m  ·  Shanivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:53
+   ·  Sunset 17:53  ·  Moonrise 17:59  ·  Moonset 06:40\nSolar sign: Kum
+ bha  ·  Lunar sign: Simha\n\nTithi:     Pournami           18:53 (-1) –
+  16:40\nNakshatra: Magha              03:33 – 02:06 (+1)\nYoga:      Ati
+ ganda           02:41 – 23:43\nKarana:    Bava 05:45–16:40  /  Balava 
+ 16:40–03:37 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:17 – 06:
+ 05\n  Abhijit Muhurta  12:01 – 12:45\n  Amrita Kalam     23:51 – 01:21
+  (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       09:38 – 11:01\n  Gulik
+ a Kalam     06:53 – 08:15\n  Yamagandam       13:46 – 15:08\n  Varjyam
+           14:49 – 16:19\n  Durmuhurtham     06:53 – 07:37\n  Durmuhurt
+ ham     07:37 – 08:21\n\n─ Choghadiya ─\n  06:53 – 08:15  Kaal\n  
+ 08:15 – 09:38  Shubh\n  09:38 – 11:01  Rog\n  11:01 – 12:23  Udveg\n
+   12:23 – 13:46  Char\n  13:46 – 15:08  Labh\n  15:08 – 16:31  Amrit
+ \n  16:31 – 17:53  Kaal\n\n─ Night Choghadiya ─\n  17:53 – 01:29 (
+ +1)  Labh\n  01:29 (+1) – 09:05 (+1)  Udveg\n  09:05 (+1) – 16:40 (+1)
+   Shubh\n  16:40 (+1) – 00:16 (+1)  Amrit\n  00:16 (+1) – 07:51 (+1)  
+ Char\n  07:51 (+1) – 15:27 (+1)  Rog\n  15:27 (+1) – 23:02 (+1)  Kaal\
+ n  23:02 (+1) – 06:38 (+1)  Labh\n\n─ Eclipse ─\n  🌕 Lunar Eclips
+ e (Penumbral) — not visible from this location\n  Window:   13:12 – 17
+ :13\n\n⚡ Ganda Moola (Magha)  ·  Pournami  ·  Lunar Eclipse (Penumbral
+ )
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Vijaya Ekadashi · Purva Ashadha · Vyatipata
+DTSTART;VALUE=DATE:20270303
+DTEND;VALUE=DATE:20270304
+UID:2027-03-03-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Magha Maasam  ·  Krishna Paksh
+ am  ·  Budhavaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:3
+ 8  ·  Sunset 18:05  ·  Moonrise 04:12  ·  Moonset 13:45\nSolar sign: Ku
+ mbha  ·  Lunar sign: Dhanu\n\nTithi:     Vijaya Ekadashi    14:33 (-1) 
+ – 16:36\nNakshatra: Purva Ashadha      05:48 (-1) – 08:16\nYoga:      
+ Vyatipata          10:34 (-1) – 11:02\nKarana:    Balava 03:33–16:36  
+ /  Kaulava 16:36–05:41 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :02 – 05:50\n  Amrita Kalam     03:47 (+1) – 05:34 (+1)\n\n─ Inauspi
+ cious ─\n  Rahu Kalam       12:21 – 13:47\n  Gulika Kalam     10:55 
+ – 12:21\n  Yamagandam       08:04 – 09:30\n  Varjyam          17:09 
+ – 18:55\n  Durmuhurtham     11:58 – 12:44\n\n─ Choghadiya ─\n  06:
+ 38 – 08:04  Labh\n  08:04 – 09:30  Amrit\n  09:30 – 10:55  Kaal\n  1
+ 0:55 – 12:21  Shubh\n  12:21 – 13:47  Rog\n  13:47 – 15:13  Udveg\n 
+  15:13 – 16:39  Char\n  16:39 – 18:05  Labh\n\n─ Night Choghadiya 
+ ─\n  18:05 – 22:39  Udveg\n  22:39 – 03:12 (+1)  Shubh\n  03:12 (+1)
+  – 07:46 (+1)  Amrit\n  07:46 (+1) – 12:20 (+1)  Char\n  12:20 (+1) 
+ – 16:54 (+1)  Rog\n  16:54 (+1) – 21:28 (+1)  Kaal\n  21:28 (+1) – 0
+ 2:01 (+1)  Labh\n  02:01 (+1) – 06:35 (+1)  Udveg\n\n⚡ Vijaya Ekadashi
+  — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Maha Shivaratri — Krishna Trayodashi · Shravana · Parigha
+DTSTART;VALUE=DATE:20270305
+DTEND;VALUE=DATE:20270306
+UID:2027-03-05-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Magha Maasam  ·  Krishna Paksh
+ am  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:
+ 35  ·  Sunset 18:07  ·  Moonrise 05:16  ·  Moonset 15:47\nSolar sign: K
+ umbha  ·  Lunar sign: Makara\n\nTithi:     Krishna Trayodashi 18:45 (-1) 
+ – 20:48\nNakshatra: Shravana           10:53 (-1) – 13:28\nYoga:      
+ Parigha            11:36 (-1) – 12:09\nKarana:    Garaja 18:45 (-1)–07
+ :48  /  Vanija 07:48–20:48\n\n─ Auspicious ─\n  Brahma Muhurta   04:
+ 59 – 05:47\n  Abhijit Muhurta  11:58 – 12:44\n  Amrita Kalam     04:25
+  (+1) – 06:10 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       10:54 –
+  12:21\n  Gulika Kalam     08:02 – 09:28\n  Yamagandam       15:14 – 1
+ 6:40\n  Varjyam          17:52 – 19:37\n  Durmuhurtham     08:53 – 09:
+ 40\n  Durmuhurtham     12:44 – 13:30\n\n─ Choghadiya ─\n  06:35 – 
+ 08:02  Char\n  08:02 – 09:28  Labh\n  09:28 – 10:54  Amrit\n  10:54 
+ – 12:21  Kaal\n  12:21 – 13:47  Shubh\n  13:47 – 15:14  Rog\n  15:14
+  – 16:40  Udveg\n  16:40 – 18:07  Char\n\n─ Night Choghadiya ─\n  
+ 18:07 – 22:40  Rog\n  22:40 – 03:13 (+1)  Kaal\n  03:13 (+1) – 07:46
+  (+1)  Labh\n  07:46 (+1) – 12:19 (+1)  Udveg\n  12:19 (+1) – 16:53 (+
+ 1)  Shubh\n  16:53 (+1) – 21:26 (+1)  Amrit\n  21:26 (+1) – 01:59 (+1)
+   Char\n  01:59 (+1) – 06:32 (+1)  Rog\n\n─ Special Yogas ─\n  Sarva
+ rtha Siddhi Yoga\n\n⚡ Maha Shivaratri  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Shatabhisha · Siddha
+DTSTART;VALUE=DATE:20270307
+DTEND;VALUE=DATE:20270308
+UID:2027-03-07-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Magha Maasam  ·  Krishna Paksh
+ am  ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:32 
+  ·  Sunset 18:09  ·  Moonrise 06:07  ·  Moonset 17:49\nSolar sign: Kumb
+ ha  ·  Lunar sign: Kumbha\n\nTithi:     Amavasya           22:36 (-1) –
+  00:02 (+1)\nNakshatra: Shatabhisha        15:51 (-1) – 17:54\nYoga:    
+   Siddha             12:32 (-1) – 12:40\nKarana:    Chatushpada 22:36 (-
+ 1)–11:22  /  Naga 11:22–00:02 (+1)\n\n─ Auspicious ─\n  Brahma Muh
+ urta   04:56 – 05:44\n  Abhijit Muhurta  11:57 – 12:44\n  Amrita Kalam
+      10:05 – 11:49\n\n─ Inauspicious ─\n  Rahu Kalam       16:42 –
+  18:09\n  Gulika Kalam     15:15 – 16:42\n  Yamagandam       12:20 – 1
+ 3:47\n  Varjyam          00:44 (+1) – 02:27 (+1)\n  Durmuhurtham     16:
+ 36 – 17:22\n\n─ Choghadiya ─\n  06:32 – 07:59  Udveg\n  07:59 – 
+ 09:26  Char\n  09:26 – 10:53  Labh\n  10:53 – 12:20  Amrit\n  12:20 
+ – 13:47  Kaal\n  13:47 – 15:15  Shubh\n  15:15 – 16:42  Rog\n  16:42
+  – 18:09  Udveg\n\n─ Night Choghadiya ─\n  18:09 – 01:40 (+1)  Shu
+ bh\n  01:40 (+1) – 09:10 (+1)  Amrit\n  09:10 (+1) – 16:41 (+1)  Char\
+ n  16:41 (+1) – 00:12 (+1)  Rog\n  00:12 (+1) – 08:43 (+1)  Kaal\n  08
+ :43 (+1) – 16:14 (+1)  Labh\n  16:14 (+1) – 23:45 (+1)  Udveg\n  23:45
+  (+1) – 07:16 (+1)  Shubh\n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amalaki Ekadashi · Pushya · Atiganda
+DTSTART;VALUE=DATE:20270318
+DTEND;VALUE=DATE:20270319
+UID:2027-03-18-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Shukla Pak
+ sham  ·  Guruvaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 07:
+ 16  ·  Sunset 19:19  ·  Moonrise 15:22  ·  Moonset 05:03\nSolar sign: M
+ eena  ·  Lunar sign: Karka\n\nTithi:     Amalaki Ekadashi   14:59 (-1) 
+ – 12:35\nNakshatra: Pushya             15:59 (-1) – 14:19\nYoga:      
+ Atiganda           16:51 (-1) – 13:44\nKarana:    Vishti 01:47–12:35  
+ /  Bava 12:35–23:23\n\n─ Auspicious ─\n  Brahma Muhurta   05:40 – 
+ 06:28\n  Abhijit Muhurta  12:53 – 13:42\n  Amrita Kalam     08:21 – 09
+ :51\n\n─ Inauspicious ─\n  Rahu Kalam       14:48 – 16:18\n  Gulika 
+ Kalam     10:17 – 11:47\n  Yamagandam       07:16 – 08:46\n  Varjyam  
+         02:15 (+1) – 03:44 (+1)\n  Durmuhurtham     11:17 – 12:05\n  D
+ urmuhurtham     16:06 – 16:54\n\n─ Choghadiya ─\n  07:16 – 08:46  
+ Shubh\n  08:46 – 10:17  Rog\n  10:17 – 11:47  Udveg\n  11:47 – 13:18
+   Char\n  13:18 – 14:48  Labh\n  14:48 – 16:18  Amrit\n  16:18 – 17:
+ 49  Kaal\n  17:49 – 19:19  Shubh\n\n─ Night Choghadiya ─\n  19:19 
+ – 20:49  Amrit\n  20:49 – 22:18  Char\n  22:18 – 23:47  Rog\n  23:47
+  – 01:17 (+1)  Kaal\n  01:17 (+1) – 02:46 (+1)  Labh\n  02:46 (+1) –
+  04:16 (+1)  Udveg\n  04:16 (+1) – 05:45 (+1)  Shubh\n  05:45 (+1) – 0
+ 7:14 (+1)  Amrit\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n  Amri
+ ta Siddhi Yoga\n\n⚡ Amalaki Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Ashlesha · Sukarma
+DTSTART;VALUE=DATE:20270319
+DTEND;VALUE=DATE:20270320
+UID:2027-03-19-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Shukla Pak
+ sham  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 0
+ 7:14  ·  Sunset 19:20  ·  Moonrise 16:36  ·  Moonset 05:37\nSolar sign:
+  Meena  ·  Lunar sign: Karka\n\nTithi:     Shukla Dwadashi    12:35 (-1) 
+ – 10:13\nNakshatra: Ashlesha           14:19 (-1) – 12:41\nYoga:      
+ Sukarma            13:44 (-1) – 10:39\nKarana:    Balava 23:23 (-1)–10
+ :13  /  Kaulava 10:13–21:05\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :38 – 06:26\n  Abhijit Muhurta  12:53 – 13:41\n  Amrita Kalam     11:1
+ 2 – 12:41\n\n─ Inauspicious ─\n  Rahu Kalam       11:46 – 13:17\n 
+  Gulika Kalam     08:45 – 10:16\n  Yamagandam       16:19 – 17:49\n  V
+ arjyam          23:57 – 01:27 (+1)\n  Durmuhurtham     09:39 – 10:28\n
+   Durmuhurtham     13:41 – 14:30\n\n─ Choghadiya ─\n  07:14 – 08:4
+ 5  Char\n  08:45 – 10:16  Labh\n  10:16 – 11:46  Amrit\n  11:46 – 13
+ :17  Kaal\n  13:17 – 14:48  Shubh\n  14:48 – 16:19  Rog\n  16:19 – 1
+ 7:49  Udveg\n  17:49 – 19:20  Char\n\n─ Night Choghadiya ─\n  19:20 
+ – 20:49  Rog\n  20:49 – 22:18  Kaal\n  22:18 – 23:47  Labh\n  23:47 
+ – 01:16 (+1)  Udveg\n  01:16 (+1) – 02:46 (+1)  Shubh\n  02:46 (+1) 
+ – 04:15 (+1)  Amrit\n  04:15 (+1) – 05:44 (+1)  Char\n  05:44 (+1) –
+  07:13 (+1)  Rog\n\n⚡ Ganda Moola (Ashlesha)  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Magha · Dhriti
+DTSTART;VALUE=DATE:20270320
+DTEND;VALUE=DATE:20270321
+UID:2027-03-20-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Shukla Pak
+ sham  ·  Shanivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 07
+ :13  ·  Sunset 19:21  ·  Moonrise 17:48  ·  Moonset 06:08\nSolar sign: 
+ Meena  ·  Lunar sign: Simha\n\nTithi:     Shukla Trayodashi  10:13 (-1) 
+ – 07:59\nNakshatra: Magha              12:41 (-1) – 11:12\nYoga:      
+ Dhriti             10:39 (-1) – 07:40\nKarana:    Taitila 21:05 (-1)–0
+ 7:59  /  Garaja 07:59–18:56\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :37 – 06:25\n  Abhijit Muhurta  12:53 – 13:41\n  Amrita Kalam     08:5
+ 7 – 10:27\n  Amrita Kalam     03:52 (+1) – 05:23 (+1)\n\n─ Inauspici
+ ous ─\n  Rahu Kalam       10:15 – 11:46\n  Gulika Kalam     07:13 – 
+ 08:44\n  Yamagandam       14:48 – 16:19\n  Varjyam          18:46 – 20
+ :17\n  Durmuhurtham     07:13 – 08:01\n  Durmuhurtham     08:01 – 08:5
+ 0\n\n─ Choghadiya ─\n  07:13 – 08:44  Kaal\n  08:44 – 10:15  Shubh
+ \n  10:15 – 11:46  Rog\n  11:46 – 13:17  Udveg\n  13:17 – 14:48  Cha
+ r\n  14:48 – 16:19  Labh\n  16:19 – 17:50  Amrit\n  17:50 – 19:21  K
+ aal\n\n─ Night Choghadiya ─\n  19:21 – 20:50  Labh\n  20:50 – 22:1
+ 9  Udveg\n  22:19 – 23:47  Shubh\n  23:47 – 01:16 (+1)  Amrit\n  01:16
+  (+1) – 02:45 (+1)  Char\n  02:45 (+1) – 04:14 (+1)  Rog\n  04:14 (+1)
+  – 05:42 (+1)  Kaal\n  05:42 (+1) – 07:11 (+1)  Labh\n\n⚡ Ganda Mool
+ a (Magha)  ·  Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Holika Dahan — Pournami · Purva Phalguni · Ganda
+DTSTART;VALUE=DATE:20270321
+DTEND;VALUE=DATE:20270322
+UID:2027-03-21-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Shukla Pak
+ sham  ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 07:1
+ 1  ·  Sunset 19:22  ·  Moonrise 18:59  ·  Moonset 06:35\nSolar sign: Me
+ ena  ·  Lunar sign: Simha\n\nTithi:     Pournami           05:57 – 04:1
+ 1 (+1)\nNakshatra: Purva Phalguni     11:12 (-1) – 09:55\nYoga:      Gan
+ da              04:51 – 02:15 (+1)\nKarana:    Vishti 05:57–17:01  /  
+ Bava 17:01–04:11 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:35 
+ – 06:23\n  Abhijit Muhurta  12:52 – 13:41\n  Amrita Kalam     02:01 (+
+ 1) – 03:33 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       17:51 – 19
+ :22\n  Gulika Kalam     16:19 – 17:51\n  Yamagandam       13:17 – 14:4
+ 8\n  Varjyam          16:49 – 18:21\n  Durmuhurtham     17:45 – 18:33\
+ n\n─ Choghadiya ─\n  07:11 – 08:43  Udveg\n  08:43 – 10:14  Char\n
+   10:14 – 11:45  Labh\n  11:45 – 13:17  Amrit\n  13:17 – 14:48  Kaal
+ \n  14:48 – 16:19  Shubh\n  16:19 – 17:51  Rog\n  17:51 – 19:22  Udv
+ eg\n\n─ Night Choghadiya ─\n  19:22 – 05:48 (+1)  Shubh\n  05:48 (+1
+ ) – 16:15 (+1)  Amrit\n  16:15 (+1) – 02:41 (+1)  Char\n  02:41 (+1) 
+ – 13:08 (+1)  Rog\n  13:08 (+1) – 23:34 (+1)  Kaal\n  23:34 (+1) – 1
+ 0:00 (+1)  Labh\n  10:00 (+1) – 20:27 (+1)  Udveg\n  20:27 (+1) – 06:5
+ 3 (+1)  Shubh\n\n⚡ Holika Dahan  ·  Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Papamochani Ekadashi · Dhanishtha · Sadhya
+DTSTART;VALUE=DATE:20270402
+DTEND;VALUE=DATE:20270403
+UID:2027-04-02-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Krishna Pa
+ ksham  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 
+ 06:53  ·  Sunset 19:33  ·  Moonrise 04:44  ·  Moonset 15:35\nSolar sign
+ : Meena  ·  Lunar sign: Makara\n\nTithi:     Papamochani Ekadashi 09:50 (
+ -1) – 11:51\nNakshatra: Dhanishtha         21:40 (-1) – 00:07 (+1)\nYo
+ ga:      Sadhya             19:26 (-1) – 19:54\nKarana:    Balava 22:52 
+ (-1)–11:51  /  Kaulava 11:51–00:46 (+1)\n\n─ Auspicious ─\n  Brahm
+ a Muhurta   05:17 – 06:05\n  Abhijit Muhurta  12:48 – 13:38\n  Amrita 
+ Kalam     12:39 – 14:25\n\n─ Inauspicious ─\n  Rahu Kalam       11:3
+ 8 – 13:13\n  Gulika Kalam     08:28 – 10:03\n  Yamagandam       16:23 
+ – 17:58\n  Durmuhurtham     09:25 – 10:16\n  Durmuhurtham     13:38 
+ – 14:29\n\n─ Choghadiya ─\n  06:53 – 08:28  Char\n  08:28 – 10:0
+ 3  Labh\n  10:03 – 11:38  Amrit\n  11:38 – 13:13  Kaal\n  13:13 – 14
+ :48  Shubh\n  14:48 – 16:23  Rog\n  16:23 – 17:58  Udveg\n  17:58 – 
+ 19:33  Char\n\n─ Night Choghadiya ─\n  19:33 – 20:58  Rog\n  20:58 
+ – 22:23  Kaal\n  22:23 – 23:47  Labh\n  23:47 – 01:12 (+1)  Udveg\n 
+  01:12 (+1) – 02:37 (+1)  Shubh\n  02:37 (+1) – 04:02 (+1)  Amrit\n  0
+ 4:02 (+1) – 05:27 (+1)  Char\n  05:27 (+1) – 06:52 (+1)  Rog\n\n─ Sp
+ ecial Yogas ─\n  Siddha Yoga\n\n⚡ Papamochani Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Shatabhisha · Shubha
+DTSTART;VALUE=DATE:20270403
+DTEND;VALUE=DATE:20270404
+UID:2027-04-03-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Krishna Pa
+ ksham  ·  Shanivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 0
+ 6:52  ·  Sunset 19:34  ·  Moonrise 05:09  ·  Moonset 16:36\nSolar sign:
+  Meena  ·  Lunar sign: Kumbha\n\nTithi:     Krishna Dwadashi   11:51 (-1)
+  – 13:36\nNakshatra: Shatabhisha        00:07 – 02:15 (+1)\nYoga:     
+  Shubha             19:54 (-1) – 20:09\nKarana:    Taitila 00:46–13:36
+   /  Garaja 13:36–02:21 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   0
+ 5:16 – 06:04\n  Abhijit Muhurta  12:47 – 13:38\n  Amrita Kalam     18:
+ 24 – 20:09\n\n─ Inauspicious ─\n  Rahu Kalam       10:02 – 11:37\n
+   Gulika Kalam     06:52 – 08:27\n  Yamagandam       14:48 – 16:23\n  
+ Varjyam          07:57 – 09:42\n  Durmuhurtham     06:52 – 07:42\n  Du
+ rmuhurtham     07:42 – 08:33\n\n─ Choghadiya ─\n  06:52 – 08:27  K
+ aal\n  08:27 – 10:02  Shubh\n  10:02 – 11:37  Rog\n  11:37 – 13:13  
+ Udveg\n  13:13 – 14:48  Char\n  14:48 – 16:23  Labh\n  16:23 – 17:59
+   Amrit\n  17:59 – 19:34  Kaal\n\n─ Night Choghadiya ─\n  19:34 – 
+ 20:58  Labh\n  20:58 – 22:23  Udveg\n  22:23 – 23:47  Shubh\n  23:47 
+ – 01:12 (+1)  Amrit\n  01:12 (+1) – 02:37 (+1)  Char\n  02:37 (+1) –
+  04:01 (+1)  Rog\n  04:01 (+1) – 05:26 (+1)  Kaal\n  05:26 (+1) – 06:5
+ 0 (+1)  Labh\n\n⚡ Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Purva Bhadrapada ·
+  Shukla
+DTSTART;VALUE=DATE:20270404
+DTEND;VALUE=DATE:20270405
+UID:2027-04-04-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Krishna Pa
+ ksham  ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:
+ 50  ·  Sunset 19:35  ·  Moonrise 05:33  ·  Moonset 17:37\nSolar sign: M
+ eena  ·  Lunar sign: Kumbha\n\nTithi:     Krishna Trayodashi 13:36 (-1) 
+ – 14:59\nNakshatra: Purva Bhadrapada   02:15 – 03:59 (+1)\nYoga:      
+ Shukla             20:09 (-1) – 20:06\nKarana:    Vanija 02:21–14:59  
+ /  Vishti 14:59–03:30 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 14 – 06:02\n  Abhijit Muhurta  12:47 – 13:38\n  Amrita Kalam     19:24
+  – 21:07\n\n─ Inauspicious ─\n  Rahu Kalam       17:59 – 19:35\n  
+ Gulika Kalam     16:24 – 17:59\n  Yamagandam       13:12 – 14:48\n  Va
+ rjyam          09:07 – 10:50\n  Durmuhurtham     17:53 – 18:44\n\n─ 
+ Choghadiya ─\n  06:50 – 08:26  Udveg\n  08:26 – 10:01  Char\n  10:01
+  – 11:37  Labh\n  11:37 – 13:12  Amrit\n  13:12 – 14:48  Kaal\n  14:
+ 48 – 16:24  Shubh\n  16:24 – 17:59  Rog\n  17:59 – 19:35  Udveg\n\n
+ ─ Night Choghadiya ─\n  19:35 – 23:59  Shubh\n  23:59 – 04:23 (+1)
+   Amrit\n  04:23 (+1) – 08:47 (+1)  Char\n  08:47 (+1) – 13:11 (+1)  R
+ og\n  13:11 (+1) – 17:35 (+1)  Kaal\n  17:35 (+1) – 21:59 (+1)  Labh\n
+   21:59 (+1) – 02:23 (+1)  Udveg\n  02:23 (+1) – 06:47 (+1)  Shubh\n\n
+ ⚡ Masa Shivaratri  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Revati · Indra
+DTSTART;VALUE=DATE:20270406
+DTEND;VALUE=DATE:20270407
+UID:2027-04-06-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Parabhava Nama Samvatsara  ·  Phalguna Maasam  ·  Krishna Pa
+ ksham  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise
+  06:47  ·  Sunset 19:37  ·  Moonrise 06:21  ·  Moonset 19:45\nSolar sig
+ n: Meena  ·  Lunar sign: Meena\n\nTithi:     Amavasya           15:54 (-1
+ ) – 16:19\nNakshatra: Revati             05:15 – 06:01 (+1)\nYoga:    
+   Indra              19:41 (-1) – 18:52\nKarana:    Naga 04:10–16:19  
+ /  Kinstughna 16:19–04:20 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta  
+  05:11 – 05:59\n  Abhijit Muhurta  12:46 – 13:38\n  Amrita Kalam     0
+ 3:32 (+1) – 05:11 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       16:24
+  – 18:00\n  Gulika Kalam     13:12 – 14:48\n  Yamagandam       10:00 
+ – 11:36\n  Varjyam          17:38 – 19:17\n  Durmuhurtham     09:21 
+ – 10:12\n  Durmuhurtham     00:04 (+1) – 00:49 (+1)\n\n─ Choghadiya 
+ ─\n  06:47 – 08:23  Rog\n  08:23 – 10:00  Udveg\n  10:00 – 11:36  
+ Char\n  11:36 – 13:12  Labh\n  13:12 – 14:48  Amrit\n  14:48 – 16:24
+   Kaal\n  16:24 – 18:00  Shubh\n  18:00 – 19:37  Rog\n\n─ Night Chog
+ hadiya ─\n  19:37 – 23:59 (+1)  Kaal\n  23:59 (+1) – 04:21 (+1)  Lab
+ h\n  04:21 (+1) – 08:43 (+1)  Udveg\n  08:43 (+1) – 13:05 (+1)  Shubh\
+ n  13:05 (+1) – 17:27 (+1)  Amrit\n  17:27 (+1) – 21:49 (+1)  Char\n  
+ 21:49 (+1) – 02:11 (+1)  Rog\n  02:11 (+1) – 06:33 (+1)  Kaal\n\n⚡ G
+ anda Moola (Revati)  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Kamada Ekadashi · Magha · Ganda
+DTSTART;VALUE=DATE:20270416
+DTEND;VALUE=DATE:20270417
+UID:2027-04-16-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Chaitra Maasam  ·  Shukla Paksh
+ am  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:
+ 33  ·  Sunset 19:46  ·  Moonrise 15:34  ·  Moonset 04:09\nSolar sign: M
+ esha  ·  Lunar sign: Simha\n\nTithi:     Kamada Ekadashi    23:44 (-1) 
+ – 21:28\nNakshatra: Magha              20:50 (-1) – 19:19\nYoga:      
+ Ganda              18:19 (-1) – 15:20\nKarana:    Vanija 23:44 (-1)–10
+ :35  /  Vishti 10:35–21:28\n\n─ Auspicious ─\n  Brahma Muhurta   04:
+ 57 – 05:45\n  Abhijit Muhurta  12:43 – 13:36\n  Amrita Kalam     17:04
+  – 18:34\n\n─ Inauspicious ─\n  Rahu Kalam       11:30 – 13:09\n  
+ Gulika Kalam     08:12 – 09:51\n  Yamagandam       16:28 – 18:07\n  Va
+ rjyam          08:05 – 09:34\n  Varjyam          02:52 (+1) – 04:23 (+
+ 1)\n  Durmuhurtham     09:11 – 10:04\n  Durmuhurtham     13:36 – 14:29
+ \n\n─ Choghadiya ─\n  06:33 – 08:12  Char\n  08:12 – 09:51  Labh\n
+   09:51 – 11:30  Amrit\n  11:30 – 13:09  Kaal\n  13:09 – 14:48  Shub
+ h\n  14:48 – 16:28  Rog\n  16:28 – 18:07  Udveg\n  18:07 – 19:46  Ch
+ ar\n\n─ Night Choghadiya ─\n  19:46 – 21:06  Rog\n  21:06 – 22:27 
+  Kaal\n  22:27 – 23:48  Labh\n  23:48 – 01:09 (+1)  Udveg\n  01:09 (+1
+ ) – 02:29 (+1)  Shubh\n  02:29 (+1) – 03:50 (+1)  Amrit\n  03:50 (+1) 
+ – 05:11 (+1)  Char\n  05:11 (+1) – 06:31 (+1)  Rog\n\n─ Special Yoga
+ s ─\n  Siddha Yoga\n\n⚡ Ganda Moola (Magha)  ·  Kamada Ekadashi — f
+ asting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Purva Phalguni · Vriddhi
+DTSTART;VALUE=DATE:20270417
+DTEND;VALUE=DATE:20270418
+UID:2027-04-17-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Chaitra Maasam  ·  Shukla Paksh
+ am  ·  Shanivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:3
+ 1  ·  Sunset 19:47  ·  Moonrise 16:43  ·  Moonset 04:36\nSolar sign: Me
+ sha  ·  Lunar sign: Simha\n\nTithi:     Shukla Dwadashi    21:28 (-1) –
+  19:24\nNakshatra: Purva Phalguni     19:19 (-1) – 17:59\nYoga:      Vri
+ ddhi            15:20 (-1) – 12:29\nKarana:    Bava 21:28 (-1)–08:24  
+ /  Balava 08:24–19:24\n\n─ Auspicious ─\n  Brahma Muhurta   04:55 
+ – 05:43\n  Abhijit Muhurta  12:43 – 13:36\n  Amrita Kalam     11:56 
+ – 13:27\n\n─ Inauspicious ─\n  Rahu Kalam       09:50 – 11:30\n  G
+ ulika Kalam     06:31 – 08:11\n  Yamagandam       14:48 – 16:28\n  Var
+ jyam          00:51 (+1) – 02:23 (+1)\n  Durmuhurtham     06:31 – 07:2
+ 4\n  Durmuhurtham     07:24 – 08:17\n\n─ Choghadiya ─\n  06:31 – 0
+ 8:11  Kaal\n  08:11 – 09:50  Shubh\n  09:50 – 11:30  Rog\n  11:30 – 
+ 13:09  Udveg\n  13:09 – 14:48  Char\n  14:48 – 16:28  Labh\n  16:28 
+ – 18:07  Amrit\n  18:07 – 19:47  Kaal\n\n─ Night Choghadiya ─\n  1
+ 9:47 – 21:07  Labh\n  21:07 – 22:28  Udveg\n  22:28 – 23:48  Shubh\n
+   23:48 – 01:08 (+1)  Amrit\n  01:08 (+1) – 02:29 (+1)  Char\n  02:29 
+ (+1) – 03:49 (+1)  Rog\n  03:49 (+1) – 05:10 (+1)  Kaal\n  05:10 (+1) 
+ – 06:30 (+1)  Labh\n\n⚡ Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Uttara Phalguni · Dhruva
+DTSTART;VALUE=DATE:20270418
+DTEND;VALUE=DATE:20270419
+UID:2027-04-18-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Chaitra Maasam  ·  Shukla Paksh
+ am  ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:30 
+  ·  Sunset 19:48  ·  Moonrise 17:51  ·  Moonset 05:03\nSolar sign: Mesh
+ a  ·  Lunar sign: Kanya\n\nTithi:     Shukla Trayodashi  19:24 (-1) – 1
+ 7:37\nNakshatra: Uttara Phalguni    17:59 (-1) – 16:55\nYoga:      Dhruv
+ a             12:29 (-1) – 09:51\nKarana:    Taitila 06:28–17:37  /  G
+ araja 17:37–04:50 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:54 
+ – 05:42\n  Abhijit Muhurta  12:42 – 13:35\n  Amrita Kalam     10:02 
+ – 11:34\n\n─ Inauspicious ─\n  Rahu Kalam       18:08 – 19:48\n  G
+ ulika Kalam     16:28 – 18:08\n  Yamagandam       13:09 – 14:49\n  Var
+ jyam          01:03 (+1) – 02:36 (+1)\n  Durmuhurtham     18:01 – 18:5
+ 4\n\n─ Choghadiya ─\n  06:30 – 08:10  Udveg\n  08:10 – 09:49  Char
+ \n  09:49 – 11:29  Labh\n  11:29 – 13:09  Amrit\n  13:09 – 14:49  Ka
+ al\n  14:49 – 16:28  Shubh\n  16:28 – 18:08  Rog\n  18:08 – 19:48  U
+ dveg\n\n─ Night Choghadiya ─\n  19:48 – 00:08 (+1)  Shubh\n  00:08 (
+ +1) – 04:28 (+1)  Amrit\n  04:28 (+1) – 08:47 (+1)  Char\n  08:47 (+1)
+  – 13:07 (+1)  Rog\n  13:07 (+1) – 17:27 (+1)  Kaal\n  17:27 (+1) – 
+ 21:47 (+1)  Labh\n  21:47 (+1) – 02:07 (+1)  Udveg\n  02:07 (+1) – 06:
+ 27 (+1)  Shubh\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Chitra · Vajra
+DTSTART;VALUE=DATE:20270420
+DTEND;VALUE=DATE:20270421
+UID:2027-04-20-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Chaitra Maasam  ·  Shukla Paksh
+ am  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 06
+ :27  ·  Sunset 19:49  ·  Moonrise 20:06  ·  Moonset 05:57\nSolar sign: 
+ Mesha  ·  Lunar sign: Tula\n\nTithi:     Pournami           16:09 (-1) 
+ – 15:07\nNakshatra: Chitra             16:11 (-1) – 15:51\nYoga:      
+ Vajra              05:24 – 03:41 (+1)\nKarana:    Bava 03:35–15:07  / 
+  Balava 15:07–02:45 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:51
+  – 05:39\n  Abhijit Muhurta  12:42 – 13:35\n  Amrita Kalam     09:32 
+ – 11:07\n\n─ Inauspicious ─\n  Rahu Kalam       16:29 – 18:09\n  G
+ ulika Kalam     13:08 – 14:49\n  Yamagandam       09:48 – 11:28\n  Var
+ jyam          21:29 – 23:05\n  Durmuhurtham     09:08 – 10:01\n  Durmu
+ hurtham     00:04 (+1) – 00:46 (+1)\n\n─ Choghadiya ─\n  06:27 – 0
+ 8:08  Rog\n  08:08 – 09:48  Udveg\n  09:48 – 11:28  Char\n  11:28 – 
+ 13:08  Labh\n  13:08 – 14:49  Amrit\n  14:49 – 16:29  Kaal\n  16:29 
+ – 18:09  Shubh\n  18:09 – 19:49  Rog\n\n─ Night Choghadiya ─\n  19
+ :49 – 03:07 (+1)  Kaal\n  03:07 (+1) – 10:25 (+1)  Labh\n  10:25 (+1) 
+ – 17:43 (+1)  Udveg\n  17:43 (+1) – 01:01 (+1)  Shubh\n  01:01 (+1) 
+ – 08:20 (+1)  Amrit\n  08:20 (+1) – 15:38 (+1)  Char\n  15:38 (+1) –
+  22:56 (+1)  Rog\n  22:56 (+1) – 06:14 (+1)  Kaal\n\n⚡ Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Varuthini Ekadashi · Shatabhisha · Indra
+DTSTART;VALUE=DATE:20270501
+DTEND;VALUE=DATE:20270502
+UID:2027-05-01-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Chaitra Maasam  ·  Krishna Paks
+ ham  ·  Shanivaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 06:
+ 14  ·  Sunset 20:00  ·  Moonrise 03:34  ·  Moonset 15:23\nSolar sign: M
+ esha  ·  Lunar sign: Kumbha\n\nTithi:     Varuthini Ekadashi 02:36 – 03
+ :57 (+1)\nNakshatra: Shatabhisha        07:21 (-1) – 09:34\nYoga:      I
+ ndra              03:26 – 03:30 (+1)\nKarana:    Bava 02:36–15:20  /  
+ Balava 15:20–03:57 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:38 
+ – 05:26\n  Abhijit Muhurta  12:39 – 13:34\n  Amrita Kalam     02:48 (+
+ 1) – 04:31 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       09:40 – 11
+ :23\n  Gulika Kalam     06:14 – 07:57\n  Yamagandam       14:50 – 16:3
+ 3\n  Varjyam          16:28 – 18:11\n  Durmuhurtham     06:14 – 07:09\
+ n  Durmuhurtham     07:09 – 08:04\n\n─ Choghadiya ─\n  06:14 – 07:
+ 57  Kaal\n  07:57 – 09:40  Shubh\n  09:40 – 11:23  Rog\n  11:23 – 13
+ :07  Udveg\n  13:07 – 14:50  Char\n  14:50 – 16:33  Labh\n  16:33 – 
+ 18:16  Amrit\n  18:16 – 20:00  Kaal\n\n─ Night Choghadiya ─\n  20:00
+  – 00:16 (+1)  Labh\n  00:16 (+1) – 04:32 (+1)  Udveg\n  04:32 (+1) 
+ – 08:49 (+1)  Shubh\n  08:49 (+1) – 13:05 (+1)  Amrit\n  13:05 (+1) 
+ – 17:22 (+1)  Char\n  17:22 (+1) – 21:38 (+1)  Rog\n  21:38 (+1) – 0
+ 1:55 (+1)  Kaal\n  01:55 (+1) – 06:11 (+1)  Labh\n\n─ Special Yogas 
+ ─\n  Visha Yoga\n\n⚡ Varuthini Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Trayodashi · Uttara Bhadrapada · Vishkambha
+DTSTART;VALUE=DATE:20270503
+DTEND;VALUE=DATE:20270504
+UID:2027-05-03-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Chaitra Maasam  ·  Krishna Paks
+ ham  ·  Somavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 06:1
+ 1  ·  Sunset 20:01  ·  Moonrise 04:21  ·  Moonset 17:28\nSolar sign: Me
+ sha  ·  Lunar sign: Meena\n\nTithi:     Krishna Trayodashi 04:50 – 05:1
+ 3 (+1)\nNakshatra: Uttara Bhadrapada  11:24 (-1) – 12:47\nYoga:      Vis
+ hkambha         03:12 – 02:31 (+1)\nKarana:    Garaja 04:50–17:06  /  
+ Vanija 17:06–05:13 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:35 
+ – 05:23\n  Abhijit Muhurta  12:39 – 13:34\n  Amrita Kalam     07:43 
+ – 09:24\n\n─ Inauspicious ─\n  Rahu Kalam       07:55 – 09:39\n  G
+ ulika Kalam     14:50 – 16:34\n  Yamagandam       11:23 – 13:06\n  Var
+ jyam          01:14 (+1) – 02:53 (+1)\n  Durmuhurtham     13:34 – 14:2
+ 9\n  Durmuhurtham     16:20 – 17:15\n\n─ Choghadiya ─\n  06:11 – 0
+ 7:55  Amrit\n  07:55 – 09:39  Kaal\n  09:39 – 11:23  Shubh\n  11:23 
+ – 13:06  Rog\n  13:06 – 14:50  Udveg\n  14:50 – 16:34  Char\n  16:34
+  – 18:18  Labh\n  18:18 – 20:01  Amrit\n\n─ Night Choghadiya ─\n  
+ 20:01 – 00:17 (+1)  Char\n  00:17 (+1) – 04:33 (+1)  Rog\n  04:33 (+1)
+  – 08:49 (+1)  Kaal\n  08:49 (+1) – 13:05 (+1)  Labh\n  13:05 (+1) –
+  17:21 (+1)  Udveg\n  17:21 (+1) – 21:37 (+1)  Shubh\n  21:37 (+1) – 0
+ 1:53 (+1)  Amrit\n  01:53 (+1) – 06:09 (+1)  Char\n\n⚡ Soma Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Ashvini · Ayushman
+DTSTART;VALUE=DATE:20270505
+DTEND;VALUE=DATE:20270506
+UID:2027-05-05-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Chaitra Maasam  ·  Krishna Paks
+ ham  ·  Budhavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 06:
+ 09  ·  Sunset 20:03  ·  Moonrise 05:17  ·  Moonset 19:46\nSolar sign: M
+ esha  ·  Lunar sign: Mesha\n\nTithi:     Amavasya           05:06 – 04:
+ 29 (+1)\nNakshatra: Ashvini            13:40 (-1) – 14:03\nYoga:      Ay
+ ushman           01:27 – 23:58\nKarana:    Chatushpada 05:06–16:51  / 
+  Naga 16:51–04:29 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:33 
+ – 05:21\n  Amrita Kalam     06:44 – 08:22\n\n─ Inauspicious ─\n  R
+ ahu Kalam       13:06 – 14:50\n  Gulika Kalam     11:22 – 13:06\n  Yam
+ agandam       07:53 – 09:38\n  Varjyam          09:59 – 11:37\n  Varjy
+ am          23:37 – 01:12 (+1)\n  Durmuhurtham     12:38 – 13:34\n\n
+ ─ Choghadiya ─\n  06:09 – 07:53  Labh\n  07:53 – 09:38  Amrit\n  0
+ 9:38 – 11:22  Kaal\n  11:22 – 13:06  Shubh\n  13:06 – 14:50  Rog\n  
+ 14:50 – 16:35  Udveg\n  16:35 – 18:19  Char\n  18:19 – 20:03  Labh\n
+ \n─ Night Choghadiya ─\n  20:03 – 03:18 (+1)  Udveg\n  03:18 (+1) 
+ – 10:32 (+1)  Shubh\n  10:32 (+1) – 17:46 (+1)  Amrit\n  17:46 (+1) 
+ – 01:01 (+1)  Char\n  01:01 (+1) – 08:15 (+1)  Rog\n  08:15 (+1) – 1
+ 5:30 (+1)  Kaal\n  15:30 (+1) – 22:44 (+1)  Labh\n  22:44 (+1) – 05:59
+  (+1)  Udveg\n\n⚡ Ganda Moola (Ashvini)  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Mohini Ekadashi · Hasta · Vajra
+DTSTART;VALUE=DATE:20270516
+DTEND;VALUE=DATE:20270517
+UID:2027-05-16-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Vaishakha Maasam  ·  Shukla Pak
+ sham  ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 05:5
+ 9  ·  Sunset 20:13  ·  Moonrise 16:47  ·  Moonset 03:32\nSolar sign: Vr
+ ishabha  ·  Lunar sign: Kanya\n\nTithi:     Mohini Ekadashi    08:01 (-1)
+  – 06:11\nNakshatra: Hasta              00:55 – 00:06 (+1)\nYoga:     
+  Vajra              18:11 (-1) – 15:46\nKarana:    Vishti 19:04 (-1)–0
+ 6:11  /  Bava 06:11–17:24\n\n─ Auspicious ─\n  Brahma Muhurta   04:2
+ 3 – 05:11\n  Abhijit Muhurta  12:37 – 13:34\n  Amrita Kalam     18:18 
+ – 19:51\n\n─ Inauspicious ─\n  Rahu Kalam       18:26 – 20:13\n  G
+ ulika Kalam     16:39 – 18:26\n  Yamagandam       13:06 – 14:53\n  Var
+ jyam          09:02 – 10:35\n  Durmuhurtham     18:19 – 19:16\n\n─ C
+ hoghadiya ─\n  05:59 – 07:45  Udveg\n  07:45 – 09:32  Char\n  09:32 
+ – 11:19  Labh\n  11:19 – 13:06  Amrit\n  13:06 – 14:53  Kaal\n  14:5
+ 3 – 16:39  Shubh\n  16:39 – 18:26  Rog\n  18:26 – 20:13  Udveg\n\n
+ ─ Night Choghadiya ─\n  20:13 – 21:26  Shubh\n  21:26 – 22:39  Amr
+ it\n  22:39 – 23:52  Char\n  23:52 – 01:05 (+1)  Rog\n  01:05 (+1) –
+  02:19 (+1)  Kaal\n  02:19 (+1) – 03:32 (+1)  Labh\n  03:32 (+1) – 04:
+ 45 (+1)  Udveg\n  04:45 (+1) – 05:58 (+1)  Shubh\n\n─ Special Yogas 
+ ─\n  Sarvartha Siddhi Yoga\n  Amrita Siddhi Yoga\n\n⚡ Mohini Ekadashi 
+ — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Chitra · Siddhi
+DTSTART;VALUE=DATE:20270517
+DTEND;VALUE=DATE:20270518
+UID:2027-05-17-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Vaishakha Maasam  ·  Shukla Pak
+ sham  ·  Somavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 05:
+ 58  ·  Sunset 20:14  ·  Moonrise 17:54  ·  Moonset 03:58\nSolar sign: V
+ rishabha  ·  Lunar sign: Kanya\n\nTithi:     Shukla Trayodashi  04:42 –
+  03:37 (+1)\nNakshatra: Chitra             00:06 – 23:41\nYoga:      Sid
+ dhi             15:46 (-1) – 13:39\nKarana:    Kaulava 04:42–16:06  / 
+  Taitila 16:06–03:37 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:2
+ 2 – 05:10\n  Abhijit Muhurta  12:37 – 13:34\n  Amrita Kalam     17:23 
+ – 18:58\n\n─ Inauspicious ─\n  Rahu Kalam       07:45 – 09:32\n  G
+ ulika Kalam     14:53 – 16:40\n  Yamagandam       11:19 – 13:06\n  Var
+ jyam          07:58 – 09:32\n  Varjyam          05:17 (+1) – 06:53 (+1
+ )\n  Durmuhurtham     13:34 – 14:31\n  Durmuhurtham     16:26 – 17:23\
+ n\n─ Choghadiya ─\n  05:58 – 07:45  Amrit\n  07:45 – 09:32  Kaal\n
+   09:32 – 11:19  Shubh\n  11:19 – 13:06  Rog\n  13:06 – 14:53  Udveg
+ \n  14:53 – 16:40  Char\n  16:40 – 18:27  Labh\n  18:27 – 20:14  Amr
+ it\n\n─ Night Choghadiya ─\n  20:14 – 00:27 (+1)  Char\n  00:27 (+1)
+  – 04:39 (+1)  Rog\n  04:39 (+1) – 08:52 (+1)  Kaal\n  08:52 (+1) – 
+ 13:05 (+1)  Labh\n  13:05 (+1) – 17:18 (+1)  Udveg\n  17:18 (+1) – 21:
+ 31 (+1)  Shubh\n  21:31 (+1) – 01:43 (+1)  Amrit\n  01:43 (+1) – 05:56
+  (+1)  Char\n\n⚡ Soma Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Vishakha · Variyan
+DTSTART;VALUE=DATE:20270519
+DTEND;VALUE=DATE:20270520
+UID:2027-05-19-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Vaishakha Maasam  ·  Shukla Pak
+ sham  ·  Budhavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 05
+ :56  ·  Sunset 20:16  ·  Moonrise 20:05  ·  Moonset 05:01\nSolar sign: 
+ Vrishabha  ·  Lunar sign: Tula\n\nTithi:     Pournami           02:59 –
+  02:50 (+1)\nNakshatra: Vishakha           23:42 (-1) – 00:11 (+1)\nYoga
+ :      Variyan            11:52 (-1) – 10:28\nKarana:    Vishti 02:59–
+ 14:51  /  Bava 14:51–02:50 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   04:20 – 05:08\n  Amrita Kalam     15:12 – 16:50\n\n─ Inauspicious 
+ ─\n  Rahu Kalam       13:06 – 14:53\n  Gulika Kalam     11:19 – 13:0
+ 6\n  Yamagandam       07:44 – 09:31\n  Varjyam          04:21 (+1) – 0
+ 6:01 (+1)\n  Durmuhurtham     12:37 – 13:35\n\n─ Choghadiya ─\n  05:
+ 56 – 07:44  Labh\n  07:44 – 09:31  Amrit\n  09:31 – 11:19  Kaal\n  1
+ 1:19 – 13:06  Shubh\n  13:06 – 14:53  Rog\n  14:53 – 16:41  Udveg\n 
+  16:41 – 18:28  Char\n  18:28 – 20:16  Labh\n\n─ Night Choghadiya 
+ ─\n  20:16 – 06:27 (+1)  Udveg\n  06:27 (+1) – 16:39 (+1)  Shubh\n  
+ 16:39 (+1) – 02:51 (+1)  Amrit\n  02:51 (+1) – 13:02 (+1)  Char\n  13:
+ 02 (+1) – 23:14 (+1)  Rog\n  23:14 (+1) – 09:26 (+1)  Kaal\n  09:26 (+
+ 1) – 19:38 (+1)  Labh\n  19:38 (+1) – 05:49 (+1)  Udveg\n\n⚡ Pournam
+ i
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Apara Ekadashi · Revati · Ayushman
+DTSTART;VALUE=DATE:20270531
+DTEND;VALUE=DATE:20270601
+UID:2027-05-31-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Vaishakha Maasam  ·  Krishna Pa
+ ksham  ·  Somavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 05
+ :49  ·  Sunset 20:25  ·  Moonrise 02:46  ·  Moonset 16:15\nSolar sign: 
+ Vrishabha  ·  Lunar sign: Meena\n\nTithi:     Apara Ekadashi     16:55 (-
+ 1) – 17:18\nNakshatra: Revati             20:18 (-1) – 21:18\nYoga:   
+    Ayushman           11:26 (-1) – 10:51\nKarana:    Balava 05:11–17:1
+ 8  /  Kaulava 17:18–05:18 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta  
+  04:13 – 05:01\n  Abhijit Muhurta  12:38 – 13:36\n  Amrita Kalam     1
+ 8:48 – 20:28\n\n─ Inauspicious ─\n  Rahu Kalam       07:39 – 09:28
+ \n  Gulika Kalam     14:56 – 16:46\n  Yamagandam       11:18 – 13:07\n
+   Varjyam          08:48 – 10:28\n  Durmuhurtham     13:36 – 14:35\n  
+ Durmuhurtham     16:31 – 17:30\n\n─ Choghadiya ─\n  05:49 – 07:39 
+  Amrit\n  07:39 – 09:28  Kaal\n  09:28 – 11:18  Shubh\n  11:18 – 13:
+ 07  Rog\n  13:07 – 14:56  Udveg\n  14:56 – 16:46  Char\n  16:46 – 18
+ :35  Labh\n  18:35 – 20:25  Amrit\n\n─ Night Choghadiya ─\n  20:25 
+ – 21:35  Char\n  21:35 – 22:46  Rog\n  22:46 – 23:56  Kaal\n  23:56 
+ – 01:07 (+1)  Labh\n  01:07 (+1) – 02:17 (+1)  Udveg\n  02:17 (+1) –
+  03:28 (+1)  Shubh\n  03:28 (+1) – 04:38 (+1)  Amrit\n  04:38 (+1) – 0
+ 5:49 (+1)  Char\n\n─ Special Yogas ─\n  Dagdha Yoga\n\n⚡ Ganda Moola
+  (Revati)  ·  Apara Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Ashvini · Saubhagya
+DTSTART;VALUE=DATE:20270601
+DTEND;VALUE=DATE:20270602
+UID:2027-06-01-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Vaishakha Maasam  ·  Krishna Pa
+ ksham  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise
+  05:49  ·  Sunset 20:25  ·  Moonrise 03:14  ·  Moonset 17:24\nSolar sig
+ n: Vrishabha  ·  Lunar sign: Mesha\n\nTithi:     Krishna Dwadashi   17:18
+  (-1) – 17:11\nNakshatra: Ashvini            21:18 (-1) – 21:47\nYoga:
+       Saubhagya          10:51 (-1) – 09:53\nKarana:    Taitila 05:18–
+ 17:11  /  Garaja 17:11–04:56 (+1)\n\n─ Auspicious ─\n  Brahma Muhurt
+ a   04:13 – 05:01\n  Abhijit Muhurta  12:38 – 13:36\n  Amrita Kalam   
+   14:26 – 16:04\n\n─ Inauspicious ─\n  Rahu Kalam       16:46 – 18
+ :36\n  Gulika Kalam     13:07 – 14:57\n  Yamagandam       09:28 – 11:1
+ 8\n  Varjyam          17:42 – 19:20\n  Durmuhurtham     08:44 – 09:43\
+ n  Durmuhurtham     00:11 (+1) – 00:48 (+1)\n\n─ Choghadiya ─\n  05:
+ 49 – 07:39  Rog\n  07:39 – 09:28  Udveg\n  09:28 – 11:18  Char\n  11
+ :18 – 13:07  Labh\n  13:07 – 14:57  Amrit\n  14:57 – 16:46  Kaal\n  
+ 16:46 – 18:36  Shubh\n  18:36 – 20:25  Rog\n\n─ Night Choghadiya ─
+ \n  20:25 – 21:36  Kaal\n  21:36 – 22:46  Labh\n  22:46 – 23:57  Udv
+ eg\n  23:57 – 01:07 (+1)  Shubh\n  01:07 (+1) – 02:17 (+1)  Amrit\n  0
+ 2:17 (+1) – 03:28 (+1)  Char\n  03:28 (+1) – 04:38 (+1)  Rog\n  04:38 
+ (+1) – 05:49 (+1)  Kaal\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yog
+ a\n  Amrita Siddhi Yoga\n\n⚡ Ganda Moola (Ashvini)  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Bharani · Shobhana
+DTSTART;VALUE=DATE:20270602
+DTEND;VALUE=DATE:20270603
+UID:2027-06-02-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Vaishakha Maasam  ·  Krishna Pa
+ ksham  ·  Budhavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 0
+ 5:49  ·  Sunset 20:26  ·  Moonrise 03:46  ·  Moonset 18:35\nSolar sign:
+  Vrishabha  ·  Lunar sign: Mesha\n\nTithi:     Krishna Trayodashi 17:11 (
+ -1) – 16:34\nNakshatra: Bharani            21:47 (-1) – 21:48\nYoga:  
+     Shobhana           09:53 (-1) – 08:31\nKarana:    Vanija 04:56–16:
+ 34  /  Vishti 16:34–04:05 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta  
+  04:13 – 05:01\n  Amrita Kalam     17:00 – 18:36\n\n─ Inauspicious 
+ ─\n  Rahu Kalam       13:07 – 14:57\n  Gulika Kalam     11:18 – 13:0
+ 7\n  Yamagandam       07:38 – 09:28\n  Varjyam          07:24 – 09:00\
+ n  Durmuhurtham     12:38 – 13:37\n\n─ Choghadiya ─\n  05:49 – 07:
+ 38  Labh\n  07:38 – 09:28  Amrit\n  09:28 – 11:18  Kaal\n  11:18 – 1
+ 3:07  Shubh\n  13:07 – 14:57  Rog\n  14:57 – 16:47  Udveg\n  16:47 –
+  18:36  Char\n  18:36 – 20:26  Labh\n\n─ Night Choghadiya ─\n  20:26
+  – 00:36 (+1)  Udveg\n  00:36 (+1) – 04:47 (+1)  Shubh\n  04:47 (+1) 
+ – 08:57 (+1)  Amrit\n  08:57 (+1) – 13:07 (+1)  Char\n  13:07 (+1) –
+  17:17 (+1)  Rog\n  17:17 (+1) – 21:28 (+1)  Kaal\n  21:28 (+1) – 01:3
+ 8 (+1)  Labh\n  01:38 (+1) – 05:48 (+1)  Udveg\n\n⚡ Masa Shivaratri  
+ ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Rohini · Dhriti
+DTSTART;VALUE=DATE:20270604
+DTEND;VALUE=DATE:20270605
+UID:2027-06-04-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Vaishakha Maasam  ·  Krishna Pa
+ ksham  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 
+ 05:48  ·  Sunset 20:27  ·  Moonrise 05:17  ·  Moonset 20:59\nSolar sign
+ : Vrishabha  ·  Lunar sign: Vrishabha\n\nTithi:     Amavasya           15
+ :29 (-1) – 14:00\nNakshatra: Rohini             21:23 (-1) – 20:34\nYo
+ ga:      Dhriti             04:40 – 02:16 (+1)\nKarana:    Naga 02:47–
+ 14:00  /  Kinstughna 14:00–01:08 (+1)\n\n─ Auspicious ─\n  Brahma Mu
+ hurta   04:12 – 05:00\n  Abhijit Muhurta  12:38 – 13:37\n  Amrita Kala
+ m     17:28 – 19:01\n\n─ Inauspicious ─\n  Rahu Kalam       11:18 
+ – 13:08\n  Gulika Kalam     07:38 – 09:28\n  Yamagandam       16:47 
+ – 18:37\n  Varjyam          12:50 – 14:23\n  Varjyam          01:54 (+
+ 1) – 03:26 (+1)\n  Durmuhurtham     08:44 – 09:43\n  Durmuhurtham     
+ 13:37 – 14:36\n\n─ Choghadiya ─\n  05:48 – 07:38  Char\n  07:38 
+ – 09:28  Labh\n  09:28 – 11:18  Amrit\n  11:18 – 13:08  Kaal\n  13:0
+ 8 – 14:58  Shubh\n  14:58 – 16:47  Rog\n  16:47 – 18:37  Udveg\n  18
+ :37 – 20:27  Char\n\n─ Night Choghadiya ─\n  20:27 – 00:37 (+1)  R
+ og\n  00:37 (+1) – 04:47 (+1)  Kaal\n  04:47 (+1) – 08:57 (+1)  Labh\n
+   08:57 (+1) – 13:07 (+1)  Udveg\n  13:07 (+1) – 17:17 (+1)  Shubh\n  
+ 17:17 (+1) – 21:27 (+1)  Amrit\n  21:27 (+1) – 01:37 (+1)  Char\n  01:
+ 37 (+1) – 05:47 (+1)  Rog\n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Nirjala Ekadashi · Chitra · Parigha
+DTSTART;VALUE=DATE:20270614
+DTEND;VALUE=DATE:20270615
+UID:2027-06-14-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Jyeshtha Maasam  ·  Shukla Paks
+ ham  ·  Somavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 05:4
+ 7  ·  Sunset 20:32  ·  Moonrise 16:52  ·  Moonset 02:30\nSolar sign: Vr
+ ishabha  ·  Lunar sign: Tula\n\nTithi:     Nirjala Ekadashi   16:34 (-1) 
+ – 15:26\nNakshatra: Chitra             08:03 (-1) – 07:31\nYoga:      
+ Parigha            22:29 (-1) – 20:39\nKarana:    Vishti 03:57–15:26  
+ /  Bava 15:26–03:02 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:11
+  – 04:59\n  Abhijit Muhurta  12:40 – 13:39\n  Amrita Kalam     22:40 
+ – 00:16 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       07:37 – 09:28
+ \n  Gulika Kalam     15:00 – 16:51\n  Yamagandam       11:19 – 13:10\n
+   Varjyam          13:06 – 14:42\n  Durmuhurtham     13:39 – 14:38\n  
+ Durmuhurtham     16:36 – 17:35\n\n─ Choghadiya ─\n  05:47 – 07:37 
+  Amrit\n  07:37 – 09:28  Kaal\n  09:28 – 11:19  Shubh\n  11:19 – 13:
+ 10  Rog\n  13:10 – 15:00  Udveg\n  15:00 – 16:51  Char\n  16:51 – 18
+ :42  Labh\n  18:42 – 20:32  Amrit\n\n─ Night Choghadiya ─\n  20:32 
+ – 21:42  Char\n  21:42 – 22:51  Rog\n  22:51 – 00:00 (+1)  Kaal\n  0
+ 0:00 (+1) – 01:10 (+1)  Labh\n  01:10 (+1) – 02:19 (+1)  Udveg\n  02:1
+ 9 (+1) – 03:28 (+1)  Shubh\n  03:28 (+1) – 04:38 (+1)  Amrit\n  04:38 
+ (+1) – 05:47 (+1)  Char\n\n─ Special Yogas ─\n  Dagdha Yoga\n\n⚡ N
+ irjala Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Swati · Shiva
+DTSTART;VALUE=DATE:20270615
+DTEND;VALUE=DATE:20270616
+UID:2027-06-15-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Jyeshtha Maasam  ·  Shukla Paks
+ ham  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 0
+ 5:47  ·  Sunset 20:33  ·  Moonrise 17:56  ·  Moonset 03:02\nSolar sign:
+  Vrishabha  ·  Lunar sign: Tula\n\nTithi:     Shukla Dwadashi    15:26 (-
+ 1) – 14:45\nNakshatra: Swati              07:31 (-1) – 07:26\nYoga:   
+    Shiva              20:39 (-1) – 19:11\nKarana:    Balava 03:02–14:4
+ 5  /  Kaulava 14:45–02:36 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta  
+  04:11 – 04:59\n  Abhijit Muhurta  12:40 – 13:39\n  Amrita Kalam     2
+ 2:53 – 00:30 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       16:51 – 
+ 18:42\n  Gulika Kalam     13:10 – 15:01\n  Yamagandam       09:28 – 11
+ :19\n  Varjyam          13:07 – 14:45\n  Durmuhurtham     08:44 – 09:4
+ 3\n  Durmuhurtham     00:14 (+1) – 00:51 (+1)\n\n─ Choghadiya ─\n  0
+ 5:47 – 07:38  Rog\n  07:38 – 09:28  Udveg\n  09:28 – 11:19  Char\n  
+ 11:19 – 13:10  Labh\n  13:10 – 15:01  Amrit\n  15:01 – 16:51  Kaal\n
+   16:51 – 18:42  Shubh\n  18:42 – 20:33  Rog\n\n─ Night Choghadiya 
+ ─\n  20:33 – 21:42  Kaal\n  21:42 – 22:51  Labh\n  22:51 – 00:01 (
+ +1)  Udveg\n  00:01 (+1) – 01:10 (+1)  Shubh\n  01:10 (+1) – 02:19 (+1
+ )  Amrit\n  02:19 (+1) – 03:28 (+1)  Char\n  03:28 (+1) – 04:38 (+1)  
+ Rog\n  04:38 (+1) – 05:47 (+1)  Kaal\n\n⚡ Pradosham  ·  Mithuna Sankr
+ amanam
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Vishakha · Siddha
+DTSTART;VALUE=DATE:20270616
+DTEND;VALUE=DATE:20270617
+UID:2027-06-16-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Jyeshtha Maasam  ·  Shukla Paks
+ ham  ·  Budhavaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 05:
+ 47  ·  Sunset 20:33  ·  Moonrise 18:59  ·  Moonset 03:38\nSolar sign: M
+ ithuna  ·  Lunar sign: Vrischika\n\nTithi:     Shukla Trayodashi  14:45 (
+ -1) – 14:33\nNakshatra: Vishakha           07:26 (-1) – 07:49\nYoga:  
+     Siddha             19:11 (-1) – 18:07\nKarana:    Taitila 02:36–14
+ :33  /  Garaja 14:33–02:39 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   04:11 – 04:59\n  Amrita Kalam     21:55 – 23:35\n\n─ Inauspicious 
+ ─\n  Rahu Kalam       13:10 – 15:01\n  Gulika Kalam     11:19 – 13:1
+ 0\n  Yamagandam       07:38 – 09:28\n  Varjyam          11:58 – 13:37\
+ n  Durmuhurtham     12:40 – 13:40\n\n─ Choghadiya ─\n  05:47 – 07:
+ 38  Labh\n  07:38 – 09:28  Amrit\n  09:28 – 11:19  Kaal\n  11:19 – 1
+ 3:10  Shubh\n  13:10 – 15:01  Rog\n  15:01 – 16:52  Udveg\n  16:52 –
+  18:42  Char\n  18:42 – 20:33  Labh\n\n─ Night Choghadiya ─\n  20:33
+  – 00:42 (+1)  Udveg\n  00:42 (+1) – 04:52 (+1)  Shubh\n  04:52 (+1) 
+ – 09:01 (+1)  Amrit\n  09:01 (+1) – 13:10 (+1)  Char\n  13:10 (+1) –
+  17:19 (+1)  Rog\n  17:19 (+1) – 21:29 (+1)  Kaal\n  21:29 (+1) – 01:3
+ 8 (+1)  Labh\n  01:38 (+1) – 05:47 (+1)  Udveg\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Jyeshtha · Shubha
+DTSTART;VALUE=DATE:20270618
+DTEND;VALUE=DATE:20270619
+UID:2027-06-18-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Jyeshtha Maasam  ·  Shukla Paks
+ ham  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Grishma\nSunrise 05
+ :47  ·  Sunset 20:34  ·  Moonrise 20:50  ·  Moonset 05:09\nSolar sign: 
+ Mithuna  ·  Lunar sign: Vrischika\n\nTithi:     Pournami           14:52 
+ (-1) – 15:41\nNakshatra: Jyeshtha           08:42 (-1) – 10:05\nYoga: 
+      Shubha             17:28 (-1) – 17:11\nKarana:    Bava 03:13–15:4
+ 1  /  Balava 15:41–04:16 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 04:11 – 04:59\n  Abhijit Muhurta  12:41 – 13:40\n  Amrita Kalam     05
+ :01 (+1) – 06:45 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       11:20 
+ – 13:10\n  Gulika Kalam     07:38 – 09:29\n  Yamagandam       16:52 
+ – 18:43\n  Durmuhurtham     08:44 – 09:44\n  Durmuhurtham     13:40 
+ – 14:39\n\n─ Choghadiya ─\n  05:47 – 07:38  Char\n  07:38 – 09:2
+ 9  Labh\n  09:29 – 11:20  Amrit\n  11:20 – 13:10  Kaal\n  13:10 – 15
+ :01  Shubh\n  15:01 – 16:52  Rog\n  16:52 – 18:43  Udveg\n  18:43 – 
+ 20:34  Char\n\n─ Night Choghadiya ─\n  20:34 – 03:43 (+1)  Rog\n  03
+ :43 (+1) – 10:53 (+1)  Kaal\n  10:53 (+1) – 18:02 (+1)  Labh\n  18:02 
+ (+1) – 01:12 (+1)  Udveg\n  01:12 (+1) – 08:21 (+1)  Shubh\n  08:21 (+
+ 1) – 15:31 (+1)  Amrit\n  15:31 (+1) – 22:41 (+1)  Char\n  22:41 (+1) 
+ – 05:50 (+1)  Rog\n\n⚡ Ganda Moola (Jyeshtha)  ·  Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Yogini Ekadashi · Bharani · Sukarma
+DTSTART;VALUE=DATE:20270629
+DTEND;VALUE=DATE:20270630
+UID:2027-06-29-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Jyeshtha Maasam  ·  Krishna Pak
+ sham  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Varsha\nSunrise 0
+ 5:50  ·  Sunset 20:35  ·  Moonrise 01:42  ·  Moonset 16:13\nSolar sign:
+  Mithuna  ·  Lunar sign: Mesha\n\nTithi:     Yogini Ekadashi    04:44 –
+  04:08 (+1)\nNakshatra: Bharani            05:30 – 05:38 (+1)\nYoga:    
+   Sukarma            18:46 (-1) – 17:29\nKarana:    Bava 04:44–16:30  
+ /  Balava 16:30–04:08 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:
+ 14 – 05:02\n  Abhijit Muhurta  12:43 – 13:42\n  Amrita Kalam     00:48
+  (+1) – 02:25 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       16:54 –
+  18:44\n  Gulika Kalam     13:13 – 15:03\n  Yamagandam       09:31 – 1
+ 1:22\n  Varjyam          15:09 – 16:46\n  Durmuhurtham     08:47 – 09:
+ 46\n  Durmuhurtham     00:17 (+1) – 00:54 (+1)\n\n─ Choghadiya ─\n  
+ 05:50 – 07:41  Rog\n  07:41 – 09:31  Udveg\n  09:31 – 11:22  Char\n 
+  11:22 – 13:13  Labh\n  13:13 – 15:03  Amrit\n  15:03 – 16:54  Kaal\
+ n  16:54 – 18:44  Shubh\n  18:44 – 20:35  Rog\n\n─ Night Choghadiya 
+ ─\n  20:35 – 00:45 (+1)  Kaal\n  00:45 (+1) – 04:54 (+1)  Labh\n  04
+ :54 (+1) – 09:04 (+1)  Udveg\n  09:04 (+1) – 13:13 (+1)  Shubh\n  13:1
+ 3 (+1) – 17:23 (+1)  Amrit\n  17:23 (+1) – 21:32 (+1)  Char\n  21:32 (
+ +1) – 01:42 (+1)  Rog\n  01:42 (+1) – 05:51 (+1)  Kaal\n\n⚡ Yogini E
+ kadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Trayodashi · Rohini · Shoola
+DTSTART;VALUE=DATE:20270701
+DTEND;VALUE=DATE:20270702
+UID:2027-07-01-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Jyeshtha Maasam  ·  Krishna Pak
+ sham  ·  Guruvaram\nAyanam: Uttarayanam  ·  Rituvu: Varsha\nSunrise 05:5
+ 1  ·  Sunset 20:35  ·  Moonrise 03:02  ·  Moonset 18:36\nSolar sign: Mi
+ thuna  ·  Lunar sign: Vrishabha\n\nTithi:     Krishna Trayodashi 03:05 
+ – 01:37 (+1)\nNakshatra: Rohini             05:18 – 04:34 (+1)\nYoga: 
+      Shoola             15:48 (-1) – 13:47\nKarana:    Garaja 03:05–14
+ :24  /  Vanija 14:24–01:37 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   04:15 – 05:03\n  Abhijit Muhurta  12:44 – 13:42\n  Amrita Kalam     
+ 01:28 (+1) – 03:01 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       15:0
+ 4 – 16:54\n  Gulika Kalam     09:32 – 11:23\n  Yamagandam       05:51 
+ – 07:42\n  Varjyam          20:49 – 22:22\n  Durmuhurtham     10:46 
+ – 11:45\n  Durmuhurtham     16:39 – 17:38\n\n─ Choghadiya ─\n  05:
+ 51 – 07:42  Shubh\n  07:42 – 09:32  Rog\n  09:32 – 11:23  Udveg\n  1
+ 1:23 – 13:13  Char\n  13:13 – 15:04  Labh\n  15:04 – 16:54  Amrit\n 
+  16:54 – 18:44  Kaal\n  18:44 – 20:35  Shubh\n\n─ Night Choghadiya 
+ ─\n  20:35 – 00:45 (+1)  Amrit\n  00:45 (+1) – 04:54 (+1)  Char\n  0
+ 4:54 (+1) – 09:04 (+1)  Rog\n  09:04 (+1) – 13:13 (+1)  Kaal\n  13:13 
+ (+1) – 17:23 (+1)  Labh\n  17:23 (+1) – 21:33 (+1)  Udveg\n  21:33 (+1
+ ) – 01:42 (+1)  Shubh\n  01:42 (+1) – 05:52 (+1)  Amrit\n\n⚡ Pradosh
+ am
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Ardra · Vriddhi
+DTSTART;VALUE=DATE:20270703
+DTEND;VALUE=DATE:20270704
+UID:2027-07-03-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Jyeshtha Maasam  ·  Krishna Pak
+ sham  ·  Shanivaram\nAyanam: Uttarayanam  ·  Rituvu: Varsha\nSunrise 05:
+ 52  ·  Sunset 20:35  ·  Moonrise 05:05  ·  Moonset 20:42\nSolar sign: M
+ ithuna  ·  Lunar sign: Mithuna\n\nTithi:     Amavasya           23:49 (-1
+ ) – 21:43\nNakshatra: Ardra              03:30 – 02:10 (+1)\nYoga:    
+   Vriddhi            11:27 (-1) – 08:51\nKarana:    Chatushpada 23:49 (-
+ 1)–10:48  /  Naga 10:48–21:43\n\n─ Auspicious ─\n  Brahma Muhurta 
+   04:16 – 05:04\n  Abhijit Muhurta  12:44 – 13:43\n  Amrita Kalam     
+ 16:43 – 18:14\n\n─ Inauspicious ─\n  Rahu Kalam       09:33 – 11:2
+ 3\n  Gulika Kalam     05:52 – 07:42\n  Yamagandam       15:04 – 16:54\
+ n  Varjyam          11:26 – 12:57\n  Durmuhurtham     05:52 – 06:51\n 
+  Durmuhurtham     06:51 – 07:50\n\n─ Choghadiya ─\n  05:52 – 07:42
+   Kaal\n  07:42 – 09:33  Shubh\n  09:33 – 11:23  Rog\n  11:23 – 13:1
+ 3  Udveg\n  13:13 – 15:04  Char\n  15:04 – 16:54  Labh\n  16:54 – 18
+ :44  Amrit\n  18:44 – 20:35  Kaal\n\n─ Night Choghadiya ─\n  20:35 
+ – 00:45 (+1)  Labh\n  00:45 (+1) – 04:56 (+1)  Udveg\n  04:56 (+1) –
+  09:06 (+1)  Shubh\n  09:06 (+1) – 13:16 (+1)  Amrit\n  13:16 (+1) – 1
+ 7:27 (+1)  Char\n  17:27 (+1) – 21:37 (+1)  Rog\n  21:37 (+1) – 01:48 
+ (+1)  Kaal\n  01:48 (+1) – 05:58 (+1)  Labh\n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shayani Ekadashi · Vishakha · Shubha
+DTSTART;VALUE=DATE:20270713
+DTEND;VALUE=DATE:20270714
+UID:2027-07-13-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashadha Maasam  ·  Shukla Paksh
+ am  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Varsha\nSunrise 05:
+ 58  ·  Sunset 20:32  ·  Moonrise 16:53  ·  Moonset 01:38\nSolar sign: M
+ ithuna  ·  Lunar sign: Tula\n\nTithi:     Shayani Ekadashi   02:12 – 01
+ :58 (+1)\nNakshatra: Vishakha           15:12 (-1) – 15:28\nYoga:      S
+ hubha             04:12 – 03:04 (+1)\nKarana:    Vanija 02:12–14:01  /
+   Vishti 14:01–01:58 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:2
+ 2 – 05:10\n  Abhijit Muhurta  12:46 – 13:44\n  Amrita Kalam     06:34 
+ – 08:11\n  Amrita Kalam     05:30 (+1) – 07:09 (+1)\n\n─ Inauspiciou
+ s ─\n  Rahu Kalam       16:53 – 18:42\n  Gulika Kalam     13:15 – 15
+ :04\n  Yamagandam       09:36 – 11:26\n  Varjyam          19:36 – 21:1
+ 5\n  Durmuhurtham     08:53 – 09:51\n  Durmuhurtham     00:18 (+1) – 0
+ 0:56 (+1)\n\n─ Choghadiya ─\n  05:58 – 07:47  Rog\n  07:47 – 09:36
+   Udveg\n  09:36 – 11:26  Char\n  11:26 – 13:15  Labh\n  13:15 – 15:
+ 04  Amrit\n  15:04 – 16:53  Kaal\n  16:53 – 18:42  Shubh\n  18:42 – 
+ 20:32  Rog\n\n─ Night Choghadiya ─\n  20:32 – 00:43 (+1)  Kaal\n  00
+ :43 (+1) – 04:54 (+1)  Labh\n  04:54 (+1) – 09:05 (+1)  Udveg\n  09:05
+  (+1) – 13:16 (+1)  Shubh\n  13:16 (+1) – 17:26 (+1)  Amrit\n  17:26 (
+ +1) – 21:37 (+1)  Char\n  21:37 (+1) – 01:48 (+1)  Rog\n  01:48 (+1) 
+ – 05:59 (+1)  Kaal\n\n⚡ Shayani Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Jyeshtha · Brahma
+DTSTART;VALUE=DATE:20270715
+DTEND;VALUE=DATE:20270716
+UID:2027-07-15-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashadha Maasam  ·  Shukla Paksh
+ am  ·  Guruvaram\nAyanam: Uttarayanam  ·  Rituvu: Varsha\nSunrise 05:59 
+  ·  Sunset 20:31  ·  Moonrise 18:47  ·  Moonset 03:05\nSolar sign: Mith
+ una  ·  Lunar sign: Vrischika\n\nTithi:     Shukla Trayodashi  02:14 – 
+ 03:01 (+1)\nNakshatra: Jyeshtha           16:14 (-1) – 17:30\nYoga:     
+  Brahma             02:20 – 01:59 (+1)\nKarana:    Kaulava 02:14–14:34
+   /  Taitila 14:34–03:01 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 04:23 – 05:11\n  Abhijit Muhurta  12:46 – 13:44\n  Amrita Kalam     08
+ :14 – 09:55\n\n─ Inauspicious ─\n  Rahu Kalam       15:04 – 16:53\
+ n  Gulika Kalam     09:37 – 11:26\n  Yamagandam       05:59 – 07:48\n 
+  Durmuhurtham     10:50 – 11:48\n  Durmuhurtham     16:38 – 17:36\n\n
+ ─ Choghadiya ─\n  05:59 – 07:48  Shubh\n  07:48 – 09:37  Rog\n  09
+ :37 – 11:26  Udveg\n  11:26 – 13:15  Char\n  13:15 – 15:04  Labh\n  
+ 15:04 – 16:53  Amrit\n  16:53 – 18:42  Kaal\n  18:42 – 20:31  Shubh\
+ n\n─ Night Choghadiya ─\n  20:31 – 00:42 (+1)  Amrit\n  00:42 (+1) 
+ – 04:53 (+1)  Char\n  04:53 (+1) – 09:04 (+1)  Rog\n  09:04 (+1) – 1
+ 3:16 (+1)  Kaal\n  13:16 (+1) – 17:27 (+1)  Labh\n  17:27 (+1) – 21:38
+  (+1)  Udveg\n  21:38 (+1) – 01:50 (+1)  Shubh\n  01:50 (+1) – 06:01 (
+ +1)  Amrit\n\n⚡ Ganda Moola (Jyeshtha)  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Guru Pournami — Pournami · Purva Ashadha · Vaidhriti
+DTSTART;VALUE=DATE:20270717
+DTEND;VALUE=DATE:20270718
+UID:2027-07-17-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashadha Maasam  ·  Shukla Paksh
+ am  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 06:
+ 01  ·  Sunset 20:30  ·  Moonrise 20:14  ·  Moonset 04:55\nSolar sign: K
+ arka  ·  Lunar sign: Dhanu\n\nTithi:     Pournami           04:15 – 05:
+ 52 (+1)\nNakshatra: Purva Ashadha      19:14 (-1) – 21:23\nYoga:      Va
+ idhriti          02:00 – 02:20 (+1)\nKarana:    Vishti 04:15–17:01  / 
+  Bava 17:01–05:52 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:25 
+ – 05:13\n  Abhijit Muhurta  12:46 – 13:44\n  Amrita Kalam     16:09 
+ – 17:53\n\n─ Inauspicious ─\n  Rahu Kalam       09:38 – 11:27\n  G
+ ulika Kalam     06:01 – 07:49\n  Yamagandam       15:04 – 16:52\n  Dur
+ muhurtham     06:01 – 06:59\n  Durmuhurtham     06:59 – 07:57\n\n─ C
+ hoghadiya ─\n  06:01 – 07:49  Kaal\n  07:49 – 09:38  Shubh\n  09:38 
+ – 11:27  Rog\n  11:27 – 13:15  Udveg\n  13:15 – 15:04  Char\n  15:04
+  – 16:52  Labh\n  16:52 – 18:41  Amrit\n  18:41 – 20:30  Kaal\n\n─
+  Night Choghadiya ─\n  20:30 – 06:42 (+1)  Labh\n  06:42 (+1) – 16:5
+ 5 (+1)  Udveg\n  16:55 (+1) – 03:07 (+1)  Shubh\n  03:07 (+1) – 13:20 
+ (+1)  Amrit\n  13:20 (+1) – 23:32 (+1)  Char\n  23:32 (+1) – 09:45 (+1
+ )  Rog\n  09:45 (+1) – 19:58 (+1)  Kaal\n  19:58 (+1) – 06:10 (+1)  La
+ bh\n\n⚡ Guru Pournami  ·  Pournami  ·  Karka Sankramanam
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Kamika Ekadashi · Rohini · Dhruva
+DTSTART;VALUE=DATE:20270729
+DTEND;VALUE=DATE:20270730
+UID:2027-07-29-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashadha Maasam  ·  Krishna Paks
+ ham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 06:
+ 10  ·  Sunset 20:21  ·  Moonrise 01:41  ·  Moonset 17:23\nSolar sign: K
+ arka  ·  Lunar sign: Vrishabha\n\nTithi:     Kamika Ekadashi    14:38 (-1
+ ) – 13:12\nNakshatra: Rohini             13:12 (-1) – 12:33\nYoga:    
+   Dhruva             22:56 (-1) – 20:39\nKarana:    Balava 01:58–13:12
+   /  Kaulava 13:12–00:21 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 04:34 – 05:22\n  Abhijit Muhurta  12:47 – 13:44\n  Amrita Kalam     09
+ :27 – 11:00\n  Amrita Kalam     03:08 (+1) – 04:40 (+1)\n\n─ Inauspi
+ cious ─\n  Rahu Kalam       15:02 – 16:48\n  Gulika Kalam     09:43 
+ – 11:29\n  Yamagandam       06:10 – 07:57\n  Varjyam          17:55 
+ – 19:27\n  Durmuhurtham     10:54 – 11:50\n  Durmuhurtham     16:34 
+ – 17:31\n\n─ Choghadiya ─\n  06:10 – 07:57  Shubh\n  07:57 – 09:
+ 43  Rog\n  09:43 – 11:29  Udveg\n  11:29 – 13:15  Char\n  13:15 – 15
+ :02  Labh\n  15:02 – 16:48  Amrit\n  16:48 – 18:34  Kaal\n  18:34 – 
+ 20:21  Shubh\n\n─ Night Choghadiya ─\n  20:21 – 21:34  Amrit\n  21:3
+ 4 – 22:48  Char\n  22:48 – 00:02 (+1)  Rog\n  00:02 (+1) – 01:16 (+1
+ )  Kaal\n  01:16 (+1) – 02:30 (+1)  Labh\n  02:30 (+1) – 03:43 (+1)  U
+ dveg\n  03:43 (+1) – 04:57 (+1)  Shubh\n  04:57 (+1) – 06:11 (+1)  Amr
+ it\n\n⚡ Kamika Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Mrigashira · Vyaghata
+DTSTART;VALUE=DATE:20270730
+DTEND;VALUE=DATE:20270731
+UID:2027-07-30-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashadha Maasam  ·  Krishna Paks
+ ham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 0
+ 6:11  ·  Sunset 20:20  ·  Moonrise 02:41  ·  Moonset 18:25\nSolar sign:
+  Karka  ·  Lunar sign: Mithuna\n\nTithi:     Krishna Dwadashi   13:12 (-1
+ ) – 11:26\nNakshatra: Mrigashira         12:33 (-1) – 11:34\nYoga:    
+   Vyaghata           20:39 (-1) – 18:05\nKarana:    Taitila 00:21–11:2
+ 6  /  Garaja 11:26–22:26\n\n─ Auspicious ─\n  Brahma Muhurta   04:35
+  – 05:23\n  Abhijit Muhurta  12:47 – 13:44\n  Amrita Kalam     00:49 (
+ +1) – 02:20 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       11:29 – 1
+ 3:15\n  Gulika Kalam     07:57 – 09:43\n  Yamagandam       16:48 – 18:
+ 34\n  Varjyam          19:31 – 21:02\n  Durmuhurtham     09:01 – 09:57
+ \n  Durmuhurtham     13:44 – 14:40\n\n─ Choghadiya ─\n  06:11 – 07
+ :57  Char\n  07:57 – 09:43  Labh\n  09:43 – 11:29  Amrit\n  11:29 – 
+ 13:15  Kaal\n  13:15 – 15:01  Shubh\n  15:01 – 16:48  Rog\n  16:48 –
+  18:34  Udveg\n  18:34 – 20:20  Char\n\n─ Night Choghadiya ─\n  20:2
+ 0 – 21:34  Rog\n  21:34 – 22:48  Kaal\n  22:48 – 00:02 (+1)  Labh\n 
+  00:02 (+1) – 01:16 (+1)  Udveg\n  01:16 (+1) – 02:30 (+1)  Shubh\n  0
+ 2:30 (+1) – 03:44 (+1)  Amrit\n  03:44 (+1) – 04:58 (+1)  Char\n  04:5
+ 8 (+1) – 06:12 (+1)  Rog\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Ardra · Harshana
+DTSTART;VALUE=DATE:20270731
+DTEND;VALUE=DATE:20270801
+UID:2027-07-31-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashadha Maasam  ·  Krishna Paks
+ ham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 06
+ :12  ·  Sunset 20:19  ·  Moonrise 03:52  ·  Moonset 19:18\nSolar sign: 
+ Karka  ·  Lunar sign: Mithuna\n\nTithi:     Krishna Trayodashi 11:26 (-1)
+  – 09:22\nNakshatra: Ardra              11:34 (-1) – 10:17\nYoga:     
+  Harshana           18:05 (-1) – 15:19\nKarana:    Vanija 22:26 (-1)–0
+ 9:22  /  Vishti 09:22–20:15\n\n─ Auspicious ─\n  Brahma Muhurta   04
+ :36 – 05:24\n  Abhijit Muhurta  12:47 – 13:44\n\n─ Inauspicious ─\
+ n  Rahu Kalam       09:44 – 11:29\n  Gulika Kalam     06:12 – 07:58\n 
+  Yamagandam       15:01 – 16:47\n  Varjyam          21:32 – 23:02\n  D
+ urmuhurtham     06:12 – 07:08\n  Durmuhurtham     07:08 – 08:05\n\n─
+  Choghadiya ─\n  06:12 – 07:58  Kaal\n  07:58 – 09:44  Shubh\n  09:4
+ 4 – 11:29  Rog\n  11:29 – 13:15  Udveg\n  13:15 – 15:01  Char\n  15:
+ 01 – 16:47  Labh\n  16:47 – 18:33  Amrit\n  18:33 – 20:19  Kaal\n\n
+ ─ Night Choghadiya ─\n  20:19 – 06:34 (+1)  Labh\n  06:34 (+1) – 1
+ 6:50 (+1)  Udveg\n  16:50 (+1) – 03:05 (+1)  Shubh\n  03:05 (+1) – 13:
+ 20 (+1)  Amrit\n  13:20 (+1) – 23:36 (+1)  Char\n  23:36 (+1) – 09:51 
+ (+1)  Rog\n  09:51 (+1) – 20:07 (+1)  Kaal\n  20:07 (+1) – 06:22 (+1) 
+  Labh\n\n⚡ Masa Shivaratri  ·  Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Putrada Ekadashi · Mula · Vaidhriti
+DTSTART;VALUE=DATE:20270812
+DTEND;VALUE=DATE:20270813
+UID:2027-08-12-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Shukla Paks
+ ham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 06:
+ 22  ·  Sunset 20:06  ·  Moonrise 17:32  ·  Moonset 01:53\nSolar sign: K
+ arka  ·  Lunar sign: Dhanu\n\nTithi:     Putrada Ekadashi   13:49 (-1) 
+ – 14:35\nNakshatra: Mula               00:57 – 02:35 (+1)\nYoga:      
+ Vaidhriti          11:01 (-1) – 10:35\nKarana:    Vishti 02:08–14:35  
+ /  Bava 14:35–03:08 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04:46
+  – 05:34\n  Abhijit Muhurta  12:46 – 13:41\n  Amrita Kalam     19:45 
+ – 21:28\n\n─ Inauspicious ─\n  Rahu Kalam       14:57 – 16:40\n  G
+ ulika Kalam     09:48 – 11:31\n  Yamagandam       06:22 – 08:05\n  Var
+ jyam          00:53 (+1) – 02:35 (+1)\n  Durmuhurtham     10:57 – 11:5
+ 2\n  Durmuhurtham     16:26 – 17:21\n\n─ Choghadiya ─\n  06:22 – 0
+ 8:05  Shubh\n  08:05 – 09:48  Rog\n  09:48 – 11:31  Udveg\n  11:31 –
+  13:14  Char\n  13:14 – 14:57  Labh\n  14:57 – 16:40  Amrit\n  16:40 
+ – 18:23  Kaal\n  18:23 – 20:06  Shubh\n\n─ Night Choghadiya ─\n  2
+ 0:06 – 21:23  Amrit\n  21:23 – 22:40  Char\n  22:40 – 23:57  Rog\n  
+ 23:57 – 01:14 (+1)  Kaal\n  01:14 (+1) – 02:32 (+1)  Labh\n  02:32 (+1
+ ) – 03:49 (+1)  Udveg\n  03:49 (+1) – 05:06 (+1)  Shubh\n  05:06 (+1) 
+ – 06:23 (+1)  Amrit\n\n⚡ Ganda Moola (Mula)  ·  Putrada Ekadashi — 
+ fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Varalakshmi Vratam — Shukla Dwadashi · Purva Ashadha · Vi
+ shkambha
+DTSTART;VALUE=DATE:20270813
+DTEND;VALUE=DATE:20270814
+UID:2027-08-13-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Shukla Paks
+ ham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 0
+ 6:23  ·  Sunset 20:04  ·  Moonrise 18:14  ·  Moonset 02:49\nSolar sign:
+  Karka  ·  Lunar sign: Dhanu\n\nTithi:     Shukla Dwadashi    14:35 (-1) 
+ – 15:48\nNakshatra: Purva Ashadha      02:35 – 04:38 (+1)\nYoga:      
+ Vishkambha         10:35 (-1) – 10:32\nKarana:    Balava 03:08–15:48  
+ /  Kaulava 15:48–04:34 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04
+ :47 – 05:35\n  Abhijit Muhurta  12:46 – 13:41\n  Amrita Kalam     23:2
+ 6 – 01:10 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       11:31 – 13:
+ 14\n  Gulika Kalam     08:06 – 09:48\n  Yamagandam       16:39 – 18:22
+ \n  Varjyam          13:00 – 14:45\n  Durmuhurtham     09:07 – 10:02\n
+   Durmuhurtham     13:41 – 14:36\n\n─ Choghadiya ─\n  06:23 – 08:0
+ 6  Char\n  08:06 – 09:48  Labh\n  09:48 – 11:31  Amrit\n  11:31 – 13
+ :14  Kaal\n  13:14 – 14:56  Shubh\n  14:56 – 16:39  Rog\n  16:39 – 1
+ 8:22  Udveg\n  18:22 – 20:04  Char\n\n─ Night Choghadiya ─\n  20:04 
+ – 21:22  Rog\n  21:22 – 22:39  Kaal\n  22:39 – 23:57  Labh\n  23:57 
+ – 01:14 (+1)  Udveg\n  01:14 (+1) – 02:32 (+1)  Shubh\n  02:32 (+1) 
+ – 03:49 (+1)  Amrit\n  03:49 (+1) – 05:06 (+1)  Char\n  05:06 (+1) –
+  06:24 (+1)  Rog\n\n⚡ Varalakshmi Vratam  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Uttara Ashadha · Preeti
+DTSTART;VALUE=DATE:20270814
+DTEND;VALUE=DATE:20270815
+UID:2027-08-14-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Shukla Paks
+ ham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 06
+ :24  ·  Sunset 20:03  ·  Moonrise 18:50  ·  Moonset 03:48\nSolar sign: 
+ Karka  ·  Lunar sign: Dhanu\n\nTithi:     Shukla Trayodashi  15:48 (-1) 
+ – 17:26\nNakshatra: Uttara Ashadha     04:38 – 07:01 (+1)\nYoga:      
+ Preeti             10:32 (-1) – 10:47\nKarana:    Taitila 04:34–17:26 
+  /  Garaja 17:26–06:21 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   04
+ :48 – 05:36\n  Abhijit Muhurta  12:46 – 13:41\n  Amrita Kalam     23:5
+ 9 – 01:45 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       09:49 – 11:
+ 31\n  Gulika Kalam     06:24 – 08:06\n  Yamagandam       14:56 – 16:38
+ \n  Varjyam          13:26 – 15:12\n  Durmuhurtham     06:24 – 07:19\n
+   Durmuhurtham     07:19 – 08:13\n\n─ Choghadiya ─\n  06:24 – 08:0
+ 6  Kaal\n  08:06 – 09:49  Shubh\n  09:49 – 11:31  Rog\n  11:31 – 13:
+ 14  Udveg\n  13:14 – 14:56  Char\n  14:56 – 16:38  Labh\n  16:38 – 1
+ 8:21  Amrit\n  18:21 – 20:03  Kaal\n\n─ Night Choghadiya ─\n  20:03 
+ – 00:21 (+1)  Labh\n  00:21 (+1) – 04:39 (+1)  Udveg\n  04:39 (+1) –
+  08:57 (+1)  Shubh\n  08:57 (+1) – 13:14 (+1)  Amrit\n  13:14 (+1) – 1
+ 7:32 (+1)  Char\n  17:32 (+1) – 21:50 (+1)  Rog\n  21:50 (+1) – 02:08 
+ (+1)  Kaal\n  02:08 (+1) – 06:26 (+1)  Labh\n\n⚡ Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Raksha Bandhan — Pournami · Shravana · Saubhagya
+DTSTART;VALUE=DATE:20270816
+DTEND;VALUE=DATE:20270817
+UID:2027-08-16-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Shukla Paks
+ ham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Varsha\nSunrise 06:
+ 26  ·  Sunset 20:01  ·  Moonrise 19:47  ·  Moonset 05:48\nSolar sign: K
+ arka  ·  Lunar sign: Makara\n\nTithi:     Pournami           19:19 (-1) 
+ – 21:21\nNakshatra: Shravana           07:01 (-1) – 09:36\nYoga:      
+ Saubhagya          11:17 (-1) – 11:55\nKarana:    Vishti 19:19 (-1)–08
+ :20  /  Bava 08:20–21:21\n\n─ Auspicious ─\n  Brahma Muhurta   04:50
+  – 05:38\n  Abhijit Muhurta  12:46 – 13:40\n  Amrita Kalam     00:41 (
+ +1) – 02:27 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       08:07 – 0
+ 9:49\n  Gulika Kalam     14:55 – 16:37\n  Yamagandam       11:31 – 13:
+ 13\n  Varjyam          14:02 – 15:49\n  Durmuhurtham     13:40 – 14:35
+ \n  Durmuhurtham     16:23 – 17:18\n\n─ Choghadiya ─\n  06:26 – 08
+ :07  Amrit\n  08:07 – 09:49  Kaal\n  09:49 – 11:31  Shubh\n  11:31 –
+  13:13  Rog\n  13:13 – 14:55  Udveg\n  14:55 – 16:37  Char\n  16:37 
+ – 18:19  Labh\n  18:19 – 20:01  Amrit\n\n─ Night Choghadiya ─\n  2
+ 0:01 – 03:20 (+1)  Char\n  03:20 (+1) – 10:39 (+1)  Rog\n  10:39 (+1) 
+ – 17:59 (+1)  Kaal\n  17:59 (+1) – 01:18 (+1)  Labh\n  01:18 (+1) – 
+ 08:37 (+1)  Udveg\n  08:37 (+1) – 15:56 (+1)  Shubh\n  15:56 (+1) – 23
+ :16 (+1)  Amrit\n  23:16 (+1) – 06:35 (+1)  Char\n\n─ Special Yogas 
+ ─\n  Sarvartha Siddhi Yoga\n\n⚡ Raksha Bandhan  ·  Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Aja Ekadashi · Ardra · Siddhi
+DTSTART;VALUE=DATE:20270827
+DTEND;VALUE=DATE:20270828
+UID:2027-08-27-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Krishna Pak
+ sham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 
+ 06:35  ·  Sunset 19:46  ·  Moonrise 01:31  ·  Moonset 17:06\nSolar sign
+ : Simha  ·  Lunar sign: Mithuna\n\nTithi:     Aja Ekadashi       23:28 (-
+ 1) – 21:26\nNakshatra: Ardra              19:36 (-1) – 18:23\nYoga:   
+    Siddhi             02:57 – 00:12 (+1)\nKarana:    Bava 23:28 (-1)–1
+ 0:29  /  Balava 10:29–21:26\n\n─ Auspicious ─\n  Brahma Muhurta   04
+ :59 – 05:47\n  Abhijit Muhurta  12:44 – 13:37\n  Amrita Kalam     08:5
+ 4 – 10:25\n\n─ Inauspicious ─\n  Rahu Kalam       11:32 – 13:10\n 
+  Gulika Kalam     08:14 – 09:53\n  Yamagandam       16:28 – 18:07\n  V
+ arjyam          05:40 (+1) – 07:10 (+1)\n  Durmuhurtham     09:13 – 10
+ :06\n  Durmuhurtham     13:37 – 14:29\n\n─ Choghadiya ─\n  06:35 –
+  08:14  Char\n  08:14 – 09:53  Labh\n  09:53 – 11:32  Amrit\n  11:32 
+ – 13:10  Kaal\n  13:10 – 14:49  Shubh\n  14:49 – 16:28  Rog\n  16:28
+  – 18:07  Udveg\n  18:07 – 19:46  Char\n\n─ Night Choghadiya ─\n  
+ 19:46 – 21:07  Rog\n  21:07 – 22:28  Kaal\n  22:28 – 23:50  Labh\n  
+ 23:50 – 01:11 (+1)  Udveg\n  01:11 (+1) – 02:32 (+1)  Shubh\n  02:32 (
+ +1) – 03:53 (+1)  Amrit\n  03:53 (+1) – 05:15 (+1)  Char\n  05:15 (+1)
+  – 06:36 (+1)  Rog\n\n─ Special Yogas ─\n  Siddha Yoga\n\n⚡ Aja Ek
+ adashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Punarvasu · Vyatipata
+DTSTART;VALUE=DATE:20270828
+DTEND;VALUE=DATE:20270829
+UID:2027-08-28-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Krishna Pak
+ sham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 0
+ 6:36  ·  Sunset 19:44  ·  Moonrise 02:44  ·  Moonset 17:52\nSolar sign:
+  Simha  ·  Lunar sign: Mithuna\n\nTithi:     Krishna Dwadashi   21:26 (-1
+ ) – 19:11\nNakshatra: Punarvasu          18:23 (-1) – 16:56\nYoga:    
+   Vyatipata          00:12 – 21:17\nKarana:    Kaulava 21:26 (-1)–08:2
+ 0  /  Taitila 08:20–19:11\n\n─ Auspicious ─\n  Brahma Muhurta   05:0
+ 0 – 05:48\n  Abhijit Muhurta  12:44 – 13:36\n  Amrita Kalam     14:41 
+ – 16:11\n\n─ Inauspicious ─\n  Rahu Kalam       09:53 – 11:32\n  G
+ ulika Kalam     06:36 – 08:14\n  Yamagandam       14:49 – 16:27\n  Var
+ jyam          00:24 (+1) – 01:54 (+1)\n  Durmuhurtham     06:36 – 07:2
+ 8\n  Durmuhurtham     07:28 – 08:21\n\n─ Choghadiya ─\n  06:36 – 0
+ 8:14  Kaal\n  08:14 – 09:53  Shubh\n  09:53 – 11:32  Rog\n  11:32 – 
+ 13:10  Udveg\n  13:10 – 14:49  Char\n  14:49 – 16:27  Labh\n  16:27 
+ – 18:06  Amrit\n  18:06 – 19:44  Kaal\n\n─ Night Choghadiya ─\n  1
+ 9:44 – 21:06  Labh\n  21:06 – 22:27  Udveg\n  22:27 – 23:49  Shubh\n
+   23:49 – 01:10 (+1)  Amrit\n  01:10 (+1) – 02:32 (+1)  Char\n  02:32 
+ (+1) – 03:54 (+1)  Rog\n  03:54 (+1) – 05:15 (+1)  Kaal\n  05:15 (+1) 
+ – 06:37 (+1)  Labh\n\n─ Special Yogas ─\n  Tripushkara Yoga\n\n⚡ S
+ hani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Pushya · Variyan
+DTSTART;VALUE=DATE:20270829
+DTEND;VALUE=DATE:20270830
+UID:2027-08-29-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Krishna Pak
+ sham  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 06:
+ 37  ·  Sunset 19:43  ·  Moonrise 04:01  ·  Moonset 18:32\nSolar sign: S
+ imha  ·  Lunar sign: Karka\n\nTithi:     Krishna Trayodashi 19:11 (-1) 
+ – 16:48\nNakshatra: Pushya             16:56 (-1) – 15:20\nYoga:      
+ Variyan            21:17 (-1) – 18:15\nKarana:    Vanija 06:00–16:48  
+ /  Vishti 16:48–03:35 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 01 – 05:49\n  Abhijit Muhurta  12:44 – 13:36\n  Amrita Kalam     09:22
+  – 10:51\n\n─ Inauspicious ─\n  Rahu Kalam       18:05 – 19:43\n  
+ Gulika Kalam     16:26 – 18:05\n  Yamagandam       13:10 – 14:48\n  Va
+ rjyam          03:15 (+1) – 04:44 (+1)\n  Durmuhurtham     17:58 – 18:
+ 50\n\n─ Choghadiya ─\n  06:37 – 08:15  Udveg\n  08:15 – 09:53  Cha
+ r\n  09:53 – 11:32  Labh\n  11:32 – 13:10  Amrit\n  13:10 – 14:48  K
+ aal\n  14:48 – 16:26  Shubh\n  16:26 – 18:05  Rog\n  18:05 – 19:43  
+ Udveg\n\n─ Night Choghadiya ─\n  19:43 – 00:05 (+1)  Shubh\n  00:05 
+ (+1) – 04:27 (+1)  Amrit\n  04:27 (+1) – 08:49 (+1)  Char\n  08:49 (+1
+ ) – 13:11 (+1)  Rog\n  13:11 (+1) – 17:33 (+1)  Kaal\n  17:33 (+1) –
+  21:55 (+1)  Labh\n  21:55 (+1) – 02:16 (+1)  Udveg\n  02:16 (+1) – 06
+ :38 (+1)  Shubh\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n\n⚡ M
+ asa Shivaratri  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Magha · Shiva
+DTSTART;VALUE=DATE:20270831
+DTEND;VALUE=DATE:20270901
+UID:2027-08-31-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Shravana Maasam  ·  Krishna Pak
+ sham  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise
+  06:38  ·  Sunset 19:40  ·  Moonrise 06:35  ·  Moonset 19:35\nSolar sig
+ n: Simha  ·  Lunar sign: Simha\n\nTithi:     Amavasya           14:21 (-1
+ ) – 11:55\nNakshatra: Magha              13:40 (-1) – 12:01\nYoga:    
+   Shiva              15:10 (-1) – 12:06\nKarana:    Naga 01:07–11:55  
+ /  Kinstughna 11:55–22:44\n\n─ Auspicious ─\n  Brahma Muhurta   05:0
+ 2 – 05:50\n  Abhijit Muhurta  12:43 – 13:35\n  Amrita Kalam     09:47 
+ – 11:16\n  Amrita Kalam     04:29 (+1) – 05:58 (+1)\n\n─ Inauspiciou
+ s ─\n  Rahu Kalam       16:25 – 18:02\n  Gulika Kalam     13:09 – 14
+ :47\n  Yamagandam       09:54 – 11:31\n  Varjyam          19:30 – 21:0
+ 0\n  Durmuhurtham     09:15 – 10:07\n  Durmuhurtham     00:04 (+1) – 0
+ 0:48 (+1)\n\n─ Choghadiya ─\n  06:38 – 08:16  Rog\n  08:16 – 09:54
+   Udveg\n  09:54 – 11:31  Char\n  11:31 – 13:09  Labh\n  13:09 – 14:
+ 47  Amrit\n  14:47 – 16:25  Kaal\n  16:25 – 18:02  Shubh\n  18:02 – 
+ 19:40  Rog\n\n─ Night Choghadiya ─\n  19:40 – 00:03 (+1)  Kaal\n  00
+ :03 (+1) – 04:27 (+1)  Labh\n  04:27 (+1) – 08:50 (+1)  Udveg\n  08:50
+  (+1) – 13:13 (+1)  Shubh\n  13:13 (+1) – 17:37 (+1)  Amrit\n  17:37 (
+ +1) – 22:00 (+1)  Char\n  22:00 (+1) – 02:23 (+1)  Rog\n  02:23 (+1) 
+ – 06:47 (+1)  Kaal\n\n⚡ Ganda Moola (Magha)  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Parivartini Ekadashi · Purva Ashadha · Saubhagya
+DTSTART;VALUE=DATE:20270910
+DTEND;VALUE=DATE:20270911
+UID:2027-09-10-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla Pa
+ ksham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise
+  06:47  ·  Sunset 19:25  ·  Moonrise 16:50  ·  Moonset 01:40\nSolar sig
+ n: Simha  ·  Lunar sign: Dhanu\n\nTithi:     Parivartini Ekadashi 04:03 
+ – 05:41 (+1)\nNakshatra: Purva Ashadha      09:57 (-1) – 11:55\nYoga: 
+      Saubhagya          18:30 (-1) – 18:40\nKarana:    Vanija 04:03–16
+ :49  /  Vishti 16:49–05:41 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:11 – 05:59\n  Abhijit Muhurta  12:41 – 13:31\n\n─ Inauspicious 
+ ─\n  Rahu Kalam       11:31 – 13:06\n  Gulika Kalam     08:22 – 09:5
+ 6\n  Yamagandam       16:15 – 17:50\n  Varjyam          20:41 – 22:27\
+ n  Durmuhurtham     09:18 – 10:09\n  Durmuhurtham     13:31 – 14:22\n\
+ n─ Choghadiya ─\n  06:47 – 08:22  Char\n  08:22 – 09:56  Labh\n  0
+ 9:56 – 11:31  Amrit\n  11:31 – 13:06  Kaal\n  13:06 – 14:41  Shubh\n
+   14:41 – 16:15  Rog\n  16:15 – 17:50  Udveg\n  17:50 – 19:25  Char\
+ n\n─ Night Choghadiya ─\n  19:25 – 23:50  Rog\n  23:50 – 04:16 (+1
+ )  Kaal\n  04:16 (+1) – 08:41 (+1)  Labh\n  08:41 (+1) – 13:07 (+1)  U
+ dveg\n  13:07 (+1) – 17:32 (+1)  Shubh\n  17:32 (+1) – 21:58 (+1)  Amr
+ it\n  21:58 (+1) – 02:23 (+1)  Char\n  02:23 (+1) – 06:49 (+1)  Rog\n\
+ n─ Special Yogas ─\n  Siddha Yoga\n\n⚡ Parivartini Ekadashi — fast
+ ing day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Shravana · Atiganda
+DTSTART;VALUE=DATE:20270912
+DTEND;VALUE=DATE:20270913
+UID:2027-09-12-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla Pa
+ ksham  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 06
+ :49  ·  Sunset 19:22  ·  Moonrise 17:50  ·  Moonset 03:40\nSolar sign: 
+ Simha  ·  Lunar sign: Makara\n\nTithi:     Shukla Dwadashi    05:41 (-1) 
+ – 07:36\nNakshatra: Shravana           14:14 (-1) – 16:47\nYoga:      
+ Atiganda           19:05 (-1) – 19:40\nKarana:    Kaulava 07:36–20:38\
+ n\n─ Auspicious ─\n  Brahma Muhurta   05:13 – 06:01\n  Abhijit Muhur
+ ta  12:40 – 13:30\n\n─ Inauspicious ─\n  Rahu Kalam       17:48 – 
+ 19:22\n  Gulika Kalam     16:13 – 17:48\n  Yamagandam       13:05 – 14
+ :39\n  Varjyam          21:13 – 23:00\n  Durmuhurtham     17:41 – 18:3
+ 1\n\n─ Choghadiya ─\n  06:49 – 08:23  Udveg\n  08:23 – 09:57  Char
+ \n  09:57 – 11:31  Labh\n  11:31 – 13:05  Amrit\n  13:05 – 14:39  Ka
+ al\n  14:39 – 16:13  Shubh\n  16:13 – 17:48  Rog\n  17:48 – 19:22  U
+ dveg\n\n─ Night Choghadiya ─\n  19:22 – 20:48  Shubh\n  20:48 – 22
+ :14  Amrit\n  22:14 – 23:40  Char\n  23:40 – 01:06 (+1)  Rog\n  01:06 
+ (+1) – 02:31 (+1)  Kaal\n  02:31 (+1) – 03:57 (+1)  Labh\n  03:57 (+1)
+  – 05:23 (+1)  Udveg\n  05:23 (+1) – 06:49 (+1)  Shubh\n\n─ Special 
+ Yogas ─\n  Sarvartha Siddhi Yoga\n  Dagdha Yoga\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Dhanishtha · Sukarma
+DTSTART;VALUE=DATE:20270913
+DTEND;VALUE=DATE:20270914
+UID:2027-09-13-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla Pa
+ ksham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 0
+ 6:49  ·  Sunset 19:20  ·  Moonrise 18:15  ·  Moonset 04:39\nSolar sign:
+  Simha  ·  Lunar sign: Kumbha\n\nTithi:     Shukla Trayodashi  07:36 (-1)
+  – 09:40\nNakshatra: Dhanishtha         16:47 (-1) – 19:24\nYoga:     
+  Sukarma            19:40 (-1) – 20:18\nKarana:    Taitila 20:38 (-1)–
+ 09:40  /  Garaja 09:40–22:42\n\n─ Auspicious ─\n  Brahma Muhurta   0
+ 5:13 – 06:01\n  Abhijit Muhurta  12:40 – 13:30\n  Amrita Kalam     07:
+ 52 – 09:39\n\n─ Inauspicious ─\n  Rahu Kalam       08:23 – 09:57\n
+   Gulika Kalam     14:39 – 16:12\n  Yamagandam       11:31 – 13:05\n  
+ Varjyam          03:22 (+1) – 05:08 (+1)\n  Durmuhurtham     13:30 – 1
+ 4:20\n  Durmuhurtham     16:00 – 16:50\n\n─ Choghadiya ─\n  06:49 
+ – 08:23  Amrit\n  08:23 – 09:57  Kaal\n  09:57 – 11:31  Shubh\n  11:
+ 31 – 13:05  Rog\n  13:05 – 14:39  Udveg\n  14:39 – 16:12  Char\n  16
+ :12 – 17:46  Labh\n  17:46 – 19:20  Amrit\n\n─ Night Choghadiya ─\
+ n  19:20 – 23:46  Char\n  23:46 – 04:13 (+1)  Rog\n  04:13 (+1) – 08
+ :39 (+1)  Kaal\n  08:39 (+1) – 13:06 (+1)  Labh\n  13:06 (+1) – 17:32 
+ (+1)  Udveg\n  17:32 (+1) – 21:58 (+1)  Shubh\n  21:58 (+1) – 02:25 (+
+ 1)  Amrit\n  02:25 (+1) – 06:51 (+1)  Char\n\n⚡ Soma Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Purva Bhadrapada · Shoola
+DTSTART;VALUE=DATE:20270915
+DTEND;VALUE=DATE:20270916
+UID:2027-09-15-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Bhadrapada Maasam  ·  Shukla Pa
+ ksham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 
+ 06:51  ·  Sunset 19:17  ·  Moonrise 19:01  ·  Moonset 06:37\nSolar sign
+ : Simha  ·  Lunar sign: Kumbha\n\nTithi:     Pournami           11:42 (-1
+ ) – 13:31\nNakshatra: Purva Bhadrapada   21:55 (-1) – 00:11 (+1)\nYoga
+ :      Shoola             20:50 (-1) – 21:11\nKarana:    Bava 00:38–13
+ :31  /  Balava 13:31–02:18 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:15 – 06:03\n  Amrita Kalam     15:26 – 17:11\n\n─ Inauspicious 
+ ─\n  Rahu Kalam       13:04 – 14:37\n  Gulika Kalam     11:31 – 13:0
+ 4\n  Yamagandam       08:24 – 09:58\n  Durmuhurtham     12:39 – 13:29\
+ n\n─ Choghadiya ─\n  06:51 – 08:24  Labh\n  08:24 – 09:58  Amrit\n
+   09:58 – 11:31  Kaal\n  11:31 – 13:04  Shubh\n  13:04 – 14:37  Rog\
+ n  14:37 – 16:11  Udveg\n  16:11 – 17:44  Char\n  17:44 – 19:17  Lab
+ h\n\n─ Night Choghadiya ─\n  19:17 – 05:45 (+1)  Udveg\n  05:45 (+1)
+  – 16:13 (+1)  Shubh\n  16:13 (+1) – 02:41 (+1)  Amrit\n  02:41 (+1) 
+ – 13:09 (+1)  Char\n  13:09 (+1) – 23:37 (+1)  Rog\n  23:37 (+1) – 1
+ 0:05 (+1)  Kaal\n  10:05 (+1) – 20:33 (+1)  Labh\n  20:33 (+1) – 07:01
+  (+1)  Udveg\n\n⚡ Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Magha · Sadhya
+DTSTART;VALUE=DATE:20270927
+DTEND;VALUE=DATE:20270928
+UID:2027-09-27-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Bhadrapada Maasam  ·  Krishna P
+ aksham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 
+ 07:01  ·  Sunset 18:58  ·  Moonrise 04:11  ·  Moonset 17:33\nSolar sign
+ : Kanya  ·  Lunar sign: Simha\n\nTithi:     Krishna Trayodashi 03:13 – 
+ 00:48 (+1)\nNakshatra: Magha              21:50 (-1) – 20:10\nYoga:     
+  Sadhya             23:25 (-1) – 20:19\nKarana:    Garaja 03:13–14:00 
+  /  Vanija 14:00–00:48 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :25 – 06:13\n  Abhijit Muhurta  12:36 – 13:24\n  Amrita Kalam     17:5
+ 6 – 19:26\n\n─ Inauspicious ─\n  Rahu Kalam       08:31 – 10:01\n 
+  Gulika Kalam     14:29 – 15:59\n  Yamagandam       11:30 – 13:00\n  V
+ arjyam          09:00 – 10:30\n  Varjyam          03:39 (+1) – 05:08 (
+ +1)\n  Durmuhurtham     13:24 – 14:12\n  Durmuhurtham     15:47 – 16:3
+ 5\n\n─ Choghadiya ─\n  07:01 – 08:31  Amrit\n  08:31 – 10:01  Kaal
+ \n  10:01 – 11:30  Shubh\n  11:30 – 13:00  Rog\n  13:00 – 14:29  Udv
+ eg\n  14:29 – 15:59  Char\n  15:59 – 17:29  Labh\n  17:29 – 18:58  A
+ mrit\n\n─ Night Choghadiya ─\n  18:58 – 23:29  Char\n  23:29 – 04:
+ 00 (+1)  Rog\n  04:00 (+1) – 08:30 (+1)  Kaal\n  08:30 (+1) – 13:01 (+
+ 1)  Labh\n  13:01 (+1) – 17:31 (+1)  Udveg\n  17:31 (+1) – 22:02 (+1) 
+  Shubh\n  22:02 (+1) – 02:32 (+1)  Amrit\n  02:32 (+1) – 07:03 (+1)  C
+ har\n\n⚡ Masa Shivaratri  ·  Ganda Moola (Magha)  ·  Soma Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Mahalaya Amavasya — Amavasya · Uttara Phalguni · Shukla
+DTSTART;VALUE=DATE:20270929
+DTEND;VALUE=DATE:20270930
+UID:2027-09-29-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Bhadrapada Maasam  ·  Krishna P
+ aksham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise
+  07:03  ·  Sunset 18:55  ·  Moonrise 06:37  ·  Moonset 18:30\nSolar sig
+ n: Kanya  ·  Lunar sign: Kanya\n\nTithi:     Amavasya           22:30 (-1
+ ) – 20:23\nNakshatra: Uttara Phalguni    18:35 (-1) – 17:10\nYoga:    
+   Shukla             17:18 (-1) – 14:24\nKarana:    Chatushpada 22:30 (-
+ 1)–09:25  /  Naga 09:25–20:23\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:27 – 06:15\n  Amrita Kalam     10:24 – 11:54\n\n─ Inauspicious 
+ ─\n  Rahu Kalam       12:59 – 14:28\n  Gulika Kalam     11:30 – 12:5
+ 9\n  Yamagandam       08:32 – 10:01\n  Varjyam          01:10 (+1) – 0
+ 2:41 (+1)\n  Durmuhurtham     12:35 – 13:23\n\n─ Choghadiya ─\n  07:
+ 03 – 08:32  Labh\n  08:32 – 10:01  Amrit\n  10:01 – 11:30  Kaal\n  1
+ 1:30 – 12:59  Shubh\n  12:59 – 14:28  Rog\n  14:28 – 15:57  Udveg\n 
+  15:57 – 17:26  Char\n  17:26 – 18:55  Labh\n\n─ Night Choghadiya 
+ ─\n  18:55 – 02:27 (+1)  Udveg\n  02:27 (+1) – 10:00 (+1)  Shubh\n  
+ 10:00 (+1) – 17:32 (+1)  Amrit\n  17:32 (+1) – 01:04 (+1)  Char\n  01:
+ 04 (+1) – 08:36 (+1)  Rog\n  08:36 (+1) – 16:08 (+1)  Kaal\n  16:08 (+
+ 1) – 23:41 (+1)  Labh\n  23:41 (+1) – 07:13 (+1)  Udveg\n\n⚡ Mahalay
+ a Amavasya  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Papankusha Ekadashi · Dhanishtha · Shoola
+DTSTART;VALUE=DATE:20271010
+DTEND;VALUE=DATE:20271011
+UID:2027-10-10-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashvina Maasam  ·  Shukla Paksh
+ am  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 07:13
+   ·  Sunset 18:39  ·  Moonrise 16:18  ·  Moonset 02:29\nSolar sign: Kan
+ ya  ·  Lunar sign: Makara\n\nTithi:     Papankusha Ekadashi 20:51 (-1) 
+ – 22:57\nNakshatra: Dhanishtha         23:58 (-1) – 02:35 (+1)\nYoga: 
+      Shoola             02:37 – 03:13 (+1)\nKarana:    Vanija 20:51 (-1)
+ –09:53  /  Vishti 09:53–22:57\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:37 – 06:25\n  Abhijit Muhurta  12:33 – 13:19\n  Amrita Kalam     
+ 15:03 – 16:50\n\n─ Inauspicious ─\n  Rahu Kalam       17:13 – 18:3
+ 9\n  Gulika Kalam     15:47 – 17:13\n  Yamagandam       12:56 – 14:22\
+ n  Durmuhurtham     17:07 – 17:53\n\n─ Choghadiya ─\n  07:13 – 08:
+ 39  Udveg\n  08:39 – 10:04  Char\n  10:04 – 11:30  Labh\n  11:30 – 1
+ 2:56  Amrit\n  12:56 – 14:22  Kaal\n  14:22 – 15:47  Shubh\n  15:47 
+ – 17:13  Rog\n  17:13 – 18:39  Udveg\n\n─ Night Choghadiya ─\n  18
+ :39 – 23:13  Shubh\n  23:13 – 03:48 (+1)  Amrit\n  03:48 (+1) – 08:2
+ 2 (+1)  Char\n  08:22 (+1) – 12:57 (+1)  Rog\n  12:57 (+1) – 17:31 (+1
+ )  Kaal\n  17:31 (+1) – 22:06 (+1)  Labh\n  22:06 (+1) – 02:40 (+1)  U
+ dveg\n  02:40 (+1) – 07:15 (+1)  Shubh\n\n⚡ Papankusha Ekadashi — fa
+ sting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Purva Bhadrapada · Vriddhi
+DTSTART;VALUE=DATE:20271012
+DTEND;VALUE=DATE:20271013
+UID:2027-10-12-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashvina Maasam  ·  Shukla Paksh
+ am  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 0
+ 7:15  ·  Sunset 18:36  ·  Moonrise 17:05  ·  Moonset 04:27\nSolar sign:
+  Kanya  ·  Lunar sign: Kumbha\n\nTithi:     Shukla Trayodashi  01:01 – 
+ 02:52 (+1)\nNakshatra: Purva Bhadrapada   05:09 – 07:29 (+1)\nYoga:     
+  Vriddhi            03:46 – 04:08 (+1)\nKarana:    Kaulava 01:01–13:59
+   /  Taitila 13:59–02:52 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 05:39 – 06:27\n  Abhijit Muhurta  12:33 – 13:18\n  Amrita Kalam     22
+ :42 – 00:28 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       15:46 – 1
+ 7:11\n  Gulika Kalam     12:55 – 14:21\n  Yamagandam       10:05 – 11:
+ 30\n  Varjyam          12:10 – 13:56\n  Durmuhurtham     09:31 – 10:16
+ \n  Durmuhurtham     23:40 – 00:30 (+1)\n\n─ Choghadiya ─\n  07:15 
+ – 08:40  Rog\n  08:40 – 10:05  Udveg\n  10:05 – 11:30  Char\n  11:30
+  – 12:55  Labh\n  12:55 – 14:21  Amrit\n  14:21 – 15:46  Kaal\n  15:
+ 46 – 17:11  Shubh\n  17:11 – 18:36  Rog\n\n─ Night Choghadiya ─\n 
+  18:36 – 23:11  Kaal\n  23:11 – 03:46 (+1)  Labh\n  03:46 (+1) – 08:
+ 21 (+1)  Udveg\n  08:21 (+1) – 12:56 (+1)  Shubh\n  12:56 (+1) – 17:31
+  (+1)  Amrit\n  17:31 (+1) – 22:06 (+1)  Char\n  22:06 (+1) – 02:42 (+
+ 1)  Rog\n  02:42 (+1) – 07:17 (+1)  Kaal\n\n─ Special Yogas ─\n  Sid
+ dha Yoga\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Uttara Bhadrapada · Vyaghata
+DTSTART;VALUE=DATE:20271014
+DTEND;VALUE=DATE:20271015
+UID:2027-10-14-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashvina Maasam  ·  Shukla Paksh
+ am  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Sharad\nSunrise 07:1
+ 7  ·  Sunset 18:33  ·  Moonrise 17:53  ·  Moonset 06:27\nSolar sign: Ka
+ nya  ·  Lunar sign: Meena\n\nTithi:     Pournami           04:23 – 05:2
+ 9 (+1)\nNakshatra: Uttara Bhadrapada  07:29 (-1) – 09:29\nYoga:      Vya
+ ghata           04:14 – 04:01 (+1)\nKarana:    Vishti 04:23–17:00  /  
+ Bava 17:00–05:29 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:41 
+ – 06:29\n  Abhijit Muhurta  12:32 – 13:17\n\n─ Inauspicious ─\n  R
+ ahu Kalam       14:19 – 15:44\n  Gulika Kalam     10:06 – 11:30\n  Yam
+ agandam       07:17 – 08:41\n  Varjyam          22:15 – 23:57\n  Durmu
+ hurtham     11:02 – 11:47\n  Durmuhurtham     15:33 – 16:18\n\n─ Cho
+ ghadiya ─\n  07:17 – 08:41  Shubh\n  08:41 – 10:06  Rog\n  10:06 –
+  11:30  Udveg\n  11:30 – 12:55  Char\n  12:55 – 14:19  Labh\n  14:19 
+ – 15:44  Amrit\n  15:44 – 17:09  Kaal\n  17:09 – 18:33  Shubh\n\n─
+  Night Choghadiya ─\n  18:33 – 02:10 (+1)  Amrit\n  02:10 (+1) – 09:
+ 47 (+1)  Char\n  09:47 (+1) – 17:23 (+1)  Rog\n  17:23 (+1) – 01:00 (+
+ 1)  Kaal\n  01:00 (+1) – 08:37 (+1)  Labh\n  08:37 (+1) – 16:14 (+1)  
+ Udveg\n  16:14 (+1) – 23:51 (+1)  Shubh\n  23:51 (+1) – 07:27 (+1)  Am
+ rit\n\n─ Special Yogas ─\n  Siddha Yoga\n\n⚡ Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Rama Ekadashi · Purva Phalguni · Brahma
+DTSTART;VALUE=DATE:20271025
+DTEND;VALUE=DATE:20271026
+UID:2027-10-25-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashvina Maasam  ·  Krishna Paks
+ ham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 07
+ :27  ·  Sunset 18:19  ·  Moonrise 03:08  ·  Moonset 16:01\nSolar sign: 
+ Tula  ·  Lunar sign: Simha\n\nTithi:     Rama Ekadashi      16:55 (-1) 
+ – 14:33\nNakshatra: Purva Phalguni     04:20 – 02:44 (+1)\nYoga:      
+ Brahma             03:49 – 00:45 (+1)\nKarana:    Balava 03:43–14:33  
+ /  Kaulava 14:33–01:23 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :51 – 06:39\n  Abhijit Muhurta  12:31 – 13:15\n  Amrita Kalam     20:4
+ 5 – 22:15\n\n─ Inauspicious ─\n  Rahu Kalam       08:49 – 10:10\n 
+  Gulika Kalam     14:14 – 15:36\n  Yamagandam       11:32 – 12:53\n  V
+ arjyam          11:48 – 13:18\n  Durmuhurtham     13:15 – 13:58\n  Dur
+ muhurtham     15:25 – 16:08\n\n─ Choghadiya ─\n  07:27 – 08:49  Am
+ rit\n  08:49 – 10:10  Kaal\n  10:10 – 11:32  Shubh\n  11:32 – 12:53 
+  Rog\n  12:53 – 14:14  Udveg\n  14:14 – 15:36  Char\n  15:36 – 16:57
+   Labh\n  16:57 – 18:19  Amrit\n\n─ Night Choghadiya ─\n  18:19 – 
+ 19:57  Char\n  19:57 – 21:36  Rog\n  21:36 – 23:15  Kaal\n  23:15 – 
+ 00:53 (+1)  Labh\n  00:53 (+1) – 02:32 (+1)  Udveg\n  02:32 (+1) – 04:
+ 11 (+1)  Shubh\n  04:11 (+1) – 05:50 (+1)  Amrit\n  05:50 (+1) – 07:28
+  (+1)  Char\n\n─ Special Yogas ─\n  Dagdha Yoga\n\n⚡ Rama Ekadashi 
+ — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Uttara Phalguni · Indra
+DTSTART;VALUE=DATE:20271026
+DTEND;VALUE=DATE:20271027
+UID:2027-10-26-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashvina Maasam  ·  Krishna Paks
+ ham  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise
+  07:28  ·  Sunset 18:17  ·  Moonrise 04:18  ·  Moonset 16:29\nSolar sig
+ n: Tula  ·  Lunar sign: Simha\n\nTithi:     Krishna Dwadashi   14:33 (-1)
+  – 12:16\nNakshatra: Uttara Phalguni    02:44 – 01:16 (+1)\nYoga:     
+  Indra              00:45 – 21:47\nKarana:    Taitila 01:23–12:16  /  
+ Garaja 12:16–23:12\n\n─ Auspicious ─\n  Brahma Muhurta   05:52 – 0
+ 6:40\n  Abhijit Muhurta  12:31 – 13:15\n  Amrita Kalam     18:30 – 20:
+ 01\n\n─ Inauspicious ─\n  Rahu Kalam       15:35 – 16:56\n  Gulika K
+ alam     12:53 – 14:14\n  Yamagandam       10:11 – 11:32\n  Varjyam   
+        09:29 – 11:00\n  Durmuhurtham     09:38 – 10:21\n  Durmuhurtham
+      23:34 – 00:27 (+1)\n\n─ Choghadiya ─\n  07:28 – 08:49  Rog\n 
+  08:49 – 10:11  Udveg\n  10:11 – 11:32  Char\n  11:32 – 12:53  Labh\
+ n  12:53 – 14:14  Amrit\n  14:14 – 15:35  Kaal\n  15:35 – 16:56  Shu
+ bh\n  16:56 – 18:17  Rog\n\n─ Night Choghadiya ─\n  18:17 – 19:56 
+  Kaal\n  19:56 – 21:35  Labh\n  21:35 – 23:14  Udveg\n  23:14 – 00:5
+ 3 (+1)  Shubh\n  00:53 (+1) – 02:32 (+1)  Amrit\n  02:32 (+1) – 04:11 
+ (+1)  Char\n  04:11 (+1) – 05:50 (+1)  Rog\n  05:50 (+1) – 07:29 (+1) 
+  Kaal\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n  Tripushkara Yog
+ a\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Hasta · Vaidhriti
+DTSTART;VALUE=DATE:20271027
+DTEND;VALUE=DATE:20271028
+UID:2027-10-27-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Ashvina Maasam  ·  Krishna Paks
+ ham  ·  Budhavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 0
+ 7:29  ·  Sunset 18:16  ·  Moonrise 05:28  ·  Moonset 16:58\nSolar sign:
+  Tula  ·  Lunar sign: Kanya\n\nTithi:     Krishna Trayodashi 12:16 (-1) 
+ – 10:11\nNakshatra: Hasta              01:16 – 00:02 (+1)\nYoga:      
+ Vaidhriti          21:47 (-1) – 19:00\nKarana:    Vanija 23:12 (-1)–10
+ :11  /  Vishti 10:11–21:13\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 53 – 06:41\n  Amrita Kalam     18:20 – 19:51\n\n─ Inauspicious ─\n
+   Rahu Kalam       12:53 – 14:14\n  Gulika Kalam     11:32 – 12:53\n  
+ Yamagandam       08:50 – 10:11\n  Varjyam          09:14 – 10:45\n  Du
+ rmuhurtham     12:31 – 13:14\n\n─ Choghadiya ─\n  07:29 – 08:50  L
+ abh\n  08:50 – 10:11  Amrit\n  10:11 – 11:32  Kaal\n  11:32 – 12:53 
+  Shubh\n  12:53 – 14:14  Rog\n  14:14 – 15:34  Udveg\n  15:34 – 16:5
+ 5  Char\n  16:55 – 18:16  Labh\n\n─ Night Choghadiya ─\n  18:16 – 
+ 07:57 (+1)  Udveg\n  07:57 (+1) – 21:38 (+1)  Shubh\n  21:38 (+1) – 11
+ :19 (+1)  Amrit\n  11:19 (+1) – 01:00 (+1)  Char\n  01:00 (+1) – 14:40
+  (+1)  Rog\n  14:40 (+1) – 04:21 (+1)  Kaal\n  04:21 (+1) – 17:02 (+1)
+   Labh\n  17:02 (+1) – 06:43 (+1)  Udveg\n\n─ Special Yogas ─\n  Sar
+ vartha Siddhi Yoga\n\n⚡ Masa Shivaratri  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Prabodhini Ekadashi · Purva Bhadrapada · Vyaghata
+DTSTART;VALUE=DATE:20271109
+DTEND;VALUE=DATE:20271110
+UID:2027-11-09-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Kartika Maasam  ·  Shukla Paksh
+ am  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 
+ 06:43  ·  Sunset 17:03  ·  Moonrise 14:29  ·  Moonset 02:13\nSolar sign
+ : Tula  ·  Lunar sign: Kumbha\n\nTithi:     Prabodhini Ekadashi 14:20 (-1
+ ) – 16:13\nNakshatra: Purva Bhadrapada   11:22 (-1) – 13:46\nYoga:    
+   Vyaghata           08:50 (-1) – 09:14\nKarana:    Vishti 03:19–16:13
+   /  Bava 16:13–05:03 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 07 – 05:55\n  Abhijit Muhurta  11:32 – 12:13\n\n─ Inauspicious ─\n
+   Rahu Kalam       14:28 – 15:45\n  Gulika Kalam     11:53 – 13:10\n  
+ Yamagandam       09:18 – 10:35\n  Varjyam          00:11 (+1) – 01:56 
+ (+1)\n  Durmuhurtham     08:47 – 09:28\n  Durmuhurtham     22:31 – 23:
+ 26\n\n─ Choghadiya ─\n  06:43 – 08:00  Rog\n  08:00 – 09:18  Udveg
+ \n  09:18 – 10:35  Char\n  10:35 – 11:53  Labh\n  11:53 – 13:10  Amr
+ it\n  13:10 – 14:28  Kaal\n  14:28 – 15:45  Shubh\n  15:45 – 17:03  
+ Rog\n\n─ Night Choghadiya ─\n  17:03 – 21:45  Kaal\n  21:45 – 02:2
+ 8 (+1)  Labh\n  02:28 (+1) – 07:11 (+1)  Udveg\n  07:11 (+1) – 11:54 (
+ +1)  Shubh\n  11:54 (+1) – 16:37 (+1)  Amrit\n  16:37 (+1) – 21:19 (+1
+ )  Char\n  21:19 (+1) – 02:02 (+1)  Rog\n  02:02 (+1) – 06:45 (+1)  Ka
+ al\n\n⚡ Prabodhini Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Revati · Vajra
+DTSTART;VALUE=DATE:20271111
+DTEND;VALUE=DATE:20271112
+UID:2027-11-11-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Kartika Maasam  ·  Shukla Paksh
+ am  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 06:
+ 45  ·  Sunset 17:01  ·  Moonrise 15:20  ·  Moonset 04:15\nSolar sign: T
+ ula  ·  Lunar sign: Meena\n\nTithi:     Shukla Trayodashi  17:46 (-1) –
+  18:52\nNakshatra: Revati             15:50 (-1) – 17:30\nYoga:      Vaj
+ ra              09:24 (-1) – 09:15\nKarana:    Taitila 06:22–18:52\n\n
+ ─ Auspicious ─\n  Brahma Muhurta   05:09 – 05:57\n  Abhijit Muhurta 
+  11:32 – 12:14\n  Amrita Kalam     14:56 – 16:39\n\n─ Inauspicious 
+ ─\n  Rahu Kalam       13:10 – 14:27\n  Gulika Kalam     09:19 – 10:3
+ 6\n  Yamagandam       06:45 – 08:02\n  Durmuhurtham     10:10 – 10:51\
+ n  Durmuhurtham     14:17 – 14:58\n\n─ Choghadiya ─\n  06:45 – 08:
+ 02  Shubh\n  08:02 – 09:19  Rog\n  09:19 – 10:36  Udveg\n  10:36 – 1
+ 1:53  Char\n  11:53 – 13:10  Labh\n  13:10 – 14:27  Amrit\n  14:27 –
+  15:44  Kaal\n  15:44 – 17:01  Shubh\n\n─ Night Choghadiya ─\n  17:0
+ 1 – 21:44  Amrit\n  21:44 – 02:27 (+1)  Char\n  02:27 (+1) – 07:11 (
+ +1)  Rog\n  07:11 (+1) – 11:54 (+1)  Kaal\n  11:54 (+1) – 16:37 (+1)  
+ Labh\n  16:37 (+1) – 21:21 (+1)  Udveg\n  21:21 (+1) – 02:04 (+1)  Shu
+ bh\n  02:04 (+1) – 06:47 (+1)  Amrit\n\n─ Special Yogas ─\n  Sarvart
+ ha Siddhi Yoga\n\n⚡ Ganda Moola (Revati)  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Karthika Pournami — Pournami · Bharani · Vyatipata
+DTSTART;VALUE=DATE:20271113
+DTEND;VALUE=DATE:20271114
+UID:2027-11-13-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Kartika Maasam  ·  Shukla Paksh
+ am  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 06
+ :47  ·  Sunset 16:59  ·  Moonrise 16:28  ·  Moonset 06:28\nSolar sign: 
+ Tula  ·  Lunar sign: Mesha\n\nTithi:     Pournami           19:28 (-1) 
+ – 19:33\nNakshatra: Bharani            18:41 (-1) – 19:23\nYoga:      
+ Vyatipata          08:44 (-1) – 07:50\nKarana:    Vishti 19:28 (-1)–07
+ :34  /  Bava 07:34–19:33\n\n─ Auspicious ─\n  Brahma Muhurta   05:11
+  – 05:59\n  Abhijit Muhurta  11:33 – 12:14\n  Amrita Kalam     14:26 
+ – 16:05\n\n─ Inauspicious ─\n  Rahu Kalam       09:20 – 10:37\n  G
+ ulika Kalam     06:47 – 08:04\n  Yamagandam       13:10 – 14:26\n  Dur
+ muhurtham     06:47 – 07:28\n  Durmuhurtham     07:28 – 08:09\n\n─ C
+ hoghadiya ─\n  06:47 – 08:04  Kaal\n  08:04 – 09:20  Shubh\n  09:20 
+ – 10:37  Rog\n  10:37 – 11:53  Udveg\n  11:53 – 13:10  Char\n  13:10
+  – 14:26  Labh\n  14:26 – 15:43  Amrit\n  15:43 – 16:59  Kaal\n\n─
+  Night Choghadiya ─\n  16:59 – 21:44 (+1)  Labh\n  21:44 (+1) – 02:2
+ 9 (+1)  Udveg\n  02:29 (+1) – 07:14 (+1)  Shubh\n  07:14 (+1) – 11:59 
+ (+1)  Amrit\n  11:59 (+1) – 16:43 (+1)  Char\n  16:43 (+1) – 21:28 (+1
+ )  Rog\n  21:28 (+1) – 02:13 (+1)  Kaal\n  02:13 (+1) – 06:58 (+1)  La
+ bh\n\n⚡ Karthika Pournami  ·  Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Utpanna Ekadashi · Uttara Phalguni · Preeti
+DTSTART;VALUE=DATE:20271123
+DTEND;VALUE=DATE:20271124
+UID:2027-11-23-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Kartika Maasam  ·  Krishna Paks
+ ham  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise
+  06:58  ·  Sunset 16:53  ·  Moonrise 02:16  ·  Moonset 13:59\nSolar sig
+ n: Vrischika  ·  Lunar sign: Kanya\n\nTithi:     Utpanna Ekadashi   01:50
+  – 23:47\nNakshatra: Uttara Phalguni    09:53 (-1) – 08:22\nYoga:     
+  Preeti             03:31 – 00:38 (+1)\nKarana:    Bava 01:50–12:47  /
+   Balava 12:47–23:47\n\n─ Auspicious ─\n  Brahma Muhurta   05:22 –
+  06:10\n  Abhijit Muhurta  11:36 – 12:15\n  Amrita Kalam     01:24 (+1) 
+ – 02:55 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       14:24 – 15:39
+ \n  Gulika Kalam     11:55 – 13:10\n  Yamagandam       09:27 – 10:41\n
+   Varjyam          16:19 – 17:50\n  Durmuhurtham     08:57 – 09:37\n  
+ Durmuhurtham     22:31 – 23:28\n\n─ Choghadiya ─\n  06:58 – 08:12 
+  Rog\n  08:12 – 09:27  Udveg\n  09:27 – 10:41  Char\n  10:41 – 11:55
+   Labh\n  11:55 – 13:10  Amrit\n  13:10 – 14:24  Kaal\n  14:24 – 15:
+ 39  Shubh\n  15:39 – 16:53  Rog\n\n─ Night Choghadiya ─\n  16:53 –
+  21:39  Kaal\n  21:39 – 02:25 (+1)  Labh\n  02:25 (+1) – 07:11 (+1)  U
+ dveg\n  07:11 (+1) – 11:56 (+1)  Shubh\n  11:56 (+1) – 16:42 (+1)  Amr
+ it\n  16:42 (+1) – 21:28 (+1)  Char\n  21:28 (+1) – 02:14 (+1)  Rog\n 
+  02:14 (+1) – 07:00 (+1)  Kaal\n\n─ Special Yogas ─\n  Sarvartha Sid
+ dhi Yoga\n\n⚡ Utpanna Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Swati · Saubhagya
+DTSTART;VALUE=DATE:20271125
+DTEND;VALUE=DATE:20271126
+UID:2027-11-25-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Kartika Maasam  ·  Krishna Paks
+ ham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 07
+ :00  ·  Sunset 16:52  ·  Moonrise 04:33  ·  Moonset 15:00\nSolar sign: 
+ Vrischika  ·  Lunar sign: Tula\n\nTithi:     Krishna Trayodashi 21:59 (-1
+ ) – 20:31\nNakshatra: Swati              06:04 – 05:23 (+1)\nYoga:    
+   Saubhagya          21:59 (-1) – 19:35\nKarana:    Garaja 21:59 (-1)–
+ 09:12  /  Vanija 09:12–20:31\n\n─ Auspicious ─\n  Brahma Muhurta   0
+ 5:24 – 06:12\n  Abhijit Muhurta  11:36 – 12:16\n  Amrita Kalam     20:
+ 50 – 22:23\n\n─ Inauspicious ─\n  Rahu Kalam       13:10 – 14:24\n
+   Gulika Kalam     09:28 – 10:42\n  Yamagandam       07:00 – 08:14\n  
+ Varjyam          11:30 – 13:03\n  Durmuhurtham     10:17 – 10:57\n  Du
+ rmuhurtham     14:14 – 14:54\n\n─ Choghadiya ─\n  07:00 – 08:14  S
+ hubh\n  08:14 – 09:28  Rog\n  09:28 – 10:42  Udveg\n  10:42 – 11:56 
+  Char\n  11:56 – 13:10  Labh\n  13:10 – 14:24  Amrit\n  14:24 – 15:3
+ 8  Kaal\n  15:38 – 16:52  Shubh\n\n─ Night Choghadiya ─\n  16:52 –
+  21:38  Amrit\n  21:38 – 02:25 (+1)  Char\n  02:25 (+1) – 07:11 (+1)  
+ Rog\n  07:11 (+1) – 11:57 (+1)  Kaal\n  11:57 (+1) – 16:43 (+1)  Labh\
+ n  16:43 (+1) – 21:29 (+1)  Udveg\n  21:29 (+1) – 02:16 (+1)  Shubh\n 
+  02:16 (+1) – 07:02 (+1)  Amrit\n\n─ Special Yogas ─\n  Sarvartha Si
+ ddhi Yoga\n\n⚡ Masa Shivaratri  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Anuradha · Atiganda
+DTSTART;VALUE=DATE:20271127
+DTEND;VALUE=DATE:20271128
+UID:2027-11-27-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Kartika Maasam  ·  Krishna Paks
+ ham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 0
+ 7:02  ·  Sunset 16:51  ·  Moonrise 06:49  ·  Moonset 16:20\nSolar sign:
+  Vrischika  ·  Lunar sign: Vrischika\n\nTithi:     Amavasya           19:
+ 27 (-1) – 18:50\nNakshatra: Anuradha           05:08 – 05:20 (+1)\nYog
+ a:      Atiganda           17:29 (-1) – 15:45\nKarana:    Chatushpada 19
+ :27 (-1)–07:05  /  Naga 07:05–18:50\n\n─ Auspicious ─\n  Brahma Mu
+ hurta   05:26 – 06:14\n  Abhijit Muhurta  11:37 – 12:16\n  Amrita Kala
+ m     18:51 – 20:27\n\n─ Inauspicious ─\n  Rahu Kalam       09:29 
+ – 10:43\n  Gulika Kalam     07:02 – 08:16\n  Yamagandam       13:10 
+ – 14:24\n  Varjyam          09:10 – 10:47\n  Durmuhurtham     07:02 
+ – 07:41\n  Durmuhurtham     07:41 – 08:20\n\n─ Choghadiya ─\n  07:
+ 02 – 08:16  Kaal\n  08:16 – 09:29  Shubh\n  09:29 – 10:43  Rog\n  10
+ :43 – 11:57  Udveg\n  11:57 – 13:10  Char\n  13:10 – 14:24  Labh\n  
+ 14:24 – 15:38  Amrit\n  15:38 – 16:51  Kaal\n\n─ Night Choghadiya 
+ ─\n  16:51 – 03:39 (+1)  Labh\n  03:39 (+1) – 14:27 (+1)  Udveg\n  1
+ 4:27 (+1) – 01:14 (+1)  Shubh\n  01:14 (+1) – 12:02 (+1)  Amrit\n  12:
+ 02 (+1) – 22:50 (+1)  Char\n  22:50 (+1) – 09:37 (+1)  Rog\n  09:37 (+
+ 1) – 20:25 (+1)  Kaal\n  20:25 (+1) – 07:13 (+1)  Labh\n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Mokshada Ekadashi · Ashvini · Variyan
+DTSTART;VALUE=DATE:20271209
+DTEND;VALUE=DATE:20271210
+UID:2027-12-09-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Shukla Pa
+ ksham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 
+ 07:13  ·  Sunset 16:50  ·  Moonrise 13:47  ·  Moonset 03:01\nSolar sign
+ : Vrischika  ·  Lunar sign: Mesha\n\nTithi:     Mokshada Ekadashi  08:57 
+ (-1) – 10:02\nNakshatra: Ashvini            00:57 – 02:15 (+1)\nYoga: 
+      Variyan            14:48 (-1) – 14:24\nKarana:    Vishti 21:33 (-1)
+ –10:02  /  Bava 10:02–22:23\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 05:37 – 06:25\n  Abhijit Muhurta  11:42 – 12:21\n  Amrita Kalam     18
+ :39 – 20:21\n\n─ Inauspicious ─\n  Rahu Kalam       13:14 – 14:26\
+ n  Gulika Kalam     09:37 – 10:49\n  Yamagandam       07:13 – 08:25\n 
+  Varjyam          22:02 – 23:43\n  Durmuhurtham     10:25 – 11:04\n  D
+ urmuhurtham     14:16 – 14:55\n\n─ Choghadiya ─\n  07:13 – 08:25  
+ Shubh\n  08:25 – 09:37  Rog\n  09:37 – 10:49  Udveg\n  10:49 – 12:01
+   Char\n  12:01 – 13:14  Labh\n  13:14 – 14:26  Amrit\n  14:26 – 15:
+ 38  Kaal\n  15:38 – 16:50  Shubh\n\n─ Night Choghadiya ─\n  16:50 
+ – 18:38  Amrit\n  18:38 – 20:26  Char\n  20:26 – 22:14  Rog\n  22:14
+  – 00:02 (+1)  Kaal\n  00:02 (+1) – 01:50 (+1)  Labh\n  01:50 (+1) –
+  03:38 (+1)  Udveg\n  03:38 (+1) – 05:26 (+1)  Shubh\n  05:26 (+1) – 0
+ 7:14 (+1)  Amrit\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n\n⚡ 
+ Ganda Moola (Ashvini)  ·  Mokshada Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Bharani · Parigha
+DTSTART;VALUE=DATE:20271210
+DTEND;VALUE=DATE:20271211
+UID:2027-12-10-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Shukla Pa
+ ksham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunris
+ e 07:14  ·  Sunset 16:50  ·  Moonrise 14:21  ·  Moonset 04:07\nSolar si
+ gn: Vrischika  ·  Lunar sign: Mesha\n\nTithi:     Shukla Dwadashi    10:0
+ 2 (-1) – 10:37\nNakshatra: Bharani            02:15 – 03:03 (+1)\nYoga
+ :      Parigha            14:24 (-1) – 13:36\nKarana:    Balava 22:23 (-
+ 1)–10:37  /  Kaulava 10:37–22:43\n\n─ Auspicious ─\n  Brahma Muhur
+ ta   05:38 – 06:26\n  Abhijit Muhurta  11:43 – 12:21\n  Amrita Kalam  
+    22:05 – 23:44\n\n─ Inauspicious ─\n  Rahu Kalam       10:50 – 1
+ 2:02\n  Gulika Kalam     08:26 – 09:38\n  Yamagandam       14:26 – 15:
+ 38\n  Varjyam          12:10 – 13:49\n  Durmuhurtham     09:09 – 09:47
+ \n  Durmuhurtham     12:21 – 13:00\n\n─ Choghadiya ─\n  07:14 – 08
+ :26  Char\n  08:26 – 09:38  Labh\n  09:38 – 10:50  Amrit\n  10:50 – 
+ 12:02  Kaal\n  12:02 – 13:14  Shubh\n  13:14 – 14:26  Rog\n  14:26 –
+  15:38  Udveg\n  15:38 – 16:50  Char\n\n─ Night Choghadiya ─\n  16:5
+ 0 – 18:38  Rog\n  18:38 – 20:26  Kaal\n  20:26 – 22:14  Labh\n  22:1
+ 4 – 00:02 (+1)  Udveg\n  00:02 (+1) – 01:50 (+1)  Shubh\n  01:50 (+1) 
+ – 03:38 (+1)  Amrit\n  03:38 (+1) – 05:26 (+1)  Char\n  05:26 (+1) –
+  07:14 (+1)  Rog\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Krittika · Shiva
+DTSTART;VALUE=DATE:20271211
+DTEND;VALUE=DATE:20271212
+UID:2027-12-11-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Shukla Pa
+ ksham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise
+  07:14  ·  Sunset 16:50  ·  Moonrise 15:02  ·  Moonset 05:16\nSolar sig
+ n: Vrischika  ·  Lunar sign: Mesha\n\nTithi:     Shukla Trayodashi  10:37
+  (-1) – 10:41\nNakshatra: Krittika           03:03 – 03:21 (+1)\nYoga:
+       Shiva              13:36 (-1) – 12:24\nKarana:    Taitila 22:43 (-
+ 1)–10:41  /  Garaja 10:41–22:32\n\n─ Auspicious ─\n  Brahma Muhurt
+ a   05:38 – 06:26\n  Abhijit Muhurta  11:43 – 12:22\n  Amrita Kalam   
+   00:55 (+1) – 02:33 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       09
+ :38 – 10:50\n  Gulika Kalam     07:14 – 08:26\n  Yamagandam       13:1
+ 4 – 14:26\n  Varjyam          15:12 – 16:49\n  Durmuhurtham     07:14 
+ – 07:53\n  Durmuhurtham     07:53 – 08:31\n\n─ Choghadiya ─\n  07:
+ 14 – 08:26  Kaal\n  08:26 – 09:38  Shubh\n  09:38 – 10:50  Rog\n  10
+ :50 – 12:02  Udveg\n  12:02 – 13:14  Char\n  13:14 – 14:26  Labh\n  
+ 14:26 – 15:38  Amrit\n  15:38 – 16:50  Kaal\n\n─ Night Choghadiya 
+ ─\n  16:50 – 21:39  Labh\n  21:39 – 02:27 (+1)  Udveg\n  02:27 (+1) 
+ – 07:15 (+1)  Shubh\n  07:15 (+1) – 12:03 (+1)  Amrit\n  12:03 (+1) 
+ – 16:51 (+1)  Char\n  16:51 (+1) – 21:40 (+1)  Rog\n  21:40 (+1) – 0
+ 2:28 (+1)  Kaal\n  02:28 (+1) – 07:16 (+1)  Labh\n\n⚡ Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Mrigashira · Sadhya
+DTSTART;VALUE=DATE:20271213
+DTEND;VALUE=DATE:20271214
+UID:2027-12-13-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Shukla Pa
+ ksham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Hemanta\nSunrise 
+ 07:16  ·  Sunset 16:51  ·  Moonrise 16:55  ·  Moonset 07:31\nSolar sign
+ : Vrischika  ·  Lunar sign: Vrishabha\n\nTithi:     Pournami           10
+ :15 (-1) – 09:20\nNakshatra: Mrigashira         03:12 – 02:36 (+1)\nYo
+ ga:      Sadhya             10:49 (-1) – 08:52\nKarana:    Bava 21:51 (-
+ 1)–09:20  /  Balava 09:20–20:44\n\n─ Auspicious ─\n  Brahma Muhurt
+ a   05:40 – 06:28\n  Abhijit Muhurta  11:44 – 12:22\n  Amrita Kalam   
+   18:01 – 19:35\n\n─ Inauspicious ─\n  Rahu Kalam       08:28 – 09
+ :40\n  Gulika Kalam     13:15 – 14:27\n  Yamagandam       10:51 – 12:0
+ 3\n  Varjyam          08:39 – 10:13\n  Durmuhurtham     12:22 – 13:01\
+ n  Durmuhurtham     14:17 – 14:56\n\n─ Choghadiya ─\n  07:16 – 08:
+ 28  Amrit\n  08:28 – 09:40  Kaal\n  09:40 – 10:51  Shubh\n  10:51 – 
+ 12:03  Rog\n  12:03 – 13:15  Udveg\n  13:15 – 14:27  Char\n  14:27 –
+  15:39  Labh\n  15:39 – 16:51  Amrit\n\n─ Night Choghadiya ─\n  16:5
+ 1 – 21:40 (+1)  Char\n  21:40 (+1) – 02:29 (+1)  Rog\n  02:29 (+1) –
+  07:17 (+1)  Kaal\n  07:17 (+1) – 12:06 (+1)  Labh\n  12:06 (+1) – 16:
+ 55 (+1)  Udveg\n  16:55 (+1) – 21:44 (+1)  Shubh\n  21:44 (+1) – 02:33
+  (+1)  Amrit\n  02:33 (+1) – 07:22 (+1)  Char\n\n─ Special Yogas ─\n
+   Sarvartha Siddhi Yoga\n  Amrita Siddhi Yoga\n\n⚡ Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Saphala Ekadashi · Swati · Sukarma
+DTSTART;VALUE=DATE:20271223
+DTEND;VALUE=DATE:20271224
+UID:2027-12-23-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Krishna P
+ aksham  ·  Guruvaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunris
+ e 07:22  ·  Sunset 16:55  ·  Moonrise 03:32  ·  Moonset 13:36\nSolar si
+ gn: Dhanu  ·  Lunar sign: Tula\n\nTithi:     Saphala Ekadashi   13:12 (-1
+ ) – 11:47\nNakshatra: Swati              14:03 (-1) – 13:18\nYoga:    
+   Sukarma            01:34 – 23:21\nKarana:    Balava 00:27–11:47  /  
+ Kaulava 11:47–23:13\n\n─ Auspicious ─\n  Brahma Muhurta   05:46 – 
+ 06:34\n  Abhijit Muhurta  11:49 – 12:27\n  Amrita Kalam     04:16 (+1) 
+ – 05:51 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       13:20 – 14:32
+ \n  Gulika Kalam     09:45 – 10:57\n  Yamagandam       07:22 – 08:33\n
+   Varjyam          18:49 – 20:23\n  Durmuhurtham     10:33 – 11:11\n  
+ Durmuhurtham     14:22 – 15:00\n\n─ Choghadiya ─\n  07:22 – 08:33 
+  Shubh\n  08:33 – 09:45  Rog\n  09:45 – 10:57  Udveg\n  10:57 – 12:0
+ 8  Char\n  12:08 – 13:20  Labh\n  13:20 – 14:32  Amrit\n  14:32 – 15
+ :43  Kaal\n  15:43 – 16:55  Shubh\n\n─ Night Choghadiya ─\n  16:55 
+ – 18:43  Amrit\n  18:43 – 20:32  Char\n  20:32 – 22:20  Rog\n  22:20
+  – 00:08 (+1)  Kaal\n  00:08 (+1) – 01:57 (+1)  Labh\n  01:57 (+1) –
+  03:45 (+1)  Udveg\n  03:45 (+1) – 05:34 (+1)  Shubh\n  05:34 (+1) – 0
+ 7:22 (+1)  Amrit\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n\n⚡ 
+ Saphala Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Dwadashi · Vishakha · Dhriti
+DTSTART;VALUE=DATE:20271224
+DTEND;VALUE=DATE:20271225
+UID:2027-12-24-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Krishna P
+ aksham  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunr
+ ise 07:22  ·  Sunset 16:55  ·  Moonrise 04:38  ·  Moonset 14:16\nSolar 
+ sign: Dhanu  ·  Lunar sign: Vrischika\n\nTithi:     Krishna Dwadashi   11
+ :47 (-1) – 10:46\nNakshatra: Vishakha           13:18 (-1) – 12:56\nYo
+ ga:      Dhriti             23:21 (-1) – 21:29\nKarana:    Taitila 23:13
+  (-1)–10:46  /  Garaja 10:46–22:25\n\n─ Auspicious ─\n  Brahma Muh
+ urta   05:46 – 06:34\n  Abhijit Muhurta  11:50 – 12:28\n  Amrita Kalam
+      02:35 (+1) – 04:12 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam      
+  10:57 – 12:09\n  Gulika Kalam     08:34 – 09:46\n  Yamagandam       1
+ 4:32 – 15:44\n  Varjyam          16:57 – 18:33\n  Durmuhurtham     09:
+ 17 – 09:55\n  Durmuhurtham     12:28 – 13:06\n\n─ Choghadiya ─\n  
+ 07:22 – 08:34  Char\n  08:34 – 09:46  Labh\n  09:46 – 10:57  Amrit\n
+   10:57 – 12:09  Kaal\n  12:09 – 13:20  Shubh\n  13:20 – 14:32  Rog\
+ n  14:32 – 15:44  Udveg\n  15:44 – 16:55  Char\n\n─ Night Choghadiya
+  ─\n  16:55 – 18:44  Rog\n  18:44 – 20:32  Kaal\n  20:32 – 22:21  
+ Labh\n  22:21 – 00:09 (+1)  Udveg\n  00:09 (+1) – 01:57 (+1)  Shubh\n 
+  01:57 (+1) – 03:46 (+1)  Amrit\n  03:46 (+1) – 05:34 (+1)  Char\n  05
+ :34 (+1) – 07:23 (+1)  Rog\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Masa Shivaratri — Krishna Trayodashi · Anuradha · Shoola
+DTSTART;VALUE=DATE:20271225
+DTEND;VALUE=DATE:20271226
+UID:2027-12-25-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Krishna P
+ aksham  ·  Shanivaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunri
+ se 07:23  ·  Sunset 16:56  ·  Moonrise 05:42  ·  Moonset 15:03\nSolar s
+ ign: Dhanu  ·  Lunar sign: Vrischika\n\nTithi:     Krishna Trayodashi 10:
+ 46 (-1) – 10:12\nNakshatra: Anuradha           12:56 (-1) – 13:02\nYog
+ a:      Shoola             21:29 (-1) – 19:59\nKarana:    Vanija 22:25 (
+ -1)–10:12  /  Vishti 10:12–22:06\n\n─ Auspicious ─\n  Brahma Muhur
+ ta   05:47 – 06:35\n  Abhijit Muhurta  11:50 – 12:28\n  Amrita Kalam  
+    04:35 (+1) – 06:14 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       0
+ 9:46 – 10:58\n  Gulika Kalam     07:23 – 08:34\n  Yamagandam       13:
+ 21 – 14:33\n  Varjyam          18:46 – 20:24\n  Durmuhurtham     07:23
+  – 08:01\n  Durmuhurtham     08:01 – 08:39\n\n─ Choghadiya ─\n  07
+ :23 – 08:34  Kaal\n  08:34 – 09:46  Shubh\n  09:46 – 10:58  Rog\n  1
+ 0:58 – 12:09  Udveg\n  12:09 – 13:21  Char\n  13:21 – 14:33  Labh\n 
+  14:33 – 15:44  Amrit\n  15:44 – 16:56  Kaal\n\n─ Night Choghadiya 
+ ─\n  16:56 – 21:44  Labh\n  21:44 – 02:33 (+1)  Udveg\n  02:33 (+1) 
+ – 07:21 (+1)  Shubh\n  07:21 (+1) – 12:10 (+1)  Amrit\n  12:10 (+1) 
+ – 16:58 (+1)  Char\n  16:58 (+1) – 21:47 (+1)  Rog\n  21:47 (+1) – 0
+ 2:35 (+1)  Kaal\n  02:35 (+1) – 07:23 (+1)  Labh\n\n⚡ Masa Shivaratri 
+  ·  Shani Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Mula · Vriddhi
+DTSTART;VALUE=DATE:20271227
+DTEND;VALUE=DATE:20271228
+UID:2027-12-27-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Margashira Maasam  ·  Krishna P
+ aksham  ·  Somavaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunris
+ e 07:23  ·  Sunset 16:57  ·  Moonrise 07:30  ·  Moonset 16:54\nSolar si
+ gn: Dhanu  ·  Lunar sign: Dhanu\n\nTithi:     Amavasya           10:08 (-
+ 1) – 10:36\nNakshatra: Mula               13:36 (-1) – 14:41\nYoga:   
+    Vriddhi            18:52 (-1) – 18:10\nKarana:    Naga 22:18 (-1)–1
+ 0:36  /  Kinstughna 10:36–23:01\n\n─ Auspicious ─\n  Brahma Muhurta 
+   05:47 – 06:35\n  Abhijit Muhurta  11:51 – 12:29\n  Amrita Kalam     
+ 08:00 – 09:40\n\n─ Inauspicious ─\n  Rahu Kalam       08:35 – 09:4
+ 7\n  Gulika Kalam     13:22 – 14:34\n  Yamagandam       10:59 – 12:10\
+ n  Varjyam          13:00 – 14:41\n  Varjyam          00:54 (+1) – 02:
+ 36 (+1)\n  Durmuhurtham     12:29 – 13:08\n  Durmuhurtham     14:24 – 
+ 15:02\n\n─ Choghadiya ─\n  07:23 – 08:35  Amrit\n  08:35 – 09:47  
+ Kaal\n  09:47 – 10:59  Shubh\n  10:59 – 12:10  Rog\n  12:10 – 13:22 
+  Udveg\n  13:22 – 14:34  Char\n  14:34 – 15:45  Labh\n  15:45 – 16:5
+ 7  Amrit\n\n─ Night Choghadiya ─\n  16:57 – 00:46 (+1)  Char\n  00:4
+ 6 (+1) – 08:34 (+1)  Rog\n  08:34 (+1) – 16:23 (+1)  Kaal\n  16:23 (+1
+ ) – 00:11 (+1)  Labh\n  00:11 (+1) – 08:00 (+1)  Udveg\n  08:00 (+1) 
+ – 15:48 (+1)  Shubh\n  15:48 (+1) – 23:36 (+1)  Amrit\n  23:36 (+1) 
+ – 07:25 (+1)  Char\n\n⚡ Ganda Moola (Mula)  ·  Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Putrada (Vaikunta) Ekadashi · Bharani · Sadhya
+DTSTART;VALUE=DATE:20280107
+DTEND;VALUE=DATE:20280108
+UID:2028-01-07-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Pushya Maasam  ·  Shukla Paksha
+ m  ·  Shukravaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunrise 0
+ 7:25  ·  Sunset 17:06  ·  Moonrise 12:52  ·  Moonset 02:54\nSolar sign:
+  Dhanu  ·  Lunar sign: Mesha\n\nTithi:     Putrada (Vaikunta) Ekadashi 02
+ :11 – 02:13 (+1)\nNakshatra: Bharani            09:47 (-1) – 10:42\nYo
+ ga:      Sadhya             18:58 (-1) – 17:55\nKarana:    Vanija 02:11
+ –14:16  /  Vishti 14:16–02:13 (+1)\n\n─ Auspicious ─\n  Brahma Muh
+ urta   05:49 – 06:37\n  Abhijit Muhurta  11:56 – 12:35\n\n─ Inauspic
+ ious ─\n  Rahu Kalam       11:03 – 12:15\n  Gulika Kalam     08:38 –
+  09:50\n  Yamagandam       14:41 – 15:53\n  Varjyam          22:54 – 0
+ 0:32 (+1)\n  Durmuhurtham     09:21 – 10:00\n  Durmuhurtham     12:35 
+ – 13:14\n\n─ Choghadiya ─\n  07:25 – 08:38  Char\n  08:38 – 09:5
+ 0  Labh\n  09:50 – 11:03  Amrit\n  11:03 – 12:15  Kaal\n  12:15 – 13
+ :28  Shubh\n  13:28 – 14:41  Rog\n  14:41 – 15:53  Udveg\n  15:53 – 
+ 17:06  Char\n\n─ Night Choghadiya ─\n  17:06 – 21:53  Rog\n  21:53 
+ – 02:41 (+1)  Kaal\n  02:41 (+1) – 07:28 (+1)  Labh\n  07:28 (+1) – 
+ 12:15 (+1)  Udveg\n  12:15 (+1) – 17:03 (+1)  Shubh\n  17:03 (+1) – 21
+ :50 (+1)  Amrit\n  21:50 (+1) – 02:37 (+1)  Char\n  02:37 (+1) – 07:25
+  (+1)  Rog\n\n─ Special Yogas ─\n  Siddha Yoga\n\n⚡ Putrada (Vaikunt
+ a) Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Rohini · Shukla
+DTSTART;VALUE=DATE:20280109
+DTEND;VALUE=DATE:20280110
+UID:2028-01-09-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Pushya Maasam  ·  Shukla Paksha
+ m  ·  Adivaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunrise 07:2
+ 5  ·  Sunset 17:08  ·  Moonrise 14:33  ·  Moonset 05:09\nSolar sign: Dh
+ anu  ·  Lunar sign: Vrishabha\n\nTithi:     Shukla Trayodashi  01:44 – 
+ 00:47 (+1)\nNakshatra: Rohini             11:07 (-1) – 11:03\nYoga:     
+  Shukla             16:27 (-1) – 14:37\nKarana:    Kaulava 01:44–13:19
+   /  Taitila 13:19–00:47 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 05:49 – 06:37\n  Abhijit Muhurta  11:57 – 12:36\n  Amrita Kalam     07
+ :52 – 09:28\n  Amrita Kalam     01:57 (+1) – 03:31 (+1)\n\n─ Inauspi
+ cious ─\n  Rahu Kalam       15:55 – 17:08\n  Gulika Kalam     14:42 
+ – 15:55\n  Yamagandam       12:16 – 13:29\n  Varjyam          16:32 
+ – 18:06\n  Durmuhurtham     15:50 – 16:29\n\n─ Choghadiya ─\n  07:
+ 25 – 08:38  Udveg\n  08:38 – 09:51  Char\n  09:51 – 11:03  Labh\n  1
+ 1:03 – 12:16  Amrit\n  12:16 – 13:29  Kaal\n  13:29 – 14:42  Shubh\n
+   14:42 – 15:55  Rog\n  15:55 – 17:08  Udveg\n\n─ Night Choghadiya 
+ ─\n  17:08 – 21:55  Shubh\n  21:55 – 02:42 (+1)  Amrit\n  02:42 (+1)
+  – 07:29 (+1)  Char\n  07:29 (+1) – 12:16 (+1)  Rog\n  12:16 (+1) – 
+ 17:03 (+1)  Kaal\n  17:03 (+1) – 21:50 (+1)  Labh\n  21:50 (+1) – 02:3
+ 7 (+1)  Udveg\n  02:37 (+1) – 07:24 (+1)  Shubh\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Ardra · Indra
+DTSTART;VALUE=DATE:20280111
+DTEND;VALUE=DATE:20280112
+UID:2028-01-11-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Pushya Maasam  ·  Shukla Paksha
+ m  ·  Mangalavaram\nAyanam: Dakshinayanam  ·  Rituvu: Shishira\nSunrise 
+ 07:24  ·  Sunset 17:10  ·  Moonrise 16:54  ·  Moonset 07:07\nSolar sign
+ : Dhanu  ·  Lunar sign: Mithuna\n\nTithi:     Pournami           23:26 (-
+ 1) – 21:44\nNakshatra: Ardra              10:34 (-1) – 09:42\nYoga:   
+    Indra              12:27 (-1) – 09:58\nKarana:    Vishti 23:26 (-1)
+ –10:37  /  Bava 10:37–21:44\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 05:48 – 06:36\n  Abhijit Muhurta  11:58 – 12:37\n  Amrita Kalam     06
+ :14 (+1) – 07:45 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       14:43 
+ – 15:57\n  Gulika Kalam     12:17 – 13:30\n  Yamagandam       09:51 
+ – 11:04\n  Varjyam          21:06 – 22:38\n  Durmuhurtham     09:22 
+ – 10:01\n  Durmuhurtham     22:52 – 23:49\n\n─ Choghadiya ─\n  07:
+ 24 – 08:38  Rog\n  08:38 – 09:51  Udveg\n  09:51 – 11:04  Char\n  11
+ :04 – 12:17  Labh\n  12:17 – 13:30  Amrit\n  13:30 – 14:43  Kaal\n  
+ 14:43 – 15:57  Shubh\n  15:57 – 17:10  Rog\n\n─ Night Choghadiya ─
+ \n  17:10 – 21:56 (+1)  Kaal\n  21:56 (+1) – 02:43 (+1)  Labh\n  02:43
+  (+1) – 07:29 (+1)  Udveg\n  07:29 (+1) – 12:15 (+1)  Shubh\n  12:15 (
+ +1) – 17:02 (+1)  Amrit\n  17:02 (+1) – 21:48 (+1)  Char\n  21:48 (+1)
+  – 02:35 (+1)  Rog\n  02:35 (+1) – 07:21 (+1)  Kaal\n\n─ Eclipse ─
+ \n  🌕 Lunar Eclipse (Partial) — visible from this location\n  Window:
+    19:45 – 20:41\n  Sutak:    10:45 – 20:41\n\n⚡ Pournami  ·  Lunar
+  Eclipse (Partial)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shattila Ekadashi · Anuradha · Vriddhi
+DTSTART;VALUE=DATE:20280121
+DTEND;VALUE=DATE:20280122
+UID:2028-01-21-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Pushya Maasam  ·  Krishna Paksh
+ am  ·  Shukravaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07
+ :21  ·  Sunset 17:20  ·  Moonrise 03:35  ·  Moonset 13:00\nSolar sign: 
+ Makara  ·  Lunar sign: Vrischika\n\nTithi:     Shattila Ekadashi  02:15 
+ – 01:44 (+1)\nNakshatra: Anuradha           20:46 (-1) – 20:45\nYoga: 
+      Vriddhi            03:07 – 01:30 (+1)\nKarana:    Bava 02:15–13:5
+ 6  /  Balava 13:56–01:44 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   
+ 05:45 – 06:33\n  Abhijit Muhurta  12:01 – 12:41\n  Amrita Kalam     10
+ :21 – 11:57\n\n─ Inauspicious ─\n  Rahu Kalam       11:06 – 12:21\
+ n  Gulika Kalam     08:36 – 09:51\n  Yamagandam       14:50 – 16:05\n 
+  Varjyam          02:27 (+1) – 04:05 (+1)\n  Durmuhurtham     09:21 – 
+ 10:01\n  Durmuhurtham     12:41 – 13:21\n\n─ Choghadiya ─\n  07:21 
+ – 08:36  Char\n  08:36 – 09:51  Labh\n  09:51 – 11:06  Amrit\n  11:0
+ 6 – 12:21  Kaal\n  12:21 – 13:35  Shubh\n  13:35 – 14:50  Rog\n  14:
+ 50 – 16:05  Udveg\n  16:05 – 17:20  Char\n\n─ Night Choghadiya ─\n
+   17:20 – 22:05  Rog\n  22:05 – 02:50 (+1)  Kaal\n  02:50 (+1) – 07:
+ 35 (+1)  Labh\n  07:35 (+1) – 12:20 (+1)  Udveg\n  12:20 (+1) – 17:05 
+ (+1)  Shubh\n  17:05 (+1) – 21:50 (+1)  Amrit\n  21:50 (+1) – 02:35 (+
+ 1)  Char\n  02:35 (+1) – 07:20 (+1)  Rog\n\n─ Special Yogas ─\n  Sar
+ vartha Siddhi Yoga\n  Siddha Yoga\n\n⚡ Shattila Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Krishna Trayodashi · Mula · Vyaghata
+DTSTART;VALUE=DATE:20280123
+DTEND;VALUE=DATE:20280124
+UID:2028-01-23-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Pushya Maasam  ·  Krishna Paksh
+ am  ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:20
+   ·  Sunset 17:22  ·  Moonrise 05:27  ·  Moonset 14:46\nSolar sign: Mak
+ ara  ·  Lunar sign: Dhanu\n\nTithi:     Krishna Trayodashi 01:43 – 02:1
+ 3 (+1)\nNakshatra: Mula               21:13 (-1) – 22:10\nYoga:      Vya
+ ghata           00:15 – 23:25\nKarana:    Garaja 01:43–13:54  /  Vanij
+ a 13:54–02:13 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:44 – 0
+ 6:32\n  Abhijit Muhurta  12:01 – 12:41\n  Amrita Kalam     15:31 – 17:
+ 11\n\n─ Inauspicious ─\n  Rahu Kalam       16:07 – 17:22\n  Gulika K
+ alam     14:52 – 16:07\n  Yamagandam       12:21 – 13:36\n  Varjyam   
+        20:31 – 22:10\n  Durmuhurtham     16:02 – 16:42\n\n─ Choghadi
+ ya ─\n  07:20 – 08:35  Udveg\n  08:35 – 09:50  Char\n  09:50 – 11:
+ 06  Labh\n  11:06 – 12:21  Amrit\n  12:21 – 13:36  Kaal\n  13:36 – 1
+ 4:52  Shubh\n  14:52 – 16:07  Rog\n  16:07 – 17:22  Udveg\n\n─ Night
+  Choghadiya ─\n  17:22 – 22:07  Shubh\n  22:07 – 02:51 (+1)  Amrit\n
+   02:51 (+1) – 07:36 (+1)  Char\n  07:36 (+1) – 12:21 (+1)  Rog\n  12:
+ 21 (+1) – 17:05 (+1)  Kaal\n  17:05 (+1) – 21:50 (+1)  Labh\n  21:50 (
+ +1) – 02:34 (+1)  Udveg\n  02:34 (+1) – 07:19 (+1)  Shubh\n\n─ Speci
+ al Yogas ─\n  Sarvartha Siddhi Yoga\n\n⚡ Ganda Moola (Mula)  ·  Prado
+ sham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Uttara Ashadha · Vajra
+DTSTART;VALUE=DATE:20280125
+DTEND;VALUE=DATE:20280126
+UID:2028-01-25-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Pushya Maasam  ·  Krishna Paksh
+ am  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 0
+ 7:19  ·  Sunset 17:25  ·  Moonrise 06:50  ·  Moonset 16:46\nSolar sign:
+  Makara  ·  Lunar sign: Makara\n\nTithi:     Amavasya           03:13 –
+  04:41 (+1)\nNakshatra: Uttara Ashadha     23:38 (-1) – 01:32 (+1)\nYoga
+ :      Vajra              22:57 (-1) – 22:52\nKarana:    Chatushpada 03:
+ 13–15:54  /  Naga 15:54–04:41 (+1)\n\n─ Auspicious ─\n  Brahma Muh
+ urta   05:43 – 06:31\n  Abhijit Muhurta  12:01 – 12:42\n  Amrita Kalam
+      18:37 – 20:21\n\n─ Inauspicious ─\n  Rahu Kalam       14:53 –
+  16:09\n  Gulika Kalam     12:22 – 13:37\n  Yamagandam       09:50 – 1
+ 1:06\n  Varjyam          08:16 – 09:59\n  Varjyam          05:54 (+1) 
+ – 07:39 (+1)\n  Durmuhurtham     09:20 – 10:00\n  Durmuhurtham     22:
+ 58 – 23:54\n\n─ Choghadiya ─\n  07:19 – 08:34  Rog\n  08:34 – 09
+ :50  Udveg\n  09:50 – 11:06  Char\n  11:06 – 12:22  Labh\n  12:22 – 
+ 13:37  Amrit\n  13:37 – 14:53  Kaal\n  14:53 – 16:09  Shubh\n  16:09 
+ – 17:25  Rog\n\n─ Night Choghadiya ─\n  17:25 – 04:08 (+1)  Kaal\n
+   04:08 (+1) – 14:51 (+1)  Labh\n  14:51 (+1) – 01:34 (+1)  Udveg\n  0
+ 1:34 (+1) – 12:17 (+1)  Shubh\n  12:17 (+1) – 23:00 (+1)  Amrit\n  23:
+ 00 (+1) – 09:43 (+1)  Char\n  09:43 (+1) – 20:26 (+1)  Rog\n  20:26 (+
+ 1) – 07:09 (+1)  Kaal\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\
+ n\n⚡ Amavasya
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Jaya Ekadashi · Mrigashira · Vaidhriti
+DTSTART;VALUE=DATE:20280206
+DTEND;VALUE=DATE:20280207
+UID:2028-02-06-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Magha Maasam  ·  Shukla Paksham
+   ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:09  
+ ·  Sunset 17:38  ·  Moonrise 13:15  ·  Moonset 03:52\nSolar sign: Makar
+ a  ·  Lunar sign: Mithuna\n\nTithi:     Jaya Ekadashi      17:05 (-1) –
+  16:06\nNakshatra: Mrigashira         18:54 (-1) – 18:30\nYoga:      Vai
+ dhriti          20:27 (-1) – 18:23\nKarana:    Vishti 04:39–16:06  /  
+ Bava 16:06–03:26 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:33 
+ – 06:21\n  Abhijit Muhurta  12:02 – 12:44\n  Amrita Kalam     09:51 
+ – 11:25\n\n─ Inauspicious ─\n  Rahu Kalam       16:19 – 17:38\n  G
+ ulika Kalam     15:01 – 16:19\n  Yamagandam       12:23 – 13:42\n  Var
+ jyam          02:37 (+1) – 04:10 (+1)\n  Durmuhurtham     16:14 – 16:5
+ 6\n\n─ Choghadiya ─\n  07:09 – 08:27  Udveg\n  08:27 – 09:46  Char
+ \n  09:46 – 11:05  Labh\n  11:05 – 12:23  Amrit\n  12:23 – 13:42  Ka
+ al\n  13:42 – 15:01  Shubh\n  15:01 – 16:19  Rog\n  16:19 – 17:38  U
+ dveg\n\n─ Night Choghadiya ─\n  17:38 – 19:19  Shubh\n  19:19 – 21
+ :00  Amrit\n  21:00 – 22:42  Char\n  22:42 – 00:23 (+1)  Rog\n  00:23 
+ (+1) – 02:04 (+1)  Kaal\n  02:04 (+1) – 03:45 (+1)  Labh\n  03:45 (+1)
+  – 05:27 (+1)  Udveg\n  05:27 (+1) – 07:08 (+1)  Shubh\n\n⚡ Jaya Eka
+ dashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Dwadashi · Ardra · Vishkambha
+DTSTART;VALUE=DATE:20280207
+DTEND;VALUE=DATE:20280208
+UID:2028-02-07-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Magha Maasam  ·  Shukla Paksham
+   ·  Somavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:08 
+  ·  Sunset 17:39  ·  Moonrise 14:24  ·  Moonset 04:50\nSolar sign: Maka
+ ra  ·  Lunar sign: Mithuna\n\nTithi:     Shukla Dwadashi    16:06 (-1) 
+ – 14:41\nNakshatra: Ardra              18:30 (-1) – 17:43\nYoga:      
+ Vishkambha         18:23 (-1) – 16:01\nKarana:    Balava 03:26–14:41  
+ /  Kaulava 14:41–01:51 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05
+ :32 – 06:20\n  Abhijit Muhurta  12:02 – 12:45\n  Amrita Kalam     08:0
+ 2 – 09:35\n\n─ Inauspicious ─\n  Rahu Kalam       08:27 – 09:46\n 
+  Gulika Kalam     13:42 – 15:01\n  Yamagandam       11:05 – 12:23\n  V
+ arjyam          05:09 (+1) – 06:41 (+1)\n  Durmuhurtham     12:45 – 13
+ :27\n  Durmuhurtham     14:51 – 15:33\n\n─ Choghadiya ─\n  07:08 –
+  08:27  Amrit\n  08:27 – 09:46  Kaal\n  09:46 – 11:05  Shubh\n  11:05 
+ – 12:23  Rog\n  12:23 – 13:42  Udveg\n  13:42 – 15:01  Char\n  15:01
+  – 16:20  Labh\n  16:20 – 17:39  Amrit\n\n─ Night Choghadiya ─\n  
+ 17:39 – 19:20  Char\n  19:20 – 21:01  Rog\n  21:01 – 22:42  Kaal\n  
+ 22:42 – 00:23 (+1)  Labh\n  00:23 (+1) – 02:04 (+1)  Udveg\n  02:04 (+
+ 1) – 03:45 (+1)  Shubh\n  03:45 (+1) – 05:26 (+1)  Amrit\n  05:26 (+1)
+  – 07:07 (+1)  Char\n\n⚡ Soma Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Shukla Trayodashi · Punarvasu · Preeti
+DTSTART;VALUE=DATE:20280208
+DTEND;VALUE=DATE:20280209
+UID:2028-02-08-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Magha Maasam  ·  Shukla Paksham
+   ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:
+ 07  ·  Sunset 17:40  ·  Moonrise 15:40  ·  Moonset 05:41\nSolar sign: M
+ akara  ·  Lunar sign: Mithuna\n\nTithi:     Shukla Trayodashi  14:41 (-1)
+  – 12:57\nNakshatra: Punarvasu          17:43 (-1) – 16:36\nYoga:     
+  Preeti             16:01 (-1) – 13:23\nKarana:    Taitila 01:51–12:57
+   /  Garaja 12:57–23:58\n\n─ Auspicious ─\n  Brahma Muhurta   05:31 
+ – 06:19\n  Abhijit Muhurta  12:02 – 12:45\n  Amrita Kalam     14:18 
+ – 15:50\n\n─ Inauspicious ─\n  Rahu Kalam       15:02 – 16:21\n  G
+ ulika Kalam     12:24 – 13:43\n  Yamagandam       09:45 – 11:04\n  Var
+ jyam          00:08 (+1) – 01:39 (+1)\n  Durmuhurtham     09:14 – 09:5
+ 6\n  Durmuhurtham     23:02 – 23:56\n\n─ Choghadiya ─\n  07:07 – 0
+ 8:26  Rog\n  08:26 – 09:45  Udveg\n  09:45 – 11:04  Char\n  11:04 – 
+ 12:24  Labh\n  12:24 – 13:43  Amrit\n  13:43 – 15:02  Kaal\n  15:02 
+ – 16:21  Shubh\n  16:21 – 17:40  Rog\n\n─ Night Choghadiya ─\n  17
+ :40 – 22:21  Kaal\n  22:21 – 03:01 (+1)  Labh\n  03:01 (+1) – 07:42 
+ (+1)  Udveg\n  07:42 (+1) – 12:22 (+1)  Shubh\n  12:22 (+1) – 17:03 (+
+ 1)  Amrit\n  17:03 (+1) – 21:44 (+1)  Char\n  21:44 (+1) – 02:24 (+1) 
+  Rog\n  02:24 (+1) – 07:05 (+1)  Kaal\n\n─ Special Yogas ─\n  Siddha
+  Yoga\n\n⚡ Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Pournami · Ashlesha · Saubhagya
+DTSTART;VALUE=DATE:20280210
+DTEND;VALUE=DATE:20280211
+UID:2028-02-10-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Magha Maasam  ·  Shukla Paksham
+   ·  Guruvaram\nAyanam: Uttarayanam  ·  Rituvu: Shishira\nSunrise 07:05 
+  ·  Sunset 17:42  ·  Moonrise 18:16  ·  Moonset 07:00\nSolar sign: Maka
+ ra  ·  Lunar sign: Karka\n\nTithi:     Pournami           10:56 (-1) – 
+ 08:43\nNakshatra: Ashlesha           15:14 (-1) – 13:40\nYoga:      Saub
+ hagya          10:32 (-1) – 07:31\nKarana:    Bava 21:50 (-1)–08:43  /
+   Balava 08:43–19:33\n\n─ Auspicious ─\n  Brahma Muhurta   05:29 –
+  06:17\n  Abhijit Muhurta  12:02 – 12:45\n  Amrita Kalam     12:11 – 1
+ 3:40\n\n─ Inauspicious ─\n  Rahu Kalam       13:43 – 15:03\n  Gulika
+  Kalam     09:44 – 11:04\n  Yamagandam       07:05 – 08:24\n  Varjyam 
+          00:51 (+1) – 02:20 (+1)\n  Durmuhurtham     10:37 – 11:20\n  
+ Durmuhurtham     14:52 – 15:35\n\n─ Choghadiya ─\n  07:05 – 08:24 
+  Shubh\n  08:24 – 09:44  Rog\n  09:44 – 11:04  Udveg\n  11:04 – 12:2
+ 4  Char\n  12:24 – 13:43  Labh\n  13:43 – 15:03  Amrit\n  15:03 – 16
+ :23  Kaal\n  16:23 – 17:42  Shubh\n\n─ Night Choghadiya ─\n  17:42 
+ – 22:21 (+1)  Amrit\n  22:21 (+1) – 03:00 (+1)  Char\n  03:00 (+1) –
+  07:39 (+1)  Rog\n  07:39 (+1) – 12:18 (+1)  Kaal\n  12:18 (+1) – 16:5
+ 7 (+1)  Labh\n  16:57 (+1) – 21:35 (+1)  Udveg\n  21:35 (+1) – 02:14 (
+ +1)  Shubh\n  02:14 (+1) – 06:53 (+1)  Amrit\n\n─ Special Yogas ─\n 
+  Siddha Yoga\n\n⚡ Ganda Moola (Ashlesha)  ·  Pournami
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Vijaya Ekadashi · Purva Ashadha · Siddhi
+DTSTART;VALUE=DATE:20280220
+DTEND;VALUE=DATE:20280221
+UID:2028-02-20-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Magha Maasam  ·  Krishna Paksha
+ m  ·  Adivaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:53  
+ ·  Sunset 17:53  ·  Moonrise 04:11  ·  Moonset 13:39\nSolar sign: Kumbh
+ a  ·  Lunar sign: Dhanu\n\nTithi:     Vijaya Ekadashi    16:55 (-1) – 1
+ 7:26\nNakshatra: Purva Ashadha      05:42 – 07:02 (+1)\nYoga:      Siddh
+ i             05:02 – 04:28 (+1)\nKarana:    Balava 05:06–17:26  /  Ka
+ ulava 17:26–05:53 (+1)\n\n─ Auspicious ─\n  Brahma Muhurta   05:17 
+ – 06:05\n  Abhijit Muhurta  12:01 – 12:45\n  Amrita Kalam     01:58 (+
+ 1) – 03:39 (+1)\n\n─ Inauspicious ─\n  Rahu Kalam       16:31 – 17
+ :53\n  Gulika Kalam     15:08 – 16:31\n  Yamagandam       12:23 – 13:4
+ 6\n  Varjyam          15:50 – 17:31\n  Durmuhurtham     16:25 – 17:09\
+ n\n─ Choghadiya ─\n  06:53 – 08:16  Udveg\n  08:16 – 09:38  Char\n
+   09:38 – 11:01  Labh\n  11:01 – 12:23  Amrit\n  12:23 – 13:46  Kaal
+ \n  13:46 – 15:08  Shubh\n  15:08 – 16:31  Rog\n  16:31 – 17:53  Udv
+ eg\n\n─ Night Choghadiya ─\n  17:53 – 22:30  Shubh\n  22:30 – 03:0
+ 8 (+1)  Amrit\n  03:08 (+1) – 07:45 (+1)  Char\n  07:45 (+1) – 12:22 (
+ +1)  Rog\n  12:22 (+1) – 16:59 (+1)  Kaal\n  16:59 (+1) – 21:36 (+1)  
+ Labh\n  21:36 (+1) – 02:13 (+1)  Udveg\n  02:13 (+1) – 06:51 (+1)  Shu
+ bh\n\n⚡ Vijaya Ekadashi — fasting day
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🪔 Maha Shivaratri — Krishna Trayodashi · Uttara Ashadha · V
+ ariyan
+DTSTART;VALUE=DATE:20280222
+DTEND;VALUE=DATE:20280223
+UID:2028-02-22-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Magha Maasam  ·  Krishna Paksha
+ m  ·  Mangalavaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:
+ 51  ·  Sunset 17:55  ·  Moonrise 05:24  ·  Moonset 15:39\nSolar sign: K
+ umbha  ·  Lunar sign: Makara\n\nTithi:     Krishna Trayodashi 18:27 (-1) 
+ – 19:55\nNakshatra: Uttara Ashadha     07:02 (-1) – 08:50\nYoga:      
+ Variyan            04:17 – 04:25 (+1)\nKarana:    Vanija 07:08–19:55\n
+ \n─ Auspicious ─\n  Brahma Muhurta   05:15 – 06:03\n  Abhijit Muhurt
+ a  12:01 – 12:45\n  Amrita Kalam     23:41 – 01:26 (+1)\n\n─ Inauspi
+ cious ─\n  Rahu Kalam       15:09 – 16:32\n  Gulika Kalam     12:23 
+ – 13:46\n  Yamagandam       09:37 – 11:00\n  Varjyam          13:12 
+ – 14:57\n  Durmuhurtham     09:03 – 09:48\n  Durmuhurtham     23:05 
+ – 23:56\n\n─ Choghadiya ─\n  06:51 – 08:14  Rog\n  08:14 – 09:37
+   Udveg\n  09:37 – 11:00  Char\n  11:00 – 12:23  Labh\n  12:23 – 13:
+ 46  Amrit\n  13:46 – 15:09  Kaal\n  15:09 – 16:32  Shubh\n  16:32 – 
+ 17:55  Rog\n\n─ Night Choghadiya ─\n  17:55 – 22:32  Kaal\n  22:32 
+ – 03:08 (+1)  Labh\n  03:08 (+1) – 07:45 (+1)  Udveg\n  07:45 (+1) –
+  12:22 (+1)  Shubh\n  12:22 (+1) – 16:58 (+1)  Amrit\n  16:58 (+1) – 2
+ 1:35 (+1)  Char\n  21:35 (+1) – 02:11 (+1)  Rog\n  02:11 (+1) – 06:48 
+ (+1)  Kaal\n\n─ Special Yogas ─\n  Sarvartha Siddhi Yoga\n  Siddha Yog
+ a\n\n⚡ Maha Shivaratri  ·  Pradosham
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:⚡ Amavasya · Dhanishtha · Shiva
+DTSTART;VALUE=DATE:20280224
+DTEND;VALUE=DATE:20280225
+UID:2028-02-24-san-francisco-surya_siddhanta@telugu-panchangam
+DESCRIPTION:Plavanga Nama Samvatsara  ·  Magha Maasam  ·  Krishna Paksha
+ m  ·  Guruvaram\nAyanam: Uttarayanam  ·  Rituvu: Vasanta\nSunrise 06:48 
+  ·  Sunset 17:57  ·  Moonrise 06:19  ·  Moonset 17:37\nSolar sign: Kumb
+ ha  ·  Lunar sign: Kumbha\n\nTithi:     Amavasya           21:46 (-1) –
+  23:50\nNakshatra: Dhanishtha         11:02 (-1) – 13:31\nYoga:      Shi
+ va              04:48 – 05:19 (+1)\nKarana:    Chatushpada 21:46 (-1)–
+ 10:47  /  Naga 10:47–23:50\n\n─ Auspicious ─\n  Brahma Muhurta   05:
+ 12 – 06:00\n  Abhijit Muhurta  12:00 – 12:45\n\n─ Inauspicious ─\n
+   Rahu Kalam       13:46 – 15:10\n  Gulika Kalam     09:35 – 10:59\n  
+ Yamagandam       06:48 – 08:12\n  Varjyam          21:30 – 23:16\n  Du
+ rmuhurtham     10:31 – 11:16\n  Durmuhurtham     14:59 – 15:43\n\n─ 
+ Choghadiya ─\n  06:48 – 08:12  Shubh\n  08:12 – 09:35  Rog\n  09:35 
+ – 10:59  Udveg\n  10:59 – 12:23  Char\n  12:23 – 13:46  Labh\n  13:4
+ 6 – 15:10  Amrit\n  15:10 – 16:34  Kaal\n  16:34 – 17:57  Shubh\n\n
+ ─ Special Yogas ─\n  Siddha Yoga\n\n⚡ Amavasya
+END:VEVENT
+END:VCALENDAR

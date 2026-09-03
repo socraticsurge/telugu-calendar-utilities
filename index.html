@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astro Chaganti Panchangam — Calendar Feeds</title>
+  <meta name="description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days for 22 cities — plus Tarabalam & Muhurtam good-day and time-slot finders, and the Gochara chart with daily Rasi Phalalu. Free, no account needed.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22><ellipse cx=%2224%22 cy=%2224%22 rx=%2221%22 ry=%227%22 transform=%22rotate(-8 24 24)%22 fill=%22none%22 stroke=%22%238E2A1F%22 stroke-width=%221.6%22 stroke-opacity=%220.82%22/><ellipse cx=%2224%22 cy=%2224%22 rx=%2212%22 ry=%2219%22 transform=%22rotate(22 24 24)%22 fill=%22none%22 stroke=%22%238E2A1F%22 stroke-width=%221.3%22 stroke-opacity=%220.6%22/><circle cx=%2213.5%22 cy=%2216%22 r=%221.6%22 fill=%22%238E2A1F%22 fill-opacity=%220.8%22/><circle cx=%2234.5%22 cy=%2232%22 r=%221.6%22 fill=%22%238E2A1F%22 fill-opacity=%220.8%22/><circle cx=%2224%22 cy=%2224%22 r=%222.8%22 fill=%22%238E2A1F%22/></svg>">
+  <meta property="og:title" content="Astro Chaganti Panchangam">
+  <meta property="og:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days — plus Tarabalam, Muhurtam, Gochara and Rasi Phalalu tools. Subscribe once, updated automatically.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://panchangam.astrochaganti.com/">
+  <meta property="og:image" content="https://panchangam.astrochaganti.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Astro Chaganti Panchangam">
+  <meta name="twitter:description" content="Telugu panchangam in your calendar app — Tithi, Nakshatra, muhurtams, Ekadashi, eclipses and festival days. Plus Tarabalam, Muhurtam, Gochara, Rasi Phalalu.">
+  <meta name="twitter:image" content="https://panchangam.astrochaganti.com/og-image.png">
+  <meta property="og:site_name" content="Astro Chaganti Panchangam">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <link rel="canonical" href="https://panchangam.astrochaganti.com/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "Astro Chaganti Panchangam",
+        "url": "https://panchangam.astrochaganti.com/",
+        "description": "Telugu / Vedic Panchangam — Tithi, Nakshatra, Muhurtam, Festivals, Tarabalam, Gochara, Lagna transitions, planetary horas — for any city.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Astro Chaganti",
+          "url": "https://panchangam.astrochaganti.com/"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "mcp-server-panchangam",
+        "description": "MCP server providing Telugu Panchangam data — Tithi, Nakshatra, Muhurtas, Festivals, Tarabalam, Gochara, Lagna transitions, planetary horas — for any city and date.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Linux, macOS, Windows",
+        "downloadUrl": "https://pypi.org/project/mcp-server-panchangam/",
+        "offers": { "@type": "Offer", "price": 0, "priceCurrency": "USD" }
+      }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --indigo: #8E2A1F; --indigo-bg: rgba(142,42,31,0.08); --indigo-border: rgba(142,42,31,0.22);
+      --amber: #8F5C18; --amber-bg: rgba(143,92,24,0.09); --amber-border: rgba(143,92,24,0.30);
+      --green: #4F6B2C; --green-bg: rgba(79,107,44,0.09); --green-border: rgba(79,107,44,0.30);
+      --brand: #8E2A1F;
+      --brand-display: Georgia, 'Times New Roman', serif;
+      --brand-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+    #settings-line {
+      display: flex; align-items: center; gap: 0.45rem;
+      font-size: 0.8rem; color: #6B6357; padding: 0.45rem 0.15rem;
+    }
+    #settings-line .sel-icon { color: var(--indigo); opacity: 0.7; flex: none; }
+    #settings-line #settings-summary {
+      min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #settings-line #settings-toggle {
+      flex: none; display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; color: var(--indigo); background: none;
+      border: none; border-radius: 6px; padding: 0; cursor: pointer; opacity: 0.75;
+    }
+    #settings-line #settings-toggle:hover { background: var(--indigo-bg); opacity: 1; }
+    #settings-line #settings-toggle[aria-expanded="true"] {
+      background: var(--indigo-bg); border: 1px solid var(--indigo-border); opacity: 1;
+    }
+    body[data-mode="mobile"] #settings-line { padding: 0.65rem 0.95rem 0.15rem; }
+    .skip-link {
+      position: absolute; left: -9999px; top: 0; z-index: 100;
+      background: var(--indigo); color: #FBF3EA; font-weight: 600;
+      padding: 0.55rem 1rem; border-radius: 0 0 8px 0; text-decoration: none;
+    }
+    .skip-link:focus { left: 0; }
+    * { box-sizing: border-box; }
+    body { font-family: var(--brand-sans); color: #1F1A17; background: #F2ECDF; margin: 0; padding: 0 1rem 2rem; line-height: 1.6; }
+    .page { max-width: 760px; margin: 0 auto; }
+
+    html { scroll-behavior: smooth; }
+    .hero { text-align: center; padding: 2.5rem 0 2.25rem; }
+    .hero .brand-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; }
+    .hero .sunmoon { flex: none; animation: none; }
+    .hero .brand-text { text-align: center; }
+    .hero h1 { font-family: var(--brand-display); font-size: 2.3rem; font-weight: 400; margin: 0; letter-spacing: 0.005em; line-height: 1.15; color: #1F1A17; }
+    .hero h1 em {
+      font-style: italic; font-weight: 400;
+      background: linear-gradient(135deg, #b83a2a 0%, #8E2A1F 50%, #6d1f16 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .hero .brand-sub {
+      font-family: var(--brand-display); font-style: italic; font-weight: 400;
+      font-size: 0.78rem; letter-spacing: 0.08em; color: rgba(31,26,23,0.45);
+      margin-top: 0.3rem;
+    }
+    .hero .tagline { color: #58504A; margin: 1.25rem auto 0; max-width: 540px; text-align: center; }
+    .hero .shloka {
+      font-family: var(--brand-display); font-style: italic;
+      font-size: 1.05rem; line-height: 1.55;
+      display: flex; flex-direction: column; gap: 0.05rem;
+      color: #4A413B;
+    }
+    .hero .shloka-gist {
+      margin-top: 0.9rem; font-size: 0.95rem; color: #6A5F58;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 620px) {
+      .hero { padding: 0.9rem 0 0.75rem; }
+      .hero .brand-row { gap: 0.3rem; }
+      .hero h1 { font-size: 1.5rem; line-height: 1.15; }
+      .hero .brand-sub { font-size: 0.58rem; letter-spacing: 0.06em; margin-top: 0.15rem; }
+      .hero .sunmoon { width: 34px; height: 34px; }
+      .hero .tagline { margin-top: 0.55rem; }
+      .hero .shloka { font-size: 0.92rem; line-height: 1.5; }
+      .hero .shloka-gist { font-size: 0.85rem; margin-top: 0.65rem; }
+    }
+    #subscribe { scroll-margin-top: 1rem; }
+    .sunmoon { font-size: 1.8rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    .card { background: #fff; border: 1px solid #DDD2BC; border-radius: 8px; padding: 1.25rem; margin: 1rem 0; box-shadow: 2px 2px 0 rgba(31,26,23,0.05); }
+    @media (max-width: 620px) {
+      .card { padding: 0.85rem; }
+      body { padding: 0 0.7rem 2rem; }
+      .selector-row .selector { flex: 1 1 100%; }
+      .selector select, .tb-date { width: 100%; min-width: 0; }
+      /* tap-target floor: 44px for primary controls */
+      .selector select, input.tb-date, input#go-date, input#tb-from, input#tb-to,
+      .tb-controls select, #mu-activity, #tb-mode, #go-view, #go-rasi,
+      .tb-profile-row select, .tb-profile-row input[type=text],
+      .btn, .fmt-toggle button, .app-tab, .read-more, .tb-add, .tb-remove, .tb-reset,
+      .go-pick, .upcoming-row a, .wa-share-mini { min-height: 44px; }
+      .wa-share-mini { min-width: 44px; }
+      .fmt-toggle { display: inline-flex; }
+      .fmt-toggle button { padding: 0 1rem; }
+      .app-tab { padding: 0.55rem 0.85rem; font-size: 0.8rem; }
+      .tb-add { padding: 0.55rem 1rem; }
+      .tb-remove { padding: 0 0.6rem; }
+    }
+    .card h2 { margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card h3.sub { font-size: 0.85rem; margin: 0 0 0.5rem; color: #6B6357; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+
+    .selector-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.6rem 0 1rem; }
+    .selector { display: flex; flex-direction: column; gap: 0.2rem; }
+    .selector label { font-size: 0.7rem; color: #746B5E; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .selector select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--indigo-border); background: var(--indigo-bg); color: var(--indigo); font-weight: 600; min-width: 160px; }
+
+    .url-box { background: #F2ECDF; border: 1px solid #DDD2BC; border-radius: 8px; padding: 0.6rem 0.9rem; font-family: monospace; font-size: 0.8rem; margin: 0.5rem 0; word-break: break-all; }
+    .sub-variants { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 0.75rem; }
+    .sub-variant-option { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.55rem 0.7rem; border: 1px solid #E7DECC; border-radius: 8px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .sub-variant-option:has(input:checked) { border-color: var(--indigo-border); background: var(--indigo-bg); }
+    .sub-variant-option input[type="radio"] { margin-top: 0.2rem; accent-color: var(--indigo); flex: none; }
+    .sub-variant-body { display: flex; flex-direction: column; gap: 0.15rem; }
+    .sub-variant-title { font-size: 0.85rem; font-weight: 600; color: #1F1A17; }
+    .sub-variant-option:has(input:checked) .sub-variant-title { color: var(--indigo); }
+    .sub-variant-desc { font-size: 0.75rem; color: #6B6357; line-height: 1.4; }
+    .sub-step-divider { font-size: 0.72rem; font-weight: 700; color: #6B6357; text-transform: uppercase; letter-spacing: 0.06em; margin: 1rem 0 0.4rem; padding-top: 0.75rem; border-top: 1px solid #E7DECC; }
+    .btn { background: var(--indigo); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .btn:hover { background: #6d1f16; }
+    .copy-confirm { margin-left: 0.75rem; color: #16a34a; display: none; font-size: 0.8rem; }
+
+    .app-tabs { display: flex; gap: 0.4rem; margin-top: 0.85rem; }
+    .app-tab { font-size: 0.75rem; padding: 0.3rem 0.7rem; border-radius: 6px 6px 0 0; background: #FBF6EB; color: #6B6357; cursor: pointer; border: none; font-family: inherit; }
+    .app-tab.active { background: var(--indigo-bg); color: var(--indigo); font-weight: 600; }
+    .app-panel { background: var(--indigo-bg); border-radius: 0 8px 8px 8px; padding: 0.7rem; font-size: 0.8rem; display: none; }
+    .app-panel.active { display: block; }
+    .app-panel ol { margin: 0; padding-left: 1.2rem; color: #58504A; }
+    .app-panel ol li { margin-bottom: 0.3rem; }
+
+    .preview-card { border: 1px solid #DDD2BC; border-radius: 8px; overflow: hidden; box-shadow: 2px 2px 0 rgba(31,26,23,0.05); }
+    .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; position: relative; padding-right: 3rem; }
+    .preview-head .date { font-weight: 700; font-size: 0.95rem; }
+    .preview-head .meta { font-size: 0.78rem; opacity: 0.85; margin-top: 0.1rem; }
+    .preview-head .badge { display: inline-block; background: #C98A3A; color: #5C3D10; font-size: 0.75rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
+
+    .flag-strip { background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); padding: 0.45rem 0.9rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+    .special-chip { display: inline-block; background: #fff; color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700; }
+    .yoga-chip { display: inline-block; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 600; }
+
+    .anga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; padding: 0.7rem 0.9rem 0.25rem; }
+    @media (max-width: 620px) { .anga-grid { grid-template-columns: repeat(2, 1fr); } }
+    .anga-cell { background: #FBF6EB; border: 1px solid #E4DAC6; border-radius: 6px; padding: 0.45rem 0.4rem; text-align: center; }
+    .anga-label { font-size: 0.7rem; font-weight: 700; color: #6B6357; text-transform: uppercase; letter-spacing: 0.08em; font-style: italic; font-family: var(--brand-display), serif; }
+    .anga-name { font-size: 0.88rem; font-weight: 700; color: #1F1A17; margin-top: 0.1rem; }
+    .anga-time { font-size: 0.75rem; color: #58504A; margin-top: 0.05rem; white-space: nowrap; }
+    sup.plus1 { font-size: 0.62em; font-weight: 700; color: #8F5C18; cursor: help; }
+    .preview-head sup.plus1 { color: #C98A3A; }
+
+    .tile-strip { border-top: 1px solid #E4DAC6; padding: 0.6rem 0.9rem 0.75rem; }
+    .strip-title { font-size: 0.75rem; font-weight: 700; color: #6B6357; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.45rem; font-style: italic; font-family: var(--brand-display), serif; }
+    .strip-title.good-t { color: #15803d; }
+    .strip-title.bad-t { color: #8E2A1F; }
+    .avoid-strip > .win-grid { margin-top: 0.45rem; }
+    .win-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.3rem; }
+    .chog-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .chog-grid { grid-template-columns: repeat(4, 1fr); } }
+    .chog-cell { border-radius: 6px; padding: 0.3rem 0.15rem; text-align: center; }
+    .chog-cell.good { background: var(--green-bg); border: 1px solid var(--green-border); }
+    .chog-cell.bad { background: #fef2f2; border: 1px solid #fecaca; }
+    .chog-name { font-size: 0.78rem; font-weight: 700; }
+    .chog-cell.good .chog-name { color: var(--green); }
+    .chog-cell.bad .chog-name { color: #b91c1c; }
+    .chog-time { font-size: 0.72rem; color: #58504A; }
+
+    /* ── Hora + Lagna strips ──
+       Match Choghadiya's 8-col footprint visually by using 6 cols
+       (12 cells = 2 even rows). Cells now show full ranges with the
+       same <wbr> break-opportunity Choghadiya uses, so on narrow
+       widths the time wraps gracefully to two lines instead of
+       overflowing the container. */
+    .hora-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .hora-grid { grid-template-columns: repeat(4, 1fr); } }
+    .hora-cell { border-radius: 6px; padding: 0.35rem 0.25rem; text-align: center; border: 1px solid transparent; }
+    .hora-glyph { font-size: 0.95rem; line-height: 1; margin-bottom: 0.15rem; }
+    .hora-lord { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.02em; }
+    .hora-time { font-size: 0.7rem; color: #58504A; margin-top: 0.15rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .hora-time sup, .lagna-time sup { font-size: 0.6em; vertical-align: super; color: var(--indigo); margin: 0 0.05em; }
+    .lagna-ribbon { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.3rem; }
+    @media (max-width: 620px) { .lagna-ribbon { grid-template-columns: repeat(4, 1fr); } }
+    .lagna-seg { padding: 0.45rem 0.25rem; text-align: center; border: 1px solid transparent; border-radius: 6px; }
+    .lagna-name { font-size: 0.78rem; font-weight: 700; font-family: var(--brand-display), Georgia, serif; }
+    .lagna-time { font-size: 0.7rem; color: #58504A; margin-top: 0.15rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
+    /* Classical planetary colours — one hue per planet for horas,
+       elemental family for lagna rashis. (The earlier "site palette"
+       toggle was dropped: it didn't carry enough signal to justify
+       the toggle baggage. Personalised favourability — kendra/trikona
+       from janma rasi — is the better path and lives in a follow-up.) */
+    .hora-cell.sun     { background: #FFF4D6; border-color: #F2C94C; color: #7A5C00; }
+    .hora-cell.moon    { background: #F4F7FB; border-color: #C8D2DE; color: #4A5867; }
+    .hora-cell.mars    { background: #FEE7E0; border-color: #F2887A; color: #8C2A1A; }
+    .hora-cell.mercury { background: #E7F5E7; border-color: #95C695; color: #2D6A3D; }
+    .hora-cell.jupiter { background: #FFF1CE; border-color: #E5B548; color: #6B4A00; }
+    .hora-cell.venus   { background: #FBF1F6; border-color: #E5C6D5; color: #7A3960; }
+    .hora-cell.saturn  { background: #E3E4EA; border-color: #9BA1B0; color: #2E3340; }
+    .lagna-seg.fire  { background: #FEEAE0; border-color: #F2887A; color: #8C2A1A; }
+    .lagna-seg.earth { background: #EEE5D2; border-color: #C8B27A; color: #6B4F1A; }
+    .lagna-seg.air   { background: #E7F1F8; border-color: #99BEDB; color: #1F4A75; }
+    .lagna-seg.water { background: #E6F1EE; border-color: #87BDB0; color: #1F5C4F; }
+
+    .preview-note { font-size: 0.75rem; color: #746B5E; margin: 0.6rem 0 0; }
+    .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #E7DECC; }
+    .tool-tab { font-family: inherit; font-size: 0.95rem; font-weight: 700; color: #746B5E;
+                background: none; border: none; cursor: pointer; padding: 0.4rem 0.65rem 0.55rem;
+                border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
+    .tool-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; flex: 1 1 0; }
+    .tool-tab .ts { font-size: 0.72rem; font-weight: 500; color: #746B5E; }
+    .tool-tab.active .ts { color: #b83a2a; }
+    @media (max-width: 620px) {
+      .tool-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 0.15rem; }
+      .tool-tabs::-webkit-scrollbar { display: none; }
+      .tool-tab { padding: 0.3rem 0.5rem 0.5rem; flex: 1 1 0; min-width: 0; align-items: center; text-align: center; }
+      .tool-tab .tt { font-size: 0.72rem; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+      .tool-tab .ts { font-size: 0.7rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    }
+    .tb-date { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
+               border: 1px solid var(--indigo-border); background: var(--indigo-bg);
+               color: var(--indigo); font-weight: 600; font-family: inherit; }
+    .tb-controls { background: var(--indigo-bg); border: 1px solid var(--indigo-border); border-radius: 8px;
+                   padding: 0.85rem; margin-top: 0.85rem; }
+    .tb-controls-title { font-size: 0.72rem; font-weight: 700; color: #8E2A1F; text-transform: uppercase;
+                         letter-spacing: 0.06em; margin-bottom: 0.7rem; display: flex; justify-content: space-between; align-items: center; }
+    .tb-reset { background: none; border: none; color: #746B5E; font-size: 0.68rem; font-weight: 600;
+                cursor: pointer; text-transform: none; letter-spacing: 0; font-family: inherit; text-decoration: underline; }
+    .tb-reset:hover { color: #b91c1c; }
+
+    /* Sub-section cards inside .tb-controls — Tarabalam and Muhurtam forms
+       use these to give each input group its own contextual space. Applied
+       on both web and mobile. */
+    .tb-section { background: #fff; border: 1px solid #DDD2BC; border-radius: 8px;
+                  padding: 0.75rem 0.9rem 0.85rem; margin-bottom: 0.65rem; }
+    .tb-section:last-of-type { margin-bottom: 0; }
+    .tb-section-head { display: flex; align-items: center; justify-content: space-between;
+                       gap: 0.5rem; margin-bottom: 0.55rem; padding-bottom: 0.45rem;
+                       border-bottom: 1px solid #FBF6EB; }
+    .tb-section-label { font-size: 0.7rem; font-weight: 700; color: #6B6357;
+                        text-transform: uppercase; letter-spacing: 0.08em;
+                        font-style: italic; font-family: var(--brand-display), serif; }
+    .tb-section .selector-row { margin: 0; }
+    .tb-cta { width: 100%; padding: 0.78rem 1.25rem; margin-top: 0.6rem;
+              border-radius: 999px; font-size: 0.92rem; letter-spacing: 0.005em; }
+    .tb-controls .tb-profile-row select, .tb-controls .tb-date { background: #fff; }
+    .tb-controls .tb-add { background: #fff; }
+    .tb-controls .tb-add:hover { background: #FBF6EB; }
+    .tb-profile-row { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .tb-profile-row input[type=text] { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
+               border: 1px solid #DDD2BC; font-family: inherit; width: 170px; }
+    .tb-profile-row select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px;
+               border: 1px solid var(--indigo-border); background: var(--indigo-bg);
+               color: var(--indigo); font-weight: 600; min-width: 170px; }
+    .tb-you { font-size: 0.7rem; color: #746B5E; font-weight: 700; }
+    .tb-filter { font-size: 0.8rem; color: #58504A; display: inline-flex; gap: 0.4rem; align-items: center; margin: 0.5rem 0; }
+    .tb-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem; }
+    .tb-table th { text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em;
+                   color: #746B5E; padding: 0.4rem 0.5rem; border-bottom: 1px solid #E7DECC; }
+    .tb-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #f6f8fb; vertical-align: middle; }
+    .tb-table tr.tb-all { background: #fcfdf4; }
+    .tb-date-cell { font-weight: 700; color: #1F1A17; white-space: nowrap; }
+    .tb-sub { font-size: 0.72rem; color: #746B5E; }
+    .tara-chip { display: inline-block; border-radius: 6px; padding: 0.08rem 0.5rem; font-weight: 700; font-size: 0.78rem; white-space: nowrap; }
+    .tb-cards { display: none; }
+    @media (max-width: 620px) {
+      .tb-table-wrap { display: none; }
+      .tb-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.6rem; }
+      .tb-card { border: 1px solid #E7DECC; border-radius: 8px; padding: 0.55rem 0.7rem; background: #FFFFFF; }
+      .tb-card.tb-all { background: #fcfdf4; border-color: #d9f99d; }
+      .tb-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+      .tb-card-flag { font-size: 0.75rem; color: #8A5518; font-weight: 700; }
+      .tb-card-sub { font-size: 0.74rem; color: #6B6357; margin-top: 0.05rem; }
+      .tb-card-row { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.35rem; margin-top: 0.35rem; border-top: 1px solid #FBF6EB; }
+      .tb-card-row .tb-sub { flex: 1; min-width: 0; font-size: 0.78rem; color: #1F1A17; font-weight: 600; }
+      .tb-card-row .tara-chip { white-space: nowrap; }
+    }
+    .tara-chip.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .tara-chip.bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .tara-chip.bad::after { content: ' ✗'; font-size: 0.85em; }
+    .tara-chip.puja { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .tb-star { color: #8A5518; font-size: 1rem; }
+    .tb-intro { font-size: 0.85rem; color: #58504A; margin: 0.2rem 0 0.6rem; }
+    .tb-add { background: none; border: 1px dashed var(--indigo-border); color: var(--indigo);
+              border-radius: 8px; padding: 0.35rem 0.8rem; font-size: 0.8rem; font-weight: 600;
+              cursor: pointer; font-family: inherit; margin-top: 0.1rem; }
+    .tb-add:hover { background: var(--indigo-bg); }
+    .tb-remove { background: none; border: none; color: #DDD2BC; font-size: 1rem; cursor: pointer; padding: 0 0.2rem; }
+    .tb-remove:hover { color: #b91c1c; }
+    .tb-summary { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+                  background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 8px;
+                  padding: 0.5rem 0.75rem; margin-top: 0.75rem; font-size: 0.83rem; color: #5C3D10; }
+    .tb-summary .count { font-weight: 800; }
+    .tb-toggle { margin-left: auto; font-size: 0.78rem; color: #92400e; display: inline-flex; gap: 0.35rem; align-items: center; cursor: pointer; }
+    .go-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(86px, auto));
+                gap: 2px; background: #DCC1B5; border: 2px solid #DCC1B5; border-radius: 8px; overflow: hidden; margin-top: 0.8rem; }
+    .go-chart > .preview-error { grid-column: 1 / -1; grid-row: 1 / -1; align-self: center;
+                                 justify-self: stretch; text-align: center; }
+    .go-box { background: #fff; padding: 0.3rem 0.35rem; position: relative; min-height: 86px; }
+    .go-box .rname { font-size: 0.62rem; font-weight: 700; color: #746B5E; text-transform: uppercase; letter-spacing: 0.04em;
+                     display: inline-block; padding-right: 1.1rem; }
+    .go-box .house { position: absolute; top: 0.25rem; right: 0.35rem; font-size: 0.62rem; font-weight: 700; color: #DCC1B5; }
+    .go-box.janma { outline: 2px solid var(--indigo); outline-offset: -2px; }
+    .go-box.janma .rname { color: var(--indigo); }
+    /* Janma lagna highlight — distinct from janma rashi (solid
+       indigo) so a user with both set can tell their Moon-rashi
+       cell from their ascendant cell at a glance. Gold dashed. */
+    .go-box.lagna { outline: 2px dashed #C28A1A; outline-offset: -2px; }
+    .go-box.lagna .rname { color: #8A5518; }
+    /* When janma rashi == janma lagna (same cell), both classes
+       apply — the solid indigo + gold dashed double-ring is a
+       useful visual: "this is BOTH your natal Moon and ascendant". */
+    .go-box.janma.lagna { outline: 2px solid var(--indigo);
+                           box-shadow: 0 0 0 2px #C28A1A inset; }
+    .go-center { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--indigo-bg); display: flex; flex-direction: column;
+                 align-items: center; justify-content: center; text-align: center; padding: 0.5rem; gap: 0.25rem; }
+    .go-center .d1 { font-family: var(--brand-display); font-weight: 700; color: var(--indigo); font-size: 1.05rem; }
+    .go-center .d2 { font-size: 0.72rem; color: #8E2A1F; }
+    .go-g { display: inline-block; border-radius: 5px; padding: 0.05rem 0.35rem; font-size: 0.72rem; font-weight: 700;
+            margin: 0.12rem 0.12rem 0 0; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); }
+    .go-g.good { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+    .go-g.blocked { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+    .go-g.bad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .go-g.bad::after { content: ' ✗'; font-size: 0.85em; }
+    .go-retro { font-size: 0.6rem; vertical-align: super; }
+    .go-moves { margin-top: 0.6rem; font-size: 0.76rem; color: #58504A; }
+    .go-moves b { color: #1F1A17; }
+    .mu-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.8rem;
+               border: 1px solid #E7DECC; border-radius: 8px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: #FFFFFF; }
+    .mu-when { font-weight: 700; color: #1F1A17; white-space: nowrap; }
+    .mu-score { margin-left: auto; font-size: 0.72rem; font-weight: 800; color: var(--green);
+                background: #fff; border: 1px solid var(--green-border); border-radius: 6px; padding: 0.05rem 0.45rem; }
+    /* Tier chip — Batch C #15 */
+    .mu-tier { font-size: 0.66rem; font-weight: 800; padding: 0.06rem 0.5rem; border-radius: 999px;
+               letter-spacing: 0.05em; text-transform: uppercase; }
+    .mu-tier-excellent { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+    .mu-tier-good      { background: #ecfeff; color: #155e75; border: 1px solid #67e8f9; }
+    .mu-tier-fair      { background: #fef9c3; color: #713f12; border: 1px solid #fde047; }
+    .mu-tier-avoid     { background: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
+    /* Dropped-days disclosure — Batch C #17 */
+    .mu-dropped { margin-top: 0.7rem; padding: 0.6rem 0.8rem; background: #f8fafc;
+                  border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.78rem; color: #475569; }
+    .mu-dropped summary { cursor: pointer; font-weight: 600; color: #1e1b4b; }
+    .mu-dropped ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+    .mu-dropped li { margin: 0.2rem 0; }
+    .mu-dropped .dd-date { font-weight: 700; color: #1e1b4b; }
+    .mu-reasons { font-size: 0.74rem; color: #6B6357; width: 100%; }
+    /* Day-context strip: sunrise anga + Abhijit/Rahu timings, so the day's
+       quality is legible on the slot card without switching to Panchangam. */
+    .mu-dayctx { width: 100%; display: flex; flex-direction: column; gap: 0.3rem;
+                 margin-top: 0.1rem; padding-bottom: 0.4rem; border-bottom: 1px dashed #E4DAC6; }
+    .mu-anga { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .mu-angachip { font-size: 0.72rem; font-weight: 700; color: #1F1A17;
+                   background: #FBF6EB; border: 1px solid #E4DAC6; border-radius: 6px;
+                   padding: 0.06rem 0.45rem; white-space: nowrap; }
+    .mu-timings-d { width: 100%; }
+    .mu-timings { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.8rem;
+                  font-size: 0.72rem; color: #6B6357; cursor: pointer; list-style: none; }
+    .mu-timings::-webkit-details-marker { display: none; }
+    .mu-timings .mu-t-aus { color: #166534; font-weight: 600; }
+    .mu-timings .mu-t-warn { color: #b45309; font-weight: 600; }
+    .mu-tim-toggle { font-size: 0.68rem; font-weight: 700; color: #94a3b8;
+                     text-transform: uppercase; letter-spacing: 0.05em; margin-left: auto; }
+    .mu-tim-toggle::before { content: '▸ '; }
+    .mu-timings-d[open] .mu-tim-toggle::before { content: '▾ '; }
+    .mu-timings-full { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.35rem;
+                       padding-left: 0.1rem; font-size: 0.72rem; }
+    .mu-tim-row { display: flex; gap: 0.5rem; align-items: baseline; }
+    .mu-tim-lbl { flex: none; width: 5.4rem; font-size: 0.62rem; font-weight: 700;
+                  text-transform: uppercase; letter-spacing: 0.05em; padding-top: 0.05rem; }
+    .mu-tim-wins { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 0.1rem 0.7rem; }
+    .mu-tim-wins .mu-tim b { font-weight: 700; }
+    .mu-tim-wins.mu-t-aus { color: #166534; }
+    .mu-tim-wins.mu-t-warn { color: #b45309; }
+    /* Grouped reason categories — Batch C #16 */
+    .mu-rgroups { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem; }
+    .mu-rg { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.74rem; line-height: 1.45; }
+    .mu-rg-label { flex: none; font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: 0.06em; color: #94a3b8; width: 6.2rem; padding-top: 0.05rem; }
+    .mu-rg-items { flex: 1 1 auto; list-style: none; margin: 0; padding: 0;
+                   display: flex; flex-direction: column; gap: 0.15rem; }
+    .mu-rg-items li { color: #475569; }
+    .mu-rg-items li.mu-pos { color: #166534; }
+    .mu-rg-items li.mu-neg { color: #b91c1c; }
+    .mu-rg-items li.mu-caution { color: #92400e; }
+    .mu-rg-content { flex: 1 1 auto; }
+    .mu-rg-content p { margin: 0 0 0.3rem; color: #475569; }
+    .mu-rg-validation { margin-top: 0.2rem; background: #f7faf5; border: 1px solid #d6e2cf;
+                        border-radius: 8px; padding: 0.55rem 0.65rem; align-items: flex-start; }
+    .mu-rg-validation .mu-rg-label { width: 7.4rem; color: #3f5c2b; }
+    .mu-rg-validation .mu-rg-items { list-style: disc; padding-left: 1rem; }
+    .mu-rg-information, .mu-rg-practical { align-items: flex-start; padding-top: 0.15rem; }
+    .mu-rg-information .mu-rg-label, .mu-rg-practical .mu-rg-label { width: 7.4rem; color: #6b6357; }
+    .mu-rg-notes { background: #fffaeb; border: 1px solid #fde68a; border-radius: 8px;
+                   padding: 0.4rem 0.6rem; }
+    .mu-rg-notes .mu-rg-label { color: var(--amber); }
+    .mu-rg-notes .mu-rg-items { color: #78350f; }
+    .go-phalalu { margin-top: 0.8rem; background: #FBF6EB; border: 1px solid var(--amber-border);
+                  border-radius: 8px; padding: 0.75rem 0.95rem; }
+    .go-phalalu h4 { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--amber);
+                     text-transform: uppercase; letter-spacing: 0.05em; }
+    .go-phalalu p { margin: 0.3rem 0; font-size: 0.84rem; color: #44403c; line-height: 1.55; }
+    .go-quality { display: inline-block; border-radius: 6px; padding: 0.1rem 0.55rem;
+                  font-size: 0.75rem; font-weight: 700; margin-left: 0.4rem; vertical-align: middle; }
+    .go-quality.good { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .go-quality.mixed { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .go-quality.difficult { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .go-cond { margin-top: 0.7rem; }
+    .go-cond .chip { display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 0.15rem 0.6rem; font-weight: 700; font-size: 0.8rem; margin-right: 0.35rem; }
+    .go-pick { background: #fff; border: 1px solid var(--indigo-border); color: var(--indigo); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin: 0 0.25rem 0.25rem 0; font-family: inherit; }
+    .go-pick:hover { background: var(--indigo-bg); }
+    .tb-readme { margin-top: 0.7rem; padding: 0.6rem 0.75rem; background: #FFFFFF; border: 1px solid #E7DECC;
+                 border-radius: 8px; font-size: 0.76rem; color: #58504A; display: flex; flex-direction: column; gap: 0.3rem; }
+    .tb-readme-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #746B5E; }
+    .tb-readme .tara-chip { margin-right: 0.25rem; }
+    .wa-share-mini { position: absolute; top: 0.6rem; right: 0.7rem; width: 32px; height: 32px;
+                     border-radius: 50%; background: #fff; color: #15803d; border: 1px solid #DDD2BC; cursor: pointer;
+                     display: flex; align-items: center; justify-content: center;
+                     box-shadow: 0 1px 3px rgba(31,26,23,0.04); }
+    .wa-share-mini:hover { background: #FBF6EB; border-color: #15803d; }
+    .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
+
+    .fmt-toggle { display: inline-flex; border: 1px solid var(--indigo-border); border-radius: 8px; overflow: hidden; }
+    .fmt-toggle button { border: none; background: #fff; color: #6B6357; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
+    .fmt-toggle button.active { background: var(--indigo-bg); color: var(--indigo); }
+
+    #global-controls-bar[hidden] { display: none; }
+    #global-controls-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+                            padding: 0.45rem 0; margin-bottom: 0.25rem; }
+    #global-controls-bar .selector { gap: 0; }
+    #global-controls-bar .selector label { display: none; }
+    #global-controls-bar .sel-wrap { display: flex; align-items: center; gap: 0.3rem; }
+    #global-controls-bar .sel-icon { color: var(--indigo); opacity: 0.7; flex: none; }
+    #global-controls-bar #sel-fmt-toggle { margin-left: auto; }
+    /* One shell: the pickers stay in the flow on mobile (no More drawer). */
+    body[data-mode="mobile"] #global-controls-bar:not([hidden]) {
+      margin-top: 0.35rem; padding: 0 0.85rem 0.65rem; row-gap: 0.4rem;
+      border-bottom: 1px solid #E7DECC;
+    }
+    body[data-mode="mobile"] #global-controls-bar select { max-width: 42vw; }
+    .preview-head .date { cursor: pointer; }
+    .preview-head .date:hover { opacity: 0.85; }
+
+    .upcoming-month { margin-bottom: 0.5rem; border: 1px solid #E7DECC; border-radius: 8px; overflow: hidden; }
+    .upcoming-month-header {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+      background: #F7F2E8; border: none; cursor: pointer; font-family: inherit;
+      font-size: 0.72rem; font-weight: 700; color: #58504A;
+      text-transform: uppercase; letter-spacing: 0.07em; padding: 0.55rem 0.75rem; text-align: left;
+    }
+    .upcoming-month-header:hover { background: #EFE9DA; }
+    .upcoming-month.open > .upcoming-month-header { color: var(--indigo); background: var(--indigo-bg); border-bottom: 1px solid var(--indigo-border); }
+    .upcoming-chevron::after { content: '▸'; font-size: 0.7rem; color: #746B5E; }
+    .upcoming-month.open .upcoming-chevron::after { content: '▾'; }
+    .upcoming-month-body { display: none; padding: 0.5rem 0.6rem 0.6rem; }
+    .upcoming-month.open .upcoming-month-body { display: block; }
+    .upcoming-list { display: flex; flex-direction: column; gap: 0.3rem; }
+    .upcoming-row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: start; gap: 0.25rem 0.6rem; padding: 0.4rem 0.5rem; border: 1px solid #E7DECC; border-radius: 6px; background: #FFFFFF; }
+    .upcoming-row.upcoming-festival { background: var(--indigo-bg); border-color: var(--indigo-border); }
+    .upcoming-row.upcoming-today { border-color: var(--amber); background: #FFFBF4; }
+    .upcoming-today-badge { font-size: 0.65rem; font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; margin-left: 0.4rem; }
+    .upcoming-date { font-size: 0.8rem; font-weight: 700; color: #1F1A17; min-width: 6rem; white-space: nowrap; padding-top: 0.1rem; }
+    .upcoming-date .dow { color: #746B5E; font-weight: 600; }
+    .upcoming-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; flex: 1 1 auto; min-width: 0; }
+    .upcoming-in { font-size: 0.72rem; color: #746B5E; margin-left: auto; white-space: nowrap; }
+    .upcoming-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-top: 0.9rem; font-size: 0.72rem; color: #6B6357; }
+    @media (max-width: 620px) {
+      .upcoming-row { flex-direction: column; align-items: flex-start; gap: 0.3rem; padding: 0.5rem 0.65rem; }
+      .upcoming-date { display: flex; justify-content: flex-start; gap: 0.35rem; align-items: baseline; width: 100%; min-width: 0; font-size: 0.78rem; }
+      .upcoming-date .dow { font-size: 0.7rem; }
+      .upcoming-chips { width: 100%; }
+      .upcoming-in { display: none; }
+    }
+
+    .sys-card { border-radius: 8px; padding: 0.9rem; margin-bottom: 0.6rem; box-shadow: 2px 2px 0 rgba(31,26,23,0.05); }
+    .sys-card.drik { background: var(--indigo-bg); border: 1px solid var(--indigo-border); }
+    .sys-card.ss { background: var(--amber-bg); border: 1px solid var(--amber-border); }
+    .sys-card.vakya { background: var(--green-bg); border: 1px solid var(--green-border); }
+    .sys-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+    .sys-card.drik h3 { color: var(--indigo); }
+    .sys-card.ss h3 { color: var(--amber); }
+    .sys-card.vakya h3 { color: var(--green); }
+    .sys-card p { margin: 0.35rem 0; font-size: 0.85rem; color: #58504A; }
+    .read-more { font-size: 0.8rem; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; }
+    .sys-card.drik .read-more { color: var(--indigo); }
+    .sys-card.ss .read-more { color: var(--amber); }
+    .sys-card.vakya .read-more { color: var(--green); }
+    .expanded { display: none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(0,0,0,0.08); font-size: 0.8rem; color: #58504A; }
+    .expanded.open { display: block; }
+    .expanded a { color: inherit; font-weight: 600; }
+
+    .tip { font-size: 0.8rem; color: #746B5E; margin-bottom: 0; }
+
+    .mcp-tagline { font-size: 0.85rem; color: #58504A; margin: 0 0 1rem; }
+    .mcp-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; }
+    .mcp-tool { background: #F2ECDF; border: 1px solid #DDD2BC; border-radius: 8px; padding: 0.6rem 0.8rem; }
+    .mcp-tool code { display: block; font-size: 0.78rem; color: var(--indigo); font-weight: 700; margin-bottom: 0.2rem; }
+    .mcp-tool span { font-size: 0.75rem; color: #6B6357; }
+    .mcp-install { background: #1F1A17; border-radius: 8px; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+    .mcp-install h4 { margin: 0 0 0.5rem; font-size: 0.7rem; color: #b83a2a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .mcp-install pre { margin: 0; font-size: 0.78rem; color: #DDD2BC; font-family: monospace; white-space: pre-wrap; line-height: 1.6; }
+    .mcp-clients { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
+    .mcp-client { font-size: 0.75rem; background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); border-radius: 6px; padding: 0.2rem 0.6rem; font-weight: 600; }
+
+    /* ---------- Mobile shell — only active under 620px via body[data-mode] ---------- */
+    #m-topbar, #m-drawer-scrim { display: none; }
+
+    body[data-mode="mobile"] {
+      padding-top: 52px;
+      padding-bottom: 1.5rem;
+    }
+    body[data-mode="mobile"] .page { padding-top: 0; }
+    body[data-mode="mobile"] .hero,
+    body[data-mode="mobile"] > .page > .card .tool-tabs { display: none; }
+
+    body[data-mode="mobile"] #m-topbar {
+      display: flex; align-items: center; gap: 0.5rem;
+      position: fixed; top: 0; left: 0; right: 0; height: 52px;
+      padding: 0 0.85rem; background: rgba(255,255,255,0.94);
+      backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px);
+      border-bottom: 1px solid #E7DECC; z-index: 50;
+    }
+    #m-topbar .m-brand {
+      font-family: var(--brand-display); font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 0.005em; color: #1F1A17; flex: 1; min-width: 0;
+      line-height: 1.15; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    #m-topbar .m-brand .m-brand-mark {
+      flex: none; width: 30px; height: 30px; display: inline-block;
+    }
+    #m-topbar .m-brand .m-brand-word { display: inline; white-space: nowrap; }
+    #m-topbar .m-brand .m-brand-word em {
+      font-style: italic;
+      background: linear-gradient(90deg, var(--brand), #b83a2a);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    #m-topbar #m-nav-btn, #m-topbar .m-topbar-spacer {
+      flex: none; width: 30px; height: 30px;
+    }
+    #m-topbar #m-nav-btn {
+      border: 0; background: transparent; padding: 0; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #m-topbar #m-nav-btn .m-nav-icon {
+      font-size: 1.15rem; line-height: 1; color: #1F1A17;
+    }
+    #m-topbar #m-nav-btn:active { background: #E7DECC; border-radius: 8px; }
+
+    /* Per-screen title, just below the topbar */
+    body[data-mode="mobile"] .m-page-title {
+      display: flex; flex-direction: column; gap: 0.1rem;
+      padding: 0.9rem 0 0.5rem;
+    }
+    .m-page-title { display: none; }
+    .m-page-title-main {
+      font-family: var(--brand-display); font-size: 1.2rem; font-weight: 700;
+      color: #1F1A17; line-height: 1.2;
+    }
+    .m-page-title-sub {
+      font-family: var(--brand-sans); font-size: 0.78rem; color: #6B6357;
+    }
+
+    body[data-mode="mobile"] #m-drawer-scrim {
+      display: block; position: fixed; inset: 0; background: rgba(31,26,23,0.4);
+      z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
+    }
+    body[data-mode="mobile"].m-nav-open #m-drawer-scrim {
+      opacity: 1; pointer-events: auto;
+    }
+
+    /* One nav: on mobile the desktop sidebar becomes a left drawer. */
+    body[data-mode="mobile"] #sidebar {
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; bottom: 0; left: 0; width: min(78vw, 300px);
+      background: #fff; border-right: 1px solid #DDD2BC; z-index: 70;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+      box-shadow: 8px 0 24px rgba(31,26,23,0.18);
+      transform: translateX(-102%); transition: transform 0.22s cubic-bezier(0.16,1,0.3,1);
+    }
+    body[data-mode="mobile"].m-nav-open #sidebar { transform: translateX(0); }
+    @media (prefers-reduced-motion: reduce) {
+      body[data-mode="mobile"] #sidebar { transition: none; }
+    }
+
+
+    @media (max-width: 340px) {
+      #m-topbar .m-brand { font-size: 0.92rem; }
+      #m-topbar .m-brand .m-brand-mark { width: 26px; height: 26px; }
+    }
+
+
+    /* Special days row: weekday + date stay together (no space-between split),
+       chips on a second line. The "in N days" hint folds into the same line as
+       the date so the row reads as one sentence. */
+    body[data-mode="mobile"] .upcoming-date { justify-content: flex-start; }
+    body[data-mode="mobile"] .upcoming-date { gap: 0.35rem; align-items: baseline; }
+    body[data-mode="mobile"] .upcoming-in { display: inline; color: #DDD2BC; font-weight: 500; }
+
+    /* ---------- Mobile Gochara screen ---------- */
+    body[data-mode="mobile"] #panel-gochara > .tb-intro { display: none; }
+    body[data-mode="mobile"] #panel-gochara > .read-more {
+      display: inline-block; font-size: 0.78rem; padding: 0.2rem 0;
+      margin: 0 0 0.3rem; color: #746B5E !important;
+    }
+    /* hide explanatory footnotes on phone; keep the last "Please note" disclaimer */
+    body[data-mode="mobile"] #panel-gochara .preview-note { display: none; }
+    body[data-mode="mobile"] #panel-gochara .preview-note:last-of-type {
+      display: block; font-size: 0.74rem; margin-top: 0.5rem;
+    }
+    /* compact pill row above the chart: Date + Viewing share one line */
+    body[data-mode="mobile"] #panel-gochara .tb-controls { padding: 0.3rem 0 0.5rem; }
+    body[data-mode="mobile"] #panel-gochara .tb-controls .selector-row { gap: 0.4rem; }
+    body[data-mode="mobile"] #panel-gochara .tb-controls .selector { flex: 1 1 48%; }
+    body[data-mode="mobile"] #panel-gochara .tb-controls .selector label { font-size: 0.68rem; }
+    /* Phalalu prose first, then chart + legend, then Coming up */
+    body[data-mode="mobile"] #panel-gochara { display: flex; flex-direction: column; }
+    body[data-mode="mobile"] #panel-gochara > .tb-controls { order: 1; }
+    body[data-mode="mobile"] #panel-gochara > #go-phalalu { order: 2; }
+    body[data-mode="mobile"] #panel-gochara > #go-chart { order: 3; }
+    body[data-mode="mobile"] #panel-gochara > #go-legend { order: 4; }
+    body[data-mode="mobile"] #panel-gochara > #go-note { order: 5; }
+    body[data-mode="mobile"] #panel-gochara > #go-moves { order: 6; }
+    body[data-mode="mobile"] #panel-gochara > #go-conditions { order: 7; }
+    body[data-mode="mobile"] #panel-gochara > .preview-note { order: 8; }
+    /* Sade Sati / Ashtama Shani banner, now below the chart */
+    body[data-mode="mobile"] #go-conditions .go-cond {
+      background: linear-gradient(180deg, #FBF6EB, #F5E6D3);
+      border: 1px solid #D9A85C; border-radius: 8px; padding: 0.65rem 0.8rem; margin: 0.6rem 0 0.4rem;
+    }
+    body[data-mode="mobile"] #go-conditions .chip {
+      background: #f59e0b; color: #fff; border: 0; font-weight: 700;
+      padding: 0.3rem 0.65rem; border-radius: 999px;
+    }
+    /* Chart full-bleed: extend just past the card padding, tighten cells */
+    body[data-mode="mobile"] .go-chart {
+      margin-left: -0.6rem; margin-right: -0.6rem;
+      grid-template-rows: repeat(4, minmax(78px, auto));
+      border-radius: 8px;
+    }
+    body[data-mode="mobile"] .go-box { padding: 0.25rem 0.3rem; min-height: 78px; }
+    body[data-mode="mobile"] .go-box .rname { font-size: 0.58rem; padding-right: 0.9rem; }
+    body[data-mode="mobile"] .go-g { font-size: 0.66rem; padding: 0.04rem 0.28rem; margin: 0.08rem 0.08rem 0 0; }
+    /* Centre cell: drop the title and "from X" subtitle; show only the date in large type */
+    body[data-mode="mobile"] .go-center .d1 { display: none; }
+    body[data-mode="mobile"] .go-center .d2 ~ .d2 { display: none; }
+    body[data-mode="mobile"] .go-center .d2 { font-size: 0.82rem; font-weight: 700; color: var(--indigo); }
+    /* Coming up: vertical chip stack, one per line */
+    body[data-mode="mobile"] .go-moves {
+      display: flex; flex-direction: column; align-items: flex-start;
+      gap: 0.3rem; margin-top: 0.7rem;
+    }
+    body[data-mode="mobile"] .go-moves > b:first-child {
+      font-size: 0.7rem; color: #746B5E; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    body[data-mode="mobile"] .go-move {
+      display: block; padding: 0.3rem 0.55rem; background: var(--indigo-bg); color: #1F1A17;
+      border: 1px solid var(--indigo-border); border-radius: 999px;
+      font-size: 0.78rem; line-height: 1.2;
+    }
+    body[data-mode="mobile"] .go-move-sep { display: none; }
+
+    /* ---------- Mobile Tarabalam screen ---------- */
+    body[data-mode="mobile"] #panel-tarabalam > .tb-intro { display: none; }
+    body[data-mode="mobile"] #panel-tarabalam > .read-more {
+      display: inline-block; font-size: 0.78rem; padding: 0.2rem 0;
+      margin: 0 0 0.3rem; color: #746B5E !important;
+    }
+    /* tighter profile + date controls */
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls { padding: 0.5rem 0; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls-title { font-size: 0.85rem; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector { flex: 1 1 48%; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector:last-child { flex: 1 1 100%; }
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector label { font-size: 0.68rem; }
+    body[data-mode="mobile"] #panel-tarabalam > .preview-note { font-size: 0.74rem; }
+
+
+    /* Mobile-only: hide the Tools & setup expansion in the Subscribe drawer
+       (interested devotees can read this on PyPI). Desktop unchanged. */
+    body[data-mode="mobile"] #card-mcp .read-more,
+    body[data-mode="mobile"] #card-mcp #mcp-more { display: none !important; }
+
+    /* ---------- Mobile Stitch input language — Tarabalam screen ---------- */
+    /* Outer container becomes a clean white surface; the inner .tb-section
+       cards provide the contextual sub-spaces. */
+    body[data-mode="mobile"] #panel-tarabalam .tb-controls {
+      background: #fff; border: 1px solid #DDD2BC; border-radius: 8px;
+      padding: 0.85rem; margin: 0 0 0.75rem;
+      box-shadow: 2px 2px 0 rgba(31,26,23,0.05);
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-section {
+      background: #FBF6EB; border-color: #E7DECC;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-section-label {
+      font-size: 0.68rem; color: #6B6357; letter-spacing: 0.1em;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-reset {
+      color: #746B5E; font-size: 0.72rem;
+    }
+
+    /* Soft gray field surface across selects, text inputs and date inputs */
+    body[data-mode="mobile"] #panel-tarabalam input[type=text],
+    body[data-mode="mobile"] #panel-tarabalam input[type=date],
+    body[data-mode="mobile"] #panel-tarabalam select {
+      background: #fff; border: 1px solid #DDD2BC;
+      border-radius: 8px; padding: 0.7rem 0.85rem;
+      font-size: 0.92rem; color: #1F1A17; font-family: inherit;
+      width: 100%;
+      -webkit-appearance: none; appearance: none;
+    }
+    body[data-mode="mobile"] #panel-tarabalam input[type=text]::placeholder {
+      color: #746B5E;
+    }
+    body[data-mode="mobile"] #panel-tarabalam select {
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%2364748b' stroke-width='1.6'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      background-size: 11px;
+      padding-right: 2.1rem;
+    }
+    body[data-mode="mobile"] #panel-tarabalam input:focus,
+    body[data-mode="mobile"] #panel-tarabalam select:focus {
+      outline: none; border-color: var(--indigo);
+      box-shadow: 0 0 0 3px rgba(142,42,31,0.12);
+    }
+
+    /* Profile row: name full-width, then birth-star + padam two-up */
+    body[data-mode="mobile"] #panel-tarabalam .tb-profile-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.5rem; margin-bottom: 0.5rem;
+      align-items: center; position: relative;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-profile-row input[type=text] {
+      grid-column: 1 / -1;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-profile-row .tb-toggle {
+      grid-column: 1 / -1; margin-left: 0;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-remove {
+      position: absolute; right: 0; top: 0;
+      color: #DDD2BC; font-size: 1.05rem;
+    }
+
+    /* + Add a family member: dashed accent button, full width */
+    body[data-mode="mobile"] #panel-tarabalam .tb-add {
+      width: 100%; padding: 0.7rem 1rem; margin-top: 0.2rem;
+      background: #fff; border: 1px dashed var(--indigo-border);
+      color: var(--indigo); font-weight: 700; font-size: 0.88rem;
+      border-radius: 8px; cursor: pointer;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-add:active { background: var(--indigo-bg); }
+
+    /* Date row: From + To two-up; Standard full-width on its own line */
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .tb-sel-mode {
+      grid-column: 1 / -1;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .tb-sel-activity {
+      grid-column: 1 / -1;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-dates .selector {
+      flex: none; min-width: 0;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .selector label {
+      font-size: 0.66rem; color: #6B6357;
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Activity row inside mu-section: just the select full width */
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-activity {
+      display: block;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-row-activity .selector {
+      flex: none; width: 100%;
+    }
+
+    /* Primary CTAs — large pill buttons (both .tb-cta and any .btn) */
+    body[data-mode="mobile"] #panel-tarabalam .tb-cta {
+      padding: 0.9rem 1.25rem; font-size: 0.95rem; font-weight: 700;
+      background: var(--indigo); color: #fff; border: 0; border-radius: 999px;
+      box-shadow: 2px 2px 0 rgba(31,26,23,0.08); cursor: pointer;
+      font-family: inherit;
+    }
+    body[data-mode="mobile"] #panel-tarabalam .tb-cta:active {
+      background: #6d1f16; box-shadow: none;
+    }
+
+    /* Mobile-only: the standalone "Special days — next 30 days" card belongs
+       to the Today tab. Hide it when Gochara or Tarabalam is the active screen. */
+    /* About card is only relevant on the About tab — hide it everywhere else on mobile */
+    body[data-mode="mobile"]:not([data-tool="about"]) #card-about { display: none; }
+
+    h2.panel-heading { display: none; }
+    /* ══ Vertical sidebar — desktop only (≥ 960 px) ══ */
+    #sidebar { display: none; }
+
+    @media (min-width: 960px) {
+      body { padding: 0 0 2rem 228px; }
+      #sidebar {
+        display: flex; flex-direction: column;
+        position: fixed; left: 0; top: 0; bottom: 0; width: 228px;
+        background: #fff; border-right: 1px solid #DDD2BC;
+        z-index: 10; overflow-y: auto;
+      }
+      .page { max-width: 820px; margin: 0; padding: 0 1.5rem 2rem; }
+      .hero { display: none; }
+      .tool-tabs { display: none; }
+      h2.panel-heading { display: flex; }
+      #settings-line {
+        margin-top: 0; height: 60px; box-sizing: border-box;
+        border-bottom: 1px solid #E7DECC;
+      }
+      #global-controls-bar:not([hidden]) { padding: 0.55rem 0 0.7rem; border-bottom: 1px solid #E7DECC; margin-bottom: 1rem; }
+      #settings-line:has(+ #global-controls-bar:not([hidden])) { border-bottom: none; }
+
+    }
+
+    /* Section switching (all widths): one shell, one data-tool matrix */
+    /* Section switching: hide secondary cards when a tool panel is active */
+    body[data-tool="today"] #special-days-card,
+    body[data-tool="today"] #subscribe,
+    body[data-tool="today"] #card-mcp,
+    body[data-tool="today"] #card-system,
+    body[data-tool="today"] #card-about,
+    body[data-tool="gochara"] #special-days-card,
+    body[data-tool="gochara"] #subscribe,
+    body[data-tool="gochara"] #card-mcp,
+    body[data-tool="gochara"] #card-system,
+    body[data-tool="gochara"] #card-about,
+    body[data-tool="tarabalam"] #special-days-card,
+    body[data-tool="tarabalam"] #subscribe,
+    body[data-tool="tarabalam"] #card-mcp,
+    body[data-tool="tarabalam"] #card-system,
+    body[data-tool="tarabalam"] #card-about,
+    body:not([data-tool="profiles"]) #card-profiles { display: none; }
+
+    /* Hide tool card when a secondary section is active */
+    body[data-tool="profiles"] #card-tools,
+    body[data-tool="festivals"] #card-tools,
+    body[data-tool="subscribe"] #card-tools,
+    body[data-tool="useinai"] #card-tools,
+    body[data-tool="about"] #card-tools { display: none; }
+
+    /* Festivals: show only special-days-card */
+    body[data-tool="festivals"] #subscribe,
+    body[data-tool="festivals"] #card-mcp,
+    body[data-tool="festivals"] #card-system,
+    body[data-tool="festivals"] #card-about { display: none; }
+
+    /* Subscribe: show subscribe + card-system (system choice affects feed URL) */
+    body[data-tool="subscribe"] #special-days-card,
+    body[data-tool="subscribe"] #card-mcp,
+    body[data-tool="subscribe"] #card-about { display: none; }
+
+    /* Use in AI: show only card-mcp */
+    body[data-tool="useinai"] #special-days-card,
+    body[data-tool="useinai"] #subscribe,
+    body[data-tool="useinai"] #card-system,
+    body[data-tool="useinai"] #card-about { display: none; }
+
+    /* About: show only card-about */
+    body[data-tool="about"] #special-days-card,
+    body[data-tool="about"] #subscribe,
+    body[data-tool="about"] #card-mcp,
+    body[data-tool="about"] #card-system { display: none; }
+
+    /* Profiles: show only the local profile-management destination. */
+    body[data-tool="profiles"] #special-days-card,
+    body[data-tool="profiles"] #subscribe,
+    body[data-tool="profiles"] #card-mcp,
+    body[data-tool="profiles"] #card-system,
+    body[data-tool="profiles"] #card-about { display: none; }
+
+    /* Sidebar chrome */
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 0.6rem;
+      height: 60px; padding: 0 1rem; box-sizing: border-box;
+      border-bottom: 1px solid #E7DECC; flex: none;
+    }
+    .sidebar-brand-name {
+      font-family: var(--brand-display); font-size: 1rem; font-weight: 400;
+      color: #1F1A17; line-height: 1.2;
+    }
+    .sidebar-brand-name em { color: var(--brand); font-style: italic; }
+    .sidebar-nav-groups { padding: 1rem 0.6rem 0.5rem; flex: 1 1 auto; }
+    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 0.65rem; width: 100%;
+      padding: 0.58rem 0.85rem; border: 1px solid transparent; border-radius: 8px;
+      background: none; cursor: pointer; font-family: inherit; font-size: 0.88rem;
+      color: #58504A; text-align: left; text-decoration: none;
+      transition: background 0.12s;
+    }
+    .sidebar-item:hover { background: #F2ECDF; color: #1F1A17; }
+    .sidebar-item.active {
+      background: var(--indigo-bg); color: var(--indigo);
+      font-weight: 600; border-color: var(--indigo-border);
+    }
+    .sidebar-icon {
+      font-size: 1rem; line-height: 1; flex: none;
+      width: 1.2rem; text-align: center;
+    }
+    .sidebar-label { flex: 1; min-width: 0; line-height: 1.3; }
+    .sidebar-shloka {
+      padding: 1rem 1rem 0.75rem; border-top: 1px solid #E7DECC; flex: none;
+    }
+    .sidebar-shloka-lines {
+      display: flex; flex-direction: column; gap: 0.05rem;
+      font-family: var(--brand-display); font-style: italic;
+      font-size: 0.71rem; line-height: 1.55; color: rgba(31,26,23,0.55);
+    }
+    .sidebar-shloka-gist {
+      margin-top: 0.45rem; font-size: 0.68rem; color: rgba(31,26,23,0.5);
+      letter-spacing: 0.01em;
+    }
+    .sidebar-footer {
+      padding: 0.6rem 1rem 0.9rem; border-top: 1px solid #E7DECC;
+      font-size: 0.72rem; color: #746B5E; line-height: 1.5; flex: none;
+    }
+    body[data-mode="mobile"] #special-days-card .preview-note { display: none; }
+
+    /* ---------- Mobile Stitch aesthetic — Today screen ---------- */
+    /* "AT A GLANCE" section label above the anga grid */
+    body[data-mode="mobile"] .anga-grid {
+      gap: 0.55rem; padding: 0.85rem 0.85rem 0.3rem; position: relative;
+    }
+    body[data-mode="mobile"] .anga-grid::before {
+      content: 'At a glance'; grid-column: 1 / -1;
+      font-size: 0.7rem; font-weight: 700; color: #6B6357;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding-bottom: 0.05rem;
+      font-style: italic; font-family: var(--brand-display), serif;
+    }
+    /* White anga cards, neutral parchment surface */
+    body[data-mode="mobile"] .anga-cell {
+      background: #FBF6EB; border: 1px solid #E4DAC6;
+      border-radius: 8px; text-align: left; padding: 0.6rem 0.7rem 0.65rem;
+      display: flex; flex-direction: column; gap: 0.1rem;
+    }
+    body[data-mode="mobile"] .anga-label {
+      font-size: 0.68rem; color: #6B6357; letter-spacing: 0.08em;
+      text-transform: uppercase; font-style: italic; font-family: var(--brand-display), serif;
+    }
+    body[data-mode="mobile"] .anga-name {
+      font-size: 1rem; line-height: 1.2; color: #1F1A17; margin-top: 0.15rem;
+    }
+    body[data-mode="mobile"] .anga-time {
+      font-size: 0.74rem; color: #6B6357; margin-top: 0.15rem;
+      white-space: normal;
+    }
+
+    /* "Crucial Timings" — Auspicious / Avoid as table-row cards */
+    body[data-mode="mobile"] .tile-strip {
+      padding: 0.85rem 0.85rem 0.55rem; border-top: 1px solid #FBF6EB;
+    }
+    body[data-mode="mobile"] .strip-title {
+      font-size: 0.7rem; letter-spacing: 0.08em; margin-bottom: 0.55rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    body[data-mode="mobile"] .win-grid {
+      display: flex; flex-direction: column; gap: 0.35rem;
+      grid-template-columns: none !important;
+    }
+    body[data-mode="mobile"] .win-grid .chog-cell {
+      display: grid; grid-template-columns: 1fr auto; align-items: center;
+      gap: 0.5rem; padding: 0.55rem 0.75rem;
+      background: #fff; border: 1px solid #DDD2BC; border-radius: 8px;
+      text-align: left;
+    }
+    body[data-mode="mobile"] .win-grid .chog-cell.good { background: var(--green-bg); border-color: var(--green-border); }
+    body[data-mode="mobile"] .win-grid .chog-cell.bad  { background: #fef2f2; border-color: #fecaca; }
+    body[data-mode="mobile"] .win-grid .chog-cell .chog-name {
+      font-size: 0.88rem; font-weight: 700; color: #1F1A17; text-align: left;
+    }
+    body[data-mode="mobile"] .win-grid .chog-cell.good .chog-name { color: #14532d; }
+    body[data-mode="mobile"] .win-grid .chog-cell.bad  .chog-name { color: #7f1d1d; }
+    body[data-mode="mobile"] .win-grid .chog-cell .chog-time {
+      font-size: 0.78rem; color: #1F1A17; white-space: nowrap; text-align: right;
+      grid-column: 2; line-height: 1.25;
+    }
+    body[data-mode="mobile"] .win-grid .chog-cell .chog-time + .chog-time {
+      grid-column: 2; margin-top: 0.05rem;
+    }
+
+    /* Day/Night Choghadiya — keep a 4-col grid but tighten cells */
+    body[data-mode="mobile"] .chog-grid { gap: 0.35rem; }
+    body[data-mode="mobile"] .chog-cell { padding: 0.4rem 0.2rem; border-radius: 8px; }
+    body[data-mode="mobile"] .chog-name { font-size: 0.74rem; }
+    body[data-mode="mobile"] .chog-time { font-size: 0.66rem; }
+
+    /* Preview head: tighten and let date lead */
+    body[data-mode="mobile"] .preview-head { padding: 0.85rem 0.95rem 0.85rem; padding-right: 3.5rem; }
+    body[data-mode="mobile"] .preview-head .date { font-size: 1rem; }
+    body[data-mode="mobile"] .preview-head .meta { font-size: 0.74rem; }
+
+    /* Flag-strip (festivals/specials chips) tighter */
+    body[data-mode="mobile"] .flag-strip { padding: 0.55rem 0.85rem 0.2rem; gap: 0.35rem; }
+  </style>
+  <script type="module" crossorigin src="/assets/index-DR4JAgT_.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DBSkTBvs.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- Mobile shell — visible only when body[data-mode="mobile"] -->
+<header id="m-topbar" role="banner">
+  <button id="m-nav-btn" aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">
+    <span class="m-nav-icon" aria-hidden="true">☰</span>
+  </button>
+  <span class="m-brand">
+    <svg class="m-brand-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
+      <ellipse cx="24" cy="24" rx="12" ry="19" transform="rotate(22 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.3" stroke-opacity="0.6"/>
+      <circle cx="13.5" cy="16" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+      <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+      <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
+    </svg>
+    <span class="m-brand-word">Astro <em>Chaganti</em></span>
+  </span>
+  <span class="m-topbar-spacer" aria-hidden="true"></span>
+</header>
+
+
+<div id="m-drawer-scrim" aria-hidden="true"></div>
+
+<nav id="sidebar" aria-label="Main navigation">
+  <div class="sidebar-brand">
+    <svg class="sunmoon" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="width:32px;height:32px;flex:none;">
+      <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
+      <ellipse cx="24" cy="24" rx="12" ry="19" transform="rotate(22 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.3" stroke-opacity="0.6"/>
+      <circle cx="13.5" cy="16" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+      <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+      <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
+    </svg>
+    <span class="sidebar-brand-name">Astro <em>Chaganti</em></span>
+  </div>
+  <div class="sidebar-nav-groups">
+    <section class="sidebar-group" aria-labelledby="sidebar-tools-label">
+      <h2 class="sidebar-group-label" id="sidebar-tools-label">Tools</h2>
+      <ul class="sidebar-nav" role="list">
+        <li>
+          <button class="sidebar-item active" id="sidebar-today" aria-current="page" onclick="switchTool('today')">
+            <span class="sidebar-icon">🔆</span>
+            <span class="sidebar-label">Panchangam</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-gochara" onclick="switchTool('gochara')">
+            <span class="sidebar-icon">🪐</span>
+            <span class="sidebar-label">Daily Horoscope</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-tarabalam" onclick="switchTool('tarabalam')">
+            <span class="sidebar-icon">⏰</span>
+            <span class="sidebar-label">Muhurtam</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-profiles" onclick="switchTool('profiles')">
+            <span class="sidebar-icon">♙</span>
+            <span class="sidebar-label">Profiles</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" id="sidebar-festivals" onclick="switchTool('festivals')">
+            <span class="sidebar-icon">🪔</span>
+            <span class="sidebar-label">Festivals</span>
+          </button>
+        </li>
+      </ul>
+    </section>
+    <section class="sidebar-group" aria-labelledby="sidebar-resources-label">
+      <h2 class="sidebar-group-label" id="sidebar-resources-label">Resources</h2>
+      <ul class="sidebar-nav" role="list">
+        <li>
+          <button class="sidebar-item" id="sidebar-subscribe" onclick="switchTool('subscribe')">
+            <span class="sidebar-icon">📅</span>
+            <span class="sidebar-label">Subscribe</span>
+          </button>
+        </li>
+        <li>
+          <a class="sidebar-item" href="/docs/">
+            <span class="sidebar-icon">📖</span>
+            <span class="sidebar-label">Documentation</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+  <div class="sidebar-shloka">
+    <div class="sidebar-shloka-lines">
+      <span>satyaṃ brūyāt priyaṃ brūyān</span>
+      <span>na brūyāt satyam apriyam</span>
+      <span>priyaṃ ca nānṛtaṃ brūyād</span>
+      <span>eṣa dharmaḥ sanātanaḥ</span>
+    </div>
+    <div class="sidebar-shloka-gist">Be truthful. Be kind.</div>
+  </div>
+  <section class="sidebar-footer" aria-label="More">
+    <ul class="sidebar-footer-list" role="list">
+      <li><button class="sidebar-item sidebar-secondary" id="sidebar-useinai" onclick="switchTool('useinai')">Use in AI</button></li>
+      <li><button class="sidebar-item sidebar-secondary" id="sidebar-about" onclick="switchTool('about')">About</button></li>
+    </ul>
+  </section>
+</nav>
+
+<main class="page" id="main">
+
+  <div class="hero">
+    <div class="brand-row">
+      <svg class="sunmoon" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="width:50px;height:50px;">
+        <ellipse cx="24" cy="24" rx="21" ry="7" transform="rotate(-8 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-opacity="0.82"/>
+        <ellipse cx="24" cy="24" rx="12" ry="19" transform="rotate(22 24 24)" fill="none" stroke="var(--brand)" stroke-width="1.3" stroke-opacity="0.6"/>
+        <circle cx="13.5" cy="16" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+        <circle cx="34.5" cy="32" r="1.6" fill="var(--brand)" fill-opacity="0.8"/>
+        <circle cx="24" cy="24" r="2.8" fill="var(--brand)"/>
+      </svg>
+      <div class="brand-text">
+        <h1>Astro <em>Chaganti</em></h1>
+        <div class="brand-sub">Panchangam · Rasi Phalalu · Muhurtam</div>
+      </div>
+    </div>
+    <div class="tagline">
+      <div class="shloka">
+        <span>satyaṃ brūyāt priyaṃ brūyān</span>
+        <span>na brūyāt satyam apriyam</span>
+        <span>priyaṃ ca nānṛtaṃ brūyād</span>
+        <span>eṣa dharmaḥ sanātanaḥ</span>
+      </div>
+      <div class="shloka-gist">Be truthful. Be kind.</div>
+    </div>
+  </div>
+
+  <div id="settings-line">
+    <svg class="sel-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span id="settings-summary" aria-live="polite">Hyderabad · Drik Ganita · 12h · Local time</span>
+    <button id="settings-toggle" aria-expanded="false" aria-controls="global-controls-bar" aria-label="Change city, system or time format" title="Change settings">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+    </button>
+  </div>
+  <div id="global-controls-bar" hidden>
+    <div class="selector" id="sel-tp-city">
+      <label for="tp-city">City</label>
+      <div class="sel-wrap">
+        <svg class="sel-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <select id="tp-city"></select>
+      </div>
+    </div>
+    <div class="selector" id="sel-tp-system">
+      <label for="tp-system">System</label>
+      <div class="sel-wrap">
+        <svg class="sel-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        <select id="tp-system"></select>
+      </div>
+    </div>
+    <div class="selector" id="sel-fmt-toggle">
+      <label id="fmt-label">Time format</label>
+      <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
+        <button id="fmt-12" type="button" aria-pressed="true" onclick="setTimeFmt('12')">12h</button>
+        <button id="fmt-24" type="button" aria-pressed="false" onclick="setTimeFmt('24')">24h</button>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-tools">
+    <div class="tool-tabs" role="tablist">
+      <button id="tab-today" class="tool-tab active" role="tab" aria-selected="true" aria-controls="panel-today" onclick="switchTool('today')">
+        <span class="tt">🔆 Today's Panchangam</span><span class="ts">What is the day?</span></button>
+      <button id="tab-gochara" class="tool-tab" role="tab" aria-selected="false" aria-controls="panel-gochara" tabindex="-1" onclick="switchTool('gochara')">
+        <span class="tt">🪐 Daily Horoscope</span><span class="ts">What does it mean for me?</span></button>
+      <button id="tab-tarabalam" class="tool-tab" role="tab" aria-selected="false" aria-controls="panel-tarabalam" tabindex="-1" onclick="switchTool('tarabalam')">
+        <span class="tt">⏰ Muhurtam</span><span class="ts">When should we act?</span></button>
+    </div>
+    <h1 class="m-page-title" id="m-page-title" tabindex="-1"><span class="m-page-title-main" id="m-page-title-main">Today's Panchangam</span><span class="m-page-title-sub" id="m-page-title-sub">What is the day?</span></h1>
+    <div id="panel-today" role="tabpanel" aria-labelledby="tab-today" aria-hidden="false">
+    <h2 class="panel-heading">Today's Panchangam</h2>
+    <div id="tp-result" aria-busy="true"><p class="preview-error" role="status">Loading…</p></div>
+    </div><!-- /panel-today -->
+
+    <div id="panel-tarabalam" role="tabpanel" aria-labelledby="tab-tarabalam" aria-hidden="true" style="display:none;">
+      <h2 class="panel-heading">⏰ Muhurtam</h2>
+      <div class="tb-controls">
+        <!-- Strip 1: date range + moon filter + activity -->
+        <div class="selector-row tb-row-dates" style="flex-wrap:wrap;">
+          <div class="selector">
+            <label for="tb-from">From</label>
+            <input type="date" id="tb-from" class="tb-date">
+          </div>
+          <div class="selector">
+            <label for="tb-to">To</label>
+            <input type="date" id="tb-to" class="tb-date">
+          </div>
+          <div class="selector tb-sel-mode">
+            <label for="tb-mode" title="How strictly the Moon (Chandrabalam) filters time slots">Moon filter</label>
+            <select id="tb-mode" class="tb-date" onchange="tbSetMode(this.value)">
+              <option value="stars">Stars only (classic)</option>
+              <option value="puja_ok">Stars + Moon, puja ok</option>
+              <option value="strict">Stars + Moon, strict</option>
+            </select>
+          </div>
+          <div class="selector tb-sel-activity">
+            <label for="mu-activity">Activity</label>
+            <select id="mu-activity" class="tb-date" aria-label="Activity">
+              <option value="any">Anything auspicious</option>
+              <optgroup label="Samskaras">
+                <option value="wedding">Wedding (Vivaha)</option>
+                <option value="engagement">Mutual engagement (Kanya-Varavarana)</option>
+                <option value="naming">Naming (Namakaranam)</option>
+                <option value="annaprasana">Annaprasana (First feeding)</option>
+                <option value="karnavedha">Karnavedha (Ear-piercing)</option>
+                <option value="mundana">Mundana / Chaula (First head-shave)</option>
+                <option value="upanayana">Upanayana (Sacred thread)</option>
+                <option value="vidyarambha">Education start (Vidyarambha)</option>
+                <option value="seemantha">Seemantha (Prenatal ceremony)</option>
+                <option value="gruhapravesha">Gruhapravesha (First entry into new home)</option>
+              </optgroup>
+              <optgroup label="Acquisitions &amp; finance">
+                <option value="vehicle">Vehicle purchase</option>
+                <option value="property">Land purchase (for building)</option>
+                <option value="house_purchase">Completed house purchase</option>
+                <option value="gold">Gold / Jewelry purchase</option>
+                <option value="business_inventory_purchase">Trade inventory purchase</option>
+                <option value="purchase">Purchase (general)</option>
+                <option value="borrowing_money">Borrowing money / taking a loan</option>
+                <option value="lending_money">Lending money / giving a loan</option>
+              </optgroup>
+              <optgroup label="Construction &amp; ventures">
+                <option value="bhumi_puja">Bhumi Puja / Foundation laying</option>
+                <option value="well_digging">Well digging</option>
+                <option value="home_repair">Home repair / renovation start</option>
+                <option value="business">Deploying capital / business investment</option>
+                <option value="job">Entering employment / starting service</option>
+              </optgroup>
+              <optgroup label="Spiritual">
+                <option value="yajna">Homa offering (Homahuti)</option>
+                <option value="pilgrimage">Pilgrimage (Tirtha Yatra)</option>
+                <option value="ceremony">Shantika / Paushtika rite</option>
+              </optgroup>
+              <optgroup label="Civil &amp; medical">
+                <option value="court">Filing a lawsuit / court action</option>
+                <option value="surgery">Surgery / medical procedure</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="travel">Travel / journey</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <!-- Strip 2: who is this for -->
+        <div class="tb-section">
+          <div class="tb-section-head">
+            <span class="tb-section-label">Who is this for?</span>
+            <button class="tb-reset" title="Clear participants from this search">clear selection</button>
+          </div>
+          <div id="tb-profiles"></div>
+        </div>
+
+        <button class="btn tb-cta" onclick="findMuhurta()">Show Slots</button>
+        <p class="preview-note" style="margin-top:0.5rem;" id="mu-context"></p>
+      </div><!-- /tb-controls -->
+
+      <!-- TARABALAM HIDDEN: tb-summary, tb-result
+      <div id="tb-summary"></div>
+      <div id="tb-result"></div>
+      END TARABALAM HIDDEN -->
+      <p id="mu-result-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+      <div id="mu-result" aria-busy="false"></div>
+      <p class="surface-boundary">
+        <strong>Use the ranking comparatively.</strong> Read any named cautions on a slot; for weddings,
+        gruhapravesham, upanayanam and other major ceremonies, consult your purohit.
+        <a href="/docs/computations/personal.muhurta-slot-ranking">How slots are ranked</a>
+        · <a href="/docs/reference/54-muhurtam-election-chart-screening">How chart checks are computed and sourced</a>
+      </p>
+    </div><!-- /panel-tarabalam -->
+
+    <div id="panel-gochara" role="tabpanel" aria-labelledby="tab-gochara" aria-hidden="true" style="display:none;">
+      <h2 class="panel-heading">🪐 Daily Horoscope</h2>
+      <div class="tb-controls">
+        <div class="selector-row" style="margin:0;">
+          <div class="selector">
+            <label for="go-view">Horoscope for</label>
+            <select id="go-view" class="tb-date" onchange="renderGochara()"></select>
+          </div>
+        </div>
+      </div>
+      <div id="go-profile-state" class="journey-profile-state" aria-live="polite"></div>
+      <div id="go-phalalu"></div>
+      <div id="go-chart" class="go-chart"><p class="preview-error">Loading…</p></div>
+      <div id="go-legend"></div>
+      <div id="go-note"></div>
+      <div id="go-moves"></div>
+      <div id="go-conditions"></div>
+      <details class="surface-boundary evidence-boundary">
+        <summary>Evidence boundary</summary>
+        <p>
+          Positions use the selected day's <strong>sunrise</strong>. Phaladeepika 26.3–8 supplies the
+          transit-house rules; Rahu/Ketu follow Phaladeepika 26.2. Results are referenced to the natal
+          Moon and never calculated from lagna.
+        </p>
+        <p>
+          This is Moon-sign transit guidance, not a full birth-chart reading or formal Muhurtam.
+          Generated prose and guidance do not inherit the scriptural authority of the source rules.
+          <a href="/docs/computations/gochara.transit-verdicts">Method, evidence and limits</a>
+        </p>
+      </details>
+    </div><!-- /panel-gochara -->
+  </div>
+
+  <section class="card" id="card-profiles" aria-labelledby="profiles-title">
+    <div id="profiles-root"></div>
+  </section>
+
+  <div class="card" id="special-days-card">
+    <h2>Festivals</h2>
+    <div id="upcoming-result"><p class="preview-error">Loading…</p></div>
+    <div class="upcoming-legend">
+      <span>🪔 Named festival</span>
+      <span>⚡ Tithi observance (Ekadashi, Pournami, Amavasya, Pradosham)</span>
+      <span>⚠️ Ganda Moola</span>
+      <span>🌕 Eclipse</span>
+    </div>
+    <p class="preview-note" style="margin-top:0.5rem;">Follows the city and system selected above.</p>
+  </div>
+
+  <div class="card" id="subscribe">
+    <h2>Subscribe to your calendar</h2>
+    <div class="selector-row">
+      <div class="selector">
+        <label for="sub-city">City</label>
+        <select id="sub-city"></select>
+      </div>
+      <div class="selector">
+        <label for="sub-system">System</label>
+        <select id="sub-system"></select>
+      </div>
+    </div>
+
+    <h3 class="sub">1 · Choose your feed</h3>
+    <div class="sub-variants">
+      <label class="sub-variant-option">
+        <input type="radio" name="sub-variant" value="" checked onchange="updateSubscribeUrl()">
+        <span class="sub-variant-body">
+          <span class="sub-variant-title">Full daily feed</span>
+          <span class="sub-variant-desc">Every day — Tithi, Nakshatra, Muhurtas, all festivals and observances</span>
+        </span>
+      </label>
+      <label class="sub-variant-option">
+        <input type="radio" name="sub-variant" value="festivals" onchange="updateSubscribeUrl()">
+        <span class="sub-variant-body">
+          <span class="sub-variant-title">🪔 Festivals only</span>
+          <span class="sub-variant-desc">Named festivals — Ugadi, Deepavali, Vinayaka Chavithi, Maha Shivaratri…</span>
+        </span>
+      </label>
+      <label class="sub-variant-option">
+        <input type="radio" name="sub-variant" value="observances" onchange="updateSubscribeUrl()">
+        <span class="sub-variant-body">
+          <span class="sub-variant-title">⚡ Tithi observances</span>
+          <span class="sub-variant-desc">Ekadashi, Pournami, Amavasya, and Pradosham — monthly vrat days</span>
+        </span>
+      </label>
+    </div>
+
+    <h3 class="sub">2 · Your subscription URL</h3>
+    <div class="url-box" id="sub-url">—</div>
+    <button class="btn" onclick="copyUrl()">Copy URL</button>
+    <span class="copy-confirm" id="copy-confirm" role="status" aria-live="polite"></span>
+
+    <h3 class="sub" style="margin-top:1.25rem;">3 · Add it to your calendar</h3>
+    <div class="app-tabs" role="tablist" aria-label="Calendar application">
+      <button class="app-tab active" id="app-tab-google" type="button" role="tab" aria-selected="true" aria-controls="app-panel-google" data-app="google" onclick="showAppTab('google')">Google</button>
+      <button class="app-tab" id="app-tab-apple" type="button" role="tab" aria-selected="false" aria-controls="app-panel-apple" tabindex="-1" data-app="apple" onclick="showAppTab('apple')">Apple</button>
+      <button class="app-tab" id="app-tab-outlook" type="button" role="tab" aria-selected="false" aria-controls="app-panel-outlook" tabindex="-1" data-app="outlook" onclick="showAppTab('outlook')">Outlook</button>
+    </div>
+    <div class="app-panel active" id="app-panel-google" role="tabpanel" aria-labelledby="app-tab-google" data-app="google">
+      <ol>
+        <li>Open Google Calendar on the web</li>
+        <li>In the left sidebar, find "Other calendars"</li>
+        <li>Click the <strong>+</strong> next to it</li>
+        <li>Select <strong>From URL</strong></li>
+        <li>Paste the subscription URL above</li>
+        <li>Click <strong>Add calendar</strong></li>
+      </ol>
+    </div>
+    <div class="app-panel" id="app-panel-apple" role="tabpanel" aria-labelledby="app-tab-apple" data-app="apple" hidden>
+      <ol>
+        <li>Open the Calendar app on your Mac</li>
+        <li>Go to <strong>File → New Calendar Subscription</strong></li>
+        <li>Paste the subscription URL above</li>
+        <li>Click <strong>Subscribe</strong></li>
+        <li>Choose how often to refresh (Daily recommended)</li>
+        <li>Click <strong>OK</strong></li>
+      </ol>
+    </div>
+    <div class="app-panel" id="app-panel-outlook" role="tabpanel" aria-labelledby="app-tab-outlook" data-app="outlook" hidden>
+      <ol>
+        <li>Open Outlook on the web</li>
+        <li>Go to <strong>Add calendar → Subscribe from web</strong></li>
+        <li>Paste the subscription URL above</li>
+        <li>Give the calendar a name</li>
+        <li>Click <strong>Import</strong></li>
+        <li>It refreshes automatically every few hours</li>
+      </ol>
+    </div>
+
+    <p class="preview-note">Updated automatically on the 1st of every month, 18 months ahead. No account needed.</p>
+  </div>
+
+  <div class="card" id="card-system">
+    <h2>Calculation system</h2>
+    <p class="surface-lead">
+      Drik Ganita is the observational default. Surya Siddhanta and Vakya are classical alternatives
+      that intentionally produce different results; choose the method followed by your tradition.
+    </p>
+    <a class="docs-link" href="/docs/reference/02-engines-and-model">Compare methods, evidence and known limits</a>
+  </div>
+
+  <div class="card" id="card-mcp">
+    <h2>Use in AI assistants</h2>
+    <p class="mcp-tagline">
+      Everything this site computes is also an <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">MCP</a>
+      server — ask Claude or any MCP-compatible assistant for a muhurta, your family's good days, or today's
+      Rasi Phalalu, and it calls this engine directly rather than guessing.
+    </p>
+    <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center; margin-bottom:0.5rem;">
+      <a class="btn" style="text-decoration:none;" href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener">📦 mcp-server-panchangam on PyPI</a>
+      <span style="font-size:0.78rem; color:#6B6357;">No API key · works offline for pre-configured cities</span>
+    </div>
+    <button class="read-more" style="color: var(--indigo);" aria-expanded="false" aria-controls="mcp-more" data-more="Tools &amp; setup for Claude, Cursor and other clients ▾" data-less="Hide tools &amp; setup ▴" onclick="toggleReadMore('mcp-more', this)">Tools &amp; setup for Claude, Cursor and other clients ▾</button>
+    <div class="expanded" id="mcp-more" hidden>
+
+    <div class="mcp-tools">
+      <div class="mcp-tool"><code>get_panchangam</code><span>Full Panchangam for any date and city — Tithi, Nakshatra, muhurtas, eclipse, yogas</span></div>
+      <div class="mcp-tool"><code>get_muhurta</code><span>One day's auspicious &amp; inauspicious windows — "is right now good?" (use <em>find_muhurta</em> to search across days)</span></div>
+      <div class="mcp-tool"><code>get_panchangam_range</code><span>Day-by-day summary for up to 31 days — compare days or plan a muhurta over a week</span></div>
+      <div class="mcp-tool"><code>get_special_days</code><span>Named festivals, Ekadashi, Pournami, Amavasya, Pradosham, Ganda Moola and Eclipses for a month</span></div>
+      <div class="mcp-tool"><code>get_graha_positions</code><span>All nine grahas at sunrise — rasi, nakshatra, retrograde, and when each enters its next rasi</span></div>
+      <div class="mcp-tool"><code>get_rasi_phalalu</code><span>Daily reading for a rashi — every sentence rendered from computed gochara/chandrabalam/tarabalam facts</span></div>
+      <div class="mcp-tool"><code>get_gochara</code><span>Transit verdicts from a janma rashi — favourable/blocked/adverse per graha with vedha, Sade Sati &amp; Ashtama Shani flags</span></div>
+      <div class="mcp-tool"><code>find_muhurta</code><span>Ranked auspicious slots over coming days — good choghadiya minus all bad windows, activity-aware, with reasons</span></div>
+      <div class="mcp-tool"><code>find_tarabalam_days</code><span>Tarabalam &amp; Chandrabalam — pass 1–4 birth stars (and rashis), choose the strictness, get the days favourable for everyone</span></div>
+      <div class="mcp-tool"><code>list_supported_cities</code><span>22 pre-configured cities with coordinates and timezone</span></div>
+    </div>
+
+    <p style="font-size:0.82rem;color:#58504A;margin:0.75rem 0 0.25rem;">Works with any city — pre-configured cities resolve instantly, any other city is geocoded via OpenStreetMap. You can also pass coordinates directly; the timezone is derived automatically. Supports all three calculation systems.</p>
+
+    <div class="mcp-clients">
+      <span class="mcp-client">Claude Desktop</span>
+      <span class="mcp-client">Claude Code</span>
+      <span class="mcp-client">Cursor</span>
+      <span class="mcp-client">Windsurf</span>
+      <span class="mcp-client">Any MCP client</span>
+    </div>
+
+    <div class="mcp-install">
+      <h4>Claude Desktop — add to claude_desktop_config.json</h4>
+      <pre>{
+  "mcpServers": {
+    "panchangam": {
+      "command": "uvx",
+      "args": ["mcp-server-panchangam"]
+    }
+  }
+}</pre>
+    </div>
+
+    <div class="mcp-install">
+      <h4>Claude Code — run once in terminal</h4>
+      <pre>claude mcp add panchangam -- uvx mcp-server-panchangam</pre>
+    </div>
+
+    </div><!-- /mcp-more -->
+  </div>
+
+  <div class="card" id="card-about">
+    <h2>About</h2>
+    <p style="font-size:0.9rem;color:#58504A;margin:0 0 1rem;line-height:1.65;">
+      <strong>Astro Chaganti's Panchangam</strong> is a free Telugu/Vedic panchangam built for the
+      Telugu-speaking community. It delivers daily almanac data as subscribable calendar feeds, a daily
+      at-a-glance view, family timing tools (Tarabalam, Muhurtam), planetary transits (Gochara), and
+      an MCP server for AI assistants. Free, open source, no account needed.
+    </p>
+
+    <h3 class="sub">Trust &amp; transparency</h3>
+    <p style="font-size:0.85rem;color:#58504A;margin:0 0 0.55rem;line-height:1.6;">
+      Each computation publishes its inputs, process, code owner, regression coverage, evidence state
+      and known limits. Verification strength varies by computation and calculation system, and is
+      stated explicitly rather than flattened into one accuracy claim.
+    </p>
+    <a class="docs-link" href="/docs/reference/09-computation-inventory">Read the methods and verification record</a>
+
+    <h3 class="sub">Links</h3>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.5rem;">
+      <a class="btn" style="text-decoration:none;font-size:0.82rem;" href="https://github.com/socraticsurge/telugu-calendar-utilities" target="_blank" rel="noopener">Source on GitHub</a>
+      <a class="btn" style="text-decoration:none;font-size:0.82rem;background:#58504A;" href="https://pypi.org/project/mcp-server-panchangam/" target="_blank" rel="noopener">MCP server on PyPI</a>
+      <a class="btn" style="text-decoration:none;font-size:0.82rem;background:#4F6B2C;" href="https://astrochaganti.com" target="_blank" rel="noopener">astrochaganti.com</a>
+    </div>
+    <p style="font-size:0.78rem;color:#746B5E;margin-top:1rem;">
+      For professional consultations and personal birth chart readings, visit
+      <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a>.
+    </p>
+  </div>
+
+</main>
+
+<!-- App entry: Vite module graph (src/main.ts imports the panels and libs). -->
+</body>
+</html>
