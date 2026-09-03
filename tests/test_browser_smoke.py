@@ -311,6 +311,28 @@ def _install_direct_route_runtime_assets(page):
     )
 
 
+def _festival_navigation_feed_fixture():
+    """Reuse a real feed shape on the date pinned by the navigation test.
+
+    This fixture checks only that the public window function selects and
+    renders its requested date. It deliberately does not establish a
+    Panchangam calculation claim for the shifted dates.
+    """
+    feed_text = MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8')
+    replacements = (
+        ('20260611', '20260831'),
+        ('20260612', '20260901'),
+        ('20260613', '20260902'),
+        ('20260614', '20260903'),
+        ('2026-06-11', '2026-08-31'),
+        ('2026-06-12', '2026-09-01'),
+        ('2026-06-13', '2026-09-02'),
+    )
+    for source, target in replacements:
+        feed_text = feed_text.replace(source, target)
+    return feed_text
+
+
 def _fixture_lagna_for_instant(instant):
     """Resolve the same canonical fixture Lagna the browser will project."""
     local = datetime.fromisoformat(instant.replace('Z', '+00:00')).astimezone(
@@ -740,7 +762,13 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
     (src/scorer/__tests__/muhurta-scorer.test.ts)."""
     page = browser.new_page()
     try:
-        _install_direct_route_runtime_assets(page)
+        feed_text = _festival_navigation_feed_fixture()
+        page.route(
+            '**/feeds/*.ics',
+            lambda route: route.fulfill(
+                status=200, content_type='text/calendar', body=feed_text,
+            ),
+        )
         page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
         # Wait until the bundle had time to evaluate.
         for marker in ('switchTool', 'setTimeFmt', 'calcTarabalam',
@@ -752,15 +780,15 @@ def test_inline_onclick_surface_is_on_window(docs_server, browser):
                 f'Check the Object.assign(window, {{...}}) block in '
                 f'src/main.ts — inline onclick handlers depend on it.'
             )
-        page.evaluate(f"window.openFestivalDate('{MUHURTA_FIXTURE_DATE}')")
+        page.evaluate("window.openFestivalDate('2026-08-31')")
         page.wait_for_function(
-            """document.querySelector('input.tp-date-input')?.value === '2026-06-11'
+            """document.querySelector('input.tp-date-input')?.value === '2026-08-31'
             && document.querySelector('#tp-result')?.getAttribute('aria-busy') === 'false'
             && document.querySelector('#tp-result')?.textContent?.includes(
-              'Thursday, June 11, 2026'
+              'Monday, August 31, 2026'
             )"""
         )
-        assert 'Thursday, June 11, 2026' in page.locator('#tp-result').inner_text()
+        assert 'Monday, August 31, 2026' in page.locator('#tp-result').inner_text()
     finally:
         page.close()
 

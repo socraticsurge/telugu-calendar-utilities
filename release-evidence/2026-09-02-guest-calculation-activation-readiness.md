@@ -1,10 +1,10 @@
 # Production activation evidence: guest birth profiles and election charts
 
-Assessment status: **complete; activation readiness incomplete**  
-Assessment completed: `2026-09-02T23:54:32+05:30` (`Asia/Kolkata`)  
-Evidence checked: 2026-09-01 and 2026-09-02  
-Repository baseline: `eec464e871afdce9268716233fed2eecc91ae17a`  
-Decision owner: repository owner  
+Assessment status: **complete; activation readiness incomplete**
+Assessment completed: `2026-09-02T23:54:32+05:30` (`Asia/Kolkata`)
+Evidence checked: 2026-09-01 and 2026-09-02
+Repository baseline: `eec464e871afdce9268716233fed2eecc91ae17a`
+Decision owner: repository owner
 Legal note: this is an engineering release assessment, not legal advice.
 
 This is a dated snapshot. Refresh the public probes, repository/PR heads,
@@ -343,8 +343,8 @@ unchanged and every approval gate remains in force.
 
 | Layer | Local checkpoint | What changed | Verification |
 |---|---|---|---|
-| DashaFlow | `97eece13f524cc70bf995ae27620068a7d6aad44`; restore `archive/dashaflow-contract-remediation-2026-09-03-97eece1` | Producer success fixtures and response validation now enforce the cross-field profile/election invariants required by the consumers. | 103 tests and compileall passed; not pushed or deployed. |
-| Astro | `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315`; restore `archive/astro-managed-geocoder-controls-2026-09-03-e7fb3fe` | Tri-state deployment gates, fixed LocationIQ/Geoapify adapters, structured attribution, bounded provider work, fail-closed shared guest limits/cache, Sentry privacy controls, and a separately gated authenticated migration with per-user and shared geocoder-fleet limits. Missing/malformed auth-migration flags preserve the existing signed-in path. | 683 tests, TypeScript, palette, route checks, production build, and independent security re-review passed with no surviving P0/P1/P2; one inherited lint warning, zero errors. Not pushed or deployed. |
+| DashaFlow | `97eece13f524cc70bf995ae27620068a7d6aad44`; restore `archive/dashaflow-contract-remediation-2026-09-03-97eece1` | Producer success fixtures and response validation now enforce the cross-field profile/election invariants required by the consumers. | 103 tests and compileall passed; pushed to PR #1; GitHub tests and both Vercel Preview checks are green; not merged or released. |
+| Astro | `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315`; restore `archive/astro-managed-geocoder-controls-2026-09-03-e7fb3fe` | Tri-state deployment gates, fixed LocationIQ/Geoapify adapters, structured attribution, bounded provider work, fail-closed shared guest limits/cache, Sentry privacy controls, and a separately gated authenticated migration with per-user and shared geocoder-fleet limits. Missing/malformed auth-migration flags preserve the existing signed-in path. | 683 tests, TypeScript, palette, route checks, production build, and independent security re-review passed with no surviving P0/P1/P2; one inherited lint warning, zero errors; pushed to PR #161 with GitHub tests and Vercel Preview green; not merged or released. |
 | Panchangam | `cbf7ea8476a8e0da123b405c269f351a91bbdc51`; restore `archive/guest-attribution-contract-2026-09-03-cbf7ea8` | The client requires allowlisted structured attribution and visibly renders safe provider/data links beside place results; runbook and reference documentation now match the hardened service boundary. | 406 frontend tests, both TypeScript configurations, 1,464 Python tests, and production/docs build passed: 62 computation routes, 11 Mermaid diagrams, and 3 landing artifacts. UI owner sign-off and hosted checks remain required. |
 | Licensing audit | `dd90f8003af5df89689e65e24448f88cd6e8fae1`; restore `archive/licensing-audit-2026-09-03-dd90f80` | A technical inventory now records 25 TCU PyPI releases/50 artifacts, direct imports, current and separately reachable deployments, artifact hashes, notices, and unresolved counsel/rights-holder questions. | 1,464 Python tests passed. The report reaches no legal conclusion and is not pushed. |
 

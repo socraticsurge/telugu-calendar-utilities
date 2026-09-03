@@ -1,8 +1,9 @@
 # Guest calculation production activation
 
-Status: **assessment complete; activation readiness incomplete**  
-Assessment timestamp: `2026-09-02T23:54:32+05:30` (`Asia/Kolkata`)  
-Panchangam production baseline: `eec464e871afdce9268716233fed2eecc91ae17a`  
+Status: **assessment complete; activation readiness incomplete**
+Assessment timestamp: `2026-09-02T23:54:32+05:30` (`Asia/Kolkata`)
+Release refresh: `2026-09-03` (`Asia/Kolkata`)
+Panchangam production baseline: `eec464e871afdce9268716233fed2eecc91ae17a`
 Epic: [#234](https://github.com/socraticsurge/telugu-calendar-utilities/issues/234)
 
 This is the operator runbook for activating guest birth-profile calculation and
@@ -20,8 +21,9 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 | Component | State |
 |---|---|
 | Panchangam profile/Muhurtam UI | Live with both remote client flags off |
-| Astro guest routes | PR #161 base plus local hardening commit `e7fb3fe6`; absent from Production and not pushed |
-| DashaFlow authenticated contracts | Local candidate `97eece13`; not pushed or released |
+| Astro guest routes | [PR #161](https://github.com/socraticsurge/astro-unified-core/pull/161) is green at `e7fb3fe6`; Preview is Ready; routes remain absent from Production |
+| DashaFlow authenticated contracts | [PR #1](https://github.com/socraticsurge/dashaflow-sidecar/pull/1) is green at `97eece13`; Preview is Ready; contracts remain unreleased |
+| Panchangam activation-readiness work | [PR #451](https://github.com/socraticsurge/telugu-calendar-utilities/pull/451) is open at `3bcc0da`; branch publication does not deploy GitHub Pages |
 | Licensing | Technical inventory `dd90f800` completed; legal/rights-holder decision remains blocked by #231, #444, #445, and #449 |
 | Production geocoder/shared controls | Fixed adapters, shared cache, privacy controls, guest budgets, and gated authenticated migration exist at `e7fb3fe6`; provider/Redis terms, credentials, Preview certification, and owner approval remain blocked by #233 and its children |
 | Authenticated three-service Preview | **Blocked:** no exact pair-bound hosted Preview path exists yet |
@@ -69,9 +71,9 @@ deployment IDs rather than mutable aliases.
 
 | Layer | Current Production commit | Candidate commit | Restore ref | Preview deployment ID | Production deployment ID | CI/security evidence |
 |---|---|---|---|---|---|---|
-| Panchangam | `eec464e871afdce9268716233fed2eecc91ae17a` | `cbf7ea8476a8e0da123b405c269f351a91bbdc51` | code checkpoint `archive/guest-attribution-contract-2026-09-03-cbf7ea8`; Production baseline `archive/release-2026-09-01-master-profile-muhurtam-eec464e` | required; unrecorded | required; unrecorded | local: 406 frontend and 1,464 Python tests, both TypeScript configurations, production/docs build, 62 computation routes, 11 Mermaid diagrams, and 3 landing artifacts passed; UI owner sign-off and hosted checks required |
-| Astro | `519d686` (`main` assessment baseline) | `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315` | `archive/astro-managed-geocoder-controls-2026-09-03-e7fb3fe` | required; unrecorded | required; unrecorded | local: 683 tests, TypeScript, lint (one inherited warning), palette, routes, production build, and independent no-P0/P1/P2 review passed; hosted checks required |
-| DashaFlow | `2c98ee8` (`master` assessment baseline) | `97eece13f524cc70bf995ae27620068a7d6aad44` | `archive/dashaflow-contract-remediation-2026-09-03-97eece1` | required; unrecorded | required; unrecorded | local: 103 tests and compileall passed; hosted checks required and unrecorded |
+| Panchangam | `eec464e871afdce9268716233fed2eecc91ae17a` | `3bcc0da839b34b28a8000a2e993d06f7a0d70473` | `archive/guest-activation-readiness-2026-09-03-3bcc0da`; Production baseline `archive/release-2026-09-01-master-profile-muhurtam-eec464e` | blocked; no exact pair-bound hosted Preview | `gh-pages` tip `d456da46a29998ec8b49d9b35d63443fec3b6ca7`, tree `248cb16b391e9a36e99cf11116c9316dfcf6e93b` | local: 406 frontend and 1,464 Python tests, both TypeScript configurations, production/docs build, 62 computation routes, 11 Mermaid diagrams, and 3 landing artifacts passed; PR #451 checks are green at `3bcc0da`, and this refresh commit requires its own checks |
+| Astro | `519d686486a91d694de652f4a393174a52c346fc` | `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315` | `archive/astro-managed-geocoder-controls-2026-09-03-e7fb3fe`; deployment `dpl_F6yWeNZ2Mx9fzdjwMnan19cM9HdY` | `dpl_CA16AEiMt52qsywcVBnjK857ZcDd` (Ready, protected) | `dpl_F6yWeNZ2Mx9fzdjwMnan19cM9HdY` | GitHub tests and Vercel Preview green; local 683 tests, TypeScript, lint (one inherited warning), palette, routes, production build, and independent no-P0/P1/P2 review passed |
+| DashaFlow | `2c98ee8ef0c4a261686c507d9732f7834bc6b4f8` | `97eece13f524cc70bf995ae27620068a7d6aad44` | `archive/dashaflow-contract-remediation-2026-09-03-97eece1`; deployment `dpl_8Aoh11sqvj3yHPESkXRYRj8L4VHA` | `dpl_HetXHkbuH4BdKn8vnmGfpWanx6bX` (Ready, protected) | `dpl_8Aoh11sqvj3yHPESkXRYRj8L4VHA` | GitHub tests and both Vercel Preview checks green; local 103 tests and compileall passed |
 
 ## Environment names and implementation state
 
