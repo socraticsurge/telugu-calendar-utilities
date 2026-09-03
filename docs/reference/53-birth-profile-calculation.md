@@ -7,7 +7,11 @@ derived, and what “verified” does and does not mean.
 > **Current assurance:** documented, traceable, and reproduced through a second
 > formula path. The three fixture cells are not an independent published-chart
 > comparison because both paths use Swiss Ephemeris. Public activation remains
-> gated on the licensing and time-ambiguity items below.
+> gated on the separate Swiss Ephemeris and PySwissEph wrapper decision,
+> producer-contract invariants, managed geocoding/shared abuse controls, and the
+> [three-service Preview runbook](../operations/guest-calculation-production-activation.md).
+> That hosted Preview runbook is currently blocked: the deployed clients cannot
+> yet bind an exact Panchangam Preview to exact Astro and DashaFlow Previews.
 
 > **Activation state:** the birth-details interface and network adapter are on
 > by default only for loopback development. A public build must set
@@ -53,7 +57,7 @@ the saved profile name. There is no cloud sync or recovery.
 ```mermaid
 flowchart LR
   UI["Panchangam static UI"] -->|"place text only"| PLACE["Astro guest place route"]
-  PLACE --> GEO["Nominatim search"]
+  PLACE --> GEO["Owner-approved managed geocoder<br/>(selection pending)"]
   PLACE --> TZ["offline coordinate-to-timezone lookup"]
   UI -->|"date, time, coordinates, timezone; no name"| GATEWAY["Astro guest profile route"]
   GATEWAY -->|"server bearer credential"| SIDE["DashaFlow sidecar v1 contract"]
@@ -65,11 +69,21 @@ flowchart LR
 The Astro gateway permits the Panchangam production origin and HTTP localhost
 origins, caps bodies at 4 KiB, rate-limits requests, and marks responses
 `private, no-store`. Its DashaFlow bearer token is server-only and must never be
-placed in browser code or a `VITE_*` variable.
+placed in browser code or a `VITE_*` variable. The reviewed gateway PR head has
+a shared deployed limiter for election charts but only per-instance limiters
+for place and birth requests. A local remediation candidate expands the shared
+guest limit, but it is not a recorded release or hosted certification and it
+does not provide a shared geocoder cache.
+[#446](https://github.com/socraticsurge/telugu-calendar-utilities/issues/446)
+must close and verify those controls before activation.
 
 The build flag is not authorization and contains no secret. A public page uses
 only the canonical `https://astrochaganti.com/api/guest` HTTPS gateway; a
-loopback or arbitrary configured base is rejected. Public activation requires
+loopback or arbitrary configured base is rejected. Consequently,
+`VITE_BIRTH_PROFILE_API_BASE` cannot select a hosted Astro Preview today.
+Astro also rejects a hosted Panchangam Preview origin, so end-to-end Preview
+certification remains blocked until an exact pair-bound mechanism is approved
+and implemented. Public activation requires
 both the exact client flag and independently enabled server-side routes. The
 server must remain disabled until the licensing and provider gates below are
 resolved. A disabled browser adapter throws a typed `disabled` error before it
@@ -256,15 +270,23 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
 
 ## Known limitations and release gates
 
-1. **Swiss Ephemeris licensing:** Astrodienst requires a developer to choose
-   AGPL-compatible licensing or a Professional License before distributing a
-   derived application or activating a public service. Its current professional
-   contract explicitly covers browser clients that request server-side
-   calculations. Public activation is blocked until the owner records the
-   applicable choice. See [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
+1. **Swiss Ephemeris and PySwissEph licensing:** Astrodienst requires a
+   developer to choose AGPL-compatible licensing or a Professional License
+   before distributing a derived application or activating a public service.
+   Its current professional contract explicitly covers browser clients that
+   request server-side calculations. PySwissEph is a separately AGPL-licensed
+   wrapper; an unresolved [upstream wrapper-license issue](https://github.com/astrorigin/pyswisseph/issues/92)
+   means a Swiss Professional License alone does not establish proprietary-use
+   rights for the current binding. Public activation is blocked until the owner
+   records the applicable combined posture. See [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
    and [Professional License contract](https://www.astro.com/swisseph/secont_e.pdf).
-   The owner decision is tracked in
-   [#231](https://github.com/socraticsurge/telugu-calendar-utilities/issues/231).
+   The decision, existing-distribution audit, implementation, and wrapper path
+   are tracked in
+   [#231](https://github.com/socraticsurge/telugu-calendar-utilities/issues/231)
+   with required children
+   [#444](https://github.com/socraticsurge/telugu-calendar-utilities/issues/444),
+   [#445](https://github.com/socraticsurge/telugu-calendar-utilities/issues/445),
+   and [#449](https://github.com/socraticsurge/telugu-calendar-utilities/issues/449).
 2. **Actual ephemeris:** current local fixture calls report Moshier because the
    deployed data-file posture has not been approved. Production must probe and
    disclose its own actual return flags; it must not promise Swiss data-file
@@ -279,13 +301,30 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
 4. **Historical timezones:** the IANA database itself warns that many pre-1970
    records represent only part of a region and are not authoritative everywhere.
    See [IANA timezone theory and limitations](https://www.iana.org/time-zones/theory).
-5. **Place search policy:** the public Nominatim service prohibits client-side
-   autocomplete and personal/confidential submissions. This UI uses an explicit
-   submit action and asks for city/town only. Production usage must continue to
-   follow the [Nominatim policy](https://operations.osmfoundation.org/policies/nominatim/)
-   or move to an approved provider/self-hosted service. Provider and cache
-   approval is tracked in
-   [#233](https://github.com/socraticsurge/telugu-calendar-utilities/issues/233).
+5. **Place search policy and cache:** this UI uses an explicit submit action,
+   asks for city/town only, and warns against street addresses. Guest use of
+   public Nominatim is retained for explicit local development only. Astro
+   candidate `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315` accepts only fixed
+   LocationIQ or Geoapify adapters for deployed guest search,
+   rejects redirects and oversized/malformed responses, and returns at most
+   five normalized rows. Deployed cache keys are token-HMAC pseudonyms and the
+   24-hour shared value contains only normalized labels, coordinates, provider
+   IDs, and ranking metadata—not the raw place query, birth date, birth time,
+   profile name, natal chart, or client IP. Missing or unavailable shared
+   storage fails closed. The browser validates an allowlist of structured
+   provider/OpenStreetMap attribution links and renders them beside results.
+   Provider transit necessarily includes the submitted city/town query; the
+   selected provider's own retention and quota terms still require approval.
+   Provider approval and implementation certification are tracked in
+   [#233](https://github.com/socraticsurge/telugu-calendar-utilities/issues/233)
+   and [#446](https://github.com/socraticsurge/telugu-calendar-utilities/issues/446).
+   Existing deployed signed-in profile creation/editing keeps its disclosed
+   Nominatim path while `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` is absent or
+   false. Exact `true` separately migrates it to the same managed adapter,
+   adds a ten-call-per-user limit, and shares the 60-call fleet ceiling with
+   guest search without depending on guest feature flags. That migration still
+   requires provider/Redis approval and Preview regression evidence under
+   [#447](https://github.com/socraticsurge/telugu-calendar-utilities/issues/447).
 6. **Birth-time sensitivity:** a small time difference can change Lagna near a
    boundary. The current calculated path accepts exact recorded time only. An
    unknown or approximate time must use manual entry; no precise Lagna is

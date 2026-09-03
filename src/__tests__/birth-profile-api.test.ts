@@ -14,6 +14,11 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
+const OSM_ATTRIBUTIONS = [{
+  label: '© OpenStreetMap contributors',
+  url: 'https://www.openstreetmap.org/copyright',
+}];
+
 function derivationPayload(): Record<string, unknown> {
   const rashiOrder = [
     'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
@@ -93,6 +98,7 @@ describe('birth profile API routing', () => {
           timezone: 'Asia/Kolkata',
         }],
         attribution: 'OpenStreetMap contributors',
+        attributions: OSM_ATTRIBUTIONS,
       },
     })) as unknown as typeof fetch;
 
@@ -135,7 +141,11 @@ describe('birth profile API routing', () => {
 
   test('never routes a public request through an arbitrary or loopback override', async () => {
     const fetcher = vi.fn(async () => jsonResponse({
-      data: { results: [], attribution: 'OpenStreetMap contributors' },
+      data: {
+        results: [],
+        attribution: 'OpenStreetMap contributors',
+        attributions: OSM_ATTRIBUTIONS,
+      },
     })) as unknown as typeof fetch;
     const publicOptions = {
       activationFlag: 'true',
@@ -172,10 +182,29 @@ describe('birth profile API routing', () => {
           longitude: 80, timezone: 'Asia/Kolkata',
         }],
         attribution: 'provider',
+        attributions: OSM_ATTRIBUTIONS,
       },
     })) as unknown as typeof fetch;
 
     await expect(searchBirthPlaces('city', { fetcher: malformed })).rejects.toMatchObject({
+      code: 'invalid-response',
+    });
+  });
+
+  test.each([
+    ['missing links', undefined],
+    ['untrusted link', [{ label: 'Provider', url: 'https://phishing.example/' }]],
+    ['duplicate links', [OSM_ATTRIBUTIONS[0], OSM_ATTRIBUTIONS[0]]],
+  ])('rejects %s in provider attribution metadata', async (_case, attributions) => {
+    const fetcher = vi.fn(async () => jsonResponse({
+      data: {
+        results: [],
+        attribution: 'Provider credit',
+        ...(attributions === undefined ? {} : { attributions }),
+      },
+    })) as unknown as typeof fetch;
+
+    await expect(searchBirthPlaces('city', { fetcher })).rejects.toMatchObject({
       code: 'invalid-response',
     });
   });

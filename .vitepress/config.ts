@@ -201,6 +201,7 @@ export default defineConfig({
           { text: 'Roadmap and backlog', link: '/reference/06-roadmap-and-backlog' },
           { text: 'Projection operations', link: '/operations/documentation-projection' },
           { text: 'Pages retention', link: '/operations/gh-pages-retention' },
+          { text: 'Guest calculation activation', link: '/operations/guest-calculation-production-activation' },
         ],
       },
     ],

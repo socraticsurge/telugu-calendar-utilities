@@ -3,6 +3,7 @@ import {
   BirthProfileApiError,
   deriveBirthProfile,
   searchBirthPlaces,
+  type BirthPlaceAttribution,
   type BirthPlaceCandidate,
   type BirthProfileDerivation,
 } from '../lib/birth-profile-api';
@@ -1559,6 +1560,8 @@ export function initProfilesPanel(
     placeStatus.id = 'profile-place-status';
     placeStatus.setAttribute('role', 'status');
     placeStatus.setAttribute('aria-live', 'polite');
+    const placeAttribution = element('p', 'profiles-place-attribution');
+    placeAttribution.hidden = true;
     const placeResults = element('ul', 'profiles-place-results');
     placeResults.setAttribute('aria-label', 'Matching birthplaces');
     placeGroup.append(
@@ -1568,6 +1571,7 @@ export function initProfilesPanel(
       selectedPlaceText,
       placeError,
       placeStatus,
+      placeAttribution,
       placeResults,
     );
     knownDetails.append(knownLegend, dateTimeGrid, placeGroup);
@@ -1704,13 +1708,26 @@ export function initProfilesPanel(
     const showPlaceResults = (
       results: BirthPlaceCandidate[],
       attribution: string,
+      attributions: BirthPlaceAttribution[],
     ): void => {
       placeResults.replaceChildren();
+      placeAttribution.replaceChildren();
+      placeAttribution.hidden = results.length === 0;
       if (results.length === 0) {
         placeStatus.textContent = 'No matching places found. Try a nearby city or add a state or country.';
         return;
       }
-      placeStatus.textContent = `${results.length} ${results.length === 1 ? 'place' : 'places'} found. ${attribution}`;
+      placeStatus.textContent = `${results.length} ${results.length === 1 ? 'place' : 'places'} found.`;
+      placeAttribution.append(document.createTextNode(`${attribution}: `));
+      attributions.forEach((entry, index) => {
+        if (index > 0) placeAttribution.append(document.createTextNode(' · '));
+        const link = document.createElement('a');
+        link.href = entry.url;
+        link.textContent = entry.label;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        placeAttribution.append(link);
+      });
       for (const candidate of results) {
         const item = element('li', 'profiles-place-results__item');
         const selectPlace = button(candidate.label, 'profiles-place-results__choice');
@@ -1746,11 +1763,17 @@ export function initProfilesPanel(
       placeInput.setAttribute('aria-busy', 'true');
       clearFieldError(placeInput, placeError);
       placeStatus.textContent = 'Searching for places…';
+      placeAttribution.hidden = true;
+      placeAttribution.replaceChildren();
       placeResults.replaceChildren();
       try {
         const response = await (options.searchPlaces || searchBirthPlaces)(query);
         if (sequence !== placeSearchSequence) return;
-        showPlaceResults(response.results, response.attribution);
+        showPlaceResults(
+          response.results,
+          response.attribution,
+          response.attributions,
+        );
       } catch (error) {
         if (sequence !== placeSearchSequence) return;
         placeError.textContent = birthApiMessage(error);

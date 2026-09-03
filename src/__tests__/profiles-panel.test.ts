@@ -80,6 +80,11 @@ const VIJAYAWADA: BirthPlaceCandidate = {
   timezone: 'Asia/Kolkata',
 };
 
+const TEST_ATTRIBUTIONS = [{
+  label: '© OpenStreetMap contributors',
+  url: 'https://www.openstreetmap.org/copyright',
+}];
+
 function calculatedProfile(): BirthProfileDerivation {
   const rashis = [
     'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha',
@@ -121,6 +126,7 @@ function installBirthApi(options: {
   const searchPlaces = options.searchPlaces || vi.fn(async () => ({
     results: [VIJAYAWADA],
     attribution: 'OpenStreetMap contributors',
+    attributions: TEST_ATTRIBUTIONS,
   }));
   const deriveProfile = options.deriveProfile || vi.fn(async () => calculatedProfile());
   controller = initProfilesPanel(store, {
@@ -296,6 +302,36 @@ describe('birth-details profile journey', () => {
     expect(storage.getItem(GUEST_BIRTH_PROFILE_STORAGE_KEY)).toContain('Vijayawada');
   });
 
+  test('renders linked provider and data attribution beside place results', async () => {
+    installBirthApi({
+      searchPlaces: vi.fn(async () => ({
+        results: [VIJAYAWADA],
+        attribution: 'Search by LocationIQ.com; data © OpenStreetMap contributors',
+        attributions: [
+          { label: 'Search by LocationIQ.com', url: 'https://locationiq.com/' },
+          ...TEST_ATTRIBUTIONS,
+        ],
+      })),
+    });
+    controller.openCreate();
+    inputValue('#profile-birth-place', 'Vijayawada');
+    buttonNamed('Find place').click();
+
+    await vi.waitFor(() => {
+      expect(document.querySelectorAll('.profiles-place-attribution a')).toHaveLength(2);
+    });
+    const links = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>('.profiles-place-attribution a'),
+    );
+    expect(links.map(link => link.href)).toEqual([
+      'https://locationiq.com/',
+      'https://www.openstreetmap.org/copyright',
+    ]);
+    expect(links.every(link => link.target === '_blank')).toBe(true);
+    expect(links.every(link => link.rel === 'noopener noreferrer')).toBe(true);
+    expect(query('.profiles-place-status').textContent).toBe('1 place found.');
+  });
+
   test('validates today and the exact birth time in the selected birthplace timezone', async () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-01-01T23:30:00Z'));
@@ -307,6 +343,7 @@ describe('birth-details profile journey', () => {
     installBirthApi({
       searchPlaces: vi.fn(async () => ({
         results: [kiritimati], attribution: 'Test provider',
+        attributions: TEST_ATTRIBUTIONS,
       })),
       deriveProfile,
     });
@@ -345,6 +382,7 @@ describe('birth-details profile journey', () => {
     installBirthApi({
       searchPlaces: vi.fn(async () => ({
         results: [honolulu], attribution: 'Test provider',
+        attributions: TEST_ATTRIBUTIONS,
       })),
       deriveProfile,
     });
@@ -379,6 +417,7 @@ describe('birth-details profile journey', () => {
     installBirthApi({
       searchPlaces: vi.fn(async () => ({
         results: [newYork], attribution: 'Test provider',
+        attributions: TEST_ATTRIBUTIONS,
       })),
       deriveProfile,
     });
@@ -437,7 +476,11 @@ describe('birth-details profile journey', () => {
           'The calculation service is unavailable. Check your connection and try again.',
         );
       }
-      return { results: [VIJAYAWADA], attribution: 'OpenStreetMap contributors' };
+      return {
+        results: [VIJAYAWADA],
+        attribution: 'OpenStreetMap contributors',
+        attributions: TEST_ATTRIBUTIONS,
+      };
     });
     installBirthApi({ searchPlaces });
     controller.openCreate();
