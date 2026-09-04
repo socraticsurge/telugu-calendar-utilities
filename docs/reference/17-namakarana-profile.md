@@ -4,9 +4,9 @@
 
 The configured naming-ceremony profile is based on B. V. Raman,
 *Muhurtha (Electional Astrology)*, Chapter VIII, “Post-natal ceremonies” /
-“Naming the child (Namakarana),” printed page 21 (PDF page 25):
+“Naming the child (Namakarana),” internal printed page 22 (physical PDF page 25) in the inspected 2020 Chistabo derivative:
 
-<https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf>
+[inspected 2020 Chistabo derivative](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
 
 Raman is a modern synthesis and secondary authority, not primary scripture.
 The source describes an election for the ceremony; it does not replace family,

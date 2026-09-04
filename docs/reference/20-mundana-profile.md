@@ -4,9 +4,10 @@
 
 The first-head-shave profile is based on B. V. Raman, *Muhurtha (Electional
 Astrology)*, Chapter VIII, “Post-natal ceremonies” / “Tonsure (Chowlam),”
-printed pages 22–23 (PDF pages 26–27):
+internal printed page 23 (physical PDF page 26) in the inspected 2020
+Chistabo derivative:
 
-<https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf>
+[inspected 2020 Chistabo derivative](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
 
 Raman is a modern synthesis and secondary authority, not primary scripture.
 The election does not replace family sampradaya, priestly guidance, guardian

@@ -54,8 +54,10 @@ python tools/check_activity_provenance.py
 
 Coverage is therefore **34 of 35 distinct profiles**, plus one compatibility
 alias. The verified profiles use
-B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with edition-specific
-printed, PDF, verse and OCR locators. Raman is a modern secondary authority,
+B. V. Raman's *Muhurtha* and *Muhurta Chintamani*, with artifact-specific
+internal-printed-page, physical-PDF-page, verse and OCR locators. The
+catalogued Raman work and inspected Chistabo derivative remain separate
+provenance objects. Raman is a modern secondary authority,
 not scripture; this
 status means the implemented criteria match the cited passage, not that every
 lineage treats the rule as universal.

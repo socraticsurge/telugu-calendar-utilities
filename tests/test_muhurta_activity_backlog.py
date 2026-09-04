@@ -29,6 +29,21 @@ def test_activity_backlog_has_unique_keys_and_resolvable_sources():
             assert candidate['locator'].strip()
 
 
+def test_pdf_locators_name_an_inspected_artifact_not_the_uninspected_work():
+    backlog = _load('docs/reference/muhurta-activity-backlog.json')
+    ledger = _load('docs/reference/provenance.json')
+    sources = {source['id']: source for source in ledger['sources']}
+
+    for item in backlog['items']:
+        for candidate in item['source_candidates']:
+            locator = candidate['locator']
+            if 'physical PDF p' not in locator:
+                continue
+            source = sources[candidate['source_id']]
+            assert source.get('inspected_directly') is True
+            assert candidate['source_id'] == 'BVR-MUHURTHA-CHISTABO-2020'
+
+
 def test_backlog_distinguishes_existing_remediation_from_new_keys():
     backlog = _load('docs/reference/muhurta-activity-backlog.json')
     by_key = {item['key']: item for item in backlog['items']}

@@ -448,7 +448,7 @@ def test_wedding_named_prohibition_rejects():
     assert any(
         outcome['rule_id'] == 'wedding.kuja-not-8'
         and outcome['status'] == 'fail'
-        and 'printed pp. 41-42' in outcome['source_locator']
+        and 'internal printed pp. 41-42' in outcome['source_locator']
         for outcome in result['outcomes']
     )
 

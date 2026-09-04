@@ -11,7 +11,8 @@ with the activity's manual checks, not left only in documentation.
 
 The `surgery` activity is linked to `muhurta.surgery`. Its electional
 authority is B. V. Raman's *Muhurtha*, Chapter XV, "Surgical Operations,"
-printed pages 64-65 (PDF pages 68-69 in the registered edition). Raman is a
+internal printed pages 64-65 (physical PDF pages 68-69 in the inspected 2020
+Chistabo derivative). Raman is a
 modern secondary authority, not scripture or medical authority.
 
 The passage recommends Tuesday or Saturday during Chandra's increase, rejects

@@ -3,8 +3,8 @@
 ## Claim and authority
 
 The `wood_cutting` activity is linked to `muhurta.wood_cutting`. Its authority
-is B. V. Raman's *Muhurtha*, Chapter XIII, "Felling Trees," printed page 58
-(PDF page 62 in the registered edition). Raman is a modern secondary
+is B. V. Raman's *Muhurtha*, Chapter XIII, "Felling Trees," internal printed
+page 58 (physical PDF page 62 in the inspected 2020 Chistabo derivative). Raman is a modern secondary
 authority, not scripture.
 
 The passage says trees should be cut while Chandra is in the last quarter so

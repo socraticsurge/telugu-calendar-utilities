@@ -4,11 +4,13 @@
 
 The configured first-feeding profile is based on B. V. Raman,
 *Muhurtha (Electional Astrology)*, Chapter VIII, “Post-natal ceremonies” /
-“First feeding on rice (Annaprasana),” printed pages 21–22 (PDF pages 25–26).
+“First feeding on rice (Annaprasana),” internal printed pages 22–23 (physical PDF pages 25–26) in the inspected
+2020 Chistabo derivative.
 Its “usual unfavorable Tithis” reference is resolved through the same book's
-general Panchanga Suddhi list in Chapter V, printed page 11 (PDF page 15):
+general Panchanga Suddhi list in Chapter V, internal printed page 12
+(physical PDF page 15):
 
-<https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf>
+[inspected 2020 Chistabo derivative](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
 
 Raman is a modern synthesis and secondary authority, not primary scripture.
 The election supplements rather than replaces pediatric feeding guidance and

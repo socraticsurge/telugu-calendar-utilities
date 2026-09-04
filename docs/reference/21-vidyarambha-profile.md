@@ -4,9 +4,10 @@
 
 The education-commencement profile is based on B. V. Raman, *Muhurtha
 (Electional Astrology)*, Chapter VIII, “Post-natal ceremonies” / “Commencing
-education (Aksharabhyasa),” printed page 23 (PDF page 27):
+education (Aksharabhyasa),” internal printed page 23 (physical PDF page 26) in the inspected 2020
+Chistabo derivative:
 
-<https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf>
+[inspected 2020 Chistabo derivative](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
 
 Raman is a modern synthesis and secondary authority, not primary scripture.
 This is an election for formal commencement; it neither limits when children

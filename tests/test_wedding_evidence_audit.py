@@ -92,9 +92,12 @@ def test_verified_claim_and_current_practice_divergence_are_explicit():
         (ROOT / 'docs/reference/provenance.json').read_text(encoding='utf-8'))
     claim = next(item for item in ledger['claims'] if item['id'] == CLAIM_ID)
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+    ]
     assert "'Electing a time for marriage,'" in claim['locator']
-    assert 'printed pp. 41-42' in claim['locator']
+    assert 'internal printed pp. 41-42 (physical PDF pp. 45-46)' in claim['locator']
 
     divergence = next(
         item for item in ledger['claims'] if item['id'] == DIVERGENCE_ID)

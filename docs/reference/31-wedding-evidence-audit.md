@@ -3,7 +3,8 @@
 ## Authority and status
 
 `wedding` follows B. V. Raman, *Muhurtha (Electional Astrology)*, Chapter IX,
-“Electing a Time for Marriage,” printed pages 41–42 (PDF pages 45–46). Raman is
+“Electing a Time for Marriage,” internal printed pages 41–42 (physical PDF
+pages 45–46 in the inspected 2020 Chistabo derivative). Raman is
 a modern secondary authority, not scripture. The claim `muhurta.wedding` means
 the configured criteria match this named passage; it does not claim that all
 regional Panchangams use the same method.

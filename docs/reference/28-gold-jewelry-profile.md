@@ -3,8 +3,9 @@
 ## Source clause and authority
 
 The `gold` activity is linked to `muhurta.gold_jewelry.purchase`. Its event
-authority is B. V. Raman's *Muhurtha*, Chapter X, "Buying Jewelry," printed
-page 45 (PDF page 49 in the registered edition). Raman is a modern secondary
+authority is B. V. Raman's *Muhurtha*, Chapter X, "Buying Jewelry," internal
+printed page 45 (physical PDF page 49 in the inspected 2020 Chistabo
+derivative). Raman is a modern secondary
 authority, not scripture.
 
 The passage says that Surya and Chandra should be well situated and aspected,

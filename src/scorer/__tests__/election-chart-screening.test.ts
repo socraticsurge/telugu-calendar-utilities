@@ -413,7 +413,7 @@ describe('source-backed election-chart predicates', () => {
       ruleId: 'wedding.kuja-not-8',
       status: 'fail',
       effect: 'reject',
-      sourceLocator: expect.stringContaining('printed pp. 41-42'),
+      sourceLocator: expect.stringContaining('internal printed pp. 41-42'),
     }));
   });
 

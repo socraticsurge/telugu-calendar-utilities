@@ -3,8 +3,8 @@
 ## Authority and scope
 
 The `home_repair` activity follows B. V. Raman, *Muhurtha (Electional
-Astrology)*, Chapter XII, “Repairing Houses,” printed pages 53–54 (PDF pages
-57–58). It covers beginning repair or renovation work on an existing home.
+Astrology)*, Chapter XII, “Repairing Houses,” internal printed pages 54–55
+(physical PDF pages 58–59 in the inspected 2020 Chistabo derivative). It covers beginning repair or renovation work on an existing home.
 
 The passage separately discusses whitewashing, dismantling a building and
 moving to another house. Those acts are deliberately excluded, as are new

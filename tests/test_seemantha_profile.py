@@ -84,8 +84,12 @@ def test_seemantha_source_gates_and_positive_fixture():
 def test_seemantha_claim_records_conservative_boundaries():
     claim = _claim()
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993']
-    assert "Chapter VII, 'Seemantha,' printed pp. 20-21" in claim['locator']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+    ]
+    assert "'Seemantha,' inspected in the 2020 Chistabo derivative" in claim['locator']
+    assert 'internal printed pp. 21-22 (physical PDF pp. 24-25)' in claim['locator']
     assert 'conservatively omits Pournami' in claim['scope']
     assert 'combustion exception remain manual checks' in claim['scope']
     assert 'medical care always take precedence' in claim['scope']

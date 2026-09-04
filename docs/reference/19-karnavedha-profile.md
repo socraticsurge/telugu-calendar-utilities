@@ -4,11 +4,13 @@
 
 The configured ear-piercing profile is based on B. V. Raman,
 *Muhurtha (Electional Astrology)*, Chapter VIII, “Post-natal ceremonies” /
-“Ear boring (Karnavedha),” printed page 22 (PDF page 26). Its reference to
+“Ear boring (Karnavedha),” internal printed page 23 (physical PDF page 26) in the inspected 2020
+Chistabo derivative. Its reference to
 Tithis “usually declared as inauspicious” is resolved through Chapter V's
-general Panchanga Suddhi list, printed page 11 (PDF page 15):
+general Panchanga Suddhi list, internal printed page 12 (physical PDF
+page 15):
 
-<https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf>
+[inspected 2020 Chistabo derivative](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
 
 Raman is a modern synthesis and secondary authority, not primary scripture.
 The profile screens electional time; medical safety, consent, sterile technique

@@ -4,7 +4,8 @@
 
 The `seemantha` activity is linked to the verified claim
 `muhurta.seemantha`. Its authority is B. V. Raman's *Muhurtha*, Chapter VII,
-“Seemantha,” printed pages 20–21 (PDF pages 24–25 of the registered scan).
+“Seemantha,” internal printed pages 21–22 (physical PDF pages 24–25 of the
+inspected 2020 Chistabo derivative).
 Raman is a modern secondary synthesis, not primary scripture; this status
 means the implemented criteria match this inspected passage within its stated
 scope.

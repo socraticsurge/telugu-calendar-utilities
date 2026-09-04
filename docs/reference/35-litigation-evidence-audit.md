@@ -18,8 +18,9 @@ profile and the MCP response discloses `alias_of: court` and
 ## Authorities inspected
 
 - B. V. Raman, *Muhurtha (Electional Astrology)*, UBS Publishers'
-  Distributors, 1993, Chapter XVII, “Filing law-suits,” printed page 67
-  (PDF page 71).
+  Distributors, 1993, is the bibliographic work. Its Chapter XVII passage,
+  “Filing law-suits,” was inspected in the distinct 2020 Chistabo derivative
+  at internal printed page 67 (physical PDF page 71).
 - Rama Daivajna, *Muhurta Chintamani*, undated Sanskrit text with Hindi
   commentary, Shubhashubha-prakarana, verses 43–45, printed pages 20–21
   (Internet Archive OCR lines 1743–1797).

@@ -4,7 +4,8 @@
 
 The `travel` activity is linked to `muhurta.travel`. Its authority is B. V.
 Raman's *Muhurtha*, Chapter XIV, "Journeys" and "Long-distance Journeys,"
-printed pages 60-61 (PDF pages 64-65 in the registered edition). Raman is a
+internal printed pages 60-61 (physical PDF pages 64-65 in the inspected 2020
+Chistabo derivative). Raman is a
 modern secondary authority, not scripture.
 
 ## Automated criteria

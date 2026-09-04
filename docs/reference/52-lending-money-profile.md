@@ -3,7 +3,8 @@
 ## Authority and role
 
 The `lending_money` activity follows B. V. Raman, *Muhurtha (Electional
-Astrology)*, Chapter X, “Lending Money,” printed page 45 (PDF page 49). It is
+Astrology)*, Chapter X, “Lending Money,” internal printed page 45 (physical PDF
+page 49 in the inspected 2020 Chistabo derivative). It is
 the lender or creditor side of making a loan. Borrowing, receiving repayment
 and investing capital are separate activities.
 

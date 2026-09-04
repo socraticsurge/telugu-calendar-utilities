@@ -3,7 +3,8 @@
 ## Authority and transaction role
 
 The `borrowing_money` activity follows B. V. Raman, *Muhurtha (Electional
-Astrology)*, Chapter X, “Borrowing Money,” printed page 45 (PDF page 49). It is
+Astrology)*, Chapter X, “Borrowing Money,” internal printed page 45 (physical
+PDF page 49 in the inspected 2020 Chistabo derivative). It is
 strictly the borrower or debtor side of taking a loan. Lending money, receiving
 repayment, investing capital and purchasing inventory are different acts.
 

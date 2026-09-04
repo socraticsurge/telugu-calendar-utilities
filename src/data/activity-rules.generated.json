@@ -1281,7 +1281,7 @@
       ],
       "manual_checks": [
         "Scope: this election is for filing or initiating a lawsuit, not a hearing, response, settlement, appeal or prediction of the case outcome.",
-        "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same edition.",
+        "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same inspected derivative.",
         "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
         "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
         "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
@@ -2617,8 +2617,8 @@
           {
             "id": "court.manual-2",
             "source_index": 1,
-            "source_text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same edition.",
-            "text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same edition.",
+            "source_text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same inspected derivative.",
+            "text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same inspected derivative.",
             "class": "manual-only",
             "display_section": "information"
           },

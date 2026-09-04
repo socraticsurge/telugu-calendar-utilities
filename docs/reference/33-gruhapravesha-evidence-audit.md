@@ -7,10 +7,12 @@ ceremonial entry into a newly built home. It is not the election for buying a
 completed house, moving into a rental, returning after renovation, or laying a
 foundation or roof. Those acts have separate scopes.
 
-The governing claim is `muhurta.gruhapravesha`. B. V. Raman, *Muhurtha
-(Electional Astrology)*, UBS Publishers' Distributors, 1993, Chapter XII,
-“House building,” section “Entering a new house,” printed pages 52–54 (PDF
-pages 56–58), is a modern secondary authority rather than scripture.
+The governing claim is `muhurta.gruhapravesha`. Its bibliographic authority is
+B. V. Raman, *Muhurtha (Electional Astrology)*, UBS Publishers'
+Distributors, 1993. The cited Chapter XII passage, “House building,” section
+“Entering a new house,” was inspected in the distinct 2020 Chistabo
+derivative at internal printed pages 52–54 (physical PDF pages 56–58). Raman's
+work is a modern secondary authority rather than scripture.
 
 ## Automated crosswalk
 

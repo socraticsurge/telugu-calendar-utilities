@@ -25,23 +25,33 @@ ELECTION_CHART_PLANETS = (
 
 ELECTION_CHART_SOURCE_LOCATORS = {
     'muhurta.wedding': (
-        "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 "
-        '(PDF pp. 45-46)'),
+        "B. V. Raman, Chapter IX, 'Electing a time for marriage,' inspected "
+        'in the 2020 Chistabo derivative at internal printed pp. 41-42 '
+        '(physical PDF pp. 45-46), from the lunar-month paragraph through '
+        'the election-chart conditions'),
     'muhurta.annaprasana': (
-        "Chapter VIII, 'First feeding on rice (Annaprasana),' printed "
-        'pp. 21-22 (PDF pp. 25-26)'),
+        "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' "
+        'inspected in the 2020 Chistabo derivative at internal printed '
+        'pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi '
+        'Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)'),
     'muhurta.seemantha': (
-        "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)"),
+        "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected "
+        'in the 2020 Chistabo derivative at internal printed pp. 21-22 '
+        '(physical PDF pp. 24-25)'),
     'muhurta.gruhapravesha': (
-        "Chapter XII, 'Entering a new house,' printed pp. 52-54 "
-        '(PDF pp. 56-58)'),
+        "B. V. Raman, Chapter XII, 'House building,' section 'Entering a "
+        "new house,' inspected in the 2020 Chistabo derivative at internal "
+        'printed pp. 52-54 (physical PDF pp. 56-58)'),
     'muhurta.land_purchase.building': (
-        "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 "
-        '(PDF p. 57)'),
+        "B. V. Raman, Chapter XII, 'Buying Lands for Buildings,' inspected "
+        'in the 2020 Chistabo derivative at internal printed p. 54 '
+        '(physical PDF p. 58)'),
     'muhurta.house_purchase.completed': (
-        "Chapter XII, 'Buying Houses,' printed p. 53 (PDF p. 57)"),
+        "B. V. Raman, Chapter XII, 'Buying Houses,' inspected in the 2020 "
+        'Chistabo derivative at internal printed p. 54 (physical PDF p. 58)'),
     'muhurta.gold_jewelry.purchase': (
-        "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)"),
+        "B. V. Raman, Chapter X, 'Buying Jewelry,' inspected in the 2020 "
+        'Chistabo derivative at internal printed p. 45 (physical PDF p. 49)'),
     'muhurta.purchase.general': (
         'Nakshatra-prakarana, purchase Muhurta verse 16, printed '
         'pp. 33-34, and marketplace verse 17, printed pp. 34-35'),
@@ -52,14 +62,17 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "Nakshatra-prakarana, 'Shantika and Paushtika Muhurta,' verse 34, "
         'printed pp. 42-43'),
     'muhurta.pilgrimage': (
-        "Chapter XIV, 'Journeys' and 'Pilgrimage,' printed pp. 60-62 "
-        '(PDF pp. 64-66)'),
+        "B. V. Raman, Chapter XIV, 'Journeys' and 'Pilgrimage,' inspected "
+        'in the 2020 Chistabo derivative at internal printed pp. 60-62 '
+        '(physical PDF pp. 64-66)'),
     'muhurta.travel': (
-        "Chapter XIV, 'Journeys' and 'Long-distance Journeys,' printed "
-        'pp. 60-61 (PDF pp. 64-65)'),
+        "B. V. Raman, Chapter XIV, 'Journeys' and 'Long-distance Journeys,' "
+        'inspected in the 2020 Chistabo derivative at internal printed '
+        'pp. 60-61 (physical PDF pp. 64-65)'),
     'muhurta.surgery': (
-        "Chapter XV, 'Surgical Operations,' printed pp. 64-65 "
-        '(PDF pp. 68-69)'),
+        "B. V. Raman, Chapter XV, 'Surgical Operations,' inspected in the "
+        '2020 Chistabo derivative at internal printed pp. 64-65 '
+        '(physical PDF pp. 68-69)'),
 }
 
 

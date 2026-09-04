@@ -75,9 +75,12 @@ def test_claims_have_exact_locator_scope_and_disclosed_divergence():
         (ROOT / 'docs/reference/provenance.json').read_text(encoding='utf-8'))
     claim = next(item for item in ledger['claims'] if item['id'] == CLAIM_ID)
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+    ]
     assert "section 'Entering a new house,'" in claim['locator']
-    assert 'printed pp. 52-54' in claim['locator']
+    assert 'internal printed pp. 52-54 (physical PDF pp. 56-58)' in claim['locator']
     assert 'first entry into a newly built home' in claim['scope']
 
     divergence = next(
