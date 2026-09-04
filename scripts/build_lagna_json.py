@@ -22,7 +22,7 @@ the rising sign next changes, paired with the new rashi index.
       ]
     }
 
-We emit every window the engine returns — the 5-min leading partial
+We emit every positive-width minute window the engine returns — the 5-min leading partial
 (tail of yesterday's wrap), every full rashi window, and the
 trailing partial(s) before next sunrise. So a typical 24h day has
 13 windows (the leading rashi appears twice — short tail at sunrise
@@ -31,6 +31,8 @@ advances into the *next* rashi for a short sliver before next
 sunrise). Intentional and accurate; the ribbon shows the cycle as
 it actually unfolds. ``cycleEnd`` is the minute-offset to next
 sunrise — used as the end time of the last visible cell.
+When a sub-minute final window's start and end independently round to
+the same minute, that zero-width serialized cell is omitted.
 
 Hora is NOT precomputed — the static site derives it client-side from
 sunrise / sunset / next-sunrise (already in the ICS feed) since the
@@ -83,15 +85,26 @@ def build_for_city(loc, start: date, days: int) -> dict:
         # Showing the full cycle is more honest than hiding the wrap.
         first = transitions[0]
         lagna0 = RASHI_NAMES.index(first.name.replace(' Lagna', ''))
-        tx = []
-        for w in transitions[1:]:
-            new_idx = RASHI_NAMES.index(w.name.replace(' Lagna', ''))
-            tx.append([_minute_of_day(w.start, day.sunrise), new_idx])
         # cycleEnd is the end of the last window — i.e. the moment
         # this panchangam day's lagna cycle ends and the next day's
         # begins (next sunrise). Used as the end time of the last
         # visible cell.
         cycle_end = _minute_of_day(transitions[-1].end, day.sunrise)
+        tx = []
+        for index, w in enumerate(transitions[1:], start=1):
+            new_idx = RASHI_NAMES.index(w.name.replace(' Lagna', ''))
+            offset = _minute_of_day(w.start, day.sunrise)
+            if offset >= cycle_end:
+                # The continuous final window can be shorter than half a
+                # minute. Independent minute rounding then collapses its start
+                # and end to cycleEnd, where it has no representable interval.
+                if index == len(transitions) - 1 and offset == cycle_end:
+                    continue
+                raise ValueError(
+                    'Lagna transition must be strictly inside cycleEnd: '
+                    f'{offset=} {cycle_end=}'
+                )
+            tx.append([offset, new_idx])
         rows.append({
             'date': d.isoformat(),
             'sunrise': sunrise_local.strftime('%H:%M'),

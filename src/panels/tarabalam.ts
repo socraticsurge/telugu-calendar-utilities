@@ -1300,11 +1300,18 @@ export function muValidLagnaDayData(lagnaDayData) {
   let previousOffset = -1;
   let previousRashi = lagnaDayData.lagna0;
   const visited = new Set([previousRashi]);
-  for (const transition of lagnaDayData.transitions) {
+  for (const [index, transition] of lagnaDayData.transitions.entries()) {
     if (!Array.isArray(transition) || transition.length !== 2) return false;
     const [offset, rashi] = transition;
+    // cycleEnd is exclusive. Older generated artifacts can independently
+    // round a sub-minute final window's start and end to that exact minute,
+    // leaving a zero-width terminal sentinel. It is boundary evidence, not an
+    // interior interval; equality is valid only for the final sequential row.
+    const terminalBoundary = index === lagnaDayData.transitions.length - 1
+      && offset === lagnaDayData.cycleEnd;
     if (!Number.isInteger(offset) || offset <= previousOffset
-        || offset >= lagnaDayData.cycleEnd) return false;
+        || offset > lagnaDayData.cycleEnd
+        || (offset === lagnaDayData.cycleEnd && !terminalBoundary)) return false;
     if (!Number.isInteger(rashi) || rashi !== (previousRashi + 1) % 12) return false;
     previousOffset = offset;
     previousRashi = rashi;

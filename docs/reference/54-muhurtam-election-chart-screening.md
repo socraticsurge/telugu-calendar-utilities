@@ -264,10 +264,15 @@ pass with a stale boundary claim. The standalone equivalent is:
   --verify tests/fixtures/lagna-boundary-guard-audit.json
 ```
 
-Some generated days currently expose a second-cycle tail beyond the first 12
-advances. This audit deliberately measures one complete zodiac cycle—exactly
-12 distinct boundaries per city-date—so the guard evidence is not inflated by
-duplicates and does not certify that separate artifact-shape behavior.
+Some already-published or cached days expose a second-cycle tail beyond the
+first 12 advances. A sub-minute final window can also have its start and end
+round to the same exclusive `cycleEnd` minute. The current generator omits
+that zero-width row; the browser accepts it only as the final sequential row
+for compatibility with existing artifacts, while keeping the half-open cycle
+and all malformed interior data fail-closed. This audit deliberately measures
+one complete zodiac cycle—exactly 12 distinct boundaries per city-date—so the
+guard evidence is not inflated by duplicates and does not certify that
+separate artifact-shape behavior.
 
 ## Exact automated-rule matrix
 

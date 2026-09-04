@@ -65,6 +65,17 @@ def test_diaspora_city_still_produces_valid_json():
     assert 0 <= data['days'][0]['lagna0'] < 12
 
 
+def test_rounded_zero_duration_terminal_transition_is_omitted():
+    """A final sub-minute window must not become a zero-width JSON cell."""
+    for city_name in ('Hyderabad', 'Delhi'):
+        city = next(c for c in CITIES if c.name == city_name)
+        row = build_for_city(city, date(2026, 9, 17), 1)['days'][0]
+        offsets = [offset for offset, _ in row['transitions']]
+
+        assert offsets[-1] < row['cycleEnd']
+        assert row['cycleEnd'] not in offsets
+
+
 def test_cell_count_is_13_or_14_per_day():
     """The 24h panchangam slice captures 13 OR 14 engine windows
     depending on how far past the leading rashi the cycle has wrapped

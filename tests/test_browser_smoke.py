@@ -248,6 +248,23 @@ MUHURTA_PLANET_RASHIS = (
 PRIVATE_TRAVELLER_ID = 'guest_private_traveller'
 OTHER_TRAVELLER_ID = 'guest_other_traveller'
 
+# Captured from /feeds/hyderabad-lagna.json on 2026-09-04. The complete
+# downloaded artifact had SHA-256
+# 91833798aa0571a962ce9a337b899c1cbf7d7ac9f0ab993a78611d9aec4c5d70.
+PUBLIC_HYDERABAD_2026_09_17_LAGNA_DAY = {
+    'date': '2026-09-17',
+    'sunrise': '06:04',
+    'guruCombust': False,
+    'shukraCombust': False,
+    'lagna0': 4,
+    'transitions': [
+        [4, 5], [129, 6], [259, 7], [393, 8], [519, 9],
+        [630, 10], [728, 11], [823, 0], [928, 1], [1049, 2],
+        [1181, 3], [1313, 4], [1440, 5],
+    ],
+    'cycleEnd': 1440,
+}
+
 
 def _muhurta_lagna_fixture():
     """Known per-day boundary map used by exact-window browser checks."""
@@ -264,6 +281,25 @@ def _muhurta_lagna_fixture():
                     [540, 0], [600, 1], [660, 2], [720, 3],
                 ],
                 'cycleEnd': 1440,
+            }
+            for date in ('2026-06-11', '2026-06-12', '2026-06-13')
+        ],
+    }
+
+
+def _terminal_boundary_lagna_fixture():
+    """Use the exact public boundary shape with the pinned browser feed dates.
+
+    Only the join key changes because the browser matrix intentionally uses the
+    immutable June ICS fixture; sunrise, Lagna and transition evidence remain
+    field-for-field equivalent to the public Hyderabad 2026-09-17 day object.
+    """
+    return {
+        'start': MUHURTA_FIXTURE_DATE,
+        'days': [
+            {
+                **PUBLIC_HYDERABAD_2026_09_17_LAGNA_DAY,
+                'date': date,
             }
             for date in ('2026-06-11', '2026-06-12', '2026-06-13')
         ],
@@ -333,13 +369,13 @@ def _festival_navigation_feed_fixture():
     return feed_text
 
 
-def _fixture_lagna_for_instant(instant):
+def _fixture_lagna_for_instant(instant, lagna_fixture=None):
     """Resolve the same canonical fixture Lagna the browser will project."""
     local = datetime.fromisoformat(instant.replace('Z', '+00:00')).astimezone(
         ZoneInfo('Asia/Kolkata')
     )
     minute = local.hour * 60 + local.minute
-    day = _muhurta_lagna_fixture()['days'][0]
+    day = (lagna_fixture or _muhurta_lagna_fixture())['days'][0]
     sunrise_hour, sunrise_minute = map(int, day['sunrise'].split(':'))
     offset = minute - (sunrise_hour * 60 + sunrise_minute)
     starts = [(0, day['lagna0']), *day['transitions']]
@@ -490,7 +526,7 @@ def _muhurta_planets(
     ]
 
 
-def _muhurta_chart_payload(request_payload, scenario):
+def _muhurta_chart_payload(request_payload, scenario, lagna_fixture=None):
     location = request_payload['location']
     instants = request_payload['instants']
     gold_templates = [None] * len(instants)
@@ -519,7 +555,7 @@ def _muhurta_chart_payload(request_payload, scenario):
             groups.append(current)
         for group in groups:
             template = _gold_pass_planets([
-                _fixture_lagna_for_instant(instants[index])
+                _fixture_lagna_for_instant(instants[index], lagna_fixture)
                 for index in group
             ])
             for index in group:
@@ -540,13 +576,15 @@ def _muhurta_chart_payload(request_payload, scenario):
                 {
                     'instant': instant,
                     'lagna': {
-                        'rashi': _fixture_lagna_for_instant(instant),
+                        'rashi': _fixture_lagna_for_instant(
+                            instant, lagna_fixture,
+                        ),
                         'degree': 12.5,
                     },
                     'planets': _muhurta_planets(
                         scenario,
                         index,
-                        _fixture_lagna_for_instant(instant),
+                        _fixture_lagna_for_instant(instant, lagna_fixture),
                         gold_templates[index],
                     ),
                 }
@@ -556,7 +594,9 @@ def _muhurta_chart_payload(request_payload, scenario):
     }
 
 
-def _install_muhurta_routes(page, docs_server, scenario):
+def _install_muhurta_routes(
+    page, docs_server, scenario, lagna_fixture=None,
+):
     """Intercept every mutable Muhurtam dependency for a built-site test."""
     calls = []
     feed_text = MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8')
@@ -582,7 +622,7 @@ def _install_muhurta_routes(page, docs_server, scenario):
         lambda route: route.fulfill(
             status=200,
             content_type='application/json',
-            body=json.dumps(_muhurta_lagna_fixture()),
+            body=json.dumps(lagna_fixture or _muhurta_lagna_fixture()),
         ),
     )
 
@@ -605,7 +645,7 @@ def _install_muhurta_routes(page, docs_server, scenario):
         body = (
             {'contract_version': '1.0', 'data': {'charts': []}}
             if scenario == 'malformed'
-            else _muhurta_chart_payload(payload, scenario)
+            else _muhurta_chart_payload(payload, scenario, lagna_fixture)
         )
         route.fulfill(
             status=200,
@@ -704,8 +744,11 @@ def _seed_private_muhurta_profiles(page):
 
 def _run_muhurta_browser_search(
     page, docs_server, scenario, activity='purchase', system='drik',
+    lagna_fixture=None,
 ):
-    calls = _install_muhurta_routes(page, docs_server, scenario)
+    calls = _install_muhurta_routes(
+        page, docs_server, scenario, lagna_fixture=lagna_fixture,
+    )
     page.goto(
         f'{docs_server}#tarabalam',
         wait_until='domcontentloaded',
@@ -2127,6 +2170,37 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
     assert not reference_errors, (
         f'{scenario} chart-aware Muhurtam raised reference errors at '
         f'{width}x{height}: {reference_errors[:3]}'
+    )
+
+
+def test_gold_screening_accepts_public_terminal_lagna_boundary(
+    docs_server, browser,
+):
+    """The public 2026-09-17 terminal sentinel must not disable screening."""
+    page = browser.new_page(viewport={'width': 1024, 'height': 768})
+    captured = _capture_console(page)
+    try:
+        calls = _run_muhurta_browser_search(
+            page,
+            docs_server,
+            'gold-pass',
+            activity='gold',
+            lagna_fixture=_terminal_boundary_lagna_fixture(),
+        )
+        result = page.locator('#mu-result')
+        assert result.locator('.mu-chart-status--screened').is_visible()
+        assert result.locator('.mu-chart-status--unavailable').count() == 0
+        assert 'received exact chart screening' in (
+            result.locator('.mu-chart-status').inner_text()
+        )
+        assert calls, 'the exact-chart gateway was not reached'
+    finally:
+        page.close()
+
+    page_errors = [message for kind, message in captured if kind == 'pageerror']
+    assert not page_errors, (
+        'terminal-boundary Gold flow raised page errors: '
+        f'{page_errors[:3]}'
     )
 
 

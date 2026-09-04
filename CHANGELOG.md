@@ -7,6 +7,16 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+## [1.15.1] — 2026-09-04
+
+### Fixed
+
+- Keep exact Muhurtam chart screening active for already-published Lagna days
+  whose final sub-minute window was serialized as a sequential, zero-width
+  transition at the exclusive `cycleEnd` minute. New artifacts omit that
+  zero-width row; interior, non-sequential, non-monotone and post-cycle
+  transitions remain fail-closed.
+
 ## [1.15.0] — 2026-09-04
 
 ### Changed
@@ -1024,7 +1034,8 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.0...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.1...HEAD
+[1.15.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.12.0...v1.13.0
