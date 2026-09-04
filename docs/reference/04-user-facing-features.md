@@ -132,7 +132,7 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
   Maudhya exclusions declared by the Python activity profile. If those flags
   are absent, affected browser searches fail closed instead of returning
   unscreened dates. Travel, Gruhapravesha, Seemantha and Surgery name a primary
-  participant for source-specific local checks. Drik activities with one of 27
+  participant for source-specific local checks. Drik activities with one of 29
   deterministic chart predicates receive a privacy-minimal DashaFlow
   candidate-time planetary-position post-screen. The browser uses its validated
   local Drik/Lahiri Lagna at each sampled minute to recompute Whole Sign houses;
@@ -141,6 +141,10 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
   inflation. Gold / jewelry purchase adds four event-specific `qualify`
   predicates: a conclusive miss keeps the slot and raw score but caps its rating
   at Good, while unresolved sample or transition evidence stays review-gated.
+  Annaprasana evaluates all six clauses in its named Raman-transcription
+  policy: five mandatory prohibitions can remove a slot, while the
+  Lagna-benefic commendation is tie-break evidence only. A fully resolved,
+  unbounded run may claim only that event-specific assessment is complete.
   This does not assess the general election-chart baseline, and qualitative
   clauses remain explicit. See
   [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).

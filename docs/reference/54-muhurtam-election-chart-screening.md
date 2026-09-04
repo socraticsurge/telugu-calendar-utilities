@@ -279,7 +279,7 @@ separate artifact-shape behavior.
 The canonical table is
 `telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES`.
 `tools/export_election_chart_rules.py` projects it to the browser; the generated
-JSON is not an independent authority. There are 27 deterministic predicates
+JSON is not an independent authority. There are 29 deterministic predicates
 across 13 activity profiles.
 
 `Reject` means a failed predicate removes the window. `Prefer` means a passing
@@ -301,9 +301,11 @@ verse plus printed page). The UI displays that locator with the computed
 outcome; a generic book title is never substituted for the exact rule
 location. A rule that requires interpretation also carries a separate
 `convention_id`, formula, and method-claim IDs. Its ranking effect carries a
-separate decision-policy claim. The event source, interpretation sources and
-product policy remain independently inspectable; none acquires another
-layer's authority merely by appearing in the same result.
+separate decision-policy claim when the source wording does not itself define
+that effect, as with Gold qualification and the Annaprasana Lagna preference.
+The event source, interpretation sources and product policy remain
+independently inspectable; none acquires another layer's authority merely by
+appearing in the same result.
 
 The same Python module owns `ELECTION_CHART_MANUAL_REMAINDERS`. For each
 screened activity it contains only the qualitative clauses left after the
@@ -314,7 +316,7 @@ Python/MCP results retain their original full `manual_checks` disclosure.
 Let `H(p)` be the locally recomputed Whole Sign house of graha `p` using the
 validated selected-city Lagna frame, `R(p)` its Rasi, `N(p)` its derived
 Navamsa, `G` the complete nine-graha set, and `S` a listed set of houses. The
-six supported predicate kinds are exactly:
+seven supported predicate kinds are exactly:
 
 ```text
 house_empty(h)                = every p in G has H(p) != h
@@ -324,23 +326,29 @@ any_planet_in_houses(P, S)    = at least one p in P has H(p) in S
 planet_well_situated(p, C)     = no adverse factor selected by convention C
 planet_receives_full_aspect(p) = at least one listed classical graha casts a
                                   full whole-sign Graha Drishti to R(p)
+house_free_of_natural_malefics = no configured natural malefic occupies house 1
 ```
 
-The first four predicates are direct configured tests. The last two exist only
-for Gold v1 and name the interpretation conventions that define dignity,
-natural relationship, Navamsa, solar clearance and full-aspect geometry. No
-unpublished orb, functional-benefic, house-lord or composite-strength model is
-hidden behind them.
+The first four predicates are direct configured tests. The fifth and sixth
+exist only for Gold v1 and name the interpretation conventions that define
+dignity, natural relationship, Navamsa, solar clearance and full-aspect
+geometry. Annaprasana adds the seventh predicate kind,
+`house_free_of_natural_malefics`, whose exact malefic set, node choice, Paksha
+formula and precision guard are named separately below. No unpublished orb,
+functional-benefic, house-lord or composite-strength model is hidden behind
+these predicates.
 
 | Activity | Rule ID | Deterministic predicate | Effect | Source claim |
 |---|---|---|---|---|
 | Wedding | `wedding.house-7-vacant` | None of the nine grahas occupies house 7 | Reject | `muhurta.wedding` |
 | Wedding | `wedding.kuja-not-8` | Kuja is not in house 8 | Reject | `muhurta.wedding` |
 | Wedding | `wedding.shukra-not-6` | Shukra is not in house 6 | Reject | `muhurta.wedding` |
-| Annaprasana | `annaprasana.house-10-vacant` | House 10 is vacant | Reject | `muhurta.annaprasana` |
-| Annaprasana | `annaprasana.budha-not-7` | Budha is not in house 7 | Reject | `muhurta.annaprasana` |
-| Annaprasana | `annaprasana.kuja-not-8` | Kuja is not in house 8 | Reject | `muhurta.annaprasana` |
-| Annaprasana | `annaprasana.shukra-not-9` | Shukra is not in house 9 | Reject | `muhurta.annaprasana` |
+| Annaprasana | `annaprasana.house-10-vacant` | House 10 is vacant | Reject | `muhurta.annaprasana.raman_transcription_chart` |
+| Annaprasana | `annaprasana.budha-not-7` | Budha is not in house 7 | Reject | `muhurta.annaprasana.raman_transcription_chart` |
+| Annaprasana | `annaprasana.kuja-not-8` | Kuja is not in house 8 | Reject | `muhurta.annaprasana.raman_transcription_chart` |
+| Annaprasana | `annaprasana.shukra-not-9` | Shukra is not in house 9 | Reject | `muhurta.annaprasana.raman_transcription_chart` |
+| Annaprasana | `annaprasana.benefic-occupies-lagna` | At least one of Budha, Guru or Shukra physically occupies house 1 | Prefer | `muhurta.annaprasana.raman_transcription_chart` |
+| Annaprasana | `annaprasana.no-natural-malefic-in-lagna` | No configured natural malefic physically occupies house 1 | Reject | `muhurta.annaprasana.raman_transcription_chart` |
 | Seemantha | `seemantha.house-8-vacant` | House 8 is vacant | Reject | `muhurta.seemantha` |
 | Seemantha | `seemantha.chandra-not-8` | Chandra is not in house 8 | Reject | `muhurta.seemantha` |
 | Gruhapravesha | `gruhapravesha.house-8-vacant` | House 8 is vacant | Reject | `muhurta.gruhapravesha` |
@@ -375,6 +383,46 @@ aspects in Phaladeepika II.23, excludes nodes and partial aspects, and reads
 Raman's unqualified “aspected” literally rather than silently changing it to
 “benefically aspected.” Exact formulas and boundaries are recorded in
 [Gold / Jewelry](28-gold-jewelry-profile.md).
+
+### Annaprasana transcription policy
+
+All six clauses share the exact locator: B. V. Raman, Chapter VIII, “First
+feeding on rice (Annaprasana),” Chistabo derivative internal printed page 22
+(physical PDF page 25). The
+public file identifies itself as a Chistabo re-edited transcription with
+bracketed additions and an omitted appendix; it is not represented as the UBS
+1993 print artifact.
+
+`whole-sign-physical-occupation-v1` makes “in Lagna” physical Whole Sign
+house-1 occupation. It does not import the Namakarana passage's separate
+Lagna-strength instruction. `annaprasana-natural-malefic-lagna-v1` fixes the
+mandatory set to Surya, Mangala, Shani, mean Rahu, mean Ketu and waning
+Chandra. BPHS 3.11 is registered only as a modern supporting witness for the
+classification. Budha's conditional association is limited to same-sign
+occupation; the accompanying malefic already controls the prohibition.
+
+For Chandra in Lagna, v1 uses the Raman transcription's Chapter II split:
+
+```text
+E = (longitude(Chandra) - longitude(Surya)) mod 360
+0 < E < 180       => waxing; no failure from Chandra
+180 < E < 360     => waning; mandatory failure
+distance(E, {0, 180, 360}) <= 0.02 degrees => unknown
+```
+
+Whole Sign projection, mean nodes, Budha same-sign association, the numeric
+Paksha formula, the ±0.02° precision guard and effect-aware sampled-window
+aggregation are individually registered product conventions. A known fixed
+malefic in Lagna controls even when the Chandra phase cell is unknown.
+
+The source choice is also explicit. Iyer's *Kalaprakasika*, Chapter III,
+printed page 34 (public PDF page 66; OCR lines 3305–3317), instead puts Shukra
+outside the 7th and Budha outside the 9th. *Muhurta Chintamani* verse 18,
+printed page 178 (scan page 194), places Chandra outside houses 1, 6 and 8;
+its commentary on printed page 180 (scan pages 196–197) qualifies the adverse
+Lagna case to weak or waning Chandra and describes full Chandra in Lagna as
+favorable. `election_chart.annaprasana.raman_transcription_policy_v1` selects
+Raman's six-clause profile and does not blend either conflicting scheme.
 
 ## Activity-specific personal roles
 
@@ -593,7 +641,7 @@ Python/MCP slot orchestrator does not apply them to its ranked result.
 | Activity | Automated here | Still requires practitioner or real-world review |
 |---|---|---|
 | Wedding | Vacant 7th; Kuja outside 8th; Shukra outside 6th | Nakshatra Pada, lineage-specific Mrityu Yoga, malefics around Lagna, Chandra association, fortification Yogas, both partners' compatibility/Tarabala/Chandrabala/Panchaka, consent |
-| Annaprasana | Vacant 10th; Budha/Kuja/Shukra exclusions | Child's age-month, benefic in Lagna, malefic-free Lagna, pediatric and family guidance |
+| Annaprasana | Vacant 10th; Budha/Kuja/Shukra exclusions; Budha/Guru/Shukra-in-Lagna preference; natural-malefic-free Lagna under the named v1 convention | No residual event-chart clause after a complete, valid Drik screen; the age-month remains an information input outside this chart assessor, and baseline #284 remains open |
 | Seemantha | Vacant 8th; Chandra outside 8th; mother's relative-star exclusions | Pregnancy month/lineage, alternative stars, Pournami dignity, medical precedence |
 | Gruhapravesha | Vacant 8th; householder Janma matches | Graha strength, Upachaya/Kendra benefic-malefic judgment, Lagna ownership, Navamsa exception, ritual preparation and pregnancy safety |
 | Land purchase | Guru and Kuja placements listed above | Weekday lord in Lagna, Lagna/7th-lord harmony, 11th lord in 12th, legal/title/soil/finance checks |
@@ -615,6 +663,14 @@ event-specific chart clauses resolved” is therefore the strongest accurate UI
 claim: it refers only to the four disclosed Gold v1 rules, not completion of
 the general baseline tracked in #284 or a complete election judgment.
 
+The Annaprasana row has the same release boundary. Non-Drik, unavailable and
+Python/MCP paths retain the three broad chart-guidance rows because they did
+not run the exact assessor. A successful, unbounded Drik result suppresses
+those fallback rows and may say only “Annaprasana event-specific chart
+assessment complete.” It always states that the general baseline in #284
+remains open. The positive Lagna clause is a preference, so its resolved
+absence is not a failure or a reason for practitioner review.
+
 Outside the named Gold v1 placement, Navamsa and full-aspect conventions,
 “aspect,” “strong,” “benefic,” “malefic,” “afflicted,” “dignified,” house-lord
 friendship and compatibility are not reduced to guesses. They remain manual
@@ -625,8 +681,8 @@ choice.
 
 The complete machine-readable crosswalk is published as
 [Muhurtam rule crosswalk JSON](muhurtam-rule-crosswalk.json). It contains all
-322 configured prerequisite rows across the 30 browser activities: 175
-Panchangam predicates, five personal predicates, 27 election-chart predicates
+324 configured prerequisite rows across the 30 browser activities: 175
+Panchangam predicates, five personal predicates, 29 election-chart predicates
 and 115 manual display rows. The original Gold manual row remains in this
 exhaustive source inventory because non-Drik, unavailable and Python/MCP
 fallbacks still disclose it; the successful Drik result uses the empty
@@ -655,7 +711,9 @@ the readable criterion-by-criterion audit.
 | Claim(s) used by chart or personal screening | Registered locator | Detailed audit |
 |---|---|---|
 | `muhurta.wedding` | B. V. Raman, *Muhurtha*, Chapter IX, printed pp. 41–42 (PDF pp. 45–46) | [Wedding](31-wedding-evidence-audit.md) |
-| `muhurta.annaprasana` | Raman, Chapter VIII, printed pp. 21–22 (PDF pp. 25–26) | [Annaprasana](18-annaprasana-profile.md) |
+| `muhurta.annaprasana`; `muhurta.annaprasana.raman_transcription_chart` | B. V. Raman Chistabo derivative, Chapter VIII, profile on internal printed pp. 22–23 (physical PDF pp. 25–26), all six chart clauses on internal printed p. 22 (physical PDF p. 25) | [Annaprasana](18-annaprasana-profile.md) |
+| `muhurta.annaprasana.source_divergence`; `election_chart.annaprasana.raman_transcription_policy_v1` | *Kalaprakasika* Chapter III, printed p. 34; *Muhurta Chintamani* verse 18, printed p. 178 with commentary printed p. 180; named Raman policy does not blend them | [Annaprasana](18-annaprasana-profile.md) |
+| `election_chart.natural_malefics.bphs_3_11_modern_witness`; Annaprasana product-convention claims | BPHS 3.11 modern web witness; exact project-policy locators in `provenance.json` | [Annaprasana](18-annaprasana-profile.md) |
 | `muhurta.seemantha` | Raman, Chapter VII, printed pp. 20–21 (PDF pp. 24–25) | [Seemantha](47-seemantha-profile.md) |
 | `muhurta.gruhapravesha` | Raman, Chapter XII, printed pp. 52–54 (PDF pp. 56–58) | [Gruhapravesha](33-gruhapravesha-evidence-audit.md) |
 | `muhurta.land_purchase.building` | Raman, Chapter XII, printed p. 53 (PDF p. 57) | [Land purchase](15-land-purchase-profile.md) |
@@ -673,13 +731,15 @@ the readable criterion-by-criterion audit.
 | `muhurta.surgery` | Raman, Chapter XV, printed pp. 64–65 (PDF pp. 68–69) | [Surgery](27-surgery-profile.md) |
 
 The principal registered editions used on this page are
-[B. V. Raman's *Muhurtha*](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf),
+[the B. V. Raman Chistabo *Muhurta* transcription](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf),
 [the Internet Archive *Muhurta Chintamani* scan](https://archive.org/details/muhurta-chintamani-hindi),
 [Phaladeepika, V. Subrahmanya Sastri's 1950 second edition](https://archive.org/details/Phaladeepika2ndEd.1950ByVSubrahmanyaSastri),
 the [BPHS 6.12 text and translation](https://enjoylearningsanskrit.com/scriptures/parashara/chapter-6/verse-12/),
 and the [Surya-Siddhanta 1935 translation](https://classicalastrologer.com/wp-content/uploads/2018/04/surya_siddhanta_english.pdf).
-Raman is a modern secondary synthesis; the Chintamani scan is an undated
-Sanskrit text with Hindi commentary and incomplete publication metadata.
+The Raman file is a modern re-edited transcription, not the bibliographically
+distinct UBS print edition. Annaprasana's named disagreement witness is the
+1945 fifth-edition Nirnaya Sagar Press *Muhurta Chintamani* with commentary;
+other rule profiles still use the separately registered undated scan.
 The Phaladeepika and BPHS passages supply disclosed interpretation methods for
 Gold v1; they are not presented as the event-specific jewelry source.
 
@@ -715,7 +775,7 @@ HTTP 200. Producer story
 is closed and Done. The browser validator remains strict; release of the
 producer fix is evidence for keeping, not relaxing, those invariants.
 
-The Python table is the source of truth for the 27 chart predicates. The
+The Python table is the source of truth for the 29 chart predicates. The
 Python personal module and TypeScript mirror carry the same five personal rule
 IDs, effects, locators, input evidence and all-sampled-state result semantics, with
 fixture parity tests. The TypeScript chart evaluator is a browser mirror and
@@ -748,6 +808,13 @@ scenario, activity, system, viewport, expected state/copy, and SHA-256 for
 every image. Fixture captures exercise the built application without calling
 a live service.
 
+The successor directory at
+`docs/screenshots/annaprasana-chart-assessor-2026-09-04/` contains eight
+content-distinct captures for complete pass, resolved preference miss,
+mandatory removal with observed evidence, and phase-boundary unknown at both
+1440×900 and 390×844. Its own manifest and evidence test bind every image to
+the named scenario, viewport, expected copy, and checksum.
+
 The earlier `muhurtam-chart-screening-2026-08-29/` directory remains as an
 immutable historical record. Its Gold manual-only image predates this
 assessor and is not evidence for the current runtime state.
@@ -756,6 +823,9 @@ Recreate that matrix from a local production build:
 
 ```bash
 python tools/capture_muhurta_chart_screenshots.py --dist dist
+
+python tools/capture_muhurta_chart_screenshots.py \
+  --dist dist --annaprasana-only
 ```
 
 ## Reproduce and verify

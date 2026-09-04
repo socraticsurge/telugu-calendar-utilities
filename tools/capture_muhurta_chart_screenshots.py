@@ -30,6 +30,10 @@ SMOKE_PATH = REPO_ROOT / 'tests' / 'test_browser_smoke.py'
 OUTPUT_DIR = (
     REPO_ROOT / 'docs' / 'screenshots' / 'gold-chart-screening-2026-09-04'
 )
+ANNAPRASANA_OUTPUT_DIR = (
+    REPO_ROOT / 'docs' / 'screenshots' /
+    'annaprasana-chart-assessor-2026-09-04'
+)
 
 
 def _load_smoke_module():
@@ -63,6 +67,7 @@ class Capture:
     height: int
     expected_state: str
     expected_copy: str
+    additional_expected_copy: str | None = None
 
 
 CAPTURES = (
@@ -133,6 +138,42 @@ CAPTURES = (
     ),
 )
 
+ANNAPRASANA_CAPTURES = tuple(
+    Capture(filename, scenario, 'annaprasana', 'drik', width, height, state, copy)
+    for scenario, state, copy in (
+        (
+            'annaprasana-pass', 'screened',
+            'Annaprasana event-specific chart assessment complete',
+        ),
+        (
+            'annaprasana-preference-miss', 'screened',
+            'Preference not present · no penalty',
+        ),
+        (
+            'annaprasana-hard-fail', 'screened',
+            'Natural malefics in Lagna: Surya.',
+        ),
+        (
+            'annaprasana-unknown', 'screened-review',
+            'inside the disclosed ±0.02° phase boundary guard',
+        ),
+    )
+    for width, height, viewport in (
+        (1440, 900, 'desktop'),
+        (390, 844, 'mobile'),
+    )
+    for filename in (
+        f'fixture-{scenario}-{viewport}-{width}x{height}.png',
+    )
+) + (
+    Capture(
+        'fixture-annaprasana-pass-final-outcomes-mobile-390x844.png',
+        'annaprasana-pass', 'annaprasana', 'drik', 390, 844, 'screened',
+        'Preference met · tie-break only',
+        'Natural malefics in Lagna: none; Chandra is outside Lagna.',
+    ),
+)
+
 
 PENDING_FETCH_SCRIPT = """
 (() => {
@@ -169,12 +210,23 @@ def _configure_search(page, smoke, base_url: str, activity: str) -> None:
     page.fill('#tb-to', smoke.MUHURTA_FIXTURE_DATE)
 
 
-def _capture_page(page, path: Path, anchor: str = '#mu-result') -> None:
-    page.locator(anchor).scroll_into_view_if_needed()
+def _capture_page(
+    page, path: Path, anchor: str = '#mu-result', top_margin: int = 0,
+) -> None:
+    locator = page.locator(anchor).first
+    if top_margin:
+        locator.evaluate(
+            "element => element.scrollIntoView({block: 'start'})"
+        )
+        page.evaluate(f'window.scrollBy(0, -{top_margin})')
+    else:
+        locator.scroll_into_view_if_needed()
     page.screenshot(path=str(path), full_page=False)
 
 
-def _capture_regular(browser, smoke, base_url: str, capture: Capture) -> dict:
+def _capture_regular(
+    browser, smoke, base_url: str, capture: Capture, output_dir: Path,
+) -> dict:
     page = browser.new_page(viewport={'width': capture.width, 'height': capture.height})
     try:
         smoke._run_muhurta_browser_search(
@@ -196,20 +248,49 @@ def _capture_regular(browser, smoke, base_url: str, capture: Capture) -> dict:
         detail_selector = None
         if capture.scenario == 'positive' or capture.scenario in {
             'gold-pass', 'gold-cap', 'gold-unknown',
+            'annaprasana-pass', 'annaprasana-preference-miss',
+            'annaprasana-unknown',
         }:
             detail_selector = '.mu-reason-details:has(.mu-rg-computed)'
         elif capture.scenario == 'mixed':
             detail_selector = '.mu-reason-details:has(.mu-chart-rule--unknown)'
         if detail_selector and result.locator(detail_selector).count():
             result.locator(detail_selector).first.locator('summary').first.click()
+        if capture.scenario == 'annaprasana-hard-fail':
+            result.locator('.mu-chart-removals > summary').click()
 
         result_text = result.text_content() or ''
         assert capture.expected_copy in result_text, (
             f'{capture.scenario} expected copy {capture.expected_copy!r}; '
             f'result={result_text[:1000]!r}'
         )
-        output = OUTPUT_DIR / capture.filename
-        _capture_page(page, output)
+        if capture.additional_expected_copy is not None:
+            assert capture.additional_expected_copy in result_text, (
+                f'{capture.scenario} expected additional copy '
+                f'{capture.additional_expected_copy!r}; '
+                f'result={result_text[:1000]!r}'
+            )
+        output = output_dir / capture.filename
+        if capture.filename == (
+            'fixture-annaprasana-pass-final-outcomes-mobile-390x844.png'
+        ):
+            capture_anchor = '.mu-chart-rule--prefer.mu-chart-rule--pass'
+        elif (
+            capture.scenario == 'annaprasana-pass'
+            and capture.width == 390
+        ):
+            capture_anchor = '.mu-chart-status--screened strong'
+        else:
+            capture_anchor = {
+                'annaprasana-preference-miss': (
+                    '.mu-chart-rule--prefer.mu-chart-rule--fail'),
+                'annaprasana-hard-fail': '.mu-chart-removals',
+                'annaprasana-unknown': '.mu-chart-rule--unknown',
+            }.get(capture.scenario, '#mu-result')
+        top_margin = 300 if capture.filename == (
+            'fixture-annaprasana-pass-mobile-390x844.png'
+        ) else 0
+        _capture_page(page, output, capture_anchor, top_margin)
         return _manifest_row(capture, output)
     finally:
         page.close()
@@ -258,7 +339,7 @@ def _capture_loading_and_timeout(browser, smoke, base_url: str) -> list[dict]:
 
 
 def _manifest_row(capture: Capture, path: Path) -> dict:
-    return {
+    row = {
         'file': capture.filename,
         'scenario': capture.scenario,
         'activity': capture.activity,
@@ -268,18 +349,27 @@ def _manifest_row(capture: Capture, path: Path) -> dict:
         'expectedCopy': capture.expected_copy,
         'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
     }
+    if capture.additional_expected_copy is not None:
+        row['additionalExpectedCopy'] = capture.additional_expected_copy
+    return row
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--dist', type=Path, default=REPO_ROOT / 'dist')
+    parser.add_argument(
+        '--annaprasana-only', action='store_true',
+        help='Capture only the nine Annaprasana release-review frames.',
+    )
     args = parser.parse_args()
     dist = args.dist.resolve()
     if not (dist / 'index.html').is_file():
         parser.error(f'{dist} does not contain index.html; build the site first')
 
     smoke = _load_smoke_module()
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir = ANNAPRASANA_OUTPUT_DIR if args.annaprasana_only else OUTPUT_DIR
+    captures = ANNAPRASANA_CAPTURES if args.annaprasana_only else CAPTURES
+    output_dir.mkdir(parents=True, exist_ok=True)
     port = _free_port()
     def handler(*handler_args, **handler_kwargs):
         return _QuietHandler(
@@ -298,10 +388,16 @@ def main() -> int:
             browser = playwright.chromium.launch(headless=True)
             try:
                 rows = [
-                    _capture_regular(browser, smoke, base_url, capture)
-                    for capture in CAPTURES
+                    _capture_regular(
+                        browser, smoke, base_url, capture, output_dir,
+                    )
+                    for capture in captures
                 ]
-                rows.extend(_capture_loading_and_timeout(browser, smoke, base_url))
+                if not args.annaprasana_only:
+                    rows.extend(
+                        _capture_loading_and_timeout(
+                            browser, smoke, base_url,
+                        ))
             finally:
                 browser.close()
     finally:
@@ -314,10 +410,10 @@ def main() -> int:
         'liveServicesUsed': False,
         'captures': rows,
     }
-    (OUTPUT_DIR / 'fixture-manifest.json').write_text(
+    (output_dir / 'fixture-manifest.json').write_text(
         json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
     )
-    print(f'Captured {len(rows)} deterministic screenshots in {OUTPUT_DIR}')
+    print(f'Captured {len(rows)} deterministic screenshots in {output_dir}')
     return 0
 
 

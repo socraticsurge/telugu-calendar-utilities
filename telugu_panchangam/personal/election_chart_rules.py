@@ -15,21 +15,23 @@ from __future__ import annotations
 
 from .election_assessors.conventions import ELECTION_CHART_CONVENTIONS
 
-ELECTION_CHART_RULE_SCHEMA_VERSION = 2
+ELECTION_CHART_RULE_SCHEMA_VERSION = 3
 ELECTION_CHART_HOUSE_SYSTEM = 'whole_sign'
 ELECTION_CHART_NODE_CONVENTION = 'mean'
 ELECTION_CHART_PLANETS = (
     'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
     'Shukra', 'Shani', 'Rahu', 'Ketu',
 )
+ELECTION_CHART_COMPLETE_ASSESSORS = ('gold', 'annaprasana')
 
 ELECTION_CHART_SOURCE_LOCATORS = {
     'muhurta.wedding': (
         "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 "
         '(PDF pp. 45-46)'),
-    'muhurta.annaprasana': (
-        "Chapter VIII, 'First feeding on rice (Annaprasana),' printed "
-        'pp. 21-22 (PDF pp. 25-26)'),
+    'muhurta.annaprasana.raman_transcription_chart': (
+        "B. V. Raman, Chapter VIII, 'First feeding on rice "
+        "(Annaprasana),' Chistabo derivative internal printed p. 22 "
+        '(physical PDF p. 25)'),
     'muhurta.seemantha': (
         "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)"),
     'muhurta.gruhapravesha': (
@@ -105,14 +107,56 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
               'planet_not_house', 'reject', 'muhurta.wedding', planet='Shukra', house=6),
     ),
     'annaprasana': (
-        _rule('annaprasana.house-10-vacant', '10th house is vacant',
-              'house_empty', 'reject', 'muhurta.annaprasana', house=10),
-        _rule('annaprasana.budha-not-7', 'Budha is outside the 7th house',
-              'planet_not_house', 'reject', 'muhurta.annaprasana', planet='Budha', house=7),
-        _rule('annaprasana.kuja-not-8', 'Mangala (Kuja) is outside the 8th house',
-              'planet_not_house', 'reject', 'muhurta.annaprasana', planet='Kuja', house=8),
-        _rule('annaprasana.shukra-not-9', 'Shukra is outside the 9th house',
-              'planet_not_house', 'reject', 'muhurta.annaprasana', planet='Shukra', house=9),
+        _rule(
+            'annaprasana.house-10-vacant', '10th house is vacant',
+            'house_empty', 'reject',
+            'muhurta.annaprasana.raman_transcription_chart',
+            convention_id='whole-sign-physical-occupation-v1', house=10,
+        ),
+        _rule(
+            'annaprasana.budha-not-7', 'Budha is outside the 7th house',
+            'planet_not_house', 'reject',
+            'muhurta.annaprasana.raman_transcription_chart',
+            convention_id='whole-sign-physical-occupation-v1',
+            planet='Budha', house=7,
+        ),
+        _rule(
+            'annaprasana.kuja-not-8',
+            'Mangala (Kuja) is outside the 8th house',
+            'planet_not_house', 'reject',
+            'muhurta.annaprasana.raman_transcription_chart',
+            convention_id='whole-sign-physical-occupation-v1',
+            planet='Kuja', house=8,
+        ),
+        _rule(
+            'annaprasana.shukra-not-9',
+            'Shukra is outside the 9th house',
+            'planet_not_house', 'reject',
+            'muhurta.annaprasana.raman_transcription_chart',
+            convention_id='whole-sign-physical-occupation-v1',
+            planet='Shukra', house=9,
+        ),
+        _rule(
+            'annaprasana.benefic-occupies-lagna',
+            'Budha, Guru or Shukra occupies Lagna',
+            'any_planet_in_houses', 'prefer',
+            'muhurta.annaprasana.raman_transcription_chart',
+            convention_id='whole-sign-physical-occupation-v1',
+            decision_policy_claim=(
+                'election_chart.annaprasana.'
+                'raman_transcription_policy_v1'),
+            planets=['Budha', 'Guru', 'Shukra'], houses=[1],
+        ),
+        _rule(
+            'annaprasana.no-natural-malefic-in-lagna',
+            'No natural malefic occupies Lagna',
+            'house_free_of_natural_malefics', 'reject',
+            'muhurta.annaprasana.raman_transcription_chart',
+            convention_id='annaprasana-natural-malefic-lagna-v1',
+            house=1,
+            fixed_malefics=['Surya', 'Kuja', 'Shani', 'Rahu', 'Ketu'],
+            lunar_phase_guard_degrees=0.02,
+        ),
     ),
     'seemantha': (
         _rule('seemantha.house-8-vacant', '8th house is vacant',
@@ -233,9 +277,7 @@ ELECTION_CHART_MANUAL_REMAINDERS: dict[str, tuple[str, ...]] = {
         'Assess malefic occupancy or hemming around Lagna and any Chandra-Graha association.',
         'Review the optional fortification combinations and both partners’ compatibility, Tarabala, Chandrabala and Panchaka.',
     ),
-    'annaprasana': (
-        'Assess whether Budha, Guru or Shukra strengthens Lagna and whether a malefic occupies Lagna.',
-    ),
+    'annaprasana': (),
     'seemantha': (
         'If relying on Pournami, assess the source’s qualitative Chandra-dignity condition.',
     ),

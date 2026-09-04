@@ -74,6 +74,24 @@ interface TarabalamPanelModule {
     lagnaDay: unknown, startMinute: number, endMinute: number,
   ): boolean;
   muValidLagnaDayData(lagnaDay: unknown): boolean;
+  muChartAssessorCanClaimComplete(
+    activity: string,
+    enrichment: {
+      state: string;
+      candidateLimitReached: boolean;
+      boundaryReviewCount: number;
+      reviewGatedCount: number;
+    },
+  ): boolean;
+  muChartAssessmentTitle(
+    activity: string,
+    enrichment: {
+      state: string;
+      candidateLimitReached: boolean;
+      boundaryReviewCount: number;
+      reviewGatedCount: number;
+    },
+  ): string;
   muShareableMuhurtaReasons(slot: unknown): string[];
   muChartShareScreeningLine(chartEnrichment: unknown): string;
   muChartShareIncludesRemainder(chartEnrichment: unknown): boolean;
@@ -243,6 +261,35 @@ afterAll(() => {
 });
 
 describe('Muhurtam saved-profile participants', () => {
+  test('uses event-specific completion wording without closing baseline 284', () => {
+    const resolved = {
+      state: 'screened', candidateLimitReached: false,
+      boundaryReviewCount: 0, reviewGatedCount: 0,
+    };
+    expect(panel.muChartAssessorCanClaimComplete('annaprasana', resolved))
+      .toBe(true);
+    expect(panel.muChartAssessmentTitle('annaprasana', resolved)).toBe(
+      'Annaprasana event-specific chart assessment complete');
+
+    const bounded = { ...resolved, candidateLimitReached: true };
+    expect(panel.muChartAssessorCanClaimComplete('annaprasana', bounded))
+      .toBe(false);
+    expect(panel.muChartAssessmentTitle('annaprasana', bounded)).toBe(
+      'Chart screening applied to a bounded candidate set');
+
+    const boundary = { ...resolved, boundaryReviewCount: 1 };
+    expect(panel.muChartAssessorCanClaimComplete('annaprasana', boundary))
+      .toBe(false);
+    expect(panel.muChartAssessmentTitle('annaprasana', boundary)).toBe(
+      'Chart screening applied with boundary review');
+
+    const unresolved = { ...resolved, reviewGatedCount: 1 };
+    expect(panel.muChartAssessorCanClaimComplete('annaprasana', unresolved))
+      .toBe(false);
+    expect(panel.muChartAssessmentTitle('annaprasana', unresolved)).toBe(
+      'Chart screening applied with unresolved facts');
+  });
+
   test('describes partial chart screening without claiming it was skipped', () => {
     expect(panel.muChartShareScreeningLine({
       state: 'unavailable',

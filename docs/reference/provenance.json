@@ -63,9 +63,89 @@
       "id": "BVR-MUHURTHA-1993",
       "title": "Muhurtha (Electional Astrology)",
       "author": "B. V. Raman",
-      "edition": "UBS Publishers' Distributors, 1993, ISBN 9788185674681",
+      "edition": "UBS Publishers' Distributors, 1993, ISBN 9788185674681, 181 catalogued pages",
+      "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC",
+      "catalogue_urls": [
+        "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC",
+        "https://openlibrary.org/books/OL9860226M/Muhurtha_%28Electional_Astrology%29"
+      ],
+      "authority_type": "modern_synthesis",
+      "inspected_directly": false,
+      "inspection_boundary": "The 1993 bibliographic work is catalogued, but no scan of this 181-page edition was inspected. Located claims were checked against the separately registered 2020 Chistabo derivative."
+    },
+    {
+      "id": "BVR-MUHURTHA-CHISTABO-2020",
+      "title": "Muhurtha (Electional Astrology) — Chistabo re-edited derivative",
+      "author": "B. V. Raman; re-edited by Simon (Chistabo)",
+      "edition": "2020 re-edited transcription, 78 physical PDF pages",
       "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf",
-      "authority_type": "modern_synthesis"
+      "authority_type": "inspected_derivative",
+      "inspected_directly": true,
+      "related_work_id": "BVR-MUHURTHA-1993",
+      "exact_edition_match_verified": false,
+      "relationship_boundary": "The derivative identifies B. V. Raman's work and says it was checked against an unspecified original scanned PDF; it does not identify that source PDF as the 181-page 1993 UBS edition.",
+      "accessed_on": "2026-09-04",
+      "sha256": "b8b878a444a487c83810329fdf8f057c40e92221a867db480d864da8be21a133",
+      "byte_size": 2172882,
+      "physical_pdf_page_count": 78,
+      "pdf_metadata": {
+        "title": "Muhurta-Raman Eng",
+        "creator": "Word",
+        "producer": "Mac OS X 10.13.6 Quartz PDFContext",
+        "created_ist": "2020-06-17T16:29:55+05:30",
+        "modified_ist": "2020-06-17T16:29:55+05:30",
+        "pdf_version": "1.4"
+      },
+      "editorial_notice": {
+        "physical_pdf_page": 3,
+        "internal_folio": "II",
+        "editor": "Simon aka Chistabo",
+        "declares_re_edit": true,
+        "declares_bracketed_additions": true,
+        "declares_typo_corrections": true,
+        "declares_appendix_omission": true
+      },
+      "page_numbering": [
+        {
+          "physical_pdf_pages": "4-36",
+          "internal_printed_pages": "1-33",
+          "relation": "internal = physical - 3"
+        },
+        {
+          "physical_pdf_pages": "37",
+          "internal_printed_pages": null,
+          "relation": "unnumbered interstitial"
+        },
+        {
+          "physical_pdf_pages": "38-78",
+          "internal_printed_pages": "34-74",
+          "relation": "internal = physical - 4"
+        }
+      ]
+    },
+    {
+      "id": "BPHS-ELS-3.11-MODERN-WITNESS",
+      "title": "Brihat Parashara Hora Shastra, chapter 3 verse 11",
+      "author": "Attributed to Parashara",
+      "edition": "Enjoy Learning Sanskrit modern web transcription, word analysis, and English rendering; accessed 2026-09-04; not a critical edition",
+      "url": "https://enjoylearningsanskrit.com/scriptures/parashara/chapter-3/verse-11/",
+      "authority_type": "modern_text_witness"
+    },
+    {
+      "id": "KALAPRAKASIKA-IYER-1917-AES-1982",
+      "title": "Kalaprakasika: The Standard Book on the Election (Mahoortha) System",
+      "author": "Attributed to Narasimha; translated and edited by N. P. Subramania Iyer",
+      "edition": "First English publication, 1917; Asian Educational Services reprint, 1982",
+      "url": "https://storage.yandexcloud.net/j108/library/2xtizybv/N.P._Subramania_Iyer_-_Kalaprakasika.pdf",
+      "authority_type": "primary_text_translation"
+    },
+    {
+      "id": "MC-NSP-1945-5E",
+      "title": "Muhurta Chintamani with Piyushadhara commentary",
+      "author": "Rama Daivajna; commentary by Govinda Daivajna",
+      "edition": "Narayan Ram Acharya, fifth edition, Nirnaya Sagar Press, Bombay, 1945",
+      "url": "https://jainqq.org/booktext/Muhurt_Chintamani/002342",
+      "authority_type": "primary_text_commentary"
     },
     {
       "id": "MC-HINDI-IA",
@@ -634,10 +714,54 @@
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
       "verification_state": "verified",
-      "source_ids": ["BVR-MUHURTHA-1993"],
-      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
-      "scope": "Supports the configured Annaprasana Nakshatra and weekday admission lists, rejected general-Panchanga-Suddhi Tithis, excluded rising Rasis, age-month guidance and disclosed election-chart checks. The Drik website post-screen now requires a vacant 10th house, Budha outside the 7th, Mangala outside the 8th and Shukra outside the 9th across every sampled state (window edges and both sides of every known interior Drik Lagna transition); qualitative Lagna strength and malefic judgment remain manual. Shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority.",
-      "last_reviewed": "2026-08-29"
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+      "scope": "Supports the configured Annaprasana age-month, weekday, Nakshatra and rising-Rasi profile and names six event-chart clauses. General Panchanga-Suddhi Tithi exclusions are cross-applied from Chapter V. Browser chart decisions, engineering conventions, shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority. The UBS ID preserves the bibliographic work identity; the inspected derivative supplies the located wording, without a claim that both artifacts are edition-identical.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.annaprasana.raman_transcription_chart",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_chart_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' Chistabo derivative internal printed p. 22 (physical PDF p. 25)",
+      "scope": "Names a vacant 10th; Budha outside the 7th; Mangala outside the 8th; Shukra outside the 9th; Budha, Guru or Shukra physically occupying Lagna as commended; and no natural malefic physically occupying Lagna. The Drik website post-screen evaluates only those six event-specific clauses. House system, malefic classification, Paksha arithmetic, precision guards, aggregation and product effects are separately identified conventions.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.annaprasana.source_divergence",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/18-annaprasana-profile.md",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["KALAPRAKASIKA-IYER-1917-AES-1982", "MC-NSP-1945-5E"],
+      "locator": "Kalaprakasika Chapter III, 'To Feed on Rice,' printed p. 34 (public PDF p. 66; OCR lines 3305-3317); Muhurta Chintamani Samskara-prakarana verse 18, printed p. 178 (scan p. 194), with Piyushadhara commentary printed p. 180 (scan pp. 196-197)",
+      "scope": "Kalaprakasika requires Shukra outside the 7th and Budha outside the 9th, reversing the two Raman-transcription assignments; the implementation therefore selects Raman as a named policy and does not blend the lists. Muhurta Chintamani verse 18 places Chandra outside houses 1, 6 and 8. Its commentary more narrowly treats weak or waning Chandra in Lagna as adverse and describes full Chandra in Lagna as favorable. Those Moon statements are disclosed as a textual difference, not silently recast as the implemented rule.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.natural_malefics.bphs_3_11_modern_witness",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BPHS-ELS-3.11-MODERN-WITNESS"],
+      "locator": "Chapter 3, verse 11, Sanskrit compound analysis and English rendering",
+      "scope": "A modern web witness for the natural-malefic enumeration: Surya, Kuja, Shani, Rahu, Ketu and waning Chandra, with Budha conditional on association with a malefic. It is not presented as a critical edition or as independent authority for the project's same-sign association inference.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.raman_transcription.paksha_definition",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/18-annaprasana-profile.md",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "B. V. Raman, Chapter II, 'On certain special yogas,' Chistabo derivative internal printed p. 4 (physical PDF p. 7)",
+      "scope": "Defines waxing when Chandra's longitude minus Surya's longitude, reduced to the circle, is below 180 degrees and waning when it exceeds 180 degrees. Exact conjunction and opposition are not classified in that wording; the implementation guard is separate.",
+      "last_reviewed": "2026-09-04"
     },
     {
       "id": "muhurta.karnavedha",
@@ -847,6 +971,83 @@
       "locator": "gold-phaladeepika-placement-full-drishti-v1; docs/research/election-chart-automation/report-source.md",
       "scope": "Resolved failure of one of Gold's four positive chart conditions retains the slot but caps an otherwise Excellent tier to Good. Unknown remains review-gated. This ranking treatment is a transparent product decision, not a textual command to reject or accept a purchase time.",
       "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.whole_sign_house_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/conventions.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "whole-sign-physical-occupation-v1",
+      "scope": "Uses the browser's canonical local Drik/Lahiri Lagna and computes house = 1 + ((graha Rasi index - Lagna Rasi index + 12) mod 12). Occupation means physical Whole Sign house presence only, not aspect, lordship, Shadbala or an inferred composite condition.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.mean_node_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/conventions.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["SWISSEPH"],
+      "locator": "DashaFlow election-chart response contract field engine.nodeConvention; annaprasana-natural-malefic-lagna-v1",
+      "scope": "Fixes Rahu and Ketu to the sidecar's disclosed mean-node positions for this policy. The choice of mean rather than true nodes is an engineering convention, not wording supplied by the Annaprasana passage.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.budha_same_sign_association_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/conventions.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BPHS-ELS-3.11-MODERN-WITNESS"],
+      "locator": "annaprasana-natural-malefic-lagna-v1; BPHS modern witness chapter 3 verse 11",
+      "scope": "Interprets Budha's association condition only as same-sign physical occupation. No additional Budha failure is produced because any accompanying fixed natural malefic in Lagna already controls the prohibition. Aspect, dispositor and lordship associations are not inferred.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.raman_180_degree_paksha_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "B. V. Raman, Chapter II, Chistabo derivative internal printed p. 4 (physical PDF p. 7); annaprasana-natural-malefic-lagna-v1",
+      "scope": "Implements the transcription's below-or-above-180-degree description as E = (Chandra longitude - Surya longitude) mod 360: 0 < E < 180 is waxing and 180 < E < 360 is waning. This ecliptic-longitude arithmetic is the named Raman policy rather than a blended lunar-phase tradition.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.lunar_phase_boundary_guard_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "annaprasana-natural-malefic-lagna-v1; lunar_phase_guard_degrees=0.02",
+      "scope": "Returns unknown at and within 0.02 degrees of either 0 or 180 degrees of solar elongation. The guard covers rounded sidecar degrees and the source's unclassified exact boundaries; it is a product precision policy, not a textual threshold.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.annaprasana_fail_closed_aggregation_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_chart.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "evaluate_election_snapshots; annaprasana-raman-transcription-v1",
+      "scope": "For each mandatory rejection across sampled chart states, any fail controls; otherwise any unknown controls; otherwise pass. For the Lagna-benefic preference, pass requires every sampled state to pass, fail requires every state to fail, and mixed or unknown states remain unknown. A fixed-malefic Lagna failure dominates a simultaneous lunar-phase unknown.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.annaprasana.raman_transcription_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "src/scorer/election-chart-enrichment.ts",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020", "KALAPRAKASIKA-IYER-1917-AES-1982", "MC-NSP-1945-5E"],
+      "locator": "annaprasana-raman-transcription-v1; docs/reference/18-annaprasana-profile.md",
+      "scope": "Selects the six Raman-transcription clauses without blending the reversed Budha/Shukra assignments found in Iyer or the distinct Muhurta Chintamani scheme. The vacant 10th, three named exclusions and natural-malefic Lagna clause are mandatory rejections. The named Lagna benefics are a tie-break preference: absence causes no rejection, score change or rating cap. Unknowns are review-gated. Completion wording is event-specific only; the general election-chart baseline remains open in issue #284.",
+      "last_reviewed": "2026-09-04"
     },
     {
       "id": "muhurta.pilgrimage",

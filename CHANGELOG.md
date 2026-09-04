@@ -7,6 +7,41 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+## [1.16.0] — 2026-09-04
+
+### Changed
+
+- Complete the six-clause Raman-transcription Annaprasana event-chart assessor
+  in the Drik browser path, with separate preference and mandatory-rejection
+  semantics, fail-closed sampled-window aggregation, and observed chart facts.
+- Publish the exact printed-page/file-page locator, the Iyer and Muhurta
+  Chintamani assignment conflict, and each engineering convention separately
+  from the source wording. The broader election-chart baseline remains tracked
+  in issue #284.
+- Expose rejected-slot rule evidence and event-specific completion states in
+  the result and share surfaces; Python/MCP continues to return the Panchangam
+  shortlist and now states that exact Annaprasana chart screening is browser
+  only.
+- Bump the MCP/PyPI release metadata to `1.16.0`; frozen engines, ICS output,
+  and deployment workflows are unchanged.
+
+## [1.15.2] — 2026-09-04
+
+### Fixed
+
+- Separate B. V. Raman's catalogued 181-page 1993 UBS work from the
+  independently inspected 78-page 2020 Chistabo re-edited transcription in
+  canonical provenance. Record the derivative's editorial disclosure,
+  checksum, byte size, PDF metadata, two-offset page model, and unverified
+  exact-edition relationship explicitly.
+- Revalidate every active Raman-linked claim and correct 17 locators while
+  preserving 13 already-aligned page coordinates and leaving four unresolved
+  claims work-only. Human-readable documentation and generated source
+  projections now distinguish internal printed pages from physical PDF pages.
+- Preserve all Muhurtam rule predicates, effects, thresholds, and ordering;
+  this patch changes source identity and locator metadata only. The frozen
+  engines, ICS generator, and workflows remain untouched.
+
 ## [1.15.1] — 2026-09-04
 
 ### Fixed
@@ -1034,7 +1069,9 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.1...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.16.0...HEAD
+[1.16.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.2...v1.16.0
+[1.15.2]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.13.0...v1.14.0

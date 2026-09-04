@@ -1,0 +1,125 @@
+{
+  "capturedAt": "2026-09-04T18:39:26+00:00",
+  "source": "tools/capture_muhurta_chart_screenshots.py",
+  "liveServicesUsed": false,
+  "captures": [
+    {
+      "file": "fixture-annaprasana-pass-desktop-1440x900.png",
+      "scenario": "annaprasana-pass",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Annaprasana event-specific chart assessment complete",
+      "sha256": "4cd0ab89930206149857ba93a93a1488baedb4410591396965d1db6f3d7c3b42"
+    },
+    {
+      "file": "fixture-annaprasana-pass-mobile-390x844.png",
+      "scenario": "annaprasana-pass",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Annaprasana event-specific chart assessment complete",
+      "sha256": "7cf7232281aa6a1a1e99fc7284dde85f81988c2a9fa65ee74eb2c7480739e2f2"
+    },
+    {
+      "file": "fixture-annaprasana-preference-miss-desktop-1440x900.png",
+      "scenario": "annaprasana-preference-miss",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference not present \u00b7 no penalty",
+      "sha256": "cc21ccf420b92007b13b94623fb31119fbd2726f0b078d5abf31935775c06ae9"
+    },
+    {
+      "file": "fixture-annaprasana-preference-miss-mobile-390x844.png",
+      "scenario": "annaprasana-preference-miss",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference not present \u00b7 no penalty",
+      "sha256": "c5ebc6eac3c66f5671a2cad1d3174fa47da5bbcda40a4543bf25f59e9ee67c2d"
+    },
+    {
+      "file": "fixture-annaprasana-hard-fail-desktop-1440x900.png",
+      "scenario": "annaprasana-hard-fail",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Natural malefics in Lagna: Surya.",
+      "sha256": "e7a5a39ee20acf623192934001fcf4c8aec3d0676afa9cb1c92b038590dcac9e"
+    },
+    {
+      "file": "fixture-annaprasana-hard-fail-mobile-390x844.png",
+      "scenario": "annaprasana-hard-fail",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Natural malefics in Lagna: Surya.",
+      "sha256": "ab93c2e5822bfcb5b72565c1196977daf45c7e784e41a5a8830711e17c462c79"
+    },
+    {
+      "file": "fixture-annaprasana-unknown-desktop-1440x900.png",
+      "scenario": "annaprasana-unknown",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened-review",
+      "expectedCopy": "inside the disclosed \u00b10.02\u00b0 phase boundary guard",
+      "sha256": "390ee80985700269e8cb2cda05b8d052b790326f05e2dd2151cf970a1e71cf4c"
+    },
+    {
+      "file": "fixture-annaprasana-unknown-mobile-390x844.png",
+      "scenario": "annaprasana-unknown",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened-review",
+      "expectedCopy": "inside the disclosed \u00b10.02\u00b0 phase boundary guard",
+      "sha256": "19fc14fb82b22fb7cca1ca195f2640e4f5c29f3123469f6ba3d256a60d7924b8"
+    },
+    {
+      "file": "fixture-annaprasana-pass-final-outcomes-mobile-390x844.png",
+      "scenario": "annaprasana-pass",
+      "activity": "annaprasana",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference met \u00b7 tie-break only",
+      "sha256": "8584a24dac6dd4b86c3b371a0bc9bae8160ff8b5b9ea258d57c83af400c888f2",
+      "additionalExpectedCopy": "Natural malefics in Lagna: none; Chandra is outside Lagna."
+    }
+  ]
+}

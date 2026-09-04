@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "source": "telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES",
   "house_system": "whole_sign",
   "node_convention": "mean",
@@ -14,8 +14,28 @@
     "Rahu",
     "Ketu"
   ],
-  "convention_schema_version": 1,
+  "convention_schema_version": 2,
   "conventions": {
+    "whole-sign-physical-occupation-v1": {
+      "label": "Whole Sign physical-occupation convention v1",
+      "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+      "method_claims": [
+        "election_chart.whole_sign_house_policy_v1"
+      ]
+    },
+    "annaprasana-natural-malefic-lagna-v1": {
+      "label": "Annaprasana natural-malefic Lagna convention v1",
+      "formula": "Reject Surya, Kuja, Shani, mean Rahu or mean Ketu in Whole Sign house 1. When Chandra occupies house 1, let E = (Chandra longitude - Surya longitude) mod 360 degrees: 0 < E < 180 is waxing and does not fail; 180 < E < 360 is waning and fails. Return unknown within ±0.02 degrees of 0 or 180. Budha joined to a natural malefic is represented by same-sign occupation; the accompanying malefic already controls this prohibition.",
+      "method_claims": [
+        "election_chart.natural_malefics.bphs_3_11_modern_witness",
+        "election_chart.whole_sign_house_policy_v1",
+        "election_chart.mean_node_policy_v1",
+        "election_chart.budha_same_sign_association_policy_v1",
+        "election_chart.raman_180_degree_paksha_policy_v1",
+        "election_chart.lunar_phase_boundary_guard_policy_v1",
+        "election_chart.annaprasana_fail_closed_aggregation_policy_v1"
+      ]
+    },
     "phaladeepika-well-placed-v1": {
       "label": "Phaladeepika well-placed convention v1",
       "formula": "Outside houses 6, 8 and 12; outside an enemy Rasi; and outside debilitation Rasi or Navamsa. Chandra must also clear Surya by more than the disclosed 12-degree v1 solar-ray threshold.",
@@ -37,6 +57,10 @@
       ]
     }
   },
+  "complete_assessors": [
+    "gold",
+    "annaprasana"
+  ],
   "rules": {
     "wedding": [
       {
@@ -75,39 +99,115 @@
         "label": "10th house is vacant",
         "kind": "house_empty",
         "effect": "reject",
-        "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
-        "house": 10
+        "source_claim": "muhurta.annaprasana.raman_transcription_chart",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' Chistabo derivative internal printed p. 22 (physical PDF p. 25)",
+        "house": 10,
+        "convention_id": "whole-sign-physical-occupation-v1",
+        "convention_label": "Whole Sign physical-occupation convention v1",
+        "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+        "method_claims": [
+          "election_chart.whole_sign_house_policy_v1"
+        ]
       },
       {
         "id": "annaprasana.budha-not-7",
         "label": "Budha is outside the 7th house",
         "kind": "planet_not_house",
         "effect": "reject",
-        "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "source_claim": "muhurta.annaprasana.raman_transcription_chart",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' Chistabo derivative internal printed p. 22 (physical PDF p. 25)",
         "planet": "Budha",
-        "house": 7
+        "house": 7,
+        "convention_id": "whole-sign-physical-occupation-v1",
+        "convention_label": "Whole Sign physical-occupation convention v1",
+        "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+        "method_claims": [
+          "election_chart.whole_sign_house_policy_v1"
+        ]
       },
       {
         "id": "annaprasana.kuja-not-8",
         "label": "Mangala (Kuja) is outside the 8th house",
         "kind": "planet_not_house",
         "effect": "reject",
-        "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "source_claim": "muhurta.annaprasana.raman_transcription_chart",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' Chistabo derivative internal printed p. 22 (physical PDF p. 25)",
         "planet": "Kuja",
-        "house": 8
+        "house": 8,
+        "convention_id": "whole-sign-physical-occupation-v1",
+        "convention_label": "Whole Sign physical-occupation convention v1",
+        "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+        "method_claims": [
+          "election_chart.whole_sign_house_policy_v1"
+        ]
       },
       {
         "id": "annaprasana.shukra-not-9",
         "label": "Shukra is outside the 9th house",
         "kind": "planet_not_house",
         "effect": "reject",
-        "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "source_claim": "muhurta.annaprasana.raman_transcription_chart",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' Chistabo derivative internal printed p. 22 (physical PDF p. 25)",
         "planet": "Shukra",
-        "house": 9
+        "house": 9,
+        "convention_id": "whole-sign-physical-occupation-v1",
+        "convention_label": "Whole Sign physical-occupation convention v1",
+        "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+        "method_claims": [
+          "election_chart.whole_sign_house_policy_v1"
+        ]
+      },
+      {
+        "id": "annaprasana.benefic-occupies-lagna",
+        "label": "Budha, Guru or Shukra occupies Lagna",
+        "kind": "any_planet_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.annaprasana.raman_transcription_chart",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' Chistabo derivative internal printed p. 22 (physical PDF p. 25)",
+        "planets": [
+          "Budha",
+          "Guru",
+          "Shukra"
+        ],
+        "houses": [
+          1
+        ],
+        "convention_id": "whole-sign-physical-occupation-v1",
+        "convention_label": "Whole Sign physical-occupation convention v1",
+        "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+        "method_claims": [
+          "election_chart.whole_sign_house_policy_v1"
+        ],
+        "decision_policy_claim": "election_chart.annaprasana.raman_transcription_policy_v1"
+      },
+      {
+        "id": "annaprasana.no-natural-malefic-in-lagna",
+        "label": "No natural malefic occupies Lagna",
+        "kind": "house_free_of_natural_malefics",
+        "effect": "reject",
+        "source_claim": "muhurta.annaprasana.raman_transcription_chart",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' Chistabo derivative internal printed p. 22 (physical PDF p. 25)",
+        "house": 1,
+        "fixed_malefics": [
+          "Surya",
+          "Kuja",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "lunar_phase_guard_degrees": 0.02,
+        "convention_id": "annaprasana-natural-malefic-lagna-v1",
+        "convention_label": "Annaprasana natural-malefic Lagna convention v1",
+        "formula": "Reject Surya, Kuja, Shani, mean Rahu or mean Ketu in Whole Sign house 1. When Chandra occupies house 1, let E = (Chandra longitude - Surya longitude) mod 360 degrees: 0 < E < 180 is waxing and does not fail; 180 < E < 360 is waning and fails. Return unknown within ±0.02 degrees of 0 or 180. Budha joined to a natural malefic is represented by same-sign occupation; the accompanying malefic already controls this prohibition.",
+        "method_claims": [
+          "election_chart.natural_malefics.bphs_3_11_modern_witness",
+          "election_chart.whole_sign_house_policy_v1",
+          "election_chart.mean_node_policy_v1",
+          "election_chart.budha_same_sign_association_policy_v1",
+          "election_chart.raman_180_degree_paksha_policy_v1",
+          "election_chart.lunar_phase_boundary_guard_policy_v1",
+          "election_chart.annaprasana_fail_closed_aggregation_policy_v1"
+        ]
       }
     ],
     "seemantha": [
@@ -438,9 +538,7 @@
       "Assess malefic occupancy or hemming around Lagna and any Chandra-Graha association.",
       "Review the optional fortification combinations and both partners’ compatibility, Tarabala, Chandrabala and Panchaka."
     ],
-    "annaprasana": [
-      "Assess whether Budha, Guru or Shukra strengthens Lagna and whether a malefic occupies Lagna."
-    ],
+    "annaprasana": [],
     "seemantha": [
       "If relying on Pournami, assess the source’s qualitative Chandra-dignity condition."
     ],
