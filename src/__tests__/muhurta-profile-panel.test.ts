@@ -426,6 +426,101 @@ describe('Muhurtam saved-profile participants', () => {
     expect(panel.muValidLagnaDayData(extended)).toBe(true);
   });
 
+  test('accepts the published Hyderabad terminal transition at exclusive cycle end', () => {
+    const publishedHyderabadDay = {
+      date: '2026-09-17',
+      sunrise: '06:04',
+      guruCombust: false,
+      shukraCombust: false,
+      lagna0: 4,
+      transitions: [
+        [4, 5], [129, 6], [259, 7], [393, 8], [519, 9],
+        [630, 10], [728, 11], [823, 0], [928, 1], [1049, 2],
+        [1181, 3], [1313, 4], [1440, 5],
+      ],
+      cycleEnd: 1440,
+    };
+
+    expect(panel.muValidLagnaDayData(publishedHyderabadDay)).toBe(true);
+    expect(panel.muChartLagnasForMinutes(publishedHyderabadDay, [364, 367, 368]))
+      .toEqual(['Simha', 'Simha', 'Kanya']);
+    const cycleEndMinute = 364 + publishedHyderabadDay.cycleEnd;
+    expect(panel.muChartLagnasForMinutes(
+      publishedHyderabadDay, [cycleEndMinute - 10, cycleEndMinute - 1],
+    )).toEqual(['Simha', 'Simha']);
+    expect(panel.muChartLagnasForMinutes(
+      publishedHyderabadDay, [cycleEndMinute],
+    )).toBeNull();
+    expect(panel.muChartLagnasForMinutes(
+      publishedHyderabadDay, [cycleEndMinute - 1, cycleEndMinute],
+    )).toBeNull();
+    expect(panel.muChartCheckMinutes(
+      publishedHyderabadDay, cycleEndMinute - 10, cycleEndMinute,
+    )).toEqual([cycleEndMinute - 10, cycleEndMinute - 1]);
+    expect(panel.muChartBoundaryNeedsReview(
+      publishedHyderabadDay, cycleEndMinute - 10, cycleEndMinute,
+    )).toBe(true);
+  });
+
+  test('accepts a published Sydney second-cycle terminal transition', () => {
+    const transitionOffsets = [
+      5, 84, 174, 286, 422, 567, 710, 853, 997, 1139, 1261, 1359,
+      1441, 1520, 1610, 1723, 1859, 2003, 2146, 2289, 2433, 2575,
+      2697, 2795, 2877,
+    ];
+    const publishedSydneyDay = {
+      date: '2026-09-17',
+      sunrise: '05:52',
+      lagna0: 4,
+      transitions: transitionOffsets.map((offset, index) => [
+        offset, (5 + index) % 12,
+      ]),
+      cycleEnd: 2877,
+    };
+
+    expect(panel.muValidLagnaDayData(publishedSydneyDay)).toBe(true);
+  });
+
+  test.each([
+    {
+      sunrise: '06:00', lagna0: 0,
+      transitions: [
+        [10, 1], [20, 2], [30, 3], [40, 4], [50, 5], [60, 6],
+        [70, 7], [80, 8], [90, 9], [100, 10], [110, 11], [120, 0],
+        [1440, 1], [1441, 2],
+      ],
+      cycleEnd: 1440,
+    },
+    {
+      sunrise: '06:00', lagna0: 0,
+      transitions: [
+        [10, 1], [20, 2], [30, 3], [40, 4], [50, 5], [60, 6],
+        [70, 7], [80, 8], [90, 9], [100, 10], [110, 11], [120, 0],
+        [1440, 3],
+      ],
+      cycleEnd: 1440,
+    },
+    {
+      sunrise: '06:00', lagna0: 0,
+      transitions: [
+        [10, 1], [20, 2], [30, 3], [40, 4], [50, 5], [60, 6],
+        [70, 7], [80, 8], [90, 9], [100, 10], [110, 11], [120, 0],
+        [1441, 1],
+      ],
+      cycleEnd: 1440,
+    },
+    {
+      sunrise: '06:00', lagna0: 0,
+      transitions: [
+        [10, 1], [0, 2], [30, 3], [40, 4], [50, 5], [60, 6],
+        [70, 7], [80, 8], [90, 9], [100, 10], [110, 11], [120, 0],
+      ],
+      cycleEnd: 1440,
+    },
+  ])('rejects invalid terminal or post-cycle Lagna transitions %#', malformed => {
+    expect(panel.muValidLagnaDayData(malformed)).toBe(false);
+  });
+
   test('accepts a first transition rounded to the sunrise minute', () => {
     const roundedAtSunrise = {
       sunrise: '06:00',
