@@ -207,6 +207,10 @@ Surya Siddhanta and Vakya use their own mean-motion models and ignore this param
 
 Source code, tests, and the related Panchangam calendar feed project: https://github.com/socraticsurge/telugu-calendar-utilities
 
+The project is licensed under GNU AGPL v3.0 or later. The repository contains
+the complete corresponding source, build instructions, tests, and preserved
+PySwissEph/Swiss Ephemeris notices.
+
 ---
 
 mcp-name: io.github.socraticsurge/panchangam

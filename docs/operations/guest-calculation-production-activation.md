@@ -1,15 +1,16 @@
 # Guest calculation production activation
 
-Status: **assessment complete; activation readiness incomplete**
-Assessment timestamp: `2026-09-02T23:54:32+05:30` (`Asia/Kolkata`)
-Release refresh: `2026-09-03` (`Asia/Kolkata`)
-Panchangam production baseline: `eec464e871afdce9268716233fed2eecc91ae17a`
+Status: **Production backend verified; paired public client activation approved**
+Assessment timestamp: `2026-09-04T15:50:00+05:30` (`Asia/Kolkata`)
+Release refresh: `2026-09-04` (`Asia/Kolkata`)
+Panchangam pre-activation baseline: `99629ada`
 Epic: [#234](https://github.com/socraticsurge/telugu-calendar-utilities/issues/234)
 
-This is the operator runbook for activating guest birth-profile calculation and
-Muhurtam election-chart screening. It records sequence and evidence; it is not
-authorization to merge, add credentials, deploy, relicense, or enable a public
-flag.
+This is the operator runbook and release record for guest birth-profile
+calculation and Muhurtam election-chart screening. The owner approved the
+AGPL-compatible public-source path and paired public activation on 2026-09-04
+after the exact Production backend passed the bounded probes below. The
+evidence and rollback checks still apply to every release and rollback step.
 
 Refresh this record immediately before any Preview, merge, deployment, or
 activation approval. Reconfirm branch heads, CI/security check URLs, exact
@@ -20,47 +21,31 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 
 | Component | State |
 |---|---|
-| Panchangam profile/Muhurtam UI | Live with both remote client flags off |
-| Astro guest routes | [PR #161](https://github.com/socraticsurge/astro-unified-core/pull/161) is green at `e7fb3fe6`; Preview is Ready; routes remain absent from Production |
-| DashaFlow authenticated contracts | [PR #1](https://github.com/socraticsurge/dashaflow-sidecar/pull/1) is green at `97eece13`; Preview is Ready; contracts remain unreleased |
-| Panchangam activation-readiness work | [PR #451](https://github.com/socraticsurge/telugu-calendar-utilities/pull/451) is open at `3bcc0da`; branch publication does not deploy GitHub Pages |
-| Licensing | Technical inventory `dd90f800` completed; legal/rights-holder decision remains blocked by #231, #444, #445, and #449 |
-| Production geocoder/shared controls | Fixed adapters, shared cache, privacy controls, guest budgets, and gated authenticated migration exist at `e7fb3fe6`; provider/Redis terms, credentials, Preview certification, and owner approval remain blocked by #233 and its children |
-| Authenticated three-service Preview | **Blocked:** no exact pair-bound hosted Preview path exists yet |
+| Panchangam profile/Muhurtam UI | The reviewed production build sets both remote client flags to exact `true`; PR #452 is the paired client activation and requires a manual `Deploy Landing Page` dispatch because `.env.production` is outside the workflow's push paths. |
+| Astro guest routes | Production deployment `dpl_G49CJ75b1YsLCR872fbaptpEiGPe` is Ready at exact public commit `4106f097`; health, birth, election-chart, and governed place-search probes passed. |
+| DashaFlow authenticated contracts | The Production Astro gateway reached the authenticated sidecar successfully for synthetic birth and election-chart derivations. The browser never receives the sidecar credential. |
+| Panchangam release posture | PR #456 merged normally at `99629ada`; tag `v1.14.0` publishes the reviewed AGPL/source package and release evidence. |
+| Licensing | The relevant repositories are public and the reviewed TCU source/package posture is AGPL-3.0-or-later with direct PySwissEph and Swiss Ephemeris notices. |
+| Production geocoder/shared controls | Keyless public Nominatim is active on the shared governed path. A bounded Hyderabad search returned 200, while 60 consecutive `/api/guest/` POST attempts from one client reached the WAF 429 boundary without creating an application draft. |
+| Rollback | Preserve the exact pre-activation TCU master archive created from `99629ada` and the existing Pages archive `archive/pre-public-activation-2026-09-04-gh-pages-79c907d`. |
 
-## Hard gates
+## Cleared activation evidence
 
-All boxes must be supported by links to evidence.
-
-- [ ] #231 records the approved Swiss Ephemeris **and PySwissEph wrapper** posture.
-- [ ] #444 audits existing PyPI and live-service exposure.
-- [ ] #445 implements and verifies the selected licensing posture.
-- [ ] #449 records wrapper rights or completes and verifies an approved replacement.
-- [ ] #443's DashaFlow producer invariants pass against the TCU consumers.
-- [ ] #233 records the provider, retention, cache, attribution, and abuse posture.
-- [ ] #446 implements and verifies the owner-approved geocoder and shared,
-      fail-closed guest abuse controls. Candidate code is not certification.
-- [ ] #447 migrates and regression-tests the authenticated profile geocoder so
-      guest activation does not leave a second ungoverned provider path.
-- [ ] An exact, owner-approved, pair-bound hosted Preview mechanism is
-      implemented for all three services and their protected deployments.
-- [ ] Logs, analytics, and application-controlled server/shared cache contain
-      no profile name, birth payload, natal chart, raw place-search text, raw
-      IP, provider key, or bearer token. Provider transit of the submitted
-      city/town query is separately disclosed and governed by approved terms.
-- [ ] Browser requests contain no profile name or cookies. Calculation
-      responses may contain the documented narrow natal- or election-chart
-      results, but must not echo birth inputs, raw IPs, provider credentials,
-      bearer credentials, or raw upstream diagnostics.
-- [ ] Place-search responses carry only allowlisted structured provider/data
-      attribution links, and the Panchangam UI visibly renders those links
-      beside returned results at desktop and mobile widths.
-- [ ] #448 records exact deployment/check IDs, probes, privacy evidence,
-      screenshots, and rollback rehearsal **after** #443, #445, #446, #447,
-      and #449 are complete.
-- [ ] Owner approvals are recorded independently for Preview configuration,
-      each merge, each Production deployment/configuration change, and each
-      public client-flag activation.
+- The owner selected and approved the public AGPL-compatible source posture,
+  Production backend, and paired birth/election client activation.
+- Astro Production is Ready at exact public source `4106f097` and immutable
+  deployment `dpl_G49CJ75b1YsLCR872fbaptpEiGPe`.
+- A Hyderabad Production place search returned 200 with the governed Nominatim
+  provider, and the WAF boundary returned 429 on the 60-request/IP probe.
+- Synthetic birth derivation returned 200 with Jyeshtha Padam 4, Vrischika and
+  Simha; synthetic election-chart derivation returned 200.
+- TCU schema-v1 compatibility was restored by #458 before the versioned
+  release, and #456 passed the full Python 3.10-3.13/security gates before its
+  normal merge.
+- The paired client activation is pinned by
+  `tests/test_production_activation_flags.py`; both exact production flags,
+  the deploy run, the resulting `gh-pages` tip, and live browser/API probes
+  must be recorded on #452 and epic #234.
 
 ## Version record
 
@@ -69,11 +54,11 @@ Fill this table without secret values.
 Do not reuse one value for production, candidate, or rollback. Record immutable
 deployment IDs rather than mutable aliases.
 
-| Layer | Current Production commit | Candidate commit | Restore ref | Preview deployment ID | Production deployment ID | CI/security evidence |
+| Layer | Current Production commit | Candidate runtime/code commit | Restore ref | Preview deployment ID | Production deployment ID | CI/security evidence |
 |---|---|---|---|---|---|---|
-| Panchangam | `eec464e871afdce9268716233fed2eecc91ae17a` | `3bcc0da839b34b28a8000a2e993d06f7a0d70473` | `archive/guest-activation-readiness-2026-09-03-3bcc0da`; Production baseline `archive/release-2026-09-01-master-profile-muhurtam-eec464e` | blocked; no exact pair-bound hosted Preview | `gh-pages` tip `d456da46a29998ec8b49d9b35d63443fec3b6ca7`, tree `248cb16b391e9a36e99cf11116c9316dfcf6e93b` | local: 406 frontend and 1,464 Python tests, both TypeScript configurations, production/docs build, 62 computation routes, 11 Mermaid diagrams, and 3 landing artifacts passed; PR #451 checks are green at `3bcc0da`, and this refresh commit requires its own checks |
-| Astro | `519d686486a91d694de652f4a393174a52c346fc` | `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315` | `archive/astro-managed-geocoder-controls-2026-09-03-e7fb3fe`; deployment `dpl_F6yWeNZ2Mx9fzdjwMnan19cM9HdY` | `dpl_CA16AEiMt52qsywcVBnjK857ZcDd` (Ready, protected) | `dpl_F6yWeNZ2Mx9fzdjwMnan19cM9HdY` | GitHub tests and Vercel Preview green; local 683 tests, TypeScript, lint (one inherited warning), palette, routes, production build, and independent no-P0/P1/P2 review passed |
-| DashaFlow | `2c98ee8ef0c4a261686c507d9732f7834bc6b4f8` | `97eece13f524cc70bf995ae27620068a7d6aad44` | `archive/dashaflow-contract-remediation-2026-09-03-97eece1`; deployment `dpl_8Aoh11sqvj3yHPESkXRYRj8L4VHA` | `dpl_HetXHkbuH4BdKn8vnmGfpWanx6bX` (Ready, protected) | `dpl_8Aoh11sqvj3yHPESkXRYRj8L4VHA` | GitHub tests and both Vercel Preview checks green; local 103 tests and compileall passed |
+| Panchangam | `99629ada` before client activation | PR #452, both production client flags exact `true` | New immutable archive at exact `99629ada`; existing Pages archive `archive/pre-public-activation-2026-09-04-gh-pages-79c907d` | Local production build and fixture-backed browser review | Manual `Deploy Landing Page` run from exact merged #452 revision | PR #456: full local suite 1,466 passed/1 skipped, full build/docs passed, and required Python 3.10-3.13, CodeQL, pip-audit and Sonar checks passed; #452 requires the same final-head gates. |
+| Astro | `4106f097` | same exact Production source revision | Repository/archive and Vercel instant rollback retained by the Astro release record | Earlier protected pair remains recorded in #448 | `dpl_G49CJ75b1YsLCR872fbaptpEiGPe` (Ready) | Health 200; governed Hyderabad search 200; synthetic birth and election charts 200; WAF 429 boundary verified. |
+| DashaFlow | Production sidecar behind Astro | same exact backend pair used by the successful probes | Retained by the DashaFlow/Astro release record | Exact-token protected Preview evidence remains in #448 | Reached only through Astro's authenticated server path | Synthetic birth and election calls passed through the Production gateway; no browser credential exists. |
 
 ## Environment names and implementation state
 
@@ -90,83 +75,80 @@ These are names only. Never record values here, in issues, or in browser code.
 | Astro | `DASHAFLOW_SIDECAR_URL` | approved HTTPS service only when deployed |
 | Astro | `DASHAFLOW_SIDECAR_TOKEN` | server-only credential sent by Astro |
 | DashaFlow | `DASHAFLOW_API_TOKEN` | server-only verifier; its value must match Astro's differently named token |
-| Astro | `GEOCODER_PROVIDER`, `GEOCODER_API_KEY` | implemented fixed-adapter pair; one owner-approved provider and server-only key are required when deployed; no provider/key is selected or configured |
-| Astro | `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` | separate exact-`true` migration gate; omission/false preserves the existing signed-in profile path while guest work is reviewed; activation requires its own Preview and owner approval |
-| Astro | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | preferred complete pair for shared guest limits, activated authenticated per-user/fleet limits, and 24-hour normalized geocoder cache |
-| Astro | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | complete compatibility pair only; never combine a URL/token across namespaces |
+| Astro | `GEOCODER_PROVIDER` | Fixed to `nominatim-public` in Production after owner approval. Preview and real local development reject it and use fixtures. |
+| Astro | `GEOCODER_API_KEY` | Must be absent for `nominatim-public`; a key is needed only if a dormant commercial adapter is selected in a later reviewed release. |
+| Astro | `GEOCODER_DAILY_REQUEST_LIMIT` | Set a canonical value no greater than `1000` for public Nominatim. Guest and managed signed-in cache misses share the same Production provider row. |
+| Astro | `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` | Exact `true` in Production so signed-in and guest calls share one governed path. Preview remains fixture-only. |
+| Astro | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | Existing database used for pseudonymous client/user/fleet counters and one non-personal provider-budget/lease row. No place query or result is stored there. |
+| Astro | `RATE_LIMIT_HMAC_SECRET` | Existing server-only HMAC secret for pseudonymous client/user/fleet counter keys. |
 | Astro runtime | `VERCEL_ENV`, `VERCEL`, `NODE_ENV` | implementation classifies only consistent explicit local or deployed markers; missing, unknown, self-hosted-production, or contradictory markers fail closed |
 
-The named provider and shared-cache contracts are implemented in local Astro
-candidate `e7fb3fe6`, but provider selection, terms, quota/billing posture,
-credentials, and hosted certification remain unapproved. Existing signed-in
-profiles remain isolated from that migration unless its separate flag is exact
-`true`. No current environment variable makes the TCU/Astro/DashaFlow hosted
-Preview chain safe or reachable. Any such variables must be added only as part
-of the reviewed pair-bound mechanism.
+The selected provider contract is live in Astro Production. Public
+Nominatim is fixed and keyless; no LocationIQ, Geoapify, Upstash, or Redis
+account is required. It is intentionally unavailable in Preview and real local
+development, where provider behavior is fixture-tested. Production guest and
+signed-in place search share one Turso-backed budget and send lease; missing or
+inconsistent runtime/configuration signals still fail closed.
 
 ### Place-search retention and quota contract
 
 | Boundary | Permitted data | Retention / verification gate |
 |---|---|---|
 | Panchangam browser request | Trimmed city/town query only; no profile name, cookie, birth date/time, or chart | Transient request state; browser network evidence required |
-| Astro process state | Ephemeral HMAC client pseudonym; SHA-256 request key; normalized provider rows while pending | Per-process limiter window or bounded process lifetime; raw query/IP inspection required |
-| Redis REST | HMAC cache/rate-limit key; at most five normalized provider rows | Geocoder rows expire after 24 hours; rate limits after one minute; GET/SET response and value are bounded |
-| Managed geocoder | Submitted city/town query, provider credential, and Astro's server egress metadata | Provider-controlled; select the exact plan/region only after terms, privacy, attribution, and deletion/retention review |
+| Astro process state | Ephemeral HMAC client pseudonym; SHA-256 request key; at most five normalized provider rows | Bounded 256-entry process cache with a 24-hour TTL; no shared result cache |
+| Turso limiter tables | Environment-scoped HMAC client/user/fleet keys plus one provider-family hash and integer count/timing fields | Window/day rollover and bounded cleanup; no raw query, result, IP, user ID, birth detail, coordinate, or credential |
+| Public Nominatim | Deliberately submitted city/town query and Astro's server egress metadata; no profile name, birth date/time, or provider credential | Provider-controlled under the linked Nominatim and OSMF policies; one bounded Production smoke query only after approval |
 | Sentry / application analytics | No request bodies, raw place query, provider URL query/key, birth payload, or chart | Verify configuration and inspect Preview events before activation |
 
-The current geocoder fleet ceiling is 60 calls per minute, shared by guest
-place search and the separately activated authenticated migration. The managed
-authenticated path also applies a 10-call-per-user minute limit. In the worst
-case of unique cache misses, the shared fleet ceiling permits 86,400 provider
-calls in 24 hours. Provider approval must either select a plan that safely
-covers this bound or lower/add a daily fleet budget; the minute limiter alone
-must not be mistaken for a purchased-plan quota.
+The geocoder fleet ceiling is 30 calls per minute, shared by guest place search
+and the activated signed-in migration. The managed signed-in path also applies
+a ten-call-per-user minute limit. Public Nominatim adds a code-capped
+1,000-attempt UTC-day budget and one exclusive 12,500 ms crash-recovery lease;
+normal completion establishes a fenced 1,100 ms cooldown before the next
+distributed send. When public Nominatim returns `429`, a bounded numeric or
+HTTP-date `Retry-After` replaces that normal cooldown fleet-wide through the
+same exact-fence update, up to 24 hours. Missing, malformed, past, or zero-delay
+guidance becomes 60 seconds. Guest place search applies a durable 50-request
+allowance of valid managed-provider cache misses per client and anchored
+24-hour window. It runs after the five-per-minute guard, validation, cache
+lookup, and duplicate coalescing and has its own bounded two-second storage
+deadline. Malformed requests and reusable results do not spend it, though
+malformed requests may already spend the earlier route capacity, fleet, and
+minute guards. Fifty is nominally 5% of the configured pool and prevents one
+client identity from exhausting the provider's UTC-day allowance. Because the
+client window is anchored rather than UTC-aligned, a boundary overlap can reach
+100 upstream attempts in one UTC day. Warm-process cache hits and coalesced
+duplicate callers spend no provider slot. These controls implement the public
+service's absolute one-request/second application ceiling; they are not a
+purchased quota or availability guarantee.
 
-## Hosted Preview blocker and future sequence
+For Turso capacity planning, a successful guest place cache miss uses five
+admission-path row mutations: the capacity, fleet, minute-client, anchored
+daily-client, and provider-reservation rows. The conditional exact-fence
+completion update is accounted separately. Any four-write guest-place estimate
+predates the anchored daily-client guard and is no longer valid.
 
-**Stop: #448 is not executable with the current clients and deployments.** A
-deployed Panchangam build accepts only the canonical Production Astro API,
-Astro CORS accepts only the Production Panchangam origin (plus loopback), and
-the server-to-server clients do not carry an approved Vercel deployment-
-protection credential. A protected Vercel Preview therefore cannot certify the
-real browser-to-Astro-to-DashaFlow chain. Do not point a Preview browser at
-Production, add a wildcard `*.vercel.app` origin, disable Preview protection,
-or create an automation-bypass token as an undocumented side effect.
+## Production evidence sequence
 
-Before the sequence below becomes executable, implement and approve a mechanism
-that binds one immutable Panchangam Preview deployment to one immutable Astro
-Preview deployment and one immutable DashaFlow Preview deployment. It must
-allowlist only the exact browser origin, restrict each client to the exact next
-service, support the approved protection/authentication path without exposing a
-credential to browser JavaScript, and have negative cross-pair tests.
+The protected Astro/DashaFlow pair first passed exact-token contracts against
+an isolated staging Turso database. The owner then approved and verified the
+exact Production backend before the paired public client release. Public
+Nominatim remains intentionally unavailable outside Production; do not weaken
+CORS, expose a protection credential to browser JavaScript, or point a hosted
+Preview browser at Production.
 
-After that prerequisite and all hard gates are complete:
-
-1. Record the three candidate commits, immutable Preview deployment IDs, exact
-   pair bindings, check URLs, and named restore refs.
-2. Verify DashaFlow locally, including coherent 1-chart and 24-chart contracts,
-   then deploy only its Preview.
-3. Configure the distinct Astro/DashaFlow token names with one approved
-   Preview-only value; verify missing/bad credentials and sanitized errors.
-4. Configure the owner-approved geocoder and shared controls at Astro. Keep both
-   guest flags and `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` off while
-   dependencies and destination restrictions are probed.
-5. Enable the Astro birth route only, then build the bound Panchangam Preview
-   with only the birth flag. Verify place search, calculation, save, reload,
-   profile detail, and Daily Horoscope reuse.
-6. Keep election-chart flags off during a defined birth-only observation
-   window; record duration, traffic/errors, provider/limit behavior, and privacy
-   inspection results.
-7. Disable birth or preserve its verified state, then exercise election alone:
-   verify 1/24-chart batches, rating evidence, unknown/failure behavior, and
-   Muhurtam reuse.
-8. Only after both isolated observations, test both capabilities together.
-9. Separately test signed-in profile create/edit while the authenticated
-   migration flag is off, then on in Preview. Verify the per-user/shared fleet
-   limits and restore it off before completing the guest-only evidence.
-10. Attach browser network evidence, screenshots, application/platform/provider
-   log checks, cache-key inspection, and negative cross-pair tests to #448.
-11. Rehearse rollback at every layer before requesting any merge approval.
+1. Astro Production deployment `dpl_G49CJ75b1YsLCR872fbaptpEiGPe` at public
+   source `4106f097` reported Ready and health returned 200.
+2. The governed Production Nominatim path returned a bounded Hyderabad result
+   with attribution; the 60-request/IP perimeter probe reached 429 without an
+   application draft.
+3. Synthetic Production birth and election requests both returned 200; the
+   birth fixture resolved to Jyeshtha Padam 4, Vrischika and Simha.
+4. TCU `v1.14.0` publishes the reviewed source/licence posture from exact
+   pre-activation master `99629ada`.
+5. PR #452 sets both client flags together, pins them in a release-contract
+   test, preserves the pre-activation master and Pages refs, and requires a
+   manual landing-page deployment plus live browser verification.
 
 ## Failure matrix
 
@@ -174,10 +156,12 @@ After that prerequisite and all hard gates are complete:
 |---|---|
 | Client flag absent/malformed | No remote call; manual profile entry or conservative unscreened Muhurtam result |
 | Astro route flag off | Fixed 503; no geocoder/sidecar call |
-| Shared limiter missing/unavailable in Preview/Production | Fixed 503; no expensive calculation/provider call |
-| Geocoder missing/unavailable | Place search 503; no fallback to public Nominatim |
-| Authenticated migration flag absent/false | Existing signed-in Nominatim path remains available; managed adapter and Redis are not consulted |
-| Authenticated migration exact `true`, dependency/limit unavailable | Signed-in place-changing operation fails closed; no public-Nominatim fallback and no DB mutation |
+| Shared Turso limiter missing/unavailable in Preview/Production | Fixed 503; no expensive calculation/provider call |
+| Production geocoder configuration missing/unavailable | Place search 503; no arbitrary or commercial fallback |
+| Guest client exceeds 50 valid managed-provider place-search misses in its anchored 24-hour window | Sanitized 429 with durable client-window retry guidance; no provider call |
+| Public Nominatim returns 429 | Sanitized 429; bounded upstream retry guidance is persisted fleet-wide through exact-fence completion. Missing, malformed, past, or zero-delay guidance becomes 60 seconds; the maximum is 24 hours |
+| Authenticated migration flag absent/false | Production preserves its old unbudgeted signed-in Nominatim path; Preview fails closed. Never use this as a Nominatim incident rollback. |
+| Authenticated migration exact `true`, provider/limit unavailable | Signed-in place-changing operation fails closed; no legacy or commercial fallback and no profile mutation |
 | Sidecar token missing/bad | Fixed gateway error; no upstream diagnostic or token in response |
 | Sidecar timeout/transient error | Up to two bounded attempts within the browser deadline, with one retry only for 502/503/504, then a fixed unavailable result |
 | Malformed/inconsistent chart | 502/invalid response; never save or score as verified |
@@ -185,32 +169,26 @@ After that prerequisite and all hard gates are complete:
 
 ## Merge and Production sequence
 
-Production starts only after every hard gate above is complete: parent decisions
-#231 and #233, audit #444, implementation gates #443, #445, #446, #447, and
-#449, then exact-chain certification #448. The owner must still approve merges.
-Preview approval, merge approval, Production deployment/configuration approval,
-and feature activation approval are separate decisions.
+Backend readiness and paired activation have separate evidence, even though the
+owner approved both public client capabilities in the same release.
 
-1. With explicit merge approval, merge DashaFlow first, then Astro. Do not deploy
-   either merely because its PR merged.
-2. With separate deployment approval, deploy the exact recorded DashaFlow commit
-   with both new consumers still inactive; smoke the authenticated v1 routes.
-3. Deploy the exact recorded Astro commit with both guest route flags and the
-   authenticated migration flag off; verify fixed disabled guest responses and
-   unchanged signed-in profile create/edit before dependency probes.
-4. With a distinct activation approval, enable Astro birth only and publish the
-   Panchangam build with only `VITE_BIRTH_PROFILE_API_ENABLED=true`.
-5. Smoke and observe birth profiles for the recorded window. Keep both election
-   flags off throughout that observation period.
-6. After evidence review and a separate election activation approval, enable
-   the Astro election route and publish the election-enabled client build.
-7. Record immutable Production deployment IDs, timestamps, probes, privacy/log
-   checks, feature-flag states, and restore refs after every step.
+1. Keep Astro at the exact verified Production revision and keep both routes
+   independently fail-closed when their server configuration is absent.
+2. Publish and verify TCU `v1.14.0` from exact merge `99629ada` before the
+   client activation merge.
+3. Create an immutable archive at `99629ada`, retain the existing `gh-pages`
+   archive at `79c907d`, then merge #452 normally only after its final-head
+   Python 3.10-3.13 and security checks pass.
+4. Manually dispatch `Deploy Landing Page` on the merged #452 master revision;
+   the production environment file is deliberately outside the push path
+   filters.
+5. Record the resulting workflow run and `gh-pages` tip, then verify the public
+   page, visible OpenStreetMap attribution, synthetic birth derivation and
+   election-chart screening from a cache-busted browser session.
 
-Publishing the Panchangam build may require a workflow/configuration change.
-`.github/workflows/` is frozen in this repository and its current path filters
-do not make a docs-only commit a production activation mechanism. Any workflow
-change requires explicit owner approval and its own reviewed branch.
+Publishing uses the existing manual `Deploy Landing Page` workflow dispatch
+because the production environment and documentation files are outside its
+push path filters. `.github/workflows/` remains unchanged and frozen.
 
 ## Rollback
 
@@ -222,16 +200,17 @@ not sufficient.
   then publish a Panchangam build with the corresponding `VITE_*` flag absent or
   false. During token rollback, keep both routes off until old/new credentials
   have completed an approved overlap or coordinated cutover.
-- **Panchangam code:** restore the recorded Production commit. The known
-  pre-activation restore branch is
-  `archive/release-2026-09-01-master-profile-muhurtam-eec464e` at baseline
-  `eec464e`; verify the ref again at release time.
+- **Panchangam code:** restore exact pre-activation commit `99629ada` through
+  immutable branch
+  `archive/pre-public-activation-2026-09-04-tcu-master-99629ad`. Resolve and
+  record the full commit ID again immediately before release.
 - **Astro/DashaFlow:** restore the separately recorded immutable deployment IDs
   and commits. Do not assume a Vercel alias still points to the reviewed build.
-- **Provider/control failure:** keep guest server flags and the authenticated
-  migration flag off. Guest search and an activated authenticated migration do
-  not fall back to public Nominatim; the explicitly disabled authenticated
-  migration preserves only the pre-existing signed-in path.
+- **Provider/control failure:** turn both guest server flags off first, but keep
+  `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED=true` while Production can reach
+  public Nominatim. Turning it off restores the old unbudgeted signed-in path.
+  To stop Nominatim completely, leave that migration flag true and remove the
+  provider selection so signed-in and guest place lookups fail closed together.
 - **Browser data:** preserve the profile schema and stored records; disabling
   remote calculation must not make existing profiles unreadable.
 - **GitHub Pages:** preserve and compare the complete published `gh-pages` tip
@@ -243,6 +222,8 @@ not sufficient.
 
 ## Decision links
 
+- [Public Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)
+- [OpenStreetMap copyright and attribution](https://www.openstreetmap.org/copyright)
 - [Licensing gate #231](https://github.com/socraticsurge/telugu-calendar-utilities/issues/231)
 - [Existing-distribution audit #444](https://github.com/socraticsurge/telugu-calendar-utilities/issues/444)
 - [License-posture implementation #445](https://github.com/socraticsurge/telugu-calendar-utilities/issues/445)

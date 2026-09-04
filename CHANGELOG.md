@@ -9,6 +9,24 @@ PyPI version tracks this file's most recent release entry.
 
 ### Changed
 
+- Enable the production browser's birth-profile derivation and Muhurtam
+  election-chart screening together with exact, independently fail-closed
+  client flags after the governed Production backend passed place-search,
+  calculation and perimeter probes.
+
+## [1.14.0] — 2026-09-04
+
+### Changed
+
+- Adopt AGPL-3.0-or-later for the current source, website, and MCP package so
+  the Swiss Ephemeris/PySwissEph calculation stack has one explicit public
+  release posture. Earlier copies keep the licence grants conveyed with them.
+- Publish corresponding-source links in the website, repository, package
+  metadata, and PyPI README; preserve direct PySwissEph and Swiss Ephemeris
+  copyright/licence notices in `THIRD_PARTY_NOTICES.md`.
+- Bump the MCP/PyPI release metadata to `1.14.0`; calculation behavior and the
+  frozen engine/ICS contracts are unchanged.
+
 - Add browser-local guest profiles with manual entry, optional birth-derived
   Nakshatra, Padam, Janma Rashi, Lagna and D1 review, stable reuse in Daily
   Horoscope and Muhurtam, and non-destructive calculated-profile detail views.
@@ -31,6 +49,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Restore the computation-architecture evidence schema-v1 meaning of
+  `scope.source_files` as the total production-source count, add an explicit
+  `established_source_files` subset, and retain additive and total counts.
 - Validate calculated birth-profile responses and restored browser records
   against the exact `1.0` DashaFlow/Lahiri contract, canonical ordered
   nine-graha tuple, Whole Sign houses, fixed node facts, and

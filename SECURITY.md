@@ -19,6 +19,12 @@ You will get an acknowledgement within 72 hours. Once a fix ships, the issue can
 
 ## Scope notes
 
+- The current project release is licensed under AGPL-3.0-or-later. The public
+  repository is the corresponding-source location for the site and MCP
+  package; dependency notices are preserved in `THIRD_PARTY_NOTICES.md`.
+  Reports that a deployed calculation advertises an unavailable, private, or
+  mismatched source revision are in scope.
+
 - The published feeds and landing page are static files on GitHub Pages. The
   landing page can hold optional guest-profile data in the browser's
   origin-scoped `localStorage`. A calculated profile can contain a display name,
@@ -38,7 +44,8 @@ You will get an acknowledgement within 72 hours. Once a fix ships, the issue can
   a secret or server authorization. Public pages route only to the canonical
   `https://astrochaganti.com/api/guest` gateway and reject loopback or arbitrary
   base overrides. The server-side routes must remain independently disabled
-  until licensing and place-provider approval are recorded.
+  until the AGPL/source release is deployed and place-provider approval is
+  recorded.
 - Muhurtam election-chart projection has a separate public activation gate:
   `VITE_ELECTION_CHART_API_ENABLED` must be the exact string `true`. An absent
   flag permits only loopback development. Public requests use only the same

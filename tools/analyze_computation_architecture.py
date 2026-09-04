@@ -38,10 +38,10 @@ _ACTIVITY_RULES_ARTIFACT = 'src/data/activity-rules.generated.json'
 _PANCHANGAM_NAMES = 'telugu_panchangam/panchangam_names.py'
 _TARABALAM_PANEL = 'src/panels/tarabalam.ts'
 
-# ``scope.source_files`` is the established computation-layer contract. New
-# feature-side helpers are additions around that layer: they still appear in
-# the module graph, history, and blast-radius evidence, but are reported
-# separately so an additive adapter does not masquerade as core expansion.
+# Schema v1 keeps ``scope.source_files`` as the total production-source count.
+# Feature-side helpers are additions around the established computation layer:
+# they still appear in the module graph, history, and blast-radius evidence,
+# while the two subsets are also reported explicitly.
 _ADDITIVE_FEATURE_SOURCES = frozenset({
     'src/lib/birth-profile-api.ts',
     'src/lib/election-chart-api.ts',
@@ -602,7 +602,8 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
         'schema_version': 1,
         'source_commit': commit,
         'scope': {
-            'source_files': len(established_source_paths),
+            'source_files': len(source_paths),
+            'established_source_files': len(established_source_paths),
             'additive_feature_source_files': len(additive_feature_paths),
             'total_source_files': len(source_paths),
             'test_files': len(test_paths),
@@ -659,11 +660,14 @@ def _summary(report: dict) -> str:
     )
     lines = [
         f"Source commit: {report['source_commit']}",
-        f"Established production modules: {report['scope']['source_files']}",
+        f"Production modules: {report['scope']['source_files']}",
+        (
+            'Established production modules: '
+            f"{report['scope']['established_source_files']}"
+        ),
         (
             'Additive feature modules: '
-            f"{report['scope']['additive_feature_source_files']} "
-            f"(total {report['scope']['total_source_files']})"
+            f"{report['scope']['additive_feature_source_files']}"
         ),
         f"Computation records: {report['scope']['computation_records']}",
         f'Manual duplicate-contract groups: {manual}',

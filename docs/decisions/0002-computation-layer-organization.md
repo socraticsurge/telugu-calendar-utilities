@@ -36,6 +36,16 @@ at the selected ref. It maps imports, computation owners/mirrors/consumers,
 cross-layer edges, direct test blast radius, private API use, engine method
 asymmetry, duplicate contract groups and file change concentration.
 
+The JSON report retains schema version 1. Its source-count fields have these
+stable meanings:
+
+| `scope` field | Meaning |
+|---|---|
+| `source_files` | Total production Python and TypeScript modules. This is the original schema-v1 contract. |
+| `established_source_files` | Modules in the established computation layer, excluding allowlisted additive feature modules. |
+| `additive_feature_source_files` | Allowlisted feature modules layered around the established computation layer. |
+| `total_source_files` | Explicit total, equal to `source_files` and to the sum of the established and additive counts. |
+
 ```bash
 python tools/analyze_computation_architecture.py \
   --ref c46e9f0850aa07d1db7b6d65f6ab50b2cb2f9972 \
