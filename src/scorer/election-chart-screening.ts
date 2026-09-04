@@ -1,13 +1,27 @@
 import rulesContract from '../data/election-chart-rules.generated.json';
 import type { ElectionChartSnapshot } from '../lib/election-chart-api';
+import {
+  completePlanetPositions,
+  evaluateFullAspect,
+  evaluateWellSituated,
+  GOLD_MAX_SAMPLE_GAP_MINUTES,
+  goldTransitionUncertainty,
+  type PrimitiveOutcome,
+} from './election-assessors/primitives';
 
 export type ElectionRuleStatus = 'pass' | 'fail' | 'unknown';
-export type ElectionRuleEffect = 'reject' | 'prefer';
+export type ElectionRuleEffect = 'reject' | 'qualify' | 'prefer';
 
 export interface ElectionChartRule {
   id: string;
   label: string;
-  kind: 'house_empty' | 'planet_not_house' | 'planet_in_houses' | 'any_planet_in_houses';
+  kind:
+    | 'house_empty'
+    | 'planet_not_house'
+    | 'planet_in_houses'
+    | 'any_planet_in_houses'
+    | 'planet_well_situated'
+    | 'planet_receives_full_aspect';
   effect: ElectionRuleEffect;
   source_claim: string;
   source_locator: string;
@@ -15,6 +29,18 @@ export interface ElectionChartRule {
   houses?: number[];
   planet?: string;
   planets?: string[];
+  avoid_houses?: number[];
+  enemy_rashis?: string[];
+  debilitation_rashi?: string;
+  navamsa_debilitation_rashi?: string;
+  aspectors?: string[];
+  solar_clearance_degrees?: number;
+  solar_clearance_guard_degrees?: number;
+  convention_id?: string;
+  convention_label?: string;
+  formula?: string;
+  method_claims?: string[];
+  decision_policy_claim?: string;
 }
 
 export interface ElectionRuleOutcome {
@@ -24,6 +50,12 @@ export interface ElectionRuleOutcome {
   sourceClaim: string;
   sourceLocator: string;
   status: ElectionRuleStatus;
+  evidence: string[];
+  conventionId?: string;
+  conventionLabel?: string;
+  formula?: string;
+  methodClaims?: string[];
+  decisionPolicyClaim?: string;
 }
 
 export interface ElectionChartScreening {
@@ -31,8 +63,13 @@ export interface ElectionChartScreening {
   rejected: boolean;
   needsReview: boolean;
   preferencePasses: number;
+  qualificationFailed: boolean;
   stable: boolean;
   boundaryConventionUncertain?: boolean;
+}
+
+export interface ElectionChartEvaluationOptions {
+  houseFrameUncertain?: boolean;
 }
 
 const EXPECTED_PLANETS = new Set(rulesContract.vacancy_includes);
@@ -62,8 +99,18 @@ function completePlanetHouses(chart: ElectionChartSnapshot): Map<string, number>
 function evaluateRule(
   rule: ElectionChartRule,
   houses: ReadonlyMap<string, number> | null,
-): ElectionRuleStatus {
-  if (!houses) return 'unknown';
+  positions: ReturnType<typeof completePlanetPositions>,
+  options: ElectionChartEvaluationOptions,
+): PrimitiveOutcome {
+  if (rule.kind === 'planet_well_situated') {
+    return evaluateWellSituated(rule, positions, options);
+  }
+  if (rule.kind === 'planet_receives_full_aspect') {
+    return evaluateFullAspect(rule, positions);
+  }
+  if (!houses || options.houseFrameUncertain) {
+    return { status: 'unknown', evidence: [] };
+  }
   let passed: boolean;
   if (rule.kind === 'house_empty') {
     passed = !Array.from(houses.values()).includes(rule.house as number);
@@ -75,7 +122,29 @@ function evaluateRule(
     passed = (rule.planets || []).some(planet =>
       (rule.houses || []).includes(houses.get(planet) as number));
   }
-  return passed ? 'pass' : 'fail';
+  return { status: passed ? 'pass' : 'fail', evidence: [] };
+}
+
+function ruleOutcome(
+  rule: ElectionChartRule,
+  result: PrimitiveOutcome,
+): ElectionRuleOutcome {
+  return {
+    ruleId: rule.id,
+    label: rule.label,
+    effect: rule.effect,
+    sourceClaim: rule.source_claim,
+    sourceLocator: rule.source_locator,
+    status: result.status,
+    evidence: result.evidence,
+    ...(rule.convention_id ? { conventionId: rule.convention_id } : {}),
+    ...(rule.convention_label ? { conventionLabel: rule.convention_label } : {}),
+    ...(rule.formula ? { formula: rule.formula } : {}),
+    ...(rule.method_claims ? { methodClaims: rule.method_claims } : {}),
+    ...(rule.decision_policy_claim
+      ? { decisionPolicyClaim: rule.decision_policy_claim }
+      : {}),
+  };
 }
 
 function summarize(outcomes: ElectionRuleOutcome[], stable = true): ElectionChartScreening {
@@ -86,23 +155,62 @@ function summarize(outcomes: ElectionRuleOutcome[], stable = true): ElectionChar
     preferencePasses: outcomes.filter(
       outcome => outcome.effect === 'prefer' && outcome.status === 'pass',
     ).length,
+    qualificationFailed: outcomes.some(
+      outcome => outcome.effect === 'qualify' && outcome.status === 'fail',
+    ),
     stable,
   };
+}
+
+function goldTransitionEvidence(
+  charts: readonly ElectionChartSnapshot[],
+): ReadonlyMap<string, string[]> {
+  const evidence = new Map<string, string[]>();
+  for (let index = 1; index < charts.length; index += 1) {
+    const startChart = charts[index - 1];
+    const endChart = charts[index];
+    const startPositions = completePlanetPositions(startChart, EXPECTED_PLANETS);
+    const endPositions = completePlanetPositions(endChart, EXPECTED_PLANETS);
+    if (!startPositions || !endPositions) continue;
+    const startInstant = Date.parse(startChart.instant);
+    const endInstant = Date.parse(endChart.instant);
+    const gapMinutes = (endInstant - startInstant) / 60_000;
+    if (
+      !Number.isFinite(gapMinutes)
+      || gapMinutes <= 0
+      || gapMinutes > GOLD_MAX_SAMPLE_GAP_MINUTES
+    ) {
+      for (const rule of automatedRulesFor('gold')) {
+        const details = evidence.get(rule.id) || [];
+        details.push(
+          'The chart instants do not prove the required ten-minute transition coverage.',
+        );
+        evidence.set(rule.id, details);
+      }
+      continue;
+    }
+    for (const rule of automatedRulesFor('gold')) {
+      const detail = goldTransitionUncertainty(
+        rule, startPositions, endPositions, gapMinutes,
+      );
+      if (!detail) continue;
+      const details = evidence.get(rule.id) || [];
+      if (!details.includes(detail)) details.push(detail);
+      evidence.set(rule.id, details);
+    }
+  }
+  return evidence;
 }
 
 export function evaluateElectionChart(
   activity: string,
   chart: ElectionChartSnapshot,
+  options: ElectionChartEvaluationOptions = {},
 ): ElectionChartScreening {
   const houses = completePlanetHouses(chart);
-  return summarize(automatedRulesFor(activity).map(rule => ({
-    ruleId: rule.id,
-    label: rule.label,
-    effect: rule.effect,
-    sourceClaim: rule.source_claim,
-    sourceLocator: rule.source_locator,
-    status: evaluateRule(rule, houses),
-  })));
+  const positions = completePlanetPositions(chart, EXPECTED_PLANETS);
+  return summarize(automatedRulesFor(activity).map(rule =>
+    ruleOutcome(rule, evaluateRule(rule, houses, positions, options))));
 }
 
 export function evaluateElectionWindow(
@@ -117,19 +225,17 @@ export function evaluateElectionWindow(
 export function evaluateElectionSnapshots(
   activity: string,
   charts: readonly ElectionChartSnapshot[],
+  options: ElectionChartEvaluationOptions = {},
 ): ElectionChartScreening {
   if (!charts.length) {
-    return summarize(automatedRulesFor(activity).map(rule => ({
-      ruleId: rule.id,
-      label: rule.label,
-      effect: rule.effect,
-      sourceClaim: rule.source_claim,
-      sourceLocator: rule.source_locator,
-      status: 'unknown' as const,
-    })), false);
+    return summarize(automatedRulesFor(activity).map(rule =>
+      ruleOutcome(rule, { status: 'unknown', evidence: [] })), false);
   }
-  const evaluations = charts.map(chart => evaluateElectionChart(activity, chart));
+  const evaluations = charts.map(chart => evaluateElectionChart(activity, chart, options));
   const first = evaluations[0];
+  const transitionEvidence = activity === 'gold'
+    ? goldTransitionEvidence(charts)
+    : new Map<string, string[]>();
   let stable = true;
   const outcomes = first.outcomes.map(firstOutcome => {
     const statuses = evaluations.map(result =>
@@ -137,7 +243,12 @@ export function evaluateElectionSnapshots(
       || 'unknown');
     if (!statuses.every(status => status === statuses[0])) stable = false;
     let status: ElectionRuleStatus;
-    if (statuses.includes('unknown')) {
+    if (
+      (firstOutcome.effect === 'reject' || firstOutcome.effect === 'qualify')
+      && statuses.includes('fail')
+    ) {
+      status = 'fail';
+    } else if (statuses.includes('unknown')) {
       status = 'unknown';
     } else if (firstOutcome.effect === 'reject') {
       status = statuses.includes('fail') ? 'fail' : 'pass';
@@ -148,7 +259,23 @@ export function evaluateElectionSnapshots(
     } else {
       status = 'unknown';
     }
-    return { ...firstOutcome, status };
+    const extraEvidence = transitionEvidence.get(firstOutcome.ruleId) || [];
+    const transitionApplied = status === 'pass' && extraEvidence.length > 0;
+    if (transitionApplied) {
+      status = 'unknown';
+      stable = false;
+    }
+    const evidence = evaluations
+      .map(result => result.outcomes.find(
+        outcome => outcome.ruleId === firstOutcome.ruleId))
+      .filter((outcome): outcome is ElectionRuleOutcome =>
+        !!outcome && outcome.status === status)
+      .flatMap(outcome => outcome.evidence)
+      .filter((detail, index, all) => all.indexOf(detail) === index)
+      .concat(transitionApplied ? extraEvidence : [])
+      .filter((detail, index, all) => all.indexOf(detail) === index)
+      .slice(0, 3);
+    return { ...firstOutcome, status, evidence };
   });
   return summarize(outcomes, stable);
 }

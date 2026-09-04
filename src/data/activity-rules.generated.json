@@ -2080,7 +2080,12 @@
           "prefer_tithi_class"
         ],
         "personal_rule_ids": [],
-        "election_chart_rule_ids": [],
+        "election_chart_rule_ids": [
+          "gold.surya-well-situated",
+          "gold.chandra-well-situated",
+          "gold.surya-fully-aspected",
+          "gold.chandra-fully-aspected"
+        ],
         "manual_checks": [
           {
             "id": "gold.manual-1",

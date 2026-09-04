@@ -1,9 +1,9 @@
 """Structured, source-backed rules for exact Muhurtam election charts.
 
-This module deliberately contains only predicates whose source wording can be
-implemented without choosing an aspect model, strength scale, dignity scheme,
-or lineage-specific benefic/malefic classification.  Qualitative requirements
-remain in ``ACTIVITY_RULES[*]['manual_checks']``.
+Every qualitative predicate names the interpretation convention that makes it
+computable.  The source wording, interpretation convention, and product
+ranking effect remain separate fields so none inherits the authority of
+another merely because they appear in one result.
 
 House occupancy uses all nine projected grahas, including Rahu and Ketu, and
 the DashaFlow contract's whole-sign houses.  A rule is evaluated at every
@@ -13,7 +13,9 @@ sampled chart state in an offered window by
 
 from __future__ import annotations
 
-ELECTION_CHART_RULE_SCHEMA_VERSION = 1
+from .election_assessors.conventions import ELECTION_CHART_CONVENTIONS
+
+ELECTION_CHART_RULE_SCHEMA_VERSION = 2
 ELECTION_CHART_HOUSE_SYSTEM = 'whole_sign'
 ELECTION_CHART_NODE_CONVENTION = 'mean'
 ELECTION_CHART_PLANETS = (
@@ -38,6 +40,8 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         '(PDF p. 57)'),
     'muhurta.house_purchase.completed': (
         "Chapter XII, 'Buying Houses,' printed p. 53 (PDF p. 57)"),
+    'muhurta.gold_jewelry.purchase': (
+        "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)"),
     'muhurta.purchase.general': (
         'Nakshatra-prakarana, purchase Muhurta verse 16, printed '
         'pp. 33-34, and marketplace verse 17, printed pp. 34-35'),
@@ -65,9 +69,11 @@ def _rule(
     kind: str,
     effect: str,
     source_claim: str,
+    convention_id: str | None = None,
+    decision_policy_claim: str | None = None,
     **facts,
 ) -> dict:
-    return {
+    rule = {
         'id': rule_id,
         'label': label,
         'kind': kind,
@@ -76,6 +82,17 @@ def _rule(
         'source_locator': ELECTION_CHART_SOURCE_LOCATORS[source_claim],
         **facts,
     }
+    if convention_id:
+        convention = ELECTION_CHART_CONVENTIONS[convention_id]
+        rule.update({
+            'convention_id': convention_id,
+            'convention_label': convention['label'],
+            'formula': convention['formula'],
+            'method_claims': convention['method_claims'],
+        })
+    if decision_policy_claim:
+        rule['decision_policy_claim'] = decision_policy_claim
+    return rule
 
 
 ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
@@ -120,6 +137,53 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
     'house_purchase': (
         _rule('house-purchase.kuja-not-lagna', 'Mangala (Kuja) is outside Lagna',
               'planet_not_house', 'reject', 'muhurta.house_purchase.completed', planet='Kuja', house=1),
+    ),
+    'gold': (
+        _rule(
+            'gold.surya-well-situated',
+            'Surya is well situated under the disclosed v1 convention',
+            'planet_well_situated', 'qualify',
+            'muhurta.gold_jewelry.purchase',
+            convention_id='phaladeepika-well-placed-v1',
+            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            planet='Surya', avoid_houses=[6, 8, 12],
+            enemy_rashis=['Vrishabha', 'Tula', 'Makara', 'Kumbha'],
+            debilitation_rashi='Tula',
+            navamsa_debilitation_rashi='Tula',
+        ),
+        _rule(
+            'gold.chandra-well-situated',
+            'Chandra is well situated under the disclosed v1 convention',
+            'planet_well_situated', 'qualify',
+            'muhurta.gold_jewelry.purchase',
+            convention_id='phaladeepika-well-placed-v1',
+            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            planet='Chandra', avoid_houses=[6, 8, 12], enemy_rashis=[],
+            debilitation_rashi='Vrischika',
+            navamsa_debilitation_rashi='Vrischika',
+            solar_clearance_degrees=12,
+            solar_clearance_guard_degrees=0.02,
+        ),
+        _rule(
+            'gold.surya-fully-aspected',
+            'Surya receives at least one full classical Graha Drishti',
+            'planet_receives_full_aspect', 'qualify',
+            'muhurta.gold_jewelry.purchase',
+            convention_id='phaladeepika-full-graha-drishti-v1',
+            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            planet='Surya',
+            aspectors=['Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani'],
+        ),
+        _rule(
+            'gold.chandra-fully-aspected',
+            'Chandra receives at least one full classical Graha Drishti',
+            'planet_receives_full_aspect', 'qualify',
+            'muhurta.gold_jewelry.purchase',
+            convention_id='phaladeepika-full-graha-drishti-v1',
+            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            planet='Chandra',
+            aspectors=['Surya', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani'],
+        ),
     ),
     'purchase': (
         _rule('purchase.chandra-lagna', 'Chandra occupies Lagna',
@@ -184,6 +248,7 @@ ELECTION_CHART_MANUAL_REMAINDERS: dict[str, tuple[str, ...]] = {
     'house_purchase': (
         'Assess whether a malefic occupies the 7th house.',
     ),
+    'gold': (),
     'purchase': (
         'Keep malefics outside the 8th and 12th houses, and assess whether benefics occupy the 2nd, 10th or 11th.',
     ),

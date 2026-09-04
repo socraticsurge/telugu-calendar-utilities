@@ -28,7 +28,7 @@ from playwright.sync_api import sync_playwright
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SMOKE_PATH = REPO_ROOT / 'tests' / 'test_browser_smoke.py'
 OUTPUT_DIR = (
-    REPO_ROOT / 'docs' / 'screenshots' / 'muhurtam-chart-screening-2026-08-29'
+    REPO_ROOT / 'docs' / 'screenshots' / 'gold-chart-screening-2026-09-04'
 )
 
 
@@ -87,9 +87,34 @@ CAPTURES = (
         'failed an exact chart requirement',
     ),
     Capture(
-        'fixture-gold-manual-only-desktop-1440x900.png',
-        'manual-only', 'gold', 'drik', 1440, 900, 'manual-only',
-        'chart review remains manual',
+        'fixture-gold-pass-desktop-1440x900.png',
+        'gold-pass', 'gold', 'drik', 1440, 900, 'screened',
+        'Gold event-specific chart clauses resolved',
+    ),
+    Capture(
+        'fixture-gold-pass-mobile-390x844.png',
+        'gold-pass', 'gold', 'drik', 390, 844, 'screened',
+        'Gold event-specific chart clauses resolved',
+    ),
+    Capture(
+        'fixture-gold-cap-desktop-1440x900.png',
+        'gold-cap', 'gold', 'drik', 1440, 900, 'screened-capped',
+        'Condition not met',
+    ),
+    Capture(
+        'fixture-gold-cap-mobile-390x844.png',
+        'gold-cap', 'gold', 'drik', 390, 844, 'screened-capped',
+        'Condition not met',
+    ),
+    Capture(
+        'fixture-gold-unknown-desktop-1440x900.png',
+        'gold-unknown', 'gold', 'drik', 1440, 900, 'screened-review',
+        'Indeterminate at calculation boundary',
+    ),
+    Capture(
+        'fixture-gold-unknown-mobile-390x844.png',
+        'gold-unknown', 'gold', 'drik', 390, 844, 'screened-review',
+        'Indeterminate at calculation boundary',
     ),
     Capture(
         'fixture-unsupported-system-tablet-landscape-1024x768.png',
@@ -169,12 +194,14 @@ def _capture_regular(browser, smoke, base_url: str, capture: Capture) -> dict:
                 f'actual status classes were {actual}; result={result.inner_text()[:800]!r}'
             )
         detail_selector = None
-        if capture.scenario == 'positive':
+        if capture.scenario == 'positive' or capture.scenario in {
+            'gold-pass', 'gold-cap', 'gold-unknown',
+        }:
             detail_selector = '.mu-reason-details:has(.mu-rg-computed)'
         elif capture.scenario == 'mixed':
             detail_selector = '.mu-reason-details:has(.mu-chart-rule--unknown)'
         if detail_selector and result.locator(detail_selector).count():
-            result.locator(detail_selector).first.locator('summary').click()
+            result.locator(detail_selector).first.locator('summary').first.click()
 
         result_text = result.text_content() or ''
         assert capture.expected_copy in result_text, (

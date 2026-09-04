@@ -96,10 +96,10 @@ def test_crosswalk_covers_every_browser_prerequisite_exactly():
 def test_crosswalk_counts_and_rule_ids_are_stable_and_unique():
     crosswalk = build_crosswalk()
     assert crosswalk['counts']['activities'] == 30
-    assert crosswalk['counts']['rows'] == 318
+    assert crosswalk['counts']['rows'] == 322
     assert crosswalk['counts']['deterministic_panchangam_rows'] == 175
     assert crosswalk['counts']['personal_rule_rows'] == 5
-    assert crosswalk['counts']['election_chart_rule_rows'] == 23
+    assert crosswalk['counts']['election_chart_rule_rows'] == 27
     assert crosswalk['counts']['manual_display_rows'] == 115
     ids = [row['rule_id'] for row in crosswalk['rows']]
     assert len(ids) == len(set(ids))
@@ -194,6 +194,28 @@ def test_exact_personal_and_chart_predicate_values_are_exposed():
     }
     assert property_rule['ranking_effect'] == (
         'post_screen_tie_break_preference')
+    assert property_rule['automation_rationale'] == (
+        'Whole Sign house occupancy is a bounded predicate over the exact '
+        'nine-Graha election chart.')
+
+    gold_rule = rows['gold.surya-well-situated']
+    assert gold_rule['automation_rationale'] == (
+        'The named, versioned interpretation convention is a bounded '
+        'predicate over the exact nine-Graha election chart.')
+    assert 'between-sample transition' in (
+        gold_rule['configured_inputs']['sample_aggregation'])
+
+    non_gold_chart_rows = [
+        row for row in rows.values()
+        if row['predicate_class'].startswith('election-chart.')
+        and row['activity'] != 'gold'
+    ]
+    assert len(non_gold_chart_rows) == 23
+    assert all(
+        'between-sample transition'
+        not in row['configured_inputs']['sample_aggregation']
+        for row in non_gold_chart_rows
+    )
 
 
 def test_manual_display_rows_preserve_exact_contract_values():
@@ -209,6 +231,21 @@ def test_manual_display_rows_preserve_exact_contract_values():
             assert row['automation_mode'] == 'manual'
             assert row['implementation_status'] == (
                 'manual_displayed_not_computed')
+
+
+def test_gold_manual_clause_is_explicitly_fallback_only():
+    rows = {
+        row['rule_id']: row
+        for row in build_crosswalk()['rows']
+    }
+    gold = rows['gold.manual-1']
+    assert gold['applicability'] == (
+        'python_or_mcp_or_non_drik_or_exact_chart_unavailable')
+    assert gold['ranking_effect'] == (
+        'fallback_only_practitioner_review_tier_cap')
+    assert gold['implementation_note'] == (
+        'Not displayed as a residual manual Gold check after a successful '
+        'exact-chart screen.')
 
 
 def test_missing_claim_locator_fails_instead_of_inventing_authority():

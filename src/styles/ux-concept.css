@@ -1518,6 +1518,16 @@ h2.panel-heading { display: none !important; }
 }
 .mu-chart-status--screened { border-left-color: var(--ux-good); }
 .mu-chart-status--screened strong { color: var(--ux-good); }
+.mu-chart-status--screened-capped {
+  border-left-color: #a2631d;
+  background: #fffaf2;
+}
+.mu-chart-status--screened-capped strong { color: #8a5518; }
+.mu-chart-status--screened-review {
+  border-left-color: #9b3d24;
+  background: #fff7f2;
+}
+.mu-chart-status--screened-review strong { color: #812f1c; }
 .mu-chart-status--disabled,
 .mu-chart-status--unavailable,
 .mu-chart-status--unsupported-system,
@@ -1540,7 +1550,9 @@ h2.panel-heading { display: none !important; }
 
 .mu-rg-computed .mu-rg-label {
   width: 7.4rem;
+  margin: 0;
   color: var(--ux-good);
+  font-size: inherit;
 }
 
 .mu-chart-rule {
@@ -1555,8 +1567,18 @@ h2.panel-heading { display: none !important; }
   font-size: var(--ux-text-xs);
 }
 
+.mu-chart-rule small {
+  flex: 0 0 100%;
+  color: var(--ux-muted);
+  font-size: var(--ux-text-xs);
+  line-height: 1.45;
+}
+
 .mu-chart-rule--pass b { color: var(--ux-good); }
+.mu-chart-rule--qualify.mu-chart-rule--fail b,
 .mu-chart-rule--unknown b { color: #8a5518; }
+.mu-chart-rule--reject.mu-chart-rule--fail b { color: #9b3d24; }
+.mu-chart-rule--prefer.mu-chart-rule--fail b { color: var(--ux-muted); }
 .mu-chart-boundary {
   margin: var(--ux-space-2) 0 0 !important;
   color: var(--ux-muted) !important;
@@ -1568,6 +1590,58 @@ h2.panel-heading { display: none !important; }
   color: var(--ux-muted) !important;
   font-size: var(--ux-text-xs);
   line-height: 1.5;
+}
+
+.mu-rule-convention {
+  padding-top: var(--ux-space-2);
+  border-top: 1px solid var(--ux-line-soft);
+}
+
+.mu-rule-policy {
+  padding: var(--ux-space-2);
+  border-left: 3px solid #c98a3a;
+  border-radius: 0 6px 6px 0;
+  background: #fff8ee;
+}
+
+.mu-technical-provenance {
+  margin-top: var(--ux-space-2);
+  border-top: 1px solid var(--ux-line-soft);
+  color: var(--ux-muted);
+  font-size: var(--ux-text-xs);
+}
+
+.mu-technical-provenance summary {
+  min-height: 44px;
+  padding: var(--ux-space-2) 0;
+  color: var(--ux-brand);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mu-technical-provenance p {
+  margin: 0 0 var(--ux-space-2) !important;
+  overflow-wrap: anywhere;
+}
+
+.mu-chart-disposition {
+  padding: 0.1rem 0.48rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: var(--ux-text-xs);
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.mu-chart-disposition--capped {
+  background: #fff8e8;
+  color: #825015;
+}
+
+.mu-chart-disposition--review {
+  background: #fff1eb;
+  color: #812f1c;
 }
 
 .mu-rule-reference code,

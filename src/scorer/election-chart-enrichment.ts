@@ -59,6 +59,9 @@ export interface ElectionChartEnrichment<TSlot extends EnrichableMuhurtamSlot> {
   personalRemovedCount: number;
   personalRemovedRules: Array<{ ruleId: string; label: string; count: number }>;
   boundaryReviewCount: number;
+  qualificationCappedCount: number;
+  reviewGatedCount: number;
+  overlappingDispositionCount: number;
   message: string;
   engine: ElectionChartDerivation['engine'] | null;
 }
@@ -210,6 +213,9 @@ function baseResult<TSlot extends EnrichableMuhurtamSlot>(
     personalRemovedCount: 0,
     personalRemovedRules: [],
     boundaryReviewCount: 0,
+    qualificationCappedCount: 0,
+    reviewGatedCount: 0,
+    overlappingDispositionCount: 0,
     message,
     engine: null,
   };
@@ -226,6 +232,7 @@ function reviewGatedResult<TSlot extends EnrichableMuhurtamSlot>(
     tier: slot.tier === 'Excellent' ? 'Good' : slot.tier,
     dayDosha: slot.dayDosha || 'practitioner_review',
   }));
+  result.reviewGatedCount = result.slots.length;
   return result;
 }
 
@@ -330,6 +337,9 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
   let chartRemovedCount = 0;
   let personalRemovedCount = 0;
   let boundaryReviewCount = 0;
+  let qualificationCappedCount = 0;
+  let reviewGatedCount = 0;
+  let overlappingDispositionCount = 0;
   const personalRemovedRules = new Map<string, { ruleId: string; label: string; count: number }>();
   let engine: ElectionChartDerivation['engine'] | null = null;
   let requestCount = 0;
@@ -398,12 +408,14 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
             return boundaryAffectsPersonal ? { ...facts, lagna: null } : facts;
           }),
         );
-        const screening = boundaryAffectsGeneric
-          ? {
-            ...evaluateElectionSnapshots(options.activity, []),
-            boundaryConventionUncertain: true,
-          }
-          : evaluateElectionSnapshots(options.activity, canonicalCharts);
+        const screening = {
+          ...evaluateElectionSnapshots(options.activity, canonicalCharts, {
+            houseFrameUncertain: boundaryAffectsGeneric,
+          }),
+          ...(boundaryAffectsGeneric
+            ? { boundaryConventionUncertain: true }
+            : {}),
+        };
         if (personal.rejected) {
           removedCount += 1;
           personalRemovedCount += 1;
@@ -432,12 +444,22 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
             personal_outcomes: personal.outcomes,
           },
         };
-        if ((
-          screening.needsReview || !screening.stable
-          || personal.needsReview || !personal.stable
-        ) && slot.tier === 'Excellent') {
-          slot.tier = 'Good';
-          slot.dayDosha ||= 'practitioner_review';
+        const qualificationFailed = screening.qualificationFailed;
+        const needsReview = screening.needsReview || personal.needsReview;
+        if (qualificationFailed) {
+          qualificationCappedCount += 1;
+          if (slot.tier === 'Excellent') slot.tier = 'Good';
+          slot.dayDosha ||= 'chart_qualification';
+        }
+        if (needsReview) {
+          reviewGatedCount += 1;
+          if (slot.tier === 'Excellent') slot.tier = 'Good';
+          if (!slot.dayDosha || slot.dayDosha === 'chart_qualification') {
+            slot.dayDosha = 'practitioner_review';
+          }
+        }
+        if (qualificationFailed && needsReview) {
+          overlappingDispositionCount += 1;
         }
         survivors.push(slot);
       }
@@ -474,6 +496,9 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
         personalRemovedCount,
         personalRemovedRules: [...personalRemovedRules.values()],
         boundaryReviewCount,
+        qualificationCappedCount,
+        reviewGatedCount,
+        overlappingDispositionCount,
         message: `${processed} highest-ranked candidates received exact chart screening before screening stopped early; only ${shown.length} already-screened survivor${shown.length === 1 ? ' is' : 's are'} shown.${removalSummary} Unprocessed candidates were not shown. ${unavailableMessage(error)}`,
         engine,
       };
@@ -495,6 +520,20 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
       : '',
   ].filter(Boolean);
   const removalSummary = removalParts.length ? ` ${removalParts.join('; ')}.` : '';
+  const dispositionParts = [
+    qualificationCappedCount
+      ? `${qualificationCappedCount} retained slot${qualificationCappedCount === 1 ? ' has' : 's have'} a conclusive event-specific condition miss; the raw score is unchanged and the maximum rating is Good`
+      : '',
+    reviewGatedCount
+      ? `${reviewGatedCount} retained slot${reviewGatedCount === 1 ? ' is' : 's are'} indeterminate at a calculation boundary or missing fact; the raw score is unchanged and the maximum rating is Good pending review`
+      : '',
+  ].filter(Boolean);
+  const dispositionSummary = dispositionParts.length
+    ? ` ${dispositionParts.join('; ')}.`
+    : '';
+  const overlapSummary = overlappingDispositionCount
+    ? ` ${overlappingDispositionCount} retained slot${overlappingDispositionCount === 1 ? ' is' : 's are'} included in both disposition counts because a conclusive miss and a separate unknown can coexist.`
+    : '';
 
   return {
     state: 'screened',
@@ -506,13 +545,14 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
     personalRemovedCount,
     personalRemovedRules: [...personalRemovedRules.values()],
     boundaryReviewCount,
+    qualificationCappedCount,
+    reviewGatedCount,
+    overlappingDispositionCount,
     message: candidateLimitReached
-      ? `${processed} highest-ranked candidates received chart screening; the per-search safety budget was reached, so ${Math.min(survivors.length, RESULT_LIMIT)} surviving slot${Math.min(survivors.length, RESULT_LIMIT) === 1 ? '' : 's'} are shown.${removalSummary}${boundaryReviewCount ? ` ${boundaryReviewCount} boundary-adjacent candidate${boundaryReviewCount === 1 ? ' remains' : 's remain'} review-gated.` : ''}`
+      ? `${processed} highest-ranked candidates received chart screening; the per-search safety budget was reached, so ${Math.min(survivors.length, RESULT_LIMIT)} surviving slot${Math.min(survivors.length, RESULT_LIMIT) === 1 ? '' : 's'} are shown.${removalSummary}${dispositionSummary}${overlapSummary}`
       : removedCount
-        ? `${processed} shortlisted slots received chart screening.${removalSummary}${boundaryReviewCount ? ` ${boundaryReviewCount} boundary-adjacent candidate${boundaryReviewCount === 1 ? ' remains' : 's remain'} review-gated.` : ''}`
-        : boundaryReviewCount
-          ? `${processed} shortlisted slots received chart screening; ${boundaryReviewCount} boundary-adjacent candidate${boundaryReviewCount === 1 ? ' remains' : 's remain'} review-gated because external Lagna transition conventions differ.`
-          : `${processed} shortlisted slots received exact chart screening across every sampled Lagna-stable state.`,
+        ? `${processed} shortlisted slots received chart screening.${removalSummary}${dispositionSummary}${overlapSummary}`
+        : `${processed} shortlisted slots received exact chart screening across every sampled state.${dispositionSummary}${overlapSummary}`,
     engine,
   };
 }

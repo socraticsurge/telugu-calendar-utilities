@@ -3,32 +3,36 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime
+from itertools import pairwise
 from typing import Any
 
-from .election_chart_rules import ELECTION_CHART_PLANETS, ELECTION_CHART_RULES
+from .election_assessors.facts import planet_houses, planet_positions
+from .election_assessors.primitives import (
+    GOLD_MAX_SAMPLE_GAP_MINUTES,
+    PrimitiveOutcome,
+    evaluate_full_aspect,
+    evaluate_well_situated,
+    gold_transition_uncertainty,
+)
+from .election_chart_rules import ELECTION_CHART_RULES
 
 
-def _planet_houses(chart: Mapping[str, Any]) -> dict[str, int] | None:
-    planets = chart.get('planets')
-    if not isinstance(planets, list) or len(planets) != len(ELECTION_CHART_PLANETS):
-        return None
-    result: dict[str, int] = {}
-    for item in planets:
-        if not isinstance(item, Mapping):
-            return None
-        name, house = item.get('name'), item.get('house')
-        if name not in ELECTION_CHART_PLANETS or type(house) is not int or not 1 <= house <= 12:
-            return None
-        if name in result:
-            return None
-        result[name] = house
-    return result if set(result) == set(ELECTION_CHART_PLANETS) else None
-
-
-def _evaluate_rule(rule: Mapping[str, Any], houses: Mapping[str, int] | None) -> str:
-    if houses is None:
-        return 'unknown'
+def _evaluate_rule(
+    rule: Mapping[str, Any],
+    houses: Mapping[str, int] | None,
+    positions: Mapping[str, Any] | None,
+    *,
+    house_frame_uncertain: bool = False,
+) -> PrimitiveOutcome:
     kind = rule['kind']
+    if kind == 'planet_well_situated':
+        return evaluate_well_situated(
+            rule, positions, house_frame_uncertain=house_frame_uncertain)
+    if kind == 'planet_receives_full_aspect':
+        return evaluate_full_aspect(rule, positions)
+    if houses is None or house_frame_uncertain:
+        return PrimitiveOutcome('unknown')
     if kind == 'house_empty':
         passed = rule['house'] not in houses.values()
     elif kind == 'planet_not_house':
@@ -38,8 +42,27 @@ def _evaluate_rule(rule: Mapping[str, Any], houses: Mapping[str, int] | None) ->
     elif kind == 'any_planet_in_houses':
         passed = any(houses.get(planet) in rule['houses'] for planet in rule['planets'])
     else:
-        return 'unknown'
-    return 'pass' if passed else 'fail'
+        return PrimitiveOutcome('unknown')
+    return PrimitiveOutcome('pass' if passed else 'fail')
+
+
+def _outcome(rule: Mapping[str, Any], result: PrimitiveOutcome) -> dict:
+    outcome = {
+        'rule_id': rule['id'],
+        'label': rule['label'],
+        'effect': rule['effect'],
+        'source_claim': rule['source_claim'],
+        'source_locator': rule['source_locator'],
+        'status': result.status,
+        'evidence': list(result.evidence),
+    }
+    for key in (
+        'convention_id', 'convention_label', 'formula', 'method_claims',
+        'decision_policy_claim',
+    ):
+        if key in rule:
+            outcome[key] = rule[key]
+    return outcome
 
 
 def _summary(outcomes: list[dict], *, stable: bool = True) -> dict:
@@ -56,22 +79,80 @@ def _summary(outcomes: list[dict], *, stable: bool = True) -> dict:
             outcome['effect'] == 'prefer' and outcome['status'] == 'pass'
             for outcome in outcomes
         ),
+        'qualification_failed': any(
+            outcome['effect'] == 'qualify' and outcome['status'] == 'fail'
+            for outcome in outcomes
+        ),
         'stable': stable,
     }
 
 
-def evaluate_election_chart(activity: str, chart: Mapping[str, Any]) -> dict:
+def _instant_minutes_between(
+    start_chart: Mapping[str, Any],
+    end_chart: Mapping[str, Any],
+) -> float | None:
+    values = []
+    for chart in (start_chart, end_chart):
+        raw = chart.get('instant')
+        if not isinstance(raw, str):
+            return None
+        try:
+            parsed = datetime.fromisoformat(raw.replace('Z', '+00:00'))
+        except ValueError:
+            return None
+        if parsed.tzinfo is None:
+            return None
+        values.append(parsed)
+    return (values[1] - values[0]).total_seconds() / 60
+
+
+def _gold_transition_evidence(
+    charts: list[Mapping[str, Any]],
+) -> dict[str, list[str]]:
+    rules = ELECTION_CHART_RULES.get('gold', ())
+    evidence: dict[str, list[str]] = {}
+    for start_chart, end_chart in pairwise(charts):
+        start_positions = planet_positions(start_chart)
+        end_positions = planet_positions(end_chart)
+        if start_positions is None or end_positions is None:
+            continue
+        gap_minutes = _instant_minutes_between(start_chart, end_chart)
+        if (
+            gap_minutes is None
+            or gap_minutes <= 0
+            or gap_minutes > GOLD_MAX_SAMPLE_GAP_MINUTES
+        ):
+            for rule in rules:
+                evidence.setdefault(rule['id'], []).append(
+                    'The chart instants do not prove the required '
+                    'ten-minute transition coverage.'
+                )
+            continue
+        for rule in rules:
+            detail = gold_transition_uncertainty(
+                rule, start_positions, end_positions, gap_minutes,
+            )
+            if detail and detail not in evidence.setdefault(rule['id'], []):
+                evidence[rule['id']].append(detail)
+    return evidence
+
+
+def evaluate_election_chart(
+    activity: str,
+    chart: Mapping[str, Any],
+    *,
+    house_frame_uncertain: bool = False,
+) -> dict:
     """Evaluate all deterministic rules for one exact chart snapshot."""
-    houses = _planet_houses(chart)
+    houses = planet_houses(chart)
+    positions = planet_positions(chart)
     outcomes = [
-        {
-            'rule_id': rule['id'],
-            'label': rule['label'],
-            'effect': rule['effect'],
-            'source_claim': rule['source_claim'],
-            'source_locator': rule['source_locator'],
-            'status': _evaluate_rule(rule, houses),
-        }
+        _outcome(rule, _evaluate_rule(
+            rule,
+            houses,
+            positions,
+            house_frame_uncertain=house_frame_uncertain,
+        ))
         for rule in ELECTION_CHART_RULES.get(activity, ())
     ]
     return _summary(outcomes)
@@ -89,6 +170,8 @@ def evaluate_election_window(
 def evaluate_election_snapshots(
     activity: str,
     charts: list[Mapping[str, Any]],
+    *,
+    house_frame_uncertain: bool = False,
 ) -> dict:
     """Conservatively combine all sampled states inside an offered window."""
     if not charts:
@@ -100,10 +183,26 @@ def evaluate_election_snapshots(
                 'source_claim': rule['source_claim'],
                 'source_locator': rule['source_locator'],
                 'status': 'unknown',
+                'evidence': [],
+                **({
+                    key: rule[key]
+                    for key in (
+                        'convention_id', 'convention_label', 'formula',
+                        'method_claims', 'decision_policy_claim',
+                    )
+                    if key in rule
+                }),
             }
             for rule in ELECTION_CHART_RULES.get(activity, ())
         ], stable=False)
-    evaluations = [evaluate_election_chart(activity, chart) for chart in charts]
+    evaluations = [
+        evaluate_election_chart(
+            activity, chart, house_frame_uncertain=house_frame_uncertain)
+        for chart in charts
+    ]
+    transition_evidence = (
+        _gold_transition_evidence(charts) if activity == 'gold' else {}
+    )
     first = evaluations[0]
     outcomes = []
     stable = True
@@ -118,7 +217,9 @@ def evaluate_election_snapshots(
         ]
         if any(status != statuses[0] for status in statuses):
             stable = False
-        if 'unknown' in statuses:
+        if first_outcome['effect'] in {'reject', 'qualify'} and 'fail' in statuses:
+            status = 'fail'
+        elif 'unknown' in statuses:
             status = 'unknown'
         elif first_outcome['effect'] == 'reject':
             status = 'fail' if 'fail' in statuses else 'pass'
@@ -128,5 +229,35 @@ def evaluate_election_snapshots(
             status = 'fail'
         else:
             status = 'unknown'
-        outcomes.append({**first_outcome, 'status': status})
+        extra_evidence = transition_evidence.get(first_outcome['rule_id'], ())
+        transition_applied = status == 'pass' and bool(extra_evidence)
+        if transition_applied:
+            status = 'unknown'
+            stable = False
+        matching = [
+            next(
+                (item for item in result['outcomes']
+                 if item['rule_id'] == first_outcome['rule_id']),
+                None,
+            )
+            for result in evaluations
+        ]
+        evidence: list[str] = []
+        for item in matching:
+            if not item or item['status'] != status:
+                continue
+            for detail in item.get('evidence', ()):
+                if detail not in evidence:
+                    evidence.append(detail)
+                if len(evidence) == 3:
+                    break
+            if len(evidence) == 3:
+                break
+        for detail in extra_evidence:
+            if not transition_applied or detail in evidence:
+                continue
+            evidence.append(detail)
+            if len(evidence) == 3:
+                break
+        outcomes.append({**first_outcome, 'status': status, 'evidence': evidence})
     return _summary(outcomes, stable=stable)

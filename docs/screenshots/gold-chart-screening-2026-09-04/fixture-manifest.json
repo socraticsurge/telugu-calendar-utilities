@@ -1,0 +1,202 @@
+{
+  "capturedAt": "2026-09-04T13:21:07+00:00",
+  "source": "tools/capture_muhurta_chart_screenshots.py",
+  "liveServicesUsed": false,
+  "captures": [
+    {
+      "file": "fixture-positive-purchase-desktop-1440x900.png",
+      "scenario": "positive",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Exact chart screening applied",
+      "sha256": "344fc807b2c5c1ae8f3884f773d1e27dab972559ff630c6ba9fe2eed3529384d"
+    },
+    {
+      "file": "fixture-positive-purchase-mobile-390x844.png",
+      "scenario": "positive",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Exact chart screening applied",
+      "sha256": "2433d207c8b39298423568f8674478de4c02d47c5067f5d7455020e02df96678"
+    },
+    {
+      "file": "fixture-mixed-rule-unknown-tablet-768x1024.png",
+      "scenario": "mixed",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "expectedState": "screened",
+      "expectedCopy": "changed within this window",
+      "sha256": "697aec9f2f6913b0c09ffbcd6bd95ab3494810c46c5ad3e9fb6e86bb92757a6f"
+    },
+    {
+      "file": "fixture-travel-mandatory-failure-desktop-1440x900.png",
+      "scenario": "failure",
+      "activity": "travel",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "failed an exact chart requirement",
+      "sha256": "4e14460687bbeb2f5e36433c5ac6bd2a8a501c6646d8f5b508093560a10af934"
+    },
+    {
+      "file": "fixture-gold-pass-desktop-1440x900.png",
+      "scenario": "gold-pass",
+      "activity": "gold",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Gold event-specific chart clauses resolved",
+      "sha256": "eadbb7bc9f99dae0960ad8e02be7eb8a518366391de012dae0b7b7d13c7ca82c"
+    },
+    {
+      "file": "fixture-gold-pass-mobile-390x844.png",
+      "scenario": "gold-pass",
+      "activity": "gold",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Gold event-specific chart clauses resolved",
+      "sha256": "e9825a44ca43cc803d5bbcfbd5f9474958b56a748439d25dd8f68376995ac726"
+    },
+    {
+      "file": "fixture-gold-cap-desktop-1440x900.png",
+      "scenario": "gold-cap",
+      "activity": "gold",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened-capped",
+      "expectedCopy": "Condition not met",
+      "sha256": "5ad0e0d6a19638414fb492dfa4703a8083509cf74ccd33a2fd912a171024a77e"
+    },
+    {
+      "file": "fixture-gold-cap-mobile-390x844.png",
+      "scenario": "gold-cap",
+      "activity": "gold",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened-capped",
+      "expectedCopy": "Condition not met",
+      "sha256": "26b424351b63b7315540705423876c37b6f9f36d615641a0f2a0844476abf1e4"
+    },
+    {
+      "file": "fixture-gold-unknown-desktop-1440x900.png",
+      "scenario": "gold-unknown",
+      "activity": "gold",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened-review",
+      "expectedCopy": "Indeterminate at calculation boundary",
+      "sha256": "d9317fc23ed7a67f2e0206dad2578e9b75097eda375eec0876af2d804c4bf921"
+    },
+    {
+      "file": "fixture-gold-unknown-mobile-390x844.png",
+      "scenario": "gold-unknown",
+      "activity": "gold",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened-review",
+      "expectedCopy": "Indeterminate at calculation boundary",
+      "sha256": "d7716d5185a6bebf8345e5bf7cecb7fef126ee81d3a6dbb4f747b610f64b7fdc"
+    },
+    {
+      "file": "fixture-unsupported-system-tablet-landscape-1024x768.png",
+      "scenario": "unsupported",
+      "activity": "purchase",
+      "system": "surya-siddhanta",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "expectedState": "unsupported-system",
+      "expectedCopy": "Selected system kept separate",
+      "sha256": "5a12153c6d22ba1acf1e4f853724703eb343f4d00436f556a7e49cc7dafe56dc"
+    },
+    {
+      "file": "fixture-offline-unavailable-mobile-390x844.png",
+      "scenario": "offline",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "unavailable",
+      "expectedCopy": "Panchangam shortlist shown",
+      "sha256": "32ea273a913e7d19c7c7d16f5ef21428babc9b3d781c3d18504486a31a14e3c0"
+    },
+    {
+      "file": "fixture-malformed-response-unavailable-desktop-1440x900.png",
+      "scenario": "malformed",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "unavailable",
+      "expectedCopy": "Panchangam shortlist shown",
+      "sha256": "fd31f3d7ba3098de8c889e2ffced667dfe2fcaa25fab3764f029a879cc8a7970"
+    },
+    {
+      "file": "fixture-chart-screening-loading-desktop-1440x900.png",
+      "scenario": "loading",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "loading",
+      "expectedCopy": "screening exact election charts",
+      "sha256": "abb8cd20528bbd84a236fd96cc073856edf6bcbaa5c8264f9ab5e5f2b6d9e889"
+    },
+    {
+      "file": "fixture-timeout-unavailable-tablet-768x1024.png",
+      "scenario": "timeout",
+      "activity": "purchase",
+      "system": "drik",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "expectedState": "unavailable",
+      "expectedCopy": "Panchangam shortlist shown",
+      "sha256": "219a0c3df4e7b706428ea0c4aa791298b9a83a98d917c5b615099aef8969c8c2"
+    }
+  ]
+}

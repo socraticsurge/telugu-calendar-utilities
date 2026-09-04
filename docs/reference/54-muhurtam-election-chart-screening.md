@@ -5,12 +5,12 @@ existing Panchangam and personal Muhurtam ranking. It answers four separate
 questions without collapsing them into one opaque score:
 
 1. Which candidate windows survive the existing day, slot and personal gates?
-2. Which source statements can be expressed as deterministic Whole Sign house
-   predicates?
-3. Which candidate windows fail those predicates in any sampled Lagna-stable
-   state?
-4. Which source statements still require a practitioner because the text does
-   not define a complete computational model?
+2. Which source statements can be expressed as deterministic predicates,
+   either directly or through a named, versioned interpretation convention?
+3. Does each predicate reject a window, qualify its displayed tier, or supply
+   tie-break evidence?
+4. Which source statements or chart facts remain genuinely unresolved after
+   that computation?
 
 > **Assurance boundary:** a chart-screened result has passed the automated
 > predicates listed below at the start, final represented minute, each
@@ -24,6 +24,12 @@ questions without collapsing them into one opaque score:
 > compatibility reading, or a professional recommendation. A high relative
 > tier still means “best among the candidates evaluated,” not universally
 > auspicious.
+
+> **Completion boundary:** “resolved” means only that every implemented,
+> event-specific predicate for the selected activity has a conclusive outcome.
+> It does not mean that the inherited general election-chart baseline is
+> complete. That separate program remains tracked in
+> [#284](https://github.com/socraticsurge/telugu-calendar-utilities/issues/284).
 
 ## Architecture and data minimization
 
@@ -42,7 +48,7 @@ flowchart LR
     LAGNA["Validated local Lagna map<br/>selected city and minute"]
     PROJECT["Local Whole Sign projection<br/>planet Rashi relative to Lagna"]
     RULES["Generated deterministic rules<br/>evaluated in browser"]
-    OUT["Reject failures<br/>tie-break preferences<br/>show unknowns"]
+    OUT["Reject failures<br/>cap unmet qualifications<br/>tie-break preferences<br/>show unknowns"]
 
     ROLE --> BASE
     BASE --> BATCH --> GATE --> SIDE --> GATE --> PROJECT --> RULES --> OUT
@@ -268,18 +274,31 @@ duplicates and does not certify that separate artifact-shape behavior.
 The canonical table is
 `telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES`.
 `tools/export_election_chart_rules.py` projects it to the browser; the generated
-JSON is not an independent authority. There are 23 deterministic predicates
-across 12 activity profiles.
+JSON is not an independent authority. There are 27 deterministic predicates
+across 13 activity profiles.
 
 `Reject` means a failed predicate removes the window. `Prefer` means a passing
 predicate is tie-break evidence only; it adds no raw score and its absence does
-not reject the window.
+not reject the window. `Qualify` means a positive event condition must pass
+across the sampled window for an `Excellent` label. A known failure retains the
+window, leaves its raw score unchanged and makes `Good` the maximum displayed
+tier; it is a conclusive event-specific condition miss, not a
+practitioner-review state. An unresolved calculation boundary or missing fact
+also retains the window with unchanged raw score and a maximum `Good` tier,
+but remains review-gated. A slot may have a conclusive miss in one rule and a
+separate unknown in another, so capped and review-gated counts are not
+mutually exclusive; the result reports the exact overlap rather than implying
+that those counts represent unique slots.
 
 Every generated predicate carries both its `source_claim` and a
 claim-specific `source_locator` (chapter/section plus printed and PDF page, or
 verse plus printed page). The UI displays that locator with the computed
 outcome; a generic book title is never substituted for the exact rule
-location.
+location. A rule that requires interpretation also carries a separate
+`convention_id`, formula, and method-claim IDs. Its ranking effect carries a
+separate decision-policy claim. The event source, interpretation sources and
+product policy remain independently inspectable; none acquires another
+layer's authority merely by appearing in the same result.
 
 The same Python module owns `ELECTION_CHART_MANUAL_REMAINDERS`. For each
 screened activity it contains only the qualitative clauses left after the
@@ -288,19 +307,25 @@ re-check the exact condition it just computed. Non-Drik, unavailable and
 Python/MCP results retain their original full `manual_checks` disclosure.
 
 Let `H(p)` be the locally recomputed Whole Sign house of graha `p` using the
-validated selected-city Lagna frame, `G` the complete nine-graha set, and `S`
-a listed set of houses. The four supported predicate
-kinds are exactly:
+validated selected-city Lagna frame, `R(p)` its Rasi, `N(p)` its derived
+Navamsa, `G` the complete nine-graha set, and `S` a listed set of houses. The
+six supported predicate kinds are exactly:
 
 ```text
 house_empty(h)                = every p in G has H(p) != h
 planet_not_house(p, h)        = H(p) != h
 planet_in_houses(p, S)        = H(p) is in S
 any_planet_in_houses(P, S)    = at least one p in P has H(p) in S
+planet_well_situated(p, C)     = no adverse factor selected by convention C
+planet_receives_full_aspect(p) = at least one listed classical graha casts a
+                                  full whole-sign Graha Drishti to R(p)
 ```
 
-There is no implicit aspect, orb, dignity, natural/functional-benefic or
-house-lord calculation behind these predicates.
+The first four predicates are direct configured tests. The last two exist only
+for Gold v1 and name the interpretation conventions that define dignity,
+natural relationship, Navamsa, solar clearance and full-aspect geometry. No
+unpublished orb, functional-benefic, house-lord or composite-strength model is
+hidden behind them.
 
 | Activity | Rule ID | Deterministic predicate | Effect | Source claim |
 |---|---|---|---|---|
@@ -318,6 +343,10 @@ house-lord calculation behind these predicates.
 | Land purchase | `property.kuja-11` | Kuja is in house 11 | Prefer | `muhurta.land_purchase.building` |
 | Land purchase | `property.kuja-not-lagna` | Kuja is not in house 1 | Reject | `muhurta.land_purchase.building` |
 | Completed-house purchase | `house-purchase.kuja-not-lagna` | Kuja is not in house 1 | Reject | `muhurta.house_purchase.completed` |
+| Gold / jewelry | `gold.surya-well-situated` | Surya passes the disclosed Phaladeepika well-placed v1 placement tests | Qualify | `muhurta.gold_jewelry.purchase` |
+| Gold / jewelry | `gold.chandra-well-situated` | Chandra passes the disclosed placement, Navamsa and solar-clearance v1 tests | Qualify | `muhurta.gold_jewelry.purchase` |
+| Gold / jewelry | `gold.surya-fully-aspected` | Surya receives at least one full classical Graha Drishti under v1 | Qualify | `muhurta.gold_jewelry.purchase` |
+| Gold / jewelry | `gold.chandra-fully-aspected` | Chandra receives at least one full classical Graha Drishti under v1 | Qualify | `muhurta.gold_jewelry.purchase` |
 | General purchase | `purchase.chandra-lagna` | Chandra is in house 1 | Prefer | `muhurta.purchase.general` |
 | General purchase | `purchase.shukra-lagna` | Shukra is in house 1 | Prefer | `muhurta.purchase.general` |
 | Entering service | `job.surya-or-kuja-10-11` | Surya or Kuja is in house 10 or 11 | Prefer | `muhurta.service_entry` |
@@ -328,11 +357,19 @@ house-lord calculation behind these predicates.
 | Travel | `travel.kuja-not-8` | Kuja is not in house 8 | Reject | `muhurta.travel` |
 | Surgery | `surgery.house-8-vacant` | House 8 is vacant | Reject | `muhurta.surgery` |
 
-No deterministic chart rule is invented for Gold / jewelry purchase. Its
-source instruction depends on qualitative benefic aspect judgment, but the
-inspected passage does not define the aspect model, benefic model, strength
-threshold or conflict resolution needed for reproducible automation. Gold
-therefore remains `manual-only`, and selecting it causes no chart API call.
+Gold's event clause comes from B. V. Raman, but its operational definitions do
+not. The `phaladeepika-well-placed-v1` convention selects Phaladeepika II.36's
+adverse-placement categories, I.6's fall signs, II.21–22's natural
+relationships, BPHS 6.12's Navamsa sequence, Whole Sign houses, and a disclosed
+12° Chandra solar-clearance product threshold. Surya-Siddhanta X.1 supplies
+historical rationale for a 12-degree lunar-visibility boundary, but its units
+are time-degrees in oblique ascension; v1's shortest-ecliptic-longitude test
+remains an explicit approximation. The
+`phaladeepika-full-graha-drishti-v1` convention selects the full classical
+aspects in Phaladeepika II.23, excludes nodes and partial aspects, and reads
+Raman's unqualified “aspected” literally rather than silently changing it to
+“benefically aspected.” Exact formulas and boundaries are recorded in
+[Gold / Jewelry](28-gold-jewelry-profile.md).
 
 ## Activity-specific personal roles
 
@@ -387,9 +424,12 @@ end_sample   = local date + max(start minute, end minute - 1)
 ```
 
 The cadence is independent of the precomputed transition source. It prevents
-coverage from depending only on one rounded transition minute. Current
-predicates depend on Rashi, Nakshatra or Whole Sign house states, not a
-continuous degree threshold.
+coverage from depending only on one rounded transition minute. Most predicates
+depend on Rashi, Nakshatra or Whole Sign house states. Gold v1 additionally
+uses Navamsa divisions and a solar-clearance threshold; a known adverse state
+at any sample governs the window, and the documented rounding guards fail
+closed when a sampled value is too close to a boundary. This remains discrete
+coverage, not a continuous-time proof.
 
 The sidecar projects graha degrees to two decimals. For Seemantha's mandatory
 relative-Nakshatra rule, the browser therefore treats the returned Chandra
@@ -415,12 +455,16 @@ on the Lagna Rashi for one or two minutes at a transition. A five-minute guard
 surrounds every local boundary. A window that contains the complete guard on
 both sides is evaluated across both canonical Lagna states. If the offered
 window touches only part of that guard at its start or end, every
-Lagna-dependent general predicate is `unknown`; Travel and Gruhapravesha Lagna
-rules are also `unknown`. The window remains visible, earns no chart preference,
-and is capped below Excellent. Seemantha and Surgery's Moon/Nakshatra personal
-rules remain computable because they do not depend on Lagna. This guard is a
-conservative containment rule, not a claim that the two implementations share
-an exact boundary.
+purely Lagna-dependent general predicate is `unknown`; Travel and
+Gruhapravesha Lagna rules are also `unknown`. Gold's placement assessor treats
+the house factor as unresolved but still evaluates its Rasi, Navamsa and
+solar-clearance factors: a known adverse factor still produces `fail`, while
+the absence of one remains `unknown` because the house condition is not
+proved. Gold's full-aspect rules remain computable because they depend on
+planetary Rashis rather than Lagna. Seemantha and Surgery's Moon/Nakshatra
+personal rules likewise remain computable. This guard is a conservative
+containment rule, not a claim that the two implementations share an exact
+boundary.
 
 The **selected city's** IANA timezone converts each wall time to an exact UTC
 instant; the computer's timezone is irrelevant. A slot minute at or above
@@ -435,12 +479,12 @@ future.
 
 The table below defines the **chart-predicate** window combiner:
 
-| Condition across every sampled state | Reject predicate | Prefer predicate |
-|---|---|---|
-| Pass at every sample | `pass`; retain | `pass`; one tie-break pass |
-| Fail at every sample | `fail`; remove | `fail`; retain with no preference |
-| Any reject failure, even when other samples pass | `fail`; remove and mark the window unstable | Not applicable |
-| Preference statuses differ between samples | Not applicable | `unknown`; retain, require review, no preference |
+| Condition across every sampled state | Reject predicate | Qualify predicate | Prefer predicate |
+|---|---|---|---|
+| Pass at every sample | `pass`; retain | `pass`; retain without a qualification cap | `pass`; one tie-break pass |
+| At least one known failure | `fail`; remove; mark unstable if statuses differ | `fail`; retain and cap below Excellent; mark unstable if statuses differ | `fail` only when every sample fails; retain with no preference |
+| No failure, but at least one `unknown` | `unknown`; retain for review | `unknown`; retain for review and cap below Excellent | `unknown`; retain for review with no preference |
+| Known preference statuses differ | Not applicable | Not applicable | `unknown`; retain for review with no preference |
 
 A complete, valid batch is a precondition for this table. A malformed or
 incomplete network response does not become a retained `unknown`; that batch is
@@ -451,8 +495,11 @@ preserved: only those already-screened survivors remain visible, while the
 failed batch and all unprocessed candidates are withheld. The result is
 labelled partial exact chart screening, never a completed run. Within a valid
 batch, `unknown` represents a supported unresolved evaluation: a preference
-whose status differs across sampled states, or a Lagna-dependent rule in a
-partial boundary-guard window.
+whose status differs across sampled states, a Lagna-dependent rule in a partial
+boundary-guard window, a rounded Navamsa boundary or the Gold v1 solar-clearance
+precision guard. For `reject` and `qualify`, a known failure in any sample takes
+precedence over an unrelated `unknown`; the failure is not hidden by missing
+evidence elsewhere in the window.
 
 The local personal-role combiner uses the same fail-at-any-sample rule for a
 prohibition. When a fully resolved personal preference is not present at every
@@ -467,11 +514,14 @@ coverage and reduces dependence on one engine's exact boundary minute, but it
 remains a discrete check rather than proof that no other astronomical status
 changed and returned between samples.
 
-A chart `unknown` or chart-unstable retained result, or an unresolved required
-personal fact, is capped from `Excellent` to `Good` and marked
-`practitioner_review`. A hard chart or personal `reject` failure removes the
-window. Positive personal preferences and chart preferences never change the
-raw score. Ordering is:
+A chart `unknown` or an unresolved required personal fact is capped from
+`Excellent` to `Good` and marked `practitioner_review`. A resolved `qualify`
+failure is also capped, but it is labelled as an unmet computed qualification,
+not practitioner review. Instability by itself is not an unresolved state: a
+pass/fail Gold qualification is unstable but fully assessed because the known
+failure governs the window. A hard chart or personal `reject` failure removes
+the window. Positive personal preferences and chart preferences never change
+the raw score. Ordering is:
 
 1. tier;
 2. raw Panchangam/personal score;
@@ -549,20 +599,33 @@ Python/MCP slot orchestrator does not apply them to its ranked result.
 | Pilgrimage | Guru in Lagna/9th preference | No additional chart clause in the cited pilgrimage paragraph; travel safety and planning remain non-astrological |
 | Travel | Kuja outside 8th; primary-traveller Lagna rules | General fortification, whether Guru/Shukra is well placed in Lagna, waxing-Chandra and 7th-house malefic judgment, unresolved published-rule conflicts, travel safety |
 | Surgery | Vacant 8th; Chandra outside patient's Janma Rashi | Operated-body-part Rashi/house, malefic affliction, Mangala strength, Mangala-Shani aspects; clinician instructions always prevail |
-| Gold / jewelry | None | Entire qualitative chart instruction and normal financial/authenticity checks |
+| Gold / jewelry | Surya and Chandra well-placement qualifications; one full classical Graha Drishti to each luminary | No remainder for these four event-specific Gold v1 clauses after a complete, valid Drik screen; the separate general election-chart baseline is not assessed, and financial, authenticity and safety checks remain real-world responsibilities |
 
-“Aspect,” “strong,” “benefic,” “malefic,” “afflicted,” “dignified,” house-lord
-friendship, Navamsa and compatibility are not reduced to guesses. They remain
-manual until a named source and deterministic convention define every required
+The Gold row is conditional on a successful Drik browser screen. Non-Drik,
+unavailable and Python/MCP fallbacks retain the original full chart-check
+disclosure because they did not run this assessor. Gold's Panchangam inputs
+also remain separately disclosed project heuristics; completing the chart
+clause does not promote those inputs into Raman-sourced rules. “Gold
+event-specific chart clauses resolved” is therefore the strongest accurate UI
+claim: it refers only to the four disclosed Gold v1 rules, not completion of
+the general baseline tracked in #284 or a complete election judgment.
+
+Outside the named Gold v1 placement, Navamsa and full-aspect conventions,
+“aspect,” “strong,” “benefic,” “malefic,” “afflicted,” “dignified,” house-lord
+friendship and compatibility are not reduced to guesses. They remain manual
+until a named source and deterministic convention define every required
 choice.
 
 ## Source-claim crosswalk
 
 The complete machine-readable crosswalk is published as
 [Muhurtam rule crosswalk JSON](muhurtam-rule-crosswalk.json). It contains all
-318 configured prerequisite rows across the 30 browser activities: 175
-Panchangam predicates, five personal predicates, 23 election-chart predicates
-and 115 manual display rows. A separate `expert_scope` in the same artefact
+322 configured prerequisite rows across the 30 browser activities: 175
+Panchangam predicates, five personal predicates, 27 election-chart predicates
+and 115 manual display rows. The original Gold manual row remains in this
+exhaustive source inventory because non-Drik, unavailable and Python/MCP
+fallbacks still disclose it; the successful Drik result uses the empty
+clause-level remainder instead. A separate `expert_scope` in the same artefact
 covers all 23 rows for the five canonical Python/MCP-only profiles: 13
 deterministic predicates and 10 manual rows. Thus every prerequisite in all 35
 canonical activity profiles is accounted for without pretending the five
@@ -592,6 +655,11 @@ the readable criterion-by-criterion audit.
 | `muhurta.gruhapravesha` | Raman, Chapter XII, printed pp. 52–54 (PDF pp. 56–58) | [Gruhapravesha](33-gruhapravesha-evidence-audit.md) |
 | `muhurta.land_purchase.building` | Raman, Chapter XII, printed p. 53 (PDF p. 57) | [Land purchase](15-land-purchase-profile.md) |
 | `muhurta.house_purchase.completed` | Raman, Chapter XII, printed p. 53 (PDF p. 57) | [Completed-house purchase](48-completed-house-purchase-profile.md) |
+| `muhurta.gold_jewelry.purchase` | Raman, Chapter X, printed p. 45 (PDF p. 49) | [Gold / Jewelry](28-gold-jewelry-profile.md) |
+| `election_chart.well_placed.phaladeepika_2_36`; `election_chart.dignity.phaladeepika_1_6`; `election_chart.relationships.phaladeepika_2_21_22` | Phaladeepika II.36, I.6 and II.21–22 in the registered 1950 second edition | [Gold / Jewelry](28-gold-jewelry-profile.md) |
+| `election_chart.full_graha_drishti.phaladeepika_2_23` | Phaladeepika II.23, book p. 18 (scan p. 55) | [Gold / Jewelry](28-gold-jewelry-profile.md) |
+| `election_chart.navamsa.bphs_6_12` | *Brihat Parashara Hora Shastra*, Chapter 6, verse 12 | [Gold / Jewelry](28-gold-jewelry-profile.md) |
+| `election_chart.chandra_solar_clearance_policy_v1`; `election_chart.gold_qualification_policy_v1` | Solar clearance: *Surya-Siddhanta* X.1, printed p. 262 (scan p. 315), as historical rationale for an explicit approximation; qualification: named Gold v1 product policy | [Gold / Jewelry](28-gold-jewelry-profile.md) |
 | `muhurta.purchase.general` | Rama Daivajna, *Muhurta Chintamani*, verses 16–17, printed pp. 33–35 (OCR lines 2336–2374) | [General purchase](39-purchase-profile.md) |
 | `muhurta.service_entry` | *Muhurta Chintamani*, verse 26, printed p. 38 (OCR lines 2565–2577) | [Entering service](40-job-contract-evidence-audit.md) |
 | `muhurta.shantika_paushtika` | *Muhurta Chintamani*, verse 34, printed pp. 42–43 (OCR lines 2749–2772) | [Shantika / Paushtika](42-ceremony-evidence-audit.md) |
@@ -599,16 +667,23 @@ the readable criterion-by-criterion audit.
 | `muhurta.travel` | Raman, Chapter XIV, printed pp. 60–61 (PDF pp. 64–65) | [Travel](30-travel-profile.md) |
 | `muhurta.surgery` | Raman, Chapter XV, printed pp. 64–65 (PDF pp. 68–69) | [Surgery](27-surgery-profile.md) |
 
-The two registered editions are [B. V. Raman's *Muhurtha*](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
-and [the Internet Archive *Muhurta Chintamani* scan](https://archive.org/details/muhurta-chintamani-hindi).
+The principal registered editions used on this page are
+[B. V. Raman's *Muhurtha*](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf),
+[the Internet Archive *Muhurta Chintamani* scan](https://archive.org/details/muhurta-chintamani-hindi),
+[Phaladeepika, V. Subrahmanya Sastri's 1950 second edition](https://archive.org/details/Phaladeepika2ndEd.1950ByVSubrahmanyaSastri),
+the [BPHS 6.12 text and translation](https://enjoylearningsanskrit.com/scriptures/parashara/chapter-6/verse-12/),
+and the [Surya-Siddhanta 1935 translation](https://classicalastrologer.com/wp-content/uploads/2018/04/surya_siddhanta_english.pdf).
 Raman is a modern secondary synthesis; the Chintamani scan is an undated
 Sanskrit text with Hindi commentary and incomplete publication metadata.
+The Phaladeepika and BPHS passages supply disclosed interpretation methods for
+Gold v1; they are not presented as the event-specific jewelry source.
 
 ## Implementation ownership and tests
 
 | Layer | Implementation | Contract tests |
 |---|---|---|
 | Canonical deterministic predicates, claim-specific source locators and clause-level manual remainders | `telugu_panchangam/personal/election_chart_rules.py` | `tests/test_election_chart_screening.py`; `src/scorer/__tests__/election-chart-screening.test.ts` |
+| Versioned interpretation conventions, chart-fact parsing, Navamsa, placement and full-aspect primitives | `telugu_panchangam/personal/election_assessors/`; `src/scorer/election-assessors/primitives.ts` | Synthetic Gold predicate oracle plus frozen actual public-gateway outcome cells across Hyderabad and Sydney, two dates, and pass/fail/unknown/conflict/boundary dispositions; Python/TypeScript parity cases in the election-chart screening suites |
 | Complete activity-by-prerequisite source crosswalk | `tools/export_muhurtam_rule_crosswalk.py`; `docs/reference/muhurtam-rule-crosswalk.json` | `tests/test_muhurtam_rule_crosswalk.py`; exporter `--check`; documentation output digest check |
 | Structured all-activity check classification | `telugu_panchangam/personal/activity_check_contract.py`; `tools/export_activity_rules.py`; `src/data/activity-rules.generated.json` | `tests/test_activity_check_contract.py`; `src/scorer/__tests__/activity-check-contract.test.ts` |
 | Pure Python snapshot/window evaluator | `telugu_panchangam/personal/election_chart.py` | `tests/test_election_chart_screening.py` |
@@ -626,32 +701,51 @@ Sanskrit text with Hindi commentary and incomplete publication metadata.
 
 Independent release review found that the original sidecar mock success
 fixtures did not satisfy the browser's node/opposition and related cross-field
-invariants, even though current real-engine probes were coherent. Candidate
-commit `97eece13` adds producer validation and coherent fixtures and passes the
-local 103-test suite, but it is not yet a merged or deployed release. The gate
-remains tracked in
-[#443](https://github.com/socraticsurge/telugu-calendar-utilities/issues/443),
-not a reason to relax the browser validator.
+invariants. The remediation began at candidate `97eece13`, merged through
+DashaFlow PR #1, and is present in the exact released production revision
+`c84fd856`. On 2026-09-04, that revision served an authenticated synthetic
+election-chart derivation through Astro production revision `4106f097` with
+HTTP 200. Producer story
+[#443](https://github.com/socraticsurge/telugu-calendar-utilities/issues/443)
+is closed and Done. The browser validator remains strict; release of the
+producer fix is evidence for keeping, not relaxing, those invariants.
 
-The Python table is the source of truth for the 23 chart predicates. The
+The Python table is the source of truth for the 27 chart predicates. The
 Python personal module and TypeScript mirror carry the same five personal rule
 IDs, effects, locators, input evidence and all-sampled-state result semantics, with
 fixture parity tests. The TypeScript chart evaluator is a browser mirror and
 must never acquire an unexported rule. The sidecar supplies positional facts
 only; it does not decide which activity is auspicious.
 
+Gold's two test fixtures have intentionally different evidentiary roles.
+`tests/fixtures/election_chart_gold_oracle.json` is synthetic and isolates
+predicate transitions. `tests/fixtures/election_chart_gold_gateway_oracle.json`
+freezes unedited HTTP 200 cells produced by Astro revision
+`4106f09708a154f1c2401880ebe8f9c0b9162eb5` and DashaFlow revision
+`c84fd856b17120c80e1bb7e455246a0ec8e429ea`. The actual gateway cells cover
+Hyderabad and Sydney on two dates and collectively yield pass, fail, unknown,
+conflict and boundary Gold outcomes. Tests first verify all nine unique grahas
+and recomputed Whole Sign houses, then require identical Python and TypeScript
+outcomes. These cells prove compatibility with the deployed deterministic
+calculation contract; the separate six-instant Drik comparison above remains
+the external ephemeris evidence.
+
 ## UI review evidence
 
-The committed review-evidence directory at
-`docs/screenshots/muhurtam-chart-screening-2026-08-29/` contains one current
-live-local capture and a reproducible ten-image fixture matrix. The fixture
-matrix covers positive desktop/mobile results, a computed unknown at tablet
-width, mandatory chart failure, manual-only guidance, unsupported-system
-tablet landscape, offline, malformed response, the actual loading phase, and
-the 20-second client timeout. Its `fixture-manifest.json` records the exact
+The current committed review-evidence directory at
+`docs/screenshots/gold-chart-screening-2026-09-04/` contains a reproducible
+15-image fixture matrix. Six fresh Gold images cover pass, conclusive
+condition miss with rating cap, and fail-closed unknown at both 1440×900 and
+390×844. The remaining images preserve generic positive, mixed, mandatory
+failure, unsupported-system, offline, malformed-response, loading, and
+20-second timeout states. Its `fixture-manifest.json` records the exact
 scenario, activity, system, viewport, expected state/copy, and SHA-256 for
 every image. Fixture captures exercise the built application without calling
 a live service.
+
+The earlier `muhurtam-chart-screening-2026-08-29/` directory remains as an
+immutable historical record. Its Gold manual-only image predates this
+assessor and is not evidence for the current runtime state.
 
 Recreate that matrix from a local production build:
 
@@ -697,8 +791,18 @@ For a manual local check, select Drik, an activity with an automated rule, a
 city, and any required primary role. Confirm that the result summary names
 chart screening, failed reject rules do not appear as retained cards, computed
 passes and unknowns are visible, and remaining qualitative checks still say
-they need practitioner review. Repeat with Gold and a non-Drik system: neither
-case should call the chart route or claim that chart screening ran.
+they need practitioner review. Then select Gold with Drik and confirm that the
+chart route runs, all four named qualification outcomes and their observed
+evidence are visible, and a complete result has no duplicate practitioner
+chart remainder. A resolved qualification failure must retain the slot, cap an
+otherwise Excellent tier to Good, keep the raw score unchanged, and say that
+the event-specific condition was conclusively not met without asking for
+practitioner review. An `unknown` must be labelled indeterminate at a
+calculation boundary or missing fact and remain review-gated. If one retained
+slot has both dispositions, the summary must report that it appears in both
+counts. Finally repeat Gold with a non-Drik system: it must not call the chart
+route or claim that Gold v1 ran, and it must retain the honest fallback
+chart-check disclosure.
 
 Review this page and the machine-readable computation record whenever the
 contract version, ayanamsha, house system, node choice, canonical graha set,

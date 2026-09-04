@@ -61,6 +61,22 @@ function slots(count: number): EnrichableMuhurtamSlot[] {
   });
 }
 
+function goldSlots(count: number): EnrichableMuhurtamSlot[] {
+  return slots(count).map(slot => {
+    const finalMinute = slot.e0 - 1;
+    const chartCheckMinutes = [slot.s0];
+    for (let minute = slot.s0 + 10; minute < finalMinute; minute += 10) {
+      chartCheckMinutes.push(minute);
+    }
+    chartCheckMinutes.push(finalMinute);
+    return {
+      ...slot,
+      chartCheckMinutes,
+      chartCheckLagnas: chartCheckMinutes.map(() => 'Mesha'),
+    };
+  });
+}
+
 function response(request: ElectionChartRequest, rejectedSlotIndexes = new Set<number>()): ElectionChartDerivation {
   return {
     contractVersion: '1.0',
@@ -72,6 +88,47 @@ function response(request: ElectionChartRequest, rejectedSlotIndexes = new Set<n
     location: request.location,
     charts: request.instants.map((instant, index) =>
       snapshot(instant, rejectedSlotIndexes.has(Math.floor(index / 2)) ? 8 : 2)),
+  };
+}
+
+function goldSnapshot(
+  instant: string,
+  overrides: Partial<Record<
+    (typeof PLANETS)[number],
+    Partial<ElectionChartSnapshot['planets'][number]>
+  >> = {},
+): ElectionChartSnapshot {
+  const positions = {
+    Surya: { rashi: 'Simha', degree: 11, house: 5 },
+    Chandra: { rashi: 'Makara', degree: 15, house: 10 },
+    Kuja: { rashi: 'Meena', degree: 1, house: 12 },
+    Budha: { rashi: 'Vrishabha', degree: 5, house: 2 },
+    Guru: { rashi: 'Mesha', degree: 12, house: 1 },
+    Shukra: { rashi: 'Karka', degree: 21, house: 4 },
+    Shani: { rashi: 'Kanya', degree: 17, house: 6 },
+    Rahu: { rashi: 'Tula', degree: 8, house: 7 },
+    Ketu: { rashi: 'Mesha', degree: 8, house: 1 },
+  };
+  return {
+    instant,
+    lagna: { rashi: 'Mesha', degree: 12.5 },
+    planets: PLANETS.map(name => ({
+      name,
+      ...positions[name],
+      retrograde: name === 'Rahu' || name === 'Ketu',
+      ...overrides[name],
+    })),
+  };
+}
+
+function goldResponse(
+  request: ElectionChartRequest,
+  chartFor?: (instant: string, index: number) => ElectionChartSnapshot,
+): ElectionChartDerivation {
+  return {
+    ...response(request),
+    charts: request.instants.map((instant, index) =>
+      chartFor ? chartFor(instant, index) : goldSnapshot(instant)),
   };
 }
 
@@ -170,11 +227,145 @@ describe('bounded election-chart enrichment', () => {
   test('does not call the service when an activity has no deterministic rules', async () => {
     const derive = vi.fn();
     const result = await enrichElectionChartSlots(slots(12), {
-      activity: 'gold', system: 'drik', location: LOCATION, derive,
+      activity: 'karnavedha', system: 'drik', location: LOCATION, derive,
     });
     expect(result.state).toBe('manual-only');
     expect(result.slots).toHaveLength(10);
     expect(derive).not.toHaveBeenCalled();
+  });
+
+  test('Gold stable pass is fully screened and preserves Excellent', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      goldResponse(request));
+    const result = await enrichElectionChartSlots(goldSlots(1), {
+      activity: 'gold', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.state).toBe('screened');
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].tier).toBe('Excellent');
+    expect(result.slots[0].dayDosha).toBeNull();
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      qualificationFailed: false,
+      needsReview: false,
+      stable: true,
+    }));
+    expect(result.slots[0].chartScreening?.outcomes.map(outcome => outcome.status))
+      .toEqual(['pass', 'pass', 'pass', 'pass']);
+    expect(derive).toHaveBeenCalledTimes(1);
+  });
+
+  test('Gold known qualifier failure caps rating without practitioner review', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) => goldResponse(
+      request,
+      instant => goldSnapshot(instant, { Surya: { rashi: 'Tula' } }),
+    ));
+    const result = await enrichElectionChartSlots(goldSlots(1), {
+      activity: 'gold', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.state).toBe('screened');
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].tier).toBe('Good');
+    expect(result.slots[0].dayDosha).toBe('chart_qualification');
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      qualificationFailed: true,
+      needsReview: false,
+      stable: true,
+      rejected: false,
+    }));
+    expect(result.chartRemovedCount).toBe(0);
+    expect(result.qualificationCappedCount).toBe(1);
+    expect(result.reviewGatedCount).toBe(0);
+  });
+
+  test('Gold sampled qualifier failure dominates pass without review gating', async () => {
+    const base = goldSlots(1);
+    base[0].chartCheckLagnas = base[0].chartCheckLagnas?.map(
+      (_lagna, index) => index % 2 ? 'Meena' : 'Mesha',
+    ) || null;
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      goldResponse(request));
+    const result = await enrichElectionChartSlots(base, {
+      activity: 'gold', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].tier).toBe('Good');
+    expect(result.slots[0].dayDosha).toBe('chart_qualification');
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      qualificationFailed: true,
+      needsReview: false,
+      stable: false,
+    }));
+    expect(result.qualificationCappedCount).toBe(1);
+    expect(result.reviewGatedCount).toBe(0);
+  });
+
+  test('Gold unresolved guard remains practitioner-review gated', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) => goldResponse(
+      request,
+      instant => goldSnapshot(instant, { Surya: { degree: 10 } }),
+    ));
+    const result = await enrichElectionChartSlots(goldSlots(1), {
+      activity: 'gold', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].tier).toBe('Good');
+    expect(result.slots[0].dayDosha).toBe('practitioner_review');
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      qualificationFailed: false,
+      needsReview: true,
+      stable: true,
+    }));
+    expect(result.qualificationCappedCount).toBe(0);
+    expect(result.reviewGatedCount).toBe(1);
+  });
+
+  test('Gold boundary uncertainty preserves Lagna-independent aspects', async () => {
+    const base = goldSlots(1);
+    base[0].chartBoundaryNeedsReview = true;
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      goldResponse(request));
+    const result = await enrichElectionChartSlots(base, {
+      activity: 'gold', system: 'drik', location: LOCATION, derive,
+      boundarySupportAvailable: true,
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].tier).toBe('Good');
+    expect(result.slots[0].dayDosha).toBe('practitioner_review');
+    expect(result.slots[0].chartScreening?.outcomes.map(outcome => outcome.status))
+      .toEqual(['unknown', 'unknown', 'pass', 'pass']);
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      boundaryConventionUncertain: true,
+      qualificationFailed: false,
+      needsReview: true,
+    }));
+  });
+
+  test('Gold reports a slot included in both capped and review-gated counts', async () => {
+    const base = goldSlots(1);
+    base[0].chartBoundaryNeedsReview = true;
+    const derive = vi.fn(async (request: ElectionChartRequest) => goldResponse(
+      request,
+      instant => goldSnapshot(instant, { Surya: { rashi: 'Tula' } }),
+    ));
+    const result = await enrichElectionChartSlots(base, {
+      activity: 'gold', system: 'drik', location: LOCATION, derive,
+      boundarySupportAvailable: true,
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.qualificationCappedCount).toBe(1);
+    expect(result.reviewGatedCount).toBe(1);
+    expect(result.overlappingDispositionCount).toBe(1);
+    expect(result.message).toContain(
+      '1 retained slot is included in both disposition counts',
+    );
+    expect(result.message).toContain('raw score is unchanged');
+    expect(result.message).toContain('maximum rating is Good');
   });
 
   test('does not blend a Drik/Lahiri chart into a non-Drik search', async () => {
@@ -319,6 +510,9 @@ describe('bounded election-chart enrichment', () => {
     expect(result.candidateLimitReached).toBe(true);
     expect(result.slots).toHaveLength(9);
     expect(result.slots.every(slot => !rejected.has(`${slot.isoDate}:${slot.s0}`))).toBe(true);
+    expect(result.qualificationCappedCount).toBe(0);
+    expect(result.reviewGatedCount).toBe(0);
+    expect(result.overlappingDispositionCount).toBe(0);
     expect(result.message).toMatch(/stopped early/i);
   });
 
@@ -370,7 +564,7 @@ describe('bounded election-chart enrichment', () => {
     expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
       rejected: false,
       needsReview: true,
-      stable: false,
+      stable: true,
       boundaryConventionUncertain: true,
     }));
     expect(result.slots[0].chartScreening?.outcomes.every(
@@ -378,7 +572,11 @@ describe('bounded election-chart enrichment', () => {
     )).toBe(true);
     expect(result.chartRemovedCount).toBe(0);
     expect(result.boundaryReviewCount).toBe(1);
-    expect(result.message).toMatch(/boundary-adjacent candidate remains review-gated/);
+    expect(result.message).toMatch(
+      /retained slot is indeterminate at a calculation boundary or missing fact/,
+    );
+    expect(result.message).toContain('raw score is unchanged');
+    expect(result.message).toContain('maximum rating is Good pending review');
   });
 
   test('boundary review does not suppress a Lagna-independent personal rejection', async () => {
@@ -450,7 +648,7 @@ describe('bounded election-chart enrichment', () => {
 
   test('an exact stable pass does not cap an otherwise Excellent slot', async () => {
     const derive = vi.fn(async (request: ElectionChartRequest) => response(request));
-    const result = await enrichElectionChartSlots(slots(1), {
+    const result = await enrichElectionChartSlots(goldSlots(1), {
       activity: 'wedding', system: 'drik', location: LOCATION, derive,
     });
     expect(result.slots).toHaveLength(1);

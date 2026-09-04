@@ -13,6 +13,10 @@ OUTPUT = ROOT / 'src' / 'data' / 'election-chart-rules.generated.json'
 
 def rendered() -> str:
     sys.path.insert(0, str(ROOT))
+    from telugu_panchangam.personal.election_assessors.conventions import (
+        ELECTION_CHART_CONVENTION_SCHEMA_VERSION,
+        ELECTION_CHART_CONVENTIONS,
+    )
     from telugu_panchangam.personal.election_chart_rules import (
         ELECTION_CHART_HOUSE_SYSTEM,
         ELECTION_CHART_MANUAL_REMAINDERS,
@@ -27,6 +31,8 @@ def rendered() -> str:
         'house_system': ELECTION_CHART_HOUSE_SYSTEM,
         'node_convention': ELECTION_CHART_NODE_CONVENTION,
         'vacancy_includes': list(ELECTION_CHART_PLANETS),
+        'convention_schema_version': ELECTION_CHART_CONVENTION_SCHEMA_VERSION,
+        'conventions': ELECTION_CHART_CONVENTIONS,
         'rules': {activity: list(rules) for activity, rules in ELECTION_CHART_RULES.items()},
         'manual_remainders': {
             activity: list(items)

@@ -2285,6 +2285,9 @@ async function findMuhurta() {
         personalRemovedCount: 0,
         personalRemovedRules: [],
         boundaryReviewCount: 0,
+        qualificationCappedCount: 0,
+        reviewGatedCount: slots.length,
+        overlappingDispositionCount: 0,
         message: 'Panchangam-ranked; exact chart screening is unavailable for this city.',
         engine: null,
       };
@@ -2391,14 +2394,29 @@ function renderMuhurta() {
        </details>`
     : '';
   const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0;
+  const hasScreeningReview = !!(
+    chartEnrichment?.boundaryReviewCount
+    || chartEnrichment?.reviewGatedCount
+  );
+  const scopeDetail = activity === 'gold'
+    ? hasScreeningReview
+      ? ' · all four Gold v1 event-specific clauses attempted; unresolved outcomes remain review-gated; the general election-chart baseline is not assessed'
+      : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed'
+    : hasScreeningReview
+      ? ''
+      : ' · every implemented event-specific outcome resolved';
   const chartStatus = chartEnrichment
     ? {
       screened: {
         title: chartEnrichment.boundaryReviewCount
           ? 'Chart screening applied with boundary review'
-          : 'Exact chart screening applied',
+          : chartEnrichment.reviewGatedCount
+            ? 'Chart screening applied with unresolved facts'
+          : activity === 'gold'
+            ? 'Gold event-specific chart clauses resolved'
+            : 'Exact chart screening applied',
         detail: chartEnrichment.engine
-          ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${chartEnrichment.boundaryReviewCount ? ' · boundary-adjacent house checks held for review' : ' · every sampled state'}`
+          ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${chartEnrichment.boundaryReviewCount ? ' · boundary-adjacent house checks held for review' : chartEnrichment.reviewGatedCount ? ' · unresolved chart facts held for review' : ''}${scopeDetail}`
           : 'Every sampled Lagna-stable state checked',
       },
       'not-run': {
@@ -2433,12 +2451,22 @@ function renderMuhurta() {
     : null;
   const renderChartStatus = () => {
     if (!chartEnrichment || !chartStatus) return '';
-    return `<div class="mu-chart-status mu-chart-status--${chartEnrichment.state}">
+    const disposition = chartEnrichment.state === 'screened'
+      ? chartEnrichment.reviewGatedCount
+        ? 'review'
+        : chartEnrichment.qualificationCappedCount
+          ? 'capped'
+          : 'resolved'
+      : null;
+    const message = !roleForActivity(activity)
+      ? chartEnrichment.message.replace('chart or profile facts', 'chart facts')
+      : chartEnrichment.message;
+    return `<section class="mu-chart-status mu-chart-status--${chartEnrichment.state}${disposition ? ` mu-chart-status--screened-${disposition}` : ''}" aria-label="Election-chart assessment status">
               <strong>${htmlEsc(chartStatus.title)}</strong>
-              <span>${htmlEsc(chartEnrichment.message)}</span>
+              <span>${htmlEsc(message)}</span>
               <small>${htmlEsc(chartStatus.detail)}</small>
               <a href="${MU_CHART_METHOD_URL}">Verify the method and sources</a>
-            </div>`;
+            </section>`;
   };
   const chartStatusHtml = renderChartStatus();
   const roleRequirement = roleForActivity(activity);
@@ -2522,40 +2550,89 @@ function renderMuhurta() {
   const renderComputedChart = screening => {
     if (!screening?.outcomes?.length) return '';
     const lis = screening.outcomes.map(outcome => {
-      const label = outcome.status === 'pass'
-        ? 'Passed'
-        : outcome.effect === 'prefer' && outcome.status === 'fail'
-          ? 'Preference not present'
-          : outcome.status === 'unknown' ? 'Could not verify' : 'Not met';
-      return `<li class="mu-chart-rule mu-chart-rule--${outcome.status}">
+      const label = outcome.effect === 'reject'
+        ? outcome.status === 'pass'
+          ? 'Required check passed'
+          : outcome.status === 'unknown'
+            ? 'Required check could not be verified'
+            : 'Removed by mandatory chart rule'
+        : outcome.effect === 'qualify'
+          ? outcome.status === 'pass'
+            ? 'Qualification met'
+            : outcome.status === 'unknown'
+              ? 'Indeterminate at calculation boundary · review needed'
+              : 'Condition not met · slot retained · raw score unchanged · maximum rating Good'
+          : outcome.status === 'pass'
+            ? 'Preference met · tie-break only'
+            : outcome.status === 'unknown'
+              ? 'Preference could not be verified'
+              : 'Preference not present · no penalty';
+      const evidence = Array.isArray(outcome.evidence) && outcome.evidence.length
+        ? `<small>Observed: ${htmlEsc(outcome.evidence.join(' '))}</small>`
+        : '';
+      return `<li class="mu-chart-rule mu-chart-rule--${outcome.effect} mu-chart-rule--${outcome.status}">
                 <span>${htmlEsc(muCapitalize(outcome.label))}</span>
                 <b>${label}</b>
+                ${evidence}
               </li>`;
     }).join('');
     const boundary = screening.boundaryConventionUncertain
-      ? 'This window touches the five-minute Lagna convention guard at an edge. Its Lagna-dependent checks remain unresolved and the rating is capped below Excellent.'
-      : screening.stable
-      ? 'The result was stable across every sampled Lagna-stable state in this window.'
-      : 'One or more sampled states changed within this window, so the rating is capped below Excellent.';
+      ? 'This window touches the five-minute Lagna convention guard at an edge. House-dependent checks remain unresolved; sign-based aspects are still evaluated.'
+      : screening.needsReview
+        ? screening.stable
+          ? 'One or more event-specific facts are indeterminate at a calculation boundary. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.'
+          : 'Sampled states changed within this window, and one or more event-specific facts are indeterminate. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.'
+        : screening.qualificationFailed
+          ? 'At least one event-specific condition was conclusively not met. The slot is retained, its raw score is unchanged, and the maximum rating is Good; this is not an unknown or review result.'
+          : screening.stable
+            ? 'The result was stable across every sampled Lagna-stable state in this window.'
+            : 'Sampled states changed, but every controlling outcome was resolved automatically.';
     const sourceReferences = Array.from(new Map<string, { claim: string; locator: string }>(
       screening.outcomes.map(outcome => [
         outcome.sourceClaim,
         { claim: outcome.sourceClaim, locator: outcome.sourceLocator },
       ]),
     ).values());
-    return `<div class="mu-rg mu-rg-computed">
-              <span class="mu-rg-label">Computed chart checks</span>
+    const decisionPolicies = [...new Set(
+      screening.outcomes
+        .map(outcome => outcome.decisionPolicyClaim)
+        .filter((claim): claim is string => !!claim),
+    )];
+    const conventions = Array.from(new Map<string, {
+      id: string; label: string; formula: string; claims: string[];
+    }>(screening.outcomes
+      .filter(outcome => outcome.conventionId)
+      .map(outcome => [outcome.conventionId, {
+        id: outcome.conventionId,
+        label: outcome.conventionLabel || outcome.conventionId,
+        formula: outcome.formula || '',
+        claims: outcome.methodClaims || [],
+      }])).values());
+    return `<section class="mu-rg mu-rg-computed" aria-label="Computed election-chart checks">
+              <h4 class="mu-rg-label">Computed chart checks</h4>
               <div class="mu-rg-content">
                 <ul class="mu-rg-items">${lis}</ul>
                 <p class="mu-chart-boundary">${boundary}</p>
-                <p class="mu-rule-reference">Source${sourceReferences.length === 1 ? '' : 's'}:
-                  ${sourceReferences.map(reference =>
-                    `<code>${htmlEsc(reference.claim)}</code> · ${htmlEsc(reference.locator)}`
-                  ).join('<br>')} ·
-                  <a href="${MU_CHART_METHOD_URL}">method, formulas and references</a>
+                <p class="mu-rule-reference"><strong>Event source${sourceReferences.length === 1 ? '' : 's'}:</strong>
+                  ${sourceReferences.map(reference => htmlEsc(reference.locator)).join('<br>')}
                 </p>
+                ${decisionPolicies.length ? `<p class="mu-rule-reference mu-rule-policy">
+                  <strong>Product ranking policy:</strong>
+                  The source defines the chart condition. This project policy defines how a resolved failure or an unresolved fact changes removal, rating caps, or tie-break ordering.
+                </p>` : ''}
+                ${conventions.map(convention => `<p class="mu-rule-reference mu-rule-convention">
+                  <strong>Interpretation convention:</strong> ${htmlEsc(convention.label)}<br>
+                  ${htmlEsc(convention.formula)}
+                </p>`).join('')}
+                <details class="mu-technical-provenance">
+                  <summary>Technical provenance</summary>
+                  <p><strong>Event claim${sourceReferences.length === 1 ? '' : 's'}:</strong> ${sourceReferences.map(reference => `<code>${htmlEsc(reference.claim)}</code>`).join(' · ')}</p>
+                  ${decisionPolicies.length ? `<p><strong>Ranking policy claim${decisionPolicies.length === 1 ? '' : 's'}:</strong> ${decisionPolicies.map(claim => `<code>${htmlEsc(claim)}</code>`).join(' · ')}</p>` : ''}
+                  ${conventions.map(convention => `<p><strong>Convention:</strong> <code>${htmlEsc(convention.id)}</code>${convention.claims.length ? `<br><strong>Method claims:</strong> ${convention.claims.map(claim => `<code>${htmlEsc(claim)}</code>`).join(' · ')}` : ''}</p>`).join('')}
+                </details>
+                <p class="mu-rule-reference"><a href="${MU_CHART_METHOD_URL}">Method, formulas, assumptions and exact references</a></p>
               </div>
-            </div>`;
+            </section>`;
   };
   const renderPersonalChecks = (outcomes, evidence) => {
     if (!outcomes?.length) return renderGroup(
@@ -2607,6 +2684,11 @@ function renderMuhurta() {
       : `<details class="mu-reason-details"><summary>Why this slot ranked here</summary><span class="mu-reasons">${s.reasons.map(reason => htmlEsc(reason)).join(' · ')}</span></details>`;
     const tier = s.tier || muScoreTier(s.score);
     const tierClass = `mu-tier-${tier.toLowerCase()}`;
+    const chartDisposition = s.chartScreening?.needsReview
+      ? '<span class="mu-chart-disposition mu-chart-disposition--review">Review needed</span>'
+      : s.chartScreening?.qualificationFailed
+        ? '<span class="mu-chart-disposition mu-chart-disposition--capped">Condition not met · max Good</span>'
+        : '';
     const dc = s.dayCtx;
     const winList = (wins) => wins.map(w =>
       `<span class="mu-tim"><b>${w.name}</b> ${w.ranges.join(', ')}</span>`).join('');
@@ -2637,6 +2719,7 @@ function renderMuhurta() {
               <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}</span>
               <span class="mu-tier ${tierClass}">${tier}</span>
               <span class="mu-score">score ${s.score}</span>
+              ${chartDisposition}
               ${dayCtxHtml}
               ${groupsHtml}
             </div>`;
@@ -2647,7 +2730,7 @@ function renderMuhurta() {
     + chartStatusHtml
     + personalRoleHtml
     + personalRemovalHtml
-    + `<p class="mu-ranking-note">Excellent slots appear before Good ones. Exact chart requirements can remove a slot. Source preferences only break ties; they do not inflate the Panchangam score. Any unresolved personal or chart judgment caps a high-scoring slot below Excellent.</p>`
+    + `<p class="mu-ranking-note">Excellent slots appear before Good ones. Mandatory chart failures remove a slot. A conclusive event-specific qualification miss retains the slot, leaves its raw score unchanged, and sets Good as its maximum rating. A calculation-boundary unknown also retains the slot and sets the same maximum pending review. Source preferences only break ties; they do not inflate the Panchangam score.</p>`
     + top.map(renderSlot).join('')
     + droppedHtml
     + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across
@@ -2655,13 +2738,21 @@ function renderMuhurta() {
        Group fit (per-person tarabalam and chandrabalam), and Activity match (preferred tithi class / vara).
        Being clear of every inauspicious window is a requirement, not a bonus. The tier reflects this score's
        rank within this search, capped below Excellent whenever a named dosha or unresolved review is present.
-       Exact election-chart checks are evaluated at both sides of every known Lagna transition in each window; a failed
-       mandatory rule removes the slot, while a source preference only breaks ties. Houses use the same local Drik/Lahiri
+       Exact event-specific election-chart checks are evaluated at both sides of every known Lagna transition in each window; a failed
+       mandatory rule removes the slot, a conclusive qualification miss retains it with unchanged raw score and a maximum Good rating, and a source preference only breaks ties. Houses use the same local Drik/Lahiri
        Lagna frame as the shortlist. A window touching the five-minute transition-convention guard at either edge remains
        review-gated.</p>`;
   const announcement = document.getElementById('mu-result-announcement');
   if (announcement) {
-    announcement.textContent = `${top.length} slot${top.length === 1 ? '' : 's'} found. ${chartStatus?.title || 'Search complete'}.`;
+    const cappedCount = chartEnrichment?.qualificationCappedCount || 0;
+    const reviewCount = chartEnrichment?.reviewGatedCount || 0;
+    const overlapCount = chartEnrichment?.overlappingDispositionCount || 0;
+    const chartCounts = chartEnrichment?.state === 'screened' ? (
+      ` ${cappedCount} retained ${cappedCount === 1 ? 'slot' : 'slots'} capped by a conclusive miss; `
+      + `${reviewCount} retained ${reviewCount === 1 ? 'slot' : 'slots'} review-gated by an unknown; `
+      + `${overlapCount} included in both counts.`
+    ) : '';
+    announcement.textContent = `${top.length} slot${top.length === 1 ? '' : 's'} found. ${chartStatus?.title || 'Search complete'}.${chartCounts}`;
   }
 }
 
@@ -2703,13 +2794,46 @@ function shareMuhurtaOnWhatsApp() {
   lines.push(muChartShareScreeningLine(chartEnrichment));
   if (muChartShareIncludesRemainder(chartEnrichment)) {
     const remainder = chartManualRemaindersFor(activity) || [];
-    if (remainder.length) {
+    const shownNeedsReview = slot => slot.chartScreening?.needsReview || (
+      Array.isArray(slot.reasonGroups?.personal_outcomes)
+      && slot.reasonGroups.personal_outcomes.some(
+        outcome => outcome?.status === 'unknown')
+    );
+    const qualificationCapped = top.filter(
+      slot => slot.chartScreening?.qualificationFailed).length;
+    const reviewGated = top.filter(shownNeedsReview).length;
+    const overlapping = top.filter(
+      slot => slot.chartScreening?.qualificationFailed
+        && shownNeedsReview(slot)).length;
+    if (activity === 'gold') {
+      lines.push('Gold v1 assesses four event-specific clauses; the general election-chart baseline is not assessed.');
+    }
+    if (!remainder.length) {
+      if (reviewGated) {
+        lines.push('All disclosed event chart clauses were attempted; unresolved facts still require review.');
+      } else if (qualificationCapped) {
+        lines.push('All disclosed event chart clauses were evaluated; one or more qualifications were not met and the affected ratings were capped.');
+      } else {
+        lines.push('All disclosed event chart clauses were evaluated and resolved under the documented interpretation convention.');
+      }
+    } else {
+      lines.push('The automated, source-backed election-chart clauses were checked across every sampled Lagna-stable state.');
       lines.push('Qualitative chart or ritual checks still require practitioner review; see the result details.');
     }
+    if (qualificationCapped) {
+      lines.push(`${qualificationCapped} shown slot${qualificationCapped === 1 ? '' : 's'} had a conclusive event-specific condition miss; ${qualificationCapped === 1 ? 'it was' : 'they were'} retained with unchanged raw score and a maximum Good rating.`);
+    }
+    if (reviewGated) {
+      lines.push(`${reviewGated} shown slot${reviewGated === 1 ? '' : 's'} ${reviewGated === 1 ? 'is' : 'are'} indeterminate at a calculation boundary or missing fact and ${reviewGated === 1 ? 'remains' : 'remain'} review-gated.`);
+    }
+    if (overlapping) {
+      lines.push(`${overlapping} shown slot${overlapping === 1 ? ' is' : 's are'} included in both counts because a conclusive miss and a separate unknown coexist.`);
+    }
+    lines.push(`Method: https://panchangam.astrochaganti.com${MU_CHART_METHOD_URL}`);
   }
   lines.push('');
   top.slice(0, 5).forEach(s => {
-    lines.push(`✅ ${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}`);
+    lines.push(`• ${s.tier || muScoreTier(s.score)} · ${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}`);
     const shareableReasons = muShareableMuhurtaReasons(s);
     if (shareableReasons.length) lines.push(`   ${shareableReasons.join(' · ')}`);
   });

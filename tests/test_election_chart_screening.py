@@ -10,7 +10,10 @@ from telugu_panchangam.personal.election_chart import (
     evaluate_election_snapshots,
     evaluate_election_window,
 )
-from telugu_panchangam.personal.election_chart_rules import ELECTION_CHART_RULES
+from telugu_panchangam.personal.election_chart_rules import (
+    ELECTION_CHART_MANUAL_REMAINDERS,
+    ELECTION_CHART_RULES,
+)
 
 PLANETS = (
     'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
@@ -35,8 +38,408 @@ def _chart(**houses):
     }
 
 
-def test_gold_remains_manual_without_inventing_an_aspect_model():
-    assert ELECTION_CHART_RULES.get('gold', ()) == ()
+GOLD_POSITIONS = {
+    'Surya': ('Simha', 11.0, 5),
+    'Chandra': ('Makara', 15.0, 10),
+    'Kuja': ('Meena', 1.0, 12),
+    'Budha': ('Vrishabha', 5.0, 2),
+    'Guru': ('Mesha', 12.0, 1),
+    'Shukra': ('Karka', 21.0, 4),
+    'Shani': ('Kanya', 17.0, 6),
+    'Rahu': ('Tula', 8.0, 7),
+    'Ketu': ('Mesha', 8.0, 1),
+}
+
+GOLD_ORACLE = json.loads(
+    (Path(__file__).parent / 'fixtures/election_chart_gold_oracle.json')
+    .read_text(encoding='utf-8')
+)
+GOLD_GATEWAY_ORACLE = json.loads(
+    (
+        Path(__file__).parent
+        / 'fixtures/election_chart_gold_gateway_oracle.json'
+    ).read_text(encoding='utf-8')
+)
+
+
+def _gold_chart(*, instant='2026-09-08T05:30:00.000Z', **overrides):
+    planets = []
+    for name in PLANETS:
+        rashi, degree, house = GOLD_POSITIONS[name]
+        values = {
+            'name': name,
+            'rashi': rashi,
+            'degree': degree,
+            'house': house,
+            'retrograde': name in {'Rahu', 'Ketu'},
+        }
+        values.update(overrides.get(name, {}))
+        planets.append(values)
+    return {
+        'instant': instant,
+        'lagna': {'rashi': 'Mesha', 'degree': 12.5},
+        'planets': planets,
+    }
+
+
+def _outcome(result, rule_id):
+    return next(
+        outcome for outcome in result['outcomes']
+        if outcome['rule_id'] == rule_id
+    )
+
+
+def test_gold_declares_four_qualification_rules_and_no_chart_remainder():
+    rules = ELECTION_CHART_RULES['gold']
+    assert [rule['id'] for rule in rules] == [
+        'gold.surya-well-situated',
+        'gold.chandra-well-situated',
+        'gold.surya-fully-aspected',
+        'gold.chandra-fully-aspected',
+    ]
+    assert {rule['effect'] for rule in rules} == {'qualify'}
+    assert all(rule['convention_id'] for rule in rules)
+    assert all(rule['method_claims'] for rule in rules)
+    assert all(
+        rule['decision_policy_claim']
+        == 'election_chart.gold_qualification_policy_v1'
+        for rule in rules
+    )
+    assert ELECTION_CHART_MANUAL_REMAINDERS['gold'] == ()
+    classical = {
+        'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani',
+    }
+    for rule in rules[2:]:
+        assert set(rule['aspectors']) <= classical
+        assert rule['planet'] not in rule['aspectors']
+        assert not {'Rahu', 'Ketu'} & set(rule['aspectors'])
+
+
+@pytest.mark.parametrize(
+    'case', GOLD_ORACLE['cases'], ids=lambda case: case['id'])
+def test_gold_shared_python_typescript_oracle(case):
+    """Both runtimes consume this corpus so their controlling outcomes agree."""
+    result = evaluate_election_chart(
+        'gold', _gold_chart(**case['overrides']))
+
+    assert [item['status'] for item in result['outcomes']] == (
+        case['expected_statuses'])
+    assert result['qualification_failed'] is case['qualification_failed']
+    assert result['needs_review'] is case['needs_review']
+
+
+def test_gold_gateway_oracle_is_actual_multi_city_date_evidence():
+    """Keep real gateway cells distinct from synthetic predicate probes."""
+    source = GOLD_GATEWAY_ORACLE['source']
+    assert source['endpoint'] == (
+        'https://astrochaganti.com/api/guest/muhurta/election-charts')
+    assert source['gateway_source_revision'] == (
+        '4106f09708a154f1c2401880ebe8f9c0b9162eb5')
+    assert source['sidecar_source_revision'] == (
+        'c84fd856b17120c80e1bb7e455246a0ec8e429ea')
+    assert source['engine'] == {
+        'name': 'DashaFlow',
+        'version': '1.1.0',
+        'ayanamsha': 'Lahiri',
+        'ephemeris': 'moshier',
+        'node_convention': 'mean',
+    }
+    cases = GOLD_GATEWAY_ORACLE['cases']
+    assert {case['city'] for case in cases} == {'Hyderabad', 'Sydney'}
+    assert len({case['chart']['instant'][:10] for case in cases}) >= 2
+    assert {
+        tag for case in cases for tag in case['coverage']
+    } == {'pass', 'fail', 'unknown', 'conflict', 'boundary'}
+
+    rashis = (
+        'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+        'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena',
+    )
+    for case in cases:
+        chart = case['chart']
+        assert [planet['name'] for planet in chart['planets']] == list(PLANETS)
+        assert len({planet['name'] for planet in chart['planets']}) == 9
+        lagna_index = rashis.index(chart['lagna']['rashi'])
+        assert all(
+            planet['house']
+            == (rashis.index(planet['rashi']) - lagna_index) % 12 + 1
+            for planet in chart['planets']
+        )
+
+
+@pytest.mark.parametrize(
+    'case', GOLD_GATEWAY_ORACLE['cases'], ids=lambda case: case['id'])
+def test_gold_real_gateway_outcome_oracle(case):
+    result = evaluate_election_chart('gold', case['chart'])
+
+    assert [item['status'] for item in result['outcomes']] == (
+        case['expected_statuses'])
+    assert result['qualification_failed'] is case['qualification_failed']
+    assert result['needs_review'] is case['needs_review']
+
+
+def test_gold_golden_fixture_passes_placement_and_full_aspect_rules():
+    result = evaluate_election_chart('gold', _gold_chart())
+
+    assert [outcome['status'] for outcome in result['outcomes']] == [
+        'pass', 'pass', 'pass', 'pass',
+    ]
+    assert {
+        key: result[key]
+        for key in (
+            'rejected', 'needs_review', 'preference_passes',
+            'qualification_failed', 'stable',
+        )
+    } == {
+        'rejected': False,
+        'needs_review': False,
+        'preference_passes': 0,
+        'qualification_failed': False,
+        'stable': True,
+    }
+    assert _outcome(
+        result, 'gold.surya-fully-aspected')['evidence'] == [
+            'Full Graha Drishti to Surya: Guru.',
+        ]
+    assert _outcome(
+        result, 'gold.chandra-fully-aspected')['evidence'] == [
+            'Full Graha Drishti to Chandra: Shukra.',
+        ]
+
+
+@pytest.mark.parametrize(
+    ('rule_id', 'overrides', 'evidence'),
+    (
+        ('gold.surya-well-situated', {'Surya': {'house': 6}}, 'house 6'),
+        ('gold.chandra-well-situated', {'Chandra': {'house': 8}}, 'house 8'),
+        (
+            'gold.surya-well-situated',
+            {'Surya': {'rashi': 'Vrishabha'}},
+            'enemy Rasi Vrishabha',
+        ),
+        (
+            'gold.surya-well-situated',
+            {'Surya': {'rashi': 'Tula'}},
+            'debilitation Rasi Tula',
+        ),
+        (
+            'gold.surya-well-situated',
+            {'Surya': {'degree': 20.1}},
+            'debilitation Navamsa Tula',
+        ),
+        (
+            'gold.chandra-well-situated',
+            {'Chandra': {'rashi': 'Simha', 'degree': 21.0}},
+            'solar clearance 10.00\N{DEGREE SIGN} below 12\N{DEGREE SIGN}',
+        ),
+    ),
+)
+def test_gold_known_adverse_placement_fails_qualification_without_rejection(
+    rule_id, overrides, evidence,
+):
+    result = evaluate_election_chart('gold', _gold_chart(**overrides))
+    outcome = _outcome(result, rule_id)
+
+    assert outcome['status'] == 'fail'
+    assert evidence in ' '.join(outcome['evidence'])
+    assert result['qualification_failed'] is True
+    assert result['rejected'] is False
+
+
+@pytest.mark.parametrize(
+    ('overrides', 'rule_id', 'evidence'),
+    (
+        (
+            {'Surya': {'degree': 10.0}},
+            'gold.surya-well-situated',
+            'Navamsa boundary',
+        ),
+        (
+            {'Chandra': {'rashi': 'Simha', 'degree': 23.0}},
+            'gold.chandra-well-situated',
+            'solar-clearance threshold',
+        ),
+    ),
+)
+def test_gold_guard_bands_fail_closed_to_unknown(overrides, rule_id, evidence):
+    result = evaluate_election_chart('gold', _gold_chart(**overrides))
+    outcome = _outcome(result, rule_id)
+
+    assert outcome['status'] == 'unknown'
+    assert evidence in ' '.join(outcome['evidence'])
+    assert result['needs_review'] is True
+    assert result['qualification_failed'] is False
+
+
+def test_gold_incomplete_chart_makes_all_four_qualifications_unknown():
+    chart = _gold_chart()
+    chart['planets'].pop()
+    result = evaluate_election_chart('gold', chart)
+
+    assert [outcome['status'] for outcome in result['outcomes']] == [
+        'unknown', 'unknown', 'unknown', 'unknown',
+    ]
+    assert result['needs_review'] is True
+    assert result['qualification_failed'] is False
+    assert result['rejected'] is False
+
+
+def test_gold_full_aspect_accepts_a_malefic_classical_aspector():
+    result = evaluate_election_chart('gold', _gold_chart(
+        Guru={'rashi': 'Mithuna'},
+        Shani={'rashi': 'Mithuna'},
+    ))
+    outcome = _outcome(result, 'gold.surya-fully-aspected')
+
+    assert outcome['status'] == 'pass'
+    assert outcome['evidence'] == ['Full Graha Drishti to Surya: Shani.']
+
+
+@pytest.mark.parametrize(
+    ('target_rule', 'overrides'),
+    (
+        (
+            'gold.surya-fully-aspected',
+            {'Guru': {'rashi': 'Mithuna'}},
+        ),
+        (
+            'gold.chandra-fully-aspected',
+            {'Shukra': {'rashi': 'Simha'}},
+        ),
+    ),
+)
+def test_gold_missing_full_aspect_fails_qualification(target_rule, overrides):
+    result = evaluate_election_chart('gold', _gold_chart(**overrides))
+    outcome = _outcome(result, target_rule)
+
+    assert outcome['status'] == 'fail'
+    assert outcome['evidence'][0].startswith('No v1 full Graha Drishti')
+    assert result['qualification_failed'] is True
+    assert result['needs_review'] is False
+
+
+def test_gold_snapshot_fail_dominates_unknown_for_the_same_rule():
+    result = evaluate_election_snapshots('gold', [
+        _gold_chart(instant='2026-09-08T05:30:00.000Z'),
+        _gold_chart(
+            instant='2026-09-08T05:40:00.000Z',
+            Surya={'degree': 10.0},
+        ),
+        _gold_chart(
+            instant='2026-09-08T05:50:00.000Z',
+            Surya={'house': 6},
+        ),
+    ])
+
+    assert _outcome(
+        result, 'gold.surya-well-situated')['status'] == 'fail'
+    assert result['stable'] is False
+    assert result['qualification_failed'] is True
+    assert result['needs_review'] is True
+    assert result['rejected'] is False
+
+
+def test_gold_unrepresented_navamsa_transition_fails_closed():
+    result = evaluate_election_snapshots('gold', [
+        _gold_chart(
+            instant='2026-09-08T05:30:00.000Z',
+            Surya={'degree': 9.96},
+        ),
+        _gold_chart(
+            instant='2026-09-08T05:35:00.000Z',
+            Surya={'degree': 9.96},
+        ),
+    ])
+
+    outcome = _outcome(result, 'gold.surya-well-situated')
+    assert outcome['status'] == 'unknown'
+    assert 'transition cannot be excluded' in ' '.join(outcome['evidence'])
+    assert result['stable'] is False
+    assert result['needs_review'] is True
+
+
+def test_gold_unrepresented_solar_clearance_transition_fails_closed():
+    result = evaluate_election_snapshots('gold', [
+        _gold_chart(
+            instant='2026-09-08T05:30:00.000Z',
+            Chandra={'rashi': 'Simha', 'degree': 23.1},
+        ),
+        _gold_chart(
+            instant='2026-09-08T05:35:00.000Z',
+            Chandra={'rashi': 'Simha', 'degree': 23.1},
+        ),
+    ])
+
+    outcome = _outcome(result, 'gold.chandra-well-situated')
+    assert outcome['status'] == 'unknown'
+    assert 'solar-clearance transition' in ' '.join(outcome['evidence'])
+    assert result['needs_review'] is True
+
+
+def test_gold_sampling_gap_over_ten_minutes_fails_closed():
+    result = evaluate_election_snapshots('gold', [
+        _gold_chart(instant='2026-09-08T05:30:00.000Z'),
+        _gold_chart(instant='2026-09-08T05:41:00.000Z'),
+    ])
+
+    assert {item['status'] for item in result['outcomes']} == {'unknown'}
+    assert all(
+        'ten-minute transition coverage' in ' '.join(item['evidence'])
+        for item in result['outcomes']
+    )
+    assert result['stable'] is False
+    assert result['needs_review'] is True
+
+
+def test_gold_rashi_rounding_boundary_fails_closed_for_aspects():
+    result = evaluate_election_chart(
+        'gold', _gold_chart(Guru={'degree': 0.0}))
+
+    outcome = _outcome(result, 'gold.surya-fully-aspected')
+    assert outcome['status'] == 'unknown'
+    assert 'Rasi boundary guard' in ' '.join(outcome['evidence'])
+
+
+def test_gold_secure_aspector_dominates_an_unrelated_boundary_uncertainty():
+    result = evaluate_election_chart('gold', _gold_chart(
+        Guru={'degree': 0.0},
+        Shani={'rashi': 'Mithuna'},
+    ))
+
+    outcome = _outcome(result, 'gold.surya-fully-aspected')
+    assert outcome['status'] == 'pass'
+    assert 'Full Graha Drishti to Surya: Shani.' in outcome['evidence']
+
+
+def test_gold_secure_continuous_aspect_dominates_unrelated_motion():
+    result = evaluate_election_snapshots('gold', [
+        _gold_chart(
+            instant='2026-09-08T05:30:00.000Z',
+            Guru={'rashi': 'Mithuna'},
+            Shani={'rashi': 'Mithuna'},
+        ),
+        _gold_chart(
+            instant='2026-09-08T05:35:00.000Z',
+            Guru={'rashi': 'Dhanu'},
+            Shani={'rashi': 'Mithuna'},
+        ),
+    ])
+
+    outcome = _outcome(result, 'gold.surya-fully-aspected')
+    assert outcome['status'] == 'pass'
+    assert 'Full Graha Drishti to Surya: Shani.' in outcome['evidence']
+    assert _outcome(result, 'gold.chandra-fully-aspected')['status'] == 'pass'
+
+
+def test_gold_uncertain_house_frame_keeps_aspect_assessment_available():
+    result = evaluate_election_snapshots(
+        'gold', [_gold_chart()], house_frame_uncertain=True)
+
+    assert [outcome['status'] for outcome in result['outcomes']] == [
+        'unknown', 'unknown', 'pass', 'pass',
+    ]
+    assert result['needs_review'] is True
+    assert result['qualification_failed'] is False
 
 
 def test_wedding_named_prohibition_rejects():
@@ -105,7 +508,7 @@ def test_generated_browser_rule_contract_is_current():
     assert result.returncode == 0, result.stderr
 
 
-def test_every_rule_uses_a_registered_provenance_claim():
+def test_every_rule_uses_registered_source_method_and_policy_claims():
     root = Path(__file__).parents[1]
     provenance = json.loads((root / 'docs/reference/provenance.json').read_text())
     claim_ids = {claim['id'] for claim in provenance['claims']}
@@ -113,6 +516,10 @@ def test_every_rule_uses_a_registered_provenance_claim():
     for rules in ELECTION_CHART_RULES.values():
         for rule in rules:
             assert rule['source_claim'] in claim_ids
+            for claim_id in rule.get('method_claims', ()):
+                assert claim_id in claim_ids
+            if 'decision_policy_claim' in rule:
+                assert rule['decision_policy_claim'] in claim_ids
 
 
 def test_provenance_distinguishes_the_drik_website_post_screen():

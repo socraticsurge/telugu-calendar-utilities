@@ -11,10 +11,10 @@
     "activities": 30,
     "browser_activities": 30,
     "python_mcp_only_activities": 5,
-    "rows": 318,
+    "rows": 322,
     "deterministic_panchangam_rows": 175,
     "personal_rule_rows": 5,
-    "election_chart_rule_rows": 23,
+    "election_chart_rule_rows": 27,
     "manual_display_rows": 115,
     "by_predicate_class": {
       "panchangam.slot-exclusion": 16,
@@ -31,6 +31,8 @@
       "panchangam.time-admission": 3,
       "personal.exact-election-fact": 5,
       "election-chart.planet_in_houses": 8,
+      "election-chart.planet_well_situated": 2,
+      "election-chart.planet_receives_full_aspect": 2,
       "panchangam.personal-slot-exclusion": 2,
       "panchangam.disclosure": 1,
       "election-chart.any_planet_in_houses": 1,
@@ -39,11 +41,11 @@
     "by_implementation_status": {
       "automated_browser_and_python": 152,
       "automated_python_only_not_browser": 23,
-      "automated_exact_chart_browser_with_python_parity": 28,
+      "automated_exact_chart_browser_with_python_parity": 32,
       "manual_displayed_not_computed": 115
     },
     "by_authority_status": {
-      "source_backed": 239,
+      "source_backed": 243,
       "explicit_project_heuristic": 76,
       "documented_conflict": 3
     },
@@ -792,7 +794,7 @@
           }
         ],
         "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
-        "scope": "Supports only the disclosed requirement that Surya and Chandra be well situated and aspected, plus the passage's general instruction to avoid unfavorable Tithis and Nakshatras. It does not supply a jewelry-specific weekday, Tithi, Nakshatra, Lagna or Choghadiya list. The configured Labh-Choghadiya, Bhadra-Tithi, Friday/Thursday and fixed-Lagna preferences are disclosed project heuristics and do not inherit authority from this citation."
+        "scope": "Supports only the disclosed requirement that Surya and Chandra be well situated and aspected, plus the passage's general instruction to avoid unfavorable Tithis and Nakshatras. The Drik website post-screen now evaluates the four chart qualifications under the separately disclosed gold-phaladeepika-placement-full-drishti-v1 convention; a resolved miss caps the tier and an unknown remains review-gated. It does not supply a jewelry-specific weekday, Tithi, Nakshatra, Lagna or Choghadiya list. The configured Labh-Choghadiya, Bhadra-Tithi, Friday/Thursday and fixed-Lagna preferences are disclosed project heuristics and do not inherit authority from this citation."
       },
       "related_claims": [],
       "manual_prerequisites": false,
@@ -802,9 +804,13 @@
         "gold.panchangam.prefer_choghadiya",
         "gold.panchangam.prefer_vara",
         "gold.panchangam.prefer_tithi_class",
+        "gold.surya-well-situated",
+        "gold.chandra-well-situated",
+        "gold.surya-fully-aspected",
+        "gold.chandra-fully-aspected",
         "gold.manual-1"
       ],
-      "row_count": 5
+      "row_count": 9
     },
     {
       "activity": "business_inventory_purchase",
@@ -8539,6 +8545,415 @@
     },
     {
       "activity": "gold",
+      "rule_id": "gold.surya-well-situated",
+      "predicate_class": "election-chart.planet_well_situated",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "planet_well_situated",
+        "predicate_inputs": {
+          "planet": "Surya",
+          "avoid_houses": [
+            6,
+            8,
+            12
+          ],
+          "enemy_rashis": [
+            "Vrishabha",
+            "Tula",
+            "Makara",
+            "Kumbha"
+          ],
+          "debilitation_rashi": "Tula",
+          "navamsa_debilitation_rashi": "Tula",
+          "convention_id": "phaladeepika-well-placed-v1",
+          "convention_label": "Phaladeepika well-placed convention v1",
+          "formula": "Outside houses 6, 8 and 12; outside an enemy Rasi; and outside debilitation Rasi or Navamsa. Chandra must also clear Surya by more than the disclosed 12-degree v1 solar-ray threshold.",
+          "method_claims": [
+            "election_chart.well_placed.phaladeepika_2_36",
+            "election_chart.dignity.phaladeepika_1_6",
+            "election_chart.relationships.phaladeepika_2_21_22",
+            "election_chart.navamsa.bphs_6_12",
+            "election_chart.chandra_solar_clearance_policy_v1",
+            "election_chart.gold_transition_envelope_v1"
+          ],
+          "decision_policy_claim": "election_chart.gold_qualification_policy_v1"
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved or a controlling between-sample transition cannot be excluded; otherwise pass"
+      },
+      "source_claim_id": "muhurta.gold_jewelry.purchase",
+      "source_claim": {
+        "id": "muhurta.gold_jewelry.purchase",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993"
+        ],
+        "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tier_cap",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+      "decision_policy_claim_id": "election_chart.gold_qualification_policy_v1",
+      "decision_policy_claim": {
+        "id": "election_chart.gold_qualification_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "gold-phaladeepika-placement-full-drishti-v1; docs/research/election-chart-automation/report-source.md"
+      },
+      "supporting_claims": [
+        {
+          "id": "election_chart.well_placed.phaladeepika_2_36",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter II, sloka 36, book p. 23 (scan p. 60)"
+        },
+        {
+          "id": "election_chart.dignity.phaladeepika_1_6",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter I, sloka 6, book pp. 3-4 (scan pp. 40-41)"
+        },
+        {
+          "id": "election_chart.relationships.phaladeepika_2_21_22",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter II, slokas 21-22, book p. 17 (scan p. 54)"
+        },
+        {
+          "id": "election_chart.navamsa.bphs_6_12",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "BPHS-ELS-6.12"
+          ],
+          "locator": "Chapter 6, verse 12"
+        }
+      ]
+    },
+    {
+      "activity": "gold",
+      "rule_id": "gold.chandra-well-situated",
+      "predicate_class": "election-chart.planet_well_situated",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "planet_well_situated",
+        "predicate_inputs": {
+          "planet": "Chandra",
+          "avoid_houses": [
+            6,
+            8,
+            12
+          ],
+          "enemy_rashis": [],
+          "debilitation_rashi": "Vrischika",
+          "navamsa_debilitation_rashi": "Vrischika",
+          "solar_clearance_degrees": 12,
+          "solar_clearance_guard_degrees": 0.02,
+          "convention_id": "phaladeepika-well-placed-v1",
+          "convention_label": "Phaladeepika well-placed convention v1",
+          "formula": "Outside houses 6, 8 and 12; outside an enemy Rasi; and outside debilitation Rasi or Navamsa. Chandra must also clear Surya by more than the disclosed 12-degree v1 solar-ray threshold.",
+          "method_claims": [
+            "election_chart.well_placed.phaladeepika_2_36",
+            "election_chart.dignity.phaladeepika_1_6",
+            "election_chart.relationships.phaladeepika_2_21_22",
+            "election_chart.navamsa.bphs_6_12",
+            "election_chart.chandra_solar_clearance_policy_v1",
+            "election_chart.gold_transition_envelope_v1"
+          ],
+          "decision_policy_claim": "election_chart.gold_qualification_policy_v1"
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved or a controlling between-sample transition cannot be excluded; otherwise pass"
+      },
+      "source_claim_id": "muhurta.gold_jewelry.purchase",
+      "source_claim": {
+        "id": "muhurta.gold_jewelry.purchase",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993"
+        ],
+        "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tier_cap",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+      "decision_policy_claim_id": "election_chart.gold_qualification_policy_v1",
+      "decision_policy_claim": {
+        "id": "election_chart.gold_qualification_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "gold-phaladeepika-placement-full-drishti-v1; docs/research/election-chart-automation/report-source.md"
+      },
+      "supporting_claims": [
+        {
+          "id": "election_chart.well_placed.phaladeepika_2_36",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter II, sloka 36, book p. 23 (scan p. 60)"
+        },
+        {
+          "id": "election_chart.dignity.phaladeepika_1_6",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter I, sloka 6, book pp. 3-4 (scan pp. 40-41)"
+        },
+        {
+          "id": "election_chart.relationships.phaladeepika_2_21_22",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter II, slokas 21-22, book p. 17 (scan p. 54)"
+        },
+        {
+          "id": "election_chart.navamsa.bphs_6_12",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "BPHS-ELS-6.12"
+          ],
+          "locator": "Chapter 6, verse 12"
+        }
+      ]
+    },
+    {
+      "activity": "gold",
+      "rule_id": "gold.surya-fully-aspected",
+      "predicate_class": "election-chart.planet_receives_full_aspect",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "planet_receives_full_aspect",
+        "predicate_inputs": {
+          "planet": "Surya",
+          "aspectors": [
+            "Chandra",
+            "Kuja",
+            "Budha",
+            "Guru",
+            "Shukra",
+            "Shani"
+          ],
+          "convention_id": "phaladeepika-full-graha-drishti-v1",
+          "convention_label": "Phaladeepika full Graha Drishti convention v1",
+          "formula": "Every classical graha fully aspects the 7th; Kuja also the 4th and 8th, Guru the 5th and 9th, and Shani the 3rd and 10th. Rahu, Ketu and partial aspects are excluded.",
+          "method_claims": [
+            "election_chart.full_graha_drishti.phaladeepika_2_23",
+            "election_chart.gold_transition_envelope_v1"
+          ],
+          "decision_policy_claim": "election_chart.gold_qualification_policy_v1"
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved or a controlling between-sample transition cannot be excluded; otherwise pass"
+      },
+      "source_claim_id": "muhurta.gold_jewelry.purchase",
+      "source_claim": {
+        "id": "muhurta.gold_jewelry.purchase",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993"
+        ],
+        "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tier_cap",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+      "decision_policy_claim_id": "election_chart.gold_qualification_policy_v1",
+      "decision_policy_claim": {
+        "id": "election_chart.gold_qualification_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "gold-phaladeepika-placement-full-drishti-v1; docs/research/election-chart-automation/report-source.md"
+      },
+      "supporting_claims": [
+        {
+          "id": "election_chart.full_graha_drishti.phaladeepika_2_23",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter II, sloka 23, book p. 18 (scan p. 55)"
+        }
+      ]
+    },
+    {
+      "activity": "gold",
+      "rule_id": "gold.chandra-fully-aspected",
+      "predicate_class": "election-chart.planet_receives_full_aspect",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "planet_receives_full_aspect",
+        "predicate_inputs": {
+          "planet": "Chandra",
+          "aspectors": [
+            "Surya",
+            "Kuja",
+            "Budha",
+            "Guru",
+            "Shukra",
+            "Shani"
+          ],
+          "convention_id": "phaladeepika-full-graha-drishti-v1",
+          "convention_label": "Phaladeepika full Graha Drishti convention v1",
+          "formula": "Every classical graha fully aspects the 7th; Kuja also the 4th and 8th, Guru the 5th and 9th, and Shani the 3rd and 10th. Rahu, Ketu and partial aspects are excluded.",
+          "method_claims": [
+            "election_chart.full_graha_drishti.phaladeepika_2_23",
+            "election_chart.gold_transition_envelope_v1"
+          ],
+          "decision_policy_claim": "election_chart.gold_qualification_policy_v1"
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved or a controlling between-sample transition cannot be excluded; otherwise pass"
+      },
+      "source_claim_id": "muhurta.gold_jewelry.purchase",
+      "source_claim": {
+        "id": "muhurta.gold_jewelry.purchase",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993"
+        ],
+        "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tier_cap",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+      "decision_policy_claim_id": "election_chart.gold_qualification_policy_v1",
+      "decision_policy_claim": {
+        "id": "election_chart.gold_qualification_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "gold-phaladeepika-placement-full-drishti-v1; docs/research/election-chart-automation/report-source.md"
+      },
+      "supporting_claims": [
+        {
+          "id": "election_chart.full_graha_drishti.phaladeepika_2_23",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter II, sloka 23, book p. 18 (scan p. 55)"
+        }
+      ]
+    },
+    {
+      "activity": "gold",
       "rule_id": "gold.manual-1",
       "predicate_class": "manual.display-row",
       "configured_inputs": {
@@ -8562,9 +8977,10 @@
       },
       "implementation_status": "manual_displayed_not_computed",
       "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "practitioner_review_tier_cap",
+      "ranking_effect": "fallback_only_practitioner_review_tier_cap",
       "automation_mode": "manual",
-      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
+      "automation_rationale": "Fallback source guidance only. In the supported Drik browser path, separately provenance-linked automated rules replace this broad clause.",
+      "implementation_note": "Not displayed as a residual manual Gold check after a successful exact-chart screen.",
       "decision_policy_claim_id": "muhurta.scoring_policy",
       "decision_policy_claim": {
         "id": "muhurta.scoring_policy",
@@ -8575,7 +8991,8 @@
         "source_ids": [],
         "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
       },
-      "authority_role": "activity_source_claim"
+      "authority_role": "activity_source_claim",
+      "applicability": "python_or_mcp_or_non_drik_or_exact_chart_unavailable"
     },
     {
       "activity": "business_inventory_purchase",

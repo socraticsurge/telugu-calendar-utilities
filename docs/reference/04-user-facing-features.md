@@ -132,13 +132,17 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
   Maudhya exclusions declared by the Python activity profile. If those flags
   are absent, affected browser searches fail closed instead of returning
   unscreened dates. Travel, Gruhapravesha, Seemantha and Surgery name a primary
-  participant for source-specific local checks. Drik activities with one of 23
+  participant for source-specific local checks. Drik activities with one of 27
   deterministic chart predicates receive a privacy-minimal DashaFlow
   candidate-time planetary-position post-screen. The browser uses its validated
   local Drik/Lahiri Lagna at each sampled minute to recompute Whole Sign houses;
   a partial five-minute transition guard is retained for review instead of
   receiving a false pass or rejection. Preferences are tie-breaks, not score
-  inflation, and qualitative clauses remain explicit. See
+  inflation. Gold / jewelry purchase adds four event-specific `qualify`
+  predicates: a conclusive miss keeps the slot and raw score but caps its rating
+  at Good, while unresolved sample or transition evidence stays review-gated.
+  This does not assess the general election-chart baseline, and qualitative
+  clauses remain explicit. See
   [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
   This post-screen is independently disabled in public builds unless
   `VITE_ELECTION_CHART_API_ENABLED` is the exact string `true`; an absent flag
