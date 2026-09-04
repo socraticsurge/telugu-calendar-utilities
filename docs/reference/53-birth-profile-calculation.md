@@ -270,18 +270,18 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
 
 ## Known limitations and release gates
 
-1. **Swiss Ephemeris and PySwissEph licensing:** Astrodienst requires a
-   developer to choose AGPL-compatible licensing or a Professional License
-   before distributing a derived application or activating a public service.
-   Its current professional contract explicitly covers browser clients that
-   request server-side calculations. PySwissEph is a separately AGPL-licensed
-   wrapper; an unresolved [upstream wrapper-license issue](https://github.com/astrorigin/pyswisseph/issues/92)
-   means a Swiss Professional License alone does not establish proprietary-use
-   rights for the current binding. Public activation is blocked until the owner
-   records the applicable combined posture. See [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
-   and [Professional License contract](https://www.astro.com/swisseph/secont_e.pdf).
+1. **Swiss Ephemeris and PySwissEph licensing:** On 2026-09-04 the owner chose
+   the AGPL-compatible public-source path for this calculation stack. The
+   current TCU/MCP release is AGPL-3.0-or-later, retains the PySwissEph and
+   Swiss Ephemeris notices, and offers corresponding source from the public
+   repository. DashaFlow and Astro must publish their exact deployed source
+   revisions under the same compatible posture before their public calculation
+   flags are enabled. This implements the conservative whole-project boundary
+   stated by [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
+   and the network-source opportunity described by
+   [GNU AGPL section 13](https://www.gnu.org/licenses/agpl-3.0.html#section13).
    The decision, existing-distribution audit, implementation, and wrapper path
-   are tracked in
+   remain recorded in
    [#231](https://github.com/socraticsurge/telugu-calendar-utilities/issues/231)
    with required children
    [#444](https://github.com/socraticsurge/telugu-calendar-utilities/issues/444),

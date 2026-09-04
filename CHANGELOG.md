@@ -7,7 +7,18 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+## [1.14.0] — 2026-09-04
+
 ### Changed
+
+- Adopt AGPL-3.0-or-later for the current source, website, and MCP package so
+  the Swiss Ephemeris/PySwissEph calculation stack has one explicit public
+  release posture. Earlier copies keep the licence grants conveyed with them.
+- Publish corresponding-source links in the website, repository, package
+  metadata, and PyPI README; preserve direct PySwissEph and Swiss Ephemeris
+  copyright/licence notices in `THIRD_PARTY_NOTICES.md`.
+- Bump the MCP/PyPI release metadata to `1.14.0`; calculation behavior and the
+  frozen engine/ICS contracts are unchanged.
 
 - Add browser-local guest profiles with manual entry, optional birth-derived
   Nakshatra, Padam, Janma Rashi, Lagna and D1 review, stable reuse in Daily

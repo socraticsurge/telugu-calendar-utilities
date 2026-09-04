@@ -1,14 +1,15 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-server-panchangam"
-version = "1.13.3"
+version = "1.14.0"
 description = "MCP server for Panchangam calculations — Tithi, Nakshatra, Yoga, Muhurtas for any city"
 readme = "README_PYPI.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 keywords = ["panchangam", "vedic", "astrology", "mcp", "calendar"]
 dependencies = [
     "mcp>=1.0,<2.0",
@@ -44,6 +45,7 @@ Homepage = "https://panchangam.astrochaganti.com"
 Repository = "https://github.com/socraticsurge/telugu-calendar-utilities"
 Issues = "https://github.com/socraticsurge/telugu-calendar-utilities/issues"
 Changelog = "https://github.com/socraticsurge/telugu-calendar-utilities/releases"
+License = "https://github.com/socraticsurge/telugu-calendar-utilities/blob/master/LICENSE"
 
 [project.scripts]
 mcp-server-panchangam = "telugu_panchangam.mcp.server:main"

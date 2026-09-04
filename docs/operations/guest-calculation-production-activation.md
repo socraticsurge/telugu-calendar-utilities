@@ -1,15 +1,15 @@
 # Guest calculation production activation
 
-Status: **assessment complete; activation readiness incomplete**
+Status: **AGPL path approved; activation readiness incomplete**
 Assessment timestamp: `2026-09-02T23:54:32+05:30` (`Asia/Kolkata`)
 Release refresh: `2026-09-03` (`Asia/Kolkata`)
 Panchangam production baseline: `eec464e871afdce9268716233fed2eecc91ae17a`
 Epic: [#234](https://github.com/socraticsurge/telugu-calendar-utilities/issues/234)
 
 This is the operator runbook for activating guest birth-profile calculation and
-Muhurtam election-chart screening. It records sequence and evidence; it is not
-authorization to merge, add credentials, deploy, relicense, or enable a public
-flag.
+Muhurtam election-chart screening. The owner approved the AGPL-compatible
+public-source path and today-launch sequence on 2026-09-04. The evidence and
+rollback checks below still apply to every executed release step.
 
 Refresh this record immediately before any Preview, merge, deployment, or
 activation approval. Reconfirm branch heads, CI/security check URLs, exact
@@ -22,9 +22,9 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 |---|---|
 | Panchangam profile/Muhurtam UI | Live with both remote client flags off |
 | Astro guest routes | [PR #161](https://github.com/socraticsurge/astro-unified-core/pull/161) is green at `e7fb3fe6`; Preview is Ready; routes remain absent from Production |
-| DashaFlow authenticated contracts | [PR #1](https://github.com/socraticsurge/dashaflow-sidecar/pull/1) is green at `97eece13`; Preview is Ready; contracts remain unreleased |
-| Panchangam activation-readiness work | [PR #451](https://github.com/socraticsurge/telugu-calendar-utilities/pull/451) is open at `3bcc0da`; branch publication does not deploy GitHub Pages |
-| Licensing | Technical inventory `dd90f800` completed; legal/rights-holder decision remains blocked by #231, #444, #445, and #449 |
+| DashaFlow authenticated contracts | [PR #3](https://github.com/socraticsurge/dashaflow-sidecar/pull/3) is green at `00f8fe2`; it adds AGPL/source disclosure and remains unmerged |
+| Panchangam activation-readiness work | [PR #451](https://github.com/socraticsurge/telugu-calendar-utilities/pull/451) is merged at `571b805`; both public client flags remain off |
+| Licensing | Owner selected the AGPL-compatible public-source path on 2026-09-04. TCU `1.14.0`, DashaFlow PR #3, and the Astro AGPL release candidate must all merge and expose public exact-revision source before activation |
 | Production geocoder/shared controls | Fixed adapters, shared cache, privacy controls, guest budgets, and gated authenticated migration exist at `e7fb3fe6`; provider/Redis terms, credentials, Preview certification, and owner approval remain blocked by #233 and its children |
 | Authenticated three-service Preview | **Blocked:** no exact pair-bound hosted Preview path exists yet |
 
@@ -32,10 +32,13 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 
 All boxes must be supported by links to evidence.
 
-- [ ] #231 records the approved Swiss Ephemeris **and PySwissEph wrapper** posture.
-- [ ] #444 audits existing PyPI and live-service exposure.
+- [ ] #231 is updated to record the owner-selected AGPL-compatible Swiss
+      Ephemeris and PySwissEph posture plus the final release evidence.
+- [x] #444 audits existing PyPI and live-service exposure.
 - [ ] #445 implements and verifies the selected licensing posture.
-- [ ] #449 records wrapper rights or completes and verifies an approved replacement.
+- [ ] #449 is updated to record that the AGPL PySwissEph binding is retained
+      under the selected AGPL-compatible posture; no proprietary wrapper grant
+      or replacement is required for this path.
 - [ ] #443's DashaFlow producer invariants pass against the TCU consumers.
 - [ ] #233 records the provider, retention, cache, attribution, and abuse posture.
 - [ ] #446 implements and verifies the owner-approved geocoder and shared,
