@@ -115,6 +115,34 @@ def test_gold_declares_four_qualification_rules_and_no_chart_remainder():
         assert not {'Rahu', 'Ketu'} & set(rule['aspectors'])
 
 
+def test_karnavedha_vacant_eighth_is_the_only_candidate_chart_rule():
+    rules = ELECTION_CHART_RULES['karnavedha']
+    assert [rule['id'] for rule in rules] == [
+        'karnavedha.house-8-vacant',
+    ]
+    assert rules[0]['kind'] == 'house_empty'
+    assert rules[0]['effect'] == 'reject'
+    assert rules[0]['house'] == 8
+    assert 'internal printed p. 23' in rules[0]['source_locator']
+    assert ELECTION_CHART_MANUAL_REMAINDERS['karnavedha'] == ()
+
+    pass_chart = _chart(**{planet: 1 for planet in PLANETS})
+    fail_chart = _chart(**{
+        **{planet: 1 for planet in PLANETS},
+        'Ketu': 8,
+    })
+    assert evaluate_election_chart(
+        'karnavedha', pass_chart)['outcomes'][0]['status'] == 'pass'
+    failed = evaluate_election_chart('karnavedha', fail_chart)
+    assert failed['outcomes'][0]['status'] == 'fail'
+    assert failed['rejected'] is True
+
+    incomplete = {**pass_chart, 'planets': pass_chart['planets'][:-1]}
+    unknown = evaluate_election_chart('karnavedha', incomplete)
+    assert unknown['outcomes'][0]['status'] == 'unknown'
+    assert unknown['needs_review'] is True
+
+
 @pytest.mark.parametrize(
     'case', GOLD_ORACLE['cases'], ids=lambda case: case['id'])
 def test_gold_shared_python_typescript_oracle(case):

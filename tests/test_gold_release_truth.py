@@ -64,7 +64,7 @@ def test_research_inventory_is_explicitly_a_dated_pre_gold_baseline():
         not in research
 
 
-def test_current_reference_pages_publish_the_27_rule_gold_contract():
+def test_current_reference_pages_publish_the_28_rule_chart_contract():
     features = ' '.join(
         _read('docs/reference/04-user-facing-features.md').split()
     )
@@ -72,10 +72,10 @@ def test_current_reference_pages_publish_the_27_rule_gold_contract():
         _read('docs/reference/05-data-flow-and-muhurta.md').split()
     )
 
-    assert 'one of 27 deterministic chart predicates' in features
+    assert 'one of 28 deterministic chart predicates' in features
     assert 'one of 23 deterministic chart predicates' not in features
-    assert '13 source-backed activity profiles' in flow
-    assert 'complete 27-rule matrix' in flow
+    assert '14 source-backed activity profiles' in flow
+    assert 'complete 28-rule matrix' in flow
     assert 'complete 23-rule matrix' not in flow
     for document in (features, flow):
         assert 'Gold / jewelry purchase' in document

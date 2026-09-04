@@ -35,7 +35,10 @@
     "audit_claim",
     "heuristic_claim",
     "related_claims",
+    "source_scope",
     "daytime_only",
+    "require_single_daylight_tithi",
+    "require_single_daylight_nakshatra",
     "forenoon_only",
     "allowed_pakshams",
     "require_homa_election",
@@ -397,9 +400,7 @@
         15
       ],
       "manual_checks": [
-        "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month.",
-        "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
-        "Election chart: leave the 8th house unoccupied."
+        "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month."
       ],
       "allowed_lagnas": [
         "Mesha",
@@ -413,7 +414,14 @@
         "Meena"
       ],
       "source_claim": "muhurta.karnavedha",
-      "daytime_only": true
+      "related_claims": [
+        "muhurta.karnavedha.vidyamadhava_divergence",
+        "muhurta.karnavedha.chintamani_divergence"
+      ],
+      "source_scope": "Raman daylight policy: one Tithi and one Nakshatra must each cover [local sunrise, local sunset), and the candidate election chart must keep the 8th house vacant. Vidyamadhava and Muhurta Chintamani are disclosed alternate lineages and are not blended into this policy.",
+      "daytime_only": true,
+      "require_single_daylight_tithi": "raman-karnavedha-daylight-v1",
+      "require_single_daylight_nakshatra": "raman-karnavedha-daylight-v1"
     },
     "mundana": {
       "label": "Mundana / Chaula (First head-shave)",
@@ -1601,10 +1609,14 @@
           "allowed_varas",
           "avoid_tithi_numbers",
           "allowed_lagnas",
-          "daytime_only"
+          "daytime_only",
+          "require_single_daylight_tithi",
+          "require_single_daylight_nakshatra"
         ],
         "personal_rule_ids": [],
-        "election_chart_rule_ids": [],
+        "election_chart_rule_ids": [
+          "karnavedha.house-8-vacant"
+        ],
         "manual_checks": [
           {
             "id": "karnavedha.manual-1",
@@ -1613,22 +1625,6 @@
             "text": "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month.",
             "class": "manual-only",
             "display_section": "information"
-          },
-          {
-            "id": "karnavedha.manual-2",
-            "source_index": 1,
-            "source_text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
-            "text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
-            "class": "manual-only",
-            "display_section": "information"
-          },
-          {
-            "id": "karnavedha.manual-3",
-            "source_index": 2,
-            "source_text": "Election chart: leave the 8th house unoccupied.",
-            "text": "Election chart: leave the 8th house unoccupied.",
-            "class": "manual-only",
-            "display_section": "chart"
           }
         ]
       },

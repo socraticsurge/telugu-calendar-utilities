@@ -59,6 +59,10 @@ import {
 } from '../scorer/election-chart-screening';
 import { localWallTimeToInstant } from '../lib/election-chart-api';
 import { electionChartCalculationEnabled } from '../lib/remote-calculation-activation';
+import {
+  evaluateConfiguredKarnavedhaDaylight,
+  karnavedhaDaylightDropReason,
+} from '../scorer/election-assessors/karnavedha-daylight';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
 // --- Tarabalam tool ---
@@ -1727,6 +1731,21 @@ async function findMuhurta() {
       const manualGuidance = muClassifyManualChecks(activity, manualChecks);
       const chartManualRemainder = chartManualRemaindersFor(activity);
       const activityLabel = rules.label;
+      const daylightPolicy = activity === 'karnavedha'
+        ? evaluateConfiguredKarnavedhaDaylight(
+          data,
+          rules.require_single_daylight_tithi,
+          rules.require_single_daylight_nakshatra,
+        )
+        : null;
+      if (daylightPolicy && !daylightPolicy.admissible) {
+        droppedDays.push({
+          date: isoDate,
+          reason: karnavedhaDaylightDropReason(daylightPolicy),
+          daylightOutcomes: daylightPolicy.outcomes,
+        });
+        continue;
+      }
       if (rules.skip_on_sankramana && data.special.some(
           item => /Sankraman/i.test(item))) {
         droppedDays.push({
@@ -2154,6 +2173,7 @@ async function findMuhurta() {
             group_fit: groupFit, activity_match: activityMatch,
             personal_source: personal.evidence,
             personal_outcomes: personal.outcomes,
+            day_source_outcomes: daylightPolicy?.outcomes || [],
             notes,
             chart_validation: manualGuidance.chart,
             chart_remainder: chartManualRemainder,
@@ -2395,9 +2415,24 @@ function renderMuhurta() {
     const [y, mo, da] = iso.split('-').map(Number);
     return new Date(y, mo - 1, da).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
+  const droppedOutcomeHtml = outcomes => outcomes?.length
+    ? `<ul class="mu-dropped-daylight" aria-label="Karnavedha daylight rule outcomes">
+         ${outcomes.map(outcome => `<li class="mu-dropped-daylight--${outcome.status}">
+           <strong>${htmlEsc(outcome.label)}</strong> · ${htmlEsc(
+             outcome.status === 'pass'
+               ? 'passed'
+               : outcome.status === 'fail'
+                 ? 'failed'
+                 : 'could not be verified')}
+           ${outcome.evidence?.length
+             ? `<small>${htmlEsc(outcome.evidence.join(' '))}</small>`
+             : ''}
+         </li>`).join('')}
+       </ul>`
+    : '';
   const droppedHtml = droppedDays.length
     ? `<details class="mu-dropped"><summary>${droppedDays.length} day${droppedDays.length>1?'s':''} filtered · see why</summary>
-         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}</li>`).join('')}</ul>
+         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}${droppedOutcomeHtml(dd.daylightOutcomes)}</li>`).join('')}</ul>
        </details>`
     : '';
   const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0;
@@ -2409,6 +2444,10 @@ function renderMuhurta() {
     ? hasScreeningReview
       ? ' · all four Gold v1 event-specific clauses attempted; unresolved outcomes remain review-gated; the general election-chart baseline is not assessed'
       : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed'
+    : activity === 'karnavedha'
+      ? hasScreeningReview
+        ? ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate has an unresolved fact'
+        : ' · daylight Tithi, daylight Nakshatra and vacant-8th outcomes all resolved'
     : hasScreeningReview
       ? ''
       : ' · every implemented event-specific outcome resolved';
@@ -2421,6 +2460,8 @@ function renderMuhurta() {
             ? 'Chart screening applied with unresolved facts'
           : activity === 'gold'
             ? 'Gold event-specific chart clauses resolved'
+            : activity === 'karnavedha'
+              ? 'Karnavedha event checks resolved'
             : 'Exact chart screening applied',
         detail: chartEnrichment.engine
           ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${chartEnrichment.boundaryReviewCount ? ' · boundary-adjacent house checks held for review' : chartEnrichment.reviewGatedCount ? ' · unresolved chart facts held for review' : ''}${scopeDetail}`
@@ -2641,6 +2682,38 @@ function renderMuhurta() {
               </div>
             </section>`;
   };
+  const renderComputedDaylight = outcomes => {
+    if (!outcomes?.length) return '';
+    const lis = outcomes.map(outcome => {
+      const label = outcome.status === 'pass'
+        ? 'Required daylight check passed'
+        : outcome.status === 'fail'
+          ? 'Day removed by daylight rule'
+          : 'Boundary could not be verified · day removed';
+      const evidence = Array.isArray(outcome.evidence) && outcome.evidence.length
+        ? `<small>Observed: ${htmlEsc(outcome.evidence.join(' '))}</small>`
+        : '';
+      return `<li class="mu-chart-rule mu-chart-rule--reject mu-chart-rule--${outcome.status}">
+                <span>${htmlEsc(muCapitalize(outcome.label))}</span>
+                <b>${label}</b>
+                ${evidence}
+              </li>`;
+    }).join('');
+    const first = outcomes[0];
+    return `<section class="mu-rg mu-rg-computed mu-rg-daylight" aria-label="Computed Karnavedha daylight checks">
+              <h4 class="mu-rg-label">Computed daylight checks</h4>
+              <div class="mu-rg-content">
+                <ul class="mu-rg-items">${lis}</ul>
+                <p class="mu-chart-boundary">Evaluated once for this day over the half-open interval [local sunrise, local sunset), using the feed's published Tithi and Nakshatra transition boundaries rather than candidate-window samples. A same-minute sunset boundary stays unknown.</p>
+                <p class="mu-rule-reference"><strong>Event source:</strong> ${htmlEsc(first.sourceLocator)}</p>
+                <details class="mu-technical-provenance">
+                  <summary>Technical provenance</summary>
+                  <p><strong>Event claim:</strong> <code>${htmlEsc(first.sourceClaim)}</code><br><strong>Named policy:</strong> <code>${htmlEsc(first.policyId)}</code><br><strong>Policy claim:</strong> <code>${htmlEsc(first.decisionPolicyClaim)}</code></p>
+                </details>
+                <p class="mu-rule-reference"><a href="${MU_CHART_METHOD_URL}">Method, boundary semantics and source crosswalk</a></p>
+              </div>
+            </section>`;
+  };
   const renderPersonalChecks = (outcomes, evidence) => {
     if (!outcomes?.length) return renderGroup(
       'Profile-specific check', evidence, 'mu-rg-personal');
@@ -2677,6 +2750,7 @@ function renderMuhurta() {
              ${renderGroup('Group fit', rg.group_fit)}
              ${renderPersonalChecks(rg.personal_outcomes, rg.personal_source)}
              ${renderGroup('Activity', rg.activity_match)}
+             ${renderComputedDaylight(rg.day_source_outcomes)}
              ${renderComputedChart(s.chartScreening)}
              ${renderChartValidation(
                s.chartScreening && Array.isArray(rg.chart_remainder)

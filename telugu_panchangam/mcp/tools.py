@@ -975,13 +975,20 @@ def _gather_muhurta_slots(
 
     for i in range(days):
         day = calculated_days[i]
+        daylight_assessment = None
+        if activity == 'karnavedha':
+            from telugu_panchangam.personal.election_assessors.karnavedha import (
+                evaluate_karnavedha_daylight,
+            )
+            daylight_assessment = evaluate_karnavedha_daylight(day)
         day_results = day_slots(day, activity=activity,
                                 janma_nakshatras=janma_nakshatras,
                                 janma_rasis=janma_rasis,
                                 janma_lagnas=janma_lagnas,
                                 chandra_mode=chandra_mode,
                                 travel_direction=travel_direction,
-                                engine=engine)
+                                engine=engine,
+                                _daylight_assessment=daylight_assessment)
         night_results = []
         if include_night:
             next_pd = calculated_days[i + 1]
@@ -997,7 +1004,8 @@ def _gather_muhurta_slots(
                                   janma_nakshatras=janma_nakshatras,
                                   janma_rasis=janma_rasis,
                                   chandra_mode=chandra_mode,
-                                  travel_direction=travel_direction)
+                                  travel_direction=travel_direction,
+                                  _daylight_assessment=daylight_assessment)
             if reason:
                 dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
         for s in day_results + night_results:
@@ -1077,6 +1085,8 @@ def tool_find_muhurta(
             'avoid_vara_tithi_names',
             'avoid_nitya_yogas',
             'require_homa_election',
+            'require_single_daylight_tithi',
+            'require_single_daylight_nakshatra',
         )
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
@@ -1091,6 +1101,7 @@ def tool_find_muhurta(
                 'audit_claim': rules.get('audit_claim'),
                 'heuristic_claim': rules.get('heuristic_claim'),
                 'related_claims': rules.get('related_claims', []),
+                'source_scope': rules.get('source_scope'),
                 'manual_prerequisites': rules.get(
                     'manual_prerequisites', False),
                 'automated_constraints': {

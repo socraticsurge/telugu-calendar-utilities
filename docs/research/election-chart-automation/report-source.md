@@ -251,10 +251,21 @@ The canonical test matrix must prove:
 - Python and TypeScript produce the same status, effect, evidence, and
   convention metadata for the golden fixtures.
 
+## Completed event after Annaprasana: Karnavedha
+
+Following the already completed Annaprasana assessor, Karnavedha now
+implements the vacant eighth-house predicate plus two
+day-level Raman-policy predicates: one Tithi and one Nakshatra throughout the
+half-open local daylight interval. Day limbs use actual engine/feed transition
+boundaries once per day and fail closed on missing or minute-equality evidence;
+DashaFlow remains limited to candidate-time chart facts. The eight-row
+Hyderabad/New York oracle covers pass/pass, fail/fail, pass/fail and fail/pass,
+including EST/EDT and next-date suffixes.
+
 ## Next event sequence
 
-After Gold passes owner review, the next bounded stories are Annaprasana,
-Karnavedha, Vidyarambha, completed-house purchase, general purchase,
+Gold and Annaprasana preceded Karnavedha. The next bounded stories are
+Vidyarambha, completed-house purchase, general purchase,
 well-digging, and business investment. They reuse placement, grouped-planet,
 benefic/malefic, and composition primitives before the program advances to
 lordship, Navamsa-Lagna, compatibility, named-Yoga, and medical-context work.

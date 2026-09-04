@@ -279,8 +279,8 @@ separate artifact-shape behavior.
 The canonical table is
 `telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES`.
 `tools/export_election_chart_rules.py` projects it to the browser; the generated
-JSON is not an independent authority. There are 27 deterministic predicates
-across 13 activity profiles.
+JSON is not an independent authority. There are 28 deterministic predicates
+across 14 activity profiles.
 
 `Reject` means a failed predicate removes the window. `Prefer` means a passing
 predicate is tie-break evidence only; it adds no raw score and its absence does
@@ -341,6 +341,7 @@ hidden behind them.
 | Annaprasana | `annaprasana.budha-not-7` | Budha is not in house 7 | Reject | `muhurta.annaprasana` |
 | Annaprasana | `annaprasana.kuja-not-8` | Kuja is not in house 8 | Reject | `muhurta.annaprasana` |
 | Annaprasana | `annaprasana.shukra-not-9` | Shukra is not in house 9 | Reject | `muhurta.annaprasana` |
+| Karnavedha | `karnavedha.house-8-vacant` | House 8 is vacant throughout the sampled candidate window | Reject | `muhurta.karnavedha` |
 | Seemantha | `seemantha.house-8-vacant` | House 8 is vacant | Reject | `muhurta.seemantha` |
 | Seemantha | `seemantha.chandra-not-8` | Chandra is not in house 8 | Reject | `muhurta.seemantha` |
 | Gruhapravesha | `gruhapravesha.house-8-vacant` | House 8 is vacant | Reject | `muhurta.gruhapravesha` |
@@ -573,8 +574,8 @@ maps all 30 browser activities to:
   display section.
 
 `tools/export_activity_rules.py` embeds that structured contract in
-`src/data/activity-rules.generated.json`. Freshness tests require all 114
-source manual checks to have an intentional classification. They produce 115
+`src/data/activity-rules.generated.json`. Freshness tests require all 112
+source manual checks to have an intentional classification. They produce 113
 display rows because the Gruhapravesha mixed owner/ritual sentence is
 deliberately split into two traceable rows rather than misclassified. This
 contract changes presentation only: it does not promote a manual check into an
@@ -585,15 +586,17 @@ automated rule.
 Automation is intentionally predicate-by-predicate. It does not promote a
 partially implemented source passage into a complete chart verdict.
 “Automated here” means the Drik browser post-screen. Python and MCP continue to
-return their ranked slots plus the original `manual_checks`; they do not call
-the DashaFlow service or claim these candidate-time chart predicates passed.
-Pure Python evaluators exist for rule parity and testing, but the public
-Python/MCP slot orchestrator does not apply them to its ranked result.
+avoid the DashaFlow service and do not claim candidate-time chart predicates
+passed. They do, however, apply Karnavedha's two exact day-level transition
+predicates before generating slots and return their criterion outcomes. Pure
+Python evaluators exist for other rule parity and testing, but the public
+Python/MCP slot orchestrator applies no other candidate-time chart evaluator.
 
 | Activity | Automated here | Still requires practitioner or real-world review |
 |---|---|---|
 | Wedding | Vacant 7th; Kuja outside 8th; Shukra outside 6th | Nakshatra Pada, lineage-specific Mrityu Yoga, malefics around Lagna, Chandra association, fortification Yogas, both partners' compatibility/Tarabala/Chandrabala/Panchaka, consent |
 | Annaprasana | Vacant 10th; Budha/Kuja/Shukra exclusions | Child's age-month, benefic in Lagna, malefic-free Lagna, pediatric and family guidance |
+| Karnavedha | One Tithi and one Nakshatra throughout `[local sunrise, local sunset)`; vacant 8th in the candidate chart | Child-age guidance, consent, sterile technique and aftercare; Python/MCP apply the day rules but do not call the candidate-chart service |
 | Seemantha | Vacant 8th; Chandra outside 8th; mother's relative-star exclusions | Pregnancy month/lineage, alternative stars, Pournami dignity, medical precedence |
 | Gruhapravesha | Vacant 8th; householder Janma matches | Graha strength, Upachaya/Kendra benefic-malefic judgment, Lagna ownership, Navamsa exception, ritual preparation and pregnancy safety |
 | Land purchase | Guru and Kuja placements listed above | Weekday lord in Lagna, Lagna/7th-lord harmony, 11th lord in 12th, legal/title/soil/finance checks |
@@ -625,9 +628,9 @@ choice.
 
 The complete machine-readable crosswalk is published as
 [Muhurtam rule crosswalk JSON](muhurtam-rule-crosswalk.json). It contains all
-322 configured prerequisite rows across the 30 browser activities: 175
-Panchangam predicates, five personal predicates, 27 election-chart predicates
-and 115 manual display rows. The original Gold manual row remains in this
+323 configured prerequisite rows across the 30 browser activities: 177
+Panchangam predicates, five personal predicates, 28 election-chart predicates
+and 113 manual display rows. The original Gold manual row remains in this
 exhaustive source inventory because non-Drik, unavailable and Python/MCP
 fallbacks still disclose it; the successful Drik result uses the empty
 clause-level remainder instead. A separate `expert_scope` in the same artefact
@@ -639,7 +642,7 @@ expert profiles are available in the browser.
 Every row records its exact configured inputs, predicate class, criterion
 claim and locator, authority state, implementation status, ranking effect, and
 the reason it is automated or left manual. Criterion authority is classified
-field by field: among browser Panchangam rows, 106 use the activity's direct
+field by field: among browser Panchangam rows, 108 use the activity's direct
 source claim, eight use the separately verified Sankramana claim, and 61 are
 explicitly labeled project heuristics. Numeric weights, tie-break ordering and
 review-tier caps carry a separate project-policy claim even when the preferred
@@ -656,6 +659,7 @@ the readable criterion-by-criterion audit.
 |---|---|---|
 | `muhurta.wedding` | B. V. Raman, *Muhurtha*, Chapter IX, printed pp. 41–42 (PDF pp. 45–46) | [Wedding](31-wedding-evidence-audit.md) |
 | `muhurta.annaprasana` | Raman, Chapter VIII, printed pp. 21–22 (PDF pp. 25–26) | [Annaprasana](18-annaprasana-profile.md) |
+| `muhurta.karnavedha`; `election_day.karnavedha_daylight_policy_v1` | Raman, Chapter VIII, internal printed p. 23 (physical PDF p. 26), with Chapter V at internal printed p. 12 (physical PDF p. 15); named half-open daylight interpretation policy | [Karnavedha](19-karnavedha-profile.md) |
 | `muhurta.seemantha` | Raman, Chapter VII, printed pp. 20–21 (PDF pp. 24–25) | [Seemantha](47-seemantha-profile.md) |
 | `muhurta.gruhapravesha` | Raman, Chapter XII, printed pp. 52–54 (PDF pp. 56–58) | [Gruhapravesha](33-gruhapravesha-evidence-audit.md) |
 | `muhurta.land_purchase.building` | Raman, Chapter XII, printed p. 53 (PDF p. 57) | [Land purchase](15-land-purchase-profile.md) |
@@ -715,7 +719,7 @@ HTTP 200. Producer story
 is closed and Done. The browser validator remains strict; release of the
 producer fix is evidence for keeping, not relaxing, those invariants.
 
-The Python table is the source of truth for the 27 chart predicates. The
+The Python table is the source of truth for the 28 chart predicates. The
 Python personal module and TypeScript mirror carry the same five personal rule
 IDs, effects, locators, input evidence and all-sampled-state result semantics, with
 fixture parity tests. The TypeScript chart evaluator is a browser mirror and
@@ -737,7 +741,22 @@ the external ephemeris evidence.
 
 ## UI review evidence
 
-The current committed review-evidence directory at
+The Karnavedha review-evidence directory at
+`docs/screenshots/karnavedha-assessor-2026-09-04/` contains twelve deterministic
+images: pass, Tithi fail, Nakshatra fail, both fail and minute-precision unknown
+at 1440×900 and 390×844, plus a chart-component pass crop rendered at each
+viewport that visibly records `8th house is vacant`. Its manifest records each
+expected state/copy, frame purpose, capture kind, image size and digest. The
+failure cases prove that no chart request is made for a rejected day; the pass
+overview expands both daylight outcomes and the two additional crops preserve
+the candidate-chart result.
+Recreate it with:
+
+```bash
+python tools/capture_karnavedha_assessor_screenshots.py --dist dist
+```
+
+The Gold review-evidence directory at
 `docs/screenshots/gold-chart-screening-2026-09-04/` contains a reproducible
 15-image fixture matrix. Six fresh Gold images cover pass, conclusive
 condition miss with rating cap, and fail-closed unknown at both 1440×900 and

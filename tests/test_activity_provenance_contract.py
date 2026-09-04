@@ -100,3 +100,14 @@ def test_generated_browser_contract_keeps_related_claims():
         if activity not in browser['rules'] or 'related_claims' not in rules:
             continue
         assert browser['rules'][activity]['related_claims'] == rules['related_claims']
+
+
+def test_generated_browser_and_mcp_keep_source_scope():
+    browser = json.loads(
+        (ROOT / 'src/data/activity-rules.generated.json').read_text(
+            encoding='utf-8'))
+    for activity, rules in ACTIVITY_RULES.items():
+        if activity not in browser['rules'] or 'source_scope' not in rules:
+            continue
+        assert browser['rules'][activity]['source_scope'] == (
+            rules['source_scope'])

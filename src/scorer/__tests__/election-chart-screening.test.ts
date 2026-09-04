@@ -426,6 +426,57 @@ describe('source-backed election-chart predicates', () => {
     }));
   });
 
+  test('Karnavedha automates the vacant eighth-house clause completely', () => {
+    expect(automatedRulesFor('karnavedha').map(rule => rule.id)).toEqual([
+      'karnavedha.house-8-vacant',
+    ]);
+    expect(chartManualRemaindersFor('karnavedha')).toEqual([]);
+
+    const passing = evaluateElectionChart(
+      'karnavedha',
+      chart(Object.fromEntries(PLANETS.map(name => [name, 1]))),
+    );
+    expect(passing).toEqual(expect.objectContaining({
+      rejected: false,
+      needsReview: false,
+      stable: true,
+    }));
+    expect(outcome(passing, 'karnavedha.house-8-vacant')).toEqual(
+      expect.objectContaining({ status: 'pass', effect: 'reject' }),
+    );
+
+    const failing = evaluateElectionChart('karnavedha', chart({ Ketu: 8 }));
+    expect(failing.rejected).toBe(true);
+    expect(outcome(failing, 'karnavedha.house-8-vacant')).toEqual(
+      expect.objectContaining({ status: 'fail', effect: 'reject' }),
+    );
+
+    const incomplete = chart();
+    incomplete.planets.pop();
+    const unknown = evaluateElectionChart('karnavedha', incomplete);
+    expect(unknown).toEqual(expect.objectContaining({
+      rejected: false,
+      needsReview: true,
+    }));
+    expect(outcome(unknown, 'karnavedha.house-8-vacant').status).toBe('unknown');
+  });
+
+  test.each([0, 13, true, false])(
+    'invalid election house %j fails closed to unknown',
+    invalidHouse => {
+      const invalid = chart();
+      (invalid.planets[0] as unknown as { house: unknown }).house = invalidHouse;
+
+      const result = evaluateElectionChart('karnavedha', invalid);
+
+      expect(result).toEqual(expect.objectContaining({
+        rejected: false,
+        needsReview: true,
+      }));
+      expect(result.outcomes.every(item => item.status === 'unknown')).toBe(true);
+    },
+  );
+
   test('Positive placements are tie-break evidence, not raw-score bonuses', () => {
     const result = evaluateElectionChart('job', chart({ Surya: 10, Kuja: 4 }));
     expect(result.rejected).toBe(false);

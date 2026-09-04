@@ -67,6 +67,8 @@ DETERMINISTIC_PANCHANGAM_FIELDS: tuple[str, ...] = (
     'prefer_lagnas',
     'caution_lagna_solar',
     'daytime_only',
+    'require_single_daylight_tithi',
+    'require_single_daylight_nakshatra',
     'forenoon_only',
     'allowed_pakshams',
     'require_homa_election',
@@ -177,8 +179,11 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
             'skip_on_yoga', 'skip_on_sankramana', 'prefer_tithi_class',
             'avoid_tithi_class', 'allowed_varas', 'avoid_tithi_numbers',
             'allowed_lagnas', 'daytime_only',
+            'require_single_daylight_tithi',
+            'require_single_daylight_nakshatra',
         ),
-        manual_sections=('information', 'information', 'chart'),
+        election_chart_rule_ids=('karnavedha.house-8-vacant',),
+        manual_sections=('information',),
     ),
     'mundana': _activity(
         panchangam_fields=(

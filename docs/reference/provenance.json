@@ -63,9 +63,65 @@
       "id": "BVR-MUHURTHA-1993",
       "title": "Muhurtha (Electional Astrology)",
       "author": "B. V. Raman",
-      "edition": "UBS Publishers' Distributors, 1993, ISBN 9788185674681",
+      "edition": "UBS Publishers' Distributors, 1993, ISBN 9788185674681, 181 catalogued pages",
+      "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC",
+      "catalogue_urls": [
+        "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC",
+        "https://openlibrary.org/books/OL9860226M/Muhurtha_%28Electional_Astrology%29"
+      ],
+      "authority_type": "modern_synthesis",
+      "inspected_directly": false,
+      "inspection_boundary": "The 1993 bibliographic work is catalogued, but no scan of this 181-page edition was inspected. Located claims were checked against the separately registered 2020 Chistabo derivative."
+    },
+    {
+      "id": "BVR-MUHURTHA-CHISTABO-2020",
+      "title": "Muhurtha (Electional Astrology) — Chistabo re-edited derivative",
+      "author": "B. V. Raman; re-edited by Simon (Chistabo)",
+      "edition": "2020 re-edited transcription, 78 physical PDF pages",
       "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf",
-      "authority_type": "modern_synthesis"
+      "authority_type": "inspected_derivative",
+      "inspected_directly": true,
+      "related_work_id": "BVR-MUHURTHA-1993",
+      "exact_edition_match_verified": false,
+      "relationship_boundary": "The derivative identifies B. V. Raman's work and says it was checked against an unspecified original scanned PDF; it does not identify that source PDF as the 181-page 1993 UBS edition.",
+      "accessed_on": "2026-09-04",
+      "sha256": "b8b878a444a487c83810329fdf8f057c40e92221a867db480d864da8be21a133",
+      "byte_size": 2172882,
+      "physical_pdf_page_count": 78,
+      "pdf_metadata": {
+        "title": "Muhurta-Raman Eng",
+        "creator": "Word",
+        "producer": "Mac OS X 10.13.6 Quartz PDFContext",
+        "created_ist": "2020-06-17T16:29:55+05:30",
+        "modified_ist": "2020-06-17T16:29:55+05:30",
+        "pdf_version": "1.4"
+      },
+      "editorial_notice": {
+        "physical_pdf_page": 3,
+        "internal_folio": "II",
+        "editor": "Simon aka Chistabo",
+        "declares_re_edit": true,
+        "declares_bracketed_additions": true,
+        "declares_typo_corrections": true,
+        "declares_appendix_omission": true
+      },
+      "page_numbering": [
+        {
+          "physical_pdf_pages": "4-36",
+          "internal_printed_pages": "1-33",
+          "relation": "internal = physical - 3"
+        },
+        {
+          "physical_pdf_pages": "37",
+          "internal_printed_pages": null,
+          "relation": "unnumbered interstitial"
+        },
+        {
+          "physical_pdf_pages": "38-78",
+          "internal_printed_pages": "34-74",
+          "relation": "internal = physical - 4"
+        }
+      ]
     },
     {
       "id": "MC-HINDI-IA",
@@ -74,6 +130,14 @@
       "edition": "Undated Sanskrit text with Hindi commentary, Internet Archive identifier muhurta-chintamani-hindi",
       "url": "https://archive.org/details/muhurta-chintamani-hindi",
       "authority_type": "primary_text_hindi_commentary"
+    },
+    {
+      "id": "VM-SASTRI-1925-V2",
+      "title": "Vidyamadhaviyam, Volume II",
+      "author": "Vidyamadhava",
+      "edition": "R. Shama Sastry edition with Vishnusarma's Muhurtadipika commentary, Government Branch Press, Mysore, 1925",
+      "url": "https://www.ebharatisampat.in/readpdf.php?id=NDA3Nzk3NTg2NzM2Njc4",
+      "authority_type": "primary_text_sanskrit_commentary"
     },
     {
       "id": "DP-DAY-PAGE",
@@ -645,10 +709,43 @@
       "implementation": "telugu_panchangam/personal/activity_rules.py",
       "evidence_class": "textual",
       "verification_state": "verified",
-      "source_ids": ["BVR-MUHURTHA-1993"],
-      "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
-      "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, age guidance, double-Tithi/double-Nakshatra caution, vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. Age, transition-count and election-house checks remain manual. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
-      "last_reviewed": "2026-07-21"
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+      "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, child-age guidance, the source wording that a day ruled by two Tithis or two Nakshatras is to be rejected, the vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. The Drik website post-screen uses DashaFlow only for the candidate-time vacant-8th chart fact. Child age remains information for guardians. Shared samskara filters, the operational meaning of 'day', boundary handling, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.karnavedha.vidyamadhava_divergence",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["VM-SASTRI-1925-V2"],
+      "locator": "Vidyamadhaviyam Vol. II, Chapter VI, verse 18, internal printed p. 39, with Vishnusarma's Muhurtadipika commentary on internal printed p. 41",
+      "scope": "Alternate Karnavedha lineage. The verse uses ahni/diva daylight language and the commentary supplies a before-Lagna exception. That exception materially differs from the selected Raman all-day two-Tithi/two-Nakshatra policy, so the project discloses but does not blend it into the automated predicate.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.karnavedha.chintamani_divergence",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Muhurta Chintamani, Samskara-prakarana, Karnavedha verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)",
+      "scope": "Alternate Karnavedha rule set with materially different detail and scope. It is retained as lineage context only; none of its additional clauses is silently imported into the named Raman daylight policy.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_day.karnavedha_daylight_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/karnavedha.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020", "VM-SASTRI-1925-V2", "MC-HINDI-IA"],
+      "locator": "Raman Chapter VIII, Karnavedha, internal printed p. 23 (physical PDF p. 26); Vidyamadhaviyam Vol. II, Chapter VI verse 18 and commentary, internal printed pp. 39 and 41; Muhurta Chintamani, Samskara-prakarana verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)",
+      "scope": "Names the product's Raman interpretation: 'day' is the half-open local daylight interval [sunrise, sunset); a Tithi or Nakshatra transition strictly inside that interval rejects the whole day, a transition exactly at sunset does not, and missing, malformed or minute-ambiguous boundary evidence is unknown and therefore not admitted. This temporal and fail-closed policy is a disclosed project interpretation, not an additional textual claim.",
+      "last_reviewed": "2026-09-04"
     },
     {
       "id": "muhurta.mundana",

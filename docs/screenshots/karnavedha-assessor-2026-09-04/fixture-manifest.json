@@ -1,0 +1,236 @@
+{
+  "capturedAt": "2026-09-04T18:46:04+00:00",
+  "source": "tools/capture_karnavedha_assessor_screenshots.py",
+  "liveServicesUsed": false,
+  "policyId": "raman-karnavedha-daylight-v1",
+  "captures": [
+    {
+      "file": "fixture-pass-desktop-1440x900.png",
+      "scenario": "karnavedha-pass",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Karnavedha event checks resolved",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "3db9883508d97dbd8b75c9bdbff51f7ca71ddab50fded1d719decc0766f8a8fe"
+    },
+    {
+      "file": "fixture-pass-mobile-390x844.png",
+      "scenario": "karnavedha-pass",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Karnavedha event checks resolved",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "0a2dd0a04564a11fd5774a6abbce51b93337c5546875896dd9bb6e35f257ea91"
+    },
+    {
+      "file": "fixture-tithi-fail-desktop-1440x900.png",
+      "scenario": "karnavedha-tithi-fail",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Tithi changes at 12:00 inside local daylight",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "d11b8b63f4d55d646f21330711876c6f88ea98e0e346fcf55c0eccccc02f2c9c"
+    },
+    {
+      "file": "fixture-tithi-fail-mobile-390x844.png",
+      "scenario": "karnavedha-tithi-fail",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Tithi changes at 12:00 inside local daylight",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "6fc6a12dfe1d21a7067792cbfa403d2394444fe160a8409e0ca5a9be6ca25f8b"
+    },
+    {
+      "file": "fixture-nakshatra-fail-desktop-1440x900.png",
+      "scenario": "karnavedha-nakshatra-fail",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Nakshatra changes at 12:30 inside local daylight",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "c73b1757996d8220b735c32d59ffdb4f65c26d3105b756235fc94d56207116a0"
+    },
+    {
+      "file": "fixture-nakshatra-fail-mobile-390x844.png",
+      "scenario": "karnavedha-nakshatra-fail",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Nakshatra changes at 12:30 inside local daylight",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "574136b9e545763f9bec5932ede85bd926fe1d7ac38807e26f5bcdf3fa228a93"
+    },
+    {
+      "file": "fixture-both-fail-desktop-1440x900.png",
+      "scenario": "karnavedha-both-fail",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Tithi changes at 12:00",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "ebeb3b9ac70e9c2ad277c44954ecf4cecc543a9fc12c6e2443bcefd87645ae04"
+    },
+    {
+      "file": "fixture-both-fail-mobile-390x844.png",
+      "scenario": "karnavedha-both-fail",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Tithi changes at 12:00",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "6b9246d90277813c07a2f7efab3e453a7e272f95a9b8a2ba6a744cccd688e9a9"
+    },
+    {
+      "file": "fixture-unknown-desktop-1440x900.png",
+      "scenario": "karnavedha-unknown",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Tithi boundary could not be verified",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "e4e03424451b76115ff9a73e7790e9b382b615bbceb0a699f737290dde374b83"
+    },
+    {
+      "file": "fixture-unknown-mobile-390x844.png",
+      "scenario": "karnavedha-unknown",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "not-run",
+      "expectedCopy": "Tithi boundary could not be verified",
+      "frame": "overview",
+      "captureKind": "viewport",
+      "imageSize": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "cc6f0c9e260338e5cbde43746575842fd5a8a77f5f25e10fd5fd6e9829cd8bb6"
+    },
+    {
+      "file": "fixture-pass-candidate-chart-desktop-1440x900.png",
+      "scenario": "karnavedha-pass",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "8th house is vacant",
+      "frame": "candidate-chart",
+      "captureKind": "element",
+      "imageSize": {
+        "width": 792,
+        "height": 193
+      },
+      "sha256": "c5e98a2fd88ff0e7996c64abc64a8e73bcf529866f04c5859c635b786b7a7942"
+    },
+    {
+      "file": "fixture-pass-candidate-chart-mobile-390x844.png",
+      "scenario": "karnavedha-pass",
+      "activity": "karnavedha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "8th house is vacant",
+      "frame": "candidate-chart",
+      "captureKind": "element",
+      "imageSize": {
+        "width": 340,
+        "height": 272
+      },
+      "sha256": "3d4f28bdc8aff783677063fefea0ddebe4aab7331519568ea5a44788b6d8f406"
+    }
+  ]
+}

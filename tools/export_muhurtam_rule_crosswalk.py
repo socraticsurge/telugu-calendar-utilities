@@ -28,6 +28,7 @@ ACTIVITY_METADATA_FIELDS = frozenset({
     'audit_claim',
     'heuristic_claim',
     'related_claims',
+    'source_scope',
     'manual_checks',
     'manual_prerequisites',
 })
@@ -58,7 +59,8 @@ PRIMARY_ACTIVITY_CLAIM_FIELDS: Mapping[str, frozenset[str]] = {
     }),
     'karnavedha': frozenset({
         'daytime_only', 'allowed_varas', 'avoid_tithi_numbers',
-        'allowed_lagnas',
+        'allowed_lagnas', 'require_single_daylight_tithi',
+        'require_single_daylight_nakshatra',
     }),
     'mundana': frozenset({
         'forenoon_only', 'skip_on_combust', 'allowed_pakshams',
@@ -271,6 +273,9 @@ def _field(
     rationale: str,
     *,
     implementation_note: str | None = None,
+    rule_id: str | None = None,
+    implementation_owner: str | None = None,
+    interpretation_policy_claim_id: str | None = None,
 ) -> dict[str, str]:
     result = {
         'predicate_class': predicate_class,
@@ -279,6 +284,13 @@ def _field(
     }
     if implementation_note:
         result['implementation_note'] = implementation_note
+    if rule_id:
+        result['rule_id'] = rule_id
+    if implementation_owner:
+        result['implementation_owner'] = implementation_owner
+    if interpretation_policy_claim_id:
+        result['interpretation_policy_claim_id'] = (
+            interpretation_policy_claim_id)
     return result
 
 
@@ -371,6 +383,28 @@ PANCHANGAM_FIELD_SEMANTICS: Mapping[str, dict[str, str]] = {
     'daytime_only': _field(
         'panchangam.time-admission', 'candidate_exclusion',
         'Night candidates are not generated for this activity.'),
+    'require_single_daylight_tithi': _field(
+        'panchangam.daylight-single-limb', 'candidate_exclusion',
+        'The exact Tithi transition span is evaluated once over the half-open '
+        'interval [local sunrise, local sunset); missing or uncertain '
+        'boundaries reject admission.',
+        rule_id='karnavedha.daylight-tithi-single',
+        implementation_owner=(
+            'telugu_panchangam/personal/election_assessors/karnavedha.py'),
+        interpretation_policy_claim_id=(
+            'election_day.karnavedha_daylight_policy_v1'),
+    ),
+    'require_single_daylight_nakshatra': _field(
+        'panchangam.daylight-single-limb', 'candidate_exclusion',
+        'The exact Nakshatra transition span is evaluated once over the '
+        'half-open interval [local sunrise, local sunset); missing or '
+        'uncertain boundaries reject admission.',
+        rule_id='karnavedha.daylight-nakshatra-single',
+        implementation_owner=(
+            'telugu_panchangam/personal/election_assessors/karnavedha.py'),
+        interpretation_policy_claim_id=(
+            'election_day.karnavedha_daylight_policy_v1'),
+    ),
     'forenoon_only': _field(
         'panchangam.time-admission', 'candidate_exclusion',
         'Candidates ending after local solar noon are rejected.'),
@@ -594,6 +628,7 @@ def _row(
     implementation_note: str | None = None,
     predicate_source_locator: str | None = None,
     decision_policy_claim: Mapping[str, Any] | None = None,
+    interpretation_policy_claim: Mapping[str, Any] | None = None,
     related_context_claims: tuple[Mapping[str, Any], ...] = (),
     supporting_claims: tuple[Mapping[str, Any], ...] = (),
     authority_role: str | None = None,
@@ -620,6 +655,11 @@ def _row(
         result['decision_policy_claim_id'] = decision_policy_claim['id']
         result['decision_policy_claim'] = _row_claim(
             decision_policy_claim)
+    if interpretation_policy_claim:
+        result['interpretation_policy_claim_id'] = (
+            interpretation_policy_claim['id'])
+        result['interpretation_policy_claim'] = _row_claim(
+            interpretation_policy_claim)
     if related_context_claims:
         result['related_context_claims'] = [
             _row_claim(item) for item in related_context_claims
@@ -777,7 +817,8 @@ def build_crosswalk(
         for field, semantics in PANCHANGAM_FIELD_SEMANTICS.items():
             if field not in activity_rules:
                 continue
-            rule_id = f'{activity}.panchangam.{field}'
+            rule_id = semantics.get(
+                'rule_id', f'{activity}.panchangam.{field}')
             status = (
                 'automated_browser_and_python'
                 if field in browser_field_set
@@ -807,7 +848,8 @@ def build_crosswalk(
                 source_claim_id=field_claim_id,
                 source_claim=field_claim,
                 implementation_status=status,
-                implementation_owner=(
+                implementation_owner=semantics.get(
+                    'implementation_owner',
                     'telugu_panchangam/personal/activity_rules.py'),
                 ranking_effect=semantics['ranking_effect'],
                 automation_mode='automated',
@@ -815,8 +857,12 @@ def build_crosswalk(
                 implementation_note=semantics.get('implementation_note'),
                 decision_policy_claim=(
                     scoring_policy_claim
-                    if _uses_project_decision_policy(
-                        semantics['ranking_effect'])
+                    if _uses_project_decision_policy(semantics['ranking_effect'])
+                    else None
+                ),
+                interpretation_policy_claim=(
+                    resolve(semantics['interpretation_policy_claim_id'])
+                    if semantics.get('interpretation_policy_claim_id')
                     else None
                 ),
             ))
@@ -1029,6 +1075,7 @@ def build_crosswalk(
             'source_claim_id': claim_id,
             'source_claim': claim,
             'related_claims': related_claims,
+            'source_scope': activity_rules.get('source_scope'),
             'manual_prerequisites': bool(
                 activity_rules.get('manual_prerequisites')),
             'surface_availability': 'browser_and_python',
@@ -1303,6 +1350,22 @@ def _validate_complete(
             if policy['authority_status'] != 'explicit_project_heuristic':
                 raise ValueError(
                     f'{row["rule_id"]}: decision policy is not heuristic')
+        interpretation_policy = row.get('interpretation_policy_claim')
+        if interpretation_policy:
+            if (
+                interpretation_policy['id']
+                != row['interpretation_policy_claim_id']
+            ):
+                raise ValueError(
+                    f'{row["rule_id"]}: interpretation policy did not '
+                    'resolve')
+            if (
+                interpretation_policy['authority_status']
+                != 'explicit_project_heuristic'
+            ):
+                raise ValueError(
+                    f'{row["rule_id"]}: interpretation policy is not '
+                    'heuristic')
         for related in row.get('related_context_claims', ()):
             if related['authority_status'] != 'documented_conflict':
                 raise ValueError(

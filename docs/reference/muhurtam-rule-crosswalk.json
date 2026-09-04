@@ -11,11 +11,11 @@
     "activities": 30,
     "browser_activities": 30,
     "python_mcp_only_activities": 5,
-    "rows": 322,
-    "deterministic_panchangam_rows": 175,
+    "rows": 323,
+    "deterministic_panchangam_rows": 177,
     "personal_rule_rows": 5,
-    "election_chart_rule_rows": 27,
-    "manual_display_rows": 115,
+    "election_chart_rule_rows": 28,
+    "manual_display_rows": 113,
     "by_predicate_class": {
       "panchangam.slot-exclusion": 16,
       "panchangam.day-exclusion": 33,
@@ -25,10 +25,11 @@
       "panchangam.day-admission-exception": 1,
       "panchangam.slot-admission": 38,
       "panchangam.ranking-penalty": 7,
-      "election-chart.house_empty": 5,
+      "election-chart.house_empty": 6,
       "election-chart.planet_not_house": 9,
-      "manual.display-row": 115,
+      "manual.display-row": 113,
       "panchangam.time-admission": 3,
+      "panchangam.daylight-single-limb": 2,
       "personal.exact-election-fact": 5,
       "election-chart.planet_in_houses": 8,
       "election-chart.planet_well_situated": 2,
@@ -39,18 +40,18 @@
       "panchangam.specialized-admission": 1
     },
     "by_implementation_status": {
-      "automated_browser_and_python": 152,
+      "automated_browser_and_python": 154,
       "automated_python_only_not_browser": 23,
-      "automated_exact_chart_browser_with_python_parity": 32,
-      "manual_displayed_not_computed": 115
+      "automated_exact_chart_browser_with_python_parity": 33,
+      "manual_displayed_not_computed": 113
     },
     "by_authority_status": {
-      "source_backed": 243,
+      "source_backed": 244,
       "explicit_project_heuristic": 76,
       "documented_conflict": 3
     },
     "deterministic_by_authority_role": {
-      "activity_source_claim": 106,
+      "activity_source_claim": 108,
       "explicit_project_heuristic": 61,
       "shared_source_claim": 8
     }
@@ -73,6 +74,7 @@
         "scope": "The 'Anything auspicious' selector deliberately adds no activity-specific rule. It exposes the finder's shared Panchanga, Choghadiya, Lagna, personal-strength and relative-tier calculations as a source-neutral exploratory ranking. It is not a classical election for an unspecified act, must not be described as scripturally verified, and should yield to every purpose-specific profile when the intended act is known."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [],
@@ -97,7 +99,7 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46), from the lunar-month paragraph through the election-chart conditions",
@@ -125,6 +127,7 @@
           "scope": "The published Hyderabad table admits qualifying Tuesdays and includes Tithis such as Chaturdashi, Pournami, Shashthi and Navami that Raman's method rejects. It also applies solar/lunar month, Adhika, Chaturmas and Guru/Shukra Asta filters. This is a real lineage and methodology divergence: the product follows its explicitly named Raman profile, preserves separately sourced conservative safeguards, and does not claim identity with Drik Panchang's marriage-date set."
         }
       ],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -183,6 +186,7 @@
         "scope": "For a mutual engagement, implements the intersection of both sides' directly stated Nakshatra admissions: Rohini, Krittika, the three Purvas and the three Uttaras. Verse 10 admits Kanyavarana under nine named stars or the marriage-election stars in verse 55; verse 11 admits Varavarana/Phaladana under Rohini, all three Uttaras, Krittika and all three Purvas. Every verse-11 star is also admitted by verse 10, so the eight-star intersection is exact. Verse 11 additionally says Shubha day, Tithi and Lagna without enumerating them in this passage; those remain mandatory practitioner prerequisites. This profile governs mutual ritual selection/gift exchange, not relationship compatibility or the wedding ceremony."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -212,13 +216,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Naming the child (Namakarana),' printed p. 21 (PDF p. 25)",
         "scope": "Supports the configured Namakarana weekday and Nakshatra admission lists, rejected Tithi numbers, fixed-Lagna preference, timing-after-birth guidance and disclosed election-chart/name checks. Shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -262,13 +267,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter VIII, 'Post-natal ceremonies' / 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
         "scope": "Supports the configured Annaprasana Nakshatra and weekday admission lists, rejected general-Panchanga-Suddhi Tithis, excluded rising Rasis, age-month guidance and disclosed election-chart checks. The Drik website post-screen now requires a vacant 10th house, Budha outside the 7th, Mangala outside the 8th and Shukra outside the 9th across every sampled state (window edges and both sides of every known interior Drik Lagna transition); qualitative Lagna strength and malefic judgment remain manual. Shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -307,20 +313,69 @@
         "evidence_class": "textual",
         "verification_state": "verified",
         "source_ids": [
-          "BVR-MUHURTHA-1993"
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
         ],
         "sources": [
           {
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
+          },
+          {
+            "id": "BVR-MUHURTHA-CHISTABO-2020",
+            "title": "Muhurtha (Electional Astrology) — Chistabo re-edited derivative",
+            "authority_type": "inspected_derivative",
             "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
           }
         ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
-        "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, age guidance, double-Tithi/double-Nakshatra caution, vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. Age, transition-count and election-house checks remain manual. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority."
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+        "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, child-age guidance, the source wording that a day ruled by two Tithis or two Nakshatras is to be rejected, the vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. The Drik website post-screen uses DashaFlow only for the candidate-time vacant-8th chart fact. Child age remains information for guardians. Shared samskara filters, the operational meaning of 'day', boundary handling, Tithi-family ranking, personal scoring and relative tiers require separate authority."
       },
-      "related_claims": [],
+      "related_claims": [
+        {
+          "id": "muhurta.karnavedha.vidyamadhava_divergence",
+          "surface": "muhurtam",
+          "authority_status": "documented_conflict",
+          "evidence_class": "textual",
+          "verification_state": "contradicted",
+          "source_ids": [
+            "VM-SASTRI-1925-V2"
+          ],
+          "sources": [
+            {
+              "id": "VM-SASTRI-1925-V2",
+              "title": "Vidyamadhaviyam, Volume II",
+              "authority_type": "primary_text_sanskrit_commentary",
+              "url": "https://www.ebharatisampat.in/readpdf.php?id=NDA3Nzk3NTg2NzM2Njc4"
+            }
+          ],
+          "locator": "Vidyamadhaviyam Vol. II, Chapter VI, verse 18, internal printed p. 39, with Vishnusarma's Muhurtadipika commentary on internal printed p. 41",
+          "scope": "Alternate Karnavedha lineage. The verse uses ahni/diva daylight language and the commentary supplies a before-Lagna exception. That exception materially differs from the selected Raman all-day two-Tithi/two-Nakshatra policy, so the project discloses but does not blend it into the automated predicate."
+        },
+        {
+          "id": "muhurta.karnavedha.chintamani_divergence",
+          "surface": "muhurtam",
+          "authority_status": "documented_conflict",
+          "evidence_class": "textual",
+          "verification_state": "contradicted",
+          "source_ids": [
+            "MC-HINDI-IA"
+          ],
+          "sources": [
+            {
+              "id": "MC-HINDI-IA",
+              "title": "Muhurta Chintamani",
+              "authority_type": "primary_text_hindi_commentary",
+              "url": "https://archive.org/details/muhurta-chintamani-hindi"
+            }
+          ],
+          "locator": "Muhurta Chintamani, Samskara-prakarana, Karnavedha verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)",
+          "scope": "Alternate Karnavedha rule set with materially different detail and scope. It is retained as lineage context only; none of its additional clauses is silently imported into the named Raman daylight policy."
+        }
+      ],
+      "source_scope": "Raman daylight policy: one Tithi and one Nakshatra must each cover [local sunrise, local sunset), and the candidate election chart must keep the 8th house vacant. Vidyamadhava and Muhurta Chintamani are disclosed alternate lineages and are not blended into this policy.",
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -332,14 +387,15 @@
         "karnavedha.panchangam.avoid_tithi_numbers",
         "karnavedha.panchangam.allowed_lagnas",
         "karnavedha.panchangam.daytime_only",
+        "karnavedha.daylight-tithi-single",
+        "karnavedha.daylight-nakshatra-single",
         "karnavedha.panchangam.skip_on_adhika",
         "karnavedha.panchangam.skip_on_khar_maasa",
         "karnavedha.panchangam.skip_on_pitru_paksha",
-        "karnavedha.manual-1",
-        "karnavedha.manual-2",
-        "karnavedha.manual-3"
+        "karnavedha.house-8-vacant",
+        "karnavedha.manual-1"
       ],
-      "row_count": 14
+      "row_count": 15
     },
     {
       "activity": "mundana",
@@ -360,13 +416,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Tonsure (Chowlam),' printed pp. 22-23 (PDF pp. 26-27)",
         "scope": "Supports the configured Shukla-Paksha, forenoon, combustion, Tithi, weekday, Nakshatra and conservative rising-Rasi rules plus disclosed age, pregnancy, solar-season and election-chart checks. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -412,13 +469,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Investiture of sacred thread (Upanayanam),' printed pp. 23-24 (PDF pp. 27-28)",
         "scope": "Supports the configured Upanayana lunar months, Uttarayana solar Rasis, exact Paksha-qualified Tithis, weekdays, Nakshatras, admitted rising Rasis and before-noon rule plus disclosed age, conditional Budha combustion and election-chart checks. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -465,13 +523,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Commencing education (Aksharabhyasa),' printed p. 23 (PDF p. 27)",
         "scope": "Supports the configured Vidyarambha weekday, Nakshatra and movable-or-common rising-Rasi admission lists plus disclosed age, forenoon/noon and election-chart guidance. Shared samskara filters, Choghadiya and Tithi-family ranking, personal scoring and relative tiers require separate authority."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -512,7 +571,7 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
@@ -540,6 +599,7 @@
           "scope": "Verse 8 corroborates the implemented rejection of Rikta Tithis, Amavasya, Dwadashi, Shashthi and Ashtami; its primary and alternative Nakshatra lists together include the profile's nine stars; its alternative weekday rule admits Monday, Wednesday, Thursday and Friday; and it likewise reduces the importance of Guru/Shukra combustion. It materially diverges on pregnancy timing by prescribing the 6th or 8th month rather than Raman's 5th or 7th. It also supplies male-planet Lagna/Navamsha and benefic/malefic house-placement rules rather than Raman's ten-Rasi admission set. The product must disclose this lineage choice and must not present one month rule as universal."
         }
       ],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -579,7 +639,7 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XII, 'House building,' section 'Entering a new house,' printed pp. 52-54 (PDF pp. 56-58)",
@@ -607,6 +667,7 @@
           "scope": "The published Panchang Shuddhi practice rejects Sunday and Tuesday but admits qualifying Saturdays, while Raman's named auspicious list is Monday, Wednesday, Thursday and Friday and reports Saturday only as another-writers' view with a theft caution. Drik Panchang also applies lunar-month and Adhika-month filters beyond this Raman profile. The product follows its named Raman lineage and discloses rather than merges this current-practice divergence."
         }
       ],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -647,13 +708,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter IV, 'Influence of Nakshatras,' movable-Nakshatra classification, printed p. 10 (PDF p. 14)",
         "scope": "Supports only the configured +1 preference for five movable Nakshatras when acquiring vehicles; the passage does not reject every other Nakshatra. The Labh-Choghadiya, Bhadra-Tithi, Friday and fixed-Lagna ranking preferences are disclosed project rules and do not inherit authority from this citation."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -684,13 +746,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
         "scope": "Supports the configured building-land purchase weekday and Nakshatra admission lists, hard Rikta-Tithi rejection and fixed-Lagna preference. The Drik website post-screen now treats Guru in a Kendra or Trikona and Mangala in the 11th as preferences only when they pass across every sampled state, and requires Mangala outside Lagna across every sampled state (window edges and both sides of every known interior Drik Lagna transition). Weekday-lord, Lagna/7th-lord harmony and 11th-lord placement remain manual checks. It does not support elections for purchasing a completed house, which Raman treats separately."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -728,7 +791,7 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XII, 'Buying Houses,' printed p. 53 (PDF p. 57)",
@@ -756,6 +819,7 @@
           "scope": "Verse 16 supports the configured preference for Revati, Shatabhisha, Ashvini, Swati, Shravana and Chitra from the buyer's perspective. Verse 17 supports the disclosed marketplace checks: reject Rikta Tithis, Tuesday and Kumbha Lagna; place Chandra and Shukra in Lagna, keep malefics out of the 8th and 12th, and place benefics in the 2nd, 10th or 11th. The Drik website post-screen now treats Chandra-in-Lagna and Shukra-in-Lagna as source preferences only when they pass across every sampled state (window edges and both sides of every known interior Drik Lagna transition); the remaining marketplace house placements stay manual. The Labh-Choghadiya bonus is a separate project heuristic, not authorized by these verses. Object-specific vehicle, building-land and jewelry profiles remain narrower authorities and take precedence."
         }
       ],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -790,13 +854,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
         "scope": "Supports only the disclosed requirement that Surya and Chandra be well situated and aspected, plus the passage's general instruction to avoid unfavorable Tithis and Nakshatras. The Drik website post-screen now evaluates the four chart qualifications under the separately disclosed gold-phaladeepika-placement-full-drishti-v1 convention; a resolved miss caps the tier and an unknown remains review-gated. It does not supply a jewelry-specific weekday, Tithi, Nakshatra, Lagna or Choghadiya list. The configured Labh-Choghadiya, Bhadra-Tithi, Friday/Thursday and fixed-Lagna preferences are disclosed project heuristics and do not inherit authority from this citation."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -832,7 +897,7 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           },
           {
             "id": "MC-HINDI-IA",
@@ -866,6 +931,7 @@
           "scope": "Verse 16 supports the configured preference for Revati, Shatabhisha, Ashvini, Swati, Shravana and Chitra from the buyer's perspective. Verse 17 supports the disclosed marketplace checks: reject Rikta Tithis, Tuesday and Kumbha Lagna; place Chandra and Shukra in Lagna, keep malefics out of the 8th and 12th, and place benefics in the 2nd, 10th or 11th. The Drik website post-screen now treats Chandra-in-Lagna and Shukra-in-Lagna as source preferences only when they pass across every sampled state (window edges and both sides of every known interior Drik Lagna transition); the remaining marketplace house placements stay manual. The Labh-Choghadiya bonus is a separate project heuristic, not authorized by these verses. Object-specific vehicle, building-land and jewelry profiles remain narrower authorities and take precedence."
         }
       ],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -907,6 +973,7 @@
         "scope": "Verse 16 supports the configured preference for Revati, Shatabhisha, Ashvini, Swati, Shravana and Chitra from the buyer's perspective. Verse 17 supports the disclosed marketplace checks: reject Rikta Tithis, Tuesday and Kumbha Lagna; place Chandra and Shukra in Lagna, keep malefics out of the 8th and 12th, and place benefics in the 2nd, 10th or 11th. The Drik website post-screen now treats Chandra-in-Lagna and Shukra-in-Lagna as source preferences only when they pass across every sampled state (window edges and both sides of every known interior Drik Lagna transition); the remaining marketplace house placements stay manual. The Labh-Choghadiya bonus is a separate project heuristic, not authorized by these verses. Object-specific vehicle, building-land and jewelry profiles remain narrower authorities and take precedence."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -939,7 +1006,7 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter X, 'Borrowing Money,' printed p. 45 (PDF p. 49)",
@@ -967,6 +1034,7 @@
           "scope": "The inspected commentary joins debt-taking to a broader Dravyaprayoga/capital-deployment election with twelve named Nakshatras, Chara Lagna, benefics in the 5th/9th and an empty 8th. It does not reproduce Raman's Krittika/Moola/Punarvasu/Dhanishtha/Janma exclusion set. This is a disclosed lineage/scope divergence, not authority to merge the formulas."
         }
       ],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -999,7 +1067,7 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter X, 'Lending Money,' printed p. 45 (PDF p. 49)",
@@ -1027,6 +1095,7 @@
           "scope": "The published methodology says not to give a loan on Wednesday, directly differing from Raman's Tuesday-and-Friday exclusion and implicit Wednesday admission. The configured profile follows the explicitly named Raman lineage and discloses, rather than merges, this current-practice divergence."
         }
       ],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1062,13 +1131,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XII, 'House Building' / 'Laying the Foundation,' printed p. 50 (PDF p. 54)",
         "scope": "Supports the configured house-foundation lunar-month, Tithi-number, Nakshatra, weekday, solar-Rasi and fixed-Lagna criteria. Full election-chart house occupancy/aspects and ritual site placement are disclosed manual checks. Shared samskara filters, personal scoring and relative tiers require separate authority."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1107,13 +1177,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XII, 'Digging Wells,' printed p. 51 (PDF p. 55)",
         "scope": "Supports the configured well-digging Nakshatra and rising-Rasi admission lists plus the disclosed Surya-in-Lagna hard-rock caution. Shukra/Chandra Kendra placement and the abundant-sweet-water condition remain manual chart checks. Shared ranking and personal factors require separate authority."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1144,13 +1215,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XII, 'Repairing Houses,' printed pp. 53-54 (PDF pp. 57-58)",
         "scope": "Supports Tuesday as the sole absolute weekday prohibition and Monday/Wednesday/Thursday as preferences for commencing repairs. Friday with Vrishabha/Tula Lagna, Monday with Karka Lagna, a benefic in Lagna, Chandra in an aquatic Rasi, and the Mangala-same-Nakshatra condition remain manual prerequisites. The seven named Nakshatras are not unconditionally rejected. Whitewashing, dismantling, new construction and moving/re-entry are separate scopes; engineering, permits and worksite safety take precedence."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1190,6 +1262,7 @@
         "scope": "Supports twelve named Nakshatras, Chara Lagna, benefics in the 5th and 9th houses and an unoccupied 8th for Dravyaprayoga: putting funds to work, including investing capital in employment or business. The Chara requirement is automated; the three house conditions remain mandatory practitioner checks. This does not authorize a universal company-founding election and excludes marketplace opening, inventory purchase and lending, which are separate activities. Commercial, legal and financial judgment always takes precedence. The former Amrit, Nanda, weekday and Sthira-Lagna proxies have been removed."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1227,6 +1300,7 @@
         "scope": "Supports the employee-side act of entering service under seven named Nakshatras and Wednesday, Friday, Sunday or Thursday, with a benefic in Lagna, Surya or Mangala in the 10th/11th, employer/employee birth-Nakshatra Yoni friendship and friendship between their Janma-Rasi lords. The weekday and star gates are automated; the Drik website post-screen now treats Surya-or-Mangala in the 10th/11th as a preference only when it passes across every sampled state (window edges and both sides of every known interior Drik Lagna transition). Benefic Lagna strength and two-person compatibility remain mandatory practitioner checks. This does not cover offer acceptance, modern contract signing, incorporation or hiring staff. Employment terms, labour law and workplace safety take precedence. The former Amrit, Nanda and Sthira-Lagna proxies have been removed."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1266,6 +1340,7 @@
         "scope": "Implements both conjunctive tests in verses 35-36 as hard gates. Homahuti counts the Moon's Nakshatra inclusively from Surya's Nakshatra in nine successive groups of three, assigned to Surya, Budha, Shukra, Shani, Chandra, Mangala, Guru, Rahu and Ketu; groups of the natural benefics Budha, Shukra, Chandra and Guru are admitted. Agnivasa numbers Tithis 1-30 from Shukla Pratipat and weekdays 1-7 from Sunday, adds one to the Tithi count, and admits modulo-four remainders 3 or 0, which place Agni on earth. The activity is deliberately scoped to a Homa offering (Homahuti), not every Yajna; rite-specific Kalpa and Sampradaya requirements remain manual."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1294,13 +1369,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XIV, 'Journeys' and 'Pilgrimage,' printed pp. 60-62 (PDF pp. 64-66)",
         "scope": "The pilgrimage paragraph explicitly incorporates the earlier journey rules. This supports rejecting Chaturdashi and Full/New Chandra days, preferring the ten named journey Nakshatras, rejecting Guru combustion and disclosing Guru-in-Lagna-or-9th as a chart check. The Drik website post-screen now treats Guru in Lagna or the 9th as a source preference only when it passes across every sampled state (window edges and both sides of every known interior Drik Lagna transition). The Vishti-Karana rejection follows the separately cited general Panchanga-Suddhi rule. The configured Chara-Lagna preference is a project heuristic and does not inherit authority from this citation; Raman instead names six individual favorable journey Rasis."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1340,6 +1416,7 @@
         "scope": "Supports the exact rejection of Rikta Tithis, Ashtami, Pournami and Amavasya; admission of Monday, Wednesday, Thursday and Friday; fifteen named Nakshatras; and rejection of Sankramana. The Drik website post-screen now treats Surya in the 10th, Chandra in the 4th and Guru in Lagna as source preferences only when they pass across every sampled state (window edges and both sides of every known interior Drik Lagna transition). Combustion, exceptional omens and the remedial Shanti urgency exception remain manual. The profile is limited to Shantika rites that pacify affliction and Paushtika welfare rites, including the passage's Puja, Purashcharana and Mula-shanti examples; it is not a universal ceremony election."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1376,13 +1453,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
         "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or the manual alternative of Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; and separation of the Lagna and 6th lords. The passage says to avoid the usual unfavorable lunar days without repeating them; automation transparently resolves that phrase to Raman's recurring explicit list in the same edition: Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The legacy litigation API key resolves explicitly to this profile and is not a separate election."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": true,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1418,13 +1496,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XV, 'Surgical Operations,' printed pp. 64-65 (PDF pp. 68-69)",
         "scope": "Supports the configured Tuesday-or-Saturday, waxing Chaturthi/Navami/Chaturdashi and Ardra/Jyeshtha/Ashlesha/Moola admission rules plus the disclosed natal-Chandra, operated-body-part, Mangala, 8th-house, relevant-house and Mangala-Shani chart checks. The Drik website post-screen now requires a vacant 8th house across every sampled state (window edges and both sides of every known interior Drik Lagna transition) and keeps Chandra outside the selected patient's Janma Rasi at every sample; operated-body-part, affliction, Mangala-strength, relevant-house and Mangala-Shani judgments remain manual. The Vishti-Karana rejection is a separately implemented project rule and does not inherit authority from this citation. Medical urgency and clinician instructions always override electional timing."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -1459,13 +1538,14 @@
             "id": "BVR-MUHURTHA-1993",
             "title": "Muhurtha (Electional Astrology)",
             "authority_type": "modern_synthesis",
-            "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
           }
         ],
         "locator": "Chapter XIV, 'Journeys' and 'Long-distance Journeys,' printed pp. 60-61 (PDF pp. 64-65)",
         "scope": "Supports configured hard rejection of Bharani/Krittika, preference for the ten named journey Nakshatras, and the disclosed Lagna, Guru/Shukra, waxing-Chandra, Mangala and 7th-house chart checks. The Drik website post-screen now requires Mangala outside the 8th across every sampled state (window edges and both sides of every known interior Drik Lagna transition), rejects candidate Lagnas 1/5/7/9 from the selected traveller's Janma Lagna at any sample and prefers a candidate Lagna matching that traveller's Janma Rasi only across every sample. General Lagna fortification, whether Guru or Shukra is well placed in Lagna, waxing Chandra and 7th-house judgment remain manual because occupancy alone cannot establish well-placed. Vishti rejection follows the separately cited general Panchanga-Suddhi rule. Chara-Lagna and Tiryan-Mukha bonuses are separately attributed project rules. Two source corrections remain outside the configured claim because existing tests pin contrary behavior: Chaturdashi/Full/New Chandra rejection, and time-of-day exceptions to Disha Shoola. Both require explicit owner approval."
       },
       "related_claims": [],
+      "source_scope": null,
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -4052,9 +4132,10 @@
         "evidence_class": "textual",
         "verification_state": "verified",
         "source_ids": [
-          "BVR-MUHURTHA-1993"
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
       },
       "implementation_status": "automated_browser_and_python",
       "implementation_owner": "telugu_panchangam/personal/activity_rules.py",
@@ -4086,9 +4167,10 @@
         "evidence_class": "textual",
         "verification_state": "verified",
         "source_ids": [
-          "BVR-MUHURTHA-1993"
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
       },
       "implementation_status": "automated_browser_and_python",
       "implementation_owner": "telugu_panchangam/personal/activity_rules.py",
@@ -4123,9 +4205,10 @@
         "evidence_class": "textual",
         "verification_state": "verified",
         "source_ids": [
-          "BVR-MUHURTHA-1993"
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
       },
       "implementation_status": "automated_browser_and_python",
       "implementation_owner": "telugu_panchangam/personal/activity_rules.py",
@@ -4150,15 +4233,102 @@
         "evidence_class": "textual",
         "verification_state": "verified",
         "source_ids": [
-          "BVR-MUHURTHA-1993"
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
       },
       "implementation_status": "automated_browser_and_python",
       "implementation_owner": "telugu_panchangam/personal/activity_rules.py",
       "ranking_effect": "candidate_exclusion",
       "automation_mode": "automated",
       "automation_rationale": "Night candidates are not generated for this activity."
+    },
+    {
+      "activity": "karnavedha",
+      "rule_id": "karnavedha.daylight-tithi-single",
+      "predicate_class": "panchangam.daylight-single-limb",
+      "configured_inputs": {
+        "activity_rule_field": "require_single_daylight_tithi",
+        "configured_value": "raman-karnavedha-daylight-v1",
+        "authority_role": "activity_source_claim"
+      },
+      "source_claim_id": "muhurta.karnavedha",
+      "source_claim": {
+        "id": "muhurta.karnavedha",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+      },
+      "implementation_status": "automated_browser_and_python",
+      "implementation_owner": "telugu_panchangam/personal/election_assessors/karnavedha.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "The exact Tithi transition span is evaluated once over the half-open interval [local sunrise, local sunset); missing or uncertain boundaries reject admission.",
+      "interpretation_policy_claim_id": "election_day.karnavedha_daylight_policy_v1",
+      "interpretation_policy_claim": {
+        "id": "election_day.karnavedha_daylight_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020",
+          "VM-SASTRI-1925-V2",
+          "MC-HINDI-IA"
+        ],
+        "locator": "Raman Chapter VIII, Karnavedha, internal printed p. 23 (physical PDF p. 26); Vidyamadhaviyam Vol. II, Chapter VI verse 18 and commentary, internal printed pp. 39 and 41; Muhurta Chintamani, Samskara-prakarana verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)"
+      }
+    },
+    {
+      "activity": "karnavedha",
+      "rule_id": "karnavedha.daylight-nakshatra-single",
+      "predicate_class": "panchangam.daylight-single-limb",
+      "configured_inputs": {
+        "activity_rule_field": "require_single_daylight_nakshatra",
+        "configured_value": "raman-karnavedha-daylight-v1",
+        "authority_role": "activity_source_claim"
+      },
+      "source_claim_id": "muhurta.karnavedha",
+      "source_claim": {
+        "id": "muhurta.karnavedha",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+      },
+      "implementation_status": "automated_browser_and_python",
+      "implementation_owner": "telugu_panchangam/personal/election_assessors/karnavedha.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "The exact Nakshatra transition span is evaluated once over the half-open interval [local sunrise, local sunset); missing or uncertain boundaries reject admission.",
+      "interpretation_policy_claim_id": "election_day.karnavedha_daylight_policy_v1",
+      "interpretation_policy_claim": {
+        "id": "election_day.karnavedha_daylight_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020",
+          "VM-SASTRI-1925-V2",
+          "MC-HINDI-IA"
+        ],
+        "locator": "Raman Chapter VIII, Karnavedha, internal printed p. 23 (physical PDF p. 26); Vidyamadhaviyam Vol. II, Chapter VI verse 18 and commentary, internal printed pp. 39 and 41; Muhurta Chintamani, Samskara-prakarana verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)"
+      }
     },
     {
       "activity": "karnavedha",
@@ -4237,6 +4407,50 @@
     },
     {
       "activity": "karnavedha",
+      "rule_id": "karnavedha.house-8-vacant",
+      "predicate_class": "election-chart.house_empty",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "house_empty",
+        "predicate_inputs": {
+          "house": 8
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
+      },
+      "source_claim_id": "muhurta.karnavedha",
+      "source_claim": {
+        "id": "muhurta.karnavedha",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "Whole Sign house occupancy is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)"
+    },
+    {
+      "activity": "karnavedha",
       "rule_id": "karnavedha.manual-1",
       "predicate_class": "manual.display-row",
       "configured_inputs": {
@@ -4254,85 +4468,16 @@
         "evidence_class": "textual",
         "verification_state": "verified",
         "source_ids": [
-          "BVR-MUHURTHA-1993"
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
       },
       "implementation_status": "manual_displayed_not_computed",
       "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
       "ranking_effect": "disclosure_only",
       "automation_mode": "manual",
       "automation_rationale": "This source-scope or lineage statement is displayed rather than converted into an unsupported machine predicate.",
-      "authority_role": "activity_source_claim"
-    },
-    {
-      "activity": "karnavedha",
-      "rule_id": "karnavedha.manual-2",
-      "predicate_class": "manual.display-row",
-      "configured_inputs": {
-        "source_index": 1,
-        "source_text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
-        "text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
-        "class": "manual-only",
-        "display_section": "information"
-      },
-      "source_claim_id": "muhurta.karnavedha",
-      "source_claim": {
-        "id": "muhurta.karnavedha",
-        "surface": "muhurtam",
-        "authority_status": "source_backed",
-        "evidence_class": "textual",
-        "verification_state": "verified",
-        "source_ids": [
-          "BVR-MUHURTHA-1993"
-        ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)"
-      },
-      "implementation_status": "manual_displayed_not_computed",
-      "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "disclosure_only",
-      "automation_mode": "manual",
-      "automation_rationale": "This source-scope or lineage statement is displayed rather than converted into an unsupported machine predicate.",
-      "authority_role": "activity_source_claim"
-    },
-    {
-      "activity": "karnavedha",
-      "rule_id": "karnavedha.manual-3",
-      "predicate_class": "manual.display-row",
-      "configured_inputs": {
-        "source_index": 2,
-        "source_text": "Election chart: leave the 8th house unoccupied.",
-        "text": "Election chart: leave the 8th house unoccupied.",
-        "class": "manual-only",
-        "display_section": "chart"
-      },
-      "source_claim_id": "muhurta.karnavedha",
-      "source_claim": {
-        "id": "muhurta.karnavedha",
-        "surface": "muhurtam",
-        "authority_status": "source_backed",
-        "evidence_class": "textual",
-        "verification_state": "verified",
-        "source_ids": [
-          "BVR-MUHURTHA-1993"
-        ],
-        "locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)"
-      },
-      "implementation_status": "manual_displayed_not_computed",
-      "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "practitioner_review_tier_cap",
-      "automation_mode": "manual",
-      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
-      "decision_policy_claim_id": "muhurta.scoring_policy",
-      "decision_policy_claim": {
-        "id": "muhurta.scoring_policy",
-        "surface": "muhurtam",
-        "authority_status": "explicit_project_heuristic",
-        "evidence_class": "project_heuristic",
-        "verification_state": "heuristic",
-        "source_ids": [],
-        "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
-      },
       "authority_role": "activity_source_claim"
     },
     {
@@ -13655,7 +13800,7 @@
               "id": "BVR-MUHURTHA-1993",
               "title": "Muhurtha (Electional Astrology)",
               "authority_type": "modern_synthesis",
-              "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+              "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
             }
           ],
           "locator": "Chapter XII, 'Laying the Foundation,' roofing-stage instruction, printed p. 50 (PDF p. 54)",
@@ -13689,7 +13834,7 @@
               "id": "BVR-MUHURTHA-1993",
               "title": "Muhurtha (Electional Astrology)",
               "authority_type": "modern_synthesis",
-              "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+              "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
             }
           ],
           "locator": "Chapter XIII, 'Felling Trees,' printed p. 58 (PDF p. 62)",
@@ -13724,7 +13869,7 @@
               "id": "BVR-MUHURTHA-1993",
               "title": "Muhurtha (Electional Astrology)",
               "authority_type": "modern_synthesis",
-              "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+              "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
             }
           ],
           "locator": "Chapter XVI, 'Electing Head of the State' and 'Coronation,' printed p. 66 (PDF p. 70)",

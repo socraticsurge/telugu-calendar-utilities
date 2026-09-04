@@ -96,11 +96,11 @@ def test_crosswalk_covers_every_browser_prerequisite_exactly():
 def test_crosswalk_counts_and_rule_ids_are_stable_and_unique():
     crosswalk = build_crosswalk()
     assert crosswalk['counts']['activities'] == 30
-    assert crosswalk['counts']['rows'] == 322
-    assert crosswalk['counts']['deterministic_panchangam_rows'] == 175
+    assert crosswalk['counts']['rows'] == 323
+    assert crosswalk['counts']['deterministic_panchangam_rows'] == 177
     assert crosswalk['counts']['personal_rule_rows'] == 5
-    assert crosswalk['counts']['election_chart_rule_rows'] == 27
-    assert crosswalk['counts']['manual_display_rows'] == 115
+    assert crosswalk['counts']['election_chart_rule_rows'] == 28
+    assert crosswalk['counts']['manual_display_rows'] == 113
     ids = [row['rule_id'] for row in crosswalk['rows']]
     assert len(ids) == len(set(ids))
     assert set(ids) == {
@@ -210,12 +210,32 @@ def test_exact_personal_and_chart_predicate_values_are_exposed():
         if row['predicate_class'].startswith('election-chart.')
         and row['activity'] != 'gold'
     ]
-    assert len(non_gold_chart_rows) == 23
+    assert len(non_gold_chart_rows) == 24
     assert all(
         'between-sample transition'
         not in row['configured_inputs']['sample_aggregation']
         for row in non_gold_chart_rows
     )
+
+    karnavedha_tithi = rows['karnavedha.daylight-tithi-single']
+    assert karnavedha_tithi['predicate_class'] == (
+        'panchangam.daylight-single-limb')
+    assert karnavedha_tithi['configured_inputs'] == {
+        'activity_rule_field': 'require_single_daylight_tithi',
+        'configured_value': 'raman-karnavedha-daylight-v1',
+        'authority_role': 'activity_source_claim',
+    }
+    assert karnavedha_tithi['implementation_owner'].endswith(
+        'election_assessors/karnavedha.py')
+    assert karnavedha_tithi['interpretation_policy_claim_id'] == (
+        'election_day.karnavedha_daylight_policy_v1')
+
+    karnavedha = next(
+        item for item in build_crosswalk()['activities']
+        if item['activity'] == 'karnavedha'
+    )
+    assert karnavedha['source_scope'] == ACTIVITY_RULES['karnavedha'][
+        'source_scope']
 
 
 def test_manual_display_rows_preserve_exact_contract_values():

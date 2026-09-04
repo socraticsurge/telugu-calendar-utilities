@@ -110,6 +110,17 @@
         "house": 9
       }
     ],
+    "karnavedha": [
+      {
+        "id": "karnavedha.house-8-vacant",
+        "label": "8th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.karnavedha",
+        "source_locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+        "house": 8
+      }
+    ],
     "seemantha": [
       {
         "id": "seemantha.house-8-vacant",
@@ -441,6 +452,7 @@
     "annaprasana": [
       "Assess whether Budha, Guru or Shukra strengthens Lagna and whether a malefic occupies Lagna."
     ],
+    "karnavedha": [],
     "seemantha": [
       "If relying on Pournami, assess the source’s qualitative Chandra-dignity condition."
     ],

@@ -30,6 +30,11 @@ ELECTION_CHART_SOURCE_LOCATORS = {
     'muhurta.annaprasana': (
         "Chapter VIII, 'First feeding on rice (Annaprasana),' printed "
         'pp. 21-22 (PDF pp. 25-26)'),
+    'muhurta.karnavedha': (
+        "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected "
+        'in the 2020 '
+        'Chistabo derivative at internal printed p. 23 '
+        '(physical PDF p. 26)'),
     'muhurta.seemantha': (
         "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)"),
     'muhurta.gruhapravesha': (
@@ -113,6 +118,10 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
               'planet_not_house', 'reject', 'muhurta.annaprasana', planet='Kuja', house=8),
         _rule('annaprasana.shukra-not-9', 'Shukra is outside the 9th house',
               'planet_not_house', 'reject', 'muhurta.annaprasana', planet='Shukra', house=9),
+    ),
+    'karnavedha': (
+        _rule('karnavedha.house-8-vacant', '8th house is vacant',
+              'house_empty', 'reject', 'muhurta.karnavedha', house=8),
     ),
     'seemantha': (
         _rule('seemantha.house-8-vacant', '8th house is vacant',
@@ -236,6 +245,7 @@ ELECTION_CHART_MANUAL_REMAINDERS: dict[str, tuple[str, ...]] = {
     'annaprasana': (
         'Assess whether Budha, Guru or Shukra strengthens Lagna and whether a malefic occupies Lagna.',
     ),
+    'karnavedha': (),
     'seemantha': (
         'If relying on Pournami, assess the source’s qualitative Chandra-dignity condition.',
     ),

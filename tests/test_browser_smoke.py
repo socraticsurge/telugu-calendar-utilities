@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import http.server
 import json
+import re
 import shutil
 import socket
 import socketserver
@@ -247,6 +248,30 @@ MUHURTA_PLANET_RASHIS = (
 )
 PRIVATE_TRAVELLER_ID = 'guest_private_traveller'
 OTHER_TRAVELLER_ID = 'guest_other_traveller'
+
+
+def _karnavedha_feed_fixture(scenario):
+    """Control only the two daylight-transition predicates in the real ICS."""
+    endings = {
+        'karnavedha-pass': ('23:30', '23:40'),
+        'karnavedha-tithi-fail': ('12:00', '23:40'),
+        'karnavedha-nakshatra-fail': ('23:30', '12:30'),
+        'karnavedha-both-fail': ('12:00', '12:30'),
+        'karnavedha-unknown': ('18:50', '23:40'),
+    }
+    tithi_end, nakshatra_end = endings[scenario]
+    # read_text normalizes CRLF; unfold the generated continuations so each
+    # DESCRIPTION can be adjusted without relying on its physical fold width.
+    feed = MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8').replace('\n ', '')
+    for limb, end in (('Tithi', tithi_end), ('Nakshatra', nakshatra_end)):
+        feed, count = re.subn(
+            rf'({limb}:\s+.+?\s+\d{{2}}:\d{{2}}'
+            rf'(?: \([+-]1\))? – )\d{{2}}:\d{{2}}(?: \([+-]1\))?',
+            rf'\g<1>{end}',
+            feed,
+        )
+        assert count == 3, f'expected all three {limb} fixture rows'
+    return feed
 
 # Captured from /feeds/hyderabad-lagna.json on 2026-09-04. The complete
 # downloaded artifact had SHA-256
@@ -497,7 +522,10 @@ def _muhurta_planets(
             ] = 10.0
         return planets
     houses = {name: 2 for name in MUHURTA_PLANET_NAMES}
-    if scenario in {'positive', 'profile'}:
+    if scenario == 'karnavedha-pass':
+        # Mean nodes remain opposite while neither occupies house 8.
+        houses.update({'Rahu': 1, 'Ketu': 7})
+    elif scenario in {'positive', 'profile'}:
         # Both generic-purchase preferences pass; travel's Kuja exclusion also
         # passes. Other houses deliberately stay compact and deterministic.
         houses.update({'Chandra': 1, 'Shukra': 1, 'Kuja': 2})
@@ -599,7 +627,11 @@ def _install_muhurta_routes(
 ):
     """Intercept every mutable Muhurtam dependency for a built-site test."""
     calls = []
-    feed_text = MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8')
+    feed_text = (
+        _karnavedha_feed_fixture(scenario)
+        if scenario.startswith('karnavedha-')
+        else MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8')
+    )
 
     page.route(
         'https://gc.zgo.at/**',
@@ -1973,7 +2005,7 @@ def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
         ('unsupported', 'purchase', 'surya-siddhanta', 'unsupported-system'),
         ('offline', 'purchase', 'drik', 'unavailable'),
         ('malformed', 'purchase', 'drik', 'unavailable'),
-        ('manual-only', 'karnavedha', 'drik', 'manual-only'),
+        ('manual-only', 'vehicle', 'drik', 'manual-only'),
         ('not-run', 'wedding', 'drik', 'not-run'),
     ),
 )
@@ -2130,7 +2162,8 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
             assert result.locator('.mu-slot').count() > 0
             assert calls == []
         elif scenario == 'manual-only':
-            assert 'chart review remains manual' in status.inner_text()
+            assert 'Panchangam shortlist complete' in status.inner_text()
+            assert 'chart review remains manual' not in status.inner_text()
             assert 'no exact chart request was needed' in status.inner_text()
             assert result.locator('.mu-slot').count() > 0
             assert calls == []
@@ -2170,6 +2203,83 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
     assert not reference_errors, (
         f'{scenario} chart-aware Muhurtam raised reference errors at '
         f'{width}x{height}: {reference_errors[:3]}'
+    )
+
+
+@pytest.mark.parametrize(
+    ('scenario', 'failed', 'unknown'),
+    (
+        ('karnavedha-pass', 0, 0),
+        ('karnavedha-tithi-fail', 1, 0),
+        ('karnavedha-nakshatra-fail', 1, 0),
+        ('karnavedha-both-fail', 2, 0),
+        ('karnavedha-unknown', 0, 1),
+    ),
+)
+@pytest.mark.parametrize(
+    ('width', 'height'),
+    ((390, 844), (1440, 900)),
+)
+def test_karnavedha_daylight_and_chart_browser_matrix(
+    docs_server, browser, scenario, failed, unknown, width, height,
+):
+    """Exercise every daylight disposition and the surviving chart pass."""
+    page = browser.new_page(viewport={'width': width, 'height': height})
+    captured = _capture_console(page)
+    try:
+        calls = _run_muhurta_browser_search(
+            page, docs_server, scenario, activity='karnavedha', system='drik',
+        )
+        result = page.locator('#mu-result')
+        if scenario == 'karnavedha-pass':
+            assert result.locator('.mu-chart-status--screened').is_visible()
+            assert 'Karnavedha event checks resolved' in result.inner_text()
+            assert result.locator('.mu-slot').count() > 0
+            result.locator('.mu-reason-details').first.locator(
+                ':scope > summary').click()
+            daylight = result.locator('.mu-rg-daylight').first
+            assert daylight.is_visible()
+            assert daylight.locator('.mu-chart-rule--pass').count() == 2
+            assert '[local sunrise, local sunset)' in daylight.inner_text()
+            assert result.locator('.mu-rg-validation').count() == 0
+            assert calls
+        else:
+            assert result.locator('.mu-chart-status--not-run').is_visible()
+            assert result.locator('.mu-slot').count() == 0
+            assert calls == []
+            dropped = result.locator('.mu-dropped')
+            dropped.locator(':scope > summary').click()
+            outcomes = dropped.locator('.mu-dropped-daylight')
+            assert outcomes.is_visible()
+            assert outcomes.locator('.mu-dropped-daylight--fail').count() == failed
+            assert outcomes.locator('.mu-dropped-daylight--unknown').count() == unknown
+            assert outcomes.locator('.mu-dropped-daylight--pass').count() == (
+                2 - failed - unknown)
+            if scenario == 'karnavedha-tithi-fail':
+                assert 'Tithi changes at 12:00 inside local daylight' in (
+                    dropped.inner_text())
+            elif scenario == 'karnavedha-nakshatra-fail':
+                assert 'Nakshatra changes at 12:30 inside local daylight' in (
+                    dropped.inner_text())
+            elif scenario == 'karnavedha-both-fail':
+                assert 'Tithi changes at 12:00' in dropped.inner_text()
+                assert 'Nakshatra changes at 12:30' in dropped.inner_text()
+            else:
+                assert 'Tithi boundary could not be verified' in (
+                    dropped.inner_text())
+
+        _assert_no_horizontal_overflow(
+            page, f'{scenario} Karnavedha at {width}px',
+        )
+    finally:
+        page.close()
+
+    page_errors = [
+        message for kind, message in captured if kind == 'pageerror'
+    ]
+    assert not page_errors, (
+        f'{scenario} Karnavedha raised page errors at {width}x{height}: '
+        f'{page_errors[:3]}'
     )
 
 
