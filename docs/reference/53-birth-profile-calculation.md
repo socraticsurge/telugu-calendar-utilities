@@ -6,22 +6,19 @@ derived, and what “verified” does and does not mean.
 
 > **Current assurance:** documented, traceable, and reproduced through a second
 > formula path. The three fixture cells are not an independent published-chart
-> comparison because both paths use Swiss Ephemeris. Public activation remains
-> gated on the separate Swiss Ephemeris and PySwissEph wrapper decision,
-> producer-contract invariants, governed Production geocoding/shared abuse
-> controls, and the
-> [production activation runbook](../operations/guest-calculation-production-activation.md).
-> The exact Astro/DashaFlow backend pair has passed protected Preview contracts;
-> the Panchangam journey still requires local owner review and one bounded,
-> approval-gated Production smoke request because public Nominatim is disabled
-> outside Production.
+> comparison because both paths use Swiss Ephemeris. The exact Production
+> backend at public Astro revision `4106f097` passed governed Nominatim, birth,
+> election-chart and WAF-boundary probes before the owner approved paired public
+> activation. See the
+> [production activation runbook](../operations/guest-calculation-production-activation.md)
+> for exact deployment and rollback evidence.
 
-> **Activation state:** the birth-details interface and network adapter are on
-> by default only for loopback development. A public build must set
+> **Activation state:** the production build sets
 > `VITE_BIRTH_PROFILE_API_ENABLED=true`, where `true` is the exact,
-> case-sensitive value; every other explicit value fails closed. When inactive,
-> Profiles defaults to manual entry and keeps existing calculated profiles
-> viewable without permitting recalculation or editing.
+> case-sensitive value. Loopback development remains enabled by default; every
+> other public value fails closed. When inactive, Profiles defaults to manual
+> entry and keeps existing calculated profiles viewable without permitting
+> recalculation or editing.
 
 ## Meaning
 
@@ -74,7 +71,7 @@ origins, caps bodies at 4 KiB, rate-limits requests, and marks responses
 `private, no-store`. Its DashaFlow bearer token is server-only and must never be
 placed in browser code or a `VITE_*` variable. The reviewed gateway stack uses
 the existing Turso database for fail-closed shared client/fleet limits on all
-guest routes. The public-Nominatim candidate also gives guest and signed-in
+guest routes. The live public-Nominatim path also gives guest and signed-in
 lookups one aggregate provider row, a 1,000-attempt UTC-day cap, and one
 exclusive cross-instance send lease. Guest place search additionally applies a
 durable allowance of 50 valid managed-provider cache misses per client in an
@@ -84,22 +81,22 @@ client identity from exhausting it, although an anchored-window reset can
 permit up to 100 upstream attempts inside one UTC day. Place queries and
 results are not written to that database; normalized results stay only in a
 bounded server-process cache.
-[#446](https://github.com/socraticsurge/telugu-calendar-utilities/issues/446)
-must close and verify those controls before activation.
+The governed controls and exact Production probes are recorded through
+[#446](https://github.com/socraticsurge/telugu-calendar-utilities/issues/446),
+[#448](https://github.com/socraticsurge/telugu-calendar-utilities/issues/448),
+and the activation runbook.
 
 The build flag is not authorization and contains no secret. A public page uses
 only the canonical `https://astrochaganti.com/api/guest` HTTPS gateway; a
 loopback or arbitrary configured base is rejected. Consequently,
 `VITE_BIRTH_PROFILE_API_BASE` cannot select a hosted Astro Preview today.
 Astro also rejects a hosted Panchangam Preview origin. This is now a deliberate
-isolation boundary: provider behavior is certified with fixtures, the exact
-Astro/DashaFlow backend pair is certified in protected Preview, and the owner
-reviews the complete Panchangam browser journey locally before one bounded
-Production smoke request. Public activation requires
-both the exact client flag and independently enabled server-side routes. The
-server must remain disabled until the licensing and provider gates below are
-resolved. A disabled browser adapter throws a typed `disabled` error before it
-creates a timeout or calls `fetch`.
+isolation boundary: provider behavior is certified with fixtures, while the
+exact Production pair and public routes are verified separately. Public
+operation requires both the exact client flag and independently enabled
+server-side routes. Either side can still disable the capability without
+weakening the other boundary. A disabled browser adapter throws a typed
+`disabled` error before it creates a timeout or calls `fetch`.
 
 ## Local storage transaction
 
@@ -286,9 +283,9 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
    the AGPL-compatible public-source path for this calculation stack. The
    current TCU/MCP release is AGPL-3.0-or-later, retains the PySwissEph and
    Swiss Ephemeris notices, and offers corresponding source from the public
-   repository. DashaFlow and Astro must publish their exact deployed source
-   revisions under the same compatible posture before their public calculation
-   flags are enabled. This implements the conservative whole-project boundary
+   repository. DashaFlow and Astro publish their exact deployed source
+   revisions under the same compatible posture. This implements the
+   conservative whole-project boundary
    stated by [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
    and the network-source opportunity described by
    [GNU AGPL section 13](https://www.gnu.org/licenses/agpl-3.0.html#section13).
@@ -299,10 +296,10 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
    [#444](https://github.com/socraticsurge/telugu-calendar-utilities/issues/444),
    [#445](https://github.com/socraticsurge/telugu-calendar-utilities/issues/445),
    and [#449](https://github.com/socraticsurge/telugu-calendar-utilities/issues/449).
-2. **Actual ephemeris:** current local fixture calls report Moshier because the
-   deployed data-file posture has not been approved. Production must probe and
-   disclose its own actual return flags; it must not promise Swiss data-file
-   output merely because PySwissEph is installed.
+2. **Actual ephemeris:** current local fixture calls and the bounded Production
+   birth/election probes report `Moshier` from DashaFlow 1.1.0. Every calculated
+   result discloses its actual return flags; the product must not promise Swiss
+   data-file output merely because PySwissEph is installed.
 3. **DST ambiguity:** DashaFlow 1.1.0 itself calls `pytz.localize` without the
    fail-closed `is_dst=None` option. The authenticated sidecar contract therefore
    validates the complete local civil time first and rejects repeated or skipped

@@ -61,13 +61,13 @@ capability. With no flag, requests are enabled only on `localhost`,
 `VITE_BIRTH_PROFILE_API_ENABLED`; enabling one calculation journey does not
 enable the other.
 
-The current public build does not set that flag. The production Astro code
-contains the guest election route but keeps it server-disabled. Activation
-remains blocked by #443, #445, #446, #447, and #449, followed by #448's exact
-protected backend Preview, local browser review, and bounded Production smoke
-evidence. Public Nominatim remains unavailable in Preview by design.
-See the
-[production activation runbook](../operations/guest-calculation-production-activation.md).
+The production build sets that flag together with the birth-profile flag after
+the owner approved paired public activation. The exact Production Astro
+deployment at public revision `4106f097` returned 200 for a synthetic election
+chart and retains an independent server-side kill switch. Public Nominatim
+remains unavailable in Preview by design. See the
+[production activation runbook](../operations/guest-calculation-production-activation.md)
+for exact deployment, perimeter and rollback evidence.
 
 When disabled, the browser does not create a request controller, register a
 timeout or call `fetch`. It retains the Panchangam shortlist, caps any

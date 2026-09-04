@@ -7,6 +7,13 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+### Changed
+
+- Enable the production browser's birth-profile derivation and Muhurtam
+  election-chart screening together with exact, independently fail-closed
+  client flags after the governed Production backend passed place-search,
+  calculation and perimeter probes.
+
 ## [1.14.0] — 2026-09-04
 
 ### Changed
