@@ -53,10 +53,13 @@ def test_tuesday_and_saturday_are_hard_rejected():
 def test_claim_has_exact_locator_scope_and_tithi_disclosure():
     claim = _claim()
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+    ]
     assert "section 'Filing law-suits,'" in claim['locator']
-    assert 'printed p. 67' in claim['locator']
-    assert 'recurring explicit list in the same edition' in claim['scope']
+    assert 'internal printed p. 67 (physical PDF p. 71)' in claim['locator']
+    assert 'recurring explicit list in the same inspected derivative' in claim['scope']
     assert 'filing or initiating a lawsuit' in claim['scope']
     assert 'legacy litigation API key resolves explicitly' in claim['scope']
 

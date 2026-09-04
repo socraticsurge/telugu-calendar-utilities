@@ -66,8 +66,12 @@ def test_claim_and_surfaces_publish_the_same_profile():
         (ROOT / 'docs/reference/provenance.json').read_text(encoding='utf-8'))
     claim = next(item for item in ledger['claims'] if item['id'] == CLAIM_ID)
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993']
-    assert "Chapter XII, 'Buying Houses,' printed p. 53" in claim['locator']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+    ]
+    assert "Chapter XII, 'Buying Houses,' inspected" in claim['locator']
+    assert 'internal printed p. 54 (physical PDF p. 58)' in claim['locator']
 
     result = json.loads(tool_find_muhurta(
         '2026-01-08', days=1, activity='house_purchase', city='Hyderabad'))

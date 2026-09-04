@@ -40,11 +40,23 @@ must always be interpreted against the named edition.
 - **BS-SASTRI-BHAT-1946** — Varahamihira, *Brihat Samhita*, Sanskrit text and
   English translation by V. Subrahmanya Sastri and M. Ramakrishna Bhat, 1946.
   Public scan: <https://archive.org/details/Brihatsamhita>.
-- **BVR-MUHURTHA-1993** — B. V. Raman, *Muhurtha (Electional Astrology)*,
-  UBS Publishers' Distributors, 1993, ISBN 9788185674681. This is a modern
-  synthesis and secondary authority, not scripture. The Bhumi Puja / house-
-  foundation profile uses Chapter XII, printed page 50 (PDF page 54), from
-  the inspected public scan linked in the machine-readable register.
+- **BVR-MUHURTHA-1993** — the bibliographic record for B. V. Raman,
+  *Muhurtha (Electional Astrology)*, UBS Publishers' Distributors, 1993,
+  ISBN 9788185674681, 181 catalogued pages. This is a modern synthesis and
+  secondary authority, not scripture. Google Books and Open Library
+  independently expose this record; no scan of that 1993 edition has been
+  inspected for the registered claims.
+- **BVR-MUHURTHA-CHISTABO-2020** — the artifact actually inspected for
+  located Raman claims: a 78-physical-page Simon/Chistabo re-edited PDF made
+  in 2020. Its notice on physical PDF p. 3 / internal folio II declares
+  bracketed additions, typo corrections and appendix omission. The artifact
+  is pinned at 2,172,882 bytes and SHA-256
+  `b8b878a444a487c83810329fdf8f057c40e92221a867db480d864da8be21a133`.
+  Its exact relationship to the 181-page 1993 edition remains unverified.
+  Physical PDF pp. 4–36 map to internal printed pp. 1–33; physical p. 37 is
+  unnumbered; physical pp. 38–78 map to internal printed pp. 34–74. Located
+  claims cite both identities and both page systems; claims without a locator
+  remain work-only rather than implying artifact inspection.
 - **MC-HINDI-IA** — Rama Daivajna, *Muhurta Chintamani*, Sanskrit text with
   Hindi commentary, undated public scan. Verse numbers and printed pages are
   stable in the registered Internet Archive object, but the scan does not

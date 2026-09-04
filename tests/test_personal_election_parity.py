@@ -31,5 +31,6 @@ def test_personal_rule_outcomes_are_source_attributed_and_input_reviewable():
         for outcome in result['outcomes']:
             assert outcome['rule_id'].startswith(f"personal.{case['activity']}.")
             assert outcome['source_claim'].startswith('muhurta.')
-            assert 'printed pp.' in outcome['source_locator']
+            assert 'internal printed pp.' in outcome['source_locator']
+            assert 'physical PDF pp.' in outcome['source_locator']
             assert set(outcome['inputs']) == {'start', 'end'}

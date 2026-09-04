@@ -4,8 +4,8 @@
 
 The `construction_roof` activity is linked to
 `muhurta.construction_roof`. Its authority is B. V. Raman's *Muhurtha*,
-Chapter XII, "Laying the Foundation," printed page 50 (PDF page 54 in the
-registered edition). Raman is a modern secondary authority, not scripture.
+Chapter XII, "Laying the Foundation," internal printed page 51 (physical PDF
+page 55 in the inspected 2020 Chistabo derivative). Raman is a modern secondary authority, not scripture.
 
 The passage treats house construction as distinct stages and says that the
 roofing should be done with Vrishabha or Tula rising. The implementation

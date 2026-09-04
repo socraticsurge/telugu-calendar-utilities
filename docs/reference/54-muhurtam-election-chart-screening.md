@@ -296,7 +296,7 @@ mutually exclusive; the result reports the exact overlap rather than implying
 that those counts represent unique slots.
 
 Every generated predicate carries both its `source_claim` and a
-claim-specific `source_locator` (chapter/section plus printed and PDF page, or
+claim-specific `source_locator` (chapter/section plus internal printed and physical PDF page, or
 verse plus printed page). The UI displays that locator with the computed
 outcome; a generic book title is never substituted for the exact rule
 location. A rule that requires interpretation also carries a separate
@@ -654,13 +654,13 @@ the readable criterion-by-criterion audit.
 
 | Claim(s) used by chart or personal screening | Registered locator | Detailed audit |
 |---|---|---|
-| `muhurta.wedding` | B. V. Raman, *Muhurtha*, Chapter IX, printed pp. 41–42 (PDF pp. 45–46) | [Wedding](31-wedding-evidence-audit.md) |
-| `muhurta.annaprasana` | Raman, Chapter VIII, printed pp. 21–22 (PDF pp. 25–26) | [Annaprasana](18-annaprasana-profile.md) |
-| `muhurta.seemantha` | Raman, Chapter VII, printed pp. 20–21 (PDF pp. 24–25) | [Seemantha](47-seemantha-profile.md) |
-| `muhurta.gruhapravesha` | Raman, Chapter XII, printed pp. 52–54 (PDF pp. 56–58) | [Gruhapravesha](33-gruhapravesha-evidence-audit.md) |
-| `muhurta.land_purchase.building` | Raman, Chapter XII, printed p. 53 (PDF p. 57) | [Land purchase](15-land-purchase-profile.md) |
-| `muhurta.house_purchase.completed` | Raman, Chapter XII, printed p. 53 (PDF p. 57) | [Completed-house purchase](48-completed-house-purchase-profile.md) |
-| `muhurta.gold_jewelry.purchase` | Raman, Chapter X, printed p. 45 (PDF p. 49) | [Gold / Jewelry](28-gold-jewelry-profile.md) |
+| `muhurta.wedding` | B. V. Raman, *Muhurtha*, Chapter IX, Chistabo derivative internal printed pp. 41–42 (physical PDF pp. 45–46) | [Wedding](31-wedding-evidence-audit.md) |
+| `muhurta.annaprasana` | Raman, Chapter VIII, Chistabo derivative internal printed pp. 22–23 (physical PDF pp. 25–26) | [Annaprasana](18-annaprasana-profile.md) |
+| `muhurta.seemantha` | Raman, Chapter VII–VIII transition, Chistabo derivative internal printed pp. 21–22 (physical PDF pp. 24–25) | [Seemantha](47-seemantha-profile.md) |
+| `muhurta.gruhapravesha` | Raman, Chapter XII, Chistabo derivative internal printed pp. 52–54 (physical PDF pp. 56–58) | [Gruhapravesha](33-gruhapravesha-evidence-audit.md) |
+| `muhurta.land_purchase.building` | Raman, Chapter XII, Chistabo derivative internal printed p. 54 (physical PDF p. 58) | [Land purchase](15-land-purchase-profile.md) |
+| `muhurta.house_purchase.completed` | Raman, Chapter XII, Chistabo derivative internal printed p. 54 (physical PDF p. 58) | [Completed-house purchase](48-completed-house-purchase-profile.md) |
+| `muhurta.gold_jewelry.purchase` | Raman, Chapter X, Chistabo derivative internal printed p. 45 (physical PDF p. 49) | [Gold / Jewelry](28-gold-jewelry-profile.md) |
 | `election_chart.well_placed.phaladeepika_2_36`; `election_chart.dignity.phaladeepika_1_6`; `election_chart.relationships.phaladeepika_2_21_22` | Phaladeepika II.36, I.6 and II.21–22 in the registered 1950 second edition | [Gold / Jewelry](28-gold-jewelry-profile.md) |
 | `election_chart.full_graha_drishti.phaladeepika_2_23` | Phaladeepika II.23, book p. 18 (scan p. 55) | [Gold / Jewelry](28-gold-jewelry-profile.md) |
 | `election_chart.navamsa.bphs_6_12` | *Brihat Parashara Hora Shastra*, Chapter 6, verse 12 | [Gold / Jewelry](28-gold-jewelry-profile.md) |
@@ -668,12 +668,12 @@ the readable criterion-by-criterion audit.
 | `muhurta.purchase.general` | Rama Daivajna, *Muhurta Chintamani*, verses 16–17, printed pp. 33–35 (OCR lines 2336–2374) | [General purchase](39-purchase-profile.md) |
 | `muhurta.service_entry` | *Muhurta Chintamani*, verse 26, printed p. 38 (OCR lines 2565–2577) | [Entering service](40-job-contract-evidence-audit.md) |
 | `muhurta.shantika_paushtika` | *Muhurta Chintamani*, verse 34, printed pp. 42–43 (OCR lines 2749–2772) | [Shantika / Paushtika](42-ceremony-evidence-audit.md) |
-| `muhurta.pilgrimage` | Raman, Chapter XIV, printed pp. 60–62 (PDF pp. 64–66) | [Pilgrimage](29-pilgrimage-profile.md) |
-| `muhurta.travel` | Raman, Chapter XIV, printed pp. 60–61 (PDF pp. 64–65) | [Travel](30-travel-profile.md) |
-| `muhurta.surgery` | Raman, Chapter XV, printed pp. 64–65 (PDF pp. 68–69) | [Surgery](27-surgery-profile.md) |
+| `muhurta.pilgrimage` | Raman, Chapter XIV, Chistabo derivative internal printed pp. 60–62 (physical PDF pp. 64–66) | [Pilgrimage](29-pilgrimage-profile.md) |
+| `muhurta.travel` | Raman, Chapter XIV, Chistabo derivative internal printed pp. 60–61 (physical PDF pp. 64–65) | [Travel](30-travel-profile.md) |
+| `muhurta.surgery` | Raman, Chapter XV, Chistabo derivative internal printed pp. 64–65 (physical PDF pp. 68–69) | [Surgery](27-surgery-profile.md) |
 
-The principal registered editions used on this page are
-[B. V. Raman's *Muhurtha*](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf),
+The principal registered source artifacts used on this page include the
+[inspected 2020 Chistabo re-edit of B. V. Raman's *Muhurtha*](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf),
 [the Internet Archive *Muhurta Chintamani* scan](https://archive.org/details/muhurta-chintamani-hindi),
 [Phaladeepika, V. Subrahmanya Sastri's 1950 second edition](https://archive.org/details/Phaladeepika2ndEd.1950ByVSubrahmanyaSastri),
 the [BPHS 6.12 text and translation](https://enjoylearningsanskrit.com/scriptures/parashara/chapter-6/verse-12/),

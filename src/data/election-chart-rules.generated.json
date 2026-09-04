@@ -45,7 +45,7 @@
         "kind": "house_empty",
         "effect": "reject",
         "source_claim": "muhurta.wedding",
-        "source_locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
+        "source_locator": "B. V. Raman, Chapter IX, 'Electing a time for marriage,' inspected in the 2020 Chistabo derivative at internal printed pp. 41-42 (physical PDF pp. 45-46), from the lunar-month paragraph through the election-chart conditions",
         "house": 7
       },
       {
@@ -54,7 +54,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.wedding",
-        "source_locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
+        "source_locator": "B. V. Raman, Chapter IX, 'Electing a time for marriage,' inspected in the 2020 Chistabo derivative at internal printed pp. 41-42 (physical PDF pp. 45-46), from the lunar-month paragraph through the election-chart conditions",
         "planet": "Kuja",
         "house": 8
       },
@@ -64,7 +64,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.wedding",
-        "source_locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46)",
+        "source_locator": "B. V. Raman, Chapter IX, 'Electing a time for marriage,' inspected in the 2020 Chistabo derivative at internal printed pp. 41-42 (physical PDF pp. 45-46), from the lunar-month paragraph through the election-chart conditions",
         "planet": "Shukra",
         "house": 6
       }
@@ -76,7 +76,7 @@
         "kind": "house_empty",
         "effect": "reject",
         "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
         "house": 10
       },
       {
@@ -85,7 +85,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
         "planet": "Budha",
         "house": 7
       },
@@ -95,7 +95,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
         "planet": "Kuja",
         "house": 8
       },
@@ -105,7 +105,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.annaprasana",
-        "source_locator": "Chapter VIII, 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26)",
+        "source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
         "planet": "Shukra",
         "house": 9
       }
@@ -117,7 +117,7 @@
         "kind": "house_empty",
         "effect": "reject",
         "source_claim": "muhurta.seemantha",
-        "source_locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
+        "source_locator": "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected in the 2020 Chistabo derivative at internal printed pp. 21-22 (physical PDF pp. 24-25)",
         "house": 8
       },
       {
@@ -126,7 +126,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.seemantha",
-        "source_locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
+        "source_locator": "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected in the 2020 Chistabo derivative at internal printed pp. 21-22 (physical PDF pp. 24-25)",
         "planet": "Chandra",
         "house": 8
       }
@@ -138,7 +138,7 @@
         "kind": "house_empty",
         "effect": "reject",
         "source_claim": "muhurta.gruhapravesha",
-        "source_locator": "Chapter XII, 'Entering a new house,' printed pp. 52-54 (PDF pp. 56-58)",
+        "source_locator": "B. V. Raman, Chapter XII, 'House building,' section 'Entering a new house,' inspected in the 2020 Chistabo derivative at internal printed pp. 52-54 (physical PDF pp. 56-58)",
         "house": 8
       }
     ],
@@ -149,7 +149,7 @@
         "kind": "planet_in_houses",
         "effect": "prefer",
         "source_claim": "muhurta.land_purchase.building",
-        "source_locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+        "source_locator": "B. V. Raman, Chapter XII, 'Buying Lands for Buildings,' inspected in the 2020 Chistabo derivative at internal printed p. 54 (physical PDF p. 58)",
         "planet": "Guru",
         "houses": [
           1,
@@ -166,7 +166,7 @@
         "kind": "planet_in_houses",
         "effect": "prefer",
         "source_claim": "muhurta.land_purchase.building",
-        "source_locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+        "source_locator": "B. V. Raman, Chapter XII, 'Buying Lands for Buildings,' inspected in the 2020 Chistabo derivative at internal printed p. 54 (physical PDF p. 58)",
         "planet": "Kuja",
         "houses": [
           11
@@ -178,7 +178,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.land_purchase.building",
-        "source_locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+        "source_locator": "B. V. Raman, Chapter XII, 'Buying Lands for Buildings,' inspected in the 2020 Chistabo derivative at internal printed p. 54 (physical PDF p. 58)",
         "planet": "Kuja",
         "house": 1
       }
@@ -190,7 +190,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.house_purchase.completed",
-        "source_locator": "Chapter XII, 'Buying Houses,' printed p. 53 (PDF p. 57)",
+        "source_locator": "B. V. Raman, Chapter XII, 'Buying Houses,' inspected in the 2020 Chistabo derivative at internal printed p. 54 (physical PDF p. 58)",
         "planet": "Kuja",
         "house": 1
       }
@@ -202,7 +202,7 @@
         "kind": "planet_well_situated",
         "effect": "qualify",
         "source_claim": "muhurta.gold_jewelry.purchase",
-        "source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+        "source_locator": "B. V. Raman, Chapter X, 'Buying Jewelry,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
         "planet": "Surya",
         "avoid_houses": [
           6,
@@ -236,7 +236,7 @@
         "kind": "planet_well_situated",
         "effect": "qualify",
         "source_claim": "muhurta.gold_jewelry.purchase",
-        "source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+        "source_locator": "B. V. Raman, Chapter X, 'Buying Jewelry,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
         "planet": "Chandra",
         "avoid_houses": [
           6,
@@ -267,7 +267,7 @@
         "kind": "planet_receives_full_aspect",
         "effect": "qualify",
         "source_claim": "muhurta.gold_jewelry.purchase",
-        "source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+        "source_locator": "B. V. Raman, Chapter X, 'Buying Jewelry,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
         "planet": "Surya",
         "aspectors": [
           "Chandra",
@@ -292,7 +292,7 @@
         "kind": "planet_receives_full_aspect",
         "effect": "qualify",
         "source_claim": "muhurta.gold_jewelry.purchase",
-        "source_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+        "source_locator": "B. V. Raman, Chapter X, 'Buying Jewelry,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
         "planet": "Chandra",
         "aspectors": [
           "Surya",
@@ -401,7 +401,7 @@
         "kind": "planet_in_houses",
         "effect": "prefer",
         "source_claim": "muhurta.pilgrimage",
-        "source_locator": "Chapter XIV, 'Journeys' and 'Pilgrimage,' printed pp. 60-62 (PDF pp. 64-66)",
+        "source_locator": "B. V. Raman, Chapter XIV, 'Journeys' and 'Pilgrimage,' inspected in the 2020 Chistabo derivative at internal printed pp. 60-62 (physical PDF pp. 64-66)",
         "planet": "Guru",
         "houses": [
           1,
@@ -416,7 +416,7 @@
         "kind": "planet_not_house",
         "effect": "reject",
         "source_claim": "muhurta.travel",
-        "source_locator": "Chapter XIV, 'Journeys' and 'Long-distance Journeys,' printed pp. 60-61 (PDF pp. 64-65)",
+        "source_locator": "B. V. Raman, Chapter XIV, 'Journeys' and 'Long-distance Journeys,' inspected in the 2020 Chistabo derivative at internal printed pp. 60-61 (physical PDF pp. 64-65)",
         "planet": "Kuja",
         "house": 8
       }
@@ -428,7 +428,7 @@
         "kind": "house_empty",
         "effect": "reject",
         "source_claim": "muhurta.surgery",
-        "source_locator": "Chapter XV, 'Surgical Operations,' printed pp. 64-65 (PDF pp. 68-69)",
+        "source_locator": "B. V. Raman, Chapter XV, 'Surgical Operations,' inspected in the 2020 Chistabo derivative at internal printed pp. 64-65 (physical PDF pp. 68-69)",
         "house": 8
       }
     ]

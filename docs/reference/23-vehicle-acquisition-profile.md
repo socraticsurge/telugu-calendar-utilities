@@ -4,9 +4,10 @@
 
 The vehicle-purchase profile uses B. V. Raman, *Muhurtha (Electional
 Astrology)*, Chapter IV, “Influence of Nakshatras,” movable-Nakshatra
-classification, printed page 10 (PDF page 14):
+classification, internal printed page 11 (physical PDF page 14) in the inspected 2020
+Chistabo derivative:
 
-<https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf>
+[inspected 2020 Chistabo derivative](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
 
 Raman is a modern synthesis and secondary authority, not primary scripture.
 The cited passage says that Shravana, Dhanishtha, Shatabhisha, Punarvasu and

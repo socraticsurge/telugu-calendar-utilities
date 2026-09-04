@@ -67,8 +67,12 @@ def test_claim_mcp_and_browser_publish_the_same_profile():
         (ROOT / 'docs/reference/provenance.json').read_text(encoding='utf-8'))
     claim = next(item for item in ledger['claims'] if item['id'] == CLAIM_ID)
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993']
-    assert "Chapter XII, 'Repairing Houses,' printed pp. 53-54" in claim['locator']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+    ]
+    assert "Chapter XII, 'Repairing Houses,' inspected" in claim['locator']
+    assert 'internal printed pp. 54-55 (physical PDF pp. 58-59)' in claim['locator']
 
     result = json.loads(tool_find_muhurta(
         '2026-01-05', days=1, activity='home_repair', city='Hyderabad'))

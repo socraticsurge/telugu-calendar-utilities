@@ -953,7 +953,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                           + 'usual unfavorable lunar days; the automated list '
                           + 'uses his explicit recurring list of Chaturthi, '
                           + 'Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, '
-                          + 'Pournami and Amavasya from the same edition.',
+                          + 'Pournami and Amavasya from the same inspected '
+                          + 'derivative.',
                           'Lagna/Navamsa: automation admits Mesha Lagna. A '
                           + 'practitioner may evaluate the source\'s alternative '
                           + 'of a non-Mesha Lagna with Mesha Navamsa.',

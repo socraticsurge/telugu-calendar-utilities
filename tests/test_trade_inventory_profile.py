@@ -88,8 +88,13 @@ def test_claim_mcp_and_browser_publish_the_same_profile():
         (ROOT / 'docs/reference/provenance.json').read_text(encoding='utf-8'))
     claim = next(item for item in ledger['claims'] if item['id'] == CLAIM_ID)
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993', 'MC-HINDI-IA']
-    assert "Chapter X, 'Buying for Business,' printed p. 45" in claim['locator']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+        'MC-HINDI-IA',
+    ]
+    assert "Chapter X, 'Buying for Business,' inspected" in claim['locator']
+    assert 'internal printed p. 45 (physical PDF p. 49)' in claim['locator']
     assert 'verse 16' in claim['locator']
 
     result = json.loads(tool_find_muhurta(

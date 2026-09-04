@@ -3,8 +3,9 @@
 ## Claim and authority
 
 The `pilgrimage` activity is linked to `muhurta.pilgrimage`. Its authority is
-B. V. Raman's *Muhurtha*, Chapter XIV, "Journeys" and "Pilgrimage," printed
-pages 60-62 (PDF pages 64-66 in the registered edition). Raman is a modern
+B. V. Raman's *Muhurtha*, Chapter XIV, "Journeys" and "Pilgrimage," internal
+printed pages 60-62 (physical PDF pages 64-66 in the inspected 2020 Chistabo
+derivative). Raman is a modern
 secondary authority, not scripture.
 
 The pilgrimage paragraph explicitly says to follow the preceding journey

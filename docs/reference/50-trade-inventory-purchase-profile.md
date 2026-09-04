@@ -3,8 +3,9 @@
 ## Authorities and boundary
 
 The `business_inventory_purchase` activity implements B. V. Raman,
-*Muhurtha (Electional Astrology)*, Chapter X, “Buying for Business,” printed
-page 45 (PDF page 49). The act is purchasing stock, raw materials or goods for
+*Muhurtha (Electional Astrology)*, Chapter X, “Buying for Business,” internal
+printed page 45 (physical PDF page 49 in the inspected 2020 Chistabo
+derivative). The act is purchasing stock, raw materials or goods for
 resale or business use.
 
 Rama Daivajna's *Muhurta Chintamani*, Nakshatra-prakarana verse 16, printed

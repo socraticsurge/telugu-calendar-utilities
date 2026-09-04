@@ -4,9 +4,10 @@
 
 The sacred-thread profile is based on B. V. Raman, *Muhurtha (Electional
 Astrology)*, Chapter VIII, “Post-natal ceremonies” / “Investiture of sacred
-thread (Upanayanam),” printed pages 23–24 (PDF pages 27–28):
+thread (Upanayanam),” internal printed pages 24–25 (physical PDF pages 27–28) in the inspected
+2020 Chistabo derivative:
 
-<https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf>
+[inspected 2020 Chistabo derivative](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf)
 
 Raman is a modern synthesis and secondary authority, not primary scripture.
 Eligibility, age, ritual procedure and lineage-specific exceptions belong to

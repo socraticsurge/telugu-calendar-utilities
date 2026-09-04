@@ -4,7 +4,8 @@
 
 The `coronation` activity is linked to `muhurta.coronation`. Its authority is
 B. V. Raman's *Muhurtha*, Chapter XVI, "Electing Head of the State" and
-"Coronation," printed page 66 (PDF page 70 in the registered edition). Raman
+"Coronation," internal printed page 66 (physical PDF page 70 in the inspected
+2020 Chistabo derivative). Raman
 is a modern secondary authority, not scripture.
 
 The coronation paragraph says the immediately preceding head-of-state rules

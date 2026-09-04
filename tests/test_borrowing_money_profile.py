@@ -62,7 +62,10 @@ def test_claims_and_product_surfaces_publish_the_same_profile():
         (ROOT / 'docs/reference/provenance.json').read_text(encoding='utf-8'))
     claim = next(item for item in ledger['claims'] if item['id'] == CLAIM_ID)
     assert claim['verification_state'] == 'verified'
-    assert claim['source_ids'] == ['BVR-MUHURTHA-1993']
+    assert claim['source_ids'] == [
+        'BVR-MUHURTHA-1993',
+        'BVR-MUHURTHA-CHISTABO-2020',
+    ]
     divergence = next(
         item for item in ledger['claims'] if item['id'] == DIVERGENCE_ID)
     assert divergence['verification_state'] == 'contradicted'

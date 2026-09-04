@@ -14,10 +14,22 @@ from typing import Any
 from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES, RASHI_NAMES
 
 LOCATORS = {
-    'travel': "Chapter XIV, 'Journeys' and 'Long-distance Journeys,' printed pp. 60-61 (PDF pp. 64-65)",
-    'gruhapravesha': "Chapter XII, 'House building,' section 'Entering a new house,' printed pp. 52-54 (PDF pp. 56-58)",
-    'seemantha': "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
-    'surgery': "Chapter XV, 'Surgical Operations,' printed pp. 64-65 (PDF pp. 68-69)",
+    'travel': (
+        "B. V. Raman, Chapter XIV, 'Journeys' and 'Long-distance Journeys,' "
+        'inspected in the 2020 Chistabo derivative at internal printed '
+        'pp. 60-61 (physical PDF pp. 64-65)'),
+    'gruhapravesha': (
+        "B. V. Raman, Chapter XII, 'House building,' section 'Entering a "
+        "new house,' inspected in the 2020 Chistabo derivative at internal "
+        'printed pp. 52-54 (physical PDF pp. 56-58)'),
+    'seemantha': (
+        "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected "
+        'in the 2020 Chistabo derivative at internal printed pp. 21-22 '
+        '(physical PDF pp. 24-25)'),
+    'surgery': (
+        "B. V. Raman, Chapter XV, 'Surgical Operations,' inspected in the "
+        '2020 Chistabo derivative at internal printed pp. 64-65 '
+        '(physical PDF pp. 68-69)'),
 }
 
 PERSONAL_ELECTION_RULES = {

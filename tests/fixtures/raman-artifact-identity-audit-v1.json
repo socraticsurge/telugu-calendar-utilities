@@ -1,0 +1,513 @@
+{
+  "schema_version": 2,
+  "story": 366,
+  "reviewed_on": "2026-09-04",
+  "bibliographic_work": {
+    "source_id": "BVR-MUHURTHA-1993",
+    "title": "Muhurtha (Electional Astrology)",
+    "author": "B. V. Raman",
+    "publisher": "UBS Publishers' Distributors",
+    "year": 1993,
+    "isbn_13": "9788185674681",
+    "catalogued_page_count": 181,
+    "catalogue_urls": [
+      "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC",
+      "https://openlibrary.org/books/OL9860226M/Muhurtha_%28Electional_Astrology%29"
+    ],
+    "inspected_directly": false,
+    "boundary": "The bibliographic identity is independently catalogued; no scan of the 181-page 1993 edition was inspected."
+  },
+  "inspected_artifact": {
+    "source_id": "BVR-MUHURTHA-CHISTABO-2020",
+    "related_work_id": "BVR-MUHURTHA-1993",
+    "exact_edition_match_verified": false,
+    "relationship_boundary": "The derivative identifies B. V. Raman's work and says it was checked against an unspecified original scanned PDF; it does not identify that source PDF as the 181-page 1993 UBS edition.",
+    "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf",
+    "accessed_on": "2026-09-04",
+    "sha256": "b8b878a444a487c83810329fdf8f057c40e92221a867db480d864da8be21a133",
+    "byte_size": 2172882,
+    "physical_page_count": 78,
+    "pdf_metadata": {
+      "title": "Muhurta-Raman Eng",
+      "creator": "Word",
+      "producer": "Mac OS X 10.13.6 Quartz PDFContext",
+      "created_ist": "2020-06-17T16:29:55+05:30",
+      "modified_ist": "2020-06-17T16:29:55+05:30",
+      "pdf_version": "1.4"
+    },
+    "editorial_notice": {
+      "physical_pdf_page": 3,
+      "internal_folio": "II",
+      "editor": "Simon aka Chistabo",
+      "declares_re_edit": true,
+      "declares_bracketed_additions": true,
+      "declares_typo_corrections": true,
+      "declares_appendix_omission": true
+    }
+  },
+  "page_numbering": {
+    "front_matter_physical_pages": [
+      1,
+      2,
+      3
+    ],
+    "segments": [
+      {
+        "physical_start": 4,
+        "physical_end": 36,
+        "internal_start": 1,
+        "internal_end": 33,
+        "relation": "internal = physical - 3"
+      },
+      {
+        "physical_start": 37,
+        "physical_end": 37,
+        "internal_start": null,
+        "internal_end": null,
+        "relation": "unnumbered interstitial"
+      },
+      {
+        "physical_start": 38,
+        "physical_end": 78,
+        "internal_start": 34,
+        "internal_end": 74,
+        "relation": "internal = physical - 4"
+      }
+    ]
+  },
+  "claim_audit": [
+    {
+      "claim_id": "panchangam.calendar_semantics",
+      "verification_state": "needs_locator",
+      "audit_state": "no_locator",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "",
+      "verified_locator": "",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993"
+      ]
+    },
+    {
+      "claim_id": "panchangam.mixed_daily_windows",
+      "verification_state": "partially_verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "B. V. Raman, Chapter III, printed p. 8 (Nakshatra Tyajyakala table), and Chapter V section 7, printed pp. 13-14 (Durmuhurta); regional tables remain regression-pinned",
+      "verified_locator": "B. V. Raman, Chapter III, Nakshatra Tyajyakala table, inspected in the 2020 Chistabo derivative at internal printed p. 7 (physical PDF p. 10), and Chapter V section 7, Durmuhurta, internal printed p. 13 (physical PDF p. 16); regional tables remain regression-pinned",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020",
+        "MC-HINDI-IA"
+      ]
+    },
+    {
+      "claim_id": "panchangam.sankramana_avoidance",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter V, 'Special adverse Yogas and their neutralization,' rule immediately before section 3 Karthari Dosha, printed p. 13 (PDF p. 17)",
+      "verified_locator": "B. V. Raman, Chapter V section 2, 'Surya Sankramana,' inspected in the 2020 Chistabo derivative at internal printed pp. 12-13 (physical PDF pp. 15-16); the exact 16-Ghati rule is on internal printed p. 13 (physical PDF p. 16)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "panchangam.panchaka_rahita",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter III, 'Panchak (5-source energy),' printed pp. 8-9 (PDF pp. 12-13)",
+      "verified_locator": "B. V. Raman, Chapter III, 'Panchak (5-source energy),' inspected in the 2020 Chistabo derivative at internal printed pp. 8-9 (physical PDF pp. 11-12)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "panchangam.derived_classifications",
+      "verification_state": "needs_locator",
+      "audit_state": "no_locator",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "",
+      "verified_locator": "",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "MC-HINDI-IA"
+      ]
+    },
+    {
+      "claim_id": "muhurta.activity_rules",
+      "verification_state": "needs_locator",
+      "audit_state": "no_locator",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "",
+      "verified_locator": "",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993"
+      ]
+    },
+    {
+      "claim_id": "muhurta.wedding",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter IX, 'Electing a time for marriage,' printed pp. 41-42 (PDF pp. 45-46), from the lunar-month paragraph through the election-chart conditions",
+      "verified_locator": "B. V. Raman, Chapter IX, 'Electing a time for marriage,' inspected in the 2020 Chistabo derivative at internal printed pp. 41-42 (physical PDF pp. 45-46), from the lunar-month paragraph through the election-chart conditions",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.gruhapravesha",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XII, 'House building,' section 'Entering a new house,' printed pp. 52-54 (PDF pp. 56-58)",
+      "verified_locator": "B. V. Raman, Chapter XII, 'House building,' section 'Entering a new house,' inspected in the 2020 Chistabo derivative at internal printed pp. 52-54 (physical PDF pp. 56-58)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.court.filing_lawsuit",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
+      "verified_locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.litigation.profile_conflict",
+      "verification_state": "contradicted",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' printed p. 67 (PDF p. 71)",
+      "verified_locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.lending_money",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter X, 'Lending Money,' printed p. 45 (PDF p. 49)",
+      "verified_locator": "B. V. Raman, Chapter X, 'Lending Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.borrowing_money",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter X, 'Borrowing Money,' printed p. 45 (PDF p. 49)",
+      "verified_locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.trade_inventory.purchase",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "B. V. Raman, Chapter X, 'Buying for Business,' printed p. 45 (PDF p. 49); Muhurta Chintamani, Nakshatra-prakarana, purchase/sale distinction, verse 16, printed pp. 33-34 (OCR lines 2336-2350)",
+      "verified_locator": "B. V. Raman, Chapter X, 'Buying for Business,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49); Muhurta Chintamani, Nakshatra-prakarana, purchase/sale distinction, verse 16, printed pp. 33-34 (OCR lines 2336-2350)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020",
+        "MC-HINDI-IA"
+      ]
+    },
+    {
+      "claim_id": "muhurta.bhumi_puja.foundation",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter XII, 'House Building' / 'Laying the Foundation,' printed p. 50 (PDF p. 54)",
+      "verified_locator": "B. V. Raman, Chapter XII, 'House Building' / 'Laying the Foundation,' inspected in the 2020 Chistabo derivative at internal printed pp. 50-51 (physical PDF pp. 54-55)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.namakarana",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter VIII, 'Post-natal ceremonies' / 'Naming the child (Namakarana),' printed p. 21 (PDF p. 25)",
+      "verified_locator": "B. V. Raman, Chapter VIII, 'Post-natal ceremonies' / 'Naming the child (Namakarana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.seemantha",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter VII, 'Seemantha,' printed pp. 20-21 (PDF pp. 24-25)",
+      "verified_locator": "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected in the 2020 Chistabo derivative at internal printed pp. 21-22 (physical PDF pp. 24-25)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.annaprasana",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter VIII, 'Post-natal ceremonies' / 'First feeding on rice (Annaprasana),' printed pp. 21-22 (PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
+      "verified_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.karnavedha",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter VIII, 'Post-natal ceremonies' / 'Ear boring (Karnavedha),' printed p. 22 (PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, printed p. 11 (PDF p. 15)",
+      "verified_locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.mundana",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter VIII, 'Post-natal ceremonies' / 'Tonsure (Chowlam),' printed pp. 22-23 (PDF pp. 26-27)",
+      "verified_locator": "B. V. Raman, Chapter VIII, 'Tonsure (Chowlam),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.vidyarambha",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter VIII, 'Post-natal ceremonies' / 'Commencing education (Aksharabhyasa),' printed p. 23 (PDF p. 27)",
+      "verified_locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.upanayana",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter VIII, 'Post-natal ceremonies' / 'Investiture of sacred thread (Upanayanam),' printed pp. 23-24 (PDF pp. 27-28)",
+      "verified_locator": "B. V. Raman, Chapter VIII, 'Investiture of sacred thread (Upanayanam),' inspected in the 2020 Chistabo derivative at internal printed pp. 24-25 (physical PDF pp. 27-28)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.vehicle.acquisition",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter IV, 'Influence of Nakshatras,' movable-Nakshatra classification, printed p. 10 (PDF p. 14)",
+      "verified_locator": "B. V. Raman, Chapter IV, 'Influence of Nakshatras,' movable-Nakshatra classification, inspected in the 2020 Chistabo derivative at internal printed p. 11 (physical PDF p. 14)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.well_digging",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter XII, 'Digging Wells,' printed p. 51 (PDF p. 55)",
+      "verified_locator": "B. V. Raman, Chapter XII, 'Digging Wells,' inspected in the 2020 Chistabo derivative at internal printed p. 52 (physical PDF p. 56)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.construction_roof",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter XII, 'Laying the Foundation,' roofing-stage instruction, printed p. 50 (PDF p. 54)",
+      "verified_locator": "B. V. Raman, Chapter XII, 'Laying the Foundation,' roofing-stage instruction, inspected in the 2020 Chistabo derivative at internal printed p. 51 (physical PDF p. 55)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.coronation",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XVI, 'Electing Head of the State' and 'Coronation,' printed p. 66 (PDF p. 70)",
+      "verified_locator": "B. V. Raman, Chapter XVI, 'Electing Head of the State' and 'Coronation,' inspected in the 2020 Chistabo derivative at internal printed p. 66 (physical PDF p. 70)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.wood_cutting",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XIII, 'Felling Trees,' printed p. 58 (PDF p. 62)",
+      "verified_locator": "B. V. Raman, Chapter XIII, 'Felling Trees,' inspected in the 2020 Chistabo derivative at internal printed p. 58 (physical PDF p. 62)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.surgery",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XV, 'Surgical Operations,' printed pp. 64-65 (PDF pp. 68-69)",
+      "verified_locator": "B. V. Raman, Chapter XV, 'Surgical Operations,' inspected in the 2020 Chistabo derivative at internal printed pp. 64-65 (physical PDF pp. 68-69)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.gold_jewelry.purchase",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
+      "verified_locator": "B. V. Raman, Chapter X, 'Buying Jewelry,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.pilgrimage",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XIV, 'Journeys' and 'Pilgrimage,' printed pp. 60-62 (PDF pp. 64-66)",
+      "verified_locator": "B. V. Raman, Chapter XIV, 'Journeys' and 'Pilgrimage,' inspected in the 2020 Chistabo derivative at internal printed pp. 60-62 (physical PDF pp. 64-66)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.travel",
+      "verification_state": "verified",
+      "audit_state": "aligned",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "Chapter XIV, 'Journeys' and 'Long-distance Journeys,' printed pp. 60-61 (PDF pp. 64-65)",
+      "verified_locator": "B. V. Raman, Chapter XIV, 'Journeys' and 'Long-distance Journeys,' inspected in the 2020 Chistabo derivative at internal printed pp. 60-61 (physical PDF pp. 64-65)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.home_repair.commencement",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter XII, 'Repairing Houses,' printed pp. 53-54 (PDF pp. 57-58)",
+      "verified_locator": "B. V. Raman, Chapter XII, 'Repairing Houses,' inspected in the 2020 Chistabo derivative at internal printed pp. 54-55 (physical PDF pp. 58-59)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.house_purchase.completed",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter XII, 'Buying Houses,' printed p. 53 (PDF p. 57)",
+      "verified_locator": "B. V. Raman, Chapter XII, 'Buying Houses,' inspected in the 2020 Chistabo derivative at internal printed p. 54 (physical PDF p. 58)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "muhurta.land_purchase.building",
+      "verification_state": "verified",
+      "audit_state": "correction_required",
+      "page_coordinates_changed": true,
+      "pre_migration_locator": "Chapter XII, 'Buying Lands for Buildings,' printed p. 53 (PDF p. 57)",
+      "verified_locator": "B. V. Raman, Chapter XII, 'Buying Lands for Buildings,' inspected in the 2020 Chistabo derivative at internal printed p. 54 (physical PDF p. 58)",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ]
+    },
+    {
+      "claim_id": "panchanga_shuddhi.five_limb_count",
+      "verification_state": "needs_locator",
+      "audit_state": "no_locator",
+      "page_coordinates_changed": false,
+      "pre_migration_locator": "",
+      "verified_locator": "",
+      "canonical_source_ids": [
+        "BVR-MUHURTHA-1993"
+      ]
+    }
+  ],
+  "counts": {
+    "total_source_linked_claims": 34,
+    "aligned": 13,
+    "correction_required": 17,
+    "no_locator": 4
+  },
+  "protected_rule_semantics_sha256": {
+    "src/data/activity-rules.generated.json": "1c654ceb75d45cf37ace640f1619882c4828b904a38c39e43f039ce92fb6e7de",
+    "src/data/election-chart-rules.generated.json": "c61a68de25e3f56c95c35b09c6608c66709434767eb69a75968542f0b69516a2"
+  },
+  "protected_scoring_implementation_sha256": {
+    "telugu_panchangam/personal/muhurta.py": "2a3d3d2164ab8c9761677bbb0076375f4a862a68cdb8d4c481a515498bc7f6da",
+    "telugu_panchangam/personal/slot_scorers.py": "5d8c935fb5f46c881ab0b31412ee6b7ee2e1a749a6998824400ac2699bc1321e",
+    "src/muhurta-scorer.ts": "918f4d627ee6e7aab93264d7b521ea896f9760c57443f7d8d85af71346c82291",
+    "src/scorer/election-chart-enrichment.ts": "911c32b722cf5b5ce8eaf53d046173c0e5b48852d73eebf1b0923258352bd5ed"
+  },
+  "canonical_migration": {
+    "status": "release_candidate_complete",
+    "version": "1.15.2",
+    "invariant": "Only source identity, locators, source-disclosure wording, documentation, generated source projections, tests, and release metadata change; computational predicates, effects, thresholds, ordering, accepted values, and ranking weights remain unchanged, and the four protected scoring implementations remain byte-identical.",
+    "located_claim_source_ids": [
+      "BVR-MUHURTHA-1993",
+      "BVR-MUHURTHA-CHISTABO-2020"
+    ],
+    "needs_locator_boundary": "The four needs_locator claims remain linked only to the bibliographic work; they do not imply inspection in the derivative."
+  }
+}

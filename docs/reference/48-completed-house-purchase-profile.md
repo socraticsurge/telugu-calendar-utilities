@@ -3,7 +3,8 @@
 ## Authority and scope
 
 The `house_purchase` activity uses B. V. Raman, *Muhurtha (Electional
-Astrology)*, Chapter XII, “Buying Houses,” printed page 53 (PDF page 57).
+Astrology)*, Chapter XII, “Buying Houses,” internal printed page 54 (physical
+PDF page 58 in the inspected 2020 Chistabo derivative).
 Raman explicitly includes both new and old completed houses. This is not the
 election for buying land for construction, starting building work, moving into
 a rental, or performing Gruhapravesha.
