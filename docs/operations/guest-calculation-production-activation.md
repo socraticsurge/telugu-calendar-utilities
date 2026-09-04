@@ -25,7 +25,7 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 | DashaFlow authenticated contracts | [PR #3](https://github.com/socraticsurge/dashaflow-sidecar/pull/3) is green at `00f8fe2`; it adds AGPL/source disclosure and remains unmerged |
 | Panchangam activation-readiness work | [PR #451](https://github.com/socraticsurge/telugu-calendar-utilities/pull/451) is merged at `571b805`; both public client flags remain off |
 | Licensing | Owner selected the AGPL-compatible public-source path on 2026-09-04. TCU `1.14.0`, DashaFlow PR #3, and the Astro AGPL release candidate must all merge and expose public exact-revision source before activation |
-| Production geocoder/shared controls | PR #169 reuses fixed public Nominatim with the existing Turso database, no LocationIQ/Geoapify account, no API key, and no Upstash/Redis dependency. It is Production-only, submit-only, process-cached, attributed, guest/auth shared, code-capped at 1,000 attempts/day, and protected by an exclusive fenced send lease. Production configuration and owner approval remain pending. |
+| Production geocoder/shared controls | PR #169 reuses fixed public Nominatim with the existing Turso database, no LocationIQ/Geoapify account, no API key, and no Upstash/Redis dependency. It is Production-only, submit-only, process-cached, attributed, guest/auth shared, code-capped at 1,000 attempts/day, and protected by an exclusive fenced send lease. After the five-per-minute guard, validation, cache lookup, and coalescing, guest clients are limited to 50 valid managed-provider misses per anchored 24 hours. That is nominally 5% of the configured pool and prevents one client identity from exhausting it, though a boundary overlap can reach 100 upstream attempts in one UTC day. An upstream `Retry-After` is persisted fleet-wide through exact-fence completion. Production configuration and owner approval remain pending. |
 | Authenticated backend Preview | Astro `dpl_DJ9hcs2aPk5vHsjuZfVEzaVEJuoE` and DashaFlow `dpl_8jXdq9TWJXRsz41zgyfZUJ9gbVyy` passed exact-token birth/election contracts against an isolated staging database. Public Nominatim is deliberately fixture-only outside Production; the Panchangam owner review remains local. |
 
 ## Hard gates
@@ -75,8 +75,8 @@ deployment IDs rather than mutable aliases.
 
 | Layer | Current Production commit | Candidate runtime/code commit | Restore ref | Preview deployment ID | Production deployment ID | CI/security evidence |
 |---|---|---|---|---|---|---|
-| Panchangam | `571b805` | `ffcfca4` in PR #456, plus this documentation-only follow-up | `origin/master` and `archive/guest-activation-readiness-2026-09-03-8b0bf74` | Local owner-review build only; the deployed client intentionally accepts the canonical Production API | Re-query the immutable `gh-pages` tip/tree immediately before publication | PR #456 was green at `ffcfca4`: 1,467 Python tests, frontend suite, Python 3.10–3.13, CodeQL, Sonar and pip-audit passed; rerun after this docs change |
-| Astro | `bc15eb60e214b94a5668403b79dffbfcf5ae8e77` | `f8c810d` in PR #168, then `bb23e3d` in stacked PR #169 | `origin/archive/astro-main-pre-guest-release-2026-09-04-519d686`; pre-review Nominatim archive `a7e013c` | `dpl_DJ9hcs2aPk5vHsjuZfVEzaVEJuoE` (Ready, protected; provider fixture-only) | Re-query exact Ready deployment of `bc15eb6` before mutation | PR #168 checks passed; PR #169 local verification passed 859 tests, TypeScript, lint with one inherited warning, palette, routes, production build, and independent code review |
+| Panchangam | `571b805` | `ffcfca4` in PR #456, documentation baseline `728a79b`, plus this security-semantics follow-up | `origin/master`; `archive/guest-activation-readiness-2026-09-03-8b0bf74`; pre-follow-up `archive/tcu-nominatim-fairness-docs-pre-2026-09-04-728a79b` | Local owner-review build only; the deployed client intentionally accepts the canonical Production API | Re-query the immutable `gh-pages` tip/tree immediately before publication | PR #456 was green at `728a79b`: 1,466 Python tests passed and 1 skipped locally; documentation freshness/build/output passed; GitHub checks passed. Rerun after this follow-up. |
+| Astro | `bc15eb60e214b94a5668403b79dffbfcf5ae8e77` | `f8c810d` in PR #168, then `07f1e10adec161d54a4d3da5ba4e1d8e7786f8cc` in stacked PR #169 | `origin/archive/astro-main-pre-guest-release-2026-09-04-519d686`; pre-review Nominatim archive `a7e013c` | `dpl_DJ9hcs2aPk5vHsjuZfVEzaVEJuoE` (Ready, protected; provider fixture-only) | Re-query exact Ready deployment of `bc15eb6` before mutation | PR #168 checks passed; PR #169 local verification passed 883 tests across 73 files, including 233 focused provider/security tests across 7 files, plus TypeScript, palette, routes, and a 27-page Production build. Lint reported 0 errors and one unchanged unused-type warning; independent review findings were remediated. |
 | DashaFlow | `d01c8db` | `00f8fe26444cd8e63511af5d0d54ae41d15c419a` in PR #3 | `origin/archive/dashaflow-master-pre-guest-release-2026-09-04-d01c8db` | `dpl_8jXdq9TWJXRsz41zgyfZUJ9gbVyy` (Ready, protected) | Re-query exact Ready deployment of `d01c8db` before mutation | 133 local tests and all PR checks passed; exact-token birth/election calls passed against the isolated Astro Preview |
 
 ## Environment names and implementation state
@@ -123,10 +123,29 @@ The geocoder fleet ceiling is 30 calls per minute, shared by guest place search
 and the activated signed-in migration. The managed signed-in path also applies
 a ten-call-per-user minute limit. Public Nominatim adds a code-capped
 1,000-attempt UTC-day budget and one exclusive 12,500 ms crash-recovery lease;
-completion establishes a fenced 1,100 ms cooldown before the next distributed
-send. Warm-process cache hits and coalesced duplicate callers spend no provider
-slot. These controls implement the public service's absolute one-request/second
-application ceiling; they are not a purchased quota or availability guarantee.
+normal completion establishes a fenced 1,100 ms cooldown before the next
+distributed send. When public Nominatim returns `429`, a bounded numeric or
+HTTP-date `Retry-After` replaces that normal cooldown fleet-wide through the
+same exact-fence update, up to 24 hours. Missing, malformed, past, or zero-delay
+guidance becomes 60 seconds. Guest place search applies a durable 50-request
+allowance of valid managed-provider cache misses per client and anchored
+24-hour window. It runs after the five-per-minute guard, validation, cache
+lookup, and duplicate coalescing and has its own bounded two-second storage
+deadline. Malformed requests and reusable results do not spend it, though
+malformed requests may already spend the earlier route capacity, fleet, and
+minute guards. Fifty is nominally 5% of the configured pool and prevents one
+client identity from exhausting the provider's UTC-day allowance. Because the
+client window is anchored rather than UTC-aligned, a boundary overlap can reach
+100 upstream attempts in one UTC day. Warm-process cache hits and coalesced
+duplicate callers spend no provider slot. These controls implement the public
+service's absolute one-request/second application ceiling; they are not a
+purchased quota or availability guarantee.
+
+For Turso capacity planning, a successful guest place cache miss uses five
+admission-path row mutations: the capacity, fleet, minute-client, anchored
+daily-client, and provider-reservation rows. The conditional exact-fence
+completion update is accounted separately. Any four-write guest-place estimate
+predates the anchored daily-client guard and is no longer valid.
 
 ## Isolated Preview and Production-only provider sequence
 
@@ -148,7 +167,9 @@ Before Production activation:
 3. Merge and deploy the credentialed Astro callers with guest flags off, then
    deploy DashaFlow authentication and repeat all signed-in chart fixtures.
 4. Provision and verify the limiter schema against the exact Production Turso
-   database. Confirm quota headroom and that request paths perform no DDL.
+   database. Confirm quota headroom, budget five admission-path mutations for a
+   successful guest place miss, account separately for exact-fence completion,
+   and verify that request paths perform no DDL.
 5. Configure `GEOCODER_PROVIDER=nominatim-public`, no geocoder API key, a daily
    limit no greater than `1000`, and keep
    `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED=true`. With guest flags still off,
@@ -173,6 +194,8 @@ Before Production activation:
 | Astro route flag off | Fixed 503; no geocoder/sidecar call |
 | Shared Turso limiter missing/unavailable in Preview/Production | Fixed 503; no expensive calculation/provider call |
 | Production geocoder configuration missing/unavailable | Place search 503; no arbitrary or commercial fallback |
+| Guest client exceeds 50 valid managed-provider place-search misses in its anchored 24-hour window | Sanitized 429 with durable client-window retry guidance; no provider call |
+| Public Nominatim returns 429 | Sanitized 429; bounded upstream retry guidance is persisted fleet-wide through exact-fence completion. Missing, malformed, past, or zero-delay guidance becomes 60 seconds; the maximum is 24 hours |
 | Authenticated migration flag absent/false | Production preserves its old unbudgeted signed-in Nominatim path; Preview fails closed. Never use this as a Nominatim incident rollback. |
 | Authenticated migration exact `true`, provider/limit unavailable | Signed-in place-changing operation fails closed; no legacy or commercial fallback and no profile mutation |
 | Sidecar token missing/bad | Fixed gateway error; no upstream diagnostic or token in response |

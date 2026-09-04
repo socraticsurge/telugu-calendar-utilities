@@ -76,9 +76,14 @@ placed in browser code or a `VITE_*` variable. The reviewed gateway stack uses
 the existing Turso database for fail-closed shared client/fleet limits on all
 guest routes. The public-Nominatim candidate also gives guest and signed-in
 lookups one aggregate provider row, a 1,000-attempt UTC-day cap, and one
-exclusive cross-instance send lease. Place queries and results are not written
-to that database; normalized results stay only in a bounded server-process
-cache.
+exclusive cross-instance send lease. Guest place search additionally applies a
+durable allowance of 50 valid managed-provider cache misses per client in an
+anchored 24-hour window, after its five-request-per-minute client guard. That
+allowance is nominally 5% of the configured 1,000-attempt pool and prevents one
+client identity from exhausting it, although an anchored-window reset can
+permit up to 100 upstream attempts inside one UTC day. Place queries and
+results are not written to that database; normalized results stay only in a
+bounded server-process cache.
 [#446](https://github.com/socraticsurge/telugu-calendar-utilities/issues/446)
 must close and verify those controls before activation.
 
@@ -319,7 +324,23 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
    fixtures and cannot compete with Production. Every Production cache miss
    uses the existing Turso database for one guest-and-authenticated provider
    pool, a code-capped 1,000-attempt UTC-day budget, a 12,500 ms exclusive
-   crash-recovery lease, and a fenced 1,100 ms cooldown after completion.
+   crash-recovery lease, and an exact-fence completion update. Normal
+   completion establishes a 1,100 ms cooldown. If public Nominatim returns
+   `429`, its bounded numeric or HTTP-date `Retry-After` is instead persisted
+   fleet-wide through that same fenced update, up to 24 hours. A missing,
+   malformed, past, or zero-delay value uses 60 seconds and cannot shorten the
+   shared backoff.
+   Guest place search first applies its five-request-per-minute client guard,
+   then, after request validation, process-cache lookup, and duplicate
+   coalescing, a durable allowance of 50 valid managed-provider cache misses per
+   client and anchored 24-hour window. This second guard has its own bounded
+   two-second storage deadline. Malformed requests and reusable results do not
+   spend this durable allowance, though malformed requests may already spend
+   the earlier route capacity, fleet, and minute guards. Fifty is nominally 5%
+   of the configured 1,000-attempt pool and prevents one client identity from
+   exhausting it. Because this client window is anchored rather than
+   UTC-aligned, a reset can permit up to 100 upstream attempts inside one
+   provider UTC day.
    Hashed cache keys and normalized result rows remain only in a bounded
    24-hour server-process cache—not Turso or Redis. The browser validates an
    allowlist of structured provider/OpenStreetMap attribution links and renders

@@ -110,6 +110,22 @@ birth/profile data are not stored there. No Upstash or Redis service is part of
 this release. Candidate code is not evidence that it is merged, configured,
 deployed, or operationally certified.
 
+The related guest place-search route has an additional durable fairness guard:
+after the five-request-per-minute client limit, request validation, cache
+lookup, and duplicate coalescing, one client may make at most 50 valid
+managed-provider cache misses in an anchored 24-hour window. This guard has its
+own bounded two-second storage deadline. Malformed requests and reusable
+results do not spend that allowance, though malformed requests may already
+spend the earlier route guards. Fifty is nominally 5% of the configured
+1,000-attempt public-Nominatim pool and prevents one client identity from
+exhausting it, though an anchored-window reset can permit up to 100 upstream
+attempts in one provider UTC day. A public-Nominatim `429` also
+persists its bounded numeric or HTTP-date `Retry-After` fleet-wide through
+exact-fence completion, up to 24 hours; missing, malformed, past, or zero-delay
+guidance becomes 60 seconds. These place-search controls support profile
+creation but do not change the election-chart request or scoring contract
+below.
+
 ## Astronomical contract
 
 The chart service returns:
