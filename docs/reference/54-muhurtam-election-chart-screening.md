@@ -61,11 +61,11 @@ capability. With no flag, requests are enabled only on `localhost`,
 `VITE_BIRTH_PROFILE_API_ENABLED`; enabling one calculation journey does not
 enable the other.
 
-The current public build does not set that flag, and the production Astro
-deployment does not yet contain the guest election route. Activation remains
-blocked by #443, #445, #446, #447, and #449, followed by the exact pair-bound
-Preview certification in #448. That hosted Preview cannot run with the current
-client allowlists, CORS policy, and protected service-to-service deployments.
+The current public build does not set that flag. The production Astro code
+contains the guest election route but keeps it server-disabled. Activation
+remains blocked by #443, #445, #446, #447, and #449, followed by #448's exact
+protected backend Preview, local browser review, and bounded Production smoke
+evidence. Public Nominatim remains unavailable in Preview by design.
 See the
 [production activation runbook](../operations/guest-calculation-production-activation.md).
 
@@ -102,13 +102,29 @@ The request uses `credentials: omit` and `cache: no-store`. The public gateway
 also enforces a 4 KiB body cap, strict origin policy, rate limiting and exact
 response validation. Network and hosting providers still process the narrow
 request in transit; “data-minimized” does not mean “no network calculation.”
-The reviewed gateway candidate makes the election-chart route combine its
-process-local guard with an atomic Upstash Redis limit shared across Vercel
-instances and fail closed if that layer is missing or unavailable. A later
-local remediation candidate expands shared limits to all three guest routes.
-Neither statement is evidence that the code is merged, configured, deployed,
-or operationally certified, and Upstash limiting is not a shared geocoder
-cache.
+The reviewed gateway stack combines each guest route's process-local guard with
+atomic limits in the existing Turso database shared across Vercel instances and
+fails closed if that layer is missing or unavailable. Limiter rows contain only
+pseudonymous counter keys and integer timing/count fields; election charts and
+birth/profile data are not stored there. No Upstash or Redis service is part of
+this release. Candidate code is not evidence that it is merged, configured,
+deployed, or operationally certified.
+
+The related guest place-search route has an additional durable fairness guard:
+after the five-request-per-minute client limit, request validation, cache
+lookup, and duplicate coalescing, one client may make at most 50 valid
+managed-provider cache misses in an anchored 24-hour window. This guard has its
+own bounded two-second storage deadline. Malformed requests and reusable
+results do not spend that allowance, though malformed requests may already
+spend the earlier route guards. Fifty is nominally 5% of the configured
+1,000-attempt public-Nominatim pool and prevents one client identity from
+exhausting it, though an anchored-window reset can permit up to 100 upstream
+attempts in one provider UTC day. A public-Nominatim `429` also
+persists its bounded numeric or HTTP-date `Retry-After` fleet-wide through
+exact-fence completion, up to 24 hours; missing, malformed, past, or zero-delay
+guidance becomes 60 seconds. These place-search controls support profile
+creation but do not change the election-chart request or scoring contract
+below.
 
 ## Astronomical contract
 

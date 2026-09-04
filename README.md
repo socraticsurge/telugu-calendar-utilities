@@ -168,6 +168,21 @@ system map. A searchable VitePress projection is built from these files at
 `/docs/`; it is disposable presentation output and does not replace the
 repository as the source of truth.
 
+## License and corresponding source
+
+Copyright (C) 2026 Vinay Chaganti.
+
+This project is free software under the
+[GNU Affero General Public License v3.0 or later](LICENSE). Users of the
+website and MCP package can obtain the complete corresponding source,
+including build instructions and tests, from this repository. Direct
+dependency notices for PySwissEph and Swiss Ephemeris are preserved in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+This project selects the AGPL path in Swiss Ephemeris's dual-license model.
+Earlier copies remain available under the licence terms conveyed with those
+copies; this release does not withdraw an earlier grant.
+
 ## Development
 
 ```bash

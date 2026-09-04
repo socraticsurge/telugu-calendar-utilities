@@ -8,10 +8,13 @@ derived, and what “verified” does and does not mean.
 > formula path. The three fixture cells are not an independent published-chart
 > comparison because both paths use Swiss Ephemeris. Public activation remains
 > gated on the separate Swiss Ephemeris and PySwissEph wrapper decision,
-> producer-contract invariants, managed geocoding/shared abuse controls, and the
-> [three-service Preview runbook](../operations/guest-calculation-production-activation.md).
-> That hosted Preview runbook is currently blocked: the deployed clients cannot
-> yet bind an exact Panchangam Preview to exact Astro and DashaFlow Previews.
+> producer-contract invariants, governed Production geocoding/shared abuse
+> controls, and the
+> [production activation runbook](../operations/guest-calculation-production-activation.md).
+> The exact Astro/DashaFlow backend pair has passed protected Preview contracts;
+> the Panchangam journey still requires local owner review and one bounded,
+> approval-gated Production smoke request because public Nominatim is disabled
+> outside Production.
 
 > **Activation state:** the birth-details interface and network adapter are on
 > by default only for loopback development. A public build must set
@@ -57,7 +60,7 @@ the saved profile name. There is no cloud sync or recovery.
 ```mermaid
 flowchart LR
   UI["Panchangam static UI"] -->|"place text only"| PLACE["Astro guest place route"]
-  PLACE --> GEO["Owner-approved managed geocoder<br/>(selection pending)"]
+  PLACE --> GEO["Public Nominatim<br/>(Production-only, governed)"]
   PLACE --> TZ["offline coordinate-to-timezone lookup"]
   UI -->|"date, time, coordinates, timezone; no name"| GATEWAY["Astro guest profile route"]
   GATEWAY -->|"server bearer credential"| SIDE["DashaFlow sidecar v1 contract"]
@@ -69,11 +72,18 @@ flowchart LR
 The Astro gateway permits the Panchangam production origin and HTTP localhost
 origins, caps bodies at 4 KiB, rate-limits requests, and marks responses
 `private, no-store`. Its DashaFlow bearer token is server-only and must never be
-placed in browser code or a `VITE_*` variable. The reviewed gateway PR head has
-a shared deployed limiter for election charts but only per-instance limiters
-for place and birth requests. A local remediation candidate expands the shared
-guest limit, but it is not a recorded release or hosted certification and it
-does not provide a shared geocoder cache.
+placed in browser code or a `VITE_*` variable. The reviewed gateway stack uses
+the existing Turso database for fail-closed shared client/fleet limits on all
+guest routes. The public-Nominatim candidate also gives guest and signed-in
+lookups one aggregate provider row, a 1,000-attempt UTC-day cap, and one
+exclusive cross-instance send lease. Guest place search additionally applies a
+durable allowance of 50 valid managed-provider cache misses per client in an
+anchored 24-hour window, after its five-request-per-minute client guard. That
+allowance is nominally 5% of the configured 1,000-attempt pool and prevents one
+client identity from exhausting it, although an anchored-window reset can
+permit up to 100 upstream attempts inside one UTC day. Place queries and
+results are not written to that database; normalized results stay only in a
+bounded server-process cache.
 [#446](https://github.com/socraticsurge/telugu-calendar-utilities/issues/446)
 must close and verify those controls before activation.
 
@@ -81,9 +91,11 @@ The build flag is not authorization and contains no secret. A public page uses
 only the canonical `https://astrochaganti.com/api/guest` HTTPS gateway; a
 loopback or arbitrary configured base is rejected. Consequently,
 `VITE_BIRTH_PROFILE_API_BASE` cannot select a hosted Astro Preview today.
-Astro also rejects a hosted Panchangam Preview origin, so end-to-end Preview
-certification remains blocked until an exact pair-bound mechanism is approved
-and implemented. Public activation requires
+Astro also rejects a hosted Panchangam Preview origin. This is now a deliberate
+isolation boundary: provider behavior is certified with fixtures, the exact
+Astro/DashaFlow backend pair is certified in protected Preview, and the owner
+reviews the complete Panchangam browser journey locally before one bounded
+Production smoke request. Public activation requires
 both the exact client flag and independently enabled server-side routes. The
 server must remain disabled until the licensing and provider gates below are
 resolved. A disabled browser adapter throws a typed `disabled` error before it
@@ -270,18 +282,18 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
 
 ## Known limitations and release gates
 
-1. **Swiss Ephemeris and PySwissEph licensing:** Astrodienst requires a
-   developer to choose AGPL-compatible licensing or a Professional License
-   before distributing a derived application or activating a public service.
-   Its current professional contract explicitly covers browser clients that
-   request server-side calculations. PySwissEph is a separately AGPL-licensed
-   wrapper; an unresolved [upstream wrapper-license issue](https://github.com/astrorigin/pyswisseph/issues/92)
-   means a Swiss Professional License alone does not establish proprietary-use
-   rights for the current binding. Public activation is blocked until the owner
-   records the applicable combined posture. See [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
-   and [Professional License contract](https://www.astro.com/swisseph/secont_e.pdf).
+1. **Swiss Ephemeris and PySwissEph licensing:** On 2026-09-04 the owner chose
+   the AGPL-compatible public-source path for this calculation stack. The
+   current TCU/MCP release is AGPL-3.0-or-later, retains the PySwissEph and
+   Swiss Ephemeris notices, and offers corresponding source from the public
+   repository. DashaFlow and Astro must publish their exact deployed source
+   revisions under the same compatible posture before their public calculation
+   flags are enabled. This implements the conservative whole-project boundary
+   stated by [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
+   and the network-source opportunity described by
+   [GNU AGPL section 13](https://www.gnu.org/licenses/agpl-3.0.html#section13).
    The decision, existing-distribution audit, implementation, and wrapper path
-   are tracked in
+   remain recorded in
    [#231](https://github.com/socraticsurge/telugu-calendar-utilities/issues/231)
    with required children
    [#444](https://github.com/socraticsurge/telugu-calendar-utilities/issues/444),
@@ -302,28 +314,51 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
    records represent only part of a region and are not authoritative everywhere.
    See [IANA timezone theory and limitations](https://www.iana.org/time-zones/theory).
 5. **Place search policy and cache:** this UI uses an explicit submit action,
-   asks for city/town only, and warns against street addresses. Guest use of
-   public Nominatim is retained for explicit local development only. Astro
-   candidate `e7fb3fe6e8e05f47f04aaa1b19ce9447d92ad315` accepts only fixed
-   LocationIQ or Geoapify adapters for deployed guest search,
-   rejects redirects and oversized/malformed responses, and returns at most
-   five normalized rows. Deployed cache keys are token-HMAC pseudonyms and the
-   24-hour shared value contains only normalized labels, coordinates, provider
-   IDs, and ranking metadata—not the raw place query, birth date, birth time,
-   profile name, natal chart, or client IP. Missing or unavailable shared
-   storage fails closed. The browser validates an allowlist of structured
-   provider/OpenStreetMap attribution links and renders them beside results.
-   Provider transit necessarily includes the submitted city/town query; the
-   selected provider's own retention and quota terms still require approval.
-   Provider approval and implementation certification are tracked in
+   asks for city/town only, and warns against street addresses. Astro
+   [PR #169](https://github.com/socraticsurge/astro-unified-core/pull/169)
+   retains the existing public Nominatim service through a fixed,
+   Production-only `nominatim-public` adapter. It sends an identifying
+   application User-Agent, rejects redirects and oversized or malformed
+   responses, and returns at most five normalized rows. Public Nominatim is
+   disabled in real local development and Preview; those environments use
+   fixtures and cannot compete with Production. Every Production cache miss
+   uses the existing Turso database for one guest-and-authenticated provider
+   pool, a code-capped 1,000-attempt UTC-day budget, a 12,500 ms exclusive
+   crash-recovery lease, and an exact-fence completion update. Normal
+   completion establishes a 1,100 ms cooldown. If public Nominatim returns
+   `429`, its bounded numeric or HTTP-date `Retry-After` is instead persisted
+   fleet-wide through that same fenced update, up to 24 hours. A missing,
+   malformed, past, or zero-delay value uses 60 seconds and cannot shorten the
+   shared backoff.
+   Guest place search first applies its five-request-per-minute client guard,
+   then, after request validation, process-cache lookup, and duplicate
+   coalescing, a durable allowance of 50 valid managed-provider cache misses per
+   client and anchored 24-hour window. This second guard has its own bounded
+   two-second storage deadline. Malformed requests and reusable results do not
+   spend this durable allowance, though malformed requests may already spend
+   the earlier route capacity, fleet, and minute guards. Fifty is nominally 5%
+   of the configured 1,000-attempt pool and prevents one client identity from
+   exhausting it. Because this client window is anchored rather than
+   UTC-aligned, a reset can permit up to 100 upstream attempts inside one
+   provider UTC day.
+   Hashed cache keys and normalized result rows remain only in a bounded
+   24-hour server-process cache—not Turso or Redis. The browser validates an
+   allowlist of structured provider/OpenStreetMap attribution links and renders
+   them beside results. Provider transit includes only the deliberately
+   submitted city/town query, not a profile name or birth date/time. The
+   [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)
+   is part of the release contract. Implementation certification is tracked in
    [#233](https://github.com/socraticsurge/telugu-calendar-utilities/issues/233)
    and [#446](https://github.com/socraticsurge/telugu-calendar-utilities/issues/446).
-   Existing deployed signed-in profile creation/editing keeps its disclosed
-   Nominatim path while `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` is absent or
-   false. Exact `true` separately migrates it to the same managed adapter,
-   adds a ten-call-per-user limit, and shares the 60-call fleet ceiling with
-   guest search without depending on guest feature flags. That migration still
-   requires provider/Redis approval and Preview regression evidence under
+   Existing Production signed-in profile creation/editing keeps its disclosed
+   legacy Nominatim path while `AUTH_PROFILE_MANAGED_GEOCODER_ENABLED` is absent
+   or false; Preview remains fixture-only. Exact `true` migrates Production to
+   the same governed adapter, adds a ten-call-per-user limit, and shares the
+   30-call fleet and provider-lease boundaries with guest search without
+   depending on guest feature flags. Guest public-Nominatim configuration
+   itself fails closed until this migration is also enabled. No LocationIQ,
+   Geoapify, Upstash, or Redis account is required. Regression evidence remains
+   under
    [#447](https://github.com/socraticsurge/telugu-calendar-utilities/issues/447).
 6. **Birth-time sensitivity:** a small time difference can change Lagna near a
    boundary. The current calculated path accepts exact recorded time only. An
