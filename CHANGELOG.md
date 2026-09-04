@@ -42,6 +42,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Restore the computation-architecture evidence schema-v1 meaning of
+  `scope.source_files` as the total production-source count, add an explicit
+  `established_source_files` subset, and retain additive and total counts.
 - Validate calculated birth-profile responses and restored browser records
   against the exact `1.0` DashaFlow/Lahiri contract, canonical ordered
   nine-graha tuple, Whole Sign houses, fixed node facts, and
