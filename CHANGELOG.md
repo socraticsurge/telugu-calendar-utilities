@@ -7,12 +7,26 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+## [1.15.0] — 2026-09-04
+
 ### Changed
 
 - Enable the production browser's birth-profile derivation and Muhurtam
   election-chart screening together with exact, independently fail-closed
   client flags after the governed Production backend passed place-search,
   calculation and perimeter probes.
+- Present Gold v1 as resolution of four event-specific chart clauses rather
+  than a complete election-chart verdict. Both a conclusive condition miss
+  and a calculation-boundary unknown retain the slot and its raw score, with
+  `Good` as the maximum rating; summaries also report when capped and
+  review-gated counts overlap.
+- Bump the MCP/PyPI release metadata to `1.15.0` for the expanded deterministic
+  Muhurtam computation contract; the frozen engines and ICS feed are unchanged.
+
+### Fixed
+
+- Date the original election-assessor inventory as a pre-Gold baseline instead
+  of presenting its 23-predicate count as the current implementation state.
 
 ## [1.14.0] — 2026-09-04
 
@@ -1010,7 +1024,9 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.0...HEAD
+[1.15.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.14.0...v1.15.0
+[1.14.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.11.0...v1.12.0
 [1.10.4]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.10.3...v1.10.4

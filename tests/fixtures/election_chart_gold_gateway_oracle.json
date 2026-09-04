@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-04",
+  "source": {
+    "endpoint": "https://astrochaganti.com/api/guest/muhurta/election-charts",
+    "request_contract": "1.0",
+    "gateway_source_revision": "4106f09708a154f1c2401880ebe8f9c0b9162eb5",
+    "sidecar_source_revision": "c84fd856b17120c80e1bb7e455246a0ec8e429ea",
+    "engine": {
+      "name": "DashaFlow",
+      "version": "1.1.0",
+      "ayanamsha": "Lahiri",
+      "ephemeris": "moshier",
+      "node_convention": "mean"
+    },
+    "house_system": "whole_sign",
+    "capture_method": "Frozen HTTP 200 response cells from the governed public guest gateway; no positions were edited or relabelled.",
+    "assertion_boundary": "These cells regression-test the Gold assessor against actual deterministic gateway output. They are not an empirical validation of astrology or an independent ephemeris comparison."
+  },
+  "cases": [
+    {
+      "id": "hyderabad-2026-01-15-known-fail",
+      "coverage": ["fail"],
+      "city": "Hyderabad",
+      "location": {
+        "latitude": 17.385,
+        "longitude": 78.4867,
+        "timezone": "Asia/Kolkata"
+      },
+      "chart": {
+        "instant": "2026-01-15T04:00:00.000Z",
+        "lagna": {"rashi": "Kumbha", "degree": 14.69},
+        "planets": [
+          {"name": "Surya", "rashi": "Makara", "degree": 0.78, "house": 12, "retrograde": false},
+          {"name": "Chandra", "rashi": "Vrischika", "degree": 19.86, "house": 10, "retrograde": false},
+          {"name": "Kuja", "rashi": "Dhanu", "degree": 29.39, "house": 11, "retrograde": false},
+          {"name": "Budha", "rashi": "Dhanu", "degree": 26.68, "house": 11, "retrograde": false},
+          {"name": "Guru", "rashi": "Mithuna", "degree": 25.24, "house": 5, "retrograde": true},
+          {"name": "Shukra", "rashi": "Makara", "degree": 2.81, "house": 12, "retrograde": false},
+          {"name": "Shani", "rashi": "Meena", "degree": 2.92, "house": 2, "retrograde": false},
+          {"name": "Rahu", "rashi": "Kumbha", "degree": 17.2, "house": 1, "retrograde": true},
+          {"name": "Ketu", "rashi": "Simha", "degree": 17.2, "house": 7, "retrograde": true}
+        ]
+      },
+      "expected_statuses": ["fail", "fail", "fail", "fail"],
+      "qualification_failed": true,
+      "needs_review": false
+    },
+    {
+      "id": "hyderabad-2026-12-15-pass",
+      "coverage": ["pass"],
+      "city": "Hyderabad",
+      "location": {
+        "latitude": 17.385,
+        "longitude": 78.4867,
+        "timezone": "Asia/Kolkata"
+      },
+      "chart": {
+        "instant": "2026-12-15T11:00:00.000Z",
+        "lagna": {"rashi": "Vrishabha", "degree": 12.27},
+        "planets": [
+          {"name": "Surya", "rashi": "Vrischika", "degree": 29.24, "house": 7, "retrograde": false},
+          {"name": "Chandra", "rashi": "Kumbha", "degree": 9.0, "house": 10, "retrograde": false},
+          {"name": "Kuja", "rashi": "Simha", "degree": 12.38, "house": 4, "retrograde": false},
+          {"name": "Budha", "rashi": "Vrischika", "degree": 19.7, "house": 7, "retrograde": false},
+          {"name": "Guru", "rashi": "Simha", "degree": 2.78, "house": 4, "retrograde": true},
+          {"name": "Shukra", "rashi": "Tula", "degree": 13.99, "house": 6, "retrograde": false},
+          {"name": "Shani", "rashi": "Meena", "degree": 13.71, "house": 11, "retrograde": false},
+          {"name": "Rahu", "rashi": "Makara", "degree": 29.48, "house": 9, "retrograde": true},
+          {"name": "Ketu", "rashi": "Karka", "degree": 29.48, "house": 3, "retrograde": true}
+        ]
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    },
+    {
+      "id": "hyderabad-2026-12-15-boundary-conflict",
+      "coverage": ["unknown", "conflict", "boundary"],
+      "city": "Hyderabad",
+      "location": {
+        "latitude": 17.385,
+        "longitude": 78.4867,
+        "timezone": "Asia/Kolkata"
+      },
+      "chart": {
+        "instant": "2026-12-15T13:00:00.000Z",
+        "lagna": {"rashi": "Mithuna", "degree": 10.77},
+        "planets": [
+          {"name": "Surya", "rashi": "Vrischika", "degree": 29.33, "house": 6, "retrograde": false},
+          {"name": "Chandra", "rashi": "Kumbha", "degree": 10.01, "house": 9, "retrograde": false},
+          {"name": "Kuja", "rashi": "Simha", "degree": 12.4, "house": 3, "retrograde": false},
+          {"name": "Budha", "rashi": "Vrischika", "degree": 19.83, "house": 6, "retrograde": false},
+          {"name": "Guru", "rashi": "Simha", "degree": 2.78, "house": 3, "retrograde": true},
+          {"name": "Shukra", "rashi": "Tula", "degree": 14.06, "house": 5, "retrograde": false},
+          {"name": "Shani", "rashi": "Meena", "degree": 13.71, "house": 10, "retrograde": false},
+          {"name": "Rahu", "rashi": "Makara", "degree": 29.48, "house": 8, "retrograde": true},
+          {"name": "Ketu", "rashi": "Karka", "degree": 29.48, "house": 2, "retrograde": true}
+        ]
+      },
+      "expected_statuses": ["fail", "unknown", "pass", "pass"],
+      "qualification_failed": true,
+      "needs_review": true
+    },
+    {
+      "id": "sydney-2026-12-15-pass",
+      "coverage": ["pass"],
+      "city": "Sydney",
+      "location": {
+        "latitude": -33.8688,
+        "longitude": 151.2093,
+        "timezone": "Australia/Sydney"
+      },
+      "chart": {
+        "instant": "2026-12-15T07:00:00.000Z",
+        "lagna": {"rashi": "Vrishabha", "degree": 4.18},
+        "planets": [
+          {"name": "Surya", "rashi": "Vrischika", "degree": 29.07, "house": 7, "retrograde": false},
+          {"name": "Chandra", "rashi": "Kumbha", "degree": 6.98, "house": 10, "retrograde": false},
+          {"name": "Kuja", "rashi": "Simha", "degree": 12.33, "house": 4, "retrograde": false},
+          {"name": "Budha", "rashi": "Vrischika", "degree": 19.44, "house": 7, "retrograde": false},
+          {"name": "Guru", "rashi": "Simha", "degree": 2.78, "house": 4, "retrograde": true},
+          {"name": "Shukra", "rashi": "Tula", "degree": 13.85, "house": 6, "retrograde": false},
+          {"name": "Shani", "rashi": "Meena", "degree": 13.71, "house": 11, "retrograde": false},
+          {"name": "Rahu", "rashi": "Makara", "degree": 29.49, "house": 9, "retrograde": true},
+          {"name": "Ketu", "rashi": "Karka", "degree": 29.49, "house": 3, "retrograde": true}
+        ]
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    }
+  ]
+}

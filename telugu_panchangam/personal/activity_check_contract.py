@@ -269,6 +269,12 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
             'prefer_lagna_class', 'prefer_choghadiya', 'prefer_vara',
             'prefer_tithi_class',
         ),
+        election_chart_rule_ids=(
+            'gold.surya-well-situated',
+            'gold.chandra-well-situated',
+            'gold.surya-fully-aspected',
+            'gold.chandra-fully-aspected',
+        ),
         manual_sections=('chart',),
     ),
     'business_inventory_purchase': _activity(

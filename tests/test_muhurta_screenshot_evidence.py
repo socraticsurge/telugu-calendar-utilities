@@ -9,14 +9,16 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EVIDENCE_DIR = (
-    REPO_ROOT / 'docs' / 'screenshots' / 'muhurtam-chart-screening-2026-08-29'
+    REPO_ROOT / 'docs' / 'screenshots' / 'gold-chart-screening-2026-09-04'
 )
 MANIFEST_PATH = EVIDENCE_DIR / 'fixture-manifest.json'
 REQUIRED_SCENARIOS = {
     'positive',
     'mixed',
     'failure',
-    'manual-only',
+    'gold-pass',
+    'gold-cap',
+    'gold-unknown',
     'unsupported',
     'offline',
     'malformed',
@@ -38,12 +40,30 @@ def test_muhurtam_screenshot_manifest_is_complete_and_current():
 
     assert manifest['source'] == 'tools/capture_muhurta_chart_screenshots.py'
     assert manifest['liveServicesUsed'] is False
-    assert len(captures) == 10
+    assert len(captures) == 15
     assert {item['scenario'] for item in captures} == REQUIRED_SCENARIOS
     assert {
         (item['viewport']['width'], item['viewport']['height'])
         for item in captures
     } == REQUIRED_VIEWPORTS
+    for scenario in ('gold-pass', 'gold-cap', 'gold-unknown'):
+        assert {
+            (item['viewport']['width'], item['viewport']['height'])
+            for item in captures if item['scenario'] == scenario
+        } == {(390, 844), (1440, 900)}
+
+    assert {
+        item['expectedState']
+        for item in captures if item['scenario'] == 'gold-pass'
+    } == {'screened'}
+    assert {
+        item['expectedState']
+        for item in captures if item['scenario'] == 'gold-cap'
+    } == {'screened-capped'}
+    assert {
+        item['expectedState']
+        for item in captures if item['scenario'] == 'gold-unknown'
+    } == {'screened-review'}
 
     filenames = [item['file'] for item in captures]
     assert len(filenames) == len(set(filenames))

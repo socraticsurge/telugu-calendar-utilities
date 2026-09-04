@@ -247,6 +247,13 @@ MANUAL_SUPPORTING_CLAIMS: Mapping[str, tuple[str, ...]] = {
     'gruhapravesha.manual-5': ('muhurta.gruhapravesha',),
 }
 
+# These rows preserve source guidance for Python/MCP, non-Drik, and service-
+# unavailable fallbacks. Their clauses are replaced by explicit automated
+# election-chart predicates in the supported browser path.
+AUTOMATED_CHART_FALLBACK_MANUAL_IDS = frozenset({
+    'gold.manual-1',
+})
+
 PRODUCT_POLICY_MANUAL_IDS = frozenset({
     'wedding.manual-5', 'engagement.manual-3', 'seemantha.manual-7',
     'gruhapravesha.manual-5', 'house_purchase.manual-4',
@@ -450,6 +457,13 @@ SAMPLED_REJECT_AGGREGATION = (
 SAMPLED_PREFERENCE_AGGREGATION = (
     'pass only if every sampled state passes; fail only if every sampled '
     'state fails; otherwise unknown')
+SAMPLED_QUALIFICATION_AGGREGATION = (
+    'fail if any sampled state fails; unknown if any sampled state is '
+    'unresolved; otherwise pass')
+SAMPLED_TRANSITION_SAFE_QUALIFICATION_AGGREGATION = (
+    'fail if any sampled state fails; unknown if any sampled state is '
+    'unresolved or a controlling between-sample transition cannot be '
+    'excluded; otherwise pass')
 
 
 def _load_provenance() -> dict[str, Any]:
@@ -583,6 +597,7 @@ def _row(
     related_context_claims: tuple[Mapping[str, Any], ...] = (),
     supporting_claims: tuple[Mapping[str, Any], ...] = (),
     authority_role: str | None = None,
+    applicability: str | None = None,
 ) -> dict[str, Any]:
     result = {
         'activity': activity,
@@ -615,6 +630,8 @@ def _row(
         ]
     if authority_role:
         result['authority_role'] = authority_role
+    if applicability:
+        result['applicability'] = applicability
     return result
 
 
@@ -853,6 +870,21 @@ def build_crosswalk(
                     f'Election-chart rule {rule_id!r} has no locator')
             chart_claim_id = rule['source_claim']
             chart_claim = resolve(chart_claim_id)
+            method_claims = tuple(
+                resolve(claim_id)
+                for claim_id in rule.get('method_claims', ())
+            )
+            source_backed_methods = tuple(
+                claim for claim in method_claims
+                if claim['authority_status'] == 'source_backed'
+            )
+            decision_policy = (
+                resolve(rule['decision_policy_claim'])
+                if rule.get('decision_policy_claim')
+                else scoring_policy_claim
+                if rule['effect'] == 'prefer'
+                else None
+            )
             predicate_inputs = {
                 key: value
                 for key, value in rule.items()
@@ -874,6 +906,14 @@ def build_crosswalk(
                     'sample_aggregation': (
                         SAMPLED_REJECT_AGGREGATION
                         if rule['effect'] == 'reject'
+                        else SAMPLED_TRANSITION_SAFE_QUALIFICATION_AGGREGATION
+                        if (
+                            rule['effect'] == 'qualify'
+                            and 'election_chart.gold_transition_envelope_v1'
+                            in rule.get('method_claims', ())
+                        )
+                        else SAMPLED_QUALIFICATION_AGGREGATION
+                        if rule['effect'] == 'qualify'
                         else SAMPLED_PREFERENCE_AGGREGATION
                     ),
                 },
@@ -887,17 +927,21 @@ def build_crosswalk(
                 ranking_effect=(
                     'candidate_exclusion'
                     if rule['effect'] == 'reject'
+                    else 'post_screen_tier_cap'
+                    if rule['effect'] == 'qualify'
                     else 'post_screen_tie_break_preference'),
                 automation_mode='automated',
                 automation_rationale=(
-                    'Whole Sign house occupancy is a bounded predicate over '
-                    'the exact nine-Graha election chart.'),
-                predicate_source_locator=predicate_locator,
-                decision_policy_claim=(
-                    scoring_policy_claim
-                    if rule['effect'] != 'reject'
-                    else None
+                    'The named, versioned interpretation convention is a '
+                    'bounded predicate over the exact nine-Graha election '
+                    'chart.'
+                    if rule.get('convention_id')
+                    else 'Whole Sign house occupancy is a bounded predicate '
+                    'over the exact nine-Graha election chart.'
                 ),
+                predicate_source_locator=predicate_locator,
+                decision_policy_claim=decision_policy,
+                supporting_claims=source_backed_methods,
             ))
             activity_row_ids.append(rule_id)
 
@@ -905,6 +949,7 @@ def build_crosswalk(
         expected_manual_ids.update(item['id'] for item in manual_checks)
         for manual in manual_checks:
             rule_id = manual['id']
+            fallback_only = rule_id in AUTOMATED_CHART_FALLBACK_MANUAL_IDS
             if rule_id in PRODUCT_POLICY_MANUAL_IDS:
                 manual_claim_id = (
                     'muhurta.product_safety_and_routing_policy')
@@ -923,6 +968,11 @@ def build_crosswalk(
                 for key, value in manual.items()
                 if key != 'id'
             }
+            manual_effect = _manual_effect(
+                manual,
+                profile_requires_review=bool(
+                    activity_rules.get('manual_prerequisites')),
+            )
             append(_row(
                 activity=activity,
                 rule_id=rule_id,
@@ -934,20 +984,29 @@ def build_crosswalk(
                 implementation_owner=(
                     'telugu_panchangam/personal/'
                     'activity_check_contract.py'),
-                ranking_effect=_manual_effect(
-                    manual,
-                    profile_requires_review=bool(
-                        activity_rules.get('manual_prerequisites')),
+                ranking_effect=(
+                    f'fallback_only_{manual_effect}'
+                    if fallback_only else manual_effect
                 ),
                 automation_mode='manual',
-                automation_rationale=_manual_rationale(manual),
+                automation_rationale=(
+                    'Fallback source guidance only. In the supported Drik '
+                    'browser path, separately provenance-linked automated '
+                    'rules replace this broad clause.'
+                    if fallback_only else _manual_rationale(manual)
+                ),
+                implementation_note=(
+                    'Not displayed as a residual manual Gold check after a '
+                    'successful exact-chart screen.'
+                    if fallback_only else None
+                ),
+                applicability=(
+                    'python_or_mcp_or_non_drik_or_exact_chart_unavailable'
+                    if fallback_only else None
+                ),
                 decision_policy_claim=(
                     scoring_policy_claim
-                    if _uses_project_decision_policy(_manual_effect(
-                        manual,
-                        profile_requires_review=bool(
-                            activity_rules.get('manual_prerequisites')),
-                    ))
+                    if _uses_project_decision_policy(manual_effect)
                     else None
                 ),
                 related_context_claims=tuple(

@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "gold-pass",
+      "overrides": {},
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    },
+    {
+      "id": "chandra-navamsa-debilitation",
+      "overrides": {
+        "Chandra": {"rashi": "Karka", "degree": 15.0},
+        "Shukra": {"rashi": "Makara"}
+      },
+      "expected_statuses": ["pass", "fail", "pass", "pass"],
+      "qualification_failed": true,
+      "needs_review": false
+    },
+    {
+      "id": "ordinary-seventh-aspects-both-luminaries",
+      "overrides": {
+        "Chandra": {"rashi": "Kumbha", "degree": 15.0},
+        "Guru": {"rashi": "Mithuna"}
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    },
+    {
+      "id": "kuja-fourth-full-aspect",
+      "overrides": {
+        "Kuja": {"rashi": "Vrishabha"},
+        "Guru": {"rashi": "Mithuna"}
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    },
+    {
+      "id": "kuja-eighth-full-aspect",
+      "overrides": {
+        "Kuja": {"rashi": "Makara"},
+        "Guru": {"rashi": "Mithuna"}
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    },
+    {
+      "id": "guru-ninth-full-aspect",
+      "overrides": {
+        "Guru": {"rashi": "Dhanu"}
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    },
+    {
+      "id": "shani-tenth-full-aspect",
+      "overrides": {
+        "Guru": {"rashi": "Mithuna"},
+        "Shani": {"rashi": "Vrischika"}
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": false
+    },
+    {
+      "id": "nodes-do-not-satisfy-classical-aspect",
+      "overrides": {
+        "Guru": {"rashi": "Mithuna"},
+        "Rahu": {"rashi": "Kumbha"},
+        "Ketu": {"rashi": "Kumbha"}
+      },
+      "expected_statuses": ["pass", "pass", "fail", "pass"],
+      "qualification_failed": true,
+      "needs_review": false
+    },
+    {
+      "id": "conjunction-is-not-an-aspect",
+      "overrides": {
+        "Guru": {"rashi": "Simha"}
+      },
+      "expected_statuses": ["pass", "pass", "fail", "pass"],
+      "qualification_failed": true,
+      "needs_review": false
+    },
+    {
+      "id": "kuja-partial-fifth-is-not-full",
+      "overrides": {
+        "Kuja": {"rashi": "Mesha"},
+        "Guru": {"rashi": "Mithuna"}
+      },
+      "expected_statuses": ["pass", "pass", "fail", "pass"],
+      "qualification_failed": true,
+      "needs_review": false
+    },
+    {
+      "id": "navamsa-rounding-guard",
+      "overrides": {
+        "Surya": {"degree": 10.0}
+      },
+      "expected_statuses": ["unknown", "pass", "pass", "pass"],
+      "qualification_failed": false,
+      "needs_review": true
+    }
+  ]
+}

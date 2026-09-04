@@ -28,6 +28,30 @@
       "authority_type": "primary_text_translation"
     },
     {
+      "id": "PD-SASTRI-1950-2E",
+      "title": "Phaladeepika",
+      "author": "Mantreswara",
+      "edition": "V. Subrahmanya Sastri English translation, second edition, 1950",
+      "url": "https://archive.org/details/Phaladeepika2ndEd.1950ByVSubrahmanyaSastri",
+      "authority_type": "primary_text_translation"
+    },
+    {
+      "id": "BPHS-ELS-6.12",
+      "title": "Brihat Parashara Hora Shastra, chapter 6 verse 12",
+      "author": "Attributed to Parashara",
+      "edition": "Sanskrit, IAST, word analysis, and English translation published by Enjoy Learning Sanskrit",
+      "url": "https://enjoylearningsanskrit.com/scriptures/parashara/chapter-6/verse-12/",
+      "authority_type": "primary_text_translation"
+    },
+    {
+      "id": "SS-BURGESS-GANGOOLY-1935",
+      "title": "Translation of the Surya-Siddhanta",
+      "author": "Ebenezer Burgess",
+      "edition": "Phanindralal Gangooly revision, University of Calcutta, 1935",
+      "url": "https://classicalastrologer.com/wp-content/uploads/2018/04/surya_siddhanta_english.pdf",
+      "authority_type": "primary_text_translation"
+    },
+    {
       "id": "JP-SASTRI-1932-V3",
       "title": "Jataka Parijata, Volume III",
       "author": "Vaidyanatha Dikshita",
@@ -73,6 +97,14 @@
       "author": "Astrodienst",
       "edition": "Swiss Ephemeris 2.10 Programmer's Documentation and pyswisseph runtime used by the repository",
       "url": "https://www.astro.com/swisseph/swephprg.htm",
+      "authority_type": "astronomical_reference"
+    },
+    {
+      "id": "NASA-MOON-FACTS-2014",
+      "title": "Moon Facts",
+      "author": "NASA Johnson Space Center, Advanced Mission Design Branch",
+      "edition": "April 10, 2014, p. 8",
+      "url": "https://ntrs.nasa.gov/api/citations/20140003573/downloads/20140003573.pdf",
       "authority_type": "astronomical_reference"
     },
     {
@@ -725,8 +757,96 @@
       "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993"],
       "locator": "Chapter X, 'Buying Jewelry,' printed p. 45 (PDF p. 49)",
-      "scope": "Supports only the disclosed requirement that Surya and Chandra be well situated and aspected, plus the passage's general instruction to avoid unfavorable Tithis and Nakshatras. It does not supply a jewelry-specific weekday, Tithi, Nakshatra, Lagna or Choghadiya list. The configured Labh-Choghadiya, Bhadra-Tithi, Friday/Thursday and fixed-Lagna preferences are disclosed project heuristics and do not inherit authority from this citation.",
-      "last_reviewed": "2026-07-21"
+      "scope": "Supports only the disclosed requirement that Surya and Chandra be well situated and aspected, plus the passage's general instruction to avoid unfavorable Tithis and Nakshatras. The Drik website post-screen now evaluates the four chart qualifications under the separately disclosed gold-phaladeepika-placement-full-drishti-v1 convention; a resolved miss caps the tier and an unknown remains review-gated. It does not supply a jewelry-specific weekday, Tithi, Nakshatra, Lagna or Choghadiya list. The configured Labh-Choghadiya, Bhadra-Tithi, Friday/Thursday and fixed-Lagna preferences are disclosed project heuristics and do not inherit authority from this citation.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.well_placed.phaladeepika_2_36",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["PD-SASTRI-1950-2E"],
+      "locator": "Chapter II, sloka 36, book p. 23 (scan p. 60)",
+      "scope": "Defines a planet as badly placed when mudha or overpowered by solar rays, debilitated in Rasi or Amsa, in an enemy sign, or in houses 6, 8 or 12, and otherwise as well placed. Using Whole Sign houses, natural rather than temporary enemies, Navamsa for Amsa, and a numeric Chandra solar-clearance threshold are separately disclosed v1 interpretation choices.",
+      "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.dignity.phaladeepika_1_6",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_chart_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["PD-SASTRI-1950-2E"],
+      "locator": "Chapter I, sloka 6, book pp. 3-4 (scan pp. 40-41)",
+      "scope": "Supplies the seven classical grahas' Rasi lords and exaltation signs, with fall in the seventh sign from exaltation. This supports the v1 Surya-in-Tula and Chandra-in-Vrischika debilitation tests; it does not authorize an opaque composite strength score.",
+      "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.relationships.phaladeepika_2_21_22",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_chart_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["PD-SASTRI-1950-2E"],
+      "locator": "Chapter II, slokas 21-22, book p. 17 (scan p. 54)",
+      "scope": "Supplies the natural friendship, neutrality and enmity table used by Gold v1. Surya therefore treats Shukra- and Shani-owned Rashis as enemy signs, while Chandra receives no invented enemy-Rasi exclusion. Temporary relationships are not blended into this convention.",
+      "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.full_graha_drishti.phaladeepika_2_23",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["PD-SASTRI-1950-2E"],
+      "locator": "Chapter II, sloka 23, book p. 18 (scan p. 55)",
+      "scope": "Supplies the full classical Graha Drishti geometry: all seven grahas fully aspect the seventh; Shani also the third and tenth, Guru the fifth and ninth, and Kuja the fourth and eighth. The text also describes partial aspects; Gold v1's full-only subset and exclusion of node aspects are disclosed interpretation choices.",
+      "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.navamsa.bphs_6_12",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BPHS-ELS-6.12"],
+      "locator": "Chapter 6, verse 12",
+      "scope": "Supplies the modality-based Navamsa sequence: begin from the Rasi itself for movable signs, its ninth for fixed signs, and its fifth for dual signs. The 0.01-degree boundary guard is a product precision policy for the rounded chart contract.",
+      "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.gold_transition_envelope_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "partially_verified",
+      "source_ids": ["NASA-MOON-FACTS-2014", "SWISSEPH"],
+      "locator": "NASA Moon Facts (2014), p. 8, maximum orbital velocity 1.076 km/s and perigee 363,300 km; Swiss Ephemeris 2.10 Programmer's Documentation sections 3.3.3-3.4, speed in ecliptic longitude (degrees/day); gold-phaladeepika-placement-full-drishti-v1",
+      "scope": "The NASA values convert to 14.66 degrees/day at lunar perigee. Gold v1 adopts the wider product safety envelope of 24 degrees/day for any one classical graha and 48 degrees/day for a two-graha separation. Adjacent represented samples must be no more than ten minutes apart. Rounded endpoints are expanded by the applicable motion envelope and contract half-step; a controlling Rasi, Navamsa, full-aspect or 12-degree solar-clearance transition that cannot be excluded fails closed to unknown. Different endpoint states evaluate both sides, malformed or non-monotone instants fail closed, and sampled displacement above the envelope fails closed. The numeric envelope is a conservative engineering policy, not a traditional rule or an independently proven global ephemeris maximum.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.chandra_solar_clearance_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["SS-BURGESS-GANGOOLY-1935"],
+      "locator": "Surya-Siddhanta Chapter X, verse 1, printed p. 262 (scan p. 315); gold-phaladeepika-placement-full-drishti-v1",
+      "scope": "Operationalizes Phaladeepika 2.36's mudha or solar-ray-overpowering condition for Chandra as more than 12 degrees of shortest ecliptic elongation, with a 0.02-degree rounding guard. Surya-Siddhanta X.1 supplies historical rationale for a 12-degree lunar visibility boundary, but its measure is kalamsa or time-degrees in oblique ascension rather than this implementation's ecliptic-longitude distance. The conversion and precision guard therefore remain explicit v1 product approximations, not a direct textual formula.",
+      "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.gold_qualification_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "src/scorer/election-chart-enrichment.ts",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "gold-phaladeepika-placement-full-drishti-v1; docs/research/election-chart-automation/report-source.md",
+      "scope": "Resolved failure of one of Gold's four positive chart conditions retains the slot but caps an otherwise Excellent tier to Good. Unknown remains review-gated. This ranking treatment is a transparent product decision, not a textual command to reject or accept a purchase time.",
+      "last_reviewed": "2026-08-30"
     },
     {
       "id": "muhurta.pilgrimage",

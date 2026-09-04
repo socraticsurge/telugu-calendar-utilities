@@ -353,8 +353,113 @@ def _fixture_lagna_for_instant(instant):
     )[rashi_index]
 
 
-def _muhurta_planets(scenario, chart_index, canonical_lagna):
+def _fixture_navamsa_rashi(rashi, degree):
+    rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
+    rashi_index = rashis.index(rashi)
+    modality = rashi_index % 3
+    start = (
+        rashi_index if modality == 0
+        else (rashi_index + 8) % 12 if modality == 1
+        else (rashi_index + 4) % 12
+    )
+    return rashis[(start + int(degree / (30 / 9))) % 12]
+
+
+def _gold_pass_planets(canonical_lagnas):
+    """Build a complete chart where both luminaries pass all Gold clauses."""
+    rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
+    if isinstance(canonical_lagnas, str):
+        canonical_lagnas = (canonical_lagnas,)
+    lagna_indexes = [rashis.index(lagna) for lagna in canonical_lagnas]
+    lagna_index = lagna_indexes[0]
+    forbidden_houses = {6, 8, 12}
+    surya_forbidden = {'Vrishabha', 'Tula', 'Makara', 'Kumbha'}
+    pair = None
+    for surya_index, surya_rashi in enumerate(rashis):
+        chandra_index = (surya_index + 6) % 12
+        surya_houses = [
+            (surya_index - index) % 12 + 1 for index in lagna_indexes
+        ]
+        chandra_houses = [
+            (chandra_index - index) % 12 + 1 for index in lagna_indexes
+        ]
+        if (
+            surya_rashi not in surya_forbidden
+            and rashis[chandra_index] != 'Vrischika'
+            and forbidden_houses.isdisjoint(surya_houses)
+            and forbidden_houses.isdisjoint(chandra_houses)
+        ):
+            pair = (
+                surya_rashi, surya_houses[0],
+                rashis[chandra_index], chandra_houses[0],
+            )
+            break
+    assert pair is not None
+    surya_rashi, surya_house, chandra_rashi, chandra_house = pair
+    safe_degrees = (1.0, 5.0, 9.0, 11.0, 15.0, 19.0, 23.0, 27.0)
+    surya_degree = next(
+        degree for degree in safe_degrees
+        if _fixture_navamsa_rashi(surya_rashi, degree) != 'Tula'
+    )
+    chandra_degree = next(
+        degree for degree in safe_degrees
+        if _fixture_navamsa_rashi(chandra_rashi, degree) != 'Vrischika'
+    )
+    positions = {
+        'Surya': (surya_rashi, surya_degree),
+        'Chandra': (chandra_rashi, chandra_degree),
+        # Keep the rounded mean-node facts exactly opposite, as required by
+        # the current public DashaFlow response contract.
+        'Rahu': (rashis[(lagna_index + 1) % 12], 10.0),
+        'Ketu': (rashis[(lagna_index + 7) % 12], 10.0),
+    }
+    planets = []
+    for index, name in enumerate(MUHURTA_PLANET_NAMES):
+        rashi, degree = positions.get(
+            name, (rashis[(lagna_index + 1) % 12], index + 0.25)
+        )
+        planets.append({
+            'name': name,
+            'rashi': rashi,
+            'degree': degree,
+            'house': (rashis.index(rashi) - lagna_index) % 12 + 1,
+            'retrograde': name in {'Shani', 'Rahu', 'Ketu'},
+        })
+    return planets
+
+
+def _muhurta_planets(
+    scenario, chart_index, canonical_lagna, gold_template=None,
+):
     """Return strict planets whose Rashis encode scenario-specific houses."""
+    if scenario in {'gold-pass', 'gold-cap', 'gold-unknown'}:
+        # A request may include samples on both sides of a Lagna transition.
+        # Keep the planetary longitudes coherent across that request and only
+        # recompute their Whole Sign houses against each sampled Lagna.
+        planets = [
+            dict(planet)
+            for planet in (
+                gold_template or _gold_pass_planets(canonical_lagna)
+            )
+        ]
+        rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
+        lagna_index = rashis.index(canonical_lagna)
+        for planet in planets:
+            planet['house'] = (
+                rashis.index(planet['rashi']) - lagna_index
+            ) % 12 + 1
+        if scenario == 'gold-cap':
+            for name, rashi in (('Surya', 'Tula'), ('Chandra', 'Vrischika')):
+                next(item for item in planets if item['name'] == name).update({
+                    'rashi': rashi,
+                    'degree': 1.0,
+                    'house': (rashis.index(rashi) - lagna_index) % 12 + 1,
+                })
+        elif scenario == 'gold-unknown':
+            next(item for item in planets if item['name'] == 'Surya')[
+                'degree'
+            ] = 10.0
+        return planets
     houses = {name: 2 for name in MUHURTA_PLANET_NAMES}
     if scenario in {'positive', 'profile'}:
         # Both generic-purchase preferences pass; travel's Kuja exclusion also
@@ -387,6 +492,38 @@ def _muhurta_planets(scenario, chart_index, canonical_lagna):
 
 def _muhurta_chart_payload(request_payload, scenario):
     location = request_payload['location']
+    instants = request_payload['instants']
+    gold_templates = [None] * len(instants)
+    if scenario in {'gold-pass', 'gold-cap', 'gold-unknown'}:
+        # These are the seven candidate-window starts generated from the
+        # pinned June 11 ICS. A gateway batch can contain several windows;
+        # planetary positions must stay coherent inside each one, while each
+        # synthetic window may use its own controlled Gold outcome fixture.
+        slot_starts = {
+            '2026-06-11T01:56:00.000Z',
+            '2026-06-11T05:27:00.000Z',
+            '2026-06-11T06:19:00.000Z',
+            '2026-06-11T07:12:00.000Z',
+            '2026-06-11T10:42:00.000Z',
+            '2026-06-11T11:35:00.000Z',
+            '2026-06-11T12:27:00.000Z',
+        }
+        groups = []
+        current = []
+        for index, instant in enumerate(instants):
+            if current and instant in slot_starts:
+                groups.append(current)
+                current = []
+            current.append(index)
+        if current:
+            groups.append(current)
+        for group in groups:
+            template = _gold_pass_planets([
+                _fixture_lagna_for_instant(instants[index])
+                for index in group
+            ])
+            for index in group:
+                gold_templates[index] = template
     return {
         'contract_version': '1.0',
         'engine': {
@@ -410,9 +547,10 @@ def _muhurta_chart_payload(request_payload, scenario):
                         scenario,
                         index,
                         _fixture_lagna_for_instant(instant),
+                        gold_templates[index],
                     ),
                 }
-                for index, instant in enumerate(request_payload['instants'])
+                for index, instant in enumerate(instants)
             ],
         },
     }
@@ -1784,12 +1922,15 @@ def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
     ('scenario', 'activity', 'system', 'expected_state'),
     (
         ('positive', 'purchase', 'drik', 'screened'),
+        ('gold-pass', 'gold', 'drik', 'screened'),
+        ('gold-cap', 'gold', 'drik', 'screened'),
+        ('gold-unknown', 'gold', 'drik', 'screened'),
         ('failure', 'travel', 'drik', 'screened'),
         ('mixed', 'purchase', 'drik', 'screened'),
         ('unsupported', 'purchase', 'surya-siddhanta', 'unsupported-system'),
         ('offline', 'purchase', 'drik', 'unavailable'),
         ('malformed', 'purchase', 'drik', 'unavailable'),
-        ('manual-only', 'gold', 'drik', 'manual-only'),
+        ('manual-only', 'karnavedha', 'drik', 'manual-only'),
         ('not-run', 'wedding', 'drik', 'not-run'),
     ),
 )
@@ -1824,6 +1965,109 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
             assert result.locator('.mu-rg-computed').count() > 0
             assert result.locator('.mu-chart-rule--pass').count() > 0
             assert calls
+        elif scenario in {'gold-pass', 'gold-cap', 'gold-unknown'}:
+            assert 'chart review remains manual' not in status.inner_text()
+            assert result.locator('.mu-slot').count() > 0
+            computed = result.locator('.mu-rg-computed').first
+            assert computed.count() == 1
+            computed_text = computed.text_content()
+            assert 'Product ranking policy' in computed_text
+            assert 'election_chart.gold_qualification_policy_v1' in (
+                computed_text)
+            assert 'Event source' in computed_text
+            assert 'Interpretation convention' in computed_text
+            assert result.locator('.mu-rg-validation').count() == 0
+            assert calls
+            assert 'general election-chart baseline is not assessed' in (
+                status.inner_text())
+
+            if scenario == 'gold-cap':
+                assert result.locator(
+                    '.mu-chart-disposition--capped'
+                ).count() > 0
+                assert result.locator(
+                    '.mu-chart-status--screened-capped'
+                ).is_visible()
+                assert (
+                    'Condition not met · slot retained · raw score unchanged '
+                    '· maximum rating Good'
+                ) in computed_text
+                assert 'Gold event-specific chart clauses resolved' in (
+                    status.inner_text()
+                )
+                assert 'general election-chart baseline is not assessed' in (
+                    status.inner_text()
+                )
+                assert result.locator(
+                    '.mu-chart-disposition--review'
+                ).count() == 0
+            elif scenario == 'gold-unknown':
+                assert result.locator(
+                    '.mu-chart-disposition--review'
+                ).count() > 0
+                assert result.locator(
+                    '.mu-chart-status--screened-review'
+                ).is_visible()
+                assert (
+                    'Indeterminate at calculation boundary · review needed'
+                ) in computed_text
+                assert 'all four Gold v1 event-specific clauses attempted' in (
+                    status.inner_text())
+                assert result.locator(
+                    '.mu-chart-disposition--capped'
+                ).count() == 0
+            else:
+                assert 'Gold event-specific chart clauses resolved' in (
+                    status.inner_text()
+                )
+                assert 'general election-chart baseline is not assessed' in (
+                    status.inner_text()
+                )
+                assert result.locator(
+                    '.mu-chart-disposition--capped'
+                ).count() == 0
+                assert result.locator(
+                    '.mu-chart-disposition--review'
+                ).count() == 0
+                assert result.locator('.mu-chart-rule--fail').count() == 0
+                assert result.locator('.mu-chart-rule--unknown').count() == 0
+
+            page.evaluate(
+                """() => {
+                    window.__muhurtaShareOpen = null;
+                    window.open = (url, target) => {
+                        window.__muhurtaShareOpen = { url, target };
+                        return null;
+                    };
+                }"""
+            )
+            result.locator(
+                'button[aria-label="Share on WhatsApp"]'
+            ).click()
+            opened = page.evaluate('window.__muhurtaShareOpen')
+            share_text = parse_qs(urlparse(opened['url']).query)['text'][0]
+            assert 'general election-chart baseline is not assessed' in share_text
+            if result.locator('.mu-chart-status--screened-review').count():
+                assert (
+                    'All disclosed event chart clauses were attempted; '
+                    'unresolved facts still require review.'
+                ) in share_text
+            elif result.locator('.mu-chart-status--screened-capped').count():
+                assert (
+                    'All disclosed event chart clauses were evaluated; '
+                    'one or more qualifications were not met'
+                ) in share_text
+            else:
+                assert (
+                    'All disclosed event chart clauses were evaluated and '
+                    'resolved'
+                ) in share_text
+            assert 'Method: https://panchangam.astrochaganti.com/docs/' in (
+                share_text)
+            assert (
+                'Qualitative chart or ritual checks still require '
+                'practitioner review'
+            ) not in share_text
         elif scenario == 'failure':
             assert 'failed an exact chart requirement' in result.inner_text()
             assert 'No clear slots found' in result.inner_text()
@@ -1862,7 +2106,7 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
 
         details = result.locator('.mu-reason-details')
         if details.count():
-            details.first.locator('summary').click()
+            details.first.locator(':scope > summary').click()
         _assert_no_horizontal_overflow(
             page, f'{scenario} chart-aware Muhurtam at {width}px',
         )
@@ -2035,7 +2279,9 @@ def test_chart_aware_muhurta_profile_role_and_share_stay_private(
         ):
             assert private_value not in share_text
 
-        result.locator('.mu-reason-details').first.locator('summary').click()
+        result.locator('.mu-reason-details').first.locator(
+            ':scope > summary'
+        ).click()
         _assert_no_horizontal_overflow(
             page, f'profile-role chart-aware Muhurtam at {width}px',
         )
