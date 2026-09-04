@@ -71,7 +71,7 @@ origins, caps bodies at 4 KiB, rate-limits requests, and marks responses
 `private, no-store`. Its DashaFlow bearer token is server-only and must never be
 placed in browser code or a `VITE_*` variable. The reviewed gateway stack uses
 the existing Turso database for fail-closed shared client/fleet limits on all
-guest routes. The public-Nominatim candidate also gives guest and signed-in
+guest routes. The live public-Nominatim path also gives guest and signed-in
 lookups one aggregate provider row, a 1,000-attempt UTC-day cap, and one
 exclusive cross-instance send lease. Guest place search additionally applies a
 durable allowance of 50 valid managed-provider cache misses per client in an
@@ -283,9 +283,9 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
    the AGPL-compatible public-source path for this calculation stack. The
    current TCU/MCP release is AGPL-3.0-or-later, retains the PySwissEph and
    Swiss Ephemeris notices, and offers corresponding source from the public
-   repository. DashaFlow and Astro must publish their exact deployed source
-   revisions under the same compatible posture before their public calculation
-   flags are enabled. This implements the conservative whole-project boundary
+   repository. DashaFlow and Astro publish their exact deployed source
+   revisions under the same compatible posture. This implements the
+   conservative whole-project boundary
    stated by [Astrodienst's licensing page](https://www.astro.com/swisseph/swisseph.htm)
    and the network-source opportunity described by
    [GNU AGPL section 13](https://www.gnu.org/licenses/agpl-3.0.html#section13).
@@ -296,10 +296,10 @@ house, ephemeris, and timezone conventions rather than comparing labels alone.
    [#444](https://github.com/socraticsurge/telugu-calendar-utilities/issues/444),
    [#445](https://github.com/socraticsurge/telugu-calendar-utilities/issues/445),
    and [#449](https://github.com/socraticsurge/telugu-calendar-utilities/issues/449).
-2. **Actual ephemeris:** current local fixture calls report Moshier because the
-   deployed data-file posture has not been approved. Production must probe and
-   disclose its own actual return flags; it must not promise Swiss data-file
-   output merely because PySwissEph is installed.
+2. **Actual ephemeris:** current local fixture calls and the bounded Production
+   birth/election probes report `Moshier` from DashaFlow 1.1.0. Every calculated
+   result discloses its actual return flags; the product must not promise Swiss
+   data-file output merely because PySwissEph is installed.
 3. **DST ambiguity:** DashaFlow 1.1.0 itself calls `pytz.localize` without the
    fail-closed `is_dst=None` option. The authenticated sidecar contract therefore
    validates the complete local civil time first and rejects repeated or skipped

@@ -23,10 +23,10 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 |---|---|
 | Panchangam profile/Muhurtam UI | The reviewed production build sets both remote client flags to exact `true`; PR #452 is the paired client activation and requires a manual `Deploy Landing Page` dispatch because `.env.production` is outside the workflow's push paths. |
 | Astro guest routes | Production deployment `dpl_G49CJ75b1YsLCR872fbaptpEiGPe` is Ready at exact public commit `4106f097`; health, birth, election-chart, and governed place-search probes passed. |
-| DashaFlow authenticated contracts | The Production Astro gateway reached the authenticated sidecar successfully for synthetic birth and election-chart derivations. The browser never receives the sidecar credential. |
+| DashaFlow authenticated contracts | Production deployment `dpl_DmZ3sEMEvtCMo7EGpY7zRtEP2ySJ` at public commit `c84fd856` served the authenticated synthetic birth and election-chart derivations through Astro. The browser never receives the sidecar credential. |
 | Panchangam release posture | PR #456 merged normally at `99629ada`; tag `v1.14.0` publishes the reviewed AGPL/source package and release evidence. |
 | Licensing | The relevant repositories are public and the reviewed TCU source/package posture is AGPL-3.0-or-later with direct PySwissEph and Swiss Ephemeris notices. |
-| Production geocoder/shared controls | Keyless public Nominatim is active on the shared governed path. A bounded Hyderabad search returned 200, while 60 consecutive `/api/guest/` POST attempts from one client reached the WAF 429 boundary without creating an application draft. |
+| Production geocoder/shared controls | Keyless public Nominatim is active on the shared governed path. A bounded Hyderabad search returned 200. In a 65-attempt `/api/guest/` probe from one client, 60 were admitted and the subsequent five returned edge 429 without creating an application draft. |
 | Rollback | Preserve the exact pre-activation TCU master archive created from `99629ada` and the existing Pages archive `archive/pre-public-activation-2026-09-04-gh-pages-79c907d`. |
 
 ## Cleared activation evidence
@@ -36,7 +36,8 @@ refs; the values below are a dated assessment, not perpetual release evidence.
 - Astro Production is Ready at exact public source `4106f097` and immutable
   deployment `dpl_G49CJ75b1YsLCR872fbaptpEiGPe`.
 - A Hyderabad Production place search returned 200 with the governed Nominatim
-  provider, and the WAF boundary returned 429 on the 60-request/IP probe.
+  provider. The WAF probe admitted 60 requests from one client, then the next
+  five returned edge 429 without creating an application draft.
 - Synthetic birth derivation returned 200 with Jyeshtha Padam 4, Vrischika and
   Simha; synthetic election-chart derivation returned 200.
 - TCU schema-v1 compatibility was restored by #458 before the versioned
@@ -57,8 +58,8 @@ deployment IDs rather than mutable aliases.
 | Layer | Current Production commit | Candidate runtime/code commit | Restore ref | Preview deployment ID | Production deployment ID | CI/security evidence |
 |---|---|---|---|---|---|---|
 | Panchangam | `99629ada` before client activation | PR #452, both production client flags exact `true` | New immutable archive at exact `99629ada`; existing Pages archive `archive/pre-public-activation-2026-09-04-gh-pages-79c907d` | Local production build and fixture-backed browser review | Manual `Deploy Landing Page` run from exact merged #452 revision | PR #456: full local suite 1,466 passed/1 skipped, full build/docs passed, and required Python 3.10-3.13, CodeQL, pip-audit and Sonar checks passed; #452 requires the same final-head gates. |
-| Astro | `4106f097` | same exact Production source revision | Repository/archive and Vercel instant rollback retained by the Astro release record | Earlier protected pair remains recorded in #448 | `dpl_G49CJ75b1YsLCR872fbaptpEiGPe` (Ready) | Health 200; governed Hyderabad search 200; synthetic birth and election charts 200; WAF 429 boundary verified. |
-| DashaFlow | Production sidecar behind Astro | same exact backend pair used by the successful probes | Retained by the DashaFlow/Astro release record | Exact-token protected Preview evidence remains in #448 | Reached only through Astro's authenticated server path | Synthetic birth and election calls passed through the Production gateway; no browser credential exists. |
+| Astro | `4106f097` | same exact Production source revision | Repository/archive and Vercel instant rollback retained by the Astro release record | Earlier protected pair remains recorded in #448 | `dpl_G49CJ75b1YsLCR872fbaptpEiGPe` (Ready) | Health 200; governed Hyderabad search 200; synthetic birth and election charts 200; WAF admitted 60 requests before five subsequent edge 429 responses. |
+| DashaFlow | `c84fd856` | same exact released Production source revision | Retained by the DashaFlow/Astro release record | Exact-token protected Preview evidence remains in #448 | `dpl_DmZ3sEMEvtCMo7EGpY7zRtEP2ySJ` (Ready) | Synthetic birth and election calls passed through the Production gateway with DashaFlow 1.1.0 and disclosed Moshier ephemeris; no browser credential exists. |
 
 ## Environment names and implementation state
 
@@ -140,8 +141,8 @@ Preview browser at Production.
 1. Astro Production deployment `dpl_G49CJ75b1YsLCR872fbaptpEiGPe` at public
    source `4106f097` reported Ready and health returned 200.
 2. The governed Production Nominatim path returned a bounded Hyderabad result
-   with attribution; the 60-request/IP perimeter probe reached 429 without an
-   application draft.
+   with attribution. The perimeter probe admitted 60 requests from one client;
+   the subsequent five returned edge 429 without an application draft.
 3. Synthetic Production birth and election requests both returned 200; the
    birth fixture resolved to Jyeshtha Padam 4, Vrischika and Simha.
 4. TCU `v1.14.0` publishes the reviewed source/licence posture from exact
