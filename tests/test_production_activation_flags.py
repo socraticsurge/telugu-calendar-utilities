@@ -1,7 +1,6 @@
 """Release contract for public guest-calculation client activation."""
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
