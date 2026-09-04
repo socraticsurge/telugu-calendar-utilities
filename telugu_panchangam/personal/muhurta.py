@@ -15,6 +15,11 @@ from telugu_panchangam.personal.activity_rules import (
     canonical_activity_nakshatras,
     get_activity_rules,
 )
+from telugu_panchangam.personal.election_assessors.karnavedha import (
+    KARNAVEDHA_DAYLIGHT_POLICY_ID,
+    evaluate_karnavedha_daylight,
+    karnavedha_daylight_drop_reason,
+)
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.lagna_position import lagna_class_of, lagnas_in_class
 from telugu_panchangam.personal.tithi_class import tithi_number
@@ -171,7 +176,8 @@ def _day_snapshot_facts(day):
 # ---------------------------------------------------------------------------
 
 def _day_skip_reason(day, rules, activity, travel_direction,
-                     janma_rasis, chandra_mode) -> str | None:
+                     janma_rasis, chandra_mode,
+                     daylight_assessment=None) -> str | None:
     """Return a reason string if the day should be skipped, else None.
 
     Covers eclipse, disha shoola, all rule-driven skips (khar maasa,
@@ -181,6 +187,9 @@ def _day_skip_reason(day, rules, activity, travel_direction,
     if day.eclipse is not None:
         kind = f'{day.eclipse.kind} eclipse'
         return f'{kind} · auspicious activities deferred'
+
+    if daylight_assessment is not None and not daylight_assessment['admissible']:
+        return karnavedha_daylight_drop_reason(daylight_assessment)
 
     allowed_maasams = rules.get('allowed_maasams')
     allowed_maasa_solar_pairs = {
@@ -281,7 +290,8 @@ def _day_skip_reason(day, rules, activity, travel_direction,
 
 def diagnose_day(day, activity='any', janma_nakshatras=None,
                  janma_rasis=None, chandra_mode='stars',
-                 travel_direction: str | None = None):
+                 travel_direction: str | None = None,
+                 *, _daylight_assessment=None):
     """If day_slots() would return [] for these inputs, explain why.
 
     Returns a string (the reason) or None when the day is not filtered.
@@ -289,8 +299,40 @@ def diagnose_day(day, activity='any', janma_nakshatras=None,
     """
     rules = (get_activity_rules(activity)
              if activity in ACTIVITIES else ACTIVITY_RULES['any'])
+    if _daylight_assessment is None:
+        _daylight_assessment = karnavedha_daylight_assessment(
+            day, rules, activity)
     return _day_skip_reason(day, rules, activity, travel_direction,
-                            janma_rasis, chandra_mode)
+                            janma_rasis, chandra_mode,
+                            _daylight_assessment)
+
+
+def karnavedha_daylight_assessment(day, rules, activity):
+    """Return the one-per-day Karnavedha assessment when configured."""
+    configured = (
+        rules.get('require_single_daylight_tithi'),
+        rules.get('require_single_daylight_nakshatra'),
+    )
+    if activity != 'karnavedha':
+        return None
+    if configured != (
+        KARNAVEDHA_DAYLIGHT_POLICY_ID,
+        KARNAVEDHA_DAYLIGHT_POLICY_ID,
+    ):
+        # Configuration drift is temporal uncertainty, never an admission.
+        assessment = evaluate_karnavedha_daylight(day)
+        for outcome in assessment['outcomes']:
+            outcome['status'] = 'unknown'
+            outcome['evidence'] = [
+                'The configured Karnavedha daylight policy is unsupported.'
+            ]
+        assessment.update({
+            'rejected': False,
+            'needs_review': True,
+            'admissible': False,
+        })
+        return assessment
+    return evaluate_karnavedha_daylight(day)
 
 
 # ---------------------------------------------------------------------------
@@ -592,7 +634,7 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
               janma_lagnas: list[str | None] | None = None,
               chandra_mode: str = 'stars',
               travel_direction: str | None = None,
-              *, engine=None) -> list[dict]:
+              *, engine=None, _daylight_assessment=None) -> list[dict]:
     """Ranked auspicious slots for one day (daytime, sunrise to sunset).
 
     When `engine` is supplied, every Moon-driven scoring component is
@@ -622,8 +664,12 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
                              '(use None for people whose rashi is unknown).')
 
     rules = get_activity_rules(activity)
+    if _daylight_assessment is None:
+        _daylight_assessment = karnavedha_daylight_assessment(
+            day, rules, activity)
     reason = _day_skip_reason(day, rules, activity, travel_direction,
-                              janma_rasis, chandra_mode)
+                              janma_rasis, chandra_mode,
+                              _daylight_assessment)
     if reason is not None:
         return []
 
@@ -753,6 +799,9 @@ def day_slots(day: PanchangamDay, activity: str = 'any',
         slot_dict = _evaluate_slot(
             s, e, block, base, facts, ctx, mu, election_reasons)
         if slot_dict is not None:
+            if _daylight_assessment is not None:
+                slot_dict['reason_groups']['day_source_outcomes'] = (
+                    _daylight_assessment['outcomes'])
             slots.append(slot_dict)
 
     assign_tiers(slots)

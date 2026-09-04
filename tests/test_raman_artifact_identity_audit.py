@@ -167,6 +167,12 @@ def _assert_non_overlapping_pointers(manifest: dict) -> None:
         if scope == f"{activity}_contract":
             assert artifact == "src/data/activity-rules.generated.json"
             assert pointer == f"/check_contract/activities/{activity}"
+        elif scope == f"{activity}_activity_rules":
+            assert artifact == "src/data/activity-rules.generated.json"
+            assert pointer == f"/rules/{activity}"
+        elif scope == f"{activity}_consumed_fields":
+            assert artifact == "src/data/activity-rules.generated.json"
+            assert pointer == "/consumed_fields"
         elif scope == f"{activity}_rules":
             assert artifact == "src/data/election-chart-rules.generated.json"
             assert pointer == f"/rules/{activity}"

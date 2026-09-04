@@ -22,7 +22,7 @@ ELECTION_CHART_PLANETS = (
     'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
     'Shukra', 'Shani', 'Rahu', 'Ketu',
 )
-ELECTION_CHART_COMPLETE_ASSESSORS = ('gold', 'annaprasana')
+ELECTION_CHART_COMPLETE_ASSESSORS = ('gold', 'annaprasana', 'karnavedha')
 
 ELECTION_CHART_SOURCE_LOCATORS = {
     'muhurta.wedding': (
@@ -35,6 +35,10 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "(Annaprasana),' inspected in the 2020 Chistabo derivative at "
         'internal printed p. 22 '
         '(physical PDF p. 25)'),
+    'muhurta.karnavedha': (
+        "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected "
+        'in the 2020 Chistabo derivative at internal printed p. 23 '
+        '(physical PDF p. 26)'),
     'muhurta.seemantha': (
         "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected "
         'in the 2020 Chistabo derivative at internal printed pp. 21-22 '
@@ -170,6 +174,10 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             lunar_phase_guard_degrees=0.02,
         ),
     ),
+    'karnavedha': (
+        _rule('karnavedha.house-8-vacant', '8th house is vacant',
+              'house_empty', 'reject', 'muhurta.karnavedha', house=8),
+    ),
     'seemantha': (
         _rule('seemantha.house-8-vacant', '8th house is vacant',
               'house_empty', 'reject', 'muhurta.seemantha', house=8),
@@ -290,6 +298,7 @@ ELECTION_CHART_MANUAL_REMAINDERS: dict[str, tuple[str, ...]] = {
         'Review the optional fortification combinations and both partners’ compatibility, Tarabala, Chandrabala and Panchaka.',
     ),
     'annaprasana': (),
+    'karnavedha': (),
     'seemantha': (
         'If relying on Pournami, assess the source’s qualitative Chandra-dignity condition.',
     ),

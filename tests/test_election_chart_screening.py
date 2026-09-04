@@ -179,7 +179,8 @@ def test_annaprasana_declares_six_rule_raman_transcription_assessor():
         'election_chart.annaprasana_fail_closed_aggregation_policy_v1',
     }
     assert ELECTION_CHART_MANUAL_REMAINDERS['annaprasana'] == ()
-    assert {'gold', 'annaprasana'} <= set(ELECTION_CHART_COMPLETE_ASSESSORS)
+    assert {'gold', 'annaprasana', 'karnavedha'} <= set(
+        ELECTION_CHART_COMPLETE_ASSESSORS)
 
 
 @pytest.mark.parametrize(
@@ -471,6 +472,58 @@ def test_gold_declares_four_qualification_rules_and_no_chart_remainder():
         assert set(rule['aspectors']) <= classical
         assert rule['planet'] not in rule['aspectors']
         assert not {'Rahu', 'Ketu'} & set(rule['aspectors'])
+
+
+def test_karnavedha_vacant_eighth_is_the_only_candidate_chart_rule():
+    rules = ELECTION_CHART_RULES['karnavedha']
+    assert [rule['id'] for rule in rules] == [
+        'karnavedha.house-8-vacant',
+    ]
+    assert rules[0]['kind'] == 'house_empty'
+    assert rules[0]['effect'] == 'reject'
+    assert rules[0]['house'] == 8
+    assert '2020 Chistabo derivative' in rules[0]['source_locator']
+    assert 'internal printed p. 23' in rules[0]['source_locator']
+    assert 'physical PDF p. 26' in rules[0]['source_locator']
+    assert ELECTION_CHART_MANUAL_REMAINDERS['karnavedha'] == ()
+    assert 'karnavedha' in ELECTION_CHART_COMPLETE_ASSESSORS
+
+    pass_chart = _chart(**{planet: 1 for planet in PLANETS})
+    fail_chart = _chart(**{
+        **{planet: 1 for planet in PLANETS},
+        'Ketu': 8,
+    })
+    assert evaluate_election_chart(
+        'karnavedha', pass_chart)['outcomes'][0]['status'] == 'pass'
+    failed = evaluate_election_chart('karnavedha', fail_chart)
+    assert failed['outcomes'][0]['status'] == 'fail'
+    assert failed['rejected'] is True
+
+    incomplete = {**pass_chart, 'planets': pass_chart['planets'][:-1]}
+    unknown = evaluate_election_chart('karnavedha', incomplete)
+    assert unknown['outcomes'][0]['status'] == 'unknown'
+    assert unknown['needs_review'] is True
+
+
+@pytest.mark.parametrize(
+    'malformation',
+    ['missing-rashi', 'nonnumeric-degree', 'missing-retrograde'],
+)
+def test_karnavedha_incomplete_position_facts_fail_closed(malformation):
+    chart = _chart(**{planet: 1 for planet in PLANETS})
+    planet = chart['planets'][0]
+    if malformation == 'missing-rashi':
+        planet.pop('rashi')
+    elif malformation == 'nonnumeric-degree':
+        planet['degree'] = '0.25'
+    else:
+        planet.pop('retrograde')
+
+    result = evaluate_election_chart('karnavedha', chart)
+
+    assert result['rejected'] is False
+    assert result['needs_review'] is True
+    assert result['outcomes'][0]['status'] == 'unknown'
 
 
 @pytest.mark.parametrize(

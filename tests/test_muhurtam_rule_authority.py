@@ -14,7 +14,7 @@ def _all_rows(crosswalk):
 def test_browser_field_authority_is_exhaustive_and_honest():
     crosswalk = build_crosswalk()
     assert crosswalk['counts']['deterministic_by_authority_role'] == {
-        'activity_source_claim': 106,
+        'activity_source_claim': 108,
         'explicit_project_heuristic': 61,
         'shared_source_claim': 8,
     }
@@ -65,7 +65,8 @@ def test_five_python_mcp_only_profiles_have_a_separate_complete_scope():
         for field in ACTIVITY_RULES[activity]
         if field not in {
             'label', 'source_claim', 'audit_claim', 'heuristic_claim',
-            'related_claims', 'manual_checks', 'manual_prerequisites',
+            'related_claims', 'source_scope', 'manual_checks',
+            'manual_prerequisites',
         }
     }
     assert actual_fields == expected_fields

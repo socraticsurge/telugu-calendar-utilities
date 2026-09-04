@@ -86,7 +86,10 @@ avoided families, Amavasya precedence, and Pushya/Siddhi Rikta neutralization.
 flowchart TB
     A["day + activity + birth data"] --> B{"Day-level HARD filters"}
     B -->|"eclipse · Disha Shoola · Panchaka ·<br/>Khar/Adhika/Pitru · Simha-stha ·<br/>combust · skip-on-yoga"| X["return [] (dropped_days + reason)"]
-    B -->|"passes"| C["15 named day or night Muhurtas"]
+    B -->|"Karnavedha"| B2{"One Tithi and one Nakshatra<br/>through [sunrise, sunset)?"}
+    B2 -->|"fail or unknown"| X
+    B2 -->|"pass"| C["15 named day or night Muhurtas"]
+    B -->|"other activity passes"| C
     C --> D{"Overlaps a hard-avoid window?"}
     D -->|"yes"| X2["exclude the whole indivisible Muhurta"]
     D -->|"no"| F["Score intrinsic nature + dominant Choghadiya<br/>and personal/activity factors"]
@@ -103,7 +106,7 @@ flowchart TB
 
 ### Browser election-chart post-screen
 
-For Drik searches, 13 source-backed activity profiles have an additional
+For Drik searches, 14 source-backed activity profiles have an additional
 browser-only post-ranking screen. The browser sends only candidate city
 coordinates/timezone and candidate UTC instants to the Astro guest gateway;
 profile identity, birth data, activity and selected role do not leave the
@@ -144,6 +147,12 @@ An empty base shortlist is `not-run` and likewise makes no chart request.
 Surya Siddhanta and Vakya searches likewise remain separate rather than
 silently receiving a Drik/Lahiri chart.
 
+Karnavedha's two day-level predicates are intentionally outside this sampled
+chart loop. Python and the browser evaluate the actual Tithi and Nakshatra
+spans once over `[local sunrise, local sunset)` before building candidates.
+DashaFlow is used only for a surviving candidate's vacant eighth-house
+predicate.
+
 Travel, Gruhapravesha, Seemantha and Surgery also identify a primary traveller,
 householder, mother or patient respectively. Existing generic group scoring is
 preserved. The additional source-specific natal rule is evaluated locally from
@@ -160,7 +169,7 @@ their deterministic Panchangam fields, personal/chart rule IDs and each manual
 row's display section explicitly, without regex-based prose classification.
 
 See [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md)
-for the complete 29-rule matrix, sampled-state semantics, personal-role formulas,
+for the complete 30-rule matrix, sampled-state semantics, personal-role formulas,
 privacy contract, source locators and manual remainder.
 
 ### What `_evaluate_slot()` adds up (`slot_scorers.py` + `muhurta.py`)

@@ -43,6 +43,7 @@
 #                           or source-neutral behavior; never grants verified status
 #   related_claims          additional provenance claims (including lineage conflicts)
 #                           relevant to the profile but not its implementation authority
+#   source_scope            concise lineage and automation boundary exposed to clients
 #   source_claim            stable verified claim ID in provenance.json
 #   daytime_only            night_slots returns no candidates for the activity
 #   forenoon_only           candidate must end by local solar noon
@@ -441,7 +442,24 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ]},
     'karnavedha':    {'label': 'Karnavedha (Ear-piercing)',
                       'source_claim': 'muhurta.karnavedha',
+                      'related_claims': [
+                          'muhurta.karnavedha.vidyamadhava_divergence',
+                          'muhurta.karnavedha.chintamani_divergence',
+                      ],
+                      'source_scope': (
+                          'Raman daylight policy: one Tithi and one '
+                          + 'Nakshatra must each cover [local sunrise, local '
+                          + 'sunset), and the candidate election chart must '
+                          + 'keep the 8th house vacant. Vidyamadhava and '
+                          + 'Muhurta Chintamani are disclosed alternate '
+                          + 'lineages and are not blended into this policy.'
+                      ),
+                      'manual_prerequisites': True,
                       'daytime_only': True,
+                      'require_single_daylight_tithi': (
+                          'raman-karnavedha-daylight-v1'),
+                      'require_single_daylight_nakshatra': (
+                          'raman-karnavedha-daylight-v1'),
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -461,8 +479,6 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'manual_checks': [
                           'Perform on the 12th or 16th day after birth, or '
                           + 'in the child’s 6th, 7th or 8th month.',
-                          'Reject a day on which two Nakshatras or two Tithis '
-                          + 'rule during the ceremony period.',
                           'Election chart: leave the 8th house unoccupied.',
                       ]},
     'mundana':       {'label': 'Mundana / Chaula (First head-shave)',

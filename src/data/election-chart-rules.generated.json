@@ -59,7 +59,8 @@
   },
   "complete_assessors": [
     "gold",
-    "annaprasana"
+    "annaprasana",
+    "karnavedha"
   ],
   "rules": {
     "wedding": [
@@ -208,6 +209,17 @@
           "election_chart.lunar_phase_boundary_guard_policy_v1",
           "election_chart.annaprasana_fail_closed_aggregation_policy_v1"
         ]
+      }
+    ],
+    "karnavedha": [
+      {
+        "id": "karnavedha.house-8-vacant",
+        "label": "8th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.karnavedha",
+        "source_locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+        "house": 8
       }
     ],
     "seemantha": [
@@ -539,6 +551,7 @@
       "Review the optional fortification combinations and both partners’ compatibility, Tarabala, Chandrabala and Panchaka."
     ],
     "annaprasana": [],
+    "karnavedha": [],
     "seemantha": [
       "If relying on Pournami, assess the source’s qualitative Chandra-dignity condition."
     ],

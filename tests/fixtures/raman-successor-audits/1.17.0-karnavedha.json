@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "release": "1.17.0",
+  "parent_release": "1.16.0",
+  "activity": "karnavedha",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [
+    {
+      "claim_id": "muhurta.karnavedha",
+      "relationship": "successor_revision",
+      "verification_state": "verified",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+      "before_sha256": "f479edce5e755650d164be09d94883c21634dc26551d46e847d7ed35a057a63c",
+      "after_sha256": "59cb8d8e7c55b405bf516141afe16e9bcdade10b26a7d85a8d92b8b76f14b910",
+      "before": {
+        "id": "muhurta.karnavedha",
+        "surface": "muhurtam",
+        "implementation": "telugu_panchangam/personal/activity_rules.py",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+        "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, age guidance, double-Tithi/double-Nakshatra caution, vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. Age, transition-count and election-house checks remain manual. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+        "last_reviewed": "2026-09-04"
+      }
+    },
+    {
+      "claim_id": "election_day.karnavedha_daylight_policy_v1",
+      "relationship": "successor_addition",
+      "verification_state": "heuristic",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020",
+        "VM-SASTRI-1925-V2",
+        "MC-HINDI-IA"
+      ],
+      "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); Vidyamadhaviyam Vol. II, Chapter VI verse 18 and commentary, internal printed pp. 39 and 41; Muhurta Chintamani, Samskara-prakarana verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)",
+      "after_sha256": "1ea80cfe4bad72560b03b589b80e4ed31dd377daf16fe955942031e61ae4ee88"
+    }
+  ],
+  "semantic_deltas": [
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/consumed_fields",
+      "operation": "replace",
+      "scope": "karnavedha_consumed_fields",
+      "before_sha256": "dbb50740e293a975925d985e9d28fab43a98115d811444dd4189858f8cca82de",
+      "after_sha256": "03bafac8ee9d143207042baea988a9c6f876408b76e7c397d477dfa06fa600c8",
+      "before": [
+        "label",
+        "avoid_karana",
+        "prefer_lagna_class",
+        "prefer_choghadiya",
+        "skip_on_yoga",
+        "skip_on_sankramana",
+        "prefer_vara",
+        "prefer_tithi_class",
+        "avoid_tithi_class",
+        "required_lagna_class",
+        "allowed_maasams",
+        "allowed_maasa_solar_pairs",
+        "allowed_varas",
+        "avoid_vara_paksha",
+        "allowed_solar_classes",
+        "allowed_nakshatras",
+        "avoid_nakshatras",
+        "prefer_nakshatras",
+        "allowed_tithi_numbers",
+        "prefer_tithi_numbers",
+        "avoid_tithi_numbers",
+        "manual_checks",
+        "manual_prerequisites",
+        "avoid_janma_nakshatra",
+        "avoid_vara_tithi_names",
+        "avoid_nitya_yogas",
+        "allowed_lagnas",
+        "prefer_lagnas",
+        "caution_lagna_solar",
+        "source_claim",
+        "audit_claim",
+        "heuristic_claim",
+        "related_claims",
+        "daytime_only",
+        "forenoon_only",
+        "allowed_pakshams",
+        "require_homa_election",
+        "allowed_solar_signs",
+        "allowed_tithi_names",
+        "skip_on_combust"
+      ]
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/rules/karnavedha",
+      "operation": "replace",
+      "scope": "karnavedha_activity_rules",
+      "before_sha256": "a16cbb54b43e54b8d04ef79b77d637bb2533080c5d5bc1b1d087d0c5eaf88f74",
+      "after_sha256": "8018edbb319069bea5e1a7426311ca988c84e9bcab7baceb134df31106259992",
+      "before": {
+        "label": "Karnavedha (Ear-piercing)",
+        "skip_on_yoga": [
+          "Visha Yoga",
+          "Dagdha Yoga"
+        ],
+        "skip_on_sankramana": true,
+        "prefer_tithi_class": "Bhadra",
+        "avoid_tithi_class": [
+          "Jaya"
+        ],
+        "allowed_varas": [
+          "Somavaram",
+          "Budhavaram",
+          "Guruvaram",
+          "Shukravaram"
+        ],
+        "avoid_tithi_numbers": [
+          4,
+          6,
+          8,
+          12,
+          14,
+          15
+        ],
+        "manual_checks": [
+          "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month.",
+          "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
+          "Election chart: leave the 8th house unoccupied."
+        ],
+        "allowed_lagnas": [
+          "Mesha",
+          "Vrishabha",
+          "Mithuna",
+          "Karka",
+          "Kanya",
+          "Tula",
+          "Dhanu",
+          "Makara",
+          "Meena"
+        ],
+        "source_claim": "muhurta.karnavedha",
+        "daytime_only": true
+      }
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/check_contract/activities/karnavedha",
+      "operation": "replace",
+      "scope": "karnavedha_contract",
+      "before_sha256": "04e7be1cc10cd6d81f09d2885ba32ed9cc84129e0dbc97d499eb6dcc4c18b009",
+      "after_sha256": "9f6f350bc4b7bd500ec270c7b0c40924736a646c39ae3751f972c66b518c5e8a",
+      "before": {
+        "deterministic_panchangam_fields": [
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "avoid_tithi_numbers",
+          "allowed_lagnas",
+          "daytime_only"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "karnavedha.manual-1",
+            "source_index": 0,
+            "source_text": "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month.",
+            "text": "Perform on the 12th or 16th day after birth, or in the child’s 6th, 7th or 8th month.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "karnavedha.manual-2",
+            "source_index": 1,
+            "source_text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
+            "text": "Reject a day on which two Nakshatras or two Tithis rule during the ceremony period.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "karnavedha.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: leave the 8th house unoccupied.",
+            "text": "Election chart: leave the 8th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      }
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/rules/karnavedha",
+      "operation": "add",
+      "scope": "karnavedha_rules",
+      "after_sha256": "8e3c30a496a4e8b410e861b2ae04dc38fb9b9f4fe1e709dd84a1a5c80b27dae8"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/manual_remainders/karnavedha",
+      "operation": "add",
+      "scope": "karnavedha_remainder",
+      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/complete_assessors",
+      "operation": "replace",
+      "scope": "completion_registry",
+      "before_sha256": "b43647e1f5bf78a9b742aa0b76efbf87e3408efd6897d051d2a4f4bca3fd844d",
+      "after_sha256": "f043a637aad83a0dcae492c161948bf902dea609c26a5dcc4fdf8616c670c600",
+      "before": [
+        "gold",
+        "annaprasana"
+      ]
+    }
+  ],
+  "protected_source_transforms": [
+    {
+      "path": "telugu_panchangam/personal/muhurta.py",
+      "scope": "karnavedha_daylight_assessment",
+      "transforms": [
+        {
+          "before": "from telugu_panchangam.personal.activity_rules import (\n    ACTIVITY_RULES,\n    ACTIVITIES,\n    canonical_activity_nakshatras,\n    get_activity_rules,\n)\nfrom telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions",
+          "after": "from telugu_panchangam.personal.activity_rules import (\n    ACTIVITY_RULES,\n    ACTIVITIES,\n    canonical_activity_nakshatras,\n    get_activity_rules,\n)\nfrom telugu_panchangam.personal.election_assessors.karnavedha import (\n    KARNAVEDHA_DAYLIGHT_POLICY_ID,\n    evaluate_karnavedha_daylight,\n    karnavedha_daylight_drop_reason,\n)\nfrom telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions"
+        },
+        {
+          "before": "def _day_skip_reason(day, rules, activity, travel_direction,\n                     janma_rasis, chandra_mode) -> str | None:\n    \"\"\"Return a reason string if the day should be skipped, else None.\n\n    Covers eclipse, disha shoola, all rule-driven skips (khar maasa,\n    adhika, pitru paksha, simha-stha guru, combustion, skip-on-yoga),\n    and chandra_mode day-level filtering.\n    \"\"\"\n    if day.eclipse is not None:\n        kind = f'{day.eclipse.kind} eclipse'\n        return f'{kind} · auspicious activities deferred'\n\n    allowed_maasams = rules.get('allowed_maasams')",
+          "after": "def _day_skip_reason(day, rules, activity, travel_direction,\n                     janma_rasis, chandra_mode,\n                     daylight_assessment=None) -> str | None:\n    \"\"\"Return a reason string if the day should be skipped, else None.\n\n    Covers eclipse, disha shoola, all rule-driven skips (khar maasa,\n    adhika, pitru paksha, simha-stha guru, combustion, skip-on-yoga),\n    and chandra_mode day-level filtering.\n    \"\"\"\n    if day.eclipse is not None:\n        kind = f'{day.eclipse.kind} eclipse'\n        return f'{kind} · auspicious activities deferred'\n\n    if daylight_assessment is not None and not daylight_assessment['admissible']:\n        return karnavedha_daylight_drop_reason(daylight_assessment)\n\n    allowed_maasams = rules.get('allowed_maasams')"
+        },
+        {
+          "before": "def diagnose_day(day, activity='any', janma_nakshatras=None,\n                 janma_rasis=None, chandra_mode='stars',\n                 travel_direction: str | None = None):\n    \"\"\"If day_slots() would return [] for these inputs, explain why.\n\n    Returns a string (the reason) or None when the day is not filtered.\n    Used by MCP find_muhurta to populate dropped_days[].\n    \"\"\"\n    rules = (get_activity_rules(activity)\n             if activity in ACTIVITIES else ACTIVITY_RULES['any'])\n    return _day_skip_reason(day, rules, activity, travel_direction,\n                            janma_rasis, chandra_mode)",
+          "after": "def diagnose_day(day, activity='any', janma_nakshatras=None,\n                 janma_rasis=None, chandra_mode='stars',\n                 travel_direction: str | None = None,\n                 *, _daylight_assessment=None):\n    \"\"\"If day_slots() would return [] for these inputs, explain why.\n\n    Returns a string (the reason) or None when the day is not filtered.\n    Used by MCP find_muhurta to populate dropped_days[].\n    \"\"\"\n    rules = (get_activity_rules(activity)\n             if activity in ACTIVITIES else ACTIVITY_RULES['any'])\n    if _daylight_assessment is None:\n        _daylight_assessment = karnavedha_daylight_assessment(\n            day, rules, activity)\n    return _day_skip_reason(day, rules, activity, travel_direction,\n                            janma_rasis, chandra_mode,\n                            _daylight_assessment)\n\n\ndef karnavedha_daylight_assessment(day, rules, activity):\n    \"\"\"Return the one-per-day Karnavedha assessment when configured.\"\"\"\n    configured = (\n        rules.get('require_single_daylight_tithi'),\n        rules.get('require_single_daylight_nakshatra'),\n    )\n    if activity != 'karnavedha':\n        return None\n    if configured != (\n        KARNAVEDHA_DAYLIGHT_POLICY_ID,\n        KARNAVEDHA_DAYLIGHT_POLICY_ID,\n    ):\n        # Configuration drift is temporal uncertainty, never an admission.\n        assessment = evaluate_karnavedha_daylight(day)\n        for outcome in assessment['outcomes']:\n            outcome['status'] = 'unknown'\n            outcome['evidence'] = [\n                'The configured Karnavedha daylight policy is unsupported.'\n            ]\n        assessment.update({\n            'rejected': False,\n            'needs_review': True,\n            'admissible': False,\n        })\n        return assessment\n    return evaluate_karnavedha_daylight(day)"
+        },
+        {
+          "before": "              chandra_mode: str = 'stars',\n              travel_direction: str | None = None,\n              *, engine=None) -> list[dict]:",
+          "after": "              chandra_mode: str = 'stars',\n              travel_direction: str | None = None,\n              *, engine=None, _daylight_assessment=None) -> list[dict]:"
+        },
+        {
+          "before": "    rules = get_activity_rules(activity)\n    reason = _day_skip_reason(day, rules, activity, travel_direction,\n                              janma_rasis, chandra_mode)",
+          "after": "    rules = get_activity_rules(activity)\n    if _daylight_assessment is None:\n        _daylight_assessment = karnavedha_daylight_assessment(\n            day, rules, activity)\n    reason = _day_skip_reason(day, rules, activity, travel_direction,\n                              janma_rasis, chandra_mode,\n                              _daylight_assessment)"
+        },
+        {
+          "before": "        slot_dict = _evaluate_slot(\n            s, e, block, base, facts, ctx, mu, election_reasons)\n        if slot_dict is not None:\n            slots.append(slot_dict)",
+          "after": "        slot_dict = _evaluate_slot(\n            s, e, block, base, facts, ctx, mu, election_reasons)\n        if slot_dict is not None:\n            if _daylight_assessment is not None:\n                slot_dict['reason_groups']['day_source_outcomes'] = (\n                    _daylight_assessment['outcomes'])\n            slots.append(slot_dict)"
+        }
+      ]
+    }
+  ]
+}

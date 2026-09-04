@@ -221,9 +221,6 @@
     "tests/test_job_contract_evidence_audit.py": {
       "I001": 1
     },
-    "tests/test_karnavedha_profile.py": {
-      "I001": 1
-    },
     "tests/test_khar_maasa.py": {
       "I001": 2
     },

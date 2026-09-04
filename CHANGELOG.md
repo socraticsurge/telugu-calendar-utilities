@@ -7,6 +7,23 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+## [1.17.0] — 2026-09-05
+
+### Changed
+
+- Complete the named Raman Karnavedha assessor with three effective
+  predicates: one Tithi and one Nakshatra throughout the half-open local
+  daylight interval, plus a vacant eighth house at every sampled state in each
+  offered candidate window.
+- Evaluate the two daylight limbs once per Panchangam day from their actual
+  transition spans, fail closed when a boundary is missing or uncertain, and
+  reserve DashaFlow chart derivation for the candidate-time house predicate.
+- Publish criterion-level results, exact source and interpretation boundaries,
+  an eight-case Hyderabad/New York DrikPanchang oracle, daylight cross-surface
+  parity, and Python/browser chart-evaluator parity evidence. Child-age guidance
+  remains informational; Python/MCP slot ranking does not derive candidate-time
+  charts.
+
 ## [1.16.0] — 2026-09-05
 
 ### Changed
@@ -1069,7 +1086,8 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.16.0...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.17.0...HEAD
+[1.17.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.2...v1.16.0
 [1.15.2]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.0...v1.15.1
