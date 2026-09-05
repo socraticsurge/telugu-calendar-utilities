@@ -36,6 +36,8 @@ ANNAPRASANA_OUTPUT_DIR = (
     REPO_ROOT / 'docs' / 'screenshots' /
     'annaprasana-chart-assessor-2026-09-04'
 )
+PREFERENCE_MET_COPY = 'Preference met · tie-break only'
+PREFERENCE_NOT_PRESENT_COPY = 'Preference not present · no penalty'
 
 
 def _load_smoke_module():
@@ -149,7 +151,7 @@ ANNAPRASANA_CAPTURES = tuple(
         ),
         (
             'annaprasana-preference-miss', 'screened',
-            'Preference not present · no penalty',
+            PREFERENCE_NOT_PRESENT_COPY,
         ),
         (
             'annaprasana-hard-fail', 'screened',
@@ -171,7 +173,7 @@ ANNAPRASANA_CAPTURES = tuple(
     Capture(
         'fixture-annaprasana-pass-final-outcomes-mobile-390x844.png',
         'annaprasana-pass', 'annaprasana', 'drik', 390, 844, 'screened',
-        'Preference met · tie-break only',
+        PREFERENCE_MET_COPY,
         'Natural malefics in Lagna: none; Chandra is outside Lagna.',
     ),
 )
@@ -181,22 +183,22 @@ AKSHARABHYASA_CAPTURES = (
     Capture(
         'fixture-aksharabhyasa-pass-desktop-1440x900.png',
         'vidyarambha-pass', 'vidyarambha', 'drik', 1440, 900, 'screened',
-        'Preference met · tie-break only',
+        PREFERENCE_MET_COPY,
     ),
     Capture(
         'fixture-aksharabhyasa-pass-mobile-390x844.png',
         'vidyarambha-pass', 'vidyarambha', 'drik', 390, 844, 'screened',
-        'Preference met · tie-break only',
+        PREFERENCE_MET_COPY,
     ),
     Capture(
         'fixture-aksharabhyasa-preference-miss-desktop-1440x900.png',
         'vidyarambha-preference-miss', 'vidyarambha', 'drik', 1440, 900,
-        'screened', 'Preference not present · no penalty',
+        'screened', PREFERENCE_NOT_PRESENT_COPY,
     ),
     Capture(
         'fixture-aksharabhyasa-preference-miss-mobile-390x844.png',
         'vidyarambha-preference-miss', 'vidyarambha', 'drik', 390, 844,
-        'screened', 'Preference not present · no penalty',
+        'screened', PREFERENCE_NOT_PRESENT_COPY,
     ),
     Capture(
         'fixture-aksharabhyasa-hard-fail-desktop-1440x900.png',
@@ -283,6 +285,20 @@ def _capture_page(
     page.screenshot(path=str(path), full_page=False)
 
 
+def _assert_expected_copy(result, capture: Capture) -> None:
+    result_text = result.text_content() or ''
+    assert capture.expected_copy in result_text, (
+        f'{capture.scenario} expected copy {capture.expected_copy!r}; '
+        f'result={result_text[:1000]!r}'
+    )
+    if capture.additional_expected_copy is not None:
+        assert capture.additional_expected_copy in result_text, (
+            f'{capture.scenario} expected additional copy '
+            f'{capture.additional_expected_copy!r}; '
+            f'result={result_text[:1000]!r}'
+        )
+
+
 def _capture_regular(
     browser, smoke, base_url: str, capture: Capture, output_dir: Path,
 ) -> dict:
@@ -320,17 +336,7 @@ def _capture_regular(
         if capture.scenario == 'annaprasana-hard-fail':
             result.locator('.mu-chart-removals > summary').click()
 
-        result_text = result.text_content() or ''
-        assert capture.expected_copy in result_text, (
-            f'{capture.scenario} expected copy {capture.expected_copy!r}; '
-            f'result={result_text[:1000]!r}'
-        )
-        if capture.additional_expected_copy is not None:
-            assert capture.additional_expected_copy in result_text, (
-                f'{capture.scenario} expected additional copy '
-                f'{capture.additional_expected_copy!r}; '
-                f'result={result_text[:1000]!r}'
-            )
+        _assert_expected_copy(result, capture)
         output = output_dir / capture.filename
         if capture.filename == (
             'fixture-annaprasana-pass-final-outcomes-mobile-390x844.png'

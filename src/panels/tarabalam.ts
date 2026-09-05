@@ -2550,25 +2550,28 @@ function renderMuhurta() {
     chartEnrichment?.boundaryReviewCount
     || chartEnrichment?.reviewGatedCount
   );
-  const scopeDetail = activity === 'gold'
-    ? hasScreeningReview
+  let scopeDetail = '';
+  if (activity === 'gold') {
+    scopeDetail = hasScreeningReview
       ? ' · all four Gold v1 event-specific clauses attempted; unresolved outcomes remain review-gated; the general election-chart baseline is not assessed'
-      : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed'
-    : activity === 'annaprasana'
-      ? muChartAssessorCanClaimComplete(activity, chartEnrichment)
-        ? ' · all six Annaprasana event-specific clauses resolved; the general election-chart baseline #284 remains open'
-        : ' · all six Annaprasana event-specific clauses attempted; unresolved or bounded outcomes remain review-gated; the general election-chart baseline #284 remains open'
-    : activity === 'karnavedha'
-      ? hasScreeningReview
-        ? ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate has an unresolved fact; the general election-chart baseline is not assessed'
-        : chartEnrichment?.candidateLimitReached
-          ? ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate was attempted on a bounded candidate set; the general election-chart baseline is not assessed'
-          : ' · daylight Tithi, daylight Nakshatra and vacant-8th outcomes all resolved'
-    : partialAssessor
-      ? ' · event-specific clauses computed; overall assessment remains partial/provisional because the shared baseline is not complete'
-      : hasScreeningReview
-        ? ''
-        : ' · every implemented event-specific outcome resolved';
+      : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed';
+  } else if (activity === 'annaprasana') {
+    scopeDetail = muChartAssessorCanClaimComplete(activity, chartEnrichment)
+      ? ' · all six Annaprasana event-specific clauses resolved; the general election-chart baseline #284 remains open'
+      : ' · all six Annaprasana event-specific clauses attempted; unresolved or bounded outcomes remain review-gated; the general election-chart baseline #284 remains open';
+  } else if (activity === 'karnavedha') {
+    if (hasScreeningReview) {
+      scopeDetail = ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate has an unresolved fact; the general election-chart baseline is not assessed';
+    } else if (chartEnrichment?.candidateLimitReached) {
+      scopeDetail = ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate was attempted on a bounded candidate set; the general election-chart baseline is not assessed';
+    } else {
+      scopeDetail = ' · daylight Tithi, daylight Nakshatra and vacant-8th outcomes all resolved';
+    }
+  } else if (partialAssessor) {
+    scopeDetail = ' · event-specific clauses computed; overall assessment remains partial/provisional because the shared baseline is not complete';
+  } else if (!hasScreeningReview) {
+    scopeDetail = ' · every implemented event-specific outcome resolved';
+  }
   const chartStatus = chartEnrichment
     ? {
       screened: {

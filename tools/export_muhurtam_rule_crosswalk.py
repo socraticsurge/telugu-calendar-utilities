@@ -252,23 +252,18 @@ MANUAL_SUPPORTING_CLAIMS: Mapping[str, tuple[str, ...]] = {
 # These rows preserve source guidance for Python/MCP, non-Drik, and service-
 # unavailable fallbacks. Their clauses are replaced by explicit automated
 # election-chart predicates in the supported browser path.
+ANNAPRASANA_AUTOMATED_FALLBACK_NOTE = (
+    'Not displayed as a residual manual Annaprasana chart check after a '
+    'successful exact-chart screen.'
+)
 AUTOMATED_CHART_FALLBACK_MANUAL_NOTES = {
     'gold.manual-1': (
         'Not displayed as a residual manual Gold check after a successful '
         'exact-chart screen.'
     ),
-    'annaprasana.manual-2': (
-        'Not displayed as a residual manual Annaprasana chart check after a '
-        'successful exact-chart screen.'
-    ),
-    'annaprasana.manual-3': (
-        'Not displayed as a residual manual Annaprasana chart check after a '
-        'successful exact-chart screen.'
-    ),
-    'annaprasana.manual-4': (
-        'Not displayed as a residual manual Annaprasana chart check after a '
-        'successful exact-chart screen.'
-    ),
+    'annaprasana.manual-2': ANNAPRASANA_AUTOMATED_FALLBACK_NOTE,
+    'annaprasana.manual-3': ANNAPRASANA_AUTOMATED_FALLBACK_NOTE,
+    'annaprasana.manual-4': ANNAPRASANA_AUTOMATED_FALLBACK_NOTE,
     'karnavedha.manual-2': (
         'Not displayed as a residual manual Karnavedha chart check after a '
         'successful exact-chart screen.'

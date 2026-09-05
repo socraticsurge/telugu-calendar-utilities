@@ -23,6 +23,7 @@ ELECTION_CHART_PLANETS = (
     'Shukra', 'Shani', 'Rahu', 'Ketu',
 )
 ELECTION_CHART_COMPLETE_ASSESSORS = ('gold', 'annaprasana', 'karnavedha')
+VIDYARAMBHA_SOURCE_CLAIM = 'muhurta.vidyarambha'
 
 ELECTION_CHART_SOURCE_LOCATORS = {
     'muhurta.wedding': (
@@ -39,7 +40,7 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected "
         'in the 2020 Chistabo derivative at internal printed p. 23 '
         '(physical PDF p. 26)'),
-    'muhurta.vidyarambha': (
+    VIDYARAMBHA_SOURCE_CLAIM: (
         "B. V. Raman, Chapter VIII, 'Commencing education "
         "(Aksharabhyasa),' inspected in the 2020 Chistabo derivative at "
         'internal printed p. 23 (physical PDF p. 26)'),
@@ -259,7 +260,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             '8th house is vacant',
             'house_empty',
             'reject',
-            'muhurta.vidyarambha',
+            VIDYARAMBHA_SOURCE_CLAIM,
             house=8,
         ),
         _rule(
@@ -267,7 +268,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'Budha, Shukra and Guru are all in the 9th house',
             'all_planets_in_houses',
             'prefer',
-            'muhurta.vidyarambha',
+            VIDYARAMBHA_SOURCE_CLAIM,
             convention_id='vidyarambha-benefic-trio-co-location-v1',
             decision_policy_claim=(
                 'election_chart.vidyarambha_reject_precedence_policy_v1'
