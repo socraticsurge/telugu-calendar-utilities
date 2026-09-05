@@ -1032,12 +1032,6 @@ export function initProfilesPanel(
   let activeFormMethod: 'birth-details' | 'manual' = birthCalculationActive
     ? 'birth-details'
     : 'manual';
-  let renderBirthForm: (
-    mode: 'create' | 'edit',
-    context: ResolvedProfilesPanelContext,
-    profile?: GuestProfile,
-  ) => void;
-
   const renderManualForm = (
     mode: 'create' | 'edit',
     context: ResolvedProfilesPanelContext,
@@ -1353,7 +1347,7 @@ export function initProfilesPanel(
     nameInput.focus();
   };
 
-  renderBirthForm = (
+  const renderBirthForm = (
     mode: 'create' | 'edit',
     context: ResolvedProfilesPanelContext,
     profile?: GuestProfile,

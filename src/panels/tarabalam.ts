@@ -5,22 +5,21 @@
 // rendering and WhatsApp shares.
 
 import {
-  MU_RASHI_NAMES, MU_LAGNA_KENDRA, MU_LAGNA_TRIKONA,
-  MU_LAGNA_CHARA, MU_LAGNA_STHIRA, MU_LAGNA_DVISVABHAVA, MU_LAGNA_CLASSES,
+  MU_RASHI_NAMES,
   MU_CHANDRA_GOOD, MU_CHANDRA_PUJA,
-  MU_TIER_NAMES, MU_RELATIVE_BANDS,
+  MU_TIER_NAMES,
   muLagnaPosition, muLagnaVerdict,
-  muIsFavourableLagna, muIsAshtamaLagna, muLagnaAtMin,
+  muIsFavourableLagna, muLagnaAtMin,
   muLagnaClassOf, muLagnasInClass,
   muScoreTier, muRelativeTier, muCanonicalNakshatra, muScoreTithiClass,
   muEndsBySolarNoon, muCombustionDropReason,
-  computePersonalDosha, computeDayDosha,
+  computeDayDosha,
 } from '../muhurta-scorer';
 import { selEl, inpEl } from '../lib/dom';
 import { getSelection } from '../selection-store';
 import { loadFeed } from '../lib/feed-loader';
 import { parseDescription, TIME_PART } from '../lib/parse-description';
-import { fmtT, dayMark, fmtRange, fmtPlain, stampOf } from '../lib/format';
+import { fmtT, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
@@ -64,7 +63,7 @@ import {
   evaluateConfiguredKarnavedhaDaylight,
   karnavedhaDaylightDropReason,
 } from '../scorer/election-assessors/karnavedha-daylight';
-import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
+import { getLoadedEvents } from './today';
 
 // --- Tarabalam tool ---
 
@@ -997,7 +996,13 @@ async function calcTarabalam() {
       if (!nak) continue;
       const taras = profiles.map(pr => {
         const t = taraOf(pr.nak, nak);
-        const entry: { who: any; tara: number; label: string; good: boolean; chandra?: any } =
+        const entry: {
+          who: string;
+          tara: number;
+          label: string;
+          good: boolean;
+          chandra?: ReturnType<typeof chandraOf>;
+        } =
           { who: pr.name, tara: t, label: TARA_NAMES[t-1], good: TARA_GOOD.has(t) };
         if (pr.rasi && data.lunarSign) entry.chandra = chandraOf(pr.rasi, data.lunarSign);
         return entry;
@@ -1006,7 +1011,7 @@ async function calcTarabalam() {
                      moonRasi: data.lunarSign || '', tithi: data.tithi ? data.tithi.name : '', taras });
     }
     renderTarabalam(profiles);
-  } catch (e) {
+  } catch (_e) {
     resBox.innerHTML = '<p class="preview-error">Could not load the feed. Try again.</p>';
   }
 }
@@ -1146,7 +1151,6 @@ function renderTarabalam(profiles?) {
       const chandraTag = t.chandra && t.chandra.verdict !== 'good'
         ? (caveat === 'puja' ? ` · ° ${ord(t.chandra.pos)}` : ` · ☾ ${ord(t.chandra.pos)}`)
         : '';
-      const mark = '';
       // colour follows the chosen standard: under 'Stars only' the chips are
       // pure star verdicts; amber only when the standard admits a day on the
       // condition of a remedial puja
@@ -1297,20 +1301,6 @@ const MU_NITYA_AUSPICIOUS_BONUS = 1;
 function muMin(t, flag?) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m + (flag === '+1' ? 1440 : flag === '-1' ? -1440 : 0);
-}
-
-function muSubtract(s, e, blocks) {
-  let pieces = [[s, e]];
-  for (const [b0, b1] of blocks) {
-    const nxt = [];
-    for (const [p0, p1] of pieces) {
-      if (b1 <= p0 || b0 >= p1) { nxt.push([p0, p1]); continue; }
-      if (p0 < b0) nxt.push([p0, b0]);
-      if (b1 < p1) nxt.push([b1, p1]);
-    }
-    pieces = nxt;
-  }
-  return pieces;
 }
 
 /**
@@ -2381,7 +2371,7 @@ async function findMuhurta() {
       context: searchContext,
     };
     renderMuhurta();
-  } catch (e) {
+  } catch (_e) {
     if (chartAbort.signal.aborted || searchSequence !== MU_SEARCH_SEQUENCE) return;
     muSetResultMessage(box, 'Could not load the feed. Try again.', 'alert');
   } finally {
@@ -2396,7 +2386,7 @@ async function findMuhurta() {
 // a nakshatra string that's not in our table (shouldn't happen on canonical
 // feeds, but defensive — return Janma (1) so the day reads as avoid).
 function taroOf_safe(janma, dayNak) {
-  try { return taraOf(janma, dayNak); } catch (e) { return 1; }
+  try { return taraOf(janma, dayNak); } catch (_e) { return 1; }
 }
 
 let MU_LAST = null;
@@ -2863,7 +2853,7 @@ function renderMuhurta() {
               </div>
             </div>`;
   };
-  const renderSlot = (s, i) => {
+  const renderSlot = (s) => {
     const rg = s.reasonGroups;
     const groupsHtml = rg
       ? `<details class="mu-reason-details">

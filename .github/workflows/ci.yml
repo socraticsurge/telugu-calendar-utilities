@@ -93,8 +93,11 @@ jobs:
         # browser cases exercise the exact dist/ bytes deployed to Pages.
         run: uv run --no-sync python -m pytest tests/test_browser_smoke.py -v
 
-      - name: Run Vitest (TS scorer + component tests)
+      - name: Lint TypeScript
+        run: npm run lint
+
+      - name: Run Vitest with coverage (TS scorer + component tests)
         # Covers src/scorer/__tests__/ — the TS mirror of the Python
         # muhurta behaviour. Any Python↔TS drift must fail HERE (the
         # regression class of the PR-63 tara_dosha parity bug).
-        run: npm test
+        run: npm run test:coverage

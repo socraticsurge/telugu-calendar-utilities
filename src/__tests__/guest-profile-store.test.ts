@@ -339,7 +339,7 @@ describe('CRUD and subscriptions', () => {
     const store = createGuestProfileStore(storage, {
       idFactory: ids('guest_untrusted'),
     });
-    const name = `\"><img src=x onerror=alert('x')>`;
+    const name = `"><img src=x onerror=alert('x')>`;
     const profile = store.create({ name, nakshatra: 'Hasta' });
 
     expect(profile.name).toBe(name);

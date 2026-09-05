@@ -54,7 +54,7 @@ test('auspicious and inauspicious windows', () => {
   ]);
   expect(day.inauspicious[0]).toMatchObject({ start: '09:06', end: '10:44' });
   // Varjyam spills past midnight — both flags must survive parsing
-  const varjyam = day.inauspicious.find((w: any) => w.name === 'Varjyam');
+  const varjyam = day.inauspicious.find(w => w.name === 'Varjyam');
   expect(varjyam).toMatchObject({ start: '01:16', sflag: '+1', end: '02:52', eflag: '+1' });
 });
 

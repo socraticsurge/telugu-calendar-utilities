@@ -3,7 +3,6 @@
 // Gochara panel: transit chart, vedha screening, and the daily
 // LLM/deterministic rasi phalalu reading.
 
-import { fmtT, fmtRange } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { RASI_NAMES, rasiFromStar } from '../data/rasis';
@@ -260,7 +259,7 @@ async function loadGochara() {
     try {
       const r = await fetch('gochara.json', { cache: 'no-cache' });
       GO_DATA = await r.json();
-    } catch (e) {
+    } catch (_e) {
       document.getElementById('go-chart').innerHTML =
         '<p class="preview-error">Sky data unavailable — try again later.</p>';
       return;
@@ -345,7 +344,7 @@ function buildStableViewSelect(preferredValue?: string): GocharaSelectionResolut
   const sel = selEl('go-view');
   const snapshot = gocharaProfileStore!.getSnapshot();
   const hadOptions = sel.options.length > 0;
-  let selectionStorageUnavailable = false;
+  let selectionStorageUnavailable: boolean;
   let resolution: GocharaSelectionResolution;
 
   if (preferredValue === undefined && !hadOptions) {
@@ -600,8 +599,6 @@ function renderGochara() {
 
   // Pre-compute occupants for the Moon-sign reference.
   const occRashi = (jr !== null) ? occupantsFor(jr) : null;
-  const houseOf = gi => jr === null ? null : houseFrom(gi, jr);
-
   // Chart colour is anchored to the documented Janma-Chandra frame.
   const verdictOf = gi => {
     if (jr === null) return null;

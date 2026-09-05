@@ -4,9 +4,19 @@
 
 import { slug, FEED_BASE_URL } from './feed-loader';
 
-// The served JSON is precomputed by scripts/build_lagna_json.py; the
-// panels index into it dynamically, so the per-day shape stays `any`.
-interface LagnaData { start: string; days: any[]; }
+// The served JSON is precomputed by scripts/build_lagna_json.py.
+export interface LagnaDayData {
+  date?: string;
+  sunrise: string;
+  lagna0: number;
+  transitions: number[][];
+  cycleEnd: number;
+  guruCombust?: boolean;
+  shukraCombust?: boolean;
+  [key: string]: unknown;
+}
+
+interface LagnaData { start: string; days: LagnaDayData[]; }
 
 // --- Lagna data layer: cached per-session, per-city fetch ---
 const LAGNA_CACHE = new Map<string, Promise<LagnaData | null>>();
@@ -19,9 +29,9 @@ async function loadLagna(city: string): Promise<LagnaData | null> {
   return promise;
 }
 
-function lagnaDayFor(data: LagnaData | null, isoDate: string): any {
+function lagnaDayFor(data: LagnaData | null, isoDate: string): LagnaDayData | null {
   if (!data || !data.days || !data.days.length) return null;
-  const direct = data.days.find((d: any) => d.date === isoDate);
+  const direct = data.days.find(d => d.date === isoDate);
   if (direct) return direct;
   // Fallback for older formats without 'date': offset from data.start.
   const start = new Date(`${data.start}T00:00:00`);

@@ -31,6 +31,8 @@ def test_ci_retains_supported_runtimes_and_browser_coverage():
     assert "actions/setup-node" not in backend
     assert "playwright install" not in backend
     assert "run: npm test" not in backend
+    assert "run: npm run lint" not in backend
+    assert "run: npm run test:coverage" not in backend
     assert "uv run --no-sync python tools/check_ruff_baseline.py" in backend
     assert "uv run --no-sync python tools/check_complexity_baseline.py" in backend
     assert "--ignore=tests/test_browser_smoke.py" in backend
@@ -39,7 +41,8 @@ def test_ci_retains_supported_runtimes_and_browser_coverage():
     assert "playwright install --with-deps chromium" in frontend
     assert "run: npm ci --ignore-scripts" in frontend
     assert "python -m pytest tests/test_browser_smoke.py -v" in frontend
-    assert "run: npm test" in frontend
+    assert "run: npm run lint" in frontend
+    assert "run: npm run test:coverage" in frontend
 
 
 def test_dependabot_tracks_python_node_and_action_locks():

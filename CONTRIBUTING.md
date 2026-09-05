@@ -33,8 +33,9 @@ uv run python tools/verify_project.py
 
 The verifier checks the provenance ledger links, generated browser activity
 data, computation inventory and documentation freshness, the Ruff lint and
-complexity debt baselines, the full Python suite, frontend tests, typecheck,
-and production build. Every gate must pass before any change merges.
+complexity debt baselines, the full Python suite, zero-warning TypeScript lint,
+frontend tests with coverage, typecheck, and the production build. Every gate
+must pass before any change merges.
 
 For any new or changed calculation, follow
 **[Add or change a computation safely](docs/reference/10-computation-contributor-workflow.md)**
@@ -63,6 +64,19 @@ optional local hooks use the Ruff check:
 ```bash
 uv run pre-commit install
 ```
+
+Frontend coverage includes every `src/**/*.ts` production file, including the
+bootstrap and relaxed DOM panels; only test files are excluded. Its negative
+Vitest thresholds cap the absolute number of uncovered statements, branches,
+functions and lines, preventing percentage dilution as the app grows. This is
+a regression floor, not a claim that the current coverage is sufficient:
+cleanup in one file can offset uncovered code elsewhere, so reviewers must
+still require focused tests for every behavior change.
+
+ESLint runs with inline configuration disabled. The few immutable or legacy
+exceptions are counted exactly in `eslint-suppressions.json`; a new violation
+or a stale suppression fails the lint command. Regenerate that file only after
+reviewing the specific rule and file boundary.
 
 ## Ground rules for changes
 

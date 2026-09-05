@@ -357,7 +357,7 @@ export function evaluatePersonalElectionSnapshots(
     const boundaryOutcomes = evaluations.map(evaluation =>
       evaluation.outcomes.find(outcome => outcome.ruleId === startOutcome.ruleId));
     const statuses = boundaryOutcomes.map(outcome => outcome?.status || 'unknown');
-    let status: PersonalRuleStatus = 'unknown';
+    let status: PersonalRuleStatus;
     if (statuses.includes('unknown')) {
       status = 'unknown';
     } else if (startOutcome.effect === 'reject') {
