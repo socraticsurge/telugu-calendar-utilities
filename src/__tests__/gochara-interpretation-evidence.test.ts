@@ -182,3 +182,59 @@ test('ignores a stale latest interpretation without losing computed guidance', a
   expect(reading.querySelector('.go-interpretation-details')).toBeNull();
   expect(reading.querySelector('.go-phalalu-details')).not.toBeNull();
 });
+
+test('renders fetched labels and interpretive prose as inert text', async () => {
+  const iso = todayISO();
+  const payload = `"><img src=x onerror=alert('x')>`;
+  const hostileRasis = [...RASIS];
+  hostileRasis[1] = payload;
+  vi.stubGlobal('fetch', vi.fn(async input => {
+    const url = String(input);
+    if (url === 'gochara.json') {
+      return {
+        ok: true,
+        json: async () => ({
+          start: iso,
+          grahas: GRAHAS,
+          rasis: hostileRasis,
+          days: [
+            [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            [1, 1, 2, 3, 4, 5, 6, 7, 8],
+          ],
+          retro: [
+            [false, false, false, false, false, false, false, false, false],
+            [false, false, false, false, false, false, false, false, false],
+          ],
+        }),
+      };
+    }
+    if (url === 'rasi_phalalu/latest.json') {
+      return {
+        ok: true,
+        json: async () => ({
+          date: iso,
+          rashis: { Mesha: { text: payload, advice: payload } },
+        }),
+      };
+    }
+    throw new Error(`Unexpected fetch: ${url}`);
+  }));
+
+  const panelPath = '../panels/gochara';
+  const panel = await import(/* @vite-ignore */ panelPath);
+  await panel.loadGochara();
+  const select = document.getElementById('go-view');
+  select.value = '0';
+  panel.renderGochara();
+
+  expect(document.getElementById('go-chart').textContent).toContain(payload);
+  expect(document.getElementById('go-moves').textContent).toContain(payload);
+  expect(document.getElementById('go-phalalu').textContent).toContain(payload);
+  expect(document.querySelector('img')).toBeNull();
+  expect(document.querySelector('[onerror]')).toBeNull();
+  const share = document.querySelector('.go-phalalu-share');
+  expect(share.getAttribute('onclick')).toBeNull();
+  const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+  share.click();
+  expect(open).toHaveBeenCalledOnce();
+});

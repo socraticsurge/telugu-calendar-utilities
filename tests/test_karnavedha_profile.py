@@ -7,11 +7,11 @@ import pytest
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
+from telugu_panchangam.personal import muhurta as finder
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.election_assessors.karnavedha import (
     KARNAVEDHA_DAYLIGHT_POLICY_ID,
 )
-from telugu_panchangam.personal.muhurta import day_slots, night_slots
 
 HYDERABAD = next(city for city in CITIES if city.name == 'Hyderabad')
 ENGINE = DrikGanitaEngine()
@@ -55,12 +55,14 @@ def test_karnavedha_profile_matches_raman_chapter_viii():
 def test_karnavedha_never_returns_night_candidates():
     day = _day(date(2026, 2, 6))
     next_day = _day(date(2026, 2, 7))
-    assert night_slots(day, next_day, activity='karnavedha', engine=ENGINE) == []
+    assert finder.night_slots(
+        day, next_day, activity='karnavedha', engine=ENGINE,
+    ) == []
 
 
 def test_positive_fixture_discloses_age_and_computed_daylight_checks():
     # Friday, Krishna Panchami; permitted Lagna windows survive.
-    slots = day_slots(_day(date(2026, 2, 6)), activity='karnavedha')
+    slots = finder.day_slots(_day(date(2026, 2, 6)), activity='karnavedha')
     assert slots
     expected = {
         f'Manual check required · {item}'
@@ -76,8 +78,6 @@ def test_positive_fixture_discloses_age_and_computed_daylight_checks():
 
 
 def test_python_slot_finder_evaluates_daylight_once_per_day(monkeypatch):
-    import telugu_panchangam.personal.muhurta as finder
-
     original = finder.evaluate_karnavedha_daylight
     calls = []
 
@@ -106,8 +106,6 @@ def test_python_slot_finder_evaluates_daylight_once_per_day(monkeypatch):
 def test_python_slot_finder_fails_closed_on_daylight_policy_drift(
     monkeypatch, configured,
 ):
-    import telugu_panchangam.personal.muhurta as finder
-
     malformed = dict(ACTIVITY_RULES['karnavedha'])
     malformed['require_single_daylight_tithi'] = configured[0]
     malformed['require_single_daylight_nakshatra'] = configured[1]
@@ -203,7 +201,6 @@ def test_mcp_drops_double_limb_day_with_exact_transition_diagnosis():
 def test_mcp_fails_closed_on_unsupported_daylight_policy_id(
     monkeypatch, policy_field,
 ):
-    import telugu_panchangam.personal.muhurta as finder
     from telugu_panchangam.mcp.tools import tool_find_muhurta
 
     malformed = dict(ACTIVITY_RULES['karnavedha'])

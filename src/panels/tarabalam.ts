@@ -362,7 +362,7 @@ export function initTarabalamProfiles(
   const currentParticipants = (): JourneyGuestProfile[] => {
     const saved = selection.profiles.map(profile => ({ ...profile }));
     const manual = manualParticipants
-      .map(tbManualProfile)
+      .map((participant, index) => tbManualProfile(participant, index))
       .filter((profile): profile is JourneyGuestProfile => profile !== null);
     return [...saved, ...manual].slice(0, MAX_GUEST_PROFILES);
   };

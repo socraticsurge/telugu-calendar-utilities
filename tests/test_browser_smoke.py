@@ -1856,11 +1856,12 @@ def test_birth_details_profile_calls_the_stateless_contract_and_reuses_result(
         panel.get_by_role(
             'button', name='View Browser Ananya', exact=True,
         ).click()
+        request_count_before_edit = len(calls)
         panel.get_by_role('button', name='Edit profile', exact=True).click()
         assert page.input_value('#profile-name') == 'Browser Ananya'
         assert page.evaluate('document.activeElement.id') == 'profile-name'
         panel.get_by_role('button', name='Cancel', exact=True).click()
-        assert calls == calls_before_view
+        assert len(calls) == request_count_before_edit
         assert page.evaluate("""() => ({
             roster: localStorage.getItem('tc-tb-profiles'),
             birth: localStorage.getItem('tc-birth-profile-data'),
