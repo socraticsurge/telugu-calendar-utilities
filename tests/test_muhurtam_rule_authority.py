@@ -120,6 +120,12 @@ def test_numeric_and_tier_policy_is_separate_from_predicate_authority():
                 )
                 if row['rule_id'] == (
                     'annaprasana.benefic-occupies-lagna')
+                else (
+                    'election_chart.'
+                    'vidyarambha_reject_precedence_policy_v1'
+                )
+                if row['rule_id'] == (
+                    'vidyarambha.budha-shukra-guru-9')
                 else 'muhurta.scoring_policy'
             )
             assert row['decision_policy_claim_id'] == expected_policy

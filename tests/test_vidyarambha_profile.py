@@ -35,7 +35,7 @@ def test_vidyarambha_profile_matches_raman_chapter_viii():
 
 def test_unlisted_weekday_is_rejected_with_source_reason():
     assert diagnose_day(_day(date(2026, 2, 22)), activity='vidyarambha') == (
-        'Adivaram · Education start (Vidyarambha) source profile '
+        'Adivaram · Aksharabhyasa (First-letter writing) source profile '
         'does not admit this weekday')
 
 
@@ -56,10 +56,14 @@ def test_mcp_and_browser_publish_same_vidyarambha_profile():
         '2026-02-06', days=1, activity='vidyarambha', city='Hyderabad'))
     profile = result['activity_profile']
     assert profile['source_claim'] == 'muhurta.vidyarambha'
+    assert profile['source_scope'] == ACTIVITY_RULES['vidyarambha'][
+        'source_scope']
 
     browser = json.loads(
         (ROOT / 'src/data/activity-rules.generated.json').read_text(encoding='utf-8'))
     exported = browser['rules']['vidyarambha']
+    assert exported['label'] == 'Aksharabhyasa (First-letter writing)'
+    assert exported['source_scope'] == profile['source_scope']
     assert exported['allowed_nakshatras'] == \
         profile['automated_constraints']['allowed_nakshatras']
     assert exported['allowed_lagnas'] == \

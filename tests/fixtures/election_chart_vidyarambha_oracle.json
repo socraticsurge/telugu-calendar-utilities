@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "source_claim": "muhurta.vidyarambha",
+  "method_claim": "election_chart.vidyarambha_co_location_policy_v1",
+  "cases": [
+    {
+      "id": "complete-pass",
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 9}}
+      ],
+      "expected_statuses": ["pass", "pass"],
+      "rejected": false,
+      "needs_review": false,
+      "preference_passes": 1,
+      "stable": true
+    },
+    {
+      "id": "hard-reject",
+      "snapshots": [
+        {"houses": {"Rahu": 8, "Budha": 9, "Shukra": 4, "Guru": 5}}
+      ],
+      "expected_statuses": ["fail", "fail"],
+      "rejected": true,
+      "needs_review": false,
+      "preference_passes": 0,
+      "stable": true
+    },
+    {
+      "id": "preference-miss-retained",
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 10}}
+      ],
+      "expected_statuses": ["pass", "fail"],
+      "rejected": false,
+      "needs_review": false,
+      "preference_passes": 0,
+      "stable": true
+    },
+    {
+      "id": "reject-wins-conflict",
+      "snapshots": [
+        {"houses": {"Rahu": 8, "Budha": 9, "Shukra": 9, "Guru": 9}}
+      ],
+      "expected_statuses": ["fail", "pass"],
+      "rejected": true,
+      "needs_review": false,
+      "preference_passes": 1,
+      "stable": true
+    },
+    {
+      "id": "missing-graha",
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 9}, "mutation": "remove-ketu"}
+      ],
+      "expected_statuses": ["unknown", "unknown"],
+      "rejected": false,
+      "needs_review": true,
+      "preference_passes": 0,
+      "stable": true
+    },
+    {
+      "id": "malformed-house",
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 9}, "mutation": "string-house"}
+      ],
+      "expected_statuses": ["unknown", "unknown"],
+      "rejected": false,
+      "needs_review": true,
+      "preference_passes": 0,
+      "stable": true
+    },
+    {
+      "id": "duplicate-graha",
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 9}, "mutation": "duplicate-surya"}
+      ],
+      "expected_statuses": ["unknown", "unknown"],
+      "rejected": false,
+      "needs_review": true,
+      "preference_passes": 0,
+      "stable": true
+    },
+    {
+      "id": "mixed-preference-is-unknown",
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 9}},
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 10}}
+      ],
+      "expected_statuses": ["pass", "unknown"],
+      "rejected": false,
+      "needs_review": true,
+      "preference_passes": 0,
+      "stable": false
+    },
+    {
+      "id": "preference-fails-only-when-all-samples-fail",
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 10}},
+        {"houses": {"Budha": 9, "Shukra": 4, "Guru": 9}}
+      ],
+      "expected_statuses": ["pass", "fail"],
+      "rejected": false,
+      "needs_review": false,
+      "preference_passes": 0,
+      "stable": true
+    },
+    {
+      "id": "house-frame-boundary",
+      "house_frame_uncertain": true,
+      "snapshots": [
+        {"houses": {"Budha": 9, "Shukra": 9, "Guru": 9}}
+      ],
+      "expected_statuses": ["unknown", "unknown"],
+      "rejected": false,
+      "needs_review": true,
+      "preference_passes": 0,
+      "stable": true
+    }
+  ]
+}

@@ -279,8 +279,8 @@ separate artifact-shape behavior.
 The canonical table is
 `telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES`.
 `tools/export_election_chart_rules.py` projects it to the browser; the generated
-JSON is not an independent authority. There are 30 deterministic predicates
-across 14 activity profiles.
+JSON is not an independent authority. There are 32 deterministic predicates
+across 15 activity profiles.
 
 `Reject` means a failed predicate removes the window. `Prefer` means a passing
 predicate is tie-break evidence only; it adds no raw score and its absence does
@@ -307,8 +307,17 @@ The event source, interpretation sources and product policy remain
 independently inspectable; none acquires another layer's authority merely by
 appearing in the same result.
 
-The same Python module owns `ELECTION_CHART_MANUAL_REMAINDERS`. For each
-screened activity it contains only the qualitative clauses left after the
+The same Python module owns `ELECTION_CHART_MANUAL_REMAINDERS` and the
+versioned `ELECTION_CHART_COMPLETE_ASSESSORS` declaration. Gold, Annaprasana,
+and Karnavedha are the currently declared complete event-specific assessors.
+Aksharabhyasa has no Chapter VIII event-clause remainder, but it is
+intentionally not declared complete because the shared general election-chart
+baseline remains provisional. The browser may name an assessor complete only
+when its declaration, rule outcomes, boundaries, candidate budget, and
+remainder all support that claim.
+
+For each screened activity, the remainder table contains only the qualitative
+clauses left after the
 predicates below; this prevents the result card from asking a practitioner to
 re-check the exact condition it just computed. Non-Drik, unavailable and
 Python/MCP results retain their original full `manual_checks` disclosure.
@@ -316,23 +325,24 @@ Python/MCP results retain their original full `manual_checks` disclosure.
 Let `H(p)` be the locally recomputed Whole Sign house of graha `p` using the
 validated selected-city Lagna frame, `R(p)` its Rasi, `N(p)` its derived
 Navamsa, `G` the complete nine-graha set, and `S` a listed set of houses. The
-seven supported predicate kinds are exactly:
+eight supported predicate kinds are exactly:
 
 ```text
 house_empty(h)                = every p in G has H(p) != h
 planet_not_house(p, h)        = H(p) != h
 planet_in_houses(p, S)        = H(p) is in S
 any_planet_in_houses(P, S)    = at least one p in P has H(p) in S
+all_planets_in_houses(P, S)   = every p in P has H(p) in S
 planet_well_situated(p, C)     = no adverse factor selected by convention C
 planet_receives_full_aspect(p) = at least one listed classical graha casts a
                                   full whole-sign Graha Drishti to R(p)
 house_free_of_natural_malefics = no configured natural malefic occupies house 1
 ```
 
-The first four predicates are direct configured tests. The fifth and sixth
-exist only for Gold v1 and name the interpretation conventions that define
+The first five predicates are direct configured occupancy tests. The sixth
+and seventh exist only for Gold v1 and name the interpretation conventions that define
 dignity, natural relationship, Navamsa, solar clearance and full-aspect
-geometry. Annaprasana adds the seventh predicate kind,
+geometry. Annaprasana adds the eighth predicate kind,
 `house_free_of_natural_malefics`, whose exact malefic set, node choice, Paksha
 formula and precision guard are named separately below. No unpublished orb,
 functional-benefic, house-lord or composite-strength model is hidden behind
@@ -361,6 +371,8 @@ these predicates.
 | Gold / jewelry | `gold.chandra-well-situated` | Chandra passes the disclosed placement, Navamsa and solar-clearance v1 tests | Qualify | `muhurta.gold_jewelry.purchase` |
 | Gold / jewelry | `gold.surya-fully-aspected` | Surya receives at least one full classical Graha Drishti under v1 | Qualify | `muhurta.gold_jewelry.purchase` |
 | Gold / jewelry | `gold.chandra-fully-aspected` | Chandra receives at least one full classical Graha Drishti under v1 | Qualify | `muhurta.gold_jewelry.purchase` |
+| Aksharabhyasa | `vidyarambha.house-8-vacant` | None of the nine grahas occupies house 8 | Reject | `muhurta.vidyarambha` |
+| Aksharabhyasa | `vidyarambha.budha-shukra-guru-9` | Budha **and** Shukra **and** Guru each occupy house 9 | Prefer | `muhurta.vidyarambha`; `election_chart.vidyarambha_co_location_policy_v1` |
 | General purchase | `purchase.chandra-lagna` | Chandra is in house 1 | Prefer | `muhurta.purchase.general` |
 | General purchase | `purchase.shukra-lagna` | Shukra is in house 1 | Prefer | `muhurta.purchase.general` |
 | Entering service | `job.surya-or-kuja-10-11` | Surya or Kuja is in house 10 or 11 | Prefer | `muhurta.service_entry` |
@@ -658,10 +670,12 @@ Python/MCP slot orchestrator applies no other candidate-time chart evaluator.
 | Travel | Kuja outside 8th; primary-traveller Lagna rules | General fortification, whether Guru/Shukra is well placed in Lagna, waxing-Chandra and 7th-house malefic judgment, unresolved published-rule conflicts, travel safety |
 | Surgery | Vacant 8th; Chandra outside patient's Janma Rashi | Operated-body-part Rashi/house, malefic affliction, Mangala strength, Mangala-Shani aspects; clinician instructions always prevail |
 | Gold / jewelry | Surya and Chandra well-placement qualifications; one full classical Graha Drishti to each luminary | No remainder for these four event-specific Gold v1 clauses after a complete, valid Drik screen; the separate general election-chart baseline is not assessed, and financial, authenticity and safety checks remain real-world responsibilities |
+| Aksharabhyasa | Vacant 8th; Budha, Shukra and Guru all in the 9th as one preference | No Chapter VIII event-clause remainder after an exact screen. The overall result remains partial/provisional because the shared general baseline is not yet complete. The owner-approved project convention makes the vacancy reject win; the trio never changes score or tier. |
 
-The Gold row is conditional on a successful Drik browser screen. Non-Drik,
-unavailable and Python/MCP fallbacks retain the original full chart-check
-disclosure because they did not run this assessor. Gold's Panchangam inputs
+The Gold and Aksharabhyasa rows are conditional on a successful Drik browser
+screen. Non-Drik, unavailable and Python/MCP fallbacks retain the original
+full chart-check disclosure because they did not run these assessors. Their
+Panchangam inputs
 also remain separately disclosed project heuristics; completing the chart
 clause does not promote those inputs into Raman-sourced rules. “Gold
 event-specific chart clauses resolved” is therefore the strongest accurate UI
@@ -686,8 +700,8 @@ choice.
 
 The complete machine-readable crosswalk is published as
 [Muhurtam rule crosswalk JSON](muhurtam-rule-crosswalk.json). It contains all
-326 configured prerequisite rows across the 30 browser activities: 177
-Panchangam predicates, five personal predicates, 30 election-chart predicates
+328 configured prerequisite rows across the 30 browser activities: 177
+Panchangam predicates, five personal predicates, 32 election-chart predicates
 and 114 manual display rows. The original Gold row, three Annaprasana rows and
 the Karnavedha vacant-eighth row remain in this exhaustive source inventory
 because non-Drik, unavailable and Python/MCP fallbacks still disclose them;
@@ -741,6 +755,7 @@ the readable criterion-by-criterion audit.
 The principal registered source artifacts used on this page include the
 [inspected 2020 Chistabo re-edit of B. V. Raman's *Muhurtha*](https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf),
 [the Internet Archive *Muhurta Chintamani* scan](https://archive.org/details/muhurta-chintamani-hindi),
+[the 1945 Nirnaya Sagar *Muhurta Chintamani* scan](https://jainqq.org/explore/002342/213),
 [Phaladeepika, V. Subrahmanya Sastri's 1950 second edition](https://archive.org/details/Phaladeepika2ndEd.1950ByVSubrahmanyaSastri),
 the [BPHS 6.12 text and translation](https://enjoylearningsanskrit.com/scriptures/parashara/chapter-6/verse-12/),
 and the [Surya-Siddhanta 1935 translation](https://classicalastrologer.com/wp-content/uploads/2018/04/surya_siddhanta_english.pdf).
@@ -755,15 +770,15 @@ Gold v1; they are not presented as the event-specific jewelry source.
 
 | Layer | Implementation | Contract tests |
 |---|---|---|
-| Canonical deterministic predicates, claim-specific source locators and clause-level manual remainders | `telugu_panchangam/personal/election_chart_rules.py` | `tests/test_election_chart_screening.py`; `src/scorer/__tests__/election-chart-screening.test.ts` |
+| Canonical deterministic predicates, complete-assessor declaration, claim-specific source locators and clause-level manual remainders | `telugu_panchangam/personal/election_chart_rules.py` | `tests/test_election_chart_screening.py`; `tests/test_vidyarambha_election_assessor.py`; `src/scorer/__tests__/election-chart-screening.test.ts` |
 | Versioned interpretation conventions, chart-fact parsing, Navamsa, placement and full-aspect primitives | `telugu_panchangam/personal/election_assessors/`; `src/scorer/election-assessors/primitives.ts` | Synthetic Gold predicate oracle plus frozen actual public-gateway outcome cells across Hyderabad and Sydney, two dates, and pass/fail/unknown/conflict/boundary dispositions; Python/TypeScript parity cases in the election-chart screening suites |
 | Complete activity-by-prerequisite source crosswalk | `tools/export_muhurtam_rule_crosswalk.py`; `docs/reference/muhurtam-rule-crosswalk.json` | `tests/test_muhurtam_rule_crosswalk.py`; exporter `--check`; documentation output digest check |
 | Structured all-activity check classification | `telugu_panchangam/personal/activity_check_contract.py`; `tools/export_activity_rules.py`; `src/data/activity-rules.generated.json` | `tests/test_activity_check_contract.py`; `src/scorer/__tests__/activity-check-contract.test.ts` |
-| Pure Python snapshot/window evaluator | `telugu_panchangam/personal/election_chart.py` | `tests/test_election_chart_screening.py` |
+| Pure Python snapshot/window evaluator | `telugu_panchangam/personal/election_chart.py` | `tests/test_election_chart_screening.py`; shared Aksharabhyasa oracle and projection replay |
 | Pure Python personal-role contract | `telugu_panchangam/personal/personal_election.py` | `tests/test_personal_election_parity.py`; `tests/fixtures/personal-election-parity.json` |
 | Generated browser rule contract | `tools/export_election_chart_rules.py`; `src/data/election-chart-rules.generated.json` | exporter `--check`; Python/TypeScript parity behavior |
 | Strict browser API adapter | `src/lib/election-chart-api.ts` | `src/__tests__/election-chart-api.test.ts` |
-| TypeScript predicate mirror | `src/scorer/election-chart-screening.ts` | `src/scorer/__tests__/election-chart-screening.test.ts` |
+| TypeScript predicate mirror | `src/scorer/election-chart-screening.ts` | `src/scorer/__tests__/election-chart-screening.test.ts`; `src/scorer/__tests__/election-chart-vidyarambha-projection.test.ts` |
 | Personal-role precedence | `src/scorer/personal-election-screening.ts` | `src/scorer/__tests__/personal-election-screening.test.ts` |
 | Bounded post-ranking enrichment | `src/scorer/election-chart-enrichment.ts` | `src/scorer/__tests__/election-chart-enrichment.test.ts` |
 | Local Lagna frame and transition-guard envelope | `tools/audit_lagna_boundary_guard.py`; `tests/fixtures/lagna-boundary-guard-audit.json` | `tests/test_lagna_boundary_guard_audit.py`; full report comparison runs in the default Python suite |
@@ -783,7 +798,7 @@ HTTP 200. Producer story
 is closed and Done. The browser validator remains strict; release of the
 producer fix is evidence for keeping, not relaxing, those invariants.
 
-The Python table is the source of truth for the 30 chart predicates. The
+The Python table is the source of truth for the 32 chart predicates. The
 Python personal module and TypeScript mirror carry the same five personal rule
 IDs, effects, locators, input evidence and all-sampled-state result semantics, with
 fixture parity tests. The TypeScript chart evaluator is a browser mirror and
@@ -819,6 +834,14 @@ Recreate it with:
 ```bash
 python tools/capture_karnavedha_assessor_screenshots.py --dist dist
 ```
+
+The Aksharabhyasa review-evidence directory at
+`docs/screenshots/aksharabhyasa-chart-assessor-2026-09-05/` contains ten
+owner-accepted captures: selector, pass, preference miss, hard rejection and
+unknown states at 1440×900 and 390×844. The manifest pins the activity,
+expected copy, viewport and SHA-256 for every image. These fixtures preserve
+the scoped partial/provisional wording and exercise the built application
+without a live service.
 
 The Gold review-evidence directory at
 `docs/screenshots/gold-chart-screening-2026-09-04/` contains a reproducible

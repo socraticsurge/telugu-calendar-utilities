@@ -834,7 +834,51 @@
       "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
       "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
-      "scope": "Supports the configured Vidyarambha weekday, Nakshatra and movable-or-common rising-Rasi admission lists plus disclosed age, forenoon/noon and election-chart guidance. Shared samskara filters, Choghadiya and Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "scope": "Supports only the Chapter VIII Aksharabhyasa first-letter-writing rite: the configured weekday, Nakshatra and movable-or-common rising-Rasi admission lists plus disclosed age and forenoon/noon guidance. The Drik website post-screen requires a vacant 8th house and treats Budha, Shukra and Guru all co-located in the 9th as a tie-break preference only. The hard reject always wins, and the trio changes neither raw score nor tier under the separately registered project convention. Chapter XI's broader subject-study elections and Muhurta Chintamani's distinct Akshararambha/Vidyarambha lineage are not blended into this assessor. Shared samskara filters, Choghadiya and Tithi-family ranking, personal scoring, relative tiers and the shared election baseline require separate authority.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.vidyarambha.raman_chapter_xi_scope",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/21-vidyarambha-profile.md",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "B. V. Raman, Chapter XI, 'Elections Pertaining to Education,' inspected in the 2020 Chistabo derivative at internal printed pp. 46-47 (physical PDF pp. 50-51)",
+      "scope": "Chapter XI addresses commencing study generally and then separate fields such as Vedas, astrology, grammar, medicine, music, science and trades. It supplies different Nakshatra, Tithi, Lagna, Yoga and chart guidance from the Chapter VIII first-letter-writing rite. This is a material scope alternative, not support for silently broadening the Aksharabhyasa assessor.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.vidyarambha.chintamani_divergence",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/21-vidyarambha-profile.md",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-NSP-1945-5E"],
+      "locator": "Muhurta Chintamani, Samskara-prakarana, verses 5.37-5.38, internal printed pp. 197-198 (physical scan pp. 213-214)",
+      "scope": "Verse 5.37 treats Akshararambha or first letter-writing and verse 5.38 treats Vidyarambha or beginning study with distinct Tithi, Nakshatra, Vara, Lagna and benefic-placement conditions. The passage does not support the Raman trio of Budha, Shukra and Guru together in the 9th. It is documented as an alternate lineage and is not blended into the Raman Chapter VIII v1 assessor.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.vidyarambha_co_location_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020", "MC-NSP-1945-5E"],
+      "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); Muhurta Chintamani, Samskara-prakarana, verses 5.37-5.38, internal printed pp. 197-198 (physical scan pp. 213-214); vidyarambha-benefic-trio-co-location-v1",
+      "scope": "The inspected Raman derivative names Budha, Shukra and Guru in the 9th but does not explicitly distinguish all-three co-location from distributive or alternative readings. Version 1 selects the strict reproducible AND formula H(Budha)=9 AND H(Shukra)=9 AND H(Guru)=9. Across samples, the preference passes only when every sample places all three in the 9th, fails only when every sample definitively fails, and otherwise resolves unknown and unstable. Muhurta Chintamani's distinct lineage is documented as an alternative, not a blended input.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_chart.vidyarambha_reject_precedence_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "src/scorer/election-chart-enrichment.ts",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "vidyarambha-benefic-trio-co-location-v1; owner decision recorded in GitHub issue 341 on 2026-09-04",
+      "scope": "The vacant-eighth failure is a hard reject. The all-three-in-the-ninth result is preference evidence only: it changes neither raw score nor tier and cannot neutralize that reject or any Panchangam, personal or safeguard gate. The inspected source does not state this precedence; it is an explicit owner-approved project convention. The event-specific Chapter VIII clauses are computed, but the overall election assessment remains partial/provisional until the shared baseline is resolved.",
       "last_reviewed": "2026-09-04"
     },
     {

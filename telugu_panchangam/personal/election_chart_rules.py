@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from .election_assessors.conventions import ELECTION_CHART_CONVENTIONS
 
-ELECTION_CHART_RULE_SCHEMA_VERSION = 3
+ELECTION_CHART_RULE_SCHEMA_VERSION = 4
 ELECTION_CHART_HOUSE_SYSTEM = 'whole_sign'
 ELECTION_CHART_NODE_CONVENTION = 'mean'
 ELECTION_CHART_PLANETS = (
@@ -23,6 +23,7 @@ ELECTION_CHART_PLANETS = (
     'Shukra', 'Shani', 'Rahu', 'Ketu',
 )
 ELECTION_CHART_COMPLETE_ASSESSORS = ('gold', 'annaprasana', 'karnavedha')
+VIDYARAMBHA_SOURCE_CLAIM = 'muhurta.vidyarambha'
 
 ELECTION_CHART_SOURCE_LOCATORS = {
     'muhurta.wedding': (
@@ -39,6 +40,10 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected "
         'in the 2020 Chistabo derivative at internal printed p. 23 '
         '(physical PDF p. 26)'),
+    VIDYARAMBHA_SOURCE_CLAIM: (
+        "B. V. Raman, Chapter VIII, 'Commencing education "
+        "(Aksharabhyasa),' inspected in the 2020 Chistabo derivative at "
+        'internal printed p. 23 (physical PDF p. 26)'),
     'muhurta.seemantha': (
         "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected "
         'in the 2020 Chistabo derivative at internal printed pp. 21-22 '
@@ -249,6 +254,29 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             aspectors=['Surya', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani'],
         ),
     ),
+    'vidyarambha': (
+        _rule(
+            'vidyarambha.house-8-vacant',
+            '8th house is vacant',
+            'house_empty',
+            'reject',
+            VIDYARAMBHA_SOURCE_CLAIM,
+            house=8,
+        ),
+        _rule(
+            'vidyarambha.budha-shukra-guru-9',
+            'Budha, Shukra and Guru are all in the 9th house',
+            'all_planets_in_houses',
+            'prefer',
+            VIDYARAMBHA_SOURCE_CLAIM,
+            convention_id='vidyarambha-benefic-trio-co-location-v1',
+            decision_policy_claim=(
+                'election_chart.vidyarambha_reject_precedence_policy_v1'
+            ),
+            planets=['Budha', 'Shukra', 'Guru'],
+            houses=[9],
+        ),
+    ),
     'purchase': (
         _rule('purchase.chandra-lagna', 'Chandra occupies Lagna',
               'planet_in_houses', 'prefer', 'muhurta.purchase.general',
@@ -312,6 +340,10 @@ ELECTION_CHART_MANUAL_REMAINDERS: dict[str, tuple[str, ...]] = {
         'Assess whether a malefic occupies the 7th house.',
     ),
     'gold': (),
+    # Chapter VIII's two event-specific chart clauses are automated. The
+    # shared election-chart baseline is still provisional, so this activity is
+    # intentionally absent from ELECTION_CHART_COMPLETE_ASSESSORS.
+    'vidyarambha': (),
     'purchase': (
         'Keep malefics outside the 8th and 12th houses, and assess whether benefics occupy the 2nd, 10th or 11th.',
     ),

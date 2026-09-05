@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "release": "1.18.0",
+  "parent_release": "1.17.0",
+  "activity": "vidyarambha",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [
+    {
+      "claim_id": "muhurta.vidyarambha",
+      "relationship": "successor_revision",
+      "verification_state": "verified",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+      "before_sha256": "aff318ee336605cc5673a2476120f107b36cf888eccb560657391d0fbaf56202",
+      "after_sha256": "91bb8a081b2169a1f26c33f17f77ea7f39a405cc9dc4a49d40f654390496df03",
+      "before": {
+        "id": "muhurta.vidyarambha",
+        "surface": "muhurtam",
+        "implementation": "telugu_panchangam/personal/activity_rules.py",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+        "scope": "Supports the configured Vidyarambha weekday, Nakshatra and movable-or-common rising-Rasi admission lists plus disclosed age, forenoon/noon and election-chart guidance. Shared samskara filters, Choghadiya and Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+        "last_reviewed": "2026-09-04"
+      }
+    },
+    {
+      "claim_id": "muhurta.vidyarambha.raman_chapter_xi_scope",
+      "relationship": "successor_addition",
+      "verification_state": "contradicted",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter XI, 'Elections Pertaining to Education,' inspected in the 2020 Chistabo derivative at internal printed pp. 46-47 (physical PDF pp. 50-51)",
+      "after_sha256": "5404813814a14fc9ca1c509fefde4b571e51f74dded11a22c7bc2a5369ba0b2a"
+    },
+    {
+      "claim_id": "election_chart.vidyarambha_co_location_policy_v1",
+      "relationship": "successor_addition",
+      "verification_state": "heuristic",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020",
+        "MC-NSP-1945-5E"
+      ],
+      "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); Muhurta Chintamani, Samskara-prakarana, verses 5.37-5.38, internal printed pp. 197-198 (physical scan pp. 213-214); vidyarambha-benefic-trio-co-location-v1",
+      "after_sha256": "8ff9f62c316597763c9795b8c0d05060317bf284c8121271fb3fc9bd9d1577c0"
+    }
+  ],
+  "semantic_deltas": [
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/check_contract/activities/vidyarambha",
+      "operation": "replace",
+      "scope": "vidyarambha_contract",
+      "before_sha256": "0d6ee8bf0c404e3d9be3e7f2cf1222282de7d589f8708af4f7e435631b583db9",
+      "after_sha256": "53ba27f942c371644250c55ae282563f2f1f8a12d82831a44a48ebf5feae8038",
+      "before": {
+        "deterministic_panchangam_fields": [
+          "prefer_choghadiya",
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "allowed_lagnas"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "vidyarambha.manual-1",
+            "source_index": 0,
+            "source_text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+            "text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "vidyarambha.manual-2",
+            "source_index": 1,
+            "source_text": "Prefer the forenoon or noon for the ceremony.",
+            "text": "Prefer the forenoon or noon for the ceremony.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "vidyarambha.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: leave the 8th house unoccupied.",
+            "text": "Election chart: leave the 8th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "vidyarambha.manual-4",
+            "source_index": 3,
+            "source_text": "Budha, Shukra and Guru together in the 9th are stated to counteract adverse influences.",
+            "text": "Budha, Shukra and Guru together in the 9th are stated to counteract adverse influences.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      }
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/rules/vidyarambha",
+      "operation": "replace",
+      "scope": "vidyarambha_activity_rules",
+      "before_sha256": "283b730e833d2ea15821ace85c975b1de9338702c9d4c1d56d40243e90ead9b9",
+      "after_sha256": "415b62dbbd2120ed16e6de2e87728018602f0e64b7db54a1951bf400c8a142eb",
+      "before": {
+        "label": "Education start (Vidyarambha)",
+        "prefer_choghadiya": [
+          "Amrit",
+          1
+        ],
+        "skip_on_yoga": [
+          "Visha Yoga",
+          "Dagdha Yoga"
+        ],
+        "skip_on_sankramana": true,
+        "prefer_tithi_class": "Nanda",
+        "avoid_tithi_class": [
+          "Jaya"
+        ],
+        "allowed_varas": [
+          "Somavaram",
+          "Budhavaram",
+          "Guruvaram",
+          "Shukravaram"
+        ],
+        "allowed_nakshatras": [
+          "Ashwini",
+          "Punarvasu",
+          "Ardra",
+          "Hasta",
+          "Chitra",
+          "Swati",
+          "Shravana",
+          "Revati"
+        ],
+        "manual_checks": [
+          "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+          "Prefer the forenoon or noon for the ceremony.",
+          "Election chart: leave the 8th house unoccupied.",
+          "Budha, Shukra and Guru together in the 9th are stated to counteract adverse influences."
+        ],
+        "allowed_lagnas": [
+          "Mesha",
+          "Karka",
+          "Tula",
+          "Makara",
+          "Mithuna",
+          "Kanya",
+          "Dhanu",
+          "Meena"
+        ],
+        "source_claim": "muhurta.vidyarambha"
+      }
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/schema_version",
+      "operation": "replace",
+      "scope": "shared_schema",
+      "before_sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "after_sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+      "before": 3
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/conventions/vidyarambha-benefic-trio-co-location-v1",
+      "operation": "add",
+      "scope": "vidyarambha_convention",
+      "after_sha256": "1e9577c448678746edebf1eaea42dbb4e8ada4102ddcd93a94cacf66c54db479"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/rules/vidyarambha",
+      "operation": "add",
+      "scope": "vidyarambha_rules",
+      "after_sha256": "3bfd245a5982cfdf614a5a305a1eb729560466873c63022a3cc0127b042a4671"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/manual_remainders/vidyarambha",
+      "operation": "add",
+      "scope": "vidyarambha_remainder",
+      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "protected_source_transforms": []
+}

@@ -1,0 +1,137 @@
+{
+  "capturedAt": "2026-09-04T19:29:48+00:00",
+  "source": "tools/capture_muhurta_chart_screenshots.py",
+  "liveServicesUsed": false,
+  "captures": [
+    {
+      "file": "fixture-aksharabhyasa-selector-desktop-1440x900.png",
+      "scenario": "vidyarambha-selector",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "pre-search",
+      "expectedCopy": "Aksharabhyasa (First-letter writing)",
+      "sha256": "a90ee342f688458d874420cee5cf9396cadc407c5b99222d2fcc67902cc9e90a"
+    },
+    {
+      "file": "fixture-aksharabhyasa-selector-mobile-390x844.png",
+      "scenario": "vidyarambha-selector",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "pre-search",
+      "expectedCopy": "Aksharabhyasa (First-letter writing)",
+      "sha256": "4440b8d193dc1a492a325ce9cc6f3b9606c51e7c03262d44265750cef602a838"
+    },
+    {
+      "file": "fixture-aksharabhyasa-pass-desktop-1440x900.png",
+      "scenario": "vidyarambha-pass",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference met \u00b7 tie-break only",
+      "sha256": "e02fb07c93e3de976898aada04fe3c974be54a0557c18ca4c9fbc1ea9cdc5be9"
+    },
+    {
+      "file": "fixture-aksharabhyasa-pass-mobile-390x844.png",
+      "scenario": "vidyarambha-pass",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference met \u00b7 tie-break only",
+      "sha256": "5d483ffabf1f9ae9cfafdaa017f5ade5bef2cc88d7abf9fdedadbfbde1d4d395"
+    },
+    {
+      "file": "fixture-aksharabhyasa-preference-miss-desktop-1440x900.png",
+      "scenario": "vidyarambha-preference-miss",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference not present \u00b7 no penalty",
+      "sha256": "f07333c5e523286cc3384201114ceb8cd467481963fddbcedff1bb01a5b03787"
+    },
+    {
+      "file": "fixture-aksharabhyasa-preference-miss-mobile-390x844.png",
+      "scenario": "vidyarambha-preference-miss",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference not present \u00b7 no penalty",
+      "sha256": "949f2ece3fb3e0fd4a0475c7332f64e90ff24db64267ef609cae9c246b8f4d6e"
+    },
+    {
+      "file": "fixture-aksharabhyasa-hard-fail-desktop-1440x900.png",
+      "scenario": "vidyarambha-hard-fail",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "House 8 occupants: Surya.",
+      "sha256": "e6006986e2325a8241b03094d37779bf670c418b64c0b4ef2be49796048c2de9"
+    },
+    {
+      "file": "fixture-aksharabhyasa-hard-fail-mobile-390x844.png",
+      "scenario": "vidyarambha-hard-fail",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "House 8 occupants: Surya.",
+      "sha256": "90591c8c9bf2092c1750049fb337f5e29fac861964646414ddc8037146f7d1f7"
+    },
+    {
+      "file": "fixture-aksharabhyasa-unknown-desktop-1440x900.png",
+      "scenario": "vidyarambha-unknown",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference could not be verified",
+      "sha256": "16930615076beabcd6aafae81935ccbffdbc730cc435fa290640454f0eed52a9"
+    },
+    {
+      "file": "fixture-aksharabhyasa-unknown-mobile-390x844.png",
+      "scenario": "vidyarambha-unknown",
+      "activity": "vidyarambha",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference could not be verified",
+      "sha256": "18c52a38975980fab5740cc865ddc586af952a2289e12ff96b85107ec9f1791a"
+    }
+  ]
+}

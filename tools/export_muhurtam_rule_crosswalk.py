@@ -25,10 +25,10 @@ SCHEMA_VERSION = 1
 ACTIVITY_METADATA_FIELDS = frozenset({
     'label',
     'source_claim',
+    'source_scope',
     'audit_claim',
     'heuristic_claim',
     'related_claims',
-    'source_scope',
     'manual_checks',
     'manual_prerequisites',
 })
@@ -252,13 +252,34 @@ MANUAL_SUPPORTING_CLAIMS: Mapping[str, tuple[str, ...]] = {
 # These rows preserve source guidance for Python/MCP, non-Drik, and service-
 # unavailable fallbacks. Their clauses are replaced by explicit automated
 # election-chart predicates in the supported browser path.
-AUTOMATED_CHART_FALLBACK_MANUAL_IDS = frozenset({
-    'gold.manual-1',
-    'annaprasana.manual-2',
-    'annaprasana.manual-3',
-    'annaprasana.manual-4',
-    'karnavedha.manual-2',
-})
+ANNAPRASANA_AUTOMATED_FALLBACK_NOTE = (
+    'Not displayed as a residual manual Annaprasana chart check after a '
+    'successful exact-chart screen.'
+)
+AUTOMATED_CHART_FALLBACK_MANUAL_NOTES = {
+    'gold.manual-1': (
+        'Not displayed as a residual manual Gold check after a successful '
+        'exact-chart screen.'
+    ),
+    'annaprasana.manual-2': ANNAPRASANA_AUTOMATED_FALLBACK_NOTE,
+    'annaprasana.manual-3': ANNAPRASANA_AUTOMATED_FALLBACK_NOTE,
+    'annaprasana.manual-4': ANNAPRASANA_AUTOMATED_FALLBACK_NOTE,
+    'karnavedha.manual-2': (
+        'Not displayed as a residual manual Karnavedha chart check after a '
+        'successful exact-chart screen.'
+    ),
+    'vidyarambha.manual-3': (
+        'Not displayed as a residual vacant-8th check after a successful '
+        'exact Aksharabhyasa chart screen.'
+    ),
+    'vidyarambha.manual-4': (
+        'Not displayed as a residual grouped-Graha check after a successful '
+        'exact Aksharabhyasa chart screen.'
+    ),
+}
+AUTOMATED_CHART_FALLBACK_MANUAL_IDS = frozenset(
+    AUTOMATED_CHART_FALLBACK_MANUAL_NOTES
+)
 
 PRODUCT_POLICY_MANUAL_IDS = frozenset({
     'wedding.manual-5', 'engagement.manual-3', 'seemantha.manual-7',
@@ -1046,15 +1067,7 @@ def build_crosswalk(
                     if fallback_only else _manual_rationale(manual)
                 ),
                 implementation_note=(
-                    'Not displayed as a residual manual Annaprasana chart '
-                    'check after a successful exact-chart screen.'
-                    if fallback_only and activity == 'annaprasana'
-                    else 'Not displayed as a residual manual Karnavedha chart '
-                    'check after a successful exact-chart screen.'
-                    if fallback_only and activity == 'karnavedha'
-                    else 'Not displayed as a residual manual Gold check '
-                    'after a successful exact-chart screen.'
-                    if fallback_only else None
+                    AUTOMATED_CHART_FALLBACK_MANUAL_NOTES.get(rule_id)
                 ),
                 applicability=(
                     'python_or_mcp_or_non_drik_or_exact_chart_unavailable'

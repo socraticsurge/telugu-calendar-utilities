@@ -354,10 +354,73 @@ DashaFlow remains limited to candidate-time chart facts. The eight-row
 Hyderabad/New York oracle covers pass/pass, fail/fail, pass/fail and fail/pass,
 including EST/EDT and next-date suffixes.
 
+## Current program state after Aksharabhyasa
+
+The canonical contract now contains **32 deterministic chart predicates
+across 15 activity profiles**. These are current counts; the earlier 23/12
+figures above remain explicitly dated pre-Gold history. Gold, Annaprasana and
+Karnavedha are declared complete only for their named event-specific
+contracts. Aksharabhyasa's two Chapter VIII clauses are automated, but its
+overall assessment remains partial/provisional because the shared general
+election-chart baseline is not yet complete.
+
+## Aksharabhyasa / Vidyarambha v1
+
+### Scope and source boundary
+
+The public label is **Aksharabhyasa (First-letter writing)**; the stable
+compatibility/API identifier is `vidyarambha`. The event source is Raman
+Chapter VIII at internal printed p. 23 (physical PDF p. 26) of the inspected
+2020 Chistabo derivative. The catalogued 181-page 1993 UBS work and the
+directly inspected 78-page derivative are separate source records; no scan of
+the 1993 edition was inspected and exact edition equivalence is not claimed.
+
+Chapter XI's broader education elections at internal printed pp. 46–47
+(physical PDF pp. 50–51) and *Muhurta Chintamani* 5.37–5.38 are registered as
+separate lineages. Neither is blended into the Chapter VIII first-letter
+assessor.
+
+### Formula, effect, and precedence
+
+The event-specific predicates are:
+
+```text
+house_8_vacant = every p in nine_grahas has H(p) != 8
+trio_in_9      = H(Budha) = 9 AND H(Shukra) = 9 AND H(Guru) = 9
+```
+
+`house_8_vacant` is a hard `reject`. `trio_in_9` is one `prefer` result: no
+raw-score change, no tier change, and no penalty on a resolved miss. The
+strict AND reading is the versioned
+`vidyarambha-benefic-trio-co-location-v1` project convention.
+
+The source does not state whether the favorable trio neutralizes the
+separately stated vacancy clause. Owner decision on 2026-09-04 establishes
+`election_chart.vidyarambha_reject_precedence_policy_v1`: the hard reject
+always wins, and the trio cannot cancel it or any Panchangam, personal, or
+safeguard gate. This is a transparent product convention rather than textual
+authority.
+
+Across samples, vacancy fails on any known occupant, becomes unknown when no
+failure is known but a sample is unresolved, and passes only when every sample
+is vacant. The trio passes only when every sample places all three in the
+ninth, fails only when every sample definitively misses, and otherwise becomes
+unknown and unstable. House-frame uncertainty and malformed, incomplete,
+duplicate, noncanonical, or out-of-range facts fail closed.
+
+### Oracle and projection limits
+
+The shared Python/TypeScript oracle covers pass, preference miss, hard fail,
+simultaneous trio pass plus hard fail, unknown facts, mixed samples, and
+all-fail aggregation. A separate deterministic DashaFlow contract replay spans
+Washington, D.C. and Hyderabad on four dates and labels external first-instant
+anchors separately from local-only projections. It proves formula and runtime
+parity, not an astrological outcome or continuous-time theorem.
+
 ## Next event sequence
 
-Gold and Annaprasana preceded Karnavedha. The next bounded stories are
-Vidyarambha, completed-house purchase, general purchase,
+Gold, Annaprasana and Karnavedha preceded Aksharabhyasa. The next bounded
+stories are completed-house purchase, general purchase,
 well-digging, and business investment. They reuse placement, grouped-planet,
 benefic/malefic, and composition primitives before the program advances to
 lordship, Navamsa-Lagna, compatibility, named-Yoga, and medical-context work.

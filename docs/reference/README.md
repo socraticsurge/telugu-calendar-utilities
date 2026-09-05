@@ -50,7 +50,7 @@ PyPI MCP package.
 | 18 | [Annaprasana source profile](18-annaprasana-profile.md) | Raman Chapter VIII and Panchanga-Suddhi crosswalk with explicit limitations |
 | 19 | [Karnavedha source profile](19-karnavedha-profile.md) | Daytime-only Chapter VIII profile with exact weekday, Tithi and Lagna gates |
 | 20 | [Mundana / Chaula source profile](20-mundana-profile.md) | Chapter VIII Paksha, combustion, forenoon and conservative Lagna contract |
-| 21 | [Vidyarambha source profile](21-vidyarambha-profile.md) | Chapter VIII weekday, Nakshatra and movable/common-Lagna crosswalk |
+| 21 | [Aksharabhyasa source profile](21-vidyarambha-profile.md) | Chapter VIII first-letter scope, exact chart formulas, precedence, separate source lineages and parity corpus |
 | 22 | [Upanayana source profile](22-upanayana-profile.md) | Paksha-exact Tithis, Uttarayana signs, before-noon gate and chart caveats |
 | 23 | [Vehicle-acquisition source profile](23-vehicle-acquisition-profile.md) | Precisely scoped Chapter IV movable-Nakshatra preference and non-inherited heuristics |
 | 24 | [Roof-laying source profile](24-construction-roof-profile.md) | Chapter XII's stage-specific Vrishabha-or-Tula Lagna gate and explicit scope boundary |
@@ -83,7 +83,7 @@ PyPI MCP package.
 | 51 | [Borrowing-money source profile](51-borrowing-money-profile.md) | Debtor-side Nakshatra gates, Chintamani divergence, and financial-safety boundary |
 | 52 | [Lending-money source profile](52-lending-money-profile.md) | Creditor-side conditional gates, published-practice conflict, and financial safeguards |
 | 53 | [Guest birth profiles and D1 chart](53-birth-profile-calculation.md) | Birth-instant conversion, Lahiri/Whole Sign formula path, privacy boundary, fixtures and release gates |
-| 54 | [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md) | Privacy-minimal DashaFlow enrichment, exact source-rule matrix, personal-role precedence, boundary semantics and manual remainder |
+| 54 | [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md) | Privacy-minimal DashaFlow enrichment, 32-rule matrix, complete-assessor claims, rejected-rule evidence, boundary semantics and manual remainder |
 
 ## How to read the diagrams
 

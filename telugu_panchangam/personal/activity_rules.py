@@ -580,8 +580,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Review the named adverse and favorable election '
                           + 'Yogas listed in the remainder of the passage.',
                       ]},
-    'vidyarambha':   {'label': 'Education start (Vidyarambha)',
+    'vidyarambha':   {'label': 'Aksharabhyasa (First-letter writing)',
                       'source_claim': 'muhurta.vidyarambha',
+                      'source_scope': (
+                          'This profile assesses the Chapter VIII '
+                          + 'Aksharabhyasa first-letter-writing rite only; '
+                          + 'it is not a generic education-start election.'
+                      ),
+                      'related_claims': [
+                          'muhurta.vidyarambha.raman_chapter_xi_scope',
+                          'muhurta.vidyarambha.chintamani_divergence',
+                      ],
                       'skip_on_yoga': list(_SAMSKARA_SKIP),
                       'skip_on_sankramana': True,
                       'skip_on_khar_maasa': True,
@@ -603,8 +612,9 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Mithuna', 'Kanya', 'Dhanu', 'Meena',
                       ],
                       'manual_checks': [
-                          'The source’s most propitious age marker is the '
-                          + '5th day of the 5th month of the child’s 5th year.',
+                          'The inspected 2020 re-edited transcription gives '
+                          + 'the most propitious age marker as the 5th day '
+                          + 'of the 5th month of the child’s 5th year.',
                           'Prefer the forenoon or noon for the ceremony.',
                           'Election chart: leave the 8th house unoccupied.',
                           'Budha, Shukra and Guru together in the 9th are '

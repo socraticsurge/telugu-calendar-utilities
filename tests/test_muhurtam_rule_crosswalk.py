@@ -96,10 +96,10 @@ def test_crosswalk_covers_every_browser_prerequisite_exactly():
 def test_crosswalk_counts_and_rule_ids_are_stable_and_unique():
     crosswalk = build_crosswalk()
     assert crosswalk['counts']['activities'] == 30
-    assert crosswalk['counts']['rows'] == 326
+    assert crosswalk['counts']['rows'] == 328
     assert crosswalk['counts']['deterministic_panchangam_rows'] == 177
     assert crosswalk['counts']['personal_rule_rows'] == 5
-    assert crosswalk['counts']['election_chart_rule_rows'] == 30
+    assert crosswalk['counts']['election_chart_rule_rows'] == 32
     assert crosswalk['counts']['manual_display_rows'] == 114
     ids = [row['rule_id'] for row in crosswalk['rows']]
     assert len(ids) == len(set(ids))
@@ -210,7 +210,7 @@ def test_exact_personal_and_chart_predicate_values_are_exposed():
         if row['predicate_class'].startswith('election-chart.')
         and row['activity'] != 'gold'
     ]
-    assert len(non_gold_chart_rows) == 26
+    assert len(non_gold_chart_rows) == 28
     assert all(
         'between-sample transition'
         not in row['configured_inputs']['sample_aggregation']

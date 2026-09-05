@@ -6,6 +6,8 @@ It writes review evidence only; it does not call a live chart service.
 
 Usage:
     python tools/capture_muhurta_chart_screenshots.py --dist dist
+    python tools/capture_muhurta_chart_screenshots.py --dist dist \
+        --aksharabhyasa-only
 """
 
 from __future__ import annotations
@@ -34,6 +36,8 @@ ANNAPRASANA_OUTPUT_DIR = (
     REPO_ROOT / 'docs' / 'screenshots' /
     'annaprasana-chart-assessor-2026-09-04'
 )
+PREFERENCE_MET_COPY = 'Preference met · tie-break only'
+PREFERENCE_NOT_PRESENT_COPY = 'Preference not present · no penalty'
 
 
 def _load_smoke_module():
@@ -147,7 +151,7 @@ ANNAPRASANA_CAPTURES = tuple(
         ),
         (
             'annaprasana-preference-miss', 'screened',
-            'Preference not present · no penalty',
+            PREFERENCE_NOT_PRESENT_COPY,
         ),
         (
             'annaprasana-hard-fail', 'screened',
@@ -169,8 +173,65 @@ ANNAPRASANA_CAPTURES = tuple(
     Capture(
         'fixture-annaprasana-pass-final-outcomes-mobile-390x844.png',
         'annaprasana-pass', 'annaprasana', 'drik', 390, 844, 'screened',
-        'Preference met · tie-break only',
+        PREFERENCE_MET_COPY,
         'Natural malefics in Lagna: none; Chandra is outside Lagna.',
+    ),
+)
+
+
+AKSHARABHYASA_CAPTURES = (
+    Capture(
+        'fixture-aksharabhyasa-pass-desktop-1440x900.png',
+        'vidyarambha-pass', 'vidyarambha', 'drik', 1440, 900, 'screened',
+        PREFERENCE_MET_COPY,
+    ),
+    Capture(
+        'fixture-aksharabhyasa-pass-mobile-390x844.png',
+        'vidyarambha-pass', 'vidyarambha', 'drik', 390, 844, 'screened',
+        PREFERENCE_MET_COPY,
+    ),
+    Capture(
+        'fixture-aksharabhyasa-preference-miss-desktop-1440x900.png',
+        'vidyarambha-preference-miss', 'vidyarambha', 'drik', 1440, 900,
+        'screened', PREFERENCE_NOT_PRESENT_COPY,
+    ),
+    Capture(
+        'fixture-aksharabhyasa-preference-miss-mobile-390x844.png',
+        'vidyarambha-preference-miss', 'vidyarambha', 'drik', 390, 844,
+        'screened', PREFERENCE_NOT_PRESENT_COPY,
+    ),
+    Capture(
+        'fixture-aksharabhyasa-hard-fail-desktop-1440x900.png',
+        'vidyarambha-hard-fail', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'House 8 occupants: Surya.',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-hard-fail-mobile-390x844.png',
+        'vidyarambha-hard-fail', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'House 8 occupants: Surya.',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-unknown-desktop-1440x900.png',
+        'vidyarambha-unknown', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'Preference could not be verified',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-unknown-mobile-390x844.png',
+        'vidyarambha-unknown', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'Preference could not be verified',
+    ),
+)
+
+AKSHARABHYASA_SELECTOR_CAPTURES = (
+    Capture(
+        'fixture-aksharabhyasa-selector-desktop-1440x900.png',
+        'vidyarambha-selector', 'vidyarambha', 'drik', 1440, 900,
+        'pre-search', 'Aksharabhyasa (First-letter writing)',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-selector-mobile-390x844.png',
+        'vidyarambha-selector', 'vidyarambha', 'drik', 390, 844,
+        'pre-search', 'Aksharabhyasa (First-letter writing)',
     ),
 )
 
@@ -224,6 +285,20 @@ def _capture_page(
     page.screenshot(path=str(path), full_page=False)
 
 
+def _assert_expected_copy(result, capture: Capture) -> None:
+    result_text = result.text_content() or ''
+    assert capture.expected_copy in result_text, (
+        f'{capture.scenario} expected copy {capture.expected_copy!r}; '
+        f'result={result_text[:1000]!r}'
+    )
+    if capture.additional_expected_copy is not None:
+        assert capture.additional_expected_copy in result_text, (
+            f'{capture.scenario} expected additional copy '
+            f'{capture.additional_expected_copy!r}; '
+            f'result={result_text[:1000]!r}'
+        )
+
+
 def _capture_regular(
     browser, smoke, base_url: str, capture: Capture, output_dir: Path,
 ) -> dict:
@@ -254,22 +329,14 @@ def _capture_regular(
             detail_selector = '.mu-reason-details:has(.mu-rg-computed)'
         elif capture.scenario == 'mixed':
             detail_selector = '.mu-reason-details:has(.mu-chart-rule--unknown)'
+        elif capture.scenario == 'vidyarambha-hard-fail':
+            detail_selector = '.mu-chart-removals'
         if detail_selector and result.locator(detail_selector).count():
             result.locator(detail_selector).first.locator('summary').first.click()
         if capture.scenario == 'annaprasana-hard-fail':
             result.locator('.mu-chart-removals > summary').click()
 
-        result_text = result.text_content() or ''
-        assert capture.expected_copy in result_text, (
-            f'{capture.scenario} expected copy {capture.expected_copy!r}; '
-            f'result={result_text[:1000]!r}'
-        )
-        if capture.additional_expected_copy is not None:
-            assert capture.additional_expected_copy in result_text, (
-                f'{capture.scenario} expected additional copy '
-                f'{capture.additional_expected_copy!r}; '
-                f'result={result_text[:1000]!r}'
-            )
+        _assert_expected_copy(result, capture)
         output = output_dir / capture.filename
         if capture.filename == (
             'fixture-annaprasana-pass-final-outcomes-mobile-390x844.png'
@@ -352,6 +419,18 @@ def _manifest_row(capture: Capture, path: Path) -> dict:
     if capture.additional_expected_copy is not None:
         row['additionalExpectedCopy'] = capture.additional_expected_copy
     return row
+
+
+def _write_manifest(output_dir: Path, rows: list[dict]) -> None:
+    manifest = {
+        'capturedAt': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        'source': 'tools/capture_muhurta_chart_screenshots.py',
+        'liveServicesUsed': False,
+        'captures': rows,
+    }
+    (output_dir / 'fixture-manifest.json').write_text(
+        json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
+    )
 
 
 def main() -> int:

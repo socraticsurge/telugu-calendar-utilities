@@ -14,7 +14,10 @@ The fields are mutually exclusive. `tools/check_activity_provenance.py` fails
 for unknown claims, wrong surfaces, wrong states, duplicate claims or an
 activity with no disposition. `tools/export_activity_rules.py` carries the same
 field into the browser contract, while `tool_find_muhurta` returns it in
-`activity_profile` for MCP consumers.
+`activity_profile` for MCP consumers. When a source-backed activity has a
+narrower meaning than its compatibility identifier, the optional
+`source_scope` field is exported on both surfaces so consumers do not silently
+broaden the claim.
 
 ## The neutral `any` selector
 

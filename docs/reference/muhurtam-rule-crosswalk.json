@@ -11,10 +11,10 @@
     "activities": 30,
     "browser_activities": 30,
     "python_mcp_only_activities": 5,
-    "rows": 326,
+    "rows": 328,
     "deterministic_panchangam_rows": 177,
     "personal_rule_rows": 5,
-    "election_chart_rule_rows": 30,
+    "election_chart_rule_rows": 32,
     "manual_display_rows": 114,
     "by_predicate_class": {
       "panchangam.slot-exclusion": 16,
@@ -25,13 +25,14 @@
       "panchangam.day-admission-exception": 1,
       "panchangam.slot-admission": 38,
       "panchangam.ranking-penalty": 7,
-      "election-chart.house_empty": 6,
+      "election-chart.house_empty": 7,
       "election-chart.planet_not_house": 9,
       "manual.display-row": 114,
       "election-chart.any_planet_in_houses": 2,
       "election-chart.house_free_of_natural_malefics": 1,
       "panchangam.time-admission": 3,
       "panchangam.daylight-single-limb": 2,
+      "election-chart.all_planets_in_houses": 1,
       "personal.exact-election-fact": 5,
       "election-chart.planet_in_houses": 8,
       "election-chart.planet_well_situated": 2,
@@ -43,11 +44,11 @@
     "by_implementation_status": {
       "automated_browser_and_python": 154,
       "automated_python_only_not_browser": 23,
-      "automated_exact_chart_browser_with_python_parity": 35,
+      "automated_exact_chart_browser_with_python_parity": 37,
       "manual_displayed_not_computed": 114
     },
     "by_authority_status": {
-      "source_backed": 247,
+      "source_backed": 249,
       "explicit_project_heuristic": 76,
       "documented_conflict": 3
     },
@@ -545,7 +546,7 @@
     },
     {
       "activity": "vidyarambha",
-      "label": "Education start (Vidyarambha)",
+      "label": "Aksharabhyasa (First-letter writing)",
       "authority_claim_field": "source_claim",
       "source_claim_id": "muhurta.vidyarambha",
       "source_claim": {
@@ -573,10 +574,58 @@
           }
         ],
         "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
-        "scope": "Supports the configured Vidyarambha weekday, Nakshatra and movable-or-common rising-Rasi admission lists plus disclosed age, forenoon/noon and election-chart guidance. Shared samskara filters, Choghadiya and Tithi-family ranking, personal scoring and relative tiers require separate authority."
+        "scope": "Supports only the Chapter VIII Aksharabhyasa first-letter-writing rite: the configured weekday, Nakshatra and movable-or-common rising-Rasi admission lists plus disclosed age and forenoon/noon guidance. The Drik website post-screen requires a vacant 8th house and treats Budha, Shukra and Guru all co-located in the 9th as a tie-break preference only. The hard reject always wins, and the trio changes neither raw score nor tier under the separately registered project convention. Chapter XI's broader subject-study elections and Muhurta Chintamani's distinct Akshararambha/Vidyarambha lineage are not blended into this assessor. Shared samskara filters, Choghadiya and Tithi-family ranking, personal scoring, relative tiers and the shared election baseline require separate authority."
       },
-      "related_claims": [],
-      "source_scope": null,
+      "related_claims": [
+        {
+          "id": "muhurta.vidyarambha.raman_chapter_xi_scope",
+          "surface": "muhurtam",
+          "authority_status": "documented_conflict",
+          "evidence_class": "textual",
+          "verification_state": "contradicted",
+          "source_ids": [
+            "BVR-MUHURTHA-1993",
+            "BVR-MUHURTHA-CHISTABO-2020"
+          ],
+          "sources": [
+            {
+              "id": "BVR-MUHURTHA-1993",
+              "title": "Muhurtha (Electional Astrology)",
+              "authority_type": "modern_synthesis",
+              "url": "https://books.google.com/books/about/Muhurtha_Electional_Astrology.html?id=nHQlAcBkDXIC"
+            },
+            {
+              "id": "BVR-MUHURTHA-CHISTABO-2020",
+              "title": "Muhurtha (Electional Astrology) — Chistabo re-edited derivative",
+              "authority_type": "inspected_derivative",
+              "url": "https://www.panchanga.lv/wp-content/uploads/2020/06/Muhurta_Raman.pdf"
+            }
+          ],
+          "locator": "B. V. Raman, Chapter XI, 'Elections Pertaining to Education,' inspected in the 2020 Chistabo derivative at internal printed pp. 46-47 (physical PDF pp. 50-51)",
+          "scope": "Chapter XI addresses commencing study generally and then separate fields such as Vedas, astrology, grammar, medicine, music, science and trades. It supplies different Nakshatra, Tithi, Lagna, Yoga and chart guidance from the Chapter VIII first-letter-writing rite. This is a material scope alternative, not support for silently broadening the Aksharabhyasa assessor."
+        },
+        {
+          "id": "muhurta.vidyarambha.chintamani_divergence",
+          "surface": "muhurtam",
+          "authority_status": "documented_conflict",
+          "evidence_class": "textual",
+          "verification_state": "contradicted",
+          "source_ids": [
+            "MC-NSP-1945-5E"
+          ],
+          "sources": [
+            {
+              "id": "MC-NSP-1945-5E",
+              "title": "Muhurta Chintamani with Piyushadhara commentary",
+              "authority_type": "primary_text_commentary",
+              "url": "https://jainqq.org/booktext/Muhurt_Chintamani/002342"
+            }
+          ],
+          "locator": "Muhurta Chintamani, Samskara-prakarana, verses 5.37-5.38, internal printed pp. 197-198 (physical scan pp. 213-214)",
+          "scope": "Verse 5.37 treats Akshararambha or first letter-writing and verse 5.38 treats Vidyarambha or beginning study with distinct Tithi, Nakshatra, Vara, Lagna and benefic-placement conditions. The passage does not support the Raman trio of Budha, Shukra and Guru together in the 9th. It is documented as an alternate lineage and is not blended into the Raman Chapter VIII v1 assessor."
+        }
+      ],
+      "source_scope": "This profile assesses the Chapter VIII Aksharabhyasa first-letter-writing rite only; it is not a generic education-start election.",
       "manual_prerequisites": false,
       "surface_availability": "browser_and_python",
       "row_ids": [
@@ -591,12 +640,14 @@
         "vidyarambha.panchangam.skip_on_adhika",
         "vidyarambha.panchangam.skip_on_khar_maasa",
         "vidyarambha.panchangam.skip_on_pitru_paksha",
+        "vidyarambha.house-8-vacant",
+        "vidyarambha.budha-shukra-guru-9",
         "vidyarambha.manual-1",
         "vidyarambha.manual-2",
         "vidyarambha.manual-3",
         "vidyarambha.manual-4"
       ],
-      "row_count": 15
+      "row_count": 17
     },
     {
       "activity": "seemantha",
@@ -6668,12 +6719,125 @@
     },
     {
       "activity": "vidyarambha",
+      "rule_id": "vidyarambha.house-8-vacant",
+      "predicate_class": "election-chart.house_empty",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "house_empty",
+        "predicate_inputs": {
+          "house": 8
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
+      },
+      "source_claim_id": "muhurta.vidyarambha",
+      "source_claim": {
+        "id": "muhurta.vidyarambha",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "Whole Sign house occupancy is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)"
+    },
+    {
+      "activity": "vidyarambha",
+      "rule_id": "vidyarambha.budha-shukra-guru-9",
+      "predicate_class": "election-chart.all_planets_in_houses",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "all_planets_in_houses",
+        "predicate_inputs": {
+          "planets": [
+            "Budha",
+            "Shukra",
+            "Guru"
+          ],
+          "houses": [
+            9
+          ],
+          "convention_id": "vidyarambha-benefic-trio-co-location-v1",
+          "convention_label": "Aksharabhyasa benefic-trio co-location convention v1",
+          "formula": "H(Budha) = 9 AND H(Shukra) = 9 AND H(Guru) = 9. All three named grahas must occupy the ninth house in every sampled chart state; one or two matching placements do not satisfy the preference.",
+          "method_claims": [
+            "election_chart.vidyarambha_co_location_policy_v1",
+            "election_chart.vidyarambha_reject_precedence_policy_v1"
+          ],
+          "decision_policy_claim": "election_chart.vidyarambha_reject_precedence_policy_v1"
+        },
+        "sample_aggregation": "pass only if every sampled state passes; fail only if every sampled state fails; otherwise unknown"
+      },
+      "source_claim_id": "muhurta.vidyarambha",
+      "source_claim": {
+        "id": "muhurta.vidyarambha",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tie_break_preference",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+      "decision_policy_claim_id": "election_chart.vidyarambha_reject_precedence_policy_v1",
+      "decision_policy_claim": {
+        "id": "election_chart.vidyarambha_reject_precedence_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "vidyarambha-benefic-trio-co-location-v1; owner decision recorded in GitHub issue 341 on 2026-09-04"
+      }
+    },
+    {
+      "activity": "vidyarambha",
       "rule_id": "vidyarambha.manual-1",
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 0,
-        "source_text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
-        "text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+        "source_text": "The inspected 2020 re-edited transcription gives the most propitious age marker as the 5th day of the 5th month of the child’s 5th year.",
+        "text": "The inspected 2020 re-edited transcription gives the most propitious age marker as the 5th day of the 5th month of the child’s 5th year.",
         "class": "manual-only",
         "display_section": "information"
       },
@@ -6754,9 +6918,10 @@
       },
       "implementation_status": "manual_displayed_not_computed",
       "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "practitioner_review_tier_cap",
+      "ranking_effect": "fallback_only_practitioner_review_tier_cap",
       "automation_mode": "manual",
-      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
+      "automation_rationale": "Fallback source guidance only. In the supported Drik browser path, separately provenance-linked automated rules replace this broad clause.",
+      "implementation_note": "Not displayed as a residual vacant-8th check after a successful exact Aksharabhyasa chart screen.",
       "decision_policy_claim_id": "muhurta.scoring_policy",
       "decision_policy_claim": {
         "id": "muhurta.scoring_policy",
@@ -6767,7 +6932,8 @@
         "source_ids": [],
         "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
       },
-      "authority_role": "activity_source_claim"
+      "authority_role": "activity_source_claim",
+      "applicability": "python_or_mcp_or_non_drik_or_exact_chart_unavailable"
     },
     {
       "activity": "vidyarambha",
@@ -6795,9 +6961,10 @@
       },
       "implementation_status": "manual_displayed_not_computed",
       "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "practitioner_review_tier_cap",
+      "ranking_effect": "fallback_only_practitioner_review_tier_cap",
       "automation_mode": "manual",
-      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
+      "automation_rationale": "Fallback source guidance only. In the supported Drik browser path, separately provenance-linked automated rules replace this broad clause.",
+      "implementation_note": "Not displayed as a residual grouped-Graha check after a successful exact Aksharabhyasa chart screen.",
       "decision_policy_claim_id": "muhurta.scoring_policy",
       "decision_policy_claim": {
         "id": "muhurta.scoring_policy",
@@ -6808,7 +6975,8 @@
         "source_ids": [],
         "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
       },
-      "authority_role": "activity_source_claim"
+      "authority_role": "activity_source_claim",
+      "applicability": "python_or_mcp_or_non_drik_or_exact_chart_unavailable"
     },
     {
       "activity": "seemantha",

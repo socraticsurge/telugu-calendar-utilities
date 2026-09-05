@@ -602,6 +602,24 @@ def _muhurta_planets(
             'Chandra': 1 if chart_index % 2 == 0 else 2,
             'Shukra': 1,
         })
+    elif scenario in {
+        'vidyarambha-pass',
+        'vidyarambha-preference-miss',
+        'vidyarambha-hard-fail',
+        'vidyarambha-unknown',
+    }:
+        houses.update({
+            'Budha': 9,
+            'Shukra': 9,
+            'Guru': 9,
+            'Rahu': 5,
+        })
+        if scenario == 'vidyarambha-preference-miss':
+            houses['Guru'] = 10
+        elif scenario == 'vidyarambha-hard-fail':
+            houses['Surya'] = 8
+        elif scenario == 'vidyarambha-unknown' and chart_index % 2:
+            houses['Guru'] = 10
     houses['Ketu'] = (houses['Rahu'] + 5) % 12 + 1
     rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
     lagna_index = rashis.index(canonical_lagna)
@@ -872,6 +890,11 @@ def _run_muhurta_browser_search(
         }""",
         system,
     )
+    if activity == 'vidyarambha':
+        option = page.locator('#mu-activity option[value="vidyarambha"]')
+        assert option.text_content().strip() == (
+            'Aksharabhyasa (First-letter writing)'
+        )
     page.select_option('#mu-activity', activity)
     page.fill('#tb-from', MUHURTA_FIXTURE_DATE)
     page.fill('#tb-to', to_date)
@@ -2365,6 +2388,11 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
             assert 'assessment complete' not in status.inner_text()
             if scenario == 'malformed':
                 assert calls
+
+        if expected_state != 'screened':
+            status_text = status.inner_text()
+            assert 'event-specific clauses were computed' not in status_text
+            assert 'event-specific clauses computed' not in status_text
 
         details = result.locator('.mu-reason-details')
         if details.count():
