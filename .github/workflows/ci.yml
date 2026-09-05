@@ -48,8 +48,10 @@ jobs:
         # requires wheels for every other package and locks its build tooling.
         run: python tools/install_locked_dependencies.py --extra test
 
-      - name: Enforce Ruff debt baseline
-        run: uv run --no-sync python tools/check_ruff_baseline.py
+      - name: Enforce static-analysis debt baselines
+        run: |
+          uv run --no-sync python tools/check_ruff_baseline.py
+          uv run --no-sync python tools/check_complexity_baseline.py
 
       - name: Run tests
         run: uv run --no-sync python -m pytest tests/ -v --ignore=tests/test_browser_smoke.py

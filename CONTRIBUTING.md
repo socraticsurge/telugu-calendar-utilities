@@ -32,9 +32,9 @@ uv run python tools/verify_project.py
 ```
 
 The verifier checks the provenance ledger links, generated browser activity
-data, computation inventory and documentation freshness, the Ruff debt
-baseline, the full Python suite, frontend tests, typecheck, and production
-build. Every gate must pass before any change merges.
+data, computation inventory and documentation freshness, the Ruff lint and
+complexity debt baselines, the full Python suite, frontend tests, typecheck,
+and production build. Every gate must pass before any change merges.
 
 For any new or changed calculation, follow
 **[Add or change a computation safely](docs/reference/10-computation-contributor-workflow.md)**
@@ -51,7 +51,14 @@ Ruff currently uses a reviewed per-file, per-rule baseline in
 `tools/ruff_baseline.json`. New lint debt fails CI. If a change reduces existing
 debt, regenerate the baseline with
 `uv run python tools/check_ruff_baseline.py --update` and review that reduction in the
-same pull request. The optional local hooks use the same check:
+same pull request.
+
+Cyclomatic complexity is separately governed by the exact file, function and
+score inventory in `tools/complexity_baseline.json`. Increases, reductions,
+moves, renames, removals and new hotspots all require review and an intentional
+`uv run python tools/check_complexity_baseline.py --update`. This ratchet records
+the frozen-core hotspots; it does not authorize refactoring frozen code. The
+optional local hooks use the Ruff check:
 
 ```bash
 uv run pre-commit install
