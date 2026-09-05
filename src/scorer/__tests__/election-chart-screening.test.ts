@@ -2,10 +2,12 @@ import { describe, expect, test } from 'vitest';
 
 import goldOracle from '../../../tests/fixtures/election_chart_gold_oracle.json';
 import goldGatewayOracle from '../../../tests/fixtures/election_chart_gold_gateway_oracle.json';
+import annaprasanaOracle from '../../../tests/fixtures/election_chart_annaprasana_oracle.json';
 
 import type { ElectionChartSnapshot } from '../../lib/election-chart-api';
 import {
   automatedRulesFor,
+  chartAssessorCompleteFor,
   chartManualRemaindersFor,
   evaluateElectionChart,
   evaluateElectionSnapshots,
@@ -55,6 +57,22 @@ const GOLD_POSITIONS: Record<PlanetName, {
   Ketu: { rashi: 'Mesha', degree: 8, house: 1 },
 };
 
+const ANNAPRASANA_POSITIONS: Record<PlanetName, {
+  rashi: string;
+  degree: number;
+  house: number;
+}> = {
+  Surya: { rashi: 'Mithuna', degree: 10, house: 3 },
+  Chandra: { rashi: 'Karka', degree: 20, house: 4 },
+  Kuja: { rashi: 'Kanya', degree: 1, house: 6 },
+  Budha: { rashi: 'Mesha', degree: 5, house: 1 },
+  Guru: { rashi: 'Vrishabha', degree: 12, house: 2 },
+  Shukra: { rashi: 'Mithuna', degree: 21, house: 3 },
+  Shani: { rashi: 'Kumbha', degree: 17, house: 11 },
+  Rahu: { rashi: 'Simha', degree: 8, house: 5 },
+  Ketu: { rashi: 'Kumbha', degree: 8, house: 11 },
+};
+
 function goldChart(
   overrides: Partial<Record<PlanetName, PlanetOverride>> = {},
   instant = '2026-09-08T05:30:00.000Z',
@@ -71,6 +89,22 @@ function goldChart(
   };
 }
 
+function annaprasanaChart(
+  overrides: Partial<Record<PlanetName, PlanetOverride>> = {},
+  instant = '2026-09-08T05:30:00.000Z',
+): ElectionChartSnapshot {
+  return {
+    instant,
+    lagna: { rashi: 'Mesha', degree: 12.5 },
+    planets: PLANETS.map(name => ({
+      name,
+      ...ANNAPRASANA_POSITIONS[name],
+      retrograde: name === 'Rahu' || name === 'Ketu',
+      ...overrides[name],
+    })),
+  };
+}
+
 function outcome(
   result: ElectionChartScreening,
   ruleId: string,
@@ -81,6 +115,256 @@ function outcome(
 }
 
 describe('source-backed election-chart predicates', () => {
+  test('Annaprasana declares the six-rule Raman transcription assessor', () => {
+    const rules = automatedRulesFor('annaprasana');
+
+    expect(rules.map(rule => rule.id)).toEqual([
+      'annaprasana.house-10-vacant',
+      'annaprasana.budha-not-7',
+      'annaprasana.kuja-not-8',
+      'annaprasana.shukra-not-9',
+      'annaprasana.benefic-occupies-lagna',
+      'annaprasana.no-natural-malefic-in-lagna',
+    ]);
+    expect(rules.map(rule => rule.effect)).toEqual([
+      'reject', 'reject', 'reject', 'reject', 'prefer', 'reject',
+    ]);
+    expect(rules.every(rule => rule.source_claim
+      === 'muhurta.annaprasana.raman_transcription_chart')).toBe(true);
+    expect(rules.every(rule => rule.source_locator
+      === "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"))
+      .toBe(true);
+    expect(rules[4].decision_policy_claim).toBe(
+      'election_chart.annaprasana.raman_transcription_policy_v1');
+    expect(rules[4].convention_id).toBe(
+      'whole-sign-physical-occupation-v1');
+    expect(rules[5].convention_id).toBe(
+      'annaprasana-natural-malefic-lagna-v1');
+    expect(new Set(rules[5].method_claims)).toEqual(new Set([
+      'election_chart.natural_malefics.bphs_3_11_modern_witness',
+      'election_chart.whole_sign_house_policy_v1',
+      'election_chart.mean_node_policy_v1',
+      'election_chart.budha_same_sign_association_policy_v1',
+      'election_chart.raman_180_degree_paksha_policy_v1',
+      'election_chart.lunar_phase_boundary_guard_policy_v1',
+      'election_chart.annaprasana_fail_closed_aggregation_policy_v1',
+    ]));
+    expect(chartManualRemaindersFor('annaprasana')).toEqual([]);
+    expect(chartAssessorCompleteFor('annaprasana')).toBe(true);
+    expect(chartAssessorCompleteFor('gold')).toBe(true);
+    expect(chartAssessorCompleteFor('pilgrimage')).toBe(false);
+  });
+
+  test.each(annaprasanaOracle.cases)(
+    'shared Python/TypeScript Annaprasana oracle: $id',
+    testCase => {
+      const result = evaluateElectionChart(
+        'annaprasana',
+        annaprasanaChart(
+          testCase.overrides as Partial<Record<PlanetName, PlanetOverride>>,
+        ),
+      );
+
+      expect(result.outcomes.map(item => item.status)).toEqual(
+        testCase.expected_statuses,
+      );
+      expect(result.rejected).toBe(testCase.rejected);
+      expect(result.preferencePasses).toBe(testCase.preference_passes);
+      expect(result.needsReview).toBe(testCase.needs_review);
+    },
+  );
+
+  test.each(annaprasanaOracle.geographic_cases)(
+    'multi-city live-projection Annaprasana golden case: $id',
+    testCase => {
+      const result = evaluateElectionChart(
+        'annaprasana', testCase.chart as ElectionChartSnapshot,
+      );
+
+      expect(result.outcomes.map(item => item.status)).toEqual(
+        testCase.expected_statuses,
+      );
+      expect(result.rejected).toBe(testCase.rejected);
+      expect(result.preferencePasses).toBe(testCase.preference_passes);
+      expect(result.needsReview).toBe(testCase.needs_review);
+
+      const rashis = [
+        'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+        'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena',
+      ];
+      const lagnaIndex = rashis.indexOf(testCase.chart.lagna.rashi);
+      expect(testCase.chart.planets.every(planet => planet.house === (
+        (rashis.indexOf(planet.rashi) - lagnaIndex + 12) % 12
+      ) + 1)).toBe(true);
+    },
+  );
+
+  test('Annaprasana geographic goldens span Hyderabad, Sydney and two dates', () => {
+    expect(new Set(
+      annaprasanaOracle.geographic_cases.map(testCase => testCase.city),
+    )).toEqual(new Set(['Hyderabad', 'Sydney']));
+    expect(new Set(
+      annaprasanaOracle.geographic_cases.map(
+        testCase => testCase.chart.instant.slice(0, 10),
+      ),
+    ).size).toBe(2);
+    expect(annaprasanaOracle.geographic_source).toEqual({
+      service: 'DashaFlow sidecar /calculate',
+      engine: 'DashaFlow 1.1.0',
+      ayanamsha: 'Lahiri',
+      ephemeris: 'moshier',
+      retrieved_on: '2026-08-30',
+      projection_note: 'Planet Rashis and degrees come from the live sidecar. Houses are the returned Whole Sign projection and are re-evaluated by the assessor; no birth-profile data is involved.',
+    });
+  });
+
+  test('Annaprasana reports observed facts for each predicate shape', () => {
+    const result = evaluateElectionChart('annaprasana', annaprasanaChart());
+
+    expect(outcome(result, 'annaprasana.house-10-vacant').evidence).toEqual([
+      'House 10 occupants: none.',
+    ]);
+    expect(outcome(result, 'annaprasana.budha-not-7').evidence).toEqual([
+      'Budha occupies house 1, outside house 7.',
+    ]);
+    expect(outcome(result, 'annaprasana.benefic-occupies-lagna').evidence).toEqual([
+      'Lagna occupants among Budha, Guru and Shukra: Budha.',
+    ]);
+    expect(outcome(result, 'annaprasana.no-natural-malefic-in-lagna').evidence).toEqual([
+      'Natural malefics in Lagna: none; Chandra is outside Lagna.',
+    ]);
+  });
+
+  test('Annaprasana waxing and waning Chandra follow the disclosed split', () => {
+    const waning = evaluateElectionChart('annaprasana', annaprasanaChart({
+      Chandra: { rashi: 'Mesha', degree: 5, house: 1 },
+    }));
+    const waxing = evaluateElectionChart('annaprasana', annaprasanaChart({
+      Surya: { rashi: 'Meena', degree: 10, house: 12 },
+      Chandra: { rashi: 'Mesha', degree: 20, house: 1 },
+    }));
+
+    expect(outcome(waning,
+      'annaprasana.no-natural-malefic-in-lagna').status).toBe('fail');
+    expect(outcome(waning,
+      'annaprasana.no-natural-malefic-in-lagna').evidence.join(' '))
+      .toContain('waning Chandra');
+    expect(waning.rejected).toBe(true);
+    expect(outcome(waxing,
+      'annaprasana.no-natural-malefic-in-lagna').status).toBe('pass');
+    expect(outcome(waxing,
+      'annaprasana.no-natural-malefic-in-lagna').evidence.join(' '))
+      .toContain('waxing Chandra');
+    expect(waxing.rejected).toBe(false);
+  });
+
+  test.each([0, 0.02, 179.98, 180, 180.02])(
+    'Annaprasana phase guard includes the %.2f degree boundary cell',
+    elongation => {
+      const chandra = elongation < 20
+        ? { rashi: 'Tula', degree: 10 + elongation, house: 1 }
+        : { rashi: 'Mesha', degree: elongation - 170, house: 1 };
+      const result = evaluateElectionChart('annaprasana', annaprasanaChart({
+        Surya: { rashi: 'Tula', degree: 10, house: 7 },
+        Chandra: chandra,
+      }));
+
+      expect(outcome(result,
+        'annaprasana.no-natural-malefic-in-lagna').status).toBe('unknown');
+      expect(result.needsReview).toBe(true);
+    },
+  );
+
+  test('Annaprasana fixed malefic failure dominates phase unknown', () => {
+    const result = evaluateElectionChart('annaprasana', annaprasanaChart({
+      Surya: { rashi: 'Mesha', degree: 10, house: 1 },
+      Chandra: { rashi: 'Mesha', degree: 10, house: 1 },
+    }));
+
+    expect(outcome(result,
+      'annaprasana.no-natural-malefic-in-lagna')).toEqual(
+      expect.objectContaining({
+        status: 'fail',
+        evidence: ['Natural malefics in Lagna: Surya.'],
+      }),
+    );
+    expect(result).toEqual(expect.objectContaining({
+      rejected: true,
+      needsReview: false,
+    }));
+  });
+
+  test('Annaprasana window aggregation is effect-aware and fail-closed', () => {
+    const preferenceMixed = evaluateElectionSnapshots('annaprasana', [
+      annaprasanaChart(),
+      annaprasanaChart(
+        { Budha: { rashi: 'Vrishabha', house: 2 } },
+        '2026-09-08T05:40:00.000Z',
+      ),
+    ]);
+    const mandatoryFailAndUnknown = evaluateElectionSnapshots('annaprasana', [
+      annaprasanaChart({
+        Surya: { rashi: 'Mesha', degree: 10, house: 1 },
+      }),
+      annaprasanaChart({
+        Surya: { rashi: 'Tula', degree: 10, house: 7 },
+        Chandra: { rashi: 'Mesha', degree: 10, house: 1 },
+      }, '2026-09-08T05:40:00.000Z'),
+    ]);
+
+    expect(outcome(preferenceMixed,
+      'annaprasana.benefic-occupies-lagna').status).toBe('unknown');
+    expect(preferenceMixed.needsReview).toBe(true);
+    expect(outcome(mandatoryFailAndUnknown,
+      'annaprasana.no-natural-malefic-in-lagna').status).toBe('fail');
+    expect(mandatoryFailAndUnknown.rejected).toBe(true);
+  });
+
+  test('Annaprasana absent commendation is a preference miss only', () => {
+    const result = evaluateElectionChart('annaprasana', annaprasanaChart({
+      Budha: { rashi: 'Vrishabha', house: 2 },
+    }));
+
+    expect(outcome(result,
+      'annaprasana.benefic-occupies-lagna').status).toBe('fail');
+    expect(result).toEqual(expect.objectContaining({
+      preferencePasses: 0,
+      rejected: false,
+      needsReview: false,
+    }));
+  });
+
+  test('Annaprasana incomplete and uncertain frames fail closed', () => {
+    const incomplete = annaprasanaChart();
+    incomplete.planets.pop();
+    const missing = evaluateElectionChart('annaprasana', incomplete);
+    const uncertain = evaluateElectionChart('annaprasana', annaprasanaChart(), {
+      houseFrameUncertain: true,
+    });
+
+    expect(missing.outcomes.every(item => item.status === 'unknown')).toBe(true);
+    expect(uncertain.outcomes.every(item => item.status === 'unknown')).toBe(true);
+  });
+
+  test.each([
+    true as unknown as number,
+    false as unknown as number,
+    0,
+    13,
+    7.5,
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+  ])('Annaprasana invalid house value %s fails closed', invalidHouse => {
+    const chart = annaprasanaChart();
+    chart.planets[0].house = invalidHouse;
+
+    const result = evaluateElectionChart('annaprasana', chart);
+
+    expect(result.outcomes.every(item => item.status === 'unknown')).toBe(true);
+    expect(result.rejected).toBe(false);
+    expect(result.needsReview).toBe(true);
+  });
+
   test('Gold declares four qualification rules and no chart remainder', () => {
     const rules = automatedRulesFor('gold');
     expect(rules.map(rule => rule.id)).toEqual([

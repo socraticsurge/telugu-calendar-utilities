@@ -221,16 +221,18 @@ describe('bounded election-chart enrichment', () => {
     });
     expect(result.state).toBe('not-run');
     expect(result.screenedCount).toBe(0);
+    expect(result.chartRemovedRules).toEqual([]);
     expect(derive).not.toHaveBeenCalled();
   });
 
   test('does not call the service when an activity has no deterministic rules', async () => {
     const derive = vi.fn();
     const result = await enrichElectionChartSlots(slots(12), {
-      activity: 'karnavedha', system: 'drik', location: LOCATION, derive,
+      activity: 'vehicle', system: 'drik', location: LOCATION, derive,
     });
     expect(result.state).toBe('manual-only');
     expect(result.slots).toHaveLength(10);
+    expect(result.chartRemovedRules).toEqual([]);
     expect(derive).not.toHaveBeenCalled();
   });
 
@@ -513,6 +515,14 @@ describe('bounded election-chart enrichment', () => {
     expect(result.qualificationCappedCount).toBe(0);
     expect(result.reviewGatedCount).toBe(0);
     expect(result.overlappingDispositionCount).toBe(0);
+    expect(result.chartRemovedRules).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'wedding.kuja-not-8',
+        label: 'Mangala (Kuja) is outside the 8th house',
+        count: 3,
+        evidence: ['Kuja occupies house 8, which is prohibited.'],
+      }),
+    ]));
     expect(result.message).toMatch(/stopped early/i);
   });
 
@@ -532,6 +542,14 @@ describe('bounded election-chart enrichment', () => {
     expect(derive.mock.calls[0][0].instants).toHaveLength(5);
     expect(result.slots).toEqual([]);
     expect(result.chartRemovedCount).toBe(1);
+    expect(result.chartRemovedRules).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'wedding.kuja-not-8',
+        label: 'Mangala (Kuja) is outside the 8th house',
+        count: 1,
+        evidence: ['Kuja occupies house 8, which is prohibited.'],
+      }),
+    ]));
   });
 
   test('fails the whole enrichment closed when a sample lacks canonical Lagna evidence', async () => {

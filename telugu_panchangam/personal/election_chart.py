@@ -12,6 +12,7 @@ from .election_assessors.primitives import (
     GOLD_MAX_SAMPLE_GAP_MINUTES,
     PrimitiveOutcome,
     evaluate_full_aspect,
+    evaluate_house_free_of_natural_malefics,
     evaluate_well_situated,
     gold_transition_uncertainty,
 )
@@ -31,19 +32,62 @@ def _evaluate_rule(
             rule, positions, house_frame_uncertain=house_frame_uncertain)
     if kind == 'planet_receives_full_aspect':
         return evaluate_full_aspect(rule, positions)
+    if kind == 'house_free_of_natural_malefics':
+        return evaluate_house_free_of_natural_malefics(
+            rule, positions, house_frame_uncertain=house_frame_uncertain)
     if houses is None or house_frame_uncertain:
-        return PrimitiveOutcome('unknown')
+        return PrimitiveOutcome(
+            'unknown', ('Complete Whole Sign house facts are unavailable.',))
     if kind == 'house_empty':
-        passed = rule['house'] not in houses.values()
+        occupants = [
+            name for name, house in houses.items() if house == rule['house']]
+        passed = not occupants
+        evidence = (
+            f'House {rule["house"]} occupants: '
+            f'{", ".join(occupants) if occupants else "none"}.',
+        )
     elif kind == 'planet_not_house':
-        passed = houses.get(rule['planet']) != rule['house']
+        observed = houses[rule['planet']]
+        passed = observed != rule['house']
+        evidence = (
+            f'{rule["planet"]} occupies house {observed}'
+            + (
+                f', outside house {rule["house"]}.'
+                if passed else ', which is prohibited.'
+            ),
+        )
     elif kind == 'planet_in_houses':
-        passed = houses.get(rule['planet']) in rule['houses']
+        observed = houses[rule['planet']]
+        passed = observed in rule['houses']
+        evidence = (
+            f'{rule["planet"]} occupies house {observed}; target houses: '
+            f'{", ".join(str(house) for house in rule["houses"])}.',
+        )
     elif kind == 'any_planet_in_houses':
-        passed = any(houses.get(planet) in rule['houses'] for planet in rule['planets'])
+        matching = [
+            planet for planet in rule['planets']
+            if houses[planet] in rule['houses']
+        ]
+        passed = bool(matching)
+        if rule['houses'] == [1]:
+            named = (
+                f'{", ".join(rule["planets"][:-1])} and '
+                f'{rule["planets"][-1]}'
+            )
+            evidence = (
+                f'Lagna occupants among {named}: '
+                f'{", ".join(matching) if matching else "none"}.',
+            )
+        else:
+            evidence = (
+                f'Matching grahas: '
+                f'{", ".join(matching) if matching else "none"}; '
+                f'target houses: '
+                f'{", ".join(str(house) for house in rule["houses"])}.',
+            )
     else:
         return PrimitiveOutcome('unknown')
-    return PrimitiveOutcome('pass' if passed else 'fail')
+    return PrimitiveOutcome('pass' if passed else 'fail', evidence)
 
 
 def _outcome(rule: Mapping[str, Any], result: PrimitiveOutcome) -> dict:

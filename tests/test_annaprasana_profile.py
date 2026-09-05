@@ -66,6 +66,14 @@ def test_mcp_and_browser_publish_same_annaprasana_profile():
         '2026-02-06', days=1, activity='annaprasana', city='Hyderabad'))
     profile = result['activity_profile']
     assert profile['source_claim'] == 'muhurta.annaprasana'
+    assert profile['source_scope'] == {
+        'panchangam_profile': 'python_and_mcp',
+        'exact_election_chart_assessor': 'drik_browser_only',
+        'event_chart_policy': (
+            'election_chart.annaprasana.'
+            'raman_transcription_policy_v1'),
+        'general_election_chart_baseline': 'open_issue_284',
+    }
 
     browser = json.loads(
         (ROOT / 'src/data/activity-rules.generated.json').read_text(encoding='utf-8'))

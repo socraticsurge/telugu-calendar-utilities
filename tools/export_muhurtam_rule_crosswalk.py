@@ -252,6 +252,9 @@ MANUAL_SUPPORTING_CLAIMS: Mapping[str, tuple[str, ...]] = {
 # election-chart predicates in the supported browser path.
 AUTOMATED_CHART_FALLBACK_MANUAL_IDS = frozenset({
     'gold.manual-1',
+    'annaprasana.manual-2',
+    'annaprasana.manual-3',
+    'annaprasana.manual-4',
 })
 
 PRODUCT_POLICY_MANUAL_IDS = frozenset({
@@ -996,8 +999,11 @@ def build_crosswalk(
                     if fallback_only else _manual_rationale(manual)
                 ),
                 implementation_note=(
-                    'Not displayed as a residual manual Gold check after a '
-                    'successful exact-chart screen.'
+                    'Not displayed as a residual manual Annaprasana chart '
+                    'check after a successful exact-chart screen.'
+                    if fallback_only and activity == 'annaprasana'
+                    else 'Not displayed as a residual manual Gold check '
+                    'after a successful exact-chart screen.'
                     if fallback_only else None
                 ),
                 applicability=(

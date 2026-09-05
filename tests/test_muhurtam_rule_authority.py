@@ -113,6 +113,12 @@ def test_numeric_and_tier_policy_is_separate_from_predicate_authority():
             expected_policy = (
                 'election_chart.gold_qualification_policy_v1'
                 if row['ranking_effect'] == 'post_screen_tier_cap'
+                else (
+                    'election_chart.annaprasana.'
+                    'raman_transcription_policy_v1'
+                )
+                if row['rule_id'] == (
+                    'annaprasana.benefic-occupies-lagna')
                 else 'muhurta.scoring_policy'
             )
             assert row['decision_policy_claim_id'] == expected_policy
