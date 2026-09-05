@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "pass",
+      "overrides": {},
+      "expected_statuses": ["pass", "pass", "pass", "pass", "pass", "pass"],
+      "rejected": false,
+      "preference_passes": 1,
+      "needs_review": false
+    },
+    {
+      "id": "preference-miss",
+      "overrides": {"Budha": {"rashi": "Vrishabha", "house": 2}},
+      "expected_statuses": ["pass", "pass", "pass", "pass", "fail", "pass"],
+      "rejected": false,
+      "preference_passes": 0,
+      "needs_review": false
+    },
+    {
+      "id": "house-10-hard-fail",
+      "overrides": {"Guru": {"rashi": "Makara", "house": 10}},
+      "expected_statuses": ["fail", "pass", "pass", "pass", "pass", "pass"],
+      "rejected": true,
+      "preference_passes": 1,
+      "needs_review": false
+    },
+    {
+      "id": "budha-7-hard-fail",
+      "overrides": {"Budha": {"rashi": "Tula", "house": 7}},
+      "expected_statuses": ["pass", "fail", "pass", "pass", "fail", "pass"],
+      "rejected": true,
+      "preference_passes": 0,
+      "needs_review": false
+    },
+    {
+      "id": "kuja-8-hard-fail",
+      "overrides": {"Kuja": {"rashi": "Vrischika", "house": 8}},
+      "expected_statuses": ["pass", "pass", "fail", "pass", "pass", "pass"],
+      "rejected": true,
+      "preference_passes": 1,
+      "needs_review": false
+    },
+    {
+      "id": "shukra-9-hard-fail",
+      "overrides": {"Shukra": {"rashi": "Dhanu", "house": 9}},
+      "expected_statuses": ["pass", "pass", "pass", "fail", "pass", "pass"],
+      "rejected": true,
+      "preference_passes": 1,
+      "needs_review": false
+    },
+    {
+      "id": "surya-lagna-hard-fail",
+      "overrides": {"Surya": {"rashi": "Mesha", "house": 1}},
+      "expected_statuses": ["pass", "pass", "pass", "pass", "pass", "fail"],
+      "rejected": true,
+      "preference_passes": 1,
+      "needs_review": false
+    },
+    {
+      "id": "waning-chandra-lagna-hard-fail",
+      "overrides": {"Chandra": {"rashi": "Mesha", "degree": 5.0, "house": 1}},
+      "expected_statuses": ["pass", "pass", "pass", "pass", "pass", "fail"],
+      "rejected": true,
+      "preference_passes": 1,
+      "needs_review": false
+    },
+    {
+      "id": "waxing-chandra-lagna-pass",
+      "overrides": {
+        "Surya": {"rashi": "Meena", "degree": 10.0, "house": 12},
+        "Chandra": {"rashi": "Mesha", "degree": 20.0, "house": 1}
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass", "pass", "pass"],
+      "rejected": false,
+      "preference_passes": 1,
+      "needs_review": false
+    },
+    {
+      "id": "full-moon-boundary-unknown",
+      "overrides": {
+        "Surya": {"rashi": "Tula", "degree": 10.0, "house": 7},
+        "Chandra": {"rashi": "Mesha", "degree": 10.0, "house": 1}
+      },
+      "expected_statuses": ["pass", "pass", "pass", "pass", "pass", "unknown"],
+      "rejected": false,
+      "preference_passes": 1,
+      "needs_review": true
+    }
+  ],
+  "geographic_source": {
+    "service": "DashaFlow sidecar /calculate",
+    "engine": "DashaFlow 1.1.0",
+    "ayanamsha": "Lahiri",
+    "ephemeris": "moshier",
+    "retrieved_on": "2026-08-30",
+    "projection_note": "Planet Rashis and degrees come from the live sidecar. Houses are the returned Whole Sign projection and are re-evaluated by the assessor; no birth-profile data is involved."
+  },
+  "geographic_cases": [
+    {
+      "id": "hyderabad-2026-01-15-0930",
+      "city": "Hyderabad",
+      "location": {
+        "latitude": 17.385,
+        "longitude": 78.4867,
+        "timezone": "Asia/Kolkata"
+      },
+      "chart": {
+        "instant": "2026-01-15T04:00:00.000Z",
+        "lagna": {
+          "rashi": "Kumbha",
+          "degree": 14.69
+        },
+        "planets": [
+          {
+            "name": "Surya",
+            "rashi": "Makara",
+            "degree": 0.78,
+            "house": 12,
+            "retrograde": false
+          },
+          {
+            "name": "Chandra",
+            "rashi": "Vrischika",
+            "degree": 19.86,
+            "house": 10,
+            "retrograde": false
+          },
+          {
+            "name": "Kuja",
+            "rashi": "Dhanu",
+            "degree": 29.39,
+            "house": 11,
+            "retrograde": false
+          },
+          {
+            "name": "Budha",
+            "rashi": "Dhanu",
+            "degree": 26.68,
+            "house": 11,
+            "retrograde": false
+          },
+          {
+            "name": "Guru",
+            "rashi": "Mithuna",
+            "degree": 25.24,
+            "house": 5,
+            "retrograde": true
+          },
+          {
+            "name": "Shukra",
+            "rashi": "Makara",
+            "degree": 2.81,
+            "house": 12,
+            "retrograde": false
+          },
+          {
+            "name": "Shani",
+            "rashi": "Meena",
+            "degree": 2.92,
+            "house": 2,
+            "retrograde": false
+          },
+          {
+            "name": "Rahu",
+            "rashi": "Kumbha",
+            "degree": 17.2,
+            "house": 1,
+            "retrograde": true
+          },
+          {
+            "name": "Ketu",
+            "rashi": "Simha",
+            "degree": 17.2,
+            "house": 7,
+            "retrograde": true
+          }
+        ]
+      },
+      "expected_statuses": [
+        "fail",
+        "pass",
+        "pass",
+        "pass",
+        "fail",
+        "fail"
+      ],
+      "rejected": true,
+      "preference_passes": 0,
+      "needs_review": false
+    },
+    {
+      "id": "sydney-2026-05-28-1400",
+      "city": "Sydney",
+      "location": {
+        "latitude": -33.8688,
+        "longitude": 151.2093,
+        "timezone": "Australia/Sydney"
+      },
+      "chart": {
+        "instant": "2026-05-28T04:00:00.000Z",
+        "lagna": {
+          "rashi": "Kanya",
+          "degree": 16.38
+        },
+        "planets": [
+          {
+            "name": "Surya",
+            "rashi": "Vrishabha",
+            "degree": 12.63,
+            "house": 9,
+            "retrograde": false
+          },
+          {
+            "name": "Chandra",
+            "rashi": "Tula",
+            "degree": 7.35,
+            "house": 2,
+            "retrograde": false
+          },
+          {
+            "name": "Kuja",
+            "rashi": "Mesha",
+            "degree": 12.68,
+            "house": 8,
+            "retrograde": false
+          },
+          {
+            "name": "Budha",
+            "rashi": "Vrishabha",
+            "degree": 28.0,
+            "house": 9,
+            "retrograde": false
+          },
+          {
+            "name": "Guru",
+            "rashi": "Mithuna",
+            "degree": 29.13,
+            "house": 10,
+            "retrograde": false
+          },
+          {
+            "name": "Shukra",
+            "rashi": "Mithuna",
+            "degree": 16.63,
+            "house": 10,
+            "retrograde": false
+          },
+          {
+            "name": "Shani",
+            "rashi": "Meena",
+            "degree": 17.68,
+            "house": 7,
+            "retrograde": false
+          },
+          {
+            "name": "Rahu",
+            "rashi": "Kumbha",
+            "degree": 10.15,
+            "house": 6,
+            "retrograde": true
+          },
+          {
+            "name": "Ketu",
+            "rashi": "Simha",
+            "degree": 10.15,
+            "house": 12,
+            "retrograde": true
+          }
+        ]
+      },
+      "expected_statuses": [
+        "fail",
+        "pass",
+        "fail",
+        "pass",
+        "fail",
+        "pass"
+      ],
+      "rejected": true,
+      "preference_passes": 0,
+      "needs_review": false
+    }
+  ]
+}

@@ -1078,9 +1078,20 @@ def tool_find_muhurta(
             'avoid_nitya_yogas',
             'require_homa_election',
         )
+        resolved_activity = ACTIVITY_ALIASES.get(activity, activity)
+        source_scope = None
+        if resolved_activity == 'annaprasana':
+            source_scope = {
+                'panchangam_profile': 'python_and_mcp',
+                'exact_election_chart_assessor': 'drik_browser_only',
+                'event_chart_policy': (
+                    'election_chart.annaprasana.'
+                    'raman_transcription_policy_v1'),
+                'general_election_chart_baseline': 'open_issue_284',
+            }
         return json.dumps({
             'start_date': start_date, 'days': days, 'activity': activity,
-            'resolved_activity': ACTIVITY_ALIASES.get(activity, activity),
+            'resolved_activity': resolved_activity,
             'city': city, 'system': system, 'chandra_mode': chandra_mode,
             'ayanamsa': ayanamsa,
             'slots': slots[:12],
@@ -1093,6 +1104,7 @@ def tool_find_muhurta(
                 'related_claims': rules.get('related_claims', []),
                 'manual_prerequisites': rules.get(
                     'manual_prerequisites', False),
+                **({'source_scope': source_scope} if source_scope else {}),
                 'automated_constraints': {
                     field: rules[field]
                     for field in constraint_fields if field in rules

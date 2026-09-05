@@ -64,7 +64,7 @@ def test_research_inventory_is_explicitly_a_dated_pre_gold_baseline():
         not in research
 
 
-def test_current_reference_pages_publish_the_27_rule_gold_contract():
+def test_current_reference_pages_publish_the_29_rule_gold_and_annaprasana_contract():
     features = ' '.join(
         _read('docs/reference/04-user-facing-features.md').split()
     )
@@ -72,15 +72,20 @@ def test_current_reference_pages_publish_the_27_rule_gold_contract():
         _read('docs/reference/05-data-flow-and-muhurta.md').split()
     )
 
-    assert 'one of 27 deterministic chart predicates' in features
+    assert 'one of 29 deterministic chart predicates' in features
+    assert 'one of 27 deterministic chart predicates' not in features
     assert 'one of 23 deterministic chart predicates' not in features
     assert '13 source-backed activity profiles' in flow
-    assert 'complete 27-rule matrix' in flow
+    assert 'complete 29-rule matrix' in flow
+    assert 'complete 27-rule matrix' not in flow
     assert 'complete 23-rule matrix' not in flow
     for document in (features, flow):
         assert 'Gold / jewelry purchase' in document
         assert '`qualify`' in document
         assert 'general election-chart baseline' in document
+    assert 'Annaprasana' in features
+    assert 'five mandatory prohibitions' in features
+    assert 'tie-break evidence only' in features
 
 
 def test_gold_docs_distinguish_synthetic_and_actual_gateway_evidence():

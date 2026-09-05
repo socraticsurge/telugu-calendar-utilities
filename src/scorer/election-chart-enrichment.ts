@@ -56,6 +56,12 @@ export interface ElectionChartEnrichment<TSlot extends EnrichableMuhurtamSlot> {
   removedCount: number;
   candidateLimitReached: boolean;
   chartRemovedCount: number;
+  chartRemovedRules: Array<{
+    ruleId: string;
+    label: string;
+    count: number;
+    evidence: string[];
+  }>;
   personalRemovedCount: number;
   personalRemovedRules: Array<{ ruleId: string; label: string; count: number }>;
   boundaryReviewCount: number;
@@ -210,6 +216,7 @@ function baseResult<TSlot extends EnrichableMuhurtamSlot>(
     removedCount: 0,
     candidateLimitReached: false,
     chartRemovedCount: 0,
+    chartRemovedRules: [],
     personalRemovedCount: 0,
     personalRemovedRules: [],
     boundaryReviewCount: 0,
@@ -340,6 +347,12 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
   let qualificationCappedCount = 0;
   let reviewGatedCount = 0;
   let overlappingDispositionCount = 0;
+  const chartRemovedRules = new Map<string, {
+    ruleId: string;
+    label: string;
+    count: number;
+    evidence: string[];
+  }>();
   const personalRemovedRules = new Map<string, { ruleId: string; label: string; count: number }>();
   let engine: ElectionChartDerivation['engine'] | null = null;
   let requestCount = 0;
@@ -432,6 +445,22 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
         if (screening.rejected) {
           removedCount += 1;
           chartRemovedCount += 1;
+          for (const outcome of screening.outcomes) {
+            if (outcome.effect !== 'reject' || outcome.status !== 'fail') continue;
+            const item = chartRemovedRules.get(outcome.ruleId) || {
+              ruleId: outcome.ruleId,
+              label: outcome.label,
+              count: 0,
+              evidence: [],
+            };
+            item.count += 1;
+            for (const observed of outcome.evidence || []) {
+              if (!item.evidence.includes(observed) && item.evidence.length < 3) {
+                item.evidence.push(observed);
+              }
+            }
+            chartRemovedRules.set(outcome.ruleId, item);
+          }
           continue;
         }
         const slot = {
@@ -493,6 +522,7 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
         removedCount,
         candidateLimitReached: processed < baseSlots.length,
         chartRemovedCount,
+        chartRemovedRules: [...chartRemovedRules.values()],
         personalRemovedCount,
         personalRemovedRules: [...personalRemovedRules.values()],
         boundaryReviewCount,
@@ -542,6 +572,7 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
     removedCount,
     candidateLimitReached,
     chartRemovedCount,
+    chartRemovedRules: [...chartRemovedRules.values()],
     personalRemovedCount,
     personalRemovedRules: [...personalRemovedRules.values()],
     boundaryReviewCount,

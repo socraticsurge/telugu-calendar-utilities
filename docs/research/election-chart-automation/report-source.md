@@ -4,8 +4,11 @@ Status: active program record
 
 Parent epic: [#248](https://github.com/socraticsurge/telugu-calendar-utilities/issues/248)
 
-First event story: [#255](https://github.com/socraticsurge/telugu-calendar-utilities/issues/255)
-Branch: `codex/gold-assessor-release-20260904`
+Implemented event stories: [#255](https://github.com/socraticsurge/telugu-calendar-utilities/issues/255)
+(Gold) and [#256](https://github.com/socraticsurge/telugu-calendar-utilities/issues/256)
+(Annaprasana)
+
+Current review branch: `codex/annaprasana-assessor-release-20260904`
 
 ## Research question
 
@@ -251,10 +254,100 @@ The canonical test matrix must prove:
 - Python and TypeScript produce the same status, effect, evidence, and
   convention metadata for the golden fixtures.
 
+## Annaprasana v1 evidence record
+
+### Controlling artifact and exact locator
+
+Story #256 implements `annaprasana-raman-transcription-v1`. Its source is the
+78-physical-page Chistabo re-edited public transcription of B. V. Raman's
+*Muhurta*. Physical PDF page 3 discloses re-editing, bracketed additions and
+omission of the appendix; it does not supply the UBS 1993 edition's bibliographic
+identity. This record therefore uses source ID
+`BVR-MUHURTHA-CHISTABO-2020` alongside the distinct UBS bibliographic ID.
+
+All six event-chart clauses are in Chapter VIII, “First feeding on rice
+(Annaprasana),” **internal printed page 22 / physical PDF page 25**:
+vacant 10th; Budha outside 7th; Mangala outside 8th; Shukra outside 9th; the
+commendation of Budha, Guru or Shukra in Lagna; and no malefic in Lagna. The
+last two are not wording from the preceding Namakarana section, and the
+implementation does not import Namakarana's Lagna-strength instruction.
+
+### Independent witnesses and disagreement
+
+| ID | Exact locator | Evidentiary role |
+|---|---|---|
+| `BVR-MUHURTHA-1993`; `BVR-MUHURTHA-CHISTABO-2020` | B. V. Raman, Chapter VIII, inspected in the 2020 Chistabo derivative at internal printed p. 22 / physical PDF p. 25 | The UBS ID preserves the bibliographic work identity; the inspected derivative supplies the located wording for the six-clause named policy. |
+| `KALAPRAKASIKA-IYER-1917-AES-1982` | N. P. Subramania Iyer, *Kalaprakasika*, Chapter III, “To Feed on Rice,” printed p. 34 / public PDF p. 66, OCR lines 3305–3317 | Keeps the clean 10th and Mangala outside 8th, but requires Shukra outside 7th and Budha outside 9th—the reverse of Raman's two assignments. |
+| `MC-NSP-1945-5E` | Rama Daivajna, *Muhurta Chintamani* with Piyushadhara commentary, Nirnaya Sagar Press, fifth edition, 1945; verse 18 printed p. 178 / scan p. 194; commentary printed p. 180 / scan pp. 196–197 | The verse places Chandra outside 1/6/8. The commentary more narrowly treats weak or waning Chandra in Lagna as adverse and treats full Chandra in Lagna as favorable. |
+| `BPHS-ELS-3.11-MODERN-WITNESS` | *Brihat Parashara Hora Shastra*, Chapter 3 verse 11, Enjoy Learning Sanskrit web rendering | Modern, non-critical text witness for the natural-malefic enumeration and Budha's association condition. |
+
+The source state is not “corroborated”: Iyer's assignments materially conflict,
+and Chintamani's Moon scheme is distinct. V1 names Raman as the controlling
+policy and does not union or average these witnesses. A source-selectable
+lineage would require a separate complete policy and oracle.
+
+### Formula and policy ledger
+
+| Clause | Computation | Product effect |
+|---|---|---|
+| Vacant 10th | Every one of the nine projected grahas has `H(p) != 10` | Mandatory rejection; any sampled failure removes. |
+| Three exclusions | `H(Budha) != 7`; `H(Kuja) != 8`; `H(Shukra) != 9` | Three independent mandatory rejections. |
+| Named Lagna benefic | Any of Budha, Guru or Shukra has `H(p) = 1` | Preference only; a miss has no penalty, score change or cap. |
+| No natural malefic in Lagna | No Surya, Kuja, Shani, mean Rahu, mean Ketu or waning Chandra has `H(p) = 1` | Mandatory rejection. |
+
+For zero-based Rasi indexes:
+
+```text
+H(p) = 1 + ((RasiIndex(p) - RasiIndex(local Lagna) + 12) mod 12)
+
+E = (longitude(Chandra) - longitude(Surya)) mod 360
+waxing  = 0 < E < 180
+waning  = 180 < E < 360
+unknown = distance(E, {0, 180, 360}) <= 0.02 degrees
+```
+
+Raman Chapter II, internal printed page 4 / physical PDF page 7, supplies the below-180
+waxing and above-180 waning description. Whole Sign projection, mean nodes,
+same-sign-only Budha association, ecliptic-longitude arithmetic, the ±0.02°
+guard and fail-closed aggregation are individually registered product
+conventions. The BPHS web page is a supporting modern witness, not authority
+for those engineering choices.
+
+Mandatory sample aggregation is `any fail`, else `any unknown`, else `pass`.
+The preference passes only when every sample passes, fails only when all fail,
+and otherwise is unknown. A fixed natural-malefic failure controls even if
+Chandra's phase is simultaneously unknown. Missing or malformed facts remain
+unknown rather than being inferred.
+
+### Completion and fallback boundary
+
+A successful, unbounded Drik browser screen has an empty Annaprasana clause
+remainder and may say only “Annaprasana event-specific chart assessment
+complete.” Every such result also states that the general election-chart
+baseline in issue #284 remains open. Non-Drik, unavailable, bounded,
+Python/MCP and unresolved paths cannot make that completion claim. Python/MCP
+publishes `exact_election_chart_assessor = drik_browser_only` and retains the
+original broad chart-guidance rows as fallback disclosure.
+
+The shared oracle at
+`tests/fixtures/election_chart_annaprasana_oracle.json` combines synthetic
+clause-isolation cases with frozen DashaFlow 1.1.0/Lahiri geographic
+projections for Hyderabad on 2026-01-15 and Sydney on 2026-05-28, retrieved on
+2026-08-30. Python and TypeScript reproduce the recorded six-rule outcomes and
+independently recompute every Whole Sign house from each returned Rasi and the
+recorded local Lagna. The synthetic cases cover complete pass, preference
+miss, every original hard exclusion, fixed natural-malefic failure, waxing and
+waning Chandra, and the full-Moon boundary; the language suites additionally
+test incomplete facts, Whole Sign frame uncertainty, observed evidence,
+fail-over-unknown precedence and effect-aware window aggregation. The built
+browser matrix and nine-frame screenshot run cover pass, preference miss,
+hard fail and unknown at 390×844 and 1440×900.
+
 ## Next event sequence
 
-After Gold passes owner review, the next bounded stories are Annaprasana,
-Karnavedha, Vidyarambha, completed-house purchase, general purchase,
-well-digging, and business investment. They reuse placement, grouped-planet,
-benefic/malefic, and composition primitives before the program advances to
-lordship, Navamsa-Lagna, compatibility, named-Yoga, and medical-context work.
+After Annaprasana owner review, the next bounded stories are Karnavedha,
+Vidyarambha, completed-house purchase, general purchase, well-digging, and
+business investment. They reuse placement, grouped-planet and composition
+primitives before the program advances to lordship, Navamsa-Lagna,
+compatibility and named-Yoga work. The still-open baseline #284 is not closed
+by completing one event-specific assessor.

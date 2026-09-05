@@ -3,6 +3,7 @@ import type { ElectionChartSnapshot } from '../lib/election-chart-api';
 import {
   completePlanetPositions,
   evaluateFullAspect,
+  evaluateHouseFreeOfNaturalMalefics,
   evaluateWellSituated,
   GOLD_MAX_SAMPLE_GAP_MINUTES,
   goldTransitionUncertainty,
@@ -21,7 +22,8 @@ export interface ElectionChartRule {
     | 'planet_in_houses'
     | 'any_planet_in_houses'
     | 'planet_well_situated'
-    | 'planet_receives_full_aspect';
+    | 'planet_receives_full_aspect'
+    | 'house_free_of_natural_malefics';
   effect: ElectionRuleEffect;
   source_claim: string;
   source_locator: string;
@@ -36,6 +38,8 @@ export interface ElectionChartRule {
   aspectors?: string[];
   solar_clearance_degrees?: number;
   solar_clearance_guard_degrees?: number;
+  fixed_malefics?: string[];
+  lunar_phase_guard_degrees?: number;
   convention_id?: string;
   convention_label?: string;
   formula?: string;
@@ -75,6 +79,9 @@ export interface ElectionChartEvaluationOptions {
 const EXPECTED_PLANETS = new Set(rulesContract.vacancy_includes);
 const RULES = rulesContract.rules as unknown as Record<string, ElectionChartRule[]>;
 const MANUAL_REMAINDERS = rulesContract.manual_remainders as unknown as Record<string, string[]>;
+const COMPLETE_ASSESSORS = new Set(
+  rulesContract.complete_assessors as unknown as string[],
+);
 
 export function automatedRulesFor(activity: string): readonly ElectionChartRule[] {
   return RULES[activity] || [];
@@ -86,11 +93,21 @@ export function chartManualRemaindersFor(activity: string): readonly string[] | 
     : null;
 }
 
+export function chartAssessorCompleteFor(activity: string): boolean {
+  return COMPLETE_ASSESSORS.has(activity);
+}
+
 function completePlanetHouses(chart: ElectionChartSnapshot): Map<string, number> | null {
   if (chart.planets.length !== EXPECTED_PLANETS.size) return null;
   const result = new Map<string, number>();
   for (const planet of chart.planets) {
-    if (!EXPECTED_PLANETS.has(planet.name) || result.has(planet.name)) return null;
+    if (
+      !EXPECTED_PLANETS.has(planet.name)
+      || result.has(planet.name)
+      || !Number.isInteger(planet.house)
+      || planet.house < 1
+      || planet.house > 12
+    ) return null;
     result.set(planet.name, planet.house);
   }
   return result.size === EXPECTED_PLANETS.size ? result : null;
@@ -108,21 +125,58 @@ function evaluateRule(
   if (rule.kind === 'planet_receives_full_aspect') {
     return evaluateFullAspect(rule, positions);
   }
+  if (rule.kind === 'house_free_of_natural_malefics') {
+    return evaluateHouseFreeOfNaturalMalefics(rule, positions, options);
+  }
   if (!houses || options.houseFrameUncertain) {
-    return { status: 'unknown', evidence: [] };
+    return {
+      status: 'unknown',
+      evidence: ['Complete Whole Sign house facts are unavailable.'],
+    };
   }
   let passed: boolean;
+  let evidence: string[];
   if (rule.kind === 'house_empty') {
-    passed = !Array.from(houses.values()).includes(rule.house as number);
+    const occupants = Array.from(houses.entries())
+      .filter(([, house]) => house === rule.house)
+      .map(([name]) => name);
+    passed = occupants.length === 0;
+    evidence = [
+      `House ${rule.house} occupants: ${occupants.length ? occupants.join(', ') : 'none'}.`,
+    ];
   } else if (rule.kind === 'planet_not_house') {
-    passed = houses.get(rule.planet as string) !== rule.house;
+    const observed = houses.get(rule.planet as string) as number;
+    passed = observed !== rule.house;
+    evidence = [
+      `${rule.planet} occupies house ${observed}${passed
+        ? `, outside house ${rule.house}.`
+        : ', which is prohibited.'}`,
+    ];
   } else if (rule.kind === 'planet_in_houses') {
-    passed = (rule.houses || []).includes(houses.get(rule.planet as string) as number);
+    const observed = houses.get(rule.planet as string) as number;
+    passed = (rule.houses || []).includes(observed);
+    evidence = [
+      `${rule.planet} occupies house ${observed}; target houses: ${(rule.houses || []).join(', ')}.`,
+    ];
   } else {
-    passed = (rule.planets || []).some(planet =>
+    const matching = (rule.planets || []).filter(planet =>
       (rule.houses || []).includes(houses.get(planet) as number));
+    passed = matching.length > 0;
+    if ((rule.houses || []).length === 1 && rule.houses?.[0] === 1) {
+      const planets = rule.planets || [];
+      const named = planets.length > 1
+        ? `${planets.slice(0, -1).join(', ')} and ${planets.at(-1)}`
+        : planets.join('');
+      evidence = [
+        `Lagna occupants among ${named}: ${matching.length ? matching.join(', ') : 'none'}.`,
+      ];
+    } else {
+      evidence = [
+        `Matching grahas: ${matching.length ? matching.join(', ') : 'none'}; target houses: ${(rule.houses || []).join(', ')}.`,
+      ];
+    }
   }
-  return { status: passed ? 'pass' : 'fail', evidence: [] };
+  return { status: passed ? 'pass' : 'fail', evidence };
 }
 
 function ruleOutcome(

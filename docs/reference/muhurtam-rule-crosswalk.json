@@ -11,10 +11,10 @@
     "activities": 30,
     "browser_activities": 30,
     "python_mcp_only_activities": 5,
-    "rows": 322,
+    "rows": 324,
     "deterministic_panchangam_rows": 175,
     "personal_rule_rows": 5,
-    "election_chart_rule_rows": 27,
+    "election_chart_rule_rows": 29,
     "manual_display_rows": 115,
     "by_predicate_class": {
       "panchangam.slot-exclusion": 16,
@@ -28,6 +28,8 @@
       "election-chart.house_empty": 5,
       "election-chart.planet_not_house": 9,
       "manual.display-row": 115,
+      "election-chart.any_planet_in_houses": 2,
+      "election-chart.house_free_of_natural_malefics": 1,
       "panchangam.time-admission": 3,
       "personal.exact-election-fact": 5,
       "election-chart.planet_in_houses": 8,
@@ -35,17 +37,16 @@
       "election-chart.planet_receives_full_aspect": 2,
       "panchangam.personal-slot-exclusion": 2,
       "panchangam.disclosure": 1,
-      "election-chart.any_planet_in_houses": 1,
       "panchangam.specialized-admission": 1
     },
     "by_implementation_status": {
       "automated_browser_and_python": 152,
       "automated_python_only_not_browser": 23,
-      "automated_exact_chart_browser_with_python_parity": 32,
+      "automated_exact_chart_browser_with_python_parity": 34,
       "manual_displayed_not_computed": 115
     },
     "by_authority_status": {
-      "source_backed": 243,
+      "source_backed": 245,
       "explicit_project_heuristic": 76,
       "documented_conflict": 3
     },
@@ -287,7 +288,7 @@
           }
         ],
         "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
-        "scope": "Supports the configured Annaprasana Nakshatra and weekday admission lists, rejected general-Panchanga-Suddhi Tithis, excluded rising Rasis, age-month guidance and disclosed election-chart checks. The Drik website post-screen now requires a vacant 10th house, Budha outside the 7th, Mangala outside the 8th and Shukra outside the 9th across every sampled state (window edges and both sides of every known interior Drik Lagna transition); qualitative Lagna strength and malefic judgment remain manual. Shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority."
+        "scope": "Supports the configured Annaprasana age-month, weekday, Nakshatra and rising-Rasi profile and names six event-chart clauses. General Panchanga-Suddhi Tithi exclusions are cross-applied from Chapter V. Browser chart decisions, engineering conventions, shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority. The UBS ID preserves the bibliographic work identity; the inspected derivative supplies the located wording, without a claim that both artifacts are edition-identical."
       },
       "related_claims": [],
       "manual_prerequisites": false,
@@ -309,12 +310,14 @@
         "annaprasana.budha-not-7",
         "annaprasana.kuja-not-8",
         "annaprasana.shukra-not-9",
+        "annaprasana.benefic-occupies-lagna",
+        "annaprasana.no-natural-malefic-in-lagna",
         "annaprasana.manual-1",
         "annaprasana.manual-2",
         "annaprasana.manual-3",
         "annaprasana.manual-4"
       ],
-      "row_count": 20
+      "row_count": 22
     },
     {
       "activity": "karnavedha",
@@ -3793,13 +3796,19 @@
         ],
         "predicate": "house_empty",
         "predicate_inputs": {
-          "house": 10
+          "house": 10,
+          "convention_id": "whole-sign-physical-occupation-v1",
+          "convention_label": "Whole Sign physical-occupation convention v1",
+          "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+          "method_claims": [
+            "election_chart.whole_sign_house_policy_v1"
+          ]
         },
         "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
       },
-      "source_claim_id": "muhurta.annaprasana",
+      "source_claim_id": "muhurta.annaprasana.raman_transcription_chart",
       "source_claim": {
-        "id": "muhurta.annaprasana",
+        "id": "muhurta.annaprasana.raman_transcription_chart",
         "surface": "muhurtam",
         "authority_status": "source_backed",
         "evidence_class": "textual",
@@ -3808,14 +3817,14 @@
           "BVR-MUHURTHA-1993",
           "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
       },
       "implementation_status": "automated_exact_chart_browser_with_python_parity",
       "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
       "ranking_effect": "candidate_exclusion",
       "automation_mode": "automated",
-      "automation_rationale": "Whole Sign house occupancy is a bounded predicate over the exact nine-Graha election chart.",
-      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
     },
     {
       "activity": "annaprasana",
@@ -3838,13 +3847,19 @@
         "predicate": "planet_not_house",
         "predicate_inputs": {
           "planet": "Budha",
-          "house": 7
+          "house": 7,
+          "convention_id": "whole-sign-physical-occupation-v1",
+          "convention_label": "Whole Sign physical-occupation convention v1",
+          "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+          "method_claims": [
+            "election_chart.whole_sign_house_policy_v1"
+          ]
         },
         "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
       },
-      "source_claim_id": "muhurta.annaprasana",
+      "source_claim_id": "muhurta.annaprasana.raman_transcription_chart",
       "source_claim": {
-        "id": "muhurta.annaprasana",
+        "id": "muhurta.annaprasana.raman_transcription_chart",
         "surface": "muhurtam",
         "authority_status": "source_backed",
         "evidence_class": "textual",
@@ -3853,14 +3868,14 @@
           "BVR-MUHURTHA-1993",
           "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
       },
       "implementation_status": "automated_exact_chart_browser_with_python_parity",
       "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
       "ranking_effect": "candidate_exclusion",
       "automation_mode": "automated",
-      "automation_rationale": "Whole Sign house occupancy is a bounded predicate over the exact nine-Graha election chart.",
-      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
     },
     {
       "activity": "annaprasana",
@@ -3883,13 +3898,19 @@
         "predicate": "planet_not_house",
         "predicate_inputs": {
           "planet": "Kuja",
-          "house": 8
+          "house": 8,
+          "convention_id": "whole-sign-physical-occupation-v1",
+          "convention_label": "Whole Sign physical-occupation convention v1",
+          "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+          "method_claims": [
+            "election_chart.whole_sign_house_policy_v1"
+          ]
         },
         "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
       },
-      "source_claim_id": "muhurta.annaprasana",
+      "source_claim_id": "muhurta.annaprasana.raman_transcription_chart",
       "source_claim": {
-        "id": "muhurta.annaprasana",
+        "id": "muhurta.annaprasana.raman_transcription_chart",
         "surface": "muhurtam",
         "authority_status": "source_backed",
         "evidence_class": "textual",
@@ -3898,14 +3919,14 @@
           "BVR-MUHURTHA-1993",
           "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
       },
       "implementation_status": "automated_exact_chart_browser_with_python_parity",
       "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
       "ranking_effect": "candidate_exclusion",
       "automation_mode": "automated",
-      "automation_rationale": "Whole Sign house occupancy is a bounded predicate over the exact nine-Graha election chart.",
-      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
     },
     {
       "activity": "annaprasana",
@@ -3928,13 +3949,19 @@
         "predicate": "planet_not_house",
         "predicate_inputs": {
           "planet": "Shukra",
-          "house": 9
+          "house": 9,
+          "convention_id": "whole-sign-physical-occupation-v1",
+          "convention_label": "Whole Sign physical-occupation convention v1",
+          "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+          "method_claims": [
+            "election_chart.whole_sign_house_policy_v1"
+          ]
         },
         "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
       },
-      "source_claim_id": "muhurta.annaprasana",
+      "source_claim_id": "muhurta.annaprasana.raman_transcription_chart",
       "source_claim": {
-        "id": "muhurta.annaprasana",
+        "id": "muhurta.annaprasana.raman_transcription_chart",
         "surface": "muhurtam",
         "authority_status": "source_backed",
         "evidence_class": "textual",
@@ -3943,14 +3970,159 @@
           "BVR-MUHURTHA-1993",
           "BVR-MUHURTHA-CHISTABO-2020"
         ],
-        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
       },
       "implementation_status": "automated_exact_chart_browser_with_python_parity",
       "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
       "ranking_effect": "candidate_exclusion",
       "automation_mode": "automated",
-      "automation_rationale": "Whole Sign house occupancy is a bounded predicate over the exact nine-Graha election chart.",
-      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)"
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
+    },
+    {
+      "activity": "annaprasana",
+      "rule_id": "annaprasana.benefic-occupies-lagna",
+      "predicate_class": "election-chart.any_planet_in_houses",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "any_planet_in_houses",
+        "predicate_inputs": {
+          "planets": [
+            "Budha",
+            "Guru",
+            "Shukra"
+          ],
+          "houses": [
+            1
+          ],
+          "convention_id": "whole-sign-physical-occupation-v1",
+          "convention_label": "Whole Sign physical-occupation convention v1",
+          "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+          "method_claims": [
+            "election_chart.whole_sign_house_policy_v1"
+          ],
+          "decision_policy_claim": "election_chart.annaprasana.raman_transcription_policy_v1"
+        },
+        "sample_aggregation": "pass only if every sampled state passes; fail only if every sampled state fails; otherwise unknown"
+      },
+      "source_claim_id": "muhurta.annaprasana.raman_transcription_chart",
+      "source_claim": {
+        "id": "muhurta.annaprasana.raman_transcription_chart",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tie_break_preference",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)",
+      "decision_policy_claim_id": "election_chart.annaprasana.raman_transcription_policy_v1",
+      "decision_policy_claim": {
+        "id": "election_chart.annaprasana.raman_transcription_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "annaprasana-raman-transcription-v1; docs/reference/18-annaprasana-profile.md"
+      }
+    },
+    {
+      "activity": "annaprasana",
+      "rule_id": "annaprasana.no-natural-malefic-in-lagna",
+      "predicate_class": "election-chart.house_free_of_natural_malefics",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "house_free_of_natural_malefics",
+        "predicate_inputs": {
+          "house": 1,
+          "fixed_malefics": [
+            "Surya",
+            "Kuja",
+            "Shani",
+            "Rahu",
+            "Ketu"
+          ],
+          "lunar_phase_guard_degrees": 0.02,
+          "convention_id": "annaprasana-natural-malefic-lagna-v1",
+          "convention_label": "Annaprasana natural-malefic Lagna convention v1",
+          "formula": "Reject Surya, Kuja, Shani, mean Rahu or mean Ketu in Whole Sign house 1. When Chandra occupies house 1, let E = (Chandra longitude - Surya longitude) mod 360 degrees: 0 < E < 180 is waxing and does not fail; 180 < E < 360 is waning and fails. Return unknown within ±0.02 degrees of 0 or 180. Budha joined to a natural malefic is represented by same-sign occupation; the accompanying malefic already controls this prohibition.",
+          "method_claims": [
+            "election_chart.natural_malefics.bphs_3_11_modern_witness",
+            "election_chart.whole_sign_house_policy_v1",
+            "election_chart.mean_node_policy_v1",
+            "election_chart.budha_same_sign_association_policy_v1",
+            "election_chart.raman_180_degree_paksha_policy_v1",
+            "election_chart.lunar_phase_boundary_guard_policy_v1",
+            "election_chart.annaprasana_fail_closed_aggregation_policy_v1"
+          ]
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
+      },
+      "source_claim_id": "muhurta.annaprasana.raman_transcription_chart",
+      "source_claim": {
+        "id": "muhurta.annaprasana.raman_transcription_chart",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)",
+      "supporting_claims": [
+        {
+          "id": "election_chart.natural_malefics.bphs_3_11_modern_witness",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "BPHS-ELS-3.11-MODERN-WITNESS"
+          ],
+          "locator": "Chapter 3, verse 11, Sanskrit compound analysis and English rendering"
+        }
+      ]
     },
     {
       "activity": "annaprasana",
@@ -4009,9 +4181,10 @@
       },
       "implementation_status": "manual_displayed_not_computed",
       "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "practitioner_review_tier_cap",
+      "ranking_effect": "fallback_only_practitioner_review_tier_cap",
       "automation_mode": "manual",
-      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
+      "automation_rationale": "Fallback source guidance only. In the supported Drik browser path, separately provenance-linked automated rules replace this broad clause.",
+      "implementation_note": "Not displayed as a residual manual Annaprasana chart check after a successful exact-chart screen.",
       "decision_policy_claim_id": "muhurta.scoring_policy",
       "decision_policy_claim": {
         "id": "muhurta.scoring_policy",
@@ -4022,7 +4195,8 @@
         "source_ids": [],
         "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
       },
-      "authority_role": "activity_source_claim"
+      "authority_role": "activity_source_claim",
+      "applicability": "python_or_mcp_or_non_drik_or_exact_chart_unavailable"
     },
     {
       "activity": "annaprasana",
@@ -4050,9 +4224,10 @@
       },
       "implementation_status": "manual_displayed_not_computed",
       "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "practitioner_review_tier_cap",
+      "ranking_effect": "fallback_only_practitioner_review_tier_cap",
       "automation_mode": "manual",
-      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
+      "automation_rationale": "Fallback source guidance only. In the supported Drik browser path, separately provenance-linked automated rules replace this broad clause.",
+      "implementation_note": "Not displayed as a residual manual Annaprasana chart check after a successful exact-chart screen.",
       "decision_policy_claim_id": "muhurta.scoring_policy",
       "decision_policy_claim": {
         "id": "muhurta.scoring_policy",
@@ -4063,7 +4238,8 @@
         "source_ids": [],
         "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
       },
-      "authority_role": "activity_source_claim"
+      "authority_role": "activity_source_claim",
+      "applicability": "python_or_mcp_or_non_drik_or_exact_chart_unavailable"
     },
     {
       "activity": "annaprasana",
@@ -4091,9 +4267,10 @@
       },
       "implementation_status": "manual_displayed_not_computed",
       "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
-      "ranking_effect": "practitioner_review_tier_cap",
+      "ranking_effect": "fallback_only_practitioner_review_tier_cap",
       "automation_mode": "manual",
-      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
+      "automation_rationale": "Fallback source guidance only. In the supported Drik browser path, separately provenance-linked automated rules replace this broad clause.",
+      "implementation_note": "Not displayed as a residual manual Annaprasana chart check after a successful exact-chart screen.",
       "decision_policy_claim_id": "muhurta.scoring_policy",
       "decision_policy_claim": {
         "id": "muhurta.scoring_policy",
@@ -4104,7 +4281,8 @@
         "source_ids": [],
         "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
       },
-      "authority_role": "activity_source_claim"
+      "authority_role": "activity_source_claim",
+      "applicability": "python_or_mcp_or_non_drik_or_exact_chart_unavailable"
     },
     {
       "activity": "karnavedha",

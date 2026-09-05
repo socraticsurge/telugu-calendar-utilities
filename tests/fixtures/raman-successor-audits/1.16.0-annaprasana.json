@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "release": "1.16.0",
+  "parent_release": "1.15.2",
+  "activity": "annaprasana",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [
+    {
+      "claim_id": "muhurta.annaprasana",
+      "relationship": "baseline_context_extension",
+      "verification_state": "verified",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+      "before_sha256": "e5e007a7c84aac4d9152d21a1c2df11a220f849b33c6ea60c680ce2ad9643d66",
+      "after_sha256": "91af75f5e8e210d2011567aec6ef4e15f68596f10804741149d3995016d1d5e4",
+      "before": {
+        "id": "muhurta.annaprasana",
+        "surface": "muhurtam",
+        "implementation": "telugu_panchangam/personal/activity_rules.py",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed pp. 22-23 (physical PDF pp. 25-26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
+        "scope": "Supports the configured Annaprasana Nakshatra and weekday admission lists, rejected general-Panchanga-Suddhi Tithis, excluded rising Rasis, age-month guidance and disclosed election-chart checks. The Drik website post-screen now requires a vacant 10th house, Budha outside the 7th, Mangala outside the 8th and Shukra outside the 9th across every sampled state (window edges and both sides of every known interior Drik Lagna transition); qualitative Lagna strength and malefic judgment remain manual. Shared samskara filters, Choghadiya and Tithi-family ranking bonuses, personal scoring and relative tiers require separate authority.",
+        "last_reviewed": "2026-09-04"
+      }
+    },
+    {
+      "claim_id": "muhurta.annaprasana.raman_transcription_chart",
+      "relationship": "successor_addition",
+      "verification_state": "verified",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter VIII, 'First feeding on rice (Annaprasana),' inspected in the 2020 Chistabo derivative at internal printed p. 22 (physical PDF p. 25)",
+      "after_sha256": "c2a8fd7ecbbb5865f764eb9e2c94e27e00b3141e089b71bf14be4d047ff2b255"
+    },
+    {
+      "claim_id": "muhurta.raman_transcription.paksha_definition",
+      "relationship": "successor_addition",
+      "verification_state": "verified",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter II, 'On certain special yogas,' inspected in the 2020 Chistabo derivative at internal printed p. 4 (physical PDF p. 7)",
+      "after_sha256": "d71cacefb0601891bdf71df3b5f17f886b0f2610844822c596de1561658fd6dd"
+    },
+    {
+      "claim_id": "election_chart.raman_180_degree_paksha_policy_v1",
+      "relationship": "successor_addition",
+      "verification_state": "heuristic",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter II, inspected in the 2020 Chistabo derivative at internal printed p. 4 (physical PDF p. 7); annaprasana-natural-malefic-lagna-v1",
+      "after_sha256": "28af9a70d6ef96b9881a9af50526d771ecfbe73f8e922e21e64f794745afb2c8"
+    }
+  ],
+  "semantic_deltas": [
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/check_contract/activities/annaprasana",
+      "operation": "replace",
+      "scope": "annaprasana_contract",
+      "before_sha256": "d63d1f49efedfd45210723678adbe0dc8db4b2319407451d91d86df69ebcdbc9",
+      "after_sha256": "16eca5620506144bf93489ae19bd6e1a5455163e2e4ccff3d688d98a1fab4688",
+      "before": {
+        "deterministic_panchangam_fields": [
+          "prefer_choghadiya",
+          "skip_on_yoga",
+          "skip_on_sankramana",
+          "prefer_tithi_class",
+          "avoid_tithi_class",
+          "allowed_varas",
+          "allowed_nakshatras",
+          "avoid_tithi_numbers",
+          "allowed_lagnas"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [
+          "annaprasana.house-10-vacant",
+          "annaprasana.budha-not-7",
+          "annaprasana.kuja-not-8",
+          "annaprasana.shukra-not-9"
+        ],
+        "manual_checks": [
+          {
+            "id": "annaprasana.manual-1",
+            "source_index": 0,
+            "source_text": "Perform first feeding in the child’s 6th, 8th, 9th or 12th month; the age-month is the most important criterion.",
+            "text": "Perform first feeding in the child’s 6th, 8th, 9th or 12th month; the age-month is the most important criterion.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "annaprasana.manual-2",
+            "source_index": 1,
+            "source_text": "Election chart: leave the 10th house unoccupied.",
+            "text": "Election chart: leave the 10th house unoccupied.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "annaprasana.manual-3",
+            "source_index": 2,
+            "source_text": "Budha, Mangala and Shukra should not occupy the 7th, 8th and 9th houses respectively.",
+            "text": "Budha, Mangala and Shukra should not occupy the 7th, 8th and 9th houses respectively.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "annaprasana.manual-4",
+            "source_index": 3,
+            "source_text": "Budha, Guru or Shukra in Lagna is highly commended; no malefic should occupy Lagna.",
+            "text": "Budha, Guru or Shukra in Lagna is highly commended; no malefic should occupy Lagna.",
+            "class": "manual-only",
+            "display_section": "chart"
+          }
+        ]
+      }
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/schema_version",
+      "operation": "replace",
+      "scope": "shared_schema",
+      "before_sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+      "after_sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "before": 2
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/convention_schema_version",
+      "operation": "replace",
+      "scope": "shared_schema",
+      "before_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "after_sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+      "before": 1
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/complete_assessors",
+      "operation": "add",
+      "scope": "completion_registry",
+      "after_sha256": "b43647e1f5bf78a9b742aa0b76efbf87e3408efd6897d051d2a4f4bca3fd844d"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/conventions/whole-sign-physical-occupation-v1",
+      "operation": "add",
+      "scope": "annaprasana_convention",
+      "after_sha256": "384aececc9d284a0e780c2b95076f6f26c2450eeed7ad92528868c79cf683f3f"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/conventions/annaprasana-natural-malefic-lagna-v1",
+      "operation": "add",
+      "scope": "annaprasana_convention",
+      "after_sha256": "f66e5eb9a45377d07a093ae0cd3a74c095ced68a9431f7de3d386f1e8fed2653"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/rules/annaprasana",
+      "operation": "replace",
+      "scope": "annaprasana_rules",
+      "before_sha256": "5c37ce125e8ba6b7ef6b1c21cc433ba203e46713ab375ae4fc7f4003aeb05750",
+      "after_sha256": "40c6a66440bf53b740d4c96698bc77c5a6890e13cff89940655eb89706e49180",
+      "before": [
+        {
+          "id": "annaprasana.house-10-vacant",
+          "label": "10th house is vacant",
+          "kind": "house_empty",
+          "effect": "reject",
+          "source_claim": "muhurta.annaprasana",
+          "house": 10
+        },
+        {
+          "id": "annaprasana.budha-not-7",
+          "label": "Budha is outside the 7th house",
+          "kind": "planet_not_house",
+          "effect": "reject",
+          "source_claim": "muhurta.annaprasana",
+          "planet": "Budha",
+          "house": 7
+        },
+        {
+          "id": "annaprasana.kuja-not-8",
+          "label": "Mangala (Kuja) is outside the 8th house",
+          "kind": "planet_not_house",
+          "effect": "reject",
+          "source_claim": "muhurta.annaprasana",
+          "planet": "Kuja",
+          "house": 8
+        },
+        {
+          "id": "annaprasana.shukra-not-9",
+          "label": "Shukra is outside the 9th house",
+          "kind": "planet_not_house",
+          "effect": "reject",
+          "source_claim": "muhurta.annaprasana",
+          "planet": "Shukra",
+          "house": 9
+        }
+      ]
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/manual_remainders/annaprasana",
+      "operation": "replace",
+      "scope": "annaprasana_remainder",
+      "before_sha256": "ab309c22df7b0fff1d47206fe4cbd064165c1a6463f264943e00366e97fad23a",
+      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "before": [
+        "Assess whether Budha, Guru or Shukra strengthens Lagna and whether a malefic occupies Lagna."
+      ]
+    }
+  ],
+  "protected_source_transforms": [
+    {
+      "path": "src/scorer/election-chart-enrichment.ts",
+      "scope": "annaprasana_rejection_evidence",
+      "transforms": [
+        {
+          "before": "  chartRemovedCount: number;\n  personalRemovedCount: number;",
+          "after": "  chartRemovedCount: number;\n  chartRemovedRules: Array<{\n    ruleId: string;\n    label: string;\n    count: number;\n    evidence: string[];\n  }>;\n  personalRemovedCount: number;"
+        },
+        {
+          "before": "    chartRemovedCount: 0,\n    personalRemovedCount: 0,",
+          "after": "    chartRemovedCount: 0,\n    chartRemovedRules: [],\n    personalRemovedCount: 0,"
+        },
+        {
+          "before": "  let overlappingDispositionCount = 0;\n  const personalRemovedRules = new Map<string, { ruleId: string; label: string; count: number }>();",
+          "after": "  let overlappingDispositionCount = 0;\n  const chartRemovedRules = new Map<string, {\n    ruleId: string;\n    label: string;\n    count: number;\n    evidence: string[];\n  }>();\n  const personalRemovedRules = new Map<string, { ruleId: string; label: string; count: number }>();"
+        },
+        {
+          "before": "        if (screening.rejected) {\n          removedCount += 1;\n          chartRemovedCount += 1;\n          continue;\n        }",
+          "after": "        if (screening.rejected) {\n          removedCount += 1;\n          chartRemovedCount += 1;\n          for (const outcome of screening.outcomes) {\n            if (outcome.effect !== 'reject' || outcome.status !== 'fail') continue;\n            const item = chartRemovedRules.get(outcome.ruleId) || {\n              ruleId: outcome.ruleId,\n              label: outcome.label,\n              count: 0,\n              evidence: [],\n            };\n            item.count += 1;\n            for (const observed of outcome.evidence || []) {\n              if (!item.evidence.includes(observed) && item.evidence.length < 3) {\n                item.evidence.push(observed);\n              }\n            }\n            chartRemovedRules.set(outcome.ruleId, item);\n          }\n          continue;\n        }"
+        },
+        {
+          "before": "        candidateLimitReached: processed < baseSlots.length,\n        chartRemovedCount,\n        personalRemovedCount,",
+          "after": "        candidateLimitReached: processed < baseSlots.length,\n        chartRemovedCount,\n        chartRemovedRules: [...chartRemovedRules.values()],\n        personalRemovedCount,"
+        },
+        {
+          "before": "    candidateLimitReached,\n    chartRemovedCount,\n    personalRemovedCount,",
+          "after": "    candidateLimitReached,\n    chartRemovedCount,\n    chartRemovedRules: [...chartRemovedRules.values()],\n    personalRemovedCount,"
+        }
+      ]
+    }
+  ]
+}

@@ -55,6 +55,7 @@ import { roleForActivity } from '../scorer/personal-election-screening';
 import { enrichElectionChartSlots } from '../scorer/election-chart-enrichment';
 import {
   automatedRulesFor,
+  chartAssessorCompleteFor,
   chartManualRemaindersFor,
 } from '../scorer/election-chart-screening';
 import { localWallTimeToInstant } from '../lib/election-chart-api';
@@ -1726,6 +1727,12 @@ async function findMuhurta() {
       const manualChecks = muRelevantManualChecks(activity, data.vaaram);
       const manualGuidance = muClassifyManualChecks(activity, manualChecks);
       const chartManualRemainder = chartManualRemaindersFor(activity);
+      const effectiveChartRemainder = chartManualRemainder !== null
+        && !chartAssessorCompleteFor(activity)
+        && chartManualRemainder.length === 0
+        && automatedRulesFor(activity).length
+        ? ['The event-specific election-chart assessor is partial; the unimplemented source clauses still require review.']
+        : chartManualRemainder;
       const activityLabel = rules.label;
       if (rules.skip_on_sankramana && data.special.some(
           item => /Sankraman/i.test(item))) {
@@ -2156,7 +2163,7 @@ async function findMuhurta() {
             personal_outcomes: personal.outcomes,
             notes,
             chart_validation: manualGuidance.chart,
-            chart_remainder: chartManualRemainder,
+            chart_remainder: effectiveChartRemainder,
             information: manualGuidance.information,
             practical: manualGuidance.practical,
           };
@@ -2185,8 +2192,8 @@ async function findMuhurta() {
           });
           if (!dayDosha && (
             rules.manual_prerequisites
-            || (system === 'drik' && chartManualRemainder !== null
-              ? chartManualRemainder.length
+            || (system === 'drik' && effectiveChartRemainder !== null
+              ? effectiveChartRemainder.length
               : manualGuidance.chart.length)
             || personal.needsReview
           )) dayDosha = 'practitioner_review';
@@ -2289,6 +2296,7 @@ async function findMuhurta() {
         removedCount: 0,
         candidateLimitReached: false,
         chartRemovedCount: 0,
+        chartRemovedRules: [],
         personalRemovedCount: 0,
         personalRemovedRules: [],
         boundaryReviewCount: 0,
@@ -2365,6 +2373,46 @@ const MU_ACT_LABEL = {
 
 const MU_CHART_METHOD_URL = '/docs/reference/54-muhurtam-election-chart-screening';
 
+type MuChartCompletionState = {
+  state: string;
+  candidateLimitReached: boolean;
+  boundaryReviewCount: number;
+  reviewGatedCount: number;
+};
+
+export function muChartAssessorCanClaimComplete(
+  activity: string,
+  enrichment: MuChartCompletionState,
+): boolean {
+  return enrichment.state === 'screened'
+    && !enrichment.candidateLimitReached
+    && enrichment.boundaryReviewCount === 0
+    && enrichment.reviewGatedCount === 0
+    && chartAssessorCompleteFor(activity);
+}
+
+export function muChartAssessmentTitle(
+  activity: string,
+  enrichment: MuChartCompletionState,
+): string {
+  if (enrichment.boundaryReviewCount) {
+    return 'Chart screening applied with boundary review';
+  }
+  if (enrichment.reviewGatedCount) {
+    return 'Chart screening applied with unresolved facts';
+  }
+  if (enrichment.candidateLimitReached) {
+    return 'Chart screening applied to a bounded candidate set';
+  }
+  if (muChartAssessorCanClaimComplete(activity, enrichment)) {
+    if (activity === 'annaprasana') {
+      return 'Annaprasana event-specific chart assessment complete';
+    }
+    if (activity === 'gold') return 'Gold event-specific chart clauses resolved';
+  }
+  return 'Exact chart screening applied';
+}
+
 export function muSafetyOverrideFor(activity: string) {
   if (activity !== 'surgery' && activity !== 'court') return null;
   return muManualCheckRows(activity).find(
@@ -2400,7 +2448,9 @@ function renderMuhurta() {
          <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}</li>`).join('')}</ul>
        </details>`
     : '';
-  const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0;
+  const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0
+    || (automatedRulesFor(activity).length > 0
+      && !chartAssessorCompleteFor(activity));
   const hasScreeningReview = !!(
     chartEnrichment?.boundaryReviewCount
     || chartEnrichment?.reviewGatedCount
@@ -2409,19 +2459,17 @@ function renderMuhurta() {
     ? hasScreeningReview
       ? ' · all four Gold v1 event-specific clauses attempted; unresolved outcomes remain review-gated; the general election-chart baseline is not assessed'
       : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed'
+    : activity === 'annaprasana'
+      ? muChartAssessorCanClaimComplete(activity, chartEnrichment)
+        ? ' · all six Annaprasana event-specific clauses resolved; the general election-chart baseline #284 remains open'
+        : ' · all six Annaprasana event-specific clauses attempted; unresolved or bounded outcomes remain review-gated; the general election-chart baseline #284 remains open'
     : hasScreeningReview
       ? ''
       : ' · every implemented event-specific outcome resolved';
   const chartStatus = chartEnrichment
     ? {
       screened: {
-        title: chartEnrichment.boundaryReviewCount
-          ? 'Chart screening applied with boundary review'
-          : chartEnrichment.reviewGatedCount
-            ? 'Chart screening applied with unresolved facts'
-          : activity === 'gold'
-            ? 'Gold event-specific chart clauses resolved'
-            : 'Exact chart screening applied',
+        title: muChartAssessmentTitle(activity, chartEnrichment),
         detail: chartEnrichment.engine
           ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${chartEnrichment.boundaryReviewCount ? ' · boundary-adjacent house checks held for review' : chartEnrichment.reviewGatedCount ? ' · unresolved chart facts held for review' : ''}${scopeDetail}`
           : 'Every sampled Lagna-stable state checked',
@@ -2431,9 +2479,7 @@ function renderMuhurta() {
         detail: 'There was no Panchangam-shortlisted slot to send for chart projection.',
       },
       'manual-only': {
-        title: hasManualChartGuidance
-          ? 'Panchangam shortlist complete; chart review remains manual'
-          : 'Panchangam shortlist complete',
+        title: 'Panchangam shortlist complete; chart review remains manual',
         detail: hasManualChartGuidance
           ? 'This activity’s source guidance is qualitative and stays with a practitioner.'
           : 'No source-specific election-chart condition is defined for this general search.',
@@ -2502,6 +2548,13 @@ function renderMuhurta() {
          <ul>${droppedPersonalRules.map(rule => `<li>${htmlEsc(rule.label)} · ${rule.count} slot${rule.count === 1 ? '' : 's'}</li>`).join('')}</ul>
        </details>`
     : '';
+  const chartRemovedRules = chartEnrichment?.chartRemovedRules || [];
+  const chartRemovalHtml = chartEnrichment?.chartRemovedCount
+    ? `<details class="mu-chart-removals">
+         <summary>${chartEnrichment.chartRemovedCount} candidate slot${chartEnrichment.chartRemovedCount === 1 ? '' : 's'} removed by exact event-chart rules</summary>
+         <ul>${chartRemovedRules.map(rule => `<li><strong>${htmlEsc(rule.label)}</strong> · ${rule.count} slot${rule.count === 1 ? '' : 's'}${rule.evidence?.length ? `<small>Observed: ${htmlEsc(rule.evidence.join(' '))}</small>` : ''}</li>`).join('')}</ul>
+       </details>`
+    : '';
   const safetyOverride = muSafetyOverrideFor(activity);
   const safetyHtml = safetyOverride
     ? `<aside class="mu-safety-override" role="note">
@@ -2521,7 +2574,7 @@ function renderMuhurta() {
     }
     const suffix = notes.length ? ` · ${notes.join(', ')}` : '';
     const noSlotsMessage = `No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.`;
-    box.innerHTML = `${safetyHtml}${chartStatusHtml}${personalRoleHtml}<p class="preview-error">${htmlEsc(noSlotsMessage)}</p>${personalRemovalHtml}${droppedHtml}`;
+    box.innerHTML = `${safetyHtml}${chartStatusHtml}${personalRoleHtml}<p class="preview-error">${htmlEsc(noSlotsMessage)}</p>${chartRemovalHtml}${personalRemovalHtml}${droppedHtml}`;
     const announcement = document.getElementById('mu-result-announcement');
     if (announcement) announcement.textContent = noSlotsMessage;
     return;
@@ -2736,6 +2789,7 @@ function renderMuhurta() {
     + safetyHtml
     + chartStatusHtml
     + personalRoleHtml
+    + chartRemovalHtml
     + personalRemovalHtml
     + `<p class="mu-ranking-note">Excellent slots appear before Good ones. Mandatory chart failures remove a slot. A conclusive event-specific qualification miss retains the slot, leaves its raw score unchanged, and sets Good as its maximum rating. A calculation-boundary unknown also retains the slot and sets the same maximum pending review. Source preferences only break ties; they do not inflate the Panchangam score.</p>`
     + top.map(renderSlot).join('')
@@ -2814,8 +2868,16 @@ function shareMuhurtaOnWhatsApp() {
         && shownNeedsReview(slot)).length;
     if (activity === 'gold') {
       lines.push('Gold v1 assesses four event-specific clauses; the general election-chart baseline is not assessed.');
+    } else if (activity === 'annaprasana') {
+      lines.push('Annaprasana v1 assesses six event-specific chart clauses; the general election-chart baseline #284 remains open.');
     }
-    if (!remainder.length) {
+    if (activity === 'annaprasana' && !remainder.length) {
+      if (reviewGated || chartEnrichment.candidateLimitReached) {
+        lines.push('All six Annaprasana event-specific chart clauses were attempted; unresolved facts still require review.');
+      } else {
+        lines.push('All six Annaprasana event-specific chart clauses were evaluated and resolved.');
+      }
+    } else if (!remainder.length) {
       if (reviewGated) {
         lines.push('All disclosed event chart clauses were attempted; unresolved facts still require review.');
       } else if (qualificationCapped) {

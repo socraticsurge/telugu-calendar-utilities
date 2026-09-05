@@ -11,6 +11,7 @@ from telugu_panchangam.personal.election_chart import (
     evaluate_election_window,
 )
 from telugu_panchangam.personal.election_chart_rules import (
+    ELECTION_CHART_COMPLETE_ASSESSORS,
     ELECTION_CHART_MANUAL_REMAINDERS,
     ELECTION_CHART_RULES,
 )
@@ -60,6 +61,24 @@ GOLD_GATEWAY_ORACLE = json.loads(
         / 'fixtures/election_chart_gold_gateway_oracle.json'
     ).read_text(encoding='utf-8')
 )
+ANNAPRASANA_ORACLE = json.loads(
+    (
+        Path(__file__).parent
+        / 'fixtures/election_chart_annaprasana_oracle.json'
+    ).read_text(encoding='utf-8')
+)
+
+ANNAPRASANA_POSITIONS = {
+    'Surya': ('Mithuna', 10.0, 3),
+    'Chandra': ('Karka', 20.0, 4),
+    'Kuja': ('Kanya', 1.0, 6),
+    'Budha': ('Mesha', 5.0, 1),
+    'Guru': ('Vrishabha', 12.0, 2),
+    'Shukra': ('Mithuna', 21.0, 3),
+    'Shani': ('Kumbha', 17.0, 11),
+    'Rahu': ('Simha', 8.0, 5),
+    'Ketu': ('Kumbha', 8.0, 11),
+}
 
 
 def _gold_chart(*, instant='2026-09-08T05:30:00.000Z', **overrides):
@@ -82,10 +101,349 @@ def _gold_chart(*, instant='2026-09-08T05:30:00.000Z', **overrides):
     }
 
 
+def _annaprasana_chart(
+    *, instant='2026-09-08T05:30:00.000Z', **overrides,
+):
+    planets = []
+    for name in PLANETS:
+        rashi, degree, house = ANNAPRASANA_POSITIONS[name]
+        values = {
+            'name': name,
+            'rashi': rashi,
+            'degree': degree,
+            'house': house,
+            'retrograde': name in {'Rahu', 'Ketu'},
+        }
+        values.update(overrides.get(name, {}))
+        planets.append(values)
+    return {
+        'instant': instant,
+        'lagna': {'rashi': 'Mesha', 'degree': 12.5},
+        'planets': planets,
+    }
+
+
 def _outcome(result, rule_id):
     return next(
         outcome for outcome in result['outcomes']
         if outcome['rule_id'] == rule_id
+    )
+
+
+def test_annaprasana_declares_six_rule_raman_transcription_assessor():
+    rules = ELECTION_CHART_RULES['annaprasana']
+
+    assert [rule['id'] for rule in rules] == [
+        'annaprasana.house-10-vacant',
+        'annaprasana.budha-not-7',
+        'annaprasana.kuja-not-8',
+        'annaprasana.shukra-not-9',
+        'annaprasana.benefic-occupies-lagna',
+        'annaprasana.no-natural-malefic-in-lagna',
+    ]
+    assert [rule['effect'] for rule in rules] == [
+        'reject', 'reject', 'reject', 'reject', 'prefer', 'reject',
+    ]
+    assert all(
+        rule['source_claim']
+        == 'muhurta.annaprasana.raman_transcription_chart'
+        for rule in rules
+    )
+    assert all(
+        rule['source_locator']
+        == (
+            "B. V. Raman, Chapter VIII, 'First feeding on rice "
+            "(Annaprasana),' inspected in the 2020 Chistabo derivative at "
+            'internal printed p. 22 '
+            '(physical PDF p. 25)'
+        )
+        for rule in rules
+    )
+    assert rules[4]['decision_policy_claim'] == (
+        'election_chart.annaprasana.raman_transcription_policy_v1')
+    assert all(
+        'decision_policy_claim' not in rule
+        for rule in (*rules[:4], rules[5])
+    )
+    assert rules[4]['convention_id'] == (
+        'whole-sign-physical-occupation-v1')
+    assert rules[5]['convention_id'] == (
+        'annaprasana-natural-malefic-lagna-v1')
+    assert set(rules[5]['method_claims']) == {
+        'election_chart.natural_malefics.bphs_3_11_modern_witness',
+        'election_chart.whole_sign_house_policy_v1',
+        'election_chart.mean_node_policy_v1',
+        'election_chart.budha_same_sign_association_policy_v1',
+        'election_chart.raman_180_degree_paksha_policy_v1',
+        'election_chart.lunar_phase_boundary_guard_policy_v1',
+        'election_chart.annaprasana_fail_closed_aggregation_policy_v1',
+    }
+    assert ELECTION_CHART_MANUAL_REMAINDERS['annaprasana'] == ()
+    assert {'gold', 'annaprasana'} <= set(ELECTION_CHART_COMPLETE_ASSESSORS)
+
+
+@pytest.mark.parametrize(
+    'case', ANNAPRASANA_ORACLE['cases'], ids=lambda case: case['id'])
+def test_annaprasana_shared_python_typescript_oracle(case):
+    result = evaluate_election_chart(
+        'annaprasana', _annaprasana_chart(**case['overrides']))
+
+    assert [item['status'] for item in result['outcomes']] == (
+        case['expected_statuses'])
+    assert result['rejected'] is case['rejected']
+    assert result['preference_passes'] == case['preference_passes']
+    assert result['needs_review'] is case['needs_review']
+
+
+@pytest.mark.parametrize(
+    'case', ANNAPRASANA_ORACLE['geographic_cases'],
+    ids=lambda case: case['id'],
+)
+def test_annaprasana_multi_city_live_projection_golden_cases(case):
+    result = evaluate_election_chart('annaprasana', case['chart'])
+
+    assert [item['status'] for item in result['outcomes']] == (
+        case['expected_statuses'])
+    assert result['rejected'] is case['rejected']
+    assert result['preference_passes'] == case['preference_passes']
+    assert result['needs_review'] is case['needs_review']
+
+    rashis = (
+        'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+        'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena',
+    )
+    lagna_index = rashis.index(case['chart']['lagna']['rashi'])
+    assert all(
+        planet['house']
+        == ((rashis.index(planet['rashi']) - lagna_index) % 12) + 1
+        for planet in case['chart']['planets']
+    )
+
+
+def test_annaprasana_geographic_golden_set_spans_dates_and_cities():
+    cases = ANNAPRASANA_ORACLE['geographic_cases']
+
+    assert {case['city'] for case in cases} == {'Hyderabad', 'Sydney'}
+    assert len({case['chart']['instant'][:10] for case in cases}) == 2
+    assert ANNAPRASANA_ORACLE['geographic_source'] == {
+        'service': 'DashaFlow sidecar /calculate',
+        'engine': 'DashaFlow 1.1.0',
+        'ayanamsha': 'Lahiri',
+        'ephemeris': 'moshier',
+        'retrieved_on': '2026-08-30',
+        'projection_note': (
+            'Planet Rashis and degrees come from the live sidecar. Houses are '
+            'the returned Whole Sign projection and are re-evaluated by the '
+            'assessor; no birth-profile data is involved.'
+        ),
+    }
+
+
+def test_annaprasana_reports_observed_facts_for_each_predicate_shape():
+    result = evaluate_election_chart('annaprasana', _annaprasana_chart())
+
+    assert _outcome(
+        result, 'annaprasana.house-10-vacant')['evidence'] == [
+            'House 10 occupants: none.',
+        ]
+    assert _outcome(
+        result, 'annaprasana.budha-not-7')['evidence'] == [
+            'Budha occupies house 1, outside house 7.',
+        ]
+    assert _outcome(
+        result, 'annaprasana.benefic-occupies-lagna')['evidence'] == [
+            'Lagna occupants among Budha, Guru and Shukra: Budha.',
+        ]
+    assert _outcome(
+        result, 'annaprasana.no-natural-malefic-in-lagna')['evidence'] == [
+            'Natural malefics in Lagna: none; Chandra is outside Lagna.',
+        ]
+
+
+def test_annaprasana_waning_chandra_rejects_but_waxing_does_not():
+    waning = evaluate_election_chart(
+        'annaprasana', _annaprasana_chart(
+            Chandra={'rashi': 'Mesha', 'degree': 5.0, 'house': 1}))
+    waxing = evaluate_election_chart(
+        'annaprasana', _annaprasana_chart(
+            Surya={'rashi': 'Meena', 'degree': 10.0, 'house': 12},
+            Chandra={'rashi': 'Mesha', 'degree': 20.0, 'house': 1},
+        ))
+
+    waning_outcome = _outcome(
+        waning, 'annaprasana.no-natural-malefic-in-lagna')
+    waxing_outcome = _outcome(
+        waxing, 'annaprasana.no-natural-malefic-in-lagna')
+    assert waning_outcome['status'] == 'fail'
+    assert 'waning Chandra' in ' '.join(waning_outcome['evidence'])
+    assert waning['rejected'] is True
+    assert waxing_outcome['status'] == 'pass'
+    assert 'waxing Chandra' in ' '.join(waxing_outcome['evidence'])
+    assert waxing['rejected'] is False
+
+
+@pytest.mark.parametrize('elongation', [0.0, 0.02, 179.98, 180.0, 180.02])
+def test_annaprasana_two_decimal_phase_guard_is_inclusive(elongation):
+    result = evaluate_election_chart(
+        'annaprasana', _annaprasana_chart(
+            Surya={'rashi': 'Tula', 'degree': 10.0, 'house': 7},
+            Chandra={
+                'rashi': 'Tula' if elongation < 30 else 'Mesha',
+                'degree': 10.0 + elongation if elongation < 20 else (
+                    elongation - 170.0),
+                'house': 1,
+            },
+        ))
+
+    assert _outcome(
+        result, 'annaprasana.no-natural-malefic-in-lagna')[
+            'status'] == 'unknown'
+    assert result['needs_review'] is True
+
+
+def test_annaprasana_fixed_malefic_failure_dominates_phase_unknown():
+    result = evaluate_election_chart(
+        'annaprasana', _annaprasana_chart(
+            Surya={'rashi': 'Mesha', 'degree': 10.0, 'house': 1},
+            Chandra={'rashi': 'Mesha', 'degree': 10.0, 'house': 1},
+        ))
+
+    outcome = _outcome(
+        result, 'annaprasana.no-natural-malefic-in-lagna')
+    assert outcome['status'] == 'fail'
+    assert outcome['evidence'] == ['Natural malefics in Lagna: Surya.']
+    assert result['rejected'] is True
+    assert result['needs_review'] is False
+
+
+def test_annaprasana_fail_closed_window_aggregation_is_effect_aware():
+    preference_mixed = evaluate_election_snapshots('annaprasana', [
+        _annaprasana_chart(),
+        _annaprasana_chart(
+            instant='2026-09-08T05:40:00.000Z',
+            Budha={'rashi': 'Vrishabha', 'house': 2}),
+    ])
+    mandatory_fail_and_unknown = evaluate_election_snapshots(
+        'annaprasana', [
+            _annaprasana_chart(
+                Surya={'rashi': 'Mesha', 'degree': 10.0, 'house': 1}),
+            _annaprasana_chart(
+                instant='2026-09-08T05:40:00.000Z',
+                Surya={'rashi': 'Tula', 'degree': 10.0, 'house': 7},
+                Chandra={'rashi': 'Mesha', 'degree': 10.0, 'house': 1}),
+        ],
+    )
+
+    assert _outcome(
+        preference_mixed,
+        'annaprasana.benefic-occupies-lagna')['status'] == 'unknown'
+    assert preference_mixed['needs_review'] is True
+    assert _outcome(
+        mandatory_fail_and_unknown,
+        'annaprasana.no-natural-malefic-in-lagna')['status'] == 'fail'
+    assert mandatory_fail_and_unknown['rejected'] is True
+
+
+def test_annaprasana_absent_commendation_is_not_a_rejection_or_penalty():
+    result = evaluate_election_chart(
+        'annaprasana', _annaprasana_chart(
+            Budha={'rashi': 'Vrishabha', 'house': 2}))
+
+    assert _outcome(
+        result, 'annaprasana.benefic-occupies-lagna')['status'] == 'fail'
+    assert result['preference_passes'] == 0
+    assert result['rejected'] is False
+    assert result['needs_review'] is False
+
+
+def test_annaprasana_incomplete_and_uncertain_frames_fail_closed():
+    incomplete = _annaprasana_chart()
+    incomplete['planets'].pop()
+
+    missing = evaluate_election_chart('annaprasana', incomplete)
+    uncertain = evaluate_election_chart(
+        'annaprasana', _annaprasana_chart(), house_frame_uncertain=True)
+
+    assert all(item['status'] == 'unknown' for item in missing['outcomes'])
+    assert all(item['status'] == 'unknown' for item in uncertain['outcomes'])
+
+
+def test_annaprasana_provenance_separates_sources_and_product_conventions():
+    root = Path(__file__).parents[1]
+    provenance = json.loads(
+        (root / 'docs/reference/provenance.json').read_text(encoding='utf-8'))
+    sources = {source['id']: source for source in provenance['sources']}
+    claims = {claim['id']: claim for claim in provenance['claims']}
+
+    transcription = sources['BVR-MUHURTHA-CHISTABO-2020']
+    assert transcription['authority_type'] == 'inspected_derivative'
+    assert transcription['inspected_directly'] is True
+    assert transcription['related_work_id'] == 'BVR-MUHURTHA-1993'
+    assert transcription['exact_edition_match_verified'] is False
+    assert transcription['physical_pdf_page_count'] == 78
+    assert transcription['sha256'] == (
+        'b8b878a444a487c83810329fdf8f057c40e92221a867db480d864da8be21a133'
+    )
+    assert sources['BVR-MUHURTHA-1993']['inspected_directly'] is False
+    chart_claim = claims['muhurta.annaprasana.raman_transcription_chart']
+    assert chart_claim['source_ids'] == [
+        'BVR-MUHURTHA-1993', 'BVR-MUHURTHA-CHISTABO-2020']
+    assert chart_claim['locator'].endswith(
+        'internal printed p. 22 (physical PDF p. 25)')
+    assert 'inspected in the 2020 Chistabo derivative' in chart_claim['locator']
+    assert 'strength' not in chart_claim['scope'].lower()
+
+    paksha_claim = claims['muhurta.raman_transcription.paksha_definition']
+    assert paksha_claim['source_ids'] == [
+        'BVR-MUHURTHA-1993', 'BVR-MUHURTHA-CHISTABO-2020']
+    assert paksha_claim['locator'] == (
+        "B. V. Raman, Chapter II, 'On certain special yogas,' inspected in "
+        'the 2020 Chistabo derivative at internal printed p. 4 '
+        '(physical PDF p. 7)'
+    )
+
+    paksha_policy = claims['election_chart.raman_180_degree_paksha_policy_v1']
+    assert paksha_policy['source_ids'] == [
+        'BVR-MUHURTHA-1993', 'BVR-MUHURTHA-CHISTABO-2020']
+    assert paksha_policy['locator'] == (
+        'B. V. Raman, Chapter II, inspected in the 2020 Chistabo derivative '
+        'at internal printed p. 4 (physical PDF p. 7); '
+        'annaprasana-natural-malefic-lagna-v1'
+    )
+
+    selection_policy = claims[
+        'election_chart.annaprasana.raman_transcription_policy_v1']
+    assert selection_policy['source_ids'] == []
+    assert 'muhurta.annaprasana.raman_transcription_chart' in (
+        selection_policy['scope'])
+    assert 'muhurta.annaprasana.source_divergence' in selection_policy['scope']
+    assert 'carry the external source IDs' in selection_policy['scope']
+
+    bphs = sources['BPHS-ELS-3.11-MODERN-WITNESS']
+    assert bphs['authority_type'] == 'modern_text_witness'
+    divergence = claims['muhurta.annaprasana.source_divergence']
+    assert divergence['verification_state'] == 'contradicted'
+    assert set(divergence['source_ids']) == {
+        'KALAPRAKASIKA-IYER-1917-AES-1982',
+        'MC-NSP-1945-5E',
+    }
+    assert 'Shukra outside the 7th' in divergence['scope']
+    assert 'Budha outside the 9th' in divergence['scope']
+    assert 'weak or waning Chandra' in divergence['scope']
+    assert 'full Chandra in Lagna' in divergence['scope']
+
+    convention_claims = {
+        'election_chart.whole_sign_house_policy_v1',
+        'election_chart.mean_node_policy_v1',
+        'election_chart.budha_same_sign_association_policy_v1',
+        'election_chart.raman_180_degree_paksha_policy_v1',
+        'election_chart.lunar_phase_boundary_guard_policy_v1',
+        'election_chart.annaprasana_fail_closed_aggregation_policy_v1',
+    }
+    assert all(
+        claims[claim_id]['evidence_class'] == 'project_heuristic'
+        and claims[claim_id]['verification_state'] == 'heuristic'
+        for claim_id in convention_claims
     )
 
 

@@ -169,6 +169,8 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
         election_chart_rule_ids=(
             'annaprasana.house-10-vacant', 'annaprasana.budha-not-7',
             'annaprasana.kuja-not-8', 'annaprasana.shukra-not-9',
+            'annaprasana.benefic-occupies-lagna',
+            'annaprasana.no-natural-malefic-in-lagna',
         ),
         manual_sections=('information', 'chart', 'chart', 'chart'),
     ),
