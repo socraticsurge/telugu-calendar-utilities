@@ -121,19 +121,27 @@ before the deploy step runs.
 
 ## The CI event model
 
-CI listens to both feature-branch pushes and pull requests. A push therefore
-validates a new branch before a PR exists. Once a PR is open, GitHub emits both
-events for the same commit. The workflow maps both events to the source branch
-with `github.head_ref || github.ref_name`; concurrency then cancels the older
-run so exactly one complete Python 3.10–3.13 matrix remains.
+CI listens to feature-branch and `master` pushes plus pull requests. A push
+therefore validates a new branch before a PR exists, and the merge commit is
+validated again on `master`. Once a PR is open, GitHub can emit both push and
+pull-request events for the same commit. The concurrency key combines the head
+repository with `github.head_ref || github.ref_name`, so local duplicate events
+cancel while identically named branches from different forks stay isolated.
 
 The matrix job names remain `test (3.10)` through `test (3.13)`, so the four
-required branch-protection contexts are unchanged. Security supplies the other
-required contexts: `CodeQL (Python)` and `pip-audit (requirements.txt)`.
+backend compatibility contexts are unchanged. Node, the production Vite build,
+Vitest, Chromium, and the browser smoke suite run once in the separate required
+`frontend-and-browser` context. Security supplies the other required contexts:
+`CodeQL (Python)` and `pip-audit (requirements.txt)`.
+
+When introducing or renaming a job, push the branch and wait for the new check
+to pass before adding its exact name to branch protection. Do not merge while a
+new coverage-bearing job is not yet required.
 
 If duplicate matrices both complete, inspect the two runs' event types and
 concurrency groups. A `push` run and a `pull_request` run for the same head
-commit must resolve to the same `ci-<source-branch>` group.
+commit in this repository must resolve to the same
+`ci-<head-repository>-<source-branch>` group.
 
 ---
 
@@ -237,8 +245,8 @@ a website label as textual authority.
 
 ## Respond to a Dependabot PR
 
-Dependabot opens PRs weekly (Monday 06:00 IST) for `pip` deps and
-GitHub Actions. The flow:
+Dependabot opens PRs weekly (Monday 06:00 IST) for Python, npm, and GitHub
+Actions dependencies. The flow:
 
 1. **Read the PR title** — it says what's bumping and from where to
    where. Major bumps need more care than patch/minor.
@@ -249,9 +257,9 @@ GitHub Actions. The flow:
 4. If CI is green and the changelog reads clean, **merge with
    squash**. Dependabot auto-deletes its branch (the
    `delete-branch-on-merge` setting handles it).
-5. If CI fails — read the failure. Most common cause: API change in a
-   transitive. Either pin to the prior version with an explicit ceiling
-   in `pyproject.toml`, or fix the call site.
+5. If CI fails — read the failure. For Python updates, adjust the bound in
+   `pyproject.toml` and regenerate `uv.lock`; for npm, update `package.json`
+   and `package-lock.json` together. Otherwise fix the affected call site.
 
 ### For GitHub Actions bumps specifically
 

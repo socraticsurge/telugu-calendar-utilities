@@ -3,19 +3,23 @@ name: CI
 on:
   pull_request:
   push:
-    branches-ignore: [master, gh-pages]
+    branches-ignore: [gh-pages]
+
+permissions:
+  contents: read
 
 # Push validates a branch before it has a PR. After a PR opens, GitHub emits
 # both push and pull_request events for the same commit; normalize both to the
 # source branch so only one matrix completes. Job names stay unchanged for
 # branch-protection compatibility.
 concurrency:
-  group: ci-${{ github.head_ref || github.ref_name }}
+  group: ci-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       # Don't kill the other versions if one fails — we want to see
       # exactly which Python version regresses.
@@ -42,19 +46,38 @@ jobs:
       - name: Install locked Python dependencies
         # PySwissEph is the sole hash-locked source-build exception; the helper
         # requires wheels for every other package and locks its build tooling.
+        run: python tools/install_locked_dependencies.py --extra test
+
+      - name: Enforce Ruff debt baseline
+        run: uv run --no-sync python tools/check_ruff_baseline.py
+
+      - name: Run tests
+        run: uv run --no-sync python -m pytest tests/ -v --ignore=tests/test_browser_smoke.py
+
+  frontend-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: '0.11.8'
+          enable-cache: true
+
+      - name: Install locked Python dependencies
         run: python tools/install_locked_dependencies.py --extra test --extra browser-test
 
-      - name: Install Playwright (for browser smoke tests)
-        # Local dev environments can skip this; tests/test_browser_smoke.py
-        # uses pytest.importorskip to auto-skip when Playwright isn't
-        # available. CI always installs so the smoke tests actually run.
+      - name: Install Playwright
         run: uv run --no-sync playwright install --with-deps chromium
 
-      - name: Set up Node (for Vite build + Vitest)
-        # Node 24 is current Active LTS (since Oct 2025, supported through
-        # Oct 2026). Node 20 hit EOL in April 2026. Must run BEFORE pytest:
-        # tests/test_browser_smoke.py builds the site (`npm run build`)
-        # and exercises dist/ — the exact bytes the deploys publish.
+      - name: Set up Node 24
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
@@ -63,11 +86,10 @@ jobs:
       - name: Install npm dependencies
         run: npm ci --ignore-scripts
 
-      - name: Enforce Ruff debt baseline
-        run: uv run --no-sync python tools/check_ruff_baseline.py
-
-      - name: Run tests
-        run: uv run --no-sync python -m pytest tests/ -v
+      - name: Run browser smoke tests
+        # The session-scoped fixture runs the production build once, then all
+        # browser cases exercise the exact dist/ bytes deployed to Pages.
+        run: uv run --no-sync python -m pytest tests/test_browser_smoke.py -v
 
       - name: Run Vitest (TS scorer + component tests)
         # Covers src/scorer/__tests__/ — the TS mirror of the Python

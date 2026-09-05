@@ -59,9 +59,9 @@ def vite_build():
     if npm is None:
         pytest.skip('npm not installed; browser smoke needs the Vite build.')
     if not (REPO_ROOT / 'node_modules').is_dir():
-        subprocess.run([npm, 'ci'], cwd=REPO_ROOT, check=True,
+        subprocess.run([npm, 'ci', '--ignore-scripts'], cwd=REPO_ROOT, check=True,
                        capture_output=True, text=True)
-    proc = subprocess.run([npm, 'run', 'build'], cwd=REPO_ROOT,
+    proc = subprocess.run([npm, 'run', 'build'], cwd=REPO_ROOT, check=False,
                           capture_output=True, text=True)
     assert proc.returncode == 0, (
         f'`npm run build` failed (exit {proc.returncode}) — the smoke '

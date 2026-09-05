@@ -1,4 +1,4 @@
-# Dependabot config — weekly bumps for pip + github-actions.
+# Dependabot config — weekly bumps for pip, npm, and GitHub Actions.
 #
 # pyproject.toml declares Python dependencies and uv.lock is the active
 # CI/release resolution. Dependabot updates both through the pip ecosystem.
@@ -35,3 +35,18 @@ updates:
       - ci
     commit-message:
       prefix: "chore(deps,ci)"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Kolkata
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - npm
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
