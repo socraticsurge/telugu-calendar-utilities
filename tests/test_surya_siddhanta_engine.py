@@ -1,6 +1,11 @@
 from datetime import date, datetime, timezone
-from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine, ss_sun_longitude, ss_moon_longitude
+
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.surya_siddhanta import (
+    SuryaSiddhantaEngine,
+    ss_moon_longitude,
+    ss_sun_longitude,
+)
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 ENGINE = SuryaSiddhantaEngine()
@@ -127,6 +132,7 @@ def test_eclipse_and_special_yogas_fields_present():
 
 def _sample_jds():
     from datetime import date
+
     from telugu_panchangam.engines.utils import local_midnight_jd
     jd0 = local_midnight_jd(date(2026, 1, 1), 'Asia/Kolkata')
     return [jd0 + i * 7.3 for i in range(60)]

@@ -6,7 +6,7 @@ from datetime import date, datetime, timezone
 
 import pytest
 
-from telugu_panchangam.ingress import rashi_ingresses, RashiIngress, INGRESS_PLANETS
+from telugu_panchangam.ingress import INGRESS_PLANETS, RashiIngress, rashi_ingresses
 
 
 def _dt(y, m, d) -> datetime:

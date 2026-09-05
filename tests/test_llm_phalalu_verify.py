@@ -11,12 +11,16 @@ import copy
 
 import pytest
 
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.personal import llm_phalalu
 from telugu_panchangam.personal.llm_phalalu import (
-    LLM_PHALALU_PROVENANCE, _canonical_graha, _verify, _compute_all_rashis,
-    _generate_verified, VerificationError,
+    LLM_PHALALU_PROVENANCE,
+    VerificationError,
+    _canonical_graha,
+    _compute_all_rashis,
+    _generate_verified,
+    _verify,
 )
-from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 
 def test_canonical_graha_maps_english_and_synonyms():

@@ -20,7 +20,10 @@ import pytz
 
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd
 from telugu_panchangam.gochara.positions import graha_positions
-from telugu_panchangam.personal.llm_phalalu import VerificationError, generate_rasi_phalalu
+from telugu_panchangam.personal.llm_phalalu import (
+    VerificationError,
+    generate_rasi_phalalu,
+)
 
 HYD_GEO = [78.4744, 17.3850, 0.0]
 

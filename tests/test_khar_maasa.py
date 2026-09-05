@@ -7,9 +7,9 @@ Sidereal (Lahiri) solar sign boundaries verified with drikpanchang.com:
 import json
 from datetime import date
 
-from telugu_panchangam.maasa_filters import KHAR_MAASA_SIGNS, khar_maasa_name
-from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikEngine
+from telugu_panchangam.maasa_filters import KHAR_MAASA_SIGNS, khar_maasa_name
 
 
 def _hyderabad():
@@ -108,8 +108,8 @@ def test_flag_in_all_three_engines():
 def test_khar_maasa_fields_in_all_mcp_paths():
     """Both is_khar_maasa and khar_maasa_name are present in all 3 MCP tools."""
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam,
         tool_get_muhurta,
+        tool_get_panchangam,
         tool_get_panchangam_range,
     )
     # Use a Khar-Maasa date so both fields have non-trivial values

@@ -1,6 +1,7 @@
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.models.panchangam_day import Location
 
+
 def test_cities_count():
     assert len(CITIES) == 22
 

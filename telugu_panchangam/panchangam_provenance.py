@@ -4,7 +4,6 @@ This module describes evidence; it does not participate in calculation.
 """
 from __future__ import annotations
 
-
 _GROUPS = (
     {
         'id': 'calendar_semantics',

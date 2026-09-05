@@ -3,8 +3,8 @@
 # sunrise nakshatra (Revati) since DP's positions page is time-of-fetch.
 from datetime import date
 
-from telugu_panchangam.gochara.positions import graha_positions, GRAHA_NAMES
-from telugu_panchangam.engines.utils import local_midnight_jd, get_sunrise
+from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd
+from telugu_panchangam.gochara.positions import GRAHA_NAMES, graha_positions
 
 HYD_GEO = [78.4744, 17.3850, 0.0]
 
@@ -86,6 +86,7 @@ def test_longitudes_in_range_and_ketu_opposite():
 
 def test_mcp_get_graha_positions():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_graha_positions
     result = json.loads(tool_get_graha_positions('2026-06-11', 'Hyderabad'))
     assert result['date'] == '2026-06-11'
@@ -97,5 +98,6 @@ def test_mcp_get_graha_positions():
 
 def test_mcp_get_graha_positions_validates():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_graha_positions
     assert 'error' in json.loads(tool_get_graha_positions('11-06-2026', 'Hyderabad'))

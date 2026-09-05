@@ -3,9 +3,11 @@ import json
 from pathlib import Path
 
 from telugu_panchangam.personal.activity_rules import (
-    ACTIVITY_ALIASES, ACTIVITY_RULES, get_activity_rules, resolve_activity,
+    ACTIVITY_ALIASES,
+    ACTIVITY_RULES,
+    get_activity_rules,
+    resolve_activity,
 )
-
 
 ROOT = Path(__file__).parents[1]
 

@@ -1,12 +1,11 @@
 """Contract tests for the generated browser Muhurtam activity catalogue."""
 import json
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from telugu_panchangam.personal.activity_catalog import BROWSER_ACTIVITIES
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
-
 
 ROOT = Path(__file__).parents[1]
 GENERATED = ROOT / 'src' / 'data' / 'activity-rules.generated.json'

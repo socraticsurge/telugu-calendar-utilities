@@ -13,7 +13,11 @@ from datetime import date, datetime, timezone
 
 import pytest
 
-from telugu_panchangam.maudhya_calendar import combustion_periods, CombustionPeriod, PLANET_NAMES
+from telugu_panchangam.maudhya_calendar import (
+    PLANET_NAMES,
+    CombustionPeriod,
+    combustion_periods,
+)
 from telugu_panchangam.models.panchangam_day import Location
 
 # Hyderabad reference location (DP reference city for 2026 calibration).

@@ -3,8 +3,8 @@
 from datetime import date
 from functools import lru_cache
 
-from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 ENGINE = DrikGanitaEngine()

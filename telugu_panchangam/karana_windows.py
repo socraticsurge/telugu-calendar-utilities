@@ -11,9 +11,9 @@ Puchha the final three nominal Ghatis of its assigned quarter. The nominal
 thirty-Ghati Vishti measure is scaled to the observed Karana duration.
 """
 from datetime import timedelta
-from telugu_panchangam.models.panchangam_day import Span, GhatiWindow, GhatiClock
-from telugu_panchangam.ghati import civil_to_ghati
 
+from telugu_panchangam.ghati import civil_to_ghati
+from telugu_panchangam.models.panchangam_day import GhatiClock, GhatiWindow, Span
 
 VISHAGHATI_OFFSETS_GHATI = {
     'Ashvini': 50, 'Bharani': 24, 'Krittika': 30, 'Rohini': 40,

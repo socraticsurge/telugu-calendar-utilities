@@ -2,10 +2,12 @@
 # classical favourable-house sets; Phaladeepika 26.3-8 supports Vedha. Nodes
 # and named Shani conditions have separate provenance states.
 from telugu_panchangam.gochara.rules import (
-    GOCHARA_FAVOURABLE, GOCHARA_PROVENANCE, VEDHA, gochara_for,
+    GOCHARA_FAVOURABLE,
+    GOCHARA_PROVENANCE,
+    VEDHA,
+    gochara_for,
     named_conditions,
 )
-
 
 # --- The classical tables themselves ---
 
@@ -136,6 +138,7 @@ def test_no_conditions_when_clear():
 
 def test_mcp_get_gochara():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_gochara
     result = json.loads(tool_get_gochara('2026-06-11', 'Mesha', 'Hyderabad'))
     assert result['janma_rasi'] == 'Mesha'
@@ -154,5 +157,6 @@ def test_mcp_get_gochara():
 
 def test_mcp_get_gochara_validates():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_gochara
     assert 'error' in json.loads(tool_get_gochara('2026-06-11', 'Aries', 'Hyderabad'))

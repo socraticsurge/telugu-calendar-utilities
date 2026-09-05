@@ -1,7 +1,6 @@
 """Guard high-level documentation against reintroducing resolved project state."""
 from pathlib import Path
 
-
 ROOT = Path(__file__).parents[1]
 
 

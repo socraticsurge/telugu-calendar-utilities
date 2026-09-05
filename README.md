@@ -185,10 +185,12 @@ copies; this release does not withdraw an earlier grant.
 
 ## Development
 
+Requires Python 3.10+, [uv](https://docs.astral.sh/uv/), and Node.js 24.
+
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-npm install
-python tools/verify_project.py
-python -m telugu_panchangam.generate   # writes to feeds/
+uv sync --locked --extra test --extra browser-test
+uv run playwright install chromium
+npm ci --ignore-scripts
+uv run python tools/verify_project.py
+uv run python -m telugu_panchangam.generate   # writes to feeds/
 ```

@@ -11,7 +11,6 @@ from telugu_panchangam.mcp.tools import (
 )
 from telugu_panchangam.panchangam_provenance import panchangam_provenance
 
-
 ROOT = Path(__file__).parents[1]
 IDENTITY_FIELDS = {'date', 'city', 'system', 'ayanamsa', 'provenance'}
 

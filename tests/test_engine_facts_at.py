@@ -9,12 +9,12 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
+from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
-from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES, VAARAM_NAMES
-from telugu_panchangam.cities import CITIES
 from telugu_panchangam.models.panchangam_day import SlotFacts
+from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES, VAARAM_NAMES
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 
@@ -144,7 +144,7 @@ def test_facts_at_moon_rashi_transition():
 def test_facts_at_karana_independent_of_special_yogas():
     """Karana name at an instant is derived from elongation purely; sanity
     that the algorithm picks a valid karana name."""
-    from telugu_panchangam.panchangam_names import KARANA_REPEATING, KARANA_FIXED
+    from telugu_panchangam.panchangam_names import KARANA_FIXED, KARANA_REPEATING
     eng = DrikGanitaEngine()
     day = eng.calculate(date(2026, 6, 17), HYD, include_eclipse=False)
     valid_names = set(KARANA_REPEATING) | set(KARANA_FIXED.values())

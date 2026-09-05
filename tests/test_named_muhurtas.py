@@ -6,10 +6,12 @@ the 8th daytime muhurta must coincide with the engine's Abhijit Muhurta.
 """
 from datetime import date, timedelta
 
-from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.muhurtas import (
-    named_muhurtas, DAY_MUHURTAS, NIGHT_MUHURTAS,
+    DAY_MUHURTAS,
+    NIGHT_MUHURTAS,
+    named_muhurtas,
 )
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
@@ -80,7 +82,6 @@ def test_eighth_daytime_muhurta_is_engine_abhijit():
 def test_no_abhijit_on_wednesday():
     """Wednesday has no Abhijit — the 8th daytime muhurta is ordinary,
     matching the engine (which returns no Abhijit window that day)."""
-    from datetime import timedelta as _td
     d = date(2026, 7, 22)  # Wednesday
     assert d.weekday() == 2
     day = ENGINE.calculate(d, HYD)

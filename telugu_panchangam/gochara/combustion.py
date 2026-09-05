@@ -9,7 +9,6 @@ upanayana) require the day be skipped.
 """
 from telugu_panchangam.models.panchangam_day import MaudhyaInfo
 
-
 COMBUSTION_THRESHOLDS = {
     'Guru': 11.0,
     'Shukra': 10.0,

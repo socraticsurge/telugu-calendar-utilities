@@ -12,10 +12,10 @@ from datetime import date, timedelta
 
 import pytest
 
-from telugu_panchangam.gochara.simha_stha import is_simha_stha
+from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
-from telugu_panchangam.cities import CITIES
+from telugu_panchangam.gochara.simha_stha import is_simha_stha
 
 
 def _hyderabad():
@@ -78,7 +78,9 @@ def test_vakya_defaults_false():
 
 def test_flags_in_all_mcp_tool_responses():
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     test_date = '2026-06-11'
 

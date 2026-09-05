@@ -1,10 +1,12 @@
 # tests/test_ics_generator.py
-from datetime import date, datetime, timezone, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+
 from icalendar import Calendar
-from telugu_panchangam.generators.ics import ICSGenerator
-from telugu_panchangam.engines.drik import DrikGanitaEngine
+
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
+from telugu_panchangam.generators.ics import ICSGenerator
 from telugu_panchangam.models.panchangam_day import EclipseInfo
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')

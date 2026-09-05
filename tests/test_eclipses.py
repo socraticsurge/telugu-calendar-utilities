@@ -1,6 +1,7 @@
 from datetime import date
-from telugu_panchangam.eclipses import get_eclipse_for_date
+
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.eclipses import get_eclipse_for_date
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 
@@ -33,9 +34,10 @@ def test_solar_eclipse_not_visible_from_hyderabad():
 
 
 def test_list_eclipses_in_range_finds_known_lunar():
+    from datetime import date
+
     from telugu_panchangam.eclipses import list_eclipses_in_range
     from telugu_panchangam.engines.utils import local_midnight_jd
-    from datetime import date
     jd_start = local_midnight_jd(date(2025, 9, 1), 'Asia/Kolkata')
     jd_end = local_midnight_jd(date(2025, 9, 30), 'Asia/Kolkata')
     eclipses = list_eclipses_in_range(jd_start, jd_end)
@@ -44,9 +46,10 @@ def test_list_eclipses_in_range_finds_known_lunar():
 
 
 def test_list_eclipses_in_range_no_eclipse_empty_period():
+    from datetime import date
+
     from telugu_panchangam.eclipses import list_eclipses_in_range
     from telugu_panchangam.engines.utils import local_midnight_jd
-    from datetime import date
     jd_start = local_midnight_jd(date(2024, 6, 14), 'UTC')
     jd_end = local_midnight_jd(date(2024, 6, 16), 'UTC')
     eclipses = list_eclipses_in_range(jd_start, jd_end)
@@ -54,11 +57,14 @@ def test_list_eclipses_in_range_no_eclipse_empty_period():
 
 
 def test_get_eclipse_from_precomputed_matches_get_eclipse_for_date():
+    from datetime import date
+
     from telugu_panchangam.eclipses import (
-        list_eclipses_in_range, get_eclipse_from_precomputed, get_eclipse_for_date
+        get_eclipse_for_date,
+        get_eclipse_from_precomputed,
+        list_eclipses_in_range,
     )
     from telugu_panchangam.engines.utils import local_midnight_jd
-    from datetime import date
     eclipse_date = date(2025, 9, 7)
     jd_start = local_midnight_jd(date(2025, 9, 1), 'Asia/Kolkata')
     jd_end = local_midnight_jd(date(2025, 9, 30), 'Asia/Kolkata')

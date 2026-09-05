@@ -42,34 +42,15 @@ def _add_tar_bytes(archive: tarfile.TarFile, name: str, data: bytes) -> None:
     archive.addfile(member, io.BytesIO(data))
 
 
-def _fixture_release(
-    tmp_path: Path,
+def _write_wheel_fixture(
+    artifact_dir: Path,
+    root: Path,
     *,
-    wheel_dependencies: tuple[str, ...] = (DEPENDENCY,),
-    wheel_native: str | None = None,
-    wheel_source: bytes = b"",
-    wheel_duplicate_source: bool = False,
-    sdist_attack: str | None = None,
-    sdist_pyproject: str = "aligned",
-    sdist_source: bytes = b"",
-    sdist_duplicate_source: bool = False,
-) -> tuple[Path, Path]:
-    root = tmp_path / "root"
-    artifact_dir = tmp_path / "dist"
-    package = root / "telugu_panchangam"
-    package.mkdir(parents=True)
-    artifact_dir.mkdir()
-    (package / "__init__.py").write_text("", encoding="utf-8")
-    (root / "LICENSE").write_text("AGPL fixture\n", encoding="utf-8")
-    (root / "THIRD_PARTY_NOTICES.md").write_text(
-        "## PySwissEph 2.10.3.2\n", encoding="utf-8"
-    )
-    (root / "pyproject.toml").write_text(
-        f'[project]\nname = "{NAME}"\nversion = "{VERSION}"\n'
-        f'dependencies = [\n    "{DEPENDENCY}",\n]\n',
-        encoding="utf-8",
-    )
-
+    wheel_dependencies: tuple[str, ...],
+    wheel_native: str | None,
+    wheel_source: bytes,
+    wheel_duplicate_source: bool,
+) -> None:
     dist_info = f"{NORMALIZED_NAME}-{VERSION}.dist-info"
     wheel = artifact_dir / f"{NORMALIZED_NAME}-{VERSION}-py3-none-any.whl"
     with zipfile.ZipFile(wheel, mode="w") as archive:
@@ -90,6 +71,16 @@ def _fixture_release(
         if wheel_native is not None:
             archive.writestr(wheel_native, b"native")
 
+
+def _write_sdist_fixture(
+    artifact_dir: Path,
+    root: Path,
+    *,
+    sdist_attack: str | None,
+    sdist_pyproject: str,
+    sdist_source: bytes,
+    sdist_duplicate_source: bool,
+) -> None:
     prefix = f"{NORMALIZED_NAME}-{VERSION}"
     sdist = artifact_dir / f"{prefix}.tar.gz"
     with tarfile.open(sdist, mode="w:gz") as archive:
@@ -124,6 +115,52 @@ def _fixture_release(
             member.type = tarfile.SYMTYPE
             member.linkname = "../../outside.py"
             archive.addfile(member)
+
+
+def _fixture_release(
+    tmp_path: Path,
+    *,
+    wheel_dependencies: tuple[str, ...] = (DEPENDENCY,),
+    wheel_native: str | None = None,
+    wheel_source: bytes = b"",
+    wheel_duplicate_source: bool = False,
+    sdist_attack: str | None = None,
+    sdist_pyproject: str = "aligned",
+    sdist_source: bytes = b"",
+    sdist_duplicate_source: bool = False,
+) -> tuple[Path, Path]:
+    root = tmp_path / "root"
+    artifact_dir = tmp_path / "dist"
+    package = root / "telugu_panchangam"
+    package.mkdir(parents=True)
+    artifact_dir.mkdir()
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (root / "LICENSE").write_text("AGPL fixture\n", encoding="utf-8")
+    (root / "THIRD_PARTY_NOTICES.md").write_text(
+        "## PySwissEph 2.10.3.2\n", encoding="utf-8"
+    )
+    (root / "pyproject.toml").write_text(
+        f'[project]\nname = "{NAME}"\nversion = "{VERSION}"\n'
+        f'dependencies = [\n    "{DEPENDENCY}",\n]\n',
+        encoding="utf-8",
+    )
+
+    _write_wheel_fixture(
+        artifact_dir,
+        root,
+        wheel_dependencies=wheel_dependencies,
+        wheel_native=wheel_native,
+        wheel_source=wheel_source,
+        wheel_duplicate_source=wheel_duplicate_source,
+    )
+    _write_sdist_fixture(
+        artifact_dir,
+        root,
+        sdist_attack=sdist_attack,
+        sdist_pyproject=sdist_pyproject,
+        sdist_source=sdist_source,
+        sdist_duplicate_source=sdist_duplicate_source,
+    )
     return artifact_dir, root
 
 

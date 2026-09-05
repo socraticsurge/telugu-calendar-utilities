@@ -1,12 +1,11 @@
 """Contract tests for Raman's felling-trees lunar-quarter rule."""
-from datetime import date
 import json
+from datetime import date
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.muhurta import day_slots
-
 
 LAST_QUARTER_TITHIS = [
     'Krishna Ashtami', 'Krishna Navami', 'Krishna Dashami',

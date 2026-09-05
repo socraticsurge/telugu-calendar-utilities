@@ -2,7 +2,9 @@
 import os
 import tempfile
 from datetime import date
-from telugu_panchangam.generate import generate_feeds, city_slug
+
+from telugu_panchangam.generate import city_slug, generate_feeds
+
 
 def test_city_slug():
     assert city_slug("Hyderabad") == "hyderabad"

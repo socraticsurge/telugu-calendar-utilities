@@ -1,8 +1,10 @@
 from datetime import date, timedelta
-from telugu_panchangam.engines.drik import DrikEngine
+
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.nakshatra_filters import (
-    PANCHAKA_NAKSHATRAS, is_panchaka_nakshatra,
+    PANCHAKA_NAKSHATRAS,
+    is_panchaka_nakshatra,
 )
 
 
@@ -45,8 +47,11 @@ def test_engine_sets_flag_consistent_with_nakshatra_name():
 
 def test_flag_in_all_mcp_tool_responses():
     import json
+
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     out1 = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
     assert 'in_panchaka_nakshatra' in out1

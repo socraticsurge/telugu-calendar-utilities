@@ -1,11 +1,11 @@
 """Tests for Nakshatra Mukha (mouth-direction) classification — Task 15."""
+import json
 from collections import Counter
 from datetime import date
-import json
 
-from telugu_panchangam.nakshatra_filters import nakshatra_mukha, NAKSHATRA_MUKHA
-from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
+from telugu_panchangam.nakshatra_filters import NAKSHATRA_MUKHA, nakshatra_mukha
 
 
 def _hyderabad():
@@ -54,7 +54,9 @@ def test_engine_populates_nakshatra_mukha():
 
 def test_mukha_in_all_mcp_tool_responses():
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     out1 = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
     assert 'nakshatra_mukha' in out1

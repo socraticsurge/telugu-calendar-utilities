@@ -1,9 +1,11 @@
 from datetime import date, timedelta
+
 import pytest
-from telugu_panchangam.gochara.combustion import compute_maudhya, COMBUSTION_THRESHOLDS
+
+from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
-from telugu_panchangam.cities import CITIES
+from telugu_panchangam.gochara.combustion import COMBUSTION_THRESHOLDS, compute_maudhya
 
 
 def _hyderabad():
@@ -56,8 +58,11 @@ def test_ss_vakya_maudhya_none():
 
 def test_maudhya_in_all_mcp_tool_responses():
     import json
+
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     out1 = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
     assert 'guru_maudhya' in out1

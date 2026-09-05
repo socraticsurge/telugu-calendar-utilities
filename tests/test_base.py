@@ -1,5 +1,11 @@
-from telugu_panchangam.panchangam_names import TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, RASHI_NAMES
 from telugu_panchangam.engines.base import PanchangamEngine
+from telugu_panchangam.panchangam_names import (
+    NAKSHATRA_NAMES,
+    RASHI_NAMES,
+    TITHI_NAMES,
+    YOGA_NAMES,
+)
+
 
 def test_tithi_names_count():
     assert len(TITHI_NAMES) == 30
@@ -21,9 +27,10 @@ def test_engine_is_abstract():
 
 def test_next_nakshatra_span():
     from datetime import datetime, timezone
-    from unittest.mock import patch, MagicMock
-    from telugu_panchangam.models.panchangam_day import Span
+    from unittest.mock import MagicMock, patch
+
     from telugu_panchangam.engines.base import next_nakshatra_span
+    from telugu_panchangam.models.panchangam_day import Span
 
     span_end = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
     # Test typical transition: Ashvini (0) -> Bharani (1)
@@ -95,6 +102,7 @@ def test_ekadashi_name_vaikunta_in_dhanurmasa():
 
 def _noon_jd(y, m, d):
     from datetime import date
+
     from telugu_panchangam.engines.utils import local_midnight_jd
     return local_midnight_jd(date(y, m, d), 'Asia/Kolkata') + 0.5
 
@@ -133,8 +141,9 @@ def test_ayanam_uttarayanam_signs():
 
 def test_nakshatra_day_windows_boundaries():
     from datetime import datetime, timedelta
-    from telugu_panchangam.models.panchangam_day import Span
+
     from telugu_panchangam.engines.base import nakshatra_day_windows
+    from telugu_panchangam.models.panchangam_day import Span
 
     day_start = datetime(2023, 1, 1, 6, 0)
     day_end = datetime(2023, 1, 2, 6, 0)
@@ -162,9 +171,10 @@ def test_nakshatra_day_windows_boundaries():
 # --- Nakshatra Ghati Window ---
 
 def test_nakshatra_ghati_window_happy_path():
+    from datetime import datetime, timedelta, timezone
+
     from telugu_panchangam.engines.base import nakshatra_ghati_window
     from telugu_panchangam.models.panchangam_day import Span
-    from datetime import datetime, timezone, timedelta
 
     start_time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
     end_time = start_time + timedelta(hours=1)
@@ -180,9 +190,10 @@ def test_nakshatra_ghati_window_happy_path():
 
 
 def test_nakshatra_ghati_window_zero_duration():
+    from datetime import datetime, timezone
+
     from telugu_panchangam.engines.base import nakshatra_ghati_window
     from telugu_panchangam.models.panchangam_day import Span
-    from datetime import datetime, timezone
 
     time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
     span = Span(name='Bharani', start=time, end=time)
@@ -197,9 +208,10 @@ def test_nakshatra_ghati_window_zero_duration():
 
 
 def test_nakshatra_ghati_window_different_nakshatra():
+    from datetime import datetime, timedelta, timezone
+
     from telugu_panchangam.engines.base import nakshatra_ghati_window
     from telugu_panchangam.models.panchangam_day import Span
-    from datetime import datetime, timezone, timedelta
 
     start_time = datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc)
     end_time = start_time + timedelta(hours=2)
@@ -217,7 +229,9 @@ def test_nakshatra_ghati_window_different_nakshatra():
 # --- Maasam naming ---
 
 from unittest.mock import patch
+
 from telugu_panchangam.engines.base import maasam_name
+
 
 def _mock_prev_new_moon(elong_func, jd):
     if jd == 100.0: return 90.0
@@ -267,8 +281,9 @@ def test_maasam_name_nija():
 
 def test_nakshatra_ghati_window_calculation():
     from datetime import datetime, timedelta, timezone
-    from telugu_panchangam.models.panchangam_day import Span
+
     from telugu_panchangam.engines.base import nakshatra_ghati_window
+    from telugu_panchangam.models.panchangam_day import Span
 
     # Create a 60-hour span to make calculations straightforward (1 hour = 1 ghati proportion)
     start = datetime(2025, 1, 1, 0, 0, tzinfo=timezone.utc)

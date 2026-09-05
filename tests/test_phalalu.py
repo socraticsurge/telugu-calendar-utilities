@@ -1,6 +1,6 @@
 # Daily Rasi Phalalu: deterministic text rendered from computed gochara,
 # chandrabalam and (optionally) tarabalam facts — never free-form fiction.
-from telugu_panchangam.personal.phalalu import rasi_phalalu, HOUSE_MEANINGS
+from telugu_panchangam.personal.phalalu import HOUSE_MEANINGS, rasi_phalalu
 
 # Jun 11 2026 sunrise sky (DP-verified rasis)
 SKY = {
@@ -67,6 +67,7 @@ def test_invalid_rasi_raises():
 
 def test_mcp_get_rasi_phalalu():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rasi_phalalu
     result = json.loads(tool_get_rasi_phalalu('2026-06-11', 'Mesha', 'Hyderabad'))
     assert result['day_quality'] in ('good', 'mixed', 'difficult')
@@ -75,6 +76,7 @@ def test_mcp_get_rasi_phalalu():
 
 def test_mcp_get_rasi_phalalu_with_star():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rasi_phalalu
     result = json.loads(tool_get_rasi_phalalu('2026-06-11', 'Meena', 'Hyderabad',
                                               janma_nakshatra='Uttara Bhadrapada'))

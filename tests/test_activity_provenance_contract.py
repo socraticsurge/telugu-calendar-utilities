@@ -5,7 +5,6 @@ from pathlib import Path
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from tools.check_activity_provenance import audit
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 

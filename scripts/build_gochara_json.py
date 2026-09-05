@@ -11,9 +11,9 @@ import json
 import os
 from datetime import date, timedelta
 
-from telugu_panchangam.panchangam_names import RASHI_NAMES
 from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd
-from telugu_panchangam.gochara.positions import graha_positions, GRAHA_NAMES
+from telugu_panchangam.gochara.positions import GRAHA_NAMES, graha_positions
+from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 HYD_GEO = [78.4744, 17.3850, 0.0]
 DAYS_AHEAD = 550  # ~18 months, matching the feed window

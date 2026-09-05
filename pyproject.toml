@@ -50,6 +50,9 @@ build = [
     "setuptools>=77",
     "wheel>=0.45,<1",
 ]
+dev = [
+    "pre-commit==4.6.2",
+]
 
 [project.urls]
 Homepage = "https://panchangam.astrochaganti.com"

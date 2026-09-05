@@ -3,10 +3,11 @@ from datetime import date
 
 import pytest
 
-from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.muhurta import (
-    day_slots, relative_tier,
+    day_slots,
+    relative_tier,
 )
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
@@ -186,8 +187,8 @@ def test_invalid_activity_raises():
 # --- Activity taxonomy (Batch D) ---
 
 def test_all_36_activities_callable():
-    from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
     from telugu_panchangam.personal.activity_rules import ACTIVITY_ALIASES
+    from telugu_panchangam.personal.muhurta import ACTIVITIES, ACTIVITY_RULES
     assert len(ACTIVITIES) == 36
     # backward-compat: every old key must still be accepted
     for old in ('any', 'travel', 'purchase', 'ceremony', 'beginning'):
@@ -289,7 +290,9 @@ def test_court_uses_exact_source_gates_not_tithi_family_bonus():
 
 def test_tithi_family_classification():
     from telugu_panchangam.personal.tithi_class import (
-        tithi_number, tithi_family, FAMILIES,
+        FAMILIES,
+        tithi_family,
+        tithi_number,
     )
     # Engine-canonical names (Pratipat, Shashthi) and the two terminus
     # aliases (Pournami / Amavasya) all map correctly.
@@ -307,8 +310,9 @@ def test_tithi_family_classification():
     # tithi_number returns 1..15
     assert tithi_number('Krishna Dwadashi') == 12
     # every family has 3 tithis
-    from telugu_panchangam.personal.tithi_class import TITHI_NUMBER_FAMILY
     from collections import Counter
+
+    from telugu_panchangam.personal.tithi_class import TITHI_NUMBER_FAMILY
     counts = Counter(TITHI_NUMBER_FAMILY.values())
     for fam in FAMILIES:
         assert counts[fam] == 3, f'{fam} should have 3 tithis, got {counts[fam]}'
@@ -728,6 +732,7 @@ def test_diagnose_day_returns_none_when_clear():
 
 def test_mcp_find_muhurta_emits_dropped_days():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     # Wedding over 2026-06-16 to 2026-06-20 — should drop 06-17 (Dagdha)
     # and 06-18 (Dagdha is gone, but Rikta + Sarvartha Siddhi might mix);
@@ -746,6 +751,7 @@ def test_mcp_find_muhurta_emits_dropped_days():
 
 def test_mcp_find_muhurta_emits_tier_on_each_slot():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     result = json.loads(tool_find_muhurta('2026-06-15', 5, 'any', 'Hyderabad'))
     assert result['slots']
@@ -763,6 +769,7 @@ def test_mcp_find_muhurta_exposes_janma_rasis_janma_lagnas_chandra_mode():
     already supported were unreachable from any MCP client.
     """
     import json
+
     from telugu_panchangam.mcp.server import find_muhurta
     # FastMCP @mcp.tool() wraps the function — original is on .fn
     fn = getattr(find_muhurta, 'fn', find_muhurta)
@@ -784,7 +791,7 @@ def test_mcp_find_muhurta_exposes_janma_rasis_janma_lagnas_chandra_mode():
 def test_unknown_tithi_name_does_not_explode():
     # Robustness: tithi_family is wrapped in try/except inside day_slots,
     # so an unknown tithi name silently skips tithi-class scoring.
-    from telugu_panchangam.personal.tithi_class import tithi_family, is_rikta
+    from telugu_panchangam.personal.tithi_class import is_rikta, tithi_family
     with pytest.raises(ValueError):
         tithi_family('Unknown Mystery Tithi')
 
@@ -938,6 +945,7 @@ def test_tithi_class_scorer_still_supports_preferred_class():
 def test_engine_kwarg_does_not_break_mcp_path():
     """Through the MCP tool — verify it still produces results."""
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     result = json.loads(tool_find_muhurta('2026-06-15', 5, 'any', 'Hyderabad'))
     assert result['slots']
@@ -973,6 +981,7 @@ def test_misaligned_rasis_raise():
 
 def test_mcp_find_muhurta():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     result = json.loads(tool_find_muhurta('2026-06-15', 5, 'any', 'Hyderabad'))
     assert result['slots'], 'expected at least one slot in 5 days'
@@ -990,6 +999,7 @@ def test_mcp_find_muhurta():
 
 def test_mcp_find_muhurta_with_chandra_mode():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     result = json.loads(tool_find_muhurta(
         '2026-06-15', 5, 'any', 'Hyderabad',
@@ -1004,6 +1014,7 @@ def test_mcp_find_muhurta_with_chandra_mode():
 
 def test_mcp_find_muhurta_validates():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     assert 'error' in json.loads(tool_find_muhurta('2026-06-15', 20, 'any', 'Hyderabad'))
     assert 'error' in json.loads(tool_find_muhurta('2026-06-15', 5, 'not-a-real-activity', 'Hyderabad'))
@@ -1036,8 +1047,8 @@ def test_night_slots_timing_between_sunset_and_next_sunrise():
 
 
 def test_night_slots_are_named_night_muhurtas():
-    from telugu_panchangam.personal.muhurta import night_slots
     from telugu_panchangam.muhurtas import NIGHT_MUHURTAS
+    from telugu_panchangam.personal.muhurta import night_slots
     night_names = {n for n, _, _ in NIGHT_MUHURTAS}
     day, next_day = _two_days(2026, 6, 16)
     slots = night_slots(day, next_day, engine=ENGINE)
@@ -1135,7 +1146,7 @@ def test_night_slots_reason_groups_have_slot_quality():
 
 
 def test_night_slots_sorted_by_tier_then_score():
-    from telugu_panchangam.personal.muhurta import night_slots, TIER_NAMES
+    from telugu_panchangam.personal.muhurta import TIER_NAMES, night_slots
     day, next_day = _two_days(2026, 6, 16)
     slots = night_slots(day, next_day, engine=ENGINE)
     assert slots
@@ -1147,9 +1158,8 @@ def test_night_slots_sorted_by_tier_then_score():
 
 
 def test_night_slots_eclipse_returns_empty():
-    from datetime import timedelta
-    from telugu_panchangam.personal.muhurta import night_slots
     from telugu_panchangam.models.panchangam_day import EclipseInfo
+    from telugu_panchangam.personal.muhurta import night_slots
     day, next_day = _two_days(2026, 6, 16)
     from dataclasses import replace
     day_with_eclipse = replace(day, eclipse=EclipseInfo(
@@ -1160,6 +1170,7 @@ def test_night_slots_eclipse_returns_empty():
 
 def test_mcp_find_muhurta_include_night():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_muhurta
     result = json.loads(tool_find_muhurta(
         '2026-06-15', 3, 'any', 'Hyderabad', include_night=True))
@@ -1192,7 +1203,8 @@ def test_day_slots_are_muhurtas_of_equal_length():
 def test_night_slots_are_at_most_48_minutes():
     """Night slot windows are also ≤ 48 minutes."""
     from datetime import timedelta
-    from telugu_panchangam.personal.muhurta import night_slots, MUHURTA_MINUTES
+
+    from telugu_panchangam.personal.muhurta import MUHURTA_MINUTES, night_slots
     limit = timedelta(minutes=MUHURTA_MINUTES)
     for date_args in [(2026, 6, 16), (2026, 6, 25)]:
         day, next_day = _two_days(*date_args)

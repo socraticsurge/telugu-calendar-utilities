@@ -1,10 +1,12 @@
+from datetime import date
+
 import pytest
 import swisseph as swe
-from datetime import date
+
 from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
-from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
+from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.models.panchangam_day import Location
 
 # CITIES is a list; use a fixed Hyderabad location for these tests.
@@ -61,6 +63,7 @@ def test_ss_vakya_ayanamsa_is_noop():
 
 def test_ayanamsa_in_mcp_response_metadata():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_panchangam
     out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
     # ayanamsa must be present somewhere — top-level or under metadata.
@@ -73,9 +76,12 @@ def test_ayanamsa_in_mcp_response_metadata():
 
 def test_ayanamsa_in_all_ayanamsa_aware_mcp_tools():
     import json
+
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_panchangam_range,
-        tool_get_graha_positions, tool_find_muhurta,
+        tool_find_muhurta,
+        tool_get_graha_positions,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     # tool_get_panchangam — top-level ayanamsa
     out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
@@ -99,6 +105,7 @@ def test_ayanamsa_in_all_ayanamsa_aware_mcp_tools():
 def test_graha_positions_lahiri_vs_raman_differ():
     """Lahiri and Raman longitudes must differ (they differ by ~20–30 arcmin)."""
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_graha_positions
     lahiri = json.loads(tool_get_graha_positions('2026-06-17', city='Hyderabad', ayanamsa='lahiri'))
     raman  = json.loads(tool_get_graha_positions('2026-06-17', city='Hyderabad', ayanamsa='raman'))
@@ -113,6 +120,7 @@ def test_graha_positions_lahiri_vs_raman_differ():
 def test_graha_positions_no_stale_ayanamsa_note():
     """The 'ayanamsa_note' warning field must be gone now that it is applied."""
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_graha_positions
     for ay in ('lahiri', 'raman'):
         out = json.loads(tool_get_graha_positions('2026-06-17', city='Hyderabad', ayanamsa=ay))
@@ -121,6 +129,7 @@ def test_graha_positions_no_stale_ayanamsa_note():
 
 def test_graha_positions_invalid_ayanamsa_returns_error():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_graha_positions
     out = json.loads(tool_get_graha_positions('2026-06-17', city='Hyderabad', ayanamsa='tropical'))
     assert 'error' in out
@@ -130,6 +139,7 @@ def test_graha_positions_invalid_ayanamsa_returns_error():
 
 def test_tool_get_gochara_accepts_ayanamsa():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_gochara
     out = json.loads(tool_get_gochara('2026-06-17', 'Mesha', 'Hyderabad', ayanamsa='raman'))
     assert 'error' not in out
@@ -141,6 +151,7 @@ def test_tool_get_gochara_raman_vs_lahiri_may_differ():
     We only verify both return valid responses — an actual positional shift
     is asserted by test_graha_positions_lahiri_vs_raman_differ above."""
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_gochara
     out_l = json.loads(tool_get_gochara('2026-06-17', 'Mesha', 'Hyderabad', ayanamsa='lahiri'))
     out_r = json.loads(tool_get_gochara('2026-06-17', 'Mesha', 'Hyderabad', ayanamsa='raman'))
@@ -150,6 +161,7 @@ def test_tool_get_gochara_raman_vs_lahiri_may_differ():
 
 def test_tool_get_rasi_phalalu_accepts_ayanamsa():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rasi_phalalu
     out = json.loads(tool_get_rasi_phalalu('2026-06-17', 'Mesha', 'Hyderabad', ayanamsa='raman'))
     assert 'error' not in out
@@ -160,6 +172,7 @@ def test_tool_get_rasi_phalalu_accepts_ayanamsa():
 def test_rashi_ingresses_lahiri_vs_raman_differ():
     """Ingress timestamps must differ between ayanamsas (sign boundaries shift)."""
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rashi_ingresses
     lahiri = json.loads(tool_get_rashi_ingresses('2026-06-01', '2026-09-30',
                                                   planets=['Sun'], ayanamsa='lahiri'))
@@ -177,6 +190,7 @@ def test_rashi_ingresses_lahiri_vs_raman_differ():
 
 def test_rashi_ingresses_ayanamsa_echoed_in_response():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rashi_ingresses
     out = json.loads(tool_get_rashi_ingresses('2026-06-01', '2026-08-31',
                                                planets=['Sun'], ayanamsa='krishnamurti'))
@@ -185,6 +199,7 @@ def test_rashi_ingresses_ayanamsa_echoed_in_response():
 
 def test_rashi_ingresses_default_ayanamsa_is_lahiri():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rashi_ingresses
     out = json.loads(tool_get_rashi_ingresses('2026-06-01', '2026-08-31', planets=['Sun']))
     assert out.get('ayanamsa') == 'lahiri'

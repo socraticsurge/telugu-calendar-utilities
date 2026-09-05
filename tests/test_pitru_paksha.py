@@ -1,8 +1,10 @@
 from datetime import date, timedelta
+
 import pytest
+
+from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.pitru_paksha import is_pitru_paksha_day
-from telugu_panchangam.cities import CITIES
 
 
 def _hyderabad():
@@ -39,8 +41,11 @@ def test_pitru_paksha_in_actual_engine_output():
 
 def test_flag_in_all_mcp_tool_responses():
     import json
+
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     out1 = json.loads(tool_get_panchangam('2026-09-15', city='Hyderabad'))
     assert 'is_pitru_paksha' in out1

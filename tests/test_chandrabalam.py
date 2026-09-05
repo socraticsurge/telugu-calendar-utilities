@@ -4,7 +4,9 @@
 import pytest
 
 from telugu_panchangam.personal.chandrabalam import (
-    chandra_position, chandra_verdict, is_favourable_chandra,
+    chandra_position,
+    chandra_verdict,
+    is_favourable_chandra,
 )
 
 # DP verdicts with moon in Meena: (janma rasi, verdict)
@@ -51,6 +53,7 @@ def test_invalid_rasi_raises():
 
 def test_mcp_tarabalam_with_rasis():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_tarabalam_days
     result = json.loads(tool_find_tarabalam_days(
         ['Uttara Bhadrapada', 'Purva Ashadha'], '2026-06-11', 7, 'Hyderabad', 'drik',
@@ -67,6 +70,7 @@ def test_mcp_tarabalam_with_rasis():
 
 def test_mcp_chandra_mode_strict_and_puja_ok():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_tarabalam_days
     args = (['Uttara Bhadrapada', 'Purva Ashadha'], '2026-06-11', 14, 'Hyderabad', 'drik')
     kw = dict(janma_rasis=['Meena', 'Dhanu'])
@@ -82,6 +86,7 @@ def test_mcp_chandra_mode_strict_and_puja_ok():
 
 def test_mcp_tarabalam_rasis_validation():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_tarabalam_days
     assert 'error' in json.loads(tool_find_tarabalam_days(
         ['Revati'], '2026-06-11', 7, 'Hyderabad', 'drik', janma_rasis=['Aries']))
@@ -106,8 +111,8 @@ def test_rasi_derivation():
     assert rasi_from_nakshatra('Purva Bhadrapada', 4) == 'Meena'
 
 def test_exactly_nine_stars_straddle():
-    from telugu_panchangam.personal.chandrabalam import rasi_from_nakshatra
     from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES
+    from telugu_panchangam.personal.chandrabalam import rasi_from_nakshatra
     straddlers = [n for n in NAKSHATRA_NAMES if rasi_from_nakshatra(n) is None]
     assert straddlers == ['Krittika', 'Mrigashira', 'Punarvasu', 'Uttara Phalguni',
                           'Chitra', 'Vishakha', 'Uttara Ashadha', 'Dhanishtha',

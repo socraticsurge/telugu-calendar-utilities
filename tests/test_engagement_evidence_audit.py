@@ -8,7 +8,6 @@ from telugu_panchangam.models.panchangam_day import Location
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.muhurta import day_slots
 
-
 ROOT = Path(__file__).parents[1]
 CLAIM_ID = 'muhurta.kanya_varavarana'
 ENGINE = DrikGanitaEngine()

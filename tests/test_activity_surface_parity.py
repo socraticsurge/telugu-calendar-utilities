@@ -4,7 +4,6 @@ from pathlib import Path
 
 from telugu_panchangam.personal.activity_catalog import BROWSER_ACTIVITIES
 
-
 ROOT = Path(__file__).parents[1]
 
 

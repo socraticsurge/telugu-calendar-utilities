@@ -2,7 +2,6 @@
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).parents[1]
 LEDGER_PATH = ROOT / 'docs' / 'reference' / 'provenance.json'
 FESTIVAL_FIXTURE = ROOT / 'tests' / 'fixtures' / 'forward_year_festivals.json'

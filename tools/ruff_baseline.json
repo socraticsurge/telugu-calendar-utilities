@@ -1,17 +1,5 @@
 {
   "counts": {
-    "scripts/build_gochara_json.py": {
-      "I001": 1
-    },
-    "scripts/build_lagna_json.py": {
-      "I001": 1
-    },
-    "scripts/generate_llm_phalalu.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/eclipses.py": {
-      "I001": 1
-    },
     "telugu_panchangam/engines/base.py": {
       "I001": 4
     },
@@ -28,356 +16,45 @@
     "telugu_panchangam/engines/vakya.py": {
       "I001": 1
     },
-    "telugu_panchangam/generate.py": {
-      "I001": 1
-    },
     "telugu_panchangam/generators/ics.py": {
       "E701": 6,
       "E731": 2,
       "F541": 1,
       "I001": 1
     },
-    "telugu_panchangam/ghati.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/gochara/combustion.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/gochara/positions.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/ingress.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/karana_windows.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/mcp/location.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/mcp/server.py": {
-      "I001": 1
-    },
     "telugu_panchangam/mcp/tools.py": {
       "E402": 22,
       "E701": 7,
-      "E741": 1,
-      "I001": 2
-    },
-    "telugu_panchangam/panchaka.py": {
-      "I001": 1
+      "E741": 1
     },
     "telugu_panchangam/panchanga_shuddhi.py": {
       "E701": 10
     },
-    "telugu_panchangam/panchangam_provenance.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/personal/homa.py": {
-      "I001": 1
-    },
     "telugu_panchangam/personal/muhurta.py": {
       "I001": 4
-    },
-    "telugu_panchangam/personal/phalalu.py": {
-      "I001": 1
     },
     "telugu_panchangam/personal/slot_scorers.py": {
       "E702": 2,
       "I001": 1
     },
-    "telugu_panchangam/sankramana.py": {
-      "I001": 1
-    },
-    "tests/test_activity_provenance_contract.py": {
-      "I001": 1
-    },
-    "tests/test_activity_rules_export.py": {
-      "I001": 1
-    },
-    "tests/test_activity_surface_parity.py": {
-      "I001": 1
-    },
-    "tests/test_adhika_maasa_muhurta.py": {
-      "I001": 1
-    },
-    "tests/test_anandadi.py": {
-      "I001": 2
-    },
-    "tests/test_annaprasana_profile.py": {
-      "I001": 1
-    },
-    "tests/test_any_activity_provenance.py": {
-      "I001": 1
-    },
-    "tests/test_ayanamsa.py": {
-      "I001": 12
-    },
     "tests/test_base.py": {
       "E402": 2,
-      "E701": 12,
-      "I001": 9
-    },
-    "tests/test_beginning_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_bhadra_mukha_puchha.py": {
-      "I001": 5
-    },
-    "tests/test_bhumi_puja_profile.py": {
-      "I001": 1
-    },
-    "tests/test_borrowing_money_profile.py": {
-      "I001": 1
+      "E701": 12
     },
     "tests/test_browser_smoke.py": {
       "E731": 1
     },
-    "tests/test_business_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_ceremony_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_chandrabalam.py": {
-      "I001": 5
-    },
-    "tests/test_cities.py": {
-      "I001": 1
-    },
-    "tests/test_codeql_contract.py": {
-      "I001": 1
-    },
-    "tests/test_court_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_cremation_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_disha_shoola.py": {
-      "I001": 2
-    },
-    "tests/test_documentation_freshness.py": {
-      "I001": 1
-    },
-    "tests/test_drik_engine.py": {
-      "I001": 1
-    },
-    "tests/test_eclipses.py": {
-      "I001": 4
-    },
-    "tests/test_engagement_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_engine_facts_at.py": {
-      "I001": 2
-    },
-    "tests/test_festivals.py": {
-      "I001": 1
-    },
-    "tests/test_generate.py": {
-      "I001": 1
-    },
-    "tests/test_ghati.py": {
-      "I001": 2
-    },
-    "tests/test_gochara_provenance.py": {
-      "I001": 1
-    },
-    "tests/test_gochara_rules.py": {
-      "I001": 3
-    },
-    "tests/test_gold_jewelry_profile.py": {
-      "I001": 1
-    },
-    "tests/test_graha_positions.py": {
-      "I001": 3
-    },
-    "tests/test_graha_yuddha.py": {
-      "I001": 1
-    },
-    "tests/test_gruhapravesha_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_home_repair_profile.py": {
-      "I001": 1
-    },
-    "tests/test_house_purchase_profile.py": {
-      "I001": 1
-    },
     "tests/test_ics_generator.py": {
-      "E741": 4,
-      "I001": 1
-    },
-    "tests/test_ingress.py": {
-      "I001": 1
-    },
-    "tests/test_integration.py": {
-      "I001": 1
-    },
-    "tests/test_job_contract_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_khar_maasa.py": {
-      "I001": 2
-    },
-    "tests/test_lagna_json_builder.py": {
-      "I001": 1
-    },
-    "tests/test_lagna_position.py": {
-      "I001": 1
-    },
-    "tests/test_land_purchase_profile.py": {
-      "I001": 1
-    },
-    "tests/test_lending_money_profile.py": {
-      "I001": 1
-    },
-    "tests/test_litigation_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_llm_phalalu_verify.py": {
-      "I001": 1
-    },
-    "tests/test_maudhya.py": {
-      "I001": 2
-    },
-    "tests/test_maudhya_calendar.py": {
-      "I001": 1
-    },
-    "tests/test_mcp_location.py": {
-      "I001": 1
-    },
-    "tests/test_mcp_tools.py": {
-      "I001": 2
-    },
-    "tests/test_models.py": {
-      "I001": 1
-    },
-    "tests/test_muhurta_activity_backlog.py": {
-      "I001": 1
+      "E741": 4
     },
     "tests/test_muhurta_finder.py": {
-      "E731": 1,
-      "F401": 1,
-      "I001": 17
-    },
-    "tests/test_muhurta_lagna_integration.py": {
-      "I001": 1
-    },
-    "tests/test_muhurta_windows.py": {
-      "I001": 1
-    },
-    "tests/test_mukha_nakshatra.py": {
-      "I001": 2
-    },
-    "tests/test_mundana_profile.py": {
-      "I001": 1
-    },
-    "tests/test_namakarana_profile.py": {
-      "I001": 1
-    },
-    "tests/test_named_muhurtas.py": {
-      "F401": 1,
-      "I001": 1
-    },
-    "tests/test_pada_on_daily.py": {
-      "I001": 4
-    },
-    "tests/test_pages_history_contract.py": {
-      "I001": 1
-    },
-    "tests/test_panchaka_nakshatras.py": {
-      "I001": 2
-    },
-    "tests/test_panchaka_rahita.py": {
-      "I001": 3
-    },
-    "tests/test_panchanga_shuddhi.py": {
-      "I001": 1
-    },
-    "tests/test_panchangam_provenance_disclosure.py": {
-      "I001": 1
+      "E731": 1
     },
     "tests/test_phalalu.py": {
-      "E741": 6,
-      "I001": 3
-    },
-    "tests/test_pilgrimage_profile.py": {
-      "I001": 1
-    },
-    "tests/test_pitru_paksha.py": {
-      "I001": 2
-    },
-    "tests/test_provenance.py": {
-      "I001": 1
-    },
-    "tests/test_purchase_profile.py": {
-      "I001": 1
-    },
-    "tests/test_samvatsara.py": {
-      "I001": 1
-    },
-    "tests/test_sankramana_window.py": {
-      "I001": 2
-    },
-    "tests/test_seemantha_profile.py": {
-      "I001": 1
-    },
-    "tests/test_simha_stha.py": {
-      "I001": 2
-    },
-    "tests/test_surya_siddhanta_engine.py": {
-      "I001": 2
-    },
-    "tests/test_tarabalam.py": {
-      "I001": 3
-    },
-    "tests/test_tracking_documentation_contract.py": {
-      "I001": 1
-    },
-    "tests/test_trade_inventory_profile.py": {
-      "I001": 1
-    },
-    "tests/test_travel_profile.py": {
-      "I001": 1
-    },
-    "tests/test_upanayana_profile.py": {
-      "I001": 1
+      "E741": 6
     },
     "tests/test_utils.py": {
-      "E701": 2,
-      "I001": 1
-    },
-    "tests/test_vakya_engine.py": {
-      "I001": 1
-    },
-    "tests/test_vehicle_profile.py": {
-      "I001": 1
-    },
-    "tests/test_vidyarambha_profile.py": {
-      "I001": 1
-    },
-    "tests/test_vishaghati.py": {
-      "I001": 3
-    },
-    "tests/test_wedding_evidence_audit.py": {
-      "I001": 1
-    },
-    "tests/test_well_digging_profile.py": {
-      "I001": 1
-    },
-    "tests/test_wood_cutting_profile.py": {
-      "I001": 1
-    },
-    "tests/test_yajna_evidence_audit.py": {
-      "I001": 1
-    },
-    "tools/check_activity_provenance.py": {
-      "I001": 1
-    },
-    "tools/verify_project.py": {
-      "I001": 1
+      "E701": 2
     }
   },
   "description": "Ruff E/F/I debt baseline; counts may only change intentionally.",

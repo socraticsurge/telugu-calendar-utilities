@@ -1,13 +1,12 @@
 """Trade-inventory purchase preserves Raman's buyer-side formula."""
-from datetime import date
 import json
+from datetime import date
 from pathlib import Path
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.muhurta import day_slots, diagnose_day
-
 
 ROOT = Path(__file__).parents[1]
 CLAIM_ID = 'muhurta.trade_inventory.purchase'
