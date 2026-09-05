@@ -18,6 +18,7 @@ def rendered() -> str:
         ELECTION_CHART_CONVENTIONS,
     )
     from telugu_panchangam.personal.election_chart_rules import (
+        ELECTION_CHART_COMPLETE_ASSESSORS,
         ELECTION_CHART_HOUSE_SYSTEM,
         ELECTION_CHART_MANUAL_REMAINDERS,
         ELECTION_CHART_NODE_CONVENTION,
@@ -33,6 +34,7 @@ def rendered() -> str:
         'vacancy_includes': list(ELECTION_CHART_PLANETS),
         'convention_schema_version': ELECTION_CHART_CONVENTION_SCHEMA_VERSION,
         'conventions': ELECTION_CHART_CONVENTIONS,
+        'complete_assessors': list(ELECTION_CHART_COMPLETE_ASSESSORS),
         'rules': {activity: list(rules) for activity, rules in ELECTION_CHART_RULES.items()},
         'manual_remainders': {
             activity: list(items)

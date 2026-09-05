@@ -38,6 +38,46 @@ class PrimitiveOutcome:
     evidence: tuple[str, ...] = ()
 
 
+def evaluate_all_planets_in_houses(
+    rule: Mapping[str, Any],
+    houses: Mapping[str, int] | None,
+    *,
+    house_frame_uncertain: bool = False,
+) -> PrimitiveOutcome:
+    """Require every named graha to occupy one of the target houses."""
+    if houses is None or house_frame_uncertain:
+        return PrimitiveOutcome(
+            'unknown', ('Complete Whole Sign house facts are unavailable.',)
+        )
+    planets = rule.get('planets')
+    target_houses = rule.get('houses')
+    if (
+        not isinstance(planets, list)
+        or not planets
+        or any(not isinstance(planet, str) or not planet for planet in planets)
+        or len(set(planets)) != len(planets)
+        or not isinstance(target_houses, list)
+        or not target_houses
+        or any(
+            type(house) is not int or not 1 <= house <= 12
+            for house in target_houses
+        )
+        or any(planet not in houses for planet in planets)
+    ):
+        return PrimitiveOutcome(
+            'unknown', ('The grouped-graha rule configuration is incomplete.',)
+        )
+    passed = all(houses[planet] in target_houses for planet in planets)
+    target_text = ', '.join(str(house) for house in target_houses)
+    observed = '; '.join(
+        f'{planet} house {houses[planet]}' for planet in planets
+    )
+    return PrimitiveOutcome(
+        'pass' if passed else 'fail',
+        (f'{observed}; all must be in house {target_text}.',),
+    )
+
+
 def navamsa_rashi(position: PlanetPosition) -> str | None:
     """Derive planetary Navamsa, failing closed near rounded boundaries."""
     internal_boundaries = (

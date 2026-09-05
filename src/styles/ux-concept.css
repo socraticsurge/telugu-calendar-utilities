@@ -1494,6 +1494,7 @@ h2.panel-heading { display: none !important; }
 
 .mu-personal-role strong { color: var(--ux-brand); }
 
+.mu-chart-removals,
 .mu-personal-removals {
   max-width: 72ch;
   margin: var(--ux-space-3) 0;
@@ -1504,6 +1505,7 @@ h2.panel-heading { display: none !important; }
   font-size: var(--ux-text-sm);
 }
 
+.mu-chart-removals summary,
 .mu-personal-removals summary {
   min-height: 44px;
   padding: var(--ux-space-3);
@@ -1512,9 +1514,17 @@ h2.panel-heading { display: none !important; }
   cursor: pointer;
 }
 
+.mu-chart-removals ul,
 .mu-personal-removals ul {
   margin: 0;
   padding: 0 var(--ux-space-4) var(--ux-space-3) 2rem;
+}
+
+.mu-chart-removals li small {
+  display: block;
+  margin-top: var(--ux-space-1);
+  color: var(--ux-text);
+  overflow-wrap: anywhere;
 }
 .mu-chart-status--screened { border-left-color: var(--ux-good); }
 .mu-chart-status--screened strong { color: var(--ux-good); }

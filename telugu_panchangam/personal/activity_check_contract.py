@@ -209,6 +209,10 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
             'prefer_tithi_class', 'avoid_tithi_class', 'allowed_varas',
             'allowed_nakshatras', 'allowed_lagnas',
         ),
+        election_chart_rule_ids=(
+            'vidyarambha.house-8-vacant',
+            'vidyarambha.budha-shukra-guru-9',
+        ),
         manual_sections=('information', 'information', 'chart', 'chart'),
     ),
     'seemantha': _activity(

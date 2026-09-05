@@ -511,6 +511,24 @@ def _muhurta_planets(
             'Chandra': 1 if chart_index % 2 == 0 else 2,
             'Shukra': 1,
         })
+    elif scenario in {
+        'vidyarambha-pass',
+        'vidyarambha-preference-miss',
+        'vidyarambha-hard-fail',
+        'vidyarambha-unknown',
+    }:
+        houses.update({
+            'Budha': 9,
+            'Shukra': 9,
+            'Guru': 9,
+            'Rahu': 5,
+        })
+        if scenario == 'vidyarambha-preference-miss':
+            houses['Guru'] = 10
+        elif scenario == 'vidyarambha-hard-fail':
+            houses['Surya'] = 8
+        elif scenario == 'vidyarambha-unknown' and chart_index % 2:
+            houses['Guru'] = 10
     houses['Ketu'] = (houses['Rahu'] + 5) % 12 + 1
     rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
     lagna_index = rashis.index(canonical_lagna)
@@ -765,6 +783,11 @@ def _run_muhurta_browser_search(
         }""",
         system,
     )
+    if activity == 'vidyarambha':
+        option = page.locator('#mu-activity option[value="vidyarambha"]')
+        assert option.text_content().strip() == (
+            'Aksharabhyasa (First-letter writing)'
+        )
     page.select_option('#mu-activity', activity)
     page.fill('#tb-from', MUHURTA_FIXTURE_DATE)
     page.fill('#tb-to', MUHURTA_FIXTURE_DATE)
@@ -1968,12 +1991,16 @@ def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
         ('gold-pass', 'gold', 'drik', 'screened'),
         ('gold-cap', 'gold', 'drik', 'screened'),
         ('gold-unknown', 'gold', 'drik', 'screened'),
+        ('vidyarambha-pass', 'vidyarambha', 'drik', 'screened'),
+        ('vidyarambha-preference-miss', 'vidyarambha', 'drik', 'screened'),
+        ('vidyarambha-hard-fail', 'vidyarambha', 'drik', 'screened'),
+        ('vidyarambha-unknown', 'vidyarambha', 'drik', 'screened'),
         ('failure', 'travel', 'drik', 'screened'),
         ('mixed', 'purchase', 'drik', 'screened'),
         ('unsupported', 'purchase', 'surya-siddhanta', 'unsupported-system'),
         ('offline', 'purchase', 'drik', 'unavailable'),
         ('malformed', 'purchase', 'drik', 'unavailable'),
-        ('manual-only', 'karnavedha', 'drik', 'manual-only'),
+        ('manual-only', 'vehicle', 'drik', 'manual-only'),
         ('not-run', 'wedding', 'drik', 'not-run'),
     ),
 )
@@ -2111,6 +2138,62 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
                 'Qualitative chart or ritual checks still require '
                 'practitioner review'
             ) not in share_text
+        elif scenario.startswith('vidyarambha-'):
+            status_text = status.inner_text()
+            assert 'Chapter VIII Aksharabhyasa first-letter-writing rite only' in (
+                status_text)
+            assert 'partial/provisional' in status_text
+            assert 'complete chart certification' not in status_text
+            assert 'The event-specific clauses were computed' in status_text
+            assert calls
+
+            if scenario == 'vidyarambha-hard-fail':
+                assert result.locator('.mu-slot').count() == 0
+                assert 'No clear slots found' in result.inner_text()
+                removal = result.locator('.mu-chart-removals')
+                assert removal.count() == 1
+                assert 'removed by exact chart requirements' in (
+                    removal.inner_text())
+                removal.locator(':scope > summary').click()
+                assert '8th house is vacant' in removal.inner_text()
+                assert 'House 8 occupants: Surya.' in removal.inner_text()
+            else:
+                assert result.locator('.mu-slot').count() > 0
+                computed = result.locator('.mu-rg-computed').first
+                computed_text = computed.text_content()
+                assert 'Interpretation convention' in computed_text
+                assert (
+                    'H(Budha) = 9 AND H(Shukra) = 9 AND H(Guru) = 9'
+                ) in computed_text
+                assert 'internal printed p. 23 (physical PDF p. 26)' in (
+                    ' '.join(computed_text.split()))
+                if scenario == 'vidyarambha-pass':
+                    assert 'Preference met · tie-break only' in computed_text
+                elif scenario == 'vidyarambha-preference-miss':
+                    assert 'Preference not present · no penalty' in computed_text
+                else:
+                    assert result.locator('.mu-chart-rule--unknown').count() > 0
+                    assert 'changed within this window' in result.locator(
+                        '.mu-chart-boundary'
+                    ).first.text_content()
+                    assert result.locator('.mu-tier-excellent').count() == 0
+
+                page.evaluate(
+                    """() => {
+                        window.__muhurtaShareOpen = null;
+                        window.open = (url, target) => {
+                            window.__muhurtaShareOpen = { url, target };
+                            return null;
+                        };
+                    }"""
+                )
+                result.locator(
+                    'button[aria-label="Share on WhatsApp"]'
+                ).click()
+                opened = page.evaluate('window.__muhurtaShareOpen')
+                share_text = parse_qs(urlparse(opened['url']).query)['text'][0]
+                assert 'partial/provisional' in share_text
+                assert 'not complete chart certification' in share_text
         elif scenario == 'failure':
             assert 'failed an exact chart requirement' in result.inner_text()
             assert 'No clear slots found' in result.inner_text()
@@ -2130,7 +2213,7 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
             assert result.locator('.mu-slot').count() > 0
             assert calls == []
         elif scenario == 'manual-only':
-            assert 'chart review remains manual' in status.inner_text()
+            assert 'Panchangam shortlist complete' in status.inner_text()
             assert 'no exact chart request was needed' in status.inner_text()
             assert result.locator('.mu-slot').count() > 0
             assert calls == []
@@ -2146,6 +2229,11 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
             assert result.locator('.mu-tier-excellent').count() == 0
             if scenario == 'malformed':
                 assert calls
+
+        if expected_state != 'screened':
+            status_text = status.inner_text()
+            assert 'event-specific clauses were computed' not in status_text
+            assert 'event-specific clauses computed' not in status_text
 
         details = result.locator('.mu-reason-details')
         if details.count():

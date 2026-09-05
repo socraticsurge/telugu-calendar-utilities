@@ -1090,6 +1090,7 @@ def tool_find_muhurta(
                 'source_claim': rules.get('source_claim'),
                 'audit_claim': rules.get('audit_claim'),
                 'heuristic_claim': rules.get('heuristic_claim'),
+                'source_scope': rules.get('source_scope'),
                 'related_claims': rules.get('related_claims', []),
                 'manual_prerequisites': rules.get(
                     'manual_prerequisites', False),

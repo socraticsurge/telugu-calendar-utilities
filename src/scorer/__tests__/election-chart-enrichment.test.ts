@@ -132,6 +132,48 @@ function goldResponse(
   };
 }
 
+function vidyarambhaSnapshot(
+  instant: string,
+  options: {
+    conflict?: boolean;
+    conflictOccupant?: (typeof PLANETS)[number];
+    preferenceMiss?: boolean;
+  } = {},
+): ElectionChartSnapshot {
+  return {
+    instant,
+    lagna: { rashi: 'Mesha', degree: 12.5 },
+    planets: PLANETS.map((name, index) => {
+      let rashi = 'Vrishabha';
+      if (name === 'Budha' || name === 'Guru' || name === 'Shukra') {
+        rashi = options.preferenceMiss && name === 'Guru' ? 'Makara' : 'Dhanu';
+      }
+      const conflictOccupant = options.conflictOccupant
+        || (options.conflict ? 'Surya' : null);
+      if (name === conflictOccupant) rashi = 'Vrischika';
+      return {
+        name,
+        rashi,
+        degree: index + 0.25,
+        house: 12,
+        retrograde: name === 'Rahu' || name === 'Ketu',
+      };
+    }),
+  };
+}
+
+function vidyarambhaResponse(
+  request: ElectionChartRequest,
+  chartFor?: (instant: string, index: number) => ElectionChartSnapshot,
+): ElectionChartDerivation {
+  return {
+    ...response(request),
+    charts: request.instants.map((instant, index) => chartFor
+      ? chartFor(instant, index)
+      : vidyarambhaSnapshot(instant)),
+  };
+}
+
 const LOCATION = { latitude: 17.385, longitude: 78.4867, timezone: 'Asia/Kolkata' };
 
 describe('bounded election-chart enrichment', () => {
@@ -366,6 +408,94 @@ describe('bounded election-chart enrichment', () => {
     );
     expect(result.message).toContain('raw score is unchanged');
     expect(result.message).toContain('maximum rating is Good');
+  });
+
+  test('Aksharabhyasa pass preserves score and tier; trio is a tie-break only', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      vidyarambhaResponse(request));
+    const base = slots(1);
+    const result = await enrichElectionChartSlots(base, {
+      activity: 'vidyarambha', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.state).toBe('screened');
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].score).toBe(base[0].score);
+    expect(result.slots[0].tier).toBe(base[0].tier);
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      rejected: false, needsReview: false, stable: true,
+      preferencePasses: 1,
+    }));
+    expect(result.chartRemovedRules).toEqual([]);
+  });
+
+  test('Aksharabhyasa preference miss is retained without score or tier penalty', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      vidyarambhaResponse(request, instant =>
+        vidyarambhaSnapshot(instant, { preferenceMiss: true })));
+    const base = slots(1);
+    const result = await enrichElectionChartSlots(base, {
+      activity: 'vidyarambha', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].score).toBe(base[0].score);
+    expect(result.slots[0].tier).toBe(base[0].tier);
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      rejected: false, needsReview: false, stable: true,
+      preferencePasses: 0,
+    }));
+  });
+
+  test('Aksharabhyasa hard fail rejects even when the trio passes', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      vidyarambhaResponse(request, instant =>
+        vidyarambhaSnapshot(instant, { conflict: true })));
+    const result = await enrichElectionChartSlots(slots(1), {
+      activity: 'vidyarambha', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.slots).toEqual([]);
+    expect(result.chartRemovedCount).toBe(1);
+    expect(result.chartRemovedRules).toEqual([{
+      ruleId: 'vidyarambha.house-8-vacant',
+      label: '8th house is vacant',
+      count: 1,
+      evidence: ['House 8 occupants: Surya.'],
+    }]);
+  });
+
+  test('Aksharabhyasa mixed trio samples are retained and review-gated', async () => {
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      vidyarambhaResponse(request, (instant, index) =>
+        vidyarambhaSnapshot(instant, { preferenceMiss: index % 2 === 1 })));
+    const result = await enrichElectionChartSlots(slots(1), {
+      activity: 'vidyarambha', system: 'drik', location: LOCATION, derive,
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].tier).toBe('Good');
+    expect(result.slots[0].dayDosha).toBe('practitioner_review');
+    expect(result.slots[0].chartScreening).toEqual(expect.objectContaining({
+      rejected: false, needsReview: true, stable: false,
+      preferencePasses: 0,
+    }));
+  });
+
+  test('Aksharabhyasa house-frame uncertainty resolves neither clause', async () => {
+    const base = slots(1);
+    base[0].chartBoundaryNeedsReview = true;
+    const derive = vi.fn(async (request: ElectionChartRequest) =>
+      vidyarambhaResponse(request));
+    const result = await enrichElectionChartSlots(base, {
+      activity: 'vidyarambha', system: 'drik', location: LOCATION, derive,
+      boundarySupportAvailable: true,
+    });
+
+    expect(result.slots).toHaveLength(1);
+    expect(result.slots[0].tier).toBe('Good');
+    expect(result.slots[0].chartScreening?.outcomes.map(outcome => outcome.status))
+      .toEqual(['unknown', 'unknown']);
   });
 
   test('does not blend a Drik/Lahiri chart into a non-Drik search', async () => {

@@ -103,7 +103,7 @@ flowchart TB
 
 ### Browser election-chart post-screen
 
-For Drik searches, 13 source-backed activity profiles have an additional
+For Drik searches, 14 source-backed activity profiles have an additional
 browser-only post-ranking screen. The browser sends only candidate city
 coordinates/timezone and candidate UTC instants to the Astro guest gateway;
 profile identity, birth data, activity and selected role do not leave the
@@ -160,7 +160,7 @@ their deterministic Panchangam fields, personal/chart rule IDs and each manual
 row's display section explicitly, without regex-based prose classification.
 
 See [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md)
-for the complete 27-rule matrix, sampled-state semantics, personal-role formulas,
+for the complete 29-rule matrix, sampled-state semantics, personal-role formulas,
 privacy contract, source locators and manual remainder.
 
 ### What `_evaluate_slot()` adds up (`slot_scorers.py` + `muhurta.py`)

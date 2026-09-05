@@ -2,10 +2,12 @@ import { describe, expect, test } from 'vitest';
 
 import goldOracle from '../../../tests/fixtures/election_chart_gold_oracle.json';
 import goldGatewayOracle from '../../../tests/fixtures/election_chart_gold_gateway_oracle.json';
+import vidyarambhaOracle from '../../../tests/fixtures/election_chart_vidyarambha_oracle.json';
 
 import type { ElectionChartSnapshot } from '../../lib/election-chart-api';
 import {
   automatedRulesFor,
+  chartAssessorCompleteFor,
   chartManualRemaindersFor,
   evaluateElectionChart,
   evaluateElectionSnapshots,
@@ -71,6 +73,39 @@ function goldChart(
   };
 }
 
+interface VidyarambhaSnapshotFixture {
+  houses?: Partial<Record<PlanetName, number>>;
+  mutation?: 'remove-ketu' | 'string-house' | 'duplicate-surya';
+}
+
+function vidyarambhaChart(
+  fixture: VidyarambhaSnapshotFixture,
+  index = 0,
+): ElectionChartSnapshot {
+  const houses: Record<PlanetName, number> = {
+    Surya: 1, Chandra: 2, Kuja: 3, Budha: 9, Guru: 9,
+    Shukra: 9, Shani: 4, Rahu: 5, Ketu: 6,
+    ...fixture.houses,
+  };
+  const result: ElectionChartSnapshot = {
+    instant: `2030-11-17T0${index}:00:00.000Z`,
+    lagna: { rashi: 'Mesha', degree: 12.5 },
+    planets: PLANETS.map((name, position) => ({
+      name,
+      rashi: 'Mesha',
+      degree: position + 0.25,
+      house: houses[name],
+      retrograde: name === 'Rahu' || name === 'Ketu',
+    })),
+  };
+  if (fixture.mutation === 'remove-ketu') result.planets.pop();
+  if (fixture.mutation === 'string-house') {
+    (result.planets[0] as unknown as { house: string }).house = '1';
+  }
+  if (fixture.mutation === 'duplicate-surya') result.planets.at(-1)!.name = 'Surya';
+  return result;
+}
+
 function outcome(
   result: ElectionChartScreening,
   ruleId: string,
@@ -81,6 +116,70 @@ function outcome(
 }
 
 describe('source-backed election-chart predicates', () => {
+  test('Aksharabhyasa declares a scoped partial two-rule assessor', () => {
+    const rules = automatedRulesFor('vidyarambha');
+    expect(rules.map(rule => rule.id)).toEqual([
+      'vidyarambha.house-8-vacant',
+      'vidyarambha.budha-shukra-guru-9',
+    ]);
+    expect(rules.map(rule => rule.effect)).toEqual(['reject', 'prefer']);
+    expect(rules[1]).toEqual(expect.objectContaining({
+      kind: 'all_planets_in_houses',
+      planets: ['Budha', 'Shukra', 'Guru'],
+      houses: [9],
+      convention_id: 'vidyarambha-benefic-trio-co-location-v1',
+      decision_policy_claim:
+        'election_chart.vidyarambha_reject_precedence_policy_v1',
+      method_claims: [
+        'election_chart.vidyarambha_co_location_policy_v1',
+        'election_chart.vidyarambha_reject_precedence_policy_v1',
+      ],
+    }));
+    expect(chartManualRemaindersFor('vidyarambha')).toEqual([]);
+    expect(chartAssessorCompleteFor('vidyarambha')).toBe(false);
+    expect(chartAssessorCompleteFor('gold')).toBe(true);
+  });
+
+  test.each(vidyarambhaOracle.cases)(
+    'shared Python/TypeScript Aksharabhyasa oracle: $id',
+    testCase => {
+      const result = evaluateElectionSnapshots(
+        'vidyarambha',
+        testCase.snapshots.map((snapshot, index) =>
+          vidyarambhaChart(snapshot as VidyarambhaSnapshotFixture, index)),
+        { houseFrameUncertain: testCase.house_frame_uncertain || false },
+      );
+
+      expect(result.outcomes.map(item => item.status)).toEqual(
+        testCase.expected_statuses,
+      );
+      expect(result.rejected).toBe(testCase.rejected);
+      expect(result.needsReview).toBe(testCase.needs_review);
+      expect(result.preferencePasses).toBe(testCase.preference_passes);
+      expect(result.stable).toBe(testCase.stable);
+    },
+  );
+
+  test('hard reject wins while trio preference changes no score or tier', () => {
+    const result = evaluateElectionChart('vidyarambha', vidyarambhaChart({
+      houses: { Rahu: 8, Budha: 9, Shukra: 9, Guru: 9 },
+    }));
+
+    expect(result.rejected).toBe(true);
+    expect(result.preferencePasses).toBe(1);
+    expect(outcome(result, 'vidyarambha.house-8-vacant').evidence).toEqual([
+      'House 8 occupants: Rahu.',
+    ]);
+    expect(outcome(result, 'vidyarambha.budha-shukra-guru-9')).toEqual(
+      expect.objectContaining({
+        status: 'pass',
+        evidence: [
+          'Budha house 9; Shukra house 9; Guru house 9; all must be in house 9.',
+        ],
+      }),
+    );
+  });
+
   test('Gold declares four qualification rules and no chart remainder', () => {
     const rules = automatedRulesFor('gold');
     expect(rules.map(rule => rule.id)).toEqual([

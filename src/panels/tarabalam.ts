@@ -55,6 +55,7 @@ import { roleForActivity } from '../scorer/personal-election-screening';
 import { enrichElectionChartSlots } from '../scorer/election-chart-enrichment';
 import {
   automatedRulesFor,
+  chartAssessorCompleteFor,
   chartManualRemaindersFor,
 } from '../scorer/election-chart-screening';
 import { localWallTimeToInstant } from '../lib/election-chart-api';
@@ -101,6 +102,38 @@ export function muClassifyManualChecks(
     result[row.display_section].push(row.text);
   }
   return result;
+}
+
+type MuChartScreeningProgress = {
+  state: 'screened' | 'not-run' | 'manual-only' | 'unsupported-system'
+    | 'disabled' | 'unavailable';
+  screenedCount: number;
+};
+
+const MU_PARTIAL_ASSESSOR_DISCLOSURE =
+  'The event-specific clauses were computed, but the overall election-chart assessment remains partial/provisional until the shared baseline is complete.';
+
+/**
+ * Describe a partial assessor as computed only after chart facts were actually
+ * screened. A partially completed unavailable run may truthfully make the same
+ * claim for its already-screened candidates; every zero-screen state stays
+ * silent even if a malformed caller supplies a contradictory count.
+ */
+export function muEventSpecificCompletionDisclosure(
+  activity: string,
+  chartEnrichment: MuChartScreeningProgress | null,
+): string | null {
+  const partialAssessor = automatedRulesFor(activity).length > 0
+    && !chartAssessorCompleteFor(activity);
+  const screeningApplied = !!chartEnrichment
+    && chartEnrichment.screenedCount > 0
+    && (
+      chartEnrichment.state === 'screened'
+      || chartEnrichment.state === 'unavailable'
+    );
+  return partialAssessor && screeningApplied
+    ? MU_PARTIAL_ASSESSOR_DISCLOSURE
+    : null;
 }
 
 function muOrdinal(value) {
@@ -1726,6 +1759,14 @@ async function findMuhurta() {
       const manualChecks = muRelevantManualChecks(activity, data.vaaram);
       const manualGuidance = muClassifyManualChecks(activity, manualChecks);
       const chartManualRemainder = chartManualRemaindersFor(activity);
+      const effectiveChartRemainder = (
+        chartManualRemainder !== null
+        && !chartAssessorCompleteFor(activity)
+        && chartManualRemainder.length === 0
+        && automatedRulesFor(activity).length > 0
+      )
+        ? [MU_PARTIAL_ASSESSOR_DISCLOSURE]
+        : chartManualRemainder;
       const activityLabel = rules.label;
       if (rules.skip_on_sankramana && data.special.some(
           item => /Sankraman/i.test(item))) {
@@ -2156,7 +2197,7 @@ async function findMuhurta() {
             personal_outcomes: personal.outcomes,
             notes,
             chart_validation: manualGuidance.chart,
-            chart_remainder: chartManualRemainder,
+            chart_remainder: effectiveChartRemainder,
             information: manualGuidance.information,
             practical: manualGuidance.practical,
           };
@@ -2185,8 +2226,8 @@ async function findMuhurta() {
           });
           if (!dayDosha && (
             rules.manual_prerequisites
-            || (system === 'drik' && chartManualRemainder !== null
-              ? chartManualRemainder.length
+            || (system === 'drik' && effectiveChartRemainder !== null
+              ? effectiveChartRemainder.length
               : manualGuidance.chart.length)
             || personal.needsReview
           )) dayDosha = 'practitioner_review';
@@ -2289,6 +2330,7 @@ async function findMuhurta() {
         removedCount: 0,
         candidateLimitReached: false,
         chartRemovedCount: 0,
+        chartRemovedRules: [],
         personalRemovedCount: 0,
         personalRemovedRules: [],
         boundaryReviewCount: 0,
@@ -2346,7 +2388,8 @@ const MU_ACT_LABEL = {
   cremation: 'deferred funeral rites (Pretakriya)',
   naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
-  upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',
+  upanayana: 'upanayana (sacred thread)',
+  vidyarambha: 'Aksharabhyasa (first-letter writing)',
   seemantha: 'seemantha (prenatal ceremony)',
   gruhapravesha: 'gruhapravesha (home entry)',
   vehicle: 'a vehicle purchase', property: 'a land purchase for building',
@@ -2400,7 +2443,16 @@ function renderMuhurta() {
          <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}</li>`).join('')}</ul>
        </details>`
     : '';
-  const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0;
+  const partialAssessor = automatedRulesFor(activity).length > 0
+    && !chartAssessorCompleteFor(activity);
+  const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0
+    || partialAssessor;
+  const sourceScope = (MU_ACTIVITY[activity] as { source_scope?: string })
+    ?.source_scope || null;
+  const partialAssessorDisclosure = muEventSpecificCompletionDisclosure(
+    activity,
+    chartEnrichment,
+  );
   const hasScreeningReview = !!(
     chartEnrichment?.boundaryReviewCount
     || chartEnrichment?.reviewGatedCount
@@ -2409,7 +2461,9 @@ function renderMuhurta() {
     ? hasScreeningReview
       ? ' · all four Gold v1 event-specific clauses attempted; unresolved outcomes remain review-gated; the general election-chart baseline is not assessed'
       : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed'
-    : hasScreeningReview
+    : partialAssessor
+      ? ' · event-specific clauses computed; overall assessment remains partial/provisional because the shared baseline is not complete'
+      : hasScreeningReview
       ? ''
       : ' · every implemented event-specific outcome resolved';
   const chartStatus = chartEnrichment
@@ -2472,6 +2526,8 @@ function renderMuhurta() {
               <strong>${htmlEsc(chartStatus.title)}</strong>
               <span>${htmlEsc(message)}</span>
               <small>${htmlEsc(chartStatus.detail)}</small>
+              ${sourceScope ? `<small class="mu-chart-source-scope"><b>Source scope:</b> ${htmlEsc(sourceScope)}</small>` : ''}
+              ${partialAssessorDisclosure ? `<small class="mu-chart-assessment-boundary"><b>Assessment boundary:</b> ${htmlEsc(partialAssessorDisclosure)}</small>` : ''}
               <a href="${MU_CHART_METHOD_URL}">Verify the method and sources</a>
             </section>`;
   };
@@ -2496,6 +2552,13 @@ function renderMuhurta() {
     : '';
   const personalRemovalCount = chartEnrichment?.personalRemovedCount
     ?? droppedPersonalRules.reduce((total, rule) => total + rule.count, 0);
+  const droppedChartRules = chartEnrichment?.chartRemovedRules || [];
+  const chartRemovalHtml = chartEnrichment?.chartRemovedCount
+    ? `<details class="mu-chart-removals">
+         <summary>${chartEnrichment.chartRemovedCount} candidate slot${chartEnrichment.chartRemovedCount === 1 ? '' : 's'} removed by exact chart requirements</summary>
+         <ul>${droppedChartRules.map(rule => `<li><span>${htmlEsc(rule.label)} · ${rule.count} slot${rule.count === 1 ? '' : 's'}</span>${rule.evidence?.length ? `<small>Observed: ${htmlEsc(rule.evidence.join(' '))}</small>` : ''}</li>`).join('')}</ul>
+       </details>`
+    : '';
   const personalRemovalHtml = personalRemovalCount
     ? `<details class="mu-personal-removals">
          <summary>${personalRemovalCount} candidate slot${personalRemovalCount === 1 ? '' : 's'} removed by profile-specific source rules</summary>
@@ -2521,7 +2584,7 @@ function renderMuhurta() {
     }
     const suffix = notes.length ? ` · ${notes.join(', ')}` : '';
     const noSlotsMessage = `No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.`;
-    box.innerHTML = `${safetyHtml}${chartStatusHtml}${personalRoleHtml}<p class="preview-error">${htmlEsc(noSlotsMessage)}</p>${personalRemovalHtml}${droppedHtml}`;
+    box.innerHTML = `${safetyHtml}${chartStatusHtml}${personalRoleHtml}<p class="preview-error">${htmlEsc(noSlotsMessage)}</p>${chartRemovalHtml}${personalRemovalHtml}${droppedHtml}`;
     const announcement = document.getElementById('mu-result-announcement');
     if (announcement) announcement.textContent = noSlotsMessage;
     return;
@@ -2736,6 +2799,7 @@ function renderMuhurta() {
     + safetyHtml
     + chartStatusHtml
     + personalRoleHtml
+    + chartRemovalHtml
     + personalRemovalHtml
     + `<p class="mu-ranking-note">Excellent slots appear before Good ones. Mandatory chart failures remove a slot. A conclusive event-specific qualification miss retains the slot, leaves its raw score unchanged, and sets Good as its maximum rating. A calculation-boundary unknown also retains the slot and sets the same maximum pending review. Source preferences only break ties; they do not inflate the Panchangam score.</p>`
     + top.map(renderSlot).join('')
@@ -2801,6 +2865,8 @@ function shareMuhurtaOnWhatsApp() {
   lines.push(muChartShareScreeningLine(chartEnrichment));
   if (muChartShareIncludesRemainder(chartEnrichment)) {
     const remainder = chartManualRemaindersFor(activity) || [];
+    const assessorPartial = automatedRulesFor(activity).length > 0
+      && !chartAssessorCompleteFor(activity);
     const shownNeedsReview = slot => slot.chartScreening?.needsReview || (
       Array.isArray(slot.reasonGroups?.personal_outcomes)
       && slot.reasonGroups.personal_outcomes.some(
@@ -2814,6 +2880,9 @@ function shareMuhurtaOnWhatsApp() {
         && shownNeedsReview(slot)).length;
     if (activity === 'gold') {
       lines.push('Gold v1 assesses four event-specific clauses; the general election-chart baseline is not assessed.');
+    }
+    if (assessorPartial) {
+      lines.push('This event assessor is still partial/provisional; the event-specific clauses are computed, but they are not complete chart certification because the shared baseline remains unresolved.');
     }
     if (!remainder.length) {
       if (reviewGated) {

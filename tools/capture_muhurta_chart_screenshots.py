@@ -6,6 +6,8 @@ It writes review evidence only; it does not call a live chart service.
 
 Usage:
     python tools/capture_muhurta_chart_screenshots.py --dist dist
+    python tools/capture_muhurta_chart_screenshots.py --dist dist \
+        --aksharabhyasa-only
 """
 
 from __future__ import annotations
@@ -29,6 +31,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SMOKE_PATH = REPO_ROOT / 'tests' / 'test_browser_smoke.py'
 OUTPUT_DIR = (
     REPO_ROOT / 'docs' / 'screenshots' / 'gold-chart-screening-2026-09-04'
+)
+AKSHARABHYASA_OUTPUT_DIR = (
+    REPO_ROOT
+    / 'docs'
+    / 'screenshots'
+    / 'aksharabhyasa-chart-assessor-2026-09-05'
 )
 
 
@@ -134,6 +142,63 @@ CAPTURES = (
 )
 
 
+AKSHARABHYASA_CAPTURES = (
+    Capture(
+        'fixture-aksharabhyasa-pass-desktop-1440x900.png',
+        'vidyarambha-pass', 'vidyarambha', 'drik', 1440, 900, 'screened',
+        'Preference met · tie-break only',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-pass-mobile-390x844.png',
+        'vidyarambha-pass', 'vidyarambha', 'drik', 390, 844, 'screened',
+        'Preference met · tie-break only',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-preference-miss-desktop-1440x900.png',
+        'vidyarambha-preference-miss', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'Preference not present · no penalty',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-preference-miss-mobile-390x844.png',
+        'vidyarambha-preference-miss', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'Preference not present · no penalty',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-hard-fail-desktop-1440x900.png',
+        'vidyarambha-hard-fail', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'House 8 occupants: Surya.',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-hard-fail-mobile-390x844.png',
+        'vidyarambha-hard-fail', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'House 8 occupants: Surya.',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-unknown-desktop-1440x900.png',
+        'vidyarambha-unknown', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'Preference could not be verified',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-unknown-mobile-390x844.png',
+        'vidyarambha-unknown', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'Preference could not be verified',
+    ),
+)
+
+AKSHARABHYASA_SELECTOR_CAPTURES = (
+    Capture(
+        'fixture-aksharabhyasa-selector-desktop-1440x900.png',
+        'vidyarambha-selector', 'vidyarambha', 'drik', 1440, 900,
+        'pre-search', 'Aksharabhyasa (First-letter writing)',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-selector-mobile-390x844.png',
+        'vidyarambha-selector', 'vidyarambha', 'drik', 390, 844,
+        'pre-search', 'Aksharabhyasa (First-letter writing)',
+    ),
+)
+
+
 PENDING_FETCH_SCRIPT = """
 (() => {
   const originalFetch = window.fetch.bind(window);
@@ -170,11 +235,13 @@ def _configure_search(page, smoke, base_url: str, activity: str) -> None:
 
 
 def _capture_page(page, path: Path, anchor: str = '#mu-result') -> None:
-    page.locator(anchor).scroll_into_view_if_needed()
+    page.locator(anchor).first.scroll_into_view_if_needed()
     page.screenshot(path=str(path), full_page=False)
 
 
-def _capture_regular(browser, smoke, base_url: str, capture: Capture) -> dict:
+def _capture_regular(
+    browser, smoke, base_url: str, capture: Capture, output_dir: Path = OUTPUT_DIR,
+) -> dict:
     page = browser.new_page(viewport={'width': capture.width, 'height': capture.height})
     try:
         smoke._run_muhurta_browser_search(
@@ -196,20 +263,45 @@ def _capture_regular(browser, smoke, base_url: str, capture: Capture) -> dict:
         detail_selector = None
         if capture.scenario == 'positive' or capture.scenario in {
             'gold-pass', 'gold-cap', 'gold-unknown',
+            'vidyarambha-pass', 'vidyarambha-preference-miss',
+            'vidyarambha-unknown',
         }:
             detail_selector = '.mu-reason-details:has(.mu-rg-computed)'
         elif capture.scenario == 'mixed':
             detail_selector = '.mu-reason-details:has(.mu-chart-rule--unknown)'
+        elif capture.scenario == 'vidyarambha-hard-fail':
+            detail_selector = '.mu-chart-removals'
         if detail_selector and result.locator(detail_selector).count():
-            result.locator(detail_selector).first.locator('summary').first.click()
+            result.locator(detail_selector).first.locator(
+                ':scope > summary'
+            ).click()
 
         result_text = result.text_content() or ''
         assert capture.expected_copy in result_text, (
             f'{capture.scenario} expected copy {capture.expected_copy!r}; '
             f'result={result_text[:1000]!r}'
         )
-        output = OUTPUT_DIR / capture.filename
-        _capture_page(page, output)
+        output = output_dir / capture.filename
+        _capture_page(page, output, detail_selector or '#mu-result')
+        return _manifest_row(capture, output)
+    finally:
+        page.close()
+
+
+def _capture_selector(
+    browser, smoke, base_url: str, capture: Capture,
+    output_dir: Path = AKSHARABHYASA_OUTPUT_DIR,
+) -> dict:
+    page = browser.new_page(viewport={'width': capture.width, 'height': capture.height})
+    try:
+        _configure_search(page, smoke, base_url, capture.activity)
+        option = page.locator(
+            '#mu-activity option[value="vidyarambha"]'
+        )
+        assert option.text_content().strip() == capture.expected_copy
+        assert page.locator('#mu-activity').input_value() == 'vidyarambha'
+        output = output_dir / capture.filename
+        _capture_page(page, output, '#mu-activity')
         return _manifest_row(capture, output)
     finally:
         page.close()
@@ -270,16 +362,36 @@ def _manifest_row(capture: Capture, path: Path) -> dict:
     }
 
 
+def _write_manifest(output_dir: Path, rows: list[dict]) -> None:
+    manifest = {
+        'capturedAt': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        'source': 'tools/capture_muhurta_chart_screenshots.py',
+        'liveServicesUsed': False,
+        'captures': rows,
+    }
+    (output_dir / 'fixture-manifest.json').write_text(
+        json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--dist', type=Path, default=REPO_ROOT / 'dist')
+    parser.add_argument(
+        '--aksharabhyasa-only',
+        action='store_true',
+        help='capture only the Aksharabhyasa assessor review matrix',
+    )
     args = parser.parse_args()
     dist = args.dist.resolve()
     if not (dist / 'index.html').is_file():
         parser.error(f'{dist} does not contain index.html; build the site first')
 
     smoke = _load_smoke_module()
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir = (
+        AKSHARABHYASA_OUTPUT_DIR if args.aksharabhyasa_only else OUTPUT_DIR
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
     port = _free_port()
     def handler(*handler_args, **handler_kwargs):
         return _QuietHandler(
@@ -297,27 +409,35 @@ def main() -> int:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             try:
-                rows = [
-                    _capture_regular(browser, smoke, base_url, capture)
-                    for capture in CAPTURES
-                ]
-                rows.extend(_capture_loading_and_timeout(browser, smoke, base_url))
+                if args.aksharabhyasa_only:
+                    rows = [
+                        _capture_selector(
+                            browser, smoke, base_url, capture, output_dir,
+                        )
+                        for capture in AKSHARABHYASA_SELECTOR_CAPTURES
+                    ]
+                    rows.extend(
+                        _capture_regular(
+                            browser, smoke, base_url, capture, output_dir,
+                        )
+                        for capture in AKSHARABHYASA_CAPTURES
+                    )
+                else:
+                    rows = [
+                        _capture_regular(browser, smoke, base_url, capture)
+                        for capture in CAPTURES
+                    ]
+                    rows.extend(
+                        _capture_loading_and_timeout(browser, smoke, base_url)
+                    )
             finally:
                 browser.close()
     finally:
         server.shutdown()
         server.server_close()
 
-    manifest = {
-        'capturedAt': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-        'source': 'tools/capture_muhurta_chart_screenshots.py',
-        'liveServicesUsed': False,
-        'captures': rows,
-    }
-    (OUTPUT_DIR / 'fixture-manifest.json').write_text(
-        json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
-    )
-    print(f'Captured {len(rows)} deterministic screenshots in {OUTPUT_DIR}')
+    _write_manifest(output_dir, rows)
+    print(f'Captured {len(rows)} deterministic screenshots in {output_dir}')
     return 0
 
 

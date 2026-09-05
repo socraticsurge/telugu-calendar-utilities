@@ -10,6 +10,8 @@ export interface PrimitiveOutcome {
 
 export interface ElectionPrimitiveRule {
   planet?: string;
+  planets?: string[];
+  houses?: number[];
   avoid_houses?: number[];
   enemy_rashis?: string[];
   debilitation_rashi?: string;
@@ -25,6 +27,42 @@ interface PlanetPosition {
   degree: number;
   house: number;
   retrograde: boolean;
+}
+
+export function evaluateAllPlanetsInHouses(
+  rule: ElectionPrimitiveRule,
+  houses: ReadonlyMap<string, number> | null,
+  options: { houseFrameUncertain?: boolean } = {},
+): PrimitiveOutcome {
+  if (!houses || options.houseFrameUncertain) {
+    return {
+      status: 'unknown',
+      evidence: ['Complete Whole Sign house facts are unavailable.'],
+    };
+  }
+  const planets = rule.planets;
+  const targetHouses = rule.houses;
+  if (
+    !planets?.length
+    || planets.some(planet => typeof planet !== 'string' || !planet)
+    || new Set(planets).size !== planets.length
+    || !targetHouses?.length
+    || targetHouses.some(house => !Number.isInteger(house) || house < 1 || house > 12)
+    || planets.some(planet => !houses.has(planet))
+  ) {
+    return {
+      status: 'unknown',
+      evidence: ['The grouped-graha rule configuration is incomplete.'],
+    };
+  }
+  const passed = planets.every(planet => targetHouses.includes(houses.get(planet)!));
+  const observed = planets
+    .map(planet => `${planet} house ${houses.get(planet)}`)
+    .join('; ');
+  return {
+    status: passed ? 'pass' : 'fail',
+    evidence: [`${observed}; all must be in house ${targetHouses.join(', ')}.`],
+  };
 }
 
 const NAVAMSA_WIDTH_DEGREES = 30 / 9;

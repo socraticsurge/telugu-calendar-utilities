@@ -11,6 +11,7 @@ from .election_assessors.facts import planet_houses, planet_positions
 from .election_assessors.primitives import (
     GOLD_MAX_SAMPLE_GAP_MINUTES,
     PrimitiveOutcome,
+    evaluate_all_planets_in_houses,
     evaluate_full_aspect,
     evaluate_well_situated,
     gold_transition_uncertainty,
@@ -31,10 +32,26 @@ def _evaluate_rule(
             rule, positions, house_frame_uncertain=house_frame_uncertain)
     if kind == 'planet_receives_full_aspect':
         return evaluate_full_aspect(rule, positions)
+    if kind == 'all_planets_in_houses':
+        return evaluate_all_planets_in_houses(
+            rule, houses, house_frame_uncertain=house_frame_uncertain
+        )
     if houses is None or house_frame_uncertain:
-        return PrimitiveOutcome('unknown')
+        return PrimitiveOutcome(
+            'unknown', ('Complete Whole Sign house facts are unavailable.',)
+        )
     if kind == 'house_empty':
-        passed = rule['house'] not in houses.values()
+        occupants = [
+            name for name, house in houses.items() if house == rule['house']
+        ]
+        passed = not occupants
+        return PrimitiveOutcome(
+            'pass' if passed else 'fail',
+            (
+                f'House {rule["house"]} occupants: '
+                f'{", ".join(occupants) if occupants else "none"}.',
+            ),
+        )
     elif kind == 'planet_not_house':
         passed = houses.get(rule['planet']) != rule['house']
     elif kind == 'planet_in_houses':
@@ -42,7 +59,10 @@ def _evaluate_rule(
     elif kind == 'any_planet_in_houses':
         passed = any(houses.get(planet) in rule['houses'] for planet in rule['planets'])
     else:
-        return PrimitiveOutcome('unknown')
+        return PrimitiveOutcome(
+            'unknown',
+            (f'Unsupported election-chart rule kind: {kind}.',),
+        )
     return PrimitiveOutcome('pass' if passed else 'fail')
 
 

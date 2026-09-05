@@ -7,6 +7,29 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+## [1.18.0] — 2026-09-05
+
+### Added
+
+- Add the scoped Aksharabhyasa first-letter-writing election assessor while
+  preserving `vidyarambha` as its stable compatibility/API identifier. A
+  known eighth-house occupant is a hard rejection; Budha, Shukra and Guru all
+  co-located in the ninth is one score- and tier-neutral preference.
+- Publish the exact Chapter VIII source boundary, strict AND/co-location
+  formula, owner-approved reject-wins convention, cross-sample aggregation,
+  Python/TypeScript parity corpus, MCP source-scope parity, and responsive UI
+  evidence. The event clauses are computed, but the overall assessment stays
+  explicitly partial/provisional pending the shared election baseline.
+- Separate the catalogued 181-page 1993 Raman work from the directly inspected
+  78-page 2020 Chistabo derivative, and keep Raman Chapter XI and *Muhurta
+  Chintamani* 5.37–5.38 as non-blended source lineages.
+
+### Release sequencing
+
+- This candidate is intentionally prepared from the requested `v1.15.1` base
+  for isolated review. It must be semantically restacked after `v1.17.0`
+  before release; it must not ship as a standalone history jump.
+
 ## [1.15.1] — 2026-09-04
 
 ### Fixed
@@ -1034,7 +1057,8 @@ ICS feed pipeline.
 ### Performance
 - Precompute eclipses once per generation run instead of per-day per-feed.
 
-[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.1...HEAD
+[Unreleased]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.18.0...HEAD
+[1.18.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.17.0...v1.18.0
 [1.15.1]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/socraticsurge/telugu-calendar-utilities/compare/v1.13.0...v1.14.0

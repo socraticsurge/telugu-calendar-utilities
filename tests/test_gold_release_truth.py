@@ -64,7 +64,7 @@ def test_research_inventory_is_explicitly_a_dated_pre_gold_baseline():
         not in research
 
 
-def test_current_reference_pages_publish_the_27_rule_gold_contract():
+def test_current_reference_pages_publish_the_29_rule_contract():
     features = ' '.join(
         _read('docs/reference/04-user-facing-features.md').split()
     )
@@ -72,15 +72,30 @@ def test_current_reference_pages_publish_the_27_rule_gold_contract():
         _read('docs/reference/05-data-flow-and-muhurta.md').split()
     )
 
-    assert 'one of 27 deterministic chart predicates' in features
+    assert 'one of 29 deterministic chart predicates' in features
     assert 'one of 23 deterministic chart predicates' not in features
-    assert '13 source-backed activity profiles' in flow
-    assert 'complete 27-rule matrix' in flow
+    assert '14 source-backed activity profiles' in flow
+    assert 'complete 29-rule matrix' in flow
     assert 'complete 23-rule matrix' not in flow
     for document in (features, flow):
         assert 'Gold / jewelry purchase' in document
         assert '`qualify`' in document
         assert 'general election-chart baseline' in document
+
+
+def test_activity_coverage_publishes_scoped_aksharabhyasa_truth():
+    coverage = _read('docs/reference/16-activity-provenance-coverage.md')
+    normalized = ' '.join(coverage.split())
+
+    assert (
+        '| `vidyarambha` | Aksharabhyasa (First-letter writing) | '
+        '`muhurta.vidyarambha` | Verified scoped Chapter VIII profile; '
+        'two deterministic clauses are Drik browser post-screened, while '
+        'the overall assessor remains partial/provisional |'
+    ) in normalized
+    assert 'exact 29-predicate matrix' in normalized
+    assert 'Education commencement (Vidyarambha)' not in coverage
+    assert 'exact 27-predicate matrix' not in coverage
 
 
 def test_gold_docs_distinguish_synthetic_and_actual_gateway_evidence():

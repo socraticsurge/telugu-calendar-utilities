@@ -132,7 +132,7 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
   Maudhya exclusions declared by the Python activity profile. If those flags
   are absent, affected browser searches fail closed instead of returning
   unscreened dates. Travel, Gruhapravesha, Seemantha and Surgery name a primary
-  participant for source-specific local checks. Drik activities with one of 27
+  participant for source-specific local checks. Drik activities with one of 29
   deterministic chart predicates receive a privacy-minimal DashaFlow
   candidate-time planetary-position post-screen. The browser uses its validated
   local Drik/Lahiri Lagna at each sampled minute to recompute Whole Sign houses;
