@@ -9,7 +9,8 @@ import shutil
 import subprocess
 
 # Build the Vite site into dist/
-subprocess.run('npm ci && npm run build', shell=True, check=True)
+subprocess.run(["npm", "ci", "--ignore-scripts"], check=True)
+subprocess.run(["npm", "run", "build"], check=True)
 
 # Copy generated feeds into dist/feeds/ so they land on gh-pages
 os.makedirs('dist/feeds', exist_ok=True)

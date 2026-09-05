@@ -270,14 +270,14 @@ A failure means a CVE was disclosed in our dependency closure.
 2. Check if a fixed version exists. If yes:
    - Bump the dep in `pyproject.toml` (the `>=` floor goes up to the
      fixed version).
-   - Install `requirements.txt`, then remove the unpublished local project and
-     the runner's build-only `setuptools` bootstrap from the audit set
-     (`pip uninstall --yes mcp-server-panchangam setuptools`). Audit the
-     remaining project dependency environment exactly as CI does:
-     `pip-audit --local --strict`.
-   - Refresh the Python 3.11 reproducibility snapshot (it is not the
-     security gate):
-     `uv pip compile pyproject.toml --extra test --python-version 3.11 --upgrade --generate-hashes -o requirements.lock`.
+   - Refresh the authoritative resolution:
+     `uv lock --upgrade-package <distribution-name>`.
+   - Reproduce the CI audit from a disposable environment:
+     `uv sync --locked --only-group audit --no-install-project --no-build`,
+     then `uv export --quiet --locked --no-dev --no-emit-project --output-file .audit-requirements.txt`,
+     then `uv run --no-sync pip-audit --strict --disable-pip --require-hashes -r .audit-requirements.txt`.
+     Delete the generated `.audit-requirements.txt` after the check; it is a
+     transient view of `uv.lock`, not another lockfile.
    - PR + merge.
 3. If no fixed version exists yet:
    - Assess severity. Most CVEs in non-network-facing libs (timezone

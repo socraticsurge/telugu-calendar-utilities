@@ -23,14 +23,20 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install -e .[llm]
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: '0.11.8'
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: python tools/install_locked_dependencies.py --extra llm
 
       - name: Generate Rasi Phalalu
         env:
           rasiphalalu: ${{ secrets.rasiphalalu }}
           PHALALU_OUT: ./public/rasi_phalalu
-        run: python scripts/generate_llm_phalalu.py
+        run: uv run --no-sync python scripts/generate_llm_phalalu.py
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4

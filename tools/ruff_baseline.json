@@ -142,9 +142,6 @@
     "tests/test_chandrabalam.py": {
       "I001": 5
     },
-    "tests/test_ci_workflow_contract.py": {
-      "I001": 1
-    },
     "tests/test_cities.py": {
       "I001": 1
     },
@@ -323,9 +320,6 @@
     },
     "tests/test_sankramana_window.py": {
       "I001": 2
-    },
-    "tests/test_security_dependency_contract.py": {
-      "I001": 1
     },
     "tests/test_seemantha_profile.py": {
       "I001": 1

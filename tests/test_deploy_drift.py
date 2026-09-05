@@ -118,7 +118,7 @@ def test_seo_asset_staged_in_build_landing_page_script(asset: str):
     Vite copies public/ verbatim to dist/, so SEO assets in public/
     reach dist/ automatically — no explicit copy needed here."""
     src = BUILD_SCRIPT.read_text(encoding='utf-8')
-    assert 'npm run build' in src, (
+    assert '["npm", "run", "build"]' in src, (
         f'scripts/build_landing_page.py does not run "npm run build". '
         f'Without the Vite build, {asset} will not reach dist/ and '
         f'the monthly generate.yml run will wipe it from gh-pages.'

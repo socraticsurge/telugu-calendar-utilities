@@ -1,8 +1,7 @@
 # Dependabot config — weekly bumps for pip + github-actions.
 #
-# pyproject.toml dependencies are the source of truth for runtime
-# packages; requirements.txt is what CI installs. Dependabot watches
-# both because they're both `pip` ecosystem files.
+# pyproject.toml declares Python dependencies and uv.lock is the active
+# CI/release resolution. Dependabot updates both through the pip ecosystem.
 #
 # All third-party Actions in .github/workflows/ are kept in lockstep
 # (helps when we move to SHA-pinning — Dependabot understands SHAs

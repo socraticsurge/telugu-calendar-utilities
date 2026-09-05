@@ -24,14 +24,20 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: '0.11.8'
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: python tools/install_locked_dependencies.py --extra test
 
       - name: Run tests
-        run: python -m pytest tests/ -v
+        run: uv run --no-sync python -m pytest tests/ -v
 
       - name: Build gochara.json
-        run: python -m scripts.build_gochara_json
+        run: uv run --no-sync python -m scripts.build_gochara_json
 
       # keep_files preserves feeds/ and index.html on gh-pages — only
       # gochara.json is added/replaced. Fully independent of generate.yml.
