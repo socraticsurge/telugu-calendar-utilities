@@ -30,24 +30,11 @@ def _planet_items(chart: Mapping[str, Any]) -> list[Any] | None:
 
 
 def planet_houses(chart: Mapping[str, Any]) -> dict[str, int] | None:
-    """Return complete canonical houses without requiring degree facts."""
-    planets = _planet_items(chart)
-    if planets is None:
+    """Return houses only when every canonical position fact is complete."""
+    positions = planet_positions(chart)
+    if positions is None:
         return None
-    result: dict[str, int] = {}
-    for item in planets:
-        if not isinstance(item, Mapping):
-            return None
-        name, house = item.get('name'), item.get('house')
-        if (
-            name not in ELECTION_CHART_PLANETS
-            or type(house) is not int
-            or not 1 <= house <= 12
-            or name in result
-        ):
-            return None
-        result[name] = house
-    return result if set(result) == set(ELECTION_CHART_PLANETS) else None
+    return {name: position.house for name, position in positions.items()}
 
 
 def planet_positions(

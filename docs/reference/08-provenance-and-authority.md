@@ -117,9 +117,12 @@ Until an edition and locator are recorded for the specific claim, it remains
   general Panchanga-Suddhi Tithis; the Drik browser post-screens the vacant
   10th and three named Graha-house exclusions, while age-month and qualitative
   Lagna requirements remain explicit manual prerequisites.
-- Karnavedha now enforces Raman's daytime-only instruction across the Python
-  and MCP night-slot path, plus exact weekday, Tithi and rising-Rasi gates;
-  age, transition and election-house checks remain manual.
+- Karnavedha uses the named `raman-karnavedha-daylight-v1` policy. Python,
+  MCP and the browser evaluate the actual Tithi and Nakshatra transition spans
+  once over `[local sunrise, local sunset)` and fail closed on uncertainty; the
+  Drik browser separately evaluates a vacant eighth house from candidate-time
+  DashaFlow facts. Child-age guidance remains informational. The registered
+  Vidyamadhava and Muhurta Chintamani alternatives are disclosed, not blended.
 - Mundana/Chaula now enforces Shukla Paksha, non-combust Guru/Shukra, exact
   Tithi/Nakshatra/weekday/Lagna criteria and a cross-surface solar-noon cutoff;
   age, pregnancy, seasonal wording and chart placements remain manual.

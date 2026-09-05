@@ -97,22 +97,6 @@ export function chartAssessorCompleteFor(activity: string): boolean {
   return COMPLETE_ASSESSORS.has(activity);
 }
 
-function completePlanetHouses(chart: ElectionChartSnapshot): Map<string, number> | null {
-  if (chart.planets.length !== EXPECTED_PLANETS.size) return null;
-  const result = new Map<string, number>();
-  for (const planet of chart.planets) {
-    if (
-      !EXPECTED_PLANETS.has(planet.name)
-      || result.has(planet.name)
-      || !Number.isInteger(planet.house)
-      || planet.house < 1
-      || planet.house > 12
-    ) return null;
-    result.set(planet.name, planet.house);
-  }
-  return result.size === EXPECTED_PLANETS.size ? result : null;
-}
-
 function evaluateRule(
   rule: ElectionChartRule,
   houses: ReadonlyMap<string, number> | null,
@@ -261,8 +245,10 @@ export function evaluateElectionChart(
   chart: ElectionChartSnapshot,
   options: ElectionChartEvaluationOptions = {},
 ): ElectionChartScreening {
-  const houses = completePlanetHouses(chart);
   const positions = completePlanetPositions(chart, EXPECTED_PLANETS);
+  const houses = positions
+    ? new Map(Array.from(positions, ([name, position]) => [name, position.house]))
+    : null;
   return summarize(automatedRulesFor(activity).map(rule =>
     ruleOutcome(rule, evaluateRule(rule, houses, positions, options))));
 }

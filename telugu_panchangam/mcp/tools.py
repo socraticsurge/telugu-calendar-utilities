@@ -975,13 +975,21 @@ def _gather_muhurta_slots(
 
     for i in range(days):
         day = calculated_days[i]
+        daylight_assessment = None
+        if activity == 'karnavedha':
+            from telugu_panchangam.personal.muhurta import (
+                karnavedha_daylight_assessment,
+            )
+            daylight_assessment = karnavedha_daylight_assessment(
+                day, get_activity_rules(activity), activity)
         day_results = day_slots(day, activity=activity,
                                 janma_nakshatras=janma_nakshatras,
                                 janma_rasis=janma_rasis,
                                 janma_lagnas=janma_lagnas,
                                 chandra_mode=chandra_mode,
                                 travel_direction=travel_direction,
-                                engine=engine)
+                                engine=engine,
+                                _daylight_assessment=daylight_assessment)
         night_results = []
         if include_night:
             next_pd = calculated_days[i + 1]
@@ -997,9 +1005,13 @@ def _gather_muhurta_slots(
                                   janma_nakshatras=janma_nakshatras,
                                   janma_rasis=janma_rasis,
                                   chandra_mode=chandra_mode,
-                                  travel_direction=travel_direction)
+                                  travel_direction=travel_direction,
+                                  _daylight_assessment=daylight_assessment)
             if reason:
-                dropped_days.append({'date': day.date.isoformat(), 'reason': reason})
+                dropped = {'date': day.date.isoformat(), 'reason': reason}
+                if daylight_assessment is not None:
+                    dropped['daylight_outcomes'] = daylight_assessment['outcomes']
+                dropped_days.append(dropped)
         for s in day_results + night_results:
             slots.append({**s, 'start': _fmt_time(s['start'], tz),
                           'end': _fmt_time(s['end'], tz)})
@@ -1077,6 +1089,8 @@ def tool_find_muhurta(
             'avoid_vara_tithi_names',
             'avoid_nitya_yogas',
             'require_homa_election',
+            'require_single_daylight_tithi',
+            'require_single_daylight_nakshatra',
         )
         resolved_activity = ACTIVITY_ALIASES.get(activity, activity)
         source_scope = None
@@ -1102,6 +1116,7 @@ def tool_find_muhurta(
                 'audit_claim': rules.get('audit_claim'),
                 'heuristic_claim': rules.get('heuristic_claim'),
                 'related_claims': rules.get('related_claims', []),
+                'source_scope': rules.get('source_scope'),
                 'manual_prerequisites': rules.get(
                     'manual_prerequisites', False),
                 **({'source_scope': source_scope} if source_scope else {}),

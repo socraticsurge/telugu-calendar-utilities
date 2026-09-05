@@ -236,6 +236,29 @@ describe('bounded election-chart enrichment', () => {
     expect(derive).not.toHaveBeenCalled();
   });
 
+  test('Karnavedha keeps a vacant eighth house and removes an occupied one', async () => {
+    const passing = await enrichElectionChartSlots(slots(1), {
+      activity: 'karnavedha', system: 'drik', location: LOCATION,
+      derive: vi.fn(async request => response(request)),
+    });
+    expect(passing.state).toBe('screened');
+    expect(passing.chartRemovedCount).toBe(0);
+    expect(passing.reviewGatedCount).toBe(0);
+    expect(passing.slots[0].chartScreening?.outcomes).toContainEqual(
+      expect.objectContaining({
+        ruleId: 'karnavedha.house-8-vacant', status: 'pass',
+      }),
+    );
+
+    const failing = await enrichElectionChartSlots(slots(1), {
+      activity: 'karnavedha', system: 'drik', location: LOCATION,
+      derive: vi.fn(async request => response(request, new Set([0]))),
+    });
+    expect(failing.state).toBe('screened');
+    expect(failing.slots).toHaveLength(0);
+    expect(failing.chartRemovedCount).toBe(1);
+  });
+
   test('Gold stable pass is fully screened and preserves Excellent', async () => {
     const derive = vi.fn(async (request: ElectionChartRequest) =>
       goldResponse(request));

@@ -60,6 +60,10 @@ import {
 } from '../scorer/election-chart-screening';
 import { localWallTimeToInstant } from '../lib/election-chart-api';
 import { electionChartCalculationEnabled } from '../lib/remote-calculation-activation';
+import {
+  evaluateConfiguredKarnavedhaDaylight,
+  karnavedhaDaylightDropReason,
+} from '../scorer/election-assessors/karnavedha-daylight';
 import { getLoadedEvents, selectedDate, ekadashiName, festivalNames } from './today';
 
 // --- Tarabalam tool ---
@@ -1734,6 +1738,21 @@ async function findMuhurta() {
         ? ['The event-specific election-chart assessor is partial; the unimplemented source clauses still require review.']
         : chartManualRemainder;
       const activityLabel = rules.label;
+      const daylightPolicy = activity === 'karnavedha'
+        ? evaluateConfiguredKarnavedhaDaylight(
+          data,
+          rules.require_single_daylight_tithi,
+          rules.require_single_daylight_nakshatra,
+        )
+        : null;
+      if (daylightPolicy && !daylightPolicy.admissible) {
+        droppedDays.push({
+          date: isoDate,
+          reason: karnavedhaDaylightDropReason(daylightPolicy),
+          daylightOutcomes: daylightPolicy.outcomes,
+        });
+        continue;
+      }
       if (rules.skip_on_sankramana && data.special.some(
           item => /Sankraman/i.test(item))) {
         droppedDays.push({
@@ -2161,6 +2180,7 @@ async function findMuhurta() {
             group_fit: groupFit, activity_match: activityMatch,
             personal_source: personal.evidence,
             personal_outcomes: personal.outcomes,
+            day_source_outcomes: daylightPolicy?.outcomes || [],
             notes,
             chart_validation: manualGuidance.chart,
             chart_remainder: effectiveChartRemainder,
@@ -2190,12 +2210,13 @@ async function findMuhurta() {
               y => MU_YOGA_PENALTY[y] !== undefined),
             nityaHardAvoid: MU_NITYA_HARD_AVOID.has(ny),
           });
+          const unresolvedSourcePrerequisite = (
+            system === 'drik' && effectiveChartRemainder !== null
+              ? effectiveChartRemainder.length > 0
+              : !!rules.manual_prerequisites || manualGuidance.chart.length > 0
+          );
           if (!dayDosha && (
-            rules.manual_prerequisites
-            || (system === 'drik' && effectiveChartRemainder !== null
-              ? effectiveChartRemainder.length
-              : manualGuidance.chart.length)
-            || personal.needsReview
+            unresolvedSourcePrerequisite || personal.needsReview
           )) dayDosha = 'practitioner_review';
 
           const chartCheckMinutes = muChartCheckMinutes(lagnaDay, s0, e0);
@@ -2380,6 +2401,10 @@ type MuChartCompletionState = {
   reviewGatedCount: number;
 };
 
+type MuChartDispositionState = MuChartCompletionState & {
+  qualificationCappedCount: number;
+};
+
 export function muChartAssessorCanClaimComplete(
   activity: string,
   enrichment: MuChartCompletionState,
@@ -2389,6 +2414,18 @@ export function muChartAssessorCanClaimComplete(
     && enrichment.boundaryReviewCount === 0
     && enrichment.reviewGatedCount === 0
     && chartAssessorCompleteFor(activity);
+}
+
+export function muChartScreeningDisposition(
+  enrichment: MuChartDispositionState,
+): 'review' | 'capped' | 'bounded' | 'resolved' | null {
+  if (enrichment.state !== 'screened') return null;
+  if (enrichment.reviewGatedCount || enrichment.boundaryReviewCount) {
+    return 'review';
+  }
+  if (enrichment.qualificationCappedCount) return 'capped';
+  if (enrichment.candidateLimitReached) return 'bounded';
+  return 'resolved';
 }
 
 export function muChartAssessmentTitle(
@@ -2410,6 +2447,7 @@ export function muChartAssessmentTitle(
     }
     if (activity === 'gold') return 'Gold event-specific chart clauses resolved';
   }
+  if (activity === 'karnavedha') return 'Karnavedha event checks resolved';
   return 'Exact chart screening applied';
 }
 
@@ -2443,9 +2481,24 @@ function renderMuhurta() {
     const [y, mo, da] = iso.split('-').map(Number);
     return new Date(y, mo - 1, da).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
+  const droppedOutcomeHtml = outcomes => outcomes?.length
+    ? `<ul class="mu-dropped-daylight" aria-label="Karnavedha daylight rule outcomes">
+         ${outcomes.map(outcome => `<li class="mu-dropped-daylight--${outcome.status}">
+           <strong>${htmlEsc(outcome.label)}</strong> · ${htmlEsc(
+             outcome.status === 'pass'
+               ? 'passed'
+               : outcome.status === 'fail'
+                 ? 'failed'
+                 : 'could not be verified')}
+           ${outcome.evidence?.length
+             ? `<small>${htmlEsc(outcome.evidence.join(' '))}</small>`
+             : ''}
+         </li>`).join('')}
+       </ul>`
+    : '';
   const droppedHtml = droppedDays.length
     ? `<details class="mu-dropped"><summary>${droppedDays.length} day${droppedDays.length>1?'s':''} filtered · see why</summary>
-         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}</li>`).join('')}</ul>
+         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}${droppedOutcomeHtml(dd.daylightOutcomes)}</li>`).join('')}</ul>
        </details>`
     : '';
   const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0
@@ -2463,6 +2516,12 @@ function renderMuhurta() {
       ? muChartAssessorCanClaimComplete(activity, chartEnrichment)
         ? ' · all six Annaprasana event-specific clauses resolved; the general election-chart baseline #284 remains open'
         : ' · all six Annaprasana event-specific clauses attempted; unresolved or bounded outcomes remain review-gated; the general election-chart baseline #284 remains open'
+    : activity === 'karnavedha'
+      ? hasScreeningReview
+        ? ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate has an unresolved fact; the general election-chart baseline is not assessed'
+        : chartEnrichment?.candidateLimitReached
+          ? ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate was attempted on a bounded candidate set; the general election-chart baseline is not assessed'
+          : ' · daylight Tithi, daylight Nakshatra and vacant-8th outcomes all resolved'
     : hasScreeningReview
       ? ''
       : ' · every implemented event-specific outcome resolved';
@@ -2479,7 +2538,9 @@ function renderMuhurta() {
         detail: 'There was no Panchangam-shortlisted slot to send for chart projection.',
       },
       'manual-only': {
-        title: 'Panchangam shortlist complete; chart review remains manual',
+        title: hasManualChartGuidance
+          ? 'Panchangam shortlist complete; chart review remains manual'
+          : 'Panchangam shortlist complete',
         detail: hasManualChartGuidance
           ? 'This activity’s source guidance is qualitative and stays with a practitioner.'
           : 'No source-specific election-chart condition is defined for this general search.',
@@ -2504,13 +2565,7 @@ function renderMuhurta() {
     : null;
   const renderChartStatus = () => {
     if (!chartEnrichment || !chartStatus) return '';
-    const disposition = chartEnrichment.state === 'screened'
-      ? chartEnrichment.reviewGatedCount
-        ? 'review'
-        : chartEnrichment.qualificationCappedCount
-          ? 'capped'
-          : 'resolved'
-      : null;
+    const disposition = muChartScreeningDisposition(chartEnrichment);
     const message = !roleForActivity(activity)
       ? chartEnrichment.message.replace('chart or profile facts', 'chart facts')
       : chartEnrichment.message;
@@ -2571,6 +2626,14 @@ function renderMuhurta() {
     }
     if (personalRemovalCount) {
       notes.push(`${personalRemovalCount} candidate slot(s) failed a profile-specific source rule`);
+    }
+    const daylightDropped = droppedDays.filter(
+      day => Array.isArray(day.daylightOutcomes) && day.daylightOutcomes.length,
+    );
+    if (daylightDropped.length) {
+      notes.push(
+        `${daylightDropped.length} Karnavedha day(s) filtered: ${daylightDropped[0].reason}`,
+      );
     }
     const suffix = notes.length ? ` · ${notes.join(', ')}` : '';
     const noSlotsMessage = `No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.`;
@@ -2694,6 +2757,38 @@ function renderMuhurta() {
               </div>
             </section>`;
   };
+  const renderComputedDaylight = outcomes => {
+    if (!outcomes?.length) return '';
+    const lis = outcomes.map(outcome => {
+      const label = outcome.status === 'pass'
+        ? 'Required daylight check passed'
+        : outcome.status === 'fail'
+          ? 'Day removed by daylight rule'
+          : 'Boundary could not be verified · day removed';
+      const evidence = Array.isArray(outcome.evidence) && outcome.evidence.length
+        ? `<small>Observed: ${htmlEsc(outcome.evidence.join(' '))}</small>`
+        : '';
+      return `<li class="mu-chart-rule mu-chart-rule--reject mu-chart-rule--${outcome.status}">
+                <span>${htmlEsc(muCapitalize(outcome.label))}</span>
+                <b>${label}</b>
+                ${evidence}
+              </li>`;
+    }).join('');
+    const first = outcomes[0];
+    return `<section class="mu-rg mu-rg-computed mu-rg-daylight" aria-label="Computed Karnavedha daylight checks">
+              <h4 class="mu-rg-label">Computed daylight checks</h4>
+              <div class="mu-rg-content">
+                <ul class="mu-rg-items">${lis}</ul>
+                <p class="mu-chart-boundary">Evaluated once for this day over the half-open interval [local sunrise, local sunset), using the feed's published Tithi and Nakshatra transition boundaries rather than candidate-window samples. A same-minute sunset boundary stays unknown.</p>
+                <p class="mu-rule-reference"><strong>Event source:</strong> ${htmlEsc(first.sourceLocator)}</p>
+                <details class="mu-technical-provenance">
+                  <summary>Technical provenance</summary>
+                  <p><strong>Event claim:</strong> <code>${htmlEsc(first.sourceClaim)}</code><br><strong>Named policy:</strong> <code>${htmlEsc(first.policyId)}</code><br><strong>Policy claim:</strong> <code>${htmlEsc(first.decisionPolicyClaim)}</code></p>
+                </details>
+                <p class="mu-rule-reference"><a href="${MU_CHART_METHOD_URL}">Method, boundary semantics and source crosswalk</a></p>
+              </div>
+            </section>`;
+  };
   const renderPersonalChecks = (outcomes, evidence) => {
     if (!outcomes?.length) return renderGroup(
       'Profile-specific check', evidence, 'mu-rg-personal');
@@ -2730,6 +2825,7 @@ function renderMuhurta() {
              ${renderGroup('Group fit', rg.group_fit)}
              ${renderPersonalChecks(rg.personal_outcomes, rg.personal_source)}
              ${renderGroup('Activity', rg.activity_match)}
+             ${renderComputedDaylight(rg.day_source_outcomes)}
              ${renderComputedChart(s.chartScreening)}
              ${renderChartValidation(
                s.chartScreening && Array.isArray(rg.chart_remainder)
@@ -2829,6 +2925,9 @@ export function muShareableMuhurtaReasons(slot) {
 
 export function muChartShareScreeningLine(chartEnrichment) {
   if (chartEnrichment?.state === 'screened') {
+    if (chartEnrichment.candidateLimitReached) {
+      return `Exact chart screening reached its safety budget after ${chartEnrichment.screenedCount} candidate${chartEnrichment.screenedCount === 1 ? '' : 's'}; every shown survivor was screened, but lower-ranked candidates were not assessed.`;
+    }
     return 'The automated, source-backed election-chart subset was checked across every sampled Lagna-stable state.';
   }
   if (chartEnrichment?.state === 'unavailable' && chartEnrichment.screenedCount > 0) {
@@ -2870,13 +2969,20 @@ function shareMuhurtaOnWhatsApp() {
       lines.push('Gold v1 assesses four event-specific clauses; the general election-chart baseline is not assessed.');
     } else if (activity === 'annaprasana') {
       lines.push('Annaprasana v1 assesses six event-specific chart clauses; the general election-chart baseline #284 remains open.');
+    } else if (activity === 'karnavedha') {
+      lines.push('Karnavedha v1 assesses two daylight-limb gates and the vacant-eighth chart clause; the general election-chart baseline is not assessed.');
     }
-    if (activity === 'annaprasana' && !remainder.length) {
+    if (chartEnrichment.candidateLimitReached) {
+      lines.push(`The chart-search safety budget was reached after ${chartEnrichment.screenedCount} candidate${chartEnrichment.screenedCount === 1 ? '' : 's'}; every shown slot was screened, but lower-ranked candidates were not assessed.`);
+    } else if (activity === 'annaprasana' && !remainder.length) {
       if (reviewGated || chartEnrichment.candidateLimitReached) {
         lines.push('All six Annaprasana event-specific chart clauses were attempted; unresolved facts still require review.');
       } else {
         lines.push('All six Annaprasana event-specific chart clauses were evaluated and resolved.');
       }
+    } else if (!chartAssessorCompleteFor(activity)) {
+      lines.push('The implemented, source-backed election-chart clauses were checked across every sampled Lagna-stable state.');
+      lines.push('Remaining event-specific eligibility and the general election-chart baseline still require practitioner review.');
     } else if (!remainder.length) {
       if (reviewGated) {
         lines.push('All disclosed event chart clauses were attempted; unresolved facts still require review.');

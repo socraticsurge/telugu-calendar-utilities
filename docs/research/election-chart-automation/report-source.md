@@ -343,11 +343,21 @@ fail-over-unknown precedence and effect-aware window aggregation. The built
 browser matrix and nine-frame screenshot run cover pass, preference miss,
 hard fail and unknown at 390×844 and 1440×900.
 
+## Completed event after Annaprasana: Karnavedha
+
+Following the already completed Annaprasana assessor, Karnavedha now
+implements the vacant eighth-house predicate plus two
+day-level Raman-policy predicates: one Tithi and one Nakshatra throughout the
+half-open local daylight interval. Day limbs use actual engine/feed transition
+boundaries once per day and fail closed on missing or minute-equality evidence;
+DashaFlow remains limited to candidate-time chart facts. The eight-row
+Hyderabad/New York oracle covers pass/pass, fail/fail, pass/fail and fail/pass,
+including EST/EDT and next-date suffixes.
+
 ## Next event sequence
 
-After Annaprasana owner review, the next bounded stories are Karnavedha,
-Vidyarambha, completed-house purchase, general purchase, well-digging, and
-business investment. They reuse placement, grouped-planet and composition
-primitives before the program advances to lordship, Navamsa-Lagna,
-compatibility and named-Yoga work. The still-open baseline #284 is not closed
-by completing one event-specific assessor.
+Gold and Annaprasana preceded Karnavedha. The next bounded stories are
+Vidyarambha, completed-house purchase, general purchase,
+well-digging, and business investment. They reuse placement, grouped-planet,
+benefic/malefic, and composition primitives before the program advances to
+lordship, Navamsa-Lagna, compatibility, named-Yoga, and medical-context work.

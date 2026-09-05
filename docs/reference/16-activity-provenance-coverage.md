@@ -64,7 +64,7 @@ lineage treats the rule as universal.
 
 The chart-screen statements above refer only to the Drik browser post-screen.
 Python/MCP continue to return the source's full `manual_checks` without calling
-the chart service. The exact 27-predicate matrix, personal-role rules and
+the chart service. The exact 30-predicate matrix, personal-role rules and
 remaining manual clauses are in
 [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 

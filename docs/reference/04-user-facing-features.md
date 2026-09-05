@@ -132,7 +132,7 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
   Maudhya exclusions declared by the Python activity profile. If those flags
   are absent, affected browser searches fail closed instead of returning
   unscreened dates. Travel, Gruhapravesha, Seemantha and Surgery name a primary
-  participant for source-specific local checks. Drik activities with one of 29
+  participant for source-specific local checks. Drik activities with one of 30
   deterministic chart predicates receive a privacy-minimal DashaFlow
   candidate-time planetary-position post-screen. The browser uses its validated
   local Drik/Lahiri Lagna at each sampled minute to recompute Whole Sign houses;
@@ -153,7 +153,12 @@ city/system and copy a `webcal://` URL, it's a daily toolkit:
   enables it only on loopback. Disabled searches keep the Panchangam shortlist,
   cap any `Excellent` label at `Good`, require review, and make no chart request.
   Public requests can use only the canonical Astro Chaganti HTTPS guest gateway;
-  browser activation does not activate the gateway or sidecar.
+  browser activation does not activate the gateway or sidecar. Karnavedha
+  first verifies that one Tithi and one Nakshatra rule throughout the
+  half-open local daylight interval; a failed or uncertain day is removed
+  before any chart request. Surviving candidates then receive the vacant-8th
+  screen, and a complete pass no longer repeats that clause as practitioner
+  work. The child-age guidance remains informational.
 - **Gochara + Rasi Phalalu** — South Indian chart, transit verdicts, computed
   daily reading.
 

@@ -156,6 +156,14 @@
       "authority_type": "primary_text_hindi_commentary"
     },
     {
+      "id": "VM-SASTRI-1925-V2",
+      "title": "Vidyamadhaviyam, Volume II",
+      "author": "Vidyamadhava",
+      "edition": "R. Shama Sastry edition with Vishnusarma's Muhurtadipika commentary, Government Branch Press, Mysore, 1925",
+      "url": "https://www.ebharatisampat.in/readpdf.php?id=NDA3Nzk3NTg2NzM2Njc4",
+      "authority_type": "primary_text_sanskrit_commentary"
+    },
+    {
       "id": "DP-DAY-PAGE",
       "title": "Drik Panchang day and festival pages",
       "author": "Drik Panchang",
@@ -771,7 +779,40 @@
       "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
       "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); general Panchanga Suddhi Tithis, Chapter V, internal printed p. 12 (physical PDF p. 15)",
-      "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, age guidance, double-Tithi/double-Nakshatra caution, vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. Age, transition-count and election-house checks remain manual. Shared samskara filters, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "scope": "Supports the daytime-only rule, admitted weekdays, rejected rising Rasis, child-age guidance, the source wording that a day ruled by two Tithis or two Nakshatras is to be rejected, the vacant-8th requirement and general-Panchanga-Suddhi Tithi exclusions. The Drik website post-screen uses DashaFlow only for the candidate-time vacant-8th chart fact. Child age remains information for guardians. Shared samskara filters, the operational meaning of 'day', boundary handling, Tithi-family ranking, personal scoring and relative tiers require separate authority.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.karnavedha.vidyamadhava_divergence",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["VM-SASTRI-1925-V2"],
+      "locator": "Vidyamadhaviyam Vol. II, Chapter VI, verse 18, internal printed p. 39, with Vishnusarma's Muhurtadipika commentary on internal printed p. 41",
+      "scope": "Alternate Karnavedha lineage. The verse uses ahni/diva daylight language and the commentary supplies a before-Lagna exception. That exception materially differs from the selected Raman all-day two-Tithi/two-Nakshatra policy, so the project discloses but does not blend it into the automated predicate.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "muhurta.karnavedha.chintamani_divergence",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "contradicted",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Muhurta Chintamani, Samskara-prakarana, Karnavedha verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)",
+      "scope": "Alternate Karnavedha rule set with materially different detail and scope. It is retained as lineage context only; none of its additional clauses is silently imported into the named Raman daylight policy.",
+      "last_reviewed": "2026-09-04"
+    },
+    {
+      "id": "election_day.karnavedha_daylight_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/karnavedha.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020", "VM-SASTRI-1925-V2", "MC-HINDI-IA"],
+      "locator": "B. V. Raman, Chapter VIII, 'Ear boring (Karnavedha),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26); Vidyamadhaviyam Vol. II, Chapter VI verse 18 and commentary, internal printed pp. 39 and 41; Muhurta Chintamani, Samskara-prakarana verses 24-25, internal printed pp. 184-185 (Internet Archive leaves n192-n193)",
+      "scope": "Names the product's Raman interpretation: 'day' is the half-open local daylight interval [sunrise, sunset); a Tithi or Nakshatra transition strictly inside that interval rejects the whole day, a transition exactly at sunset does not, and missing, malformed or minute-ambiguous boundary evidence is unknown and therefore not admitted. This temporal and fail-closed policy is a disclosed project interpretation, not an additional textual claim.",
       "last_reviewed": "2026-09-04"
     },
     {

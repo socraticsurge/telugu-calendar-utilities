@@ -92,6 +92,13 @@ interface TarabalamPanelModule {
       reviewGatedCount: number;
     },
   ): string;
+  muChartScreeningDisposition(enrichment: {
+    state: string;
+    candidateLimitReached: boolean;
+    boundaryReviewCount: number;
+    reviewGatedCount: number;
+    qualificationCappedCount: number;
+  }): 'review' | 'capped' | 'bounded' | 'resolved' | null;
   muShareableMuhurtaReasons(slot: unknown): string[];
   muChartShareScreeningLine(chartEnrichment: unknown): string;
   muChartShareIncludesRemainder(chartEnrichment: unknown): boolean;
@@ -265,6 +272,7 @@ describe('Muhurtam saved-profile participants', () => {
     const resolved = {
       state: 'screened', candidateLimitReached: false,
       boundaryReviewCount: 0, reviewGatedCount: 0,
+      qualificationCappedCount: 0,
     };
     expect(panel.muChartAssessorCanClaimComplete('annaprasana', resolved))
       .toBe(true);
@@ -276,6 +284,7 @@ describe('Muhurtam saved-profile participants', () => {
       .toBe(false);
     expect(panel.muChartAssessmentTitle('annaprasana', bounded)).toBe(
       'Chart screening applied to a bounded candidate set');
+    expect(panel.muChartScreeningDisposition(bounded)).toBe('bounded');
 
     const boundary = { ...resolved, boundaryReviewCount: 1 };
     expect(panel.muChartAssessorCanClaimComplete('annaprasana', boundary))
@@ -291,6 +300,13 @@ describe('Muhurtam saved-profile participants', () => {
   });
 
   test('describes partial chart screening without claiming it was skipped', () => {
+    expect(panel.muChartShareScreeningLine({
+      state: 'screened',
+      screenedCount: 60,
+      candidateLimitReached: true,
+    })).toBe(
+      'Exact chart screening reached its safety budget after 60 candidates; every shown survivor was screened, but lower-ranked candidates were not assessed.',
+    );
     expect(panel.muChartShareScreeningLine({
       state: 'unavailable',
       screenedCount: 24,
@@ -612,6 +628,11 @@ describe('Muhurtam saved-profile participants', () => {
       'The owner’s Janma Rasi, Nakshatra or Lagna may strengthen the election.',
     );
     expect(home.information).toContain('Complete worship and Bhootabali before entry.');
+
+    const karnavedha = panel.muClassifyManualChecks('karnavedha');
+    expect(karnavedha.chart).toContain(
+      'Election chart: leave the 8th house unoccupied.',
+    );
   });
 
   test('filters only manual rows with explicit Vara applicability', () => {

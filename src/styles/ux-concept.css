@@ -1531,6 +1531,11 @@ h2.panel-heading { display: none !important; }
   background: #fffaf2;
 }
 .mu-chart-status--screened-capped strong { color: #8a5518; }
+.mu-chart-status--screened-bounded {
+  border-left-color: #a2631d;
+  background: #fffaf2;
+}
+.mu-chart-status--screened-bounded strong { color: #8a5518; }
 .mu-chart-status--screened-review {
   border-left-color: #9b3d24;
   background: #fff7f2;

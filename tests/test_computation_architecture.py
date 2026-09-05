@@ -19,10 +19,10 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     report = build_report('HEAD', commit_limit=20)
 
     assert report['schema_version'] == 1
-    assert report['scope']['source_files'] == 96
+    assert report['scope']['source_files'] == 98
     assert report['scope']['established_source_files'] == 78
-    assert report['scope']['additive_feature_source_files'] == 18
-    assert report['scope']['total_source_files'] == 96
+    assert report['scope']['additive_feature_source_files'] == 20
+    assert report['scope']['total_source_files'] == 98
     assert report['scope']['source_files'] == report['scope']['total_source_files']
     assert report['scope']['source_files'] == (
         report['scope']['established_source_files']
@@ -35,9 +35,18 @@ def test_architecture_report_maps_modules_consumers_and_layers():
         <= set(report['layers'])
 
     summary = _summary(report)
-    assert 'Production modules: 96' in summary
+    assert 'Production modules: 98' in summary
     assert 'Established production modules: 78' in summary
-    assert 'Additive feature modules: 18' in summary
+    assert 'Additive feature modules: 20' in summary
+
+
+def test_karnavedha_assessors_extend_architecture_additively():
+    assert source_scope_class(
+        'src/scorer/election-assessors/karnavedha-daylight.ts'
+    ) == 'additive-feature'
+    assert source_scope_class(
+        'telugu_panchangam/personal/election_assessors/karnavedha.py'
+    ) == 'additive-feature'
 
 
 def test_profiles_panel_extends_architecture_additively():
