@@ -991,7 +991,9 @@ def test_mcp_find_muhurta():
     # slot in a higher tier may appear before a higher-score slot capped to a
     # lower tier by day_dosha.  Check the actual sort key, not score alone.
     from telugu_panchangam.personal.muhurta import TIER_NAMES
-    sort_key = lambda s: (-TIER_NAMES.index(s['tier']), -s['score'])
+    def sort_key(slot):
+        return -TIER_NAMES.index(slot['tier']), -slot['score']
+
     assert result['slots'] == sorted(result['slots'], key=sort_key)
     assert 'disclaimer' in result
     assert result['chandra_mode'] == 'stars'

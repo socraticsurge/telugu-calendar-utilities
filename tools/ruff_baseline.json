@@ -22,39 +22,12 @@
       "F541": 1,
       "I001": 1
     },
-    "telugu_panchangam/mcp/tools.py": {
-      "E402": 22,
-      "E701": 7,
-      "E741": 1
-    },
-    "telugu_panchangam/panchanga_shuddhi.py": {
-      "E701": 10
-    },
     "telugu_panchangam/personal/muhurta.py": {
       "I001": 4
     },
     "telugu_panchangam/personal/slot_scorers.py": {
       "E702": 2,
       "I001": 1
-    },
-    "tests/test_base.py": {
-      "E402": 2,
-      "E701": 12
-    },
-    "tests/test_browser_smoke.py": {
-      "E731": 1
-    },
-    "tests/test_ics_generator.py": {
-      "E741": 4
-    },
-    "tests/test_muhurta_finder.py": {
-      "E731": 1
-    },
-    "tests/test_phalalu.py": {
-      "E741": 6
-    },
-    "tests/test_utils.py": {
-      "E701": 2
     }
   },
   "description": "Ruff E/F/I debt baseline; counts may only change intentionally.",

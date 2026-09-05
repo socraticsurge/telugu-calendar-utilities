@@ -1,4 +1,6 @@
-from telugu_panchangam.engines.base import PanchangamEngine
+from unittest.mock import patch
+
+from telugu_panchangam.engines.base import PanchangamEngine, maasam_name
 from telugu_panchangam.panchangam_names import (
     NAKSHATRA_NAMES,
     RASHI_NAMES,
@@ -228,27 +230,29 @@ def test_nakshatra_ghati_window_different_nakshatra():
 
 # --- Maasam naming ---
 
-from unittest.mock import patch
-
-from telugu_panchangam.engines.base import maasam_name
-
 
 def _mock_prev_new_moon(elong_func, jd):
-    if jd == 100.0: return 90.0
-    if jd == 89.0: return 60.0
+    if jd == 100.0:
+        return 90.0
+    if jd == 89.0:
+        return 60.0
     return 0.0
 
 def _mock_next_new_moon(elong_func, jd):
-    if jd == 91.0: return 120.0
+    if jd == 91.0:
+        return 120.0
     return 0.0
 
 @patch('telugu_panchangam.engines.utils.previous_new_moon', _mock_prev_new_moon)
 @patch('telugu_panchangam.engines.utils.next_new_moon', _mock_next_new_moon)
 def test_maasam_name_regular():
     def mock_sun_lon(jd):
-        if jd == 90.0: return 11 * 30.0 + 15.0 # sign 11 -> Chaitra
-        if jd == 120.0: return 0 * 30.0 + 15.0 # sign 0
-        if jd == 60.0: return 10 * 30.0 + 15.0 # sign 10
+        if jd == 90.0:
+            return 11 * 30.0 + 15.0  # sign 11 -> Chaitra
+        if jd == 120.0:
+            return 0 * 30.0 + 15.0  # sign 0
+        if jd == 60.0:
+            return 10 * 30.0 + 15.0  # sign 10
         return 0.0
 
     name = maasam_name(None, mock_sun_lon, 100.0)
@@ -258,9 +262,12 @@ def test_maasam_name_regular():
 @patch('telugu_panchangam.engines.utils.next_new_moon', _mock_next_new_moon)
 def test_maasam_name_adhika():
     def mock_sun_lon(jd):
-        if jd == 90.0: return 11 * 30.0 + 5.0 # sign 11 -> Chaitra
-        if jd == 120.0: return 11 * 30.0 + 25.0 # sign 11
-        if jd == 60.0: return 10 * 30.0 + 15.0 # sign 10
+        if jd == 90.0:
+            return 11 * 30.0 + 5.0  # sign 11 -> Chaitra
+        if jd == 120.0:
+            return 11 * 30.0 + 25.0  # sign 11
+        if jd == 60.0:
+            return 10 * 30.0 + 15.0  # sign 10
         return 0.0
 
     name = maasam_name(None, mock_sun_lon, 100.0)
@@ -270,9 +277,12 @@ def test_maasam_name_adhika():
 @patch('telugu_panchangam.engines.utils.next_new_moon', _mock_next_new_moon)
 def test_maasam_name_nija():
     def mock_sun_lon(jd):
-        if jd == 90.0: return 11 * 30.0 + 25.0 # sign 11 -> Chaitra
-        if jd == 120.0: return 0 * 30.0 + 15.0 # sign 0
-        if jd == 60.0: return 11 * 30.0 + 5.0 # sign 11
+        if jd == 90.0:
+            return 11 * 30.0 + 25.0  # sign 11 -> Chaitra
+        if jd == 120.0:
+            return 0 * 30.0 + 15.0  # sign 0
+        if jd == 60.0:
+            return 11 * 30.0 + 5.0  # sign 11
         return 0.0
 
     name = maasam_name(None, mock_sun_lon, 100.0)
@@ -311,4 +321,3 @@ def test_nakshatra_ghati_window_calculation():
     assert window.name == 'Test Window'
     assert window.start == expected_start
     assert window.end == expected_end
-

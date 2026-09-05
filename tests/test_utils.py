@@ -120,8 +120,10 @@ def test_previous_new_moon_real():
 def test_previous_new_moon_overshoot():
     # Test case where initial approximation lands ahead of target, requiring backward jump
     def mock_elong(jd):
-        if jd == 0.0: return 12.19
-        if jd == -1.0: return (-24.38) % 360.0
+        if jd == 0.0:
+            return 12.19
+        if jd == -1.0:
+            return (-24.38) % 360.0
         return ((jd - 1.0) * 12.19) % 360.0
 
     res = previous_new_moon(mock_elong, 0.0)

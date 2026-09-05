@@ -109,7 +109,9 @@ def docs_server(vite_build):
     (Fixture name kept from the docs/-serving era so the test diff
     stays reviewable; it now serves the deploy artifact.)"""
     port = _pick_free_port()
-    handler = lambda *a, **kw: _QuietHandler(*a, directory=str(vite_build), **kw)
+    def handler(*args, **kwargs):
+        return _QuietHandler(*args, directory=str(vite_build), **kwargs)
+
     httpd = socketserver.TCPServer(('127.0.0.1', port), handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()

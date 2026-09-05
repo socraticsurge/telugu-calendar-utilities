@@ -6,9 +6,6 @@ from typing import Optional
 
 import pytz
 
-_log = logging.getLogger(__name__)
-_MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
-
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.eclipses import (
     get_eclipse_from_precomputed,
@@ -52,6 +49,9 @@ from telugu_panchangam.personal.muhurta import (
 )
 from telugu_panchangam.personal.phalalu import rasi_phalalu
 from telugu_panchangam.personal.tarabalam import _nak_index, taras_for_day
+
+_log = logging.getLogger(__name__)
+_MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
 
 _ENGINES = {
     'drik': DrikGanitaEngine(),
@@ -224,16 +224,23 @@ def _special_events(day: PanchangamDay) -> list[str]:
     events = list(day.festivals)
     if day.nakshatra.name in GANDA_MOOLA_NAKSHATRAS:
         events.append(f'Ganda Moola ({day.nakshatra.name})')
-    if day.is_ekadashi:         events.append('Ekadashi — fasting day')
-    if day.is_amavasya:         events.append('Amavasya')
-    if day.is_pournami:         events.append('Pournami')
-    if day.is_shani_pradosham:  events.append('Shani Pradosham')
-    elif day.is_soma_pradosham: events.append('Soma Pradosham')
-    elif day.is_pradosham:      events.append('Pradosham')
+    if day.is_ekadashi:
+        events.append('Ekadashi — fasting day')
+    if day.is_amavasya:
+        events.append('Amavasya')
+    if day.is_pournami:
+        events.append('Pournami')
+    if day.is_shani_pradosham:
+        events.append('Shani Pradosham')
+    elif day.is_soma_pradosham:
+        events.append('Soma Pradosham')
+    elif day.is_pradosham:
+        events.append('Pradosham')
     if day.sankramanam and not (day.sankramanam == 'Makara'
                                 and 'Makara Sankranti' in day.festivals):
         events.append(f'{day.sankramanam} Sankramanam')
-    if day.eclipse:             events.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
+    if day.eclipse:
+        events.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
     return events
 
 
@@ -950,11 +957,11 @@ def _validate_muhurta_inputs(
         if not janma_nakshatras or len(janma_lagnas) != len(janma_nakshatras):
             raise ValueError('janma_lagnas must align with janma_nakshatras '
                              '(use null for people whose lagna is unknown).')
-        for l in janma_lagnas:
-            if l is not None:
-                if not isinstance(l, str) or len(l) > _MAX_NAME:
+        for lagna in janma_lagnas:
+            if lagna is not None:
+                if not isinstance(lagna, str) or len(lagna) > _MAX_NAME:
                     raise ValueError('Invalid lagna rashi name.')
-                _rasi_index(l)
+                _rasi_index(lagna)
 
 
 def _gather_muhurta_slots(

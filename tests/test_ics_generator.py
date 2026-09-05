@@ -151,7 +151,7 @@ def test_night_choghadiya_section_present_with_next_day():
     last = str(events[1].get('description'))
     assert '─ Night Choghadiya ─' in first
     night = first.split('─ Night Choghadiya ─')[1].split('\n\n')[0]
-    blocks = [l for l in night.strip().split('\n') if l.strip()]
+    blocks = [line for line in night.strip().split('\n') if line.strip()]
     assert len(blocks) == 8
     # 2026-06-11 is a Thursday: night runs Amrit ... Amrit (verified vs Drik Panchang)
     assert blocks[0].endswith('Amrit')
@@ -170,9 +170,15 @@ def test_relative_day_markers_on_anga_times():
     cal = Calendar.from_ical(raw)
     event = [c for c in cal.walk() if c.name == 'VEVENT'][0]
     description = str(event.get('description'))
-    nakshatra_line = next(l for l in description.split('\n') if l.startswith('Nakshatra:'))
-    yoga_line = next(l for l in description.split('\n') if l.startswith('Yoga:'))
-    tithi_line = next(l for l in description.split('\n') if l.startswith('Tithi:'))
+    nakshatra_line = next(
+        line for line in description.split('\n') if line.startswith('Nakshatra:')
+    )
+    yoga_line = next(
+        line for line in description.split('\n') if line.startswith('Yoga:')
+    )
+    tithi_line = next(
+        line for line in description.split('\n') if line.startswith('Tithi:')
+    )
     assert '(-1)' in nakshatra_line and '(+1)' not in nakshatra_line
     assert '(+1)' in yoga_line
     assert '(+1)' not in tithi_line and '(-1)' not in tithi_line
