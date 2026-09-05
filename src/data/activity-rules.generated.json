@@ -587,7 +587,7 @@
       ]
     },
     "vidyarambha": {
-      "label": "Education start (Vidyarambha)",
+      "label": "Aksharabhyasa (First-letter writing)",
       "prefer_choghadiya": [
         "Amrit",
         1
@@ -618,7 +618,7 @@
         "Revati"
       ],
       "manual_checks": [
-        "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+        "The inspected 2020 re-edited transcription gives the most propitious age marker as the 5th day of the 5th month of the child’s 5th year.",
         "Prefer the forenoon or noon for the ceremony.",
         "Election chart: leave the 8th house unoccupied.",
         "Budha, Shukra and Guru together in the 9th are stated to counteract adverse influences."
@@ -633,7 +633,12 @@
         "Dhanu",
         "Meena"
       ],
-      "source_claim": "muhurta.vidyarambha"
+      "source_claim": "muhurta.vidyarambha",
+      "related_claims": [
+        "muhurta.vidyarambha.raman_chapter_xi_scope",
+        "muhurta.vidyarambha.chintamani_divergence"
+      ],
+      "source_scope": "This profile assesses the Chapter VIII Aksharabhyasa first-letter-writing rite only; it is not a generic education-start election."
     },
     "seemantha": {
       "label": "Seemantha (Prenatal ceremony)",
@@ -1790,13 +1795,16 @@
           "allowed_lagnas"
         ],
         "personal_rule_ids": [],
-        "election_chart_rule_ids": [],
+        "election_chart_rule_ids": [
+          "vidyarambha.house-8-vacant",
+          "vidyarambha.budha-shukra-guru-9"
+        ],
         "manual_checks": [
           {
             "id": "vidyarambha.manual-1",
             "source_index": 0,
-            "source_text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
-            "text": "The source’s most propitious age marker is the 5th day of the 5th month of the child’s 5th year.",
+            "source_text": "The inspected 2020 re-edited transcription gives the most propitious age marker as the 5th day of the 5th month of the child’s 5th year.",
+            "text": "The inspected 2020 re-edited transcription gives the most propitious age marker as the 5th day of the 5th month of the child’s 5th year.",
             "class": "manual-only",
             "display_section": "information"
           },

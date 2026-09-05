@@ -65,4 +65,17 @@ ELECTION_CHART_CONVENTIONS: dict[str, dict] = {
             'election_chart.gold_transition_envelope_v1',
         ],
     },
+    'vidyarambha-benefic-trio-co-location-v1': {
+        'label': 'Aksharabhyasa benefic-trio co-location convention v1',
+        'formula': (
+            'H(Budha) = 9 AND H(Shukra) = 9 AND H(Guru) = 9. '
+            'All three named grahas must occupy the ninth house in every '
+            'sampled chart state; one or two matching placements do not '
+            'satisfy the preference.'
+        ),
+        'method_claims': [
+            'election_chart.vidyarambha_co_location_policy_v1',
+            'election_chart.vidyarambha_reject_precedence_policy_v1',
+        ],
+    },
 }

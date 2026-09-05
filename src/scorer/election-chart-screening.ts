@@ -2,6 +2,7 @@ import rulesContract from '../data/election-chart-rules.generated.json';
 import type { ElectionChartSnapshot } from '../lib/election-chart-api';
 import {
   completePlanetPositions,
+  evaluateAllPlanetsInHouses,
   evaluateFullAspect,
   evaluateHouseFreeOfNaturalMalefics,
   evaluateWellSituated,
@@ -21,6 +22,7 @@ export interface ElectionChartRule {
     | 'planet_not_house'
     | 'planet_in_houses'
     | 'any_planet_in_houses'
+    | 'all_planets_in_houses'
     | 'planet_well_situated'
     | 'planet_receives_full_aspect'
     | 'house_free_of_natural_malefics';
@@ -112,6 +114,9 @@ function evaluateRule(
   if (rule.kind === 'house_free_of_natural_malefics') {
     return evaluateHouseFreeOfNaturalMalefics(rule, positions, options);
   }
+  if (rule.kind === 'all_planets_in_houses') {
+    return evaluateAllPlanetsInHouses(rule, houses, options);
+  }
   if (!houses || options.houseFrameUncertain) {
     return {
       status: 'unknown',
@@ -142,7 +147,7 @@ function evaluateRule(
     evidence = [
       `${rule.planet} occupies house ${observed}; target houses: ${(rule.houses || []).join(', ')}.`,
     ];
-  } else {
+  } else if (rule.kind === 'any_planet_in_houses') {
     const matching = (rule.planets || []).filter(planet =>
       (rule.houses || []).includes(houses.get(planet) as number));
     passed = matching.length > 0;
@@ -159,6 +164,11 @@ function evaluateRule(
         `Matching grahas: ${matching.length ? matching.join(', ') : 'none'}; target houses: ${(rule.houses || []).join(', ')}.`,
       ];
     }
+  } else {
+    return {
+      status: 'unknown',
+      evidence: [`Unsupported election-chart rule kind: ${String(rule.kind)}.`],
+    };
   }
   return { status: passed ? 'pass' : 'fail', evidence };
 }

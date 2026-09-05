@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "source": "telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES",
   "house_system": "whole_sign",
   "node_convention": "mean",
@@ -54,6 +54,14 @@
       "method_claims": [
         "election_chart.full_graha_drishti.phaladeepika_2_23",
         "election_chart.gold_transition_envelope_v1"
+      ]
+    },
+    "vidyarambha-benefic-trio-co-location-v1": {
+      "label": "Aksharabhyasa benefic-trio co-location convention v1",
+      "formula": "H(Budha) = 9 AND H(Shukra) = 9 AND H(Guru) = 9. All three named grahas must occupy the ninth house in every sampled chart state; one or two matching placements do not satisfy the preference.",
+      "method_claims": [
+        "election_chart.vidyarambha_co_location_policy_v1",
+        "election_chart.vidyarambha_reject_precedence_policy_v1"
       ]
     }
   },
@@ -424,6 +432,41 @@
         "decision_policy_claim": "election_chart.gold_qualification_policy_v1"
       }
     ],
+    "vidyarambha": [
+      {
+        "id": "vidyarambha.house-8-vacant",
+        "label": "8th house is vacant",
+        "kind": "house_empty",
+        "effect": "reject",
+        "source_claim": "muhurta.vidyarambha",
+        "source_locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+        "house": 8
+      },
+      {
+        "id": "vidyarambha.budha-shukra-guru-9",
+        "label": "Budha, Shukra and Guru are all in the 9th house",
+        "kind": "all_planets_in_houses",
+        "effect": "prefer",
+        "source_claim": "muhurta.vidyarambha",
+        "source_locator": "B. V. Raman, Chapter VIII, 'Commencing education (Aksharabhyasa),' inspected in the 2020 Chistabo derivative at internal printed p. 23 (physical PDF p. 26)",
+        "planets": [
+          "Budha",
+          "Shukra",
+          "Guru"
+        ],
+        "houses": [
+          9
+        ],
+        "convention_id": "vidyarambha-benefic-trio-co-location-v1",
+        "convention_label": "Aksharabhyasa benefic-trio co-location convention v1",
+        "formula": "H(Budha) = 9 AND H(Shukra) = 9 AND H(Guru) = 9. All three named grahas must occupy the ninth house in every sampled chart state; one or two matching placements do not satisfy the preference.",
+        "method_claims": [
+          "election_chart.vidyarambha_co_location_policy_v1",
+          "election_chart.vidyarambha_reject_precedence_policy_v1"
+        ],
+        "decision_policy_claim": "election_chart.vidyarambha_reject_precedence_policy_v1"
+      }
+    ],
     "purchase": [
       {
         "id": "purchase.chandra-lagna",
@@ -565,6 +608,7 @@
       "Assess whether a malefic occupies the 7th house."
     ],
     "gold": [],
+    "vidyarambha": [],
     "purchase": [
       "Keep malefics outside the 8th and 12th houses, and assess whether benefics occupy the 2nd, 10th or 11th."
     ],

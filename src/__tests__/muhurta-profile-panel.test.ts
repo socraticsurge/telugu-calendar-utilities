@@ -102,6 +102,10 @@ interface TarabalamPanelModule {
   muShareableMuhurtaReasons(slot: unknown): string[];
   muChartShareScreeningLine(chartEnrichment: unknown): string;
   muChartShareIncludesRemainder(chartEnrichment: unknown): boolean;
+  muEventSpecificCompletionDisclosure(
+    activity: string,
+    chartEnrichment: { state: string; screenedCount: number } | null,
+  ): string | null;
 }
 
 class MemoryStorage implements ProfileStorage {
@@ -268,6 +272,37 @@ afterAll(() => {
 });
 
 describe('Muhurtam saved-profile participants', () => {
+  test('claims partial event clauses only after actual chart screening', () => {
+    const completionCopy =
+      'The event-specific clauses were computed, but the overall election-chart assessment remains partial/provisional until the shared baseline is complete.';
+
+    expect(panel.muEventSpecificCompletionDisclosure('vidyarambha', {
+      state: 'screened', screenedCount: 1,
+    })).toBe(completionCopy);
+    expect(panel.muEventSpecificCompletionDisclosure('vidyarambha', {
+      state: 'unavailable', screenedCount: 3,
+    })).toBe(completionCopy);
+
+    for (const state of [
+      'disabled', 'unsupported-system', 'not-run', 'manual-only',
+    ]) {
+      expect(panel.muEventSpecificCompletionDisclosure('vidyarambha', {
+        state, screenedCount: 3,
+      })).toBeNull();
+    }
+    expect(panel.muEventSpecificCompletionDisclosure('vidyarambha', {
+      state: 'unavailable', screenedCount: 0,
+    })).toBeNull();
+    expect(panel.muEventSpecificCompletionDisclosure('vidyarambha', {
+      state: 'screened', screenedCount: 0,
+    })).toBeNull();
+    expect(panel.muEventSpecificCompletionDisclosure('vehicle', {
+      state: 'screened', screenedCount: 1,
+    })).toBeNull();
+    expect(panel.muEventSpecificCompletionDisclosure('vidyarambha', null))
+      .toBeNull();
+  });
+
   test('uses event-specific completion wording without closing baseline 284', () => {
     const resolved = {
       state: 'screened', candidateLimitReached: false,

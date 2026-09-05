@@ -24,7 +24,7 @@ python tools/check_activity_provenance.py
 | `annaprasana` | First feeding (Annaprasana) | `muhurta.annaprasana` | Verified rule-level profile |
 | `karnavedha` | Ear piercing (Karnavedha) | `muhurta.karnavedha` | Verified rule-level profile |
 | `mundana` | First head-shave (Mundana / Chaula) | `muhurta.mundana` | Verified rule-level profile |
-| `vidyarambha` | Education commencement (Vidyarambha) | `muhurta.vidyarambha` | Verified rule-level profile |
+| `vidyarambha` | Aksharabhyasa (First-letter writing) | `muhurta.vidyarambha` | Verified scoped Chapter VIII profile; two deterministic clauses are Drik browser post-screened, while the overall assessor remains partial/provisional |
 | `upanayana` | Sacred-thread ceremony (Upanayana) | `muhurta.upanayana` | Verified rule-level profile |
 | `seemantha` | Seemantha (prenatal ceremony) | `muhurta.seemantha` | Verified against Raman; related Chintamani claim records the 5th/7th versus 6th/8th-month lineage conflict |
 | `vehicle` | Vehicle purchase | `muhurta.vehicle.acquisition` | Verified activity-specific Nakshatra preference |
@@ -64,7 +64,7 @@ lineage treats the rule as universal.
 
 The chart-screen statements above refer only to the Drik browser post-screen.
 Python/MCP continue to return the source's full `manual_checks` without calling
-the chart service. The exact 30-predicate matrix, personal-role rules and
+the chart service. The exact 32-predicate matrix, personal-role rules and
 remaining manual clauses are in
 [Muhurtam election-chart screening](54-muhurtam-election-chart-screening.md).
 

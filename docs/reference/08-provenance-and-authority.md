@@ -127,8 +127,14 @@ Until an edition and locator are recorded for the specific claim, it remains
   Tithi/Nakshatra/weekday/Lagna criteria and a cross-surface solar-noon cutoff;
   age, pregnancy, seasonal wording and chart placements remain manual.
 - Vidyarambha/Aksharabhyasa now has exact weekday, Nakshatra and
-  movable-or-common Lagna gates; age, time preference and chart requirements
-  remain visible manual checks.
+  movable-or-common Lagna gates. On the Drik website, its scoped Chapter VIII
+  first-letter-writing assessor rejects an occupied eighth and tests Budha,
+  Shukra and Guru all in the ninth as one preference-only AND/co-location
+  predicate. The owner-approved convention makes the hard reject win and the
+  trio changes neither score nor tier. The overall chart assessment remains
+  partial/provisional pending the shared baseline; age and forenoon/noon
+  guidance remain informational. Chapter XI education elections and
+  *Muhurta Chintamani* 5.37–5.38 remain separate lineages.
 - Upanayana now preserves Paksha-specific Tithis by exact name and enforces
   lunar-month, Uttarayana solar-Rasi, weekday, Nakshatra, Lagna and before-noon
   gates; age, conditional combustion and full chart judgment remain manual.

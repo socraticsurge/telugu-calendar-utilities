@@ -108,6 +108,38 @@ export function muClassifyManualChecks(
   return result;
 }
 
+type MuChartScreeningProgress = {
+  state: 'screened' | 'not-run' | 'manual-only' | 'unsupported-system'
+    | 'disabled' | 'unavailable';
+  screenedCount: number;
+};
+
+const MU_PARTIAL_ASSESSOR_DISCLOSURE =
+  'The event-specific clauses were computed, but the overall election-chart assessment remains partial/provisional until the shared baseline is complete.';
+
+/**
+ * Describe a partial assessor as computed only after chart facts were actually
+ * screened. A partially completed unavailable run may truthfully make the same
+ * claim for its already-screened candidates; every zero-screen state stays
+ * silent even if a malformed caller supplies a contradictory count.
+ */
+export function muEventSpecificCompletionDisclosure(
+  activity: string,
+  chartEnrichment: MuChartScreeningProgress | null,
+): string | null {
+  const partialAssessor = automatedRulesFor(activity).length > 0
+    && !chartAssessorCompleteFor(activity);
+  const screeningApplied = !!chartEnrichment
+    && chartEnrichment.screenedCount > 0
+    && (
+      chartEnrichment.state === 'screened'
+      || chartEnrichment.state === 'unavailable'
+    );
+  return partialAssessor && screeningApplied
+    ? MU_PARTIAL_ASSESSOR_DISCLOSURE
+    : null;
+}
+
 function muOrdinal(value) {
   const mod100 = value % 100;
   if (mod100 >= 11 && mod100 <= 13) return `${value}th`;
@@ -1731,11 +1763,13 @@ async function findMuhurta() {
       const manualChecks = muRelevantManualChecks(activity, data.vaaram);
       const manualGuidance = muClassifyManualChecks(activity, manualChecks);
       const chartManualRemainder = chartManualRemaindersFor(activity);
-      const effectiveChartRemainder = chartManualRemainder !== null
+      const effectiveChartRemainder = (
+        chartManualRemainder !== null
         && !chartAssessorCompleteFor(activity)
         && chartManualRemainder.length === 0
-        && automatedRulesFor(activity).length
-        ? ['The event-specific election-chart assessor is partial; the unimplemented source clauses still require review.']
+        && automatedRulesFor(activity).length > 0
+      )
+        ? [MU_PARTIAL_ASSESSOR_DISCLOSURE]
         : chartManualRemainder;
       const activityLabel = rules.label;
       const daylightPolicy = activity === 'karnavedha'
@@ -2375,7 +2409,8 @@ const MU_ACT_LABEL = {
   cremation: 'deferred funeral rites (Pretakriya)',
   naming: 'a naming ceremony', annaprasana: 'annaprasana (first feeding)',
   karnavedha: 'karnavedha (ear-piercing)', mundana: 'a mundana / chaula',
-  upanayana: 'upanayana (sacred thread)', vidyarambha: 'vidyarambha (education start)',
+  upanayana: 'upanayana (sacred thread)',
+  vidyarambha: 'Aksharabhyasa (first-letter writing)',
   seemantha: 'seemantha (prenatal ceremony)',
   gruhapravesha: 'gruhapravesha (home entry)',
   vehicle: 'a vehicle purchase', property: 'a land purchase for building',
@@ -2501,9 +2536,16 @@ function renderMuhurta() {
          <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}${droppedOutcomeHtml(dd.daylightOutcomes)}</li>`).join('')}</ul>
        </details>`
     : '';
+  const partialAssessor = automatedRulesFor(activity).length > 0
+    && !chartAssessorCompleteFor(activity);
   const hasManualChartGuidance = muClassifyManualChecks(activity).chart.length > 0
-    || (automatedRulesFor(activity).length > 0
-      && !chartAssessorCompleteFor(activity));
+    || partialAssessor;
+  const sourceScope = (MU_ACTIVITY[activity] as { source_scope?: string })
+    ?.source_scope || null;
+  const partialAssessorDisclosure = muEventSpecificCompletionDisclosure(
+    activity,
+    chartEnrichment,
+  );
   const hasScreeningReview = !!(
     chartEnrichment?.boundaryReviewCount
     || chartEnrichment?.reviewGatedCount
@@ -2522,9 +2564,11 @@ function renderMuhurta() {
         : chartEnrichment?.candidateLimitReached
           ? ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate was attempted on a bounded candidate set; the general election-chart baseline is not assessed'
           : ' · daylight Tithi, daylight Nakshatra and vacant-8th outcomes all resolved'
-    : hasScreeningReview
-      ? ''
-      : ' · every implemented event-specific outcome resolved';
+    : partialAssessor
+      ? ' · event-specific clauses computed; overall assessment remains partial/provisional because the shared baseline is not complete'
+      : hasScreeningReview
+        ? ''
+        : ' · every implemented event-specific outcome resolved';
   const chartStatus = chartEnrichment
     ? {
       screened: {
@@ -2573,6 +2617,8 @@ function renderMuhurta() {
               <strong>${htmlEsc(chartStatus.title)}</strong>
               <span>${htmlEsc(message)}</span>
               <small>${htmlEsc(chartStatus.detail)}</small>
+              ${sourceScope ? `<small class="mu-chart-source-scope"><b>Source scope:</b> ${htmlEsc(sourceScope)}</small>` : ''}
+              ${partialAssessorDisclosure ? `<small class="mu-chart-assessment-boundary"><b>Assessment boundary:</b> ${htmlEsc(partialAssessorDisclosure)}</small>` : ''}
               <a href="${MU_CHART_METHOD_URL}">Verify the method and sources</a>
             </section>`;
   };
@@ -2954,6 +3000,8 @@ function shareMuhurtaOnWhatsApp() {
   lines.push(muChartShareScreeningLine(chartEnrichment));
   if (muChartShareIncludesRemainder(chartEnrichment)) {
     const remainder = chartManualRemaindersFor(activity) || [];
+    const assessorPartial = automatedRulesFor(activity).length > 0
+      && !chartAssessorCompleteFor(activity);
     const shownNeedsReview = slot => slot.chartScreening?.needsReview || (
       Array.isArray(slot.reasonGroups?.personal_outcomes)
       && slot.reasonGroups.personal_outcomes.some(
@@ -2972,6 +3020,9 @@ function shareMuhurtaOnWhatsApp() {
     } else if (activity === 'karnavedha') {
       lines.push('Karnavedha v1 assesses two daylight-limb gates and the vacant-eighth chart clause; the general election-chart baseline is not assessed.');
     }
+    if (assessorPartial) {
+      lines.push('This event assessor is still partial/provisional; the event-specific clauses are computed, but they are not complete chart certification because the shared baseline remains unresolved.');
+    }
     if (chartEnrichment.candidateLimitReached) {
       lines.push(`The chart-search safety budget was reached after ${chartEnrichment.screenedCount} candidate${chartEnrichment.screenedCount === 1 ? '' : 's'}; every shown slot was screened, but lower-ranked candidates were not assessed.`);
     } else if (activity === 'annaprasana' && !remainder.length) {
@@ -2980,9 +3031,6 @@ function shareMuhurtaOnWhatsApp() {
       } else {
         lines.push('All six Annaprasana event-specific chart clauses were evaluated and resolved.');
       }
-    } else if (!chartAssessorCompleteFor(activity)) {
-      lines.push('The implemented, source-backed election-chart clauses were checked across every sampled Lagna-stable state.');
-      lines.push('Remaining event-specific eligibility and the general election-chart baseline still require practitioner review.');
     } else if (!remainder.length) {
       if (reviewGated) {
         lines.push('All disclosed event chart clauses were attempted; unresolved facts still require review.');

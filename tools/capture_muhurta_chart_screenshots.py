@@ -6,6 +6,8 @@ It writes review evidence only; it does not call a live chart service.
 
 Usage:
     python tools/capture_muhurta_chart_screenshots.py --dist dist
+    python tools/capture_muhurta_chart_screenshots.py --dist dist \
+        --aksharabhyasa-only
 """
 
 from __future__ import annotations
@@ -175,6 +177,63 @@ ANNAPRASANA_CAPTURES = tuple(
 )
 
 
+AKSHARABHYASA_CAPTURES = (
+    Capture(
+        'fixture-aksharabhyasa-pass-desktop-1440x900.png',
+        'vidyarambha-pass', 'vidyarambha', 'drik', 1440, 900, 'screened',
+        'Preference met · tie-break only',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-pass-mobile-390x844.png',
+        'vidyarambha-pass', 'vidyarambha', 'drik', 390, 844, 'screened',
+        'Preference met · tie-break only',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-preference-miss-desktop-1440x900.png',
+        'vidyarambha-preference-miss', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'Preference not present · no penalty',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-preference-miss-mobile-390x844.png',
+        'vidyarambha-preference-miss', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'Preference not present · no penalty',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-hard-fail-desktop-1440x900.png',
+        'vidyarambha-hard-fail', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'House 8 occupants: Surya.',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-hard-fail-mobile-390x844.png',
+        'vidyarambha-hard-fail', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'House 8 occupants: Surya.',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-unknown-desktop-1440x900.png',
+        'vidyarambha-unknown', 'vidyarambha', 'drik', 1440, 900,
+        'screened', 'Preference could not be verified',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-unknown-mobile-390x844.png',
+        'vidyarambha-unknown', 'vidyarambha', 'drik', 390, 844,
+        'screened', 'Preference could not be verified',
+    ),
+)
+
+AKSHARABHYASA_SELECTOR_CAPTURES = (
+    Capture(
+        'fixture-aksharabhyasa-selector-desktop-1440x900.png',
+        'vidyarambha-selector', 'vidyarambha', 'drik', 1440, 900,
+        'pre-search', 'Aksharabhyasa (First-letter writing)',
+    ),
+    Capture(
+        'fixture-aksharabhyasa-selector-mobile-390x844.png',
+        'vidyarambha-selector', 'vidyarambha', 'drik', 390, 844,
+        'pre-search', 'Aksharabhyasa (First-letter writing)',
+    ),
+)
+
+
 PENDING_FETCH_SCRIPT = """
 (() => {
   const originalFetch = window.fetch.bind(window);
@@ -254,6 +313,8 @@ def _capture_regular(
             detail_selector = '.mu-reason-details:has(.mu-rg-computed)'
         elif capture.scenario == 'mixed':
             detail_selector = '.mu-reason-details:has(.mu-chart-rule--unknown)'
+        elif capture.scenario == 'vidyarambha-hard-fail':
+            detail_selector = '.mu-chart-removals'
         if detail_selector and result.locator(detail_selector).count():
             result.locator(detail_selector).first.locator('summary').first.click()
         if capture.scenario == 'annaprasana-hard-fail':
@@ -352,6 +413,18 @@ def _manifest_row(capture: Capture, path: Path) -> dict:
     if capture.additional_expected_copy is not None:
         row['additionalExpectedCopy'] = capture.additional_expected_copy
     return row
+
+
+def _write_manifest(output_dir: Path, rows: list[dict]) -> None:
+    manifest = {
+        'capturedAt': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        'source': 'tools/capture_muhurta_chart_screenshots.py',
+        'liveServicesUsed': False,
+        'captures': rows,
+    }
+    (output_dir / 'fixture-manifest.json').write_text(
+        json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
+    )
 
 
 def main() -> int:

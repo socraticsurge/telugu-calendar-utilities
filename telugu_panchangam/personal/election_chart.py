@@ -11,6 +11,7 @@ from .election_assessors.facts import planet_houses, planet_positions
 from .election_assessors.primitives import (
     GOLD_MAX_SAMPLE_GAP_MINUTES,
     PrimitiveOutcome,
+    evaluate_all_planets_in_houses,
     evaluate_full_aspect,
     evaluate_house_free_of_natural_malefics,
     evaluate_well_situated,
@@ -35,6 +36,10 @@ def _evaluate_rule(
     if kind == 'house_free_of_natural_malefics':
         return evaluate_house_free_of_natural_malefics(
             rule, positions, house_frame_uncertain=house_frame_uncertain)
+    if kind == 'all_planets_in_houses':
+        return evaluate_all_planets_in_houses(
+            rule, houses, house_frame_uncertain=house_frame_uncertain
+        )
     if houses is None or house_frame_uncertain:
         return PrimitiveOutcome(
             'unknown', ('Complete Whole Sign house facts are unavailable.',))
@@ -86,7 +91,10 @@ def _evaluate_rule(
                 f'{", ".join(str(house) for house in rule["houses"])}.',
             )
     else:
-        return PrimitiveOutcome('unknown')
+        return PrimitiveOutcome(
+            'unknown',
+            (f'Unsupported election-chart rule kind: {kind}.',),
+        )
     return PrimitiveOutcome('pass' if passed else 'fail', evidence)
 
 
