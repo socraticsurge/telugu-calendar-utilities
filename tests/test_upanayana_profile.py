@@ -56,7 +56,8 @@ def test_disallowed_solar_rasi_is_explained():
     day = _day(date(2026, 4, 20))
     day.solar_sign = 'Karka'  # isolate the solar-Rasi gate from lunar month
     reason = diagnose_day(day, activity='upanayana')
-    assert reason and 'does not admit this solar Rasi' in reason
+    assert reason
+    assert 'does not admit this solar Rasi' in reason
 
 
 def test_mcp_and_browser_publish_exact_tithi_and_solar_contract():

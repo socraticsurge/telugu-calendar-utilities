@@ -261,7 +261,8 @@ def test_get_daily_horas_entries_have_valid_planet_names():
     assert horas, 'horas list is empty'
     for h in horas:
         assert h['name'] in PLANET_HORA_NAMES, f"unknown hora ruler {h['name']!r}"
-        assert 'start' in h and 'end' in h
+        assert 'start' in h
+        assert 'end' in h
         assert h['start'] != h['end'], f'zero-length hora: {h}'
 
 
@@ -318,7 +319,8 @@ def test_get_lagna_transitions_entries_have_valid_rashi_names():
     assert lagnas, 'lagnas list is empty'
     for L in lagnas:
         assert L['name'] in RASHI_LAGNA_ORDER, f"unknown lagna {L['name']!r}"
-        assert 'start' in L and 'end' in L
+        assert 'start' in L
+        assert 'end' in L
         assert L['start'] != L['end'], f'zero-length lagna: {L}'
 
 

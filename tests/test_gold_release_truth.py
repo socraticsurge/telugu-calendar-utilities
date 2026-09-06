@@ -20,7 +20,8 @@ def test_gold_reference_pages_limit_completion_to_event_specific_clauses():
         assert 'general election-chart baseline' in document
         assert '#284' in document
         assert 'raw score' in document
-        assert 'maximum' in document and 'Good' in document
+        assert 'maximum' in document
+        assert 'Good' in document
         assert 'both counts' in document
 
     assert 'After a complete, valid Drik screen, the Gold chart remainder is empty' \
@@ -121,6 +122,7 @@ def test_gold_docs_distinguish_synthetic_and_actual_gateway_evidence():
     for document in (profile, method, research):
         assert 'election_chart_gold_oracle.json' in document
         assert 'election_chart_gold_gateway_oracle.json' in document
-        assert 'Hyderabad' in document and 'Sydney' in document
+        assert 'Hyderabad' in document
+        assert 'Sydney' in document
         assert '4106f09708a154f1c2401880ebe8f9c0b9162eb5' in document
         assert 'c84fd856b17120c80e1bb7e455246a0ec8e429ea' in document

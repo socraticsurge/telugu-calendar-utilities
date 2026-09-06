@@ -46,7 +46,8 @@ def test_kendra_trikona_classification():
     """Position 1 is in both kendra AND trikona (own rashi)."""
     assert LAGNA_KENDRA == {1, 4, 7, 10}
     assert LAGNA_TRIKONA == {1, 5, 9}
-    assert 1 in LAGNA_KENDRA and 1 in LAGNA_TRIKONA
+    assert 1 in LAGNA_KENDRA
+    assert 1 in LAGNA_TRIKONA
 
 
 def test_verdict_labels_each_position():
