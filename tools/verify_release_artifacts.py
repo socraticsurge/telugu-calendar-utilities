@@ -39,7 +39,7 @@ def _project_contract(root: Path) -> tuple[str, str, str]:
         "pyproject.toml must declare exactly one PySwissEph dependency",
     )
     dependency = dependency_matches[0]
-    pin_match = re.fullmatch(r"pyswisseph==([0-9]+(?:\.[0-9]+)+)", dependency)
+    pin_match = re.fullmatch(r"pyswisseph==(\d+(?:\.\d+)+)", dependency)
     _require(pin_match is not None, "PySwissEph must be pinned to an exact version")
     assert name_match is not None
     assert version_match is not None

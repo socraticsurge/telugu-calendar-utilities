@@ -27,6 +27,7 @@ import json
 import math
 import sys
 from collections import Counter
+from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone
 from itertools import pairwise
 from pathlib import Path
@@ -166,6 +167,124 @@ def _rounded(value: float) -> float:
     return round(value, 6)
 
 
+def _audited_day(city: Any, sampled_date: date) -> tuple[dict[str, Any], list]:
+    artifact = build_for_city(city, sampled_date, 1)
+    if len(artifact['days']) != 1:
+        raise AssertionError(
+            f'{city.name} {sampled_date}: expected exactly one artifact day'
+        )
+    day = artifact['days'][0]
+    transitions = day['transitions']
+    if len(transitions) < SIGN_TRANSITIONS_PER_CYCLE:
+        raise AssertionError(
+            f'{city.name} {sampled_date}: artifact supplied only '
+            f'{len(transitions)} Lagna transitions'
+        )
+    # A sidereal day can expose a trailing wrap transition and the
+    # generator's sunrise search can expose more than one cycle. The first
+    # 12 sign advances represent each distinct boundary exactly once.
+    return day, transitions[:SIGN_TRANSITIONS_PER_CYCLE]
+
+
+def _minimum_dwell(transitions: list) -> tuple[int, int, int]:
+    offsets = [offset for offset, _ in transitions]
+    return min(
+        (current - previous, previous, current)
+        for previous, current in pairwise(offsets)
+    )
+
+
+def _transition_measurement(
+    city: Any,
+    sampled_date: date,
+    sunrise: str,
+    minute_offset: int,
+    new_lagna_index: int,
+) -> tuple[int, float, dict[str, Any]]:
+    published = published_transition_instant(
+        sampled_date,
+        sunrise,
+        minute_offset,
+        city.timezone,
+    )
+    first_offset = first_new_minute_offset(
+        published,
+        new_lagna_index,
+        city.lat,
+        city.lon,
+    )
+    if first_offset is None:
+        raise AssertionError(
+            f'{city.name} {sampled_date} {published.isoformat()}: '
+            f'{RASHI_NAMES[new_lagna_index]} was not reached by T+2'
+        )
+    delta = continuous_boundary_delta_minutes(
+        published,
+        new_lagna_index,
+        city.lat,
+        city.lon,
+    )
+    return first_offset, abs(delta), {
+        'city': city.name,
+        'date': sampled_date.isoformat(),
+        'published_local': published.isoformat(),
+        'published_new_lagna': RASHI_NAMES[new_lagna_index],
+        'dashaflow_delta_minutes': _rounded(delta),
+    }
+
+
+@dataclass
+class _AuditState:
+    first_new_offsets: Counter[int] = field(default_factory=Counter)
+    transition_count: int = 0
+    max_abs_delta: float = -1.0
+    max_case: dict[str, Any] | None = None
+    min_internal_dwell: float = math.inf
+    min_dwell_case: dict[str, Any] | None = None
+
+    def record_day(self, city: Any, sampled_date: date) -> None:
+        day, transitions = _audited_day(city, sampled_date)
+        dwell, previous, current = _minimum_dwell(transitions)
+        if dwell < self.min_internal_dwell:
+            self.min_internal_dwell = dwell
+            self.min_dwell_case = {
+                'city': city.name,
+                'date': sampled_date.isoformat(),
+                'minutes': dwell,
+                'from_offset': previous,
+                'to_offset': current,
+            }
+        for minute_offset, new_lagna_index in transitions:
+            self.record_transition(
+                city,
+                sampled_date,
+                day['sunrise'],
+                minute_offset,
+                new_lagna_index,
+            )
+
+    def record_transition(
+        self,
+        city: Any,
+        sampled_date: date,
+        sunrise: str,
+        minute_offset: int,
+        new_lagna_index: int,
+    ) -> None:
+        first_offset, absolute_delta, case = _transition_measurement(
+            city,
+            sampled_date,
+            sunrise,
+            minute_offset,
+            new_lagna_index,
+        )
+        self.transition_count += 1
+        self.first_new_offsets[first_offset] += 1
+        if absolute_delta > self.max_abs_delta:
+            self.max_abs_delta = absolute_delta
+            self.max_case = case
+
+
 def generate_report(
     *,
     cities: list[Any] | None = None,
@@ -176,90 +295,19 @@ def generate_report(
     selected_cities = list(CITIES if cities is None else cities)
     selected_dates = sample_dates() if dates is None else dates
     started = perf_counter()
-    first_new_offsets: Counter[int] = Counter()
-    transition_count = 0
-    max_abs_delta = -1.0
-    max_case: dict[str, Any] | None = None
-    min_internal_dwell = math.inf
-    min_dwell_case: dict[str, Any] | None = None
+    state = _AuditState()
 
     swe.set_sid_mode(swe.SIDM_LAHIRI)
 
     for city in selected_cities:
         for sampled_date in selected_dates:
-            artifact = build_for_city(city, sampled_date, 1)
-            if len(artifact['days']) != 1:
-                raise AssertionError(
-                    f'{city.name} {sampled_date}: expected exactly one artifact day'
-                )
-            day = artifact['days'][0]
-            transitions = day['transitions']
-            if len(transitions) < SIGN_TRANSITIONS_PER_CYCLE:
-                raise AssertionError(
-                    f'{city.name} {sampled_date}: artifact supplied only '
-                    f'{len(transitions)} Lagna transitions'
-                )
-            # A sidereal day can expose a trailing wrap transition and the
-            # generator's sunrise search can expose more than one cycle.  The
-            # first 12 sign advances are one complete zodiac cycle and give
-            # every distinct boundary exactly once for each city-date.
-            audited_transitions = transitions[:SIGN_TRANSITIONS_PER_CYCLE]
+            state.record_day(city, sampled_date)
 
-            internal_offsets = [offset for offset, _ in audited_transitions]
-            for previous, current in pairwise(internal_offsets):
-                dwell = current - previous
-                if dwell < min_internal_dwell:
-                    min_internal_dwell = dwell
-                    min_dwell_case = {
-                        'city': city.name,
-                        'date': sampled_date.isoformat(),
-                        'minutes': dwell,
-                        'from_offset': previous,
-                        'to_offset': current,
-                    }
-
-            for minute_offset, new_lagna_index in audited_transitions:
-                transition_count += 1
-                published = published_transition_instant(
-                    sampled_date,
-                    day['sunrise'],
-                    minute_offset,
-                    city.timezone,
-                )
-                first_offset = first_new_minute_offset(
-                    published,
-                    new_lagna_index,
-                    city.lat,
-                    city.lon,
-                )
-                if first_offset is None:
-                    raise AssertionError(
-                        f'{city.name} {sampled_date} {published.isoformat()}: '
-                        f'{RASHI_NAMES[new_lagna_index]} was not reached by T+2'
-                    )
-                first_new_offsets[first_offset] += 1
-
-                delta = continuous_boundary_delta_minutes(
-                    published,
-                    new_lagna_index,
-                    city.lat,
-                    city.lon,
-                )
-                if abs(delta) > max_abs_delta:
-                    max_abs_delta = abs(delta)
-                    max_case = {
-                        'city': city.name,
-                        'date': sampled_date.isoformat(),
-                        'published_local': published.isoformat(),
-                        'published_new_lagna': RASHI_NAMES[new_lagna_index],
-                        'dashaflow_delta_minutes': _rounded(delta),
-                    }
-
-    if max_case is None or min_dwell_case is None:
+    if state.max_case is None or state.min_dwell_case is None:
         raise AssertionError('audit scope did not contain Lagna transitions')
 
     elapsed = perf_counter() - started
-    max_abs_delta = _rounded(max_abs_delta)
+    max_abs_delta = _rounded(state.max_abs_delta)
     return {
         'schema_version': AUDIT_SCHEMA_VERSION,
         'method': {
@@ -297,17 +345,17 @@ def generate_report(
             'first_new_lagna_deadline_minutes': FIRST_NEW_MINUTE_LIMIT,
         },
         'results': {
-            'transition_count': transition_count,
+            'transition_count': state.transition_count,
             'first_new_minute_offsets': {
-                str(offset): first_new_offsets[offset]
+                str(offset): state.first_new_offsets[offset]
                 for offset in range(FIRST_NEW_MINUTE_LIMIT + 1)
             },
             'transitions_after_t_plus_2': 0,
             'max_abs_boundary_delta_minutes': max_abs_delta,
             'guard_margin_minutes': _rounded(GUARD_MINUTES - max_abs_delta),
-            'max_delta_case': max_case,
-            'minimum_internal_dwell_minutes': int(min_internal_dwell),
-            'minimum_internal_dwell_case': min_dwell_case,
+            'max_delta_case': state.max_case,
+            'minimum_internal_dwell_minutes': int(state.min_internal_dwell),
+            'minimum_internal_dwell_case': state.min_dwell_case,
         },
         # Runtime varies by machine and is deliberately informational.  It is
         # excluded from fixture equality in verification mode.
