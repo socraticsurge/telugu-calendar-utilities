@@ -13,6 +13,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 FACTS_PATH = ROOT / 'docs' / 'reference' / 'project-facts.json'
 REGISTRY_PATH = ROOT / 'docs' / 'reference' / 'computations.json'
+_FEED_DIMENSIONS_LABEL = 'feed dimensions'
+_MCP_TOOL_COUNT_LABEL = 'MCP tool count'
+_PYPI_README_PATH = 'README_PYPI.md'
 
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -148,21 +151,21 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
             (f'{city_count} cities × {system_count} systems = {feed_count} feeds', 'feed count'),
         ],
         'ARCHITECTURE.md': [
-            (f'{city_count} cities × {system_count} systems', 'feed dimensions'),
+            (f'{city_count} cities × {system_count} systems', _FEED_DIMENSIONS_LABEL),
         ],
         'docs/reference/README.md': [
-            (f'{city_count} cities × {system_count} systems', 'feed dimensions'),
-            (f'**{tool_count} tools**', 'MCP tool count'),
+            (f'{city_count} cities × {system_count} systems', _FEED_DIMENSIONS_LABEL),
+            (f'**{tool_count} tools**', _MCP_TOOL_COUNT_LABEL),
         ],
         'docs/reference/01-system-mindmap.md': [
-            (f'{city_count} cities x {system_count} systems', 'feed dimensions'),
-            (f'MCP server ({tool_count} tools)', 'MCP tool count'),
+            (f'{city_count} cities x {system_count} systems', _FEED_DIMENSIONS_LABEL),
+            (f'MCP server ({tool_count} tools)', _MCP_TOOL_COUNT_LABEL),
         ],
         'docs/reference/04-user-facing-features.md': [
-            (f'MCP server — {tool_count} tools', 'MCP tool count'),
+            (f'MCP server — {tool_count} tools', _MCP_TOOL_COUNT_LABEL),
             (f'{city_count} cities × {system_count} systems = {feed_count} feeds', 'feed count'),
         ],
-        'README_PYPI.md': [
+        _PYPI_README_PATH: [
             (f'{city_count} pre-configured cities', 'city count'),
         ],
     }
@@ -172,7 +175,7 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
 
     tool_docs = (
         'docs/reference/04-user-facing-features.md',
-        'README_PYPI.md',
+        _PYPI_README_PATH,
     )
     expected_tools = set(facts['mcp_tools'])
     for path in tool_docs:
@@ -187,7 +190,7 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
                 + ', '.join(sorted(unknown))
             )
 
-    package_readme = _read('README_PYPI.md')
+    package_readme = _read(_PYPI_README_PATH)
     activity_facts = facts['muhurta_activities']
     missing_activities = [
         key
@@ -201,7 +204,7 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
         )
 
     stale_node_claims = {
-        'README_PYPI.md': ('Rahu/Ketu set (3, 6, 11)',),
+        _PYPI_README_PATH: ('Rahu/Ketu set (3, 6, 11)',),
         'telugu_panchangam/mcp/server.py': ('Rahu/Ketu houses omit the 10th',),
         'docs/reference/08-provenance-and-authority.md': (
             'known conflict in the configured node houses',

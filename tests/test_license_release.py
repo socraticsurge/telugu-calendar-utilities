@@ -15,7 +15,7 @@ def test_package_and_mcp_metadata_publish_one_agpl_release() -> None:
     version_match = re.search(r'^version = "([^"]+)"$', pyproject, re.MULTILINE)
 
     assert version_match is not None
-    assert version_match.group(1) == "1.18.1"
+    assert version_match.group(1) == "1.18.2"
     assert 'license = "AGPL-3.0-or-later"' in pyproject
     assert 'license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]' in pyproject
     assert '"pyswisseph==2.10.3.2"' in pyproject

@@ -21,6 +21,15 @@ ROOT = Path(__file__).resolve().parents[1]
 PROVENANCE = ROOT / 'docs' / 'reference' / 'provenance.json'
 OUTPUT = ROOT / 'docs' / 'reference' / 'muhurtam-rule-crosswalk.json'
 SCHEMA_VERSION = 1
+_ACTIVITY_RULES_PATH = 'telugu_panchangam/personal/activity_rules.py'
+_MANUAL_DISPLAY_ROW = 'manual.display-row'
+_PANCHANGAM_PREDICATE_PREFIX = 'panchangam.'
+_PREDICATE_DAY_ADMISSION = 'panchangam.day-admission'
+_PREDICATE_DAY_EXCLUSION = 'panchangam.day-exclusion'
+_PREDICATE_RANKING_PREFERENCE = 'panchangam.ranking-preference'
+_PREDICATE_SLOT_ADMISSION = 'panchangam.slot-admission'
+_PREDICATE_SLOT_EXCLUSION = 'panchangam.slot-exclusion'
+_PRODUCT_SAFETY_POLICY_CLAIM = 'muhurta.product_safety_and_routing_policy'
 
 ACTIVITY_METADATA_FIELDS = frozenset({
     'label',
@@ -324,16 +333,16 @@ def _field(
 # apparently verified or automated prerequisite.
 PANCHANGAM_FIELD_SEMANTICS: Mapping[str, dict[str, str]] = {
     'avoid_karana': _field(
-        'panchangam.slot-exclusion', 'candidate_exclusion',
+        _PREDICATE_SLOT_EXCLUSION, 'candidate_exclusion',
         'Configured Karana spans are removed deterministically.'),
     'prefer_lagna_class': _field(
-        'panchangam.ranking-preference', 'score_bonus_plus_one',
+        _PREDICATE_RANKING_PREFERENCE, 'score_bonus_plus_one',
         'The active Lagna class is known from the generated Lagna timeline.'),
     'prefer_choghadiya': _field(
-        'panchangam.ranking-preference', 'configured_score_bonus',
+        _PREDICATE_RANKING_PREFERENCE, 'configured_score_bonus',
         'The dominant Choghadiya block and configured bonus are exact.'),
     'skip_on_yoga': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'A configured special Yoga match rejects the day deterministically.'),
     'skip_on_sankramana': _field(
         'panchangam.window-exclusion', 'candidate_exclusion',
@@ -342,65 +351,65 @@ PANCHANGAM_FIELD_SEMANTICS: Mapping[str, dict[str, str]] = {
             'Python clips the configured avoidance window; the browser '
             'rejects a feed day carrying the Sankramana marker.')),
     'prefer_vara': _field(
-        'panchangam.ranking-preference',
+        _PREDICATE_RANKING_PREFERENCE,
         'score_bonus_plus_one_for_day_and_matching_hora',
         'The sunrise weekday and Hora ruler are deterministic.'),
     'prefer_tithi_class': _field(
-        'panchangam.ranking-preference', 'score_bonus_plus_one',
+        _PREDICATE_RANKING_PREFERENCE, 'score_bonus_plus_one',
         'The active Tithi family is computed at the candidate instant.'),
     'avoid_tithi_class': _field(
         'panchangam.ranking-penalty', 'score_penalty_minus_one',
         'The active Tithi family is computed at the candidate instant.'),
     'required_lagna_class': _field(
-        'panchangam.slot-admission', 'candidate_exclusion',
+        _PREDICATE_SLOT_ADMISSION, 'candidate_exclusion',
         'A candidate without the required Lagna class is rejected.'),
     'allowed_maasams': _field(
-        'panchangam.day-admission', 'candidate_exclusion',
+        _PREDICATE_DAY_ADMISSION, 'candidate_exclusion',
         'The normalized lunar month is tested against the configured list.'),
     'allowed_maasa_solar_pairs': _field(
         'panchangam.day-admission-exception', 'candidate_admission',
         'Configured lunar-month and Surya-Rasi pairs extend month admission.'),
     'allowed_varas': _field(
-        'panchangam.day-admission', 'candidate_exclusion',
+        _PREDICATE_DAY_ADMISSION, 'candidate_exclusion',
         'The sunrise weekday is tested against the configured list.'),
     'avoid_vara_paksha': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'Exact configured weekday and Paksha pairs reject the day.'),
     'allowed_solar_classes': _field(
-        'panchangam.day-admission', 'candidate_exclusion',
+        _PREDICATE_DAY_ADMISSION, 'candidate_exclusion',
         'Surya Rasi class is computed and tested against the configured list.'),
     'allowed_nakshatras': _field(
-        'panchangam.slot-admission', 'candidate_exclusion',
+        _PREDICATE_SLOT_ADMISSION, 'candidate_exclusion',
         'The active Nakshatra is tested against the configured list.'),
     'avoid_nakshatras': _field(
-        'panchangam.slot-exclusion', 'candidate_exclusion',
+        _PREDICATE_SLOT_EXCLUSION, 'candidate_exclusion',
         'A configured active Nakshatra rejects the candidate.'),
     'prefer_nakshatras': _field(
-        'panchangam.ranking-preference', 'score_bonus_plus_one',
+        _PREDICATE_RANKING_PREFERENCE, 'score_bonus_plus_one',
         'A configured active Nakshatra receives a deterministic bonus.'),
     'allowed_tithi_numbers': _field(
-        'panchangam.slot-admission', 'candidate_exclusion',
+        _PREDICATE_SLOT_ADMISSION, 'candidate_exclusion',
         'The active Tithi number is tested against the configured list.'),
     'prefer_tithi_numbers': _field(
-        'panchangam.ranking-preference', 'score_bonus_plus_one',
+        _PREDICATE_RANKING_PREFERENCE, 'score_bonus_plus_one',
         'A configured active Tithi number receives a deterministic bonus.'),
     'avoid_tithi_numbers': _field(
-        'panchangam.slot-exclusion', 'candidate_exclusion',
+        _PREDICATE_SLOT_EXCLUSION, 'candidate_exclusion',
         'A configured active Tithi number rejects the candidate.'),
     'avoid_janma_nakshatra': _field(
         'panchangam.personal-slot-exclusion', 'candidate_exclusion',
         'Supplied Janma Nakshatras are compared with the active Nakshatra.'),
     'avoid_vara_tithi_names': _field(
-        'panchangam.slot-exclusion', 'candidate_exclusion',
+        _PREDICATE_SLOT_EXCLUSION, 'candidate_exclusion',
         'Exact configured weekday and Paksha-qualified Tithi pairs reject.'),
     'avoid_nitya_yogas': _field(
-        'panchangam.slot-exclusion', 'candidate_exclusion',
+        _PREDICATE_SLOT_EXCLUSION, 'candidate_exclusion',
         'A configured active Nitya Yoga rejects the candidate.'),
     'allowed_lagnas': _field(
-        'panchangam.slot-admission', 'candidate_exclusion',
+        _PREDICATE_SLOT_ADMISSION, 'candidate_exclusion',
         'The active Lagna is tested against the configured list.'),
     'prefer_lagnas': _field(
-        'panchangam.ranking-preference', 'score_bonus_plus_one',
+        _PREDICATE_RANKING_PREFERENCE, 'score_bonus_plus_one',
         'A configured active Lagna receives a deterministic bonus.'),
     'caution_lagna_solar': _field(
         'panchangam.disclosure', 'disclosure_only',
@@ -434,40 +443,40 @@ PANCHANGAM_FIELD_SEMANTICS: Mapping[str, dict[str, str]] = {
         'panchangam.time-admission', 'candidate_exclusion',
         'Candidates ending after local solar noon are rejected.'),
     'allowed_pakshams': _field(
-        'panchangam.day-admission', 'candidate_exclusion',
+        _PREDICATE_DAY_ADMISSION, 'candidate_exclusion',
         'The active Paksha is tested against the configured list.'),
     'require_homa_election': _field(
         'panchangam.specialized-admission', 'candidate_exclusion',
         'The deterministic Homahuti and Agnivasa predicate must admit.'),
     'allowed_solar_signs': _field(
-        'panchangam.day-admission', 'candidate_exclusion',
+        _PREDICATE_DAY_ADMISSION, 'candidate_exclusion',
         'The Surya Rasi is tested against the configured list.'),
     'allowed_tithi_names': _field(
-        'panchangam.slot-admission', 'candidate_exclusion',
+        _PREDICATE_SLOT_ADMISSION, 'candidate_exclusion',
         'The exact Paksha-qualified Tithi name must be admitted.'),
     'skip_on_combust': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'Configured Graha combustion facts reject candidates.'),
     'skip_on_adhika': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'An Adhika lunar month rejects the day in the Python finder.'),
     'skip_on_khar_maasa': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'A computed Khara Maasa rejects the day in the Python finder.'),
     'skip_on_pitru_paksha': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'A computed Pitru Paksha rejects the day in the Python finder.'),
     'skip_on_simha_stha_guru': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'Simha-Stha Guru rejects the day in the Python finder.'),
     'penalty_on_simha_stha_shukra': _field(
         'panchangam.ranking-penalty', 'configured_score_penalty',
         'The configured penalty is applied when Shukra is in Simha.'),
     'prefer_nakshatra_mukha': _field(
-        'panchangam.ranking-preference', 'configured_score_bonus',
+        _PREDICATE_RANKING_PREFERENCE, 'configured_score_bonus',
         'The configured Nakshatra-Mukha classes and bonus are exact.'),
     'skip_on_panchaka_nakshatra': _field(
-        'panchangam.day-exclusion', 'candidate_exclusion',
+        _PREDICATE_DAY_EXCLUSION, 'candidate_exclusion',
         'The active Nakshatra is tested against the configured Panchaka '
         'membership table in the Python finder.'),
 }
@@ -756,7 +765,7 @@ def build_crosswalk(
     project_predicate_claim = resolve(PROJECT_PREDICATE_CLAIM)
     scoring_policy_claim = resolve(SCORING_POLICY_CLAIM)
     product_policy_claim = resolve(
-        'muhurta.product_safety_and_routing_policy')
+        _PRODUCT_SAFETY_POLICY_CLAIM)
     contract = build_activity_check_contract()['activities']
     expert_activities = tuple(
         activity for activity in ACTIVITY_RULES
@@ -875,7 +884,7 @@ def build_crosswalk(
                 implementation_status=status,
                 implementation_owner=semantics.get(
                     'implementation_owner',
-                    'telugu_panchangam/personal/activity_rules.py'),
+                    _ACTIVITY_RULES_PATH),
                 ranking_effect=semantics['ranking_effect'],
                 automation_mode='automated',
                 automation_rationale=semantics['automation_rationale'],
@@ -1023,7 +1032,7 @@ def build_crosswalk(
             fallback_only = rule_id in AUTOMATED_CHART_FALLBACK_MANUAL_IDS
             if rule_id in PRODUCT_POLICY_MANUAL_IDS:
                 manual_claim_id = (
-                    'muhurta.product_safety_and_routing_policy')
+                    _PRODUCT_SAFETY_POLICY_CLAIM)
                 manual_claim = product_policy_claim
                 manual_authority_role = 'product_policy'
             elif rule_id in MANUAL_ROW_CLAIM_OVERRIDES:
@@ -1047,7 +1056,7 @@ def build_crosswalk(
             append(_row(
                 activity=activity,
                 rule_id=rule_id,
-                predicate_class='manual.display-row',
+                predicate_class=_MANUAL_DISPLAY_ROW,
                 configured_inputs=configured_manual,
                 source_claim_id=manual_claim_id,
                 source_claim=manual_claim,
@@ -1148,7 +1157,7 @@ def build_crosswalk(
                 source_claim=field_claim,
                 implementation_status='automated_python_only_not_browser',
                 implementation_owner=(
-                    'telugu_panchangam/personal/activity_rules.py'),
+                    _ACTIVITY_RULES_PATH),
                 ranking_effect=semantics['ranking_effect'],
                 automation_mode='automated',
                 automation_rationale=semantics['automation_rationale'],
@@ -1174,7 +1183,7 @@ def build_crosswalk(
             rule_id = manual['id']
             if rule_id in PRODUCT_POLICY_MANUAL_IDS:
                 manual_claim_id = (
-                    'muhurta.product_safety_and_routing_policy')
+                    _PRODUCT_SAFETY_POLICY_CLAIM)
                 manual_claim = product_policy_claim
                 manual_authority_role = 'product_policy'
             else:
@@ -1184,7 +1193,7 @@ def build_crosswalk(
             expert_rows.append(_row(
                 activity=activity,
                 rule_id=rule_id,
-                predicate_class='manual.display-row',
+                predicate_class=_MANUAL_DISPLAY_ROW,
                 configured_inputs={
                     key: value
                     for key, value in manual.items()
@@ -1194,7 +1203,7 @@ def build_crosswalk(
                 source_claim=manual_claim,
                 implementation_status='manual_python_mcp_not_computed',
                 implementation_owner=(
-                    'telugu_panchangam/personal/activity_rules.py'),
+                    _ACTIVITY_RULES_PATH),
                 ranking_effect=_manual_effect(
                     manual,
                     profile_requires_review=bool(
@@ -1250,7 +1259,7 @@ def build_crosswalk(
         authority_status = row['source_claim']['authority_status']
         counts_by_authority_status[authority_status] = (
             counts_by_authority_status.get(authority_status, 0) + 1)
-        if row['predicate_class'].startswith('panchangam.'):
+        if row['predicate_class'].startswith(_PANCHANGAM_PREDICATE_PREFIX):
             role = row['configured_inputs']['authority_role']
             deterministic_by_authority_role[role] = (
                 deterministic_by_authority_role.get(role, 0) + 1)
@@ -1276,7 +1285,7 @@ def build_crosswalk(
             'python_mcp_only_activities': len(expert_activities),
             'rows': len(rows),
             'deterministic_panchangam_rows': sum(
-                row['predicate_class'].startswith('panchangam.')
+                row['predicate_class'].startswith(_PANCHANGAM_PREDICATE_PREFIX)
                 for row in rows),
             'personal_rule_rows': sum(
                 row['predicate_class'].startswith('personal.')
@@ -1285,7 +1294,7 @@ def build_crosswalk(
                 row['predicate_class'].startswith('election-chart.')
                 for row in rows),
             'manual_display_rows': sum(
-                row['predicate_class'] == 'manual.display-row'
+                row['predicate_class'] == _MANUAL_DISPLAY_ROW
                 for row in rows),
             'by_predicate_class': counts_by_class,
             'by_implementation_status': counts_by_status,
@@ -1303,10 +1312,10 @@ def build_crosswalk(
                 'activities': len(expert_activity_rows),
                 'rows': len(expert_rows),
                 'deterministic_panchangam_rows': sum(
-                    row['predicate_class'].startswith('panchangam.')
+                    row['predicate_class'].startswith(_PANCHANGAM_PREDICATE_PREFIX)
                     for row in expert_rows),
                 'manual_display_rows': sum(
-                    row['predicate_class'] == 'manual.display-row'
+                    row['predicate_class'] == _MANUAL_DISPLAY_ROW
                     for row in expert_rows),
             },
             'activities': expert_activity_rows,
@@ -1403,7 +1412,7 @@ def _validate_complete(
     actual_manual_ids = {
         row['rule_id']
         for row in rows
-        if row['predicate_class'] == 'manual.display-row'
+        if row['predicate_class'] == _MANUAL_DISPLAY_ROW
     }
     if actual_manual_ids != expected_manual_ids:
         raise ValueError('Manual display-row coverage is incomplete')

@@ -33,6 +33,8 @@ from telugu_panchangam.personal.slot_scorers import (
 )
 from telugu_panchangam.panchaka import evaluate_panchaka
 
+_ADHIKA_PREFIX = 'Adhika '
+
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
 MUHURTA_MINUTES = 48    # one classical muhurta (2 ghati) · the slot window size
 
@@ -194,7 +196,7 @@ def _day_skip_reason(day, rules, activity, travel_direction,
     allowed_maasams = rules.get('allowed_maasams')
     allowed_maasa_solar_pairs = {
         tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}
-    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')
+    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix(_ADHIKA_PREFIX)
     if ((allowed_maasams or allowed_maasa_solar_pairs) and
             normalized_maasam not in (allowed_maasams or ()) and
             (normalized_maasam, day.solar_sign) not in
@@ -238,7 +240,7 @@ def _day_skip_reason(day, rules, activity, travel_direction,
         return (f'Khar-Maasa ({day.khar_maasa_name} Maasa) · '
                 f'{rules["label"]} traditionally avoided')
 
-    if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
+    if rules.get('skip_on_adhika') and day.maasam.startswith(_ADHIKA_PREFIX):
         return f'Adhika Maasa · {rules["label"]} traditionally avoided'
 
     if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
@@ -853,7 +855,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
     allowed_maasams = rules.get('allowed_maasams')
     allowed_maasa_solar_pairs = {
         tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}
-    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')
+    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix(_ADHIKA_PREFIX)
     if ((allowed_maasams or allowed_maasa_solar_pairs) and
             normalized_maasam not in (allowed_maasams or ()) and
             (normalized_maasam, day.solar_sign) not in
@@ -879,7 +881,7 @@ def night_slots(day: PanchangamDay, next_day: PanchangamDay,
         return []
     if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
         return []
-    if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):
+    if rules.get('skip_on_adhika') and day.maasam.startswith(_ADHIKA_PREFIX):
         return []
     if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
         return []
