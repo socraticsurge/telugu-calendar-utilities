@@ -12,8 +12,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from copy import deepcopy
+from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from pathlib import Path
 from typing import Any
 
@@ -646,66 +648,68 @@ def _row_claim(claim: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _row(
-    *,
-    activity: str,
-    rule_id: str,
-    predicate_class: str,
-    configured_inputs: Mapping[str, Any],
-    source_claim_id: str,
-    source_claim: Mapping[str, Any],
-    implementation_status: str,
-    implementation_owner: str,
-    ranking_effect: str,
-    automation_mode: str,
-    automation_rationale: str,
-    implementation_note: str | None = None,
-    predicate_source_locator: str | None = None,
-    decision_policy_claim: Mapping[str, Any] | None = None,
-    interpretation_policy_claim: Mapping[str, Any] | None = None,
-    related_context_claims: tuple[Mapping[str, Any], ...] = (),
-    supporting_claims: tuple[Mapping[str, Any], ...] = (),
-    authority_role: str | None = None,
-    applicability: str | None = None,
-) -> dict[str, Any]:
+@dataclass(frozen=True)
+class _RowSpec:
+    activity: str
+    rule_id: str
+    predicate_class: str
+    configured_inputs: Mapping[str, Any]
+    source_claim_id: str
+    source_claim: Mapping[str, Any]
+    implementation_status: str
+    implementation_owner: str
+    ranking_effect: str
+    automation_mode: str
+    automation_rationale: str
+    implementation_note: str | None = None
+    predicate_source_locator: str | None = None
+    decision_policy_claim: Mapping[str, Any] | None = None
+    interpretation_policy_claim: Mapping[str, Any] | None = None
+    related_context_claims: tuple[Mapping[str, Any], ...] = ()
+    supporting_claims: tuple[Mapping[str, Any], ...] = ()
+    authority_role: str | None = None
+    applicability: str | None = None
+
+
+def _row(spec: _RowSpec) -> dict[str, Any]:
     result = {
-        'activity': activity,
-        'rule_id': rule_id,
-        'predicate_class': predicate_class,
-        'configured_inputs': _json_value(dict(configured_inputs)),
-        'source_claim_id': source_claim_id,
-        'source_claim': _row_claim(source_claim),
-        'implementation_status': implementation_status,
-        'implementation_owner': implementation_owner,
-        'ranking_effect': ranking_effect,
-        'automation_mode': automation_mode,
-        'automation_rationale': automation_rationale,
+        'activity': spec.activity,
+        'rule_id': spec.rule_id,
+        'predicate_class': spec.predicate_class,
+        'configured_inputs': _json_value(dict(spec.configured_inputs)),
+        'source_claim_id': spec.source_claim_id,
+        'source_claim': _row_claim(spec.source_claim),
+        'implementation_status': spec.implementation_status,
+        'implementation_owner': spec.implementation_owner,
+        'ranking_effect': spec.ranking_effect,
+        'automation_mode': spec.automation_mode,
+        'automation_rationale': spec.automation_rationale,
     }
-    if implementation_note:
-        result['implementation_note'] = implementation_note
-    if predicate_source_locator:
-        result['predicate_source_locator'] = predicate_source_locator
-    if decision_policy_claim:
-        result['decision_policy_claim_id'] = decision_policy_claim['id']
+    if spec.implementation_note:
+        result['implementation_note'] = spec.implementation_note
+    if spec.predicate_source_locator:
+        result['predicate_source_locator'] = spec.predicate_source_locator
+    if spec.decision_policy_claim:
+        result['decision_policy_claim_id'] = spec.decision_policy_claim['id']
         result['decision_policy_claim'] = _row_claim(
-            decision_policy_claim)
-    if interpretation_policy_claim:
+            spec.decision_policy_claim)
+    if spec.interpretation_policy_claim:
         result['interpretation_policy_claim_id'] = (
-            interpretation_policy_claim['id'])
+            spec.interpretation_policy_claim['id'])
         result['interpretation_policy_claim'] = _row_claim(
-            interpretation_policy_claim)
-    if related_context_claims:
+            spec.interpretation_policy_claim)
+    if spec.related_context_claims:
         result['related_context_claims'] = [
-            _row_claim(item) for item in related_context_claims
+            _row_claim(item) for item in spec.related_context_claims
         ]
-    if supporting_claims:
+    if spec.supporting_claims:
         result['supporting_claims'] = [
-            _row_claim(item) for item in supporting_claims
+            _row_claim(item) for item in spec.supporting_claims
         ]
-    if authority_role:
-        result['authority_role'] = authority_role
-    if applicability:
-        result['applicability'] = applicability
+    if spec.authority_role:
+        result['authority_role'] = spec.authority_role
+    if spec.applicability:
+        result['applicability'] = spec.applicability
     return result
 
 
@@ -735,6 +739,548 @@ def _expert_manual_checks(
         for index, (text, section) in enumerate(
             zip(texts, sections, strict=True), start=1)
     ]
+
+
+def _sample_aggregation(rule: Mapping[str, Any]) -> str:
+    if rule['effect'] == 'reject':
+        return SAMPLED_REJECT_AGGREGATION
+    if rule['effect'] != 'qualify':
+        return SAMPLED_PREFERENCE_AGGREGATION
+    if 'election_chart.gold_transition_envelope_v1' in rule.get(
+        'method_claims', ()
+    ):
+        return SAMPLED_TRANSITION_SAFE_QUALIFICATION_AGGREGATION
+    return SAMPLED_QUALIFICATION_AGGREGATION
+
+
+def _chart_ranking_effect(effect: str) -> str:
+    if effect == 'reject':
+        return 'candidate_exclusion'
+    if effect == 'qualify':
+        return 'post_screen_tier_cap'
+    return 'post_screen_tie_break_preference'
+
+
+def _chart_rationale(rule: Mapping[str, Any]) -> str:
+    if rule.get('convention_id'):
+        return (
+            'The named, versioned interpretation convention is a bounded '
+            'predicate over the exact nine-Graha election chart.'
+        )
+    return (
+        'Whole Sign house occupancy is a bounded predicate over the exact '
+        'nine-Graha election chart.'
+    )
+
+
+@dataclass
+class _CrosswalkBuilder:
+    resolve: Callable[[str], dict[str, Any]]
+    project_predicate_claim: dict[str, Any]
+    scoring_policy_claim: dict[str, Any]
+    product_policy_claim: dict[str, Any]
+    contract: Mapping[str, Any]
+    activity_rules: Mapping[str, Mapping[str, Any]]
+    personal_rules: Mapping[str, Any]
+    chart_rules: Mapping[str, Any]
+    browser_field_set: set[str]
+    chart_context: Mapping[str, Any]
+    rows: list[dict[str, Any]] = dataclass_field(default_factory=list)
+    seen_rule_ids: set[str] = dataclass_field(default_factory=set)
+    expected_manual_ids: set[str] = dataclass_field(default_factory=set)
+
+    def append(self, row: dict[str, Any]) -> None:
+        rule_id = row['rule_id']
+        if rule_id in self.seen_rule_ids:
+            raise ValueError(f'Duplicate crosswalk rule ID {rule_id!r}')
+        self.seen_rule_ids.add(rule_id)
+        self.rows.append(row)
+
+    def _field_authority(
+        self,
+        activity: str,
+        field_name: str,
+        claim_id: str,
+        claim: Mapping[str, Any],
+    ) -> tuple[str, Mapping[str, Any], str]:
+        if field_name in PRIMARY_ACTIVITY_CLAIM_FIELDS[activity]:
+            return claim_id, claim, 'activity_source_claim'
+        pair = (activity, field_name)
+        if pair in SHARED_SOURCE_CLAIM_FIELDS:
+            shared_id = SHARED_SOURCE_CLAIM_FIELDS[pair]
+            return shared_id, self.resolve(shared_id), 'shared_source_claim'
+        return (
+            PROJECT_PREDICATE_CLAIM,
+            self.project_predicate_claim,
+            'explicit_project_heuristic',
+        )
+
+    def panchangam_rows(
+        self,
+        activity: str,
+        rules: Mapping[str, Any],
+        claim_id: str,
+        claim: Mapping[str, Any],
+        *,
+        browser: bool,
+    ) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for field_name, semantics in PANCHANGAM_FIELD_SEMANTICS.items():
+            if field_name not in rules:
+                continue
+            field_claim_id, field_claim, authority_role = self._field_authority(
+                activity, field_name, claim_id, claim
+            )
+            status = 'automated_python_only_not_browser'
+            if browser and field_name in self.browser_field_set:
+                status = 'automated_browser_and_python'
+            rule_id = semantics.get(
+                'rule_id', f'{activity}.panchangam.{field_name}'
+            )
+            rows.append(_row(_RowSpec(
+                activity=activity,
+                rule_id=rule_id,
+                predicate_class=semantics['predicate_class'],
+                configured_inputs={
+                    'activity_rule_field': field_name,
+                    'configured_value': rules[field_name],
+                    'authority_role': authority_role,
+                },
+                source_claim_id=field_claim_id,
+                source_claim=field_claim,
+                implementation_status=status,
+                implementation_owner=semantics.get(
+                    'implementation_owner', _ACTIVITY_RULES_PATH
+                ),
+                ranking_effect=semantics['ranking_effect'],
+                automation_mode='automated',
+                automation_rationale=semantics['automation_rationale'],
+                implementation_note=semantics.get('implementation_note'),
+                decision_policy_claim=(
+                    self.scoring_policy_claim
+                    if _uses_project_decision_policy(semantics['ranking_effect'])
+                    else None
+                ),
+                interpretation_policy_claim=(
+                    self.resolve(semantics['interpretation_policy_claim_id'])
+                    if semantics.get('interpretation_policy_claim_id')
+                    else None
+                ),
+            )))
+        return rows
+
+    def personal_rows(self, activity: str) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for item in self.personal_rules.get(activity, ()):
+            rule_id, effect, claim_id, locator = item
+            if not locator:
+                raise ValueError(f'Personal rule {rule_id!r} has no predicate locator')
+            config = deepcopy(PERSONAL_PREDICATE_CONFIG[rule_id])
+            config['sample_aggregation'] = (
+                SAMPLED_REJECT_AGGREGATION
+                if effect == 'reject'
+                else SAMPLED_PREFERENCE_AGGREGATION
+            )
+            rows.append(_row(_RowSpec(
+                activity=activity,
+                rule_id=rule_id,
+                predicate_class='personal.exact-election-fact',
+                configured_inputs=config,
+                source_claim_id=claim_id,
+                source_claim=self.resolve(claim_id),
+                implementation_status=(
+                    'automated_exact_chart_browser_with_python_parity'
+                ),
+                implementation_owner=(
+                    'telugu_panchangam/personal/personal_election.py'
+                ),
+                ranking_effect=_chart_ranking_effect(effect),
+                automation_mode='automated',
+                automation_rationale=(
+                    'The named natal and exact candidate facts support a '
+                    'bounded equality or cyclic-position predicate.'
+                ),
+                predicate_source_locator=locator,
+                decision_policy_claim=(
+                    self.scoring_policy_claim if effect != 'reject' else None
+                ),
+            )))
+        return rows
+
+    def chart_rows(self, activity: str) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for rule in self.chart_rules.get(activity, ()):
+            rows.append(self._chart_row(activity, rule))
+        return rows
+
+    def _chart_row(
+        self, activity: str, rule: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        rule_id = rule['id']
+        locator = rule.get('source_locator')
+        if not locator:
+            raise ValueError(f'Election-chart rule {rule_id!r} has no locator')
+        method_claims = tuple(
+            self.resolve(claim_id)
+            for claim_id in rule.get('method_claims', ())
+        )
+        supporting = tuple(
+            claim
+            for claim in method_claims
+            if claim['authority_status'] == 'source_backed'
+        )
+        decision_policy = self._chart_decision_policy(rule)
+        predicate_inputs = {
+            key: value
+            for key, value in rule.items()
+            if key not in {
+                'id', 'label', 'kind', 'effect', 'source_claim',
+                'source_locator',
+            }
+        }
+        claim_id = rule['source_claim']
+        return _row(_RowSpec(
+            activity=activity,
+            rule_id=rule_id,
+            predicate_class=f'election-chart.{rule["kind"]}',
+            configured_inputs={
+                'house_system': self.chart_context['house_system'],
+                'node_convention': self.chart_context['node_convention'],
+                'planet_set': list(self.chart_context['planets']),
+                'predicate': rule['kind'],
+                'predicate_inputs': predicate_inputs,
+                'sample_aggregation': _sample_aggregation(rule),
+            },
+            source_claim_id=claim_id,
+            source_claim=self.resolve(claim_id),
+            implementation_status=(
+                'automated_exact_chart_browser_with_python_parity'
+            ),
+            implementation_owner=(
+                'telugu_panchangam/personal/election_chart_rules.py'
+            ),
+            ranking_effect=_chart_ranking_effect(rule['effect']),
+            automation_mode='automated',
+            automation_rationale=_chart_rationale(rule),
+            predicate_source_locator=locator,
+            decision_policy_claim=decision_policy,
+            supporting_claims=supporting,
+        ))
+
+    def _chart_decision_policy(
+        self, rule: Mapping[str, Any]
+    ) -> Mapping[str, Any] | None:
+        if rule.get('decision_policy_claim'):
+            return self.resolve(rule['decision_policy_claim'])
+        if rule['effect'] == 'prefer':
+            return self.scoring_policy_claim
+        return None
+
+    def _manual_authority(
+        self,
+        rule_id: str,
+        claim_id: str,
+        claim: Mapping[str, Any],
+    ) -> tuple[str, Mapping[str, Any], str]:
+        if rule_id in PRODUCT_POLICY_MANUAL_IDS:
+            return (
+                _PRODUCT_SAFETY_POLICY_CLAIM,
+                self.product_policy_claim,
+                'product_policy',
+            )
+        if rule_id in MANUAL_ROW_CLAIM_OVERRIDES:
+            override = MANUAL_ROW_CLAIM_OVERRIDES[rule_id]
+            return override, self.resolve(override), 'related_context'
+        return claim_id, claim, 'activity_source_claim'
+
+    def browser_manual_rows(
+        self,
+        activity: str,
+        rules: Mapping[str, Any],
+        claim_id: str,
+        claim: Mapping[str, Any],
+    ) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for manual in self.contract[activity]['manual_checks']:
+            rows.append(self._browser_manual_row(
+                activity, rules, claim_id, claim, manual
+            ))
+        return rows
+
+    def _browser_manual_row(
+        self,
+        activity: str,
+        rules: Mapping[str, Any],
+        claim_id: str,
+        claim: Mapping[str, Any],
+        manual: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        rule_id = manual['id']
+        fallback_only = rule_id in AUTOMATED_CHART_FALLBACK_MANUAL_IDS
+        manual_claim_id, manual_claim, authority_role = self._manual_authority(
+            rule_id, claim_id, claim
+        )
+        effect = _manual_effect(
+            manual,
+            profile_requires_review=bool(rules.get('manual_prerequisites')),
+        )
+        return _row(_RowSpec(
+            activity=activity,
+            rule_id=rule_id,
+            predicate_class=_MANUAL_DISPLAY_ROW,
+            configured_inputs={
+                key: value for key, value in manual.items() if key != 'id'
+            },
+            source_claim_id=manual_claim_id,
+            source_claim=manual_claim,
+            implementation_status='manual_displayed_not_computed',
+            implementation_owner=(
+                'telugu_panchangam/personal/activity_check_contract.py'
+            ),
+            ranking_effect=f'fallback_only_{effect}' if fallback_only else effect,
+            automation_mode='manual',
+            automation_rationale=(
+                'Fallback source guidance only. In the supported Drik '
+                'browser path, separately provenance-linked automated rules '
+                'replace this broad clause.'
+                if fallback_only
+                else _manual_rationale(manual)
+            ),
+            implementation_note=(
+                AUTOMATED_CHART_FALLBACK_MANUAL_NOTES.get(rule_id)
+            ),
+            applicability=(
+                'python_or_mcp_or_non_drik_or_exact_chart_unavailable'
+                if fallback_only
+                else None
+            ),
+            decision_policy_claim=(
+                self.scoring_policy_claim
+                if _uses_project_decision_policy(effect)
+                else None
+            ),
+            related_context_claims=tuple(
+                self.resolve(item)
+                for item in MANUAL_RELATED_CONTEXT_CLAIMS.get(rule_id, ())
+            ),
+            supporting_claims=tuple(
+                self.resolve(item)
+                for item in MANUAL_SUPPORTING_CLAIMS.get(rule_id, ())
+            ),
+            authority_role=authority_role,
+        ))
+
+    def add_browser_activity(self, activity: str) -> dict[str, Any]:
+        rules = self.activity_rules[activity]
+        claim_field, claim_id = _claim_field(rules)
+        claim = self.resolve(claim_id)
+        related = [self.resolve(item) for item in rules.get('related_claims', ())]
+        rows = [
+            *self.panchangam_rows(
+                activity, rules, claim_id, claim, browser=True
+            ),
+            *self.personal_rows(activity),
+            *self.chart_rows(activity),
+            *self.browser_manual_rows(activity, rules, claim_id, claim),
+        ]
+        self.expected_manual_ids.update(
+            item['id'] for item in self.contract[activity]['manual_checks']
+        )
+        for row in rows:
+            self.append(row)
+        row_ids = [row['rule_id'] for row in rows]
+        return {
+            'activity': activity,
+            'label': rules['label'],
+            'authority_claim_field': claim_field,
+            'source_claim_id': claim_id,
+            'source_claim': claim,
+            'related_claims': related,
+            'source_scope': rules.get('source_scope'),
+            'manual_prerequisites': bool(rules.get('manual_prerequisites')),
+            'surface_availability': 'browser_and_python',
+            'row_ids': row_ids,
+            'row_count': len(row_ids),
+        }
+
+    def add_expert_activity(
+        self, activity: str
+    ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+        rules = self.activity_rules[activity]
+        claim_field, claim_id = _claim_field(rules)
+        claim = self.resolve(claim_id)
+        related = [self.resolve(item) for item in rules.get('related_claims', ())]
+        if self.personal_rules.get(activity) or self.chart_rules.get(activity):
+            raise ValueError(
+                f'{activity}: expert exact-chart rules require exporter classification'
+            )
+        rows = self.panchangam_rows(
+            activity, rules, claim_id, claim, browser=False
+        )
+        rows.extend(
+            self._expert_manual_row(activity, rules, claim_id, claim, manual)
+            for manual in _expert_manual_checks(activity, rules)
+        )
+        row_ids = [row['rule_id'] for row in rows]
+        return ({
+            'activity': activity,
+            'label': rules['label'],
+            'authority_claim_field': claim_field,
+            'source_claim_id': claim_id,
+            'source_claim': claim,
+            'related_claims': related,
+            'manual_prerequisites': bool(rules.get('manual_prerequisites')),
+            'surface_availability': 'python_and_mcp_only',
+            'row_ids': row_ids,
+            'row_count': len(row_ids),
+        }, rows)
+
+    def _expert_manual_row(
+        self,
+        activity: str,
+        rules: Mapping[str, Any],
+        claim_id: str,
+        claim: Mapping[str, Any],
+        manual: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        rule_id = manual['id']
+        manual_claim_id, manual_claim, authority_role = self._manual_authority(
+            rule_id, claim_id, claim
+        )
+        effect = _manual_effect(
+            manual,
+            profile_requires_review=bool(rules.get('manual_prerequisites')),
+        )
+        return _row(_RowSpec(
+            activity=activity,
+            rule_id=rule_id,
+            predicate_class=_MANUAL_DISPLAY_ROW,
+            configured_inputs={
+                key: value for key, value in manual.items() if key != 'id'
+            },
+            source_claim_id=manual_claim_id,
+            source_claim=manual_claim,
+            implementation_status='manual_python_mcp_not_computed',
+            implementation_owner=_ACTIVITY_RULES_PATH,
+            ranking_effect=effect,
+            automation_mode='manual',
+            automation_rationale=_manual_rationale(manual),
+            decision_policy_claim=(
+                self.scoring_policy_claim
+                if _uses_project_decision_policy(effect)
+                else None
+            ),
+            authority_role=authority_role,
+        ))
+
+
+def _validate_field_classifications(
+    activities: tuple[str, ...],
+    activity_rules: Mapping[str, Mapping[str, Any]],
+) -> None:
+    canonical_fields = set().union(*(
+        set(activity_rules[activity]) - ACTIVITY_METADATA_FIELDS
+        for activity in activities
+    ))
+    semantic_fields = set(PANCHANGAM_FIELD_SEMANTICS)
+    if canonical_fields != semantic_fields:
+        raise ValueError(
+            'Panchangam field classification is stale: '
+            f'missing={sorted(canonical_fields - semantic_fields)!r}; '
+            f'unused={sorted(semantic_fields - canonical_fields)!r}'
+        )
+
+    expected_activities = set(activities)
+    if set(PRIMARY_ACTIVITY_CLAIM_FIELDS) != expected_activities:
+        raise ValueError('Primary activity field-authority map is stale')
+    if set(PROJECT_HEURISTIC_FIELDS) != expected_activities:
+        raise ValueError('Project heuristic field-authority map is stale')
+    _validate_authority_pairs(activities, activity_rules)
+
+
+def _authority_sets(activity: str) -> tuple[set[str], set[str], set[str]]:
+    primary = set(PRIMARY_ACTIVITY_CLAIM_FIELDS[activity])
+    heuristic = set(PROJECT_HEURISTIC_FIELDS[activity])
+    shared = {
+        field_name
+        for mapped_activity, field_name in SHARED_SOURCE_CLAIM_FIELDS
+        if mapped_activity == activity
+    }
+    return primary, heuristic, shared
+
+
+def _validate_authority_pairs(
+    activities: tuple[str, ...],
+    activity_rules: Mapping[str, Mapping[str, Any]],
+) -> None:
+    classified_pairs: set[tuple[str, str]] = set()
+    actual_pairs: set[tuple[str, str]] = set()
+    for activity in activities:
+        actual_fields = set(activity_rules[activity]) - ACTIVITY_METADATA_FIELDS
+        actual_pairs.update((activity, field_name) for field_name in actual_fields)
+        primary, heuristic, shared = _authority_sets(activity)
+        overlaps = (
+            (primary & heuristic) | (primary & shared) | (heuristic & shared)
+        )
+        if overlaps:
+            raise ValueError(
+                f'{activity}: duplicate field-authority classifications: '
+                f'{sorted(overlaps)!r}'
+            )
+        classified_pairs.update(
+            (activity, field_name)
+            for field_name in primary | heuristic | shared
+        )
+    if classified_pairs != actual_pairs:
+        raise ValueError(
+            'Panchangam field-authority map is stale: '
+            f'missing={sorted(actual_pairs - classified_pairs)!r}; '
+            f'unused={sorted(classified_pairs - actual_pairs)!r}'
+        )
+
+
+def _validate_personal_config(personal_rules: Mapping[str, Any]) -> None:
+    canonical_ids = {
+        item[0]
+        for rules in personal_rules.values()
+        for item in rules
+    }
+    if canonical_ids != set(PERSONAL_PREDICATE_CONFIG):
+        raise ValueError('Personal predicate configuration is stale')
+
+
+def _validate_expert_rows(
+    expert_rows: list[dict[str, Any]],
+    browser_rule_ids: set[str],
+) -> None:
+    ids = [row['rule_id'] for row in expert_rows]
+    if len(ids) != len(set(ids)):
+        raise ValueError('Expert crosswalk rule IDs are not unique')
+    if set(ids) & browser_rule_ids:
+        raise ValueError('Browser and expert crosswalk rule IDs overlap')
+
+
+def _row_counts(rows: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
+    by_class: dict[str, int] = {}
+    by_status: dict[str, int] = {}
+    by_authority: dict[str, int] = {}
+    by_role: dict[str, int] = {}
+    for row in rows:
+        predicate_class = row['predicate_class']
+        by_class[predicate_class] = by_class.get(predicate_class, 0) + 1
+        status = row['implementation_status']
+        by_status[status] = by_status.get(status, 0) + 1
+        authority = row['source_claim']['authority_status']
+        by_authority[authority] = by_authority.get(authority, 0) + 1
+        if predicate_class.startswith(_PANCHANGAM_PREDICATE_PREFIX):
+            role = row['configured_inputs']['authority_role']
+            by_role[role] = by_role.get(role, 0) + 1
+    return {
+        'class': by_class,
+        'status': by_status,
+        'authority': by_authority,
+        'role': by_role,
+    }
 
 
 def build_crosswalk(
@@ -775,494 +1321,43 @@ def build_crosswalk(
     if set(expert_activities) != set(EXPERT_ACTIVITY_MANUAL_SECTIONS):
         raise ValueError('Expert activity manual-check map is stale')
     browser_field_set = set(DETERMINISTIC_PANCHANGAM_FIELDS)
-    canonical_field_set = set().union(*(
-        set(ACTIVITY_RULES[activity]) - ACTIVITY_METADATA_FIELDS
-        for activity in all_activities
-    ))
-    semantic_field_set = set(PANCHANGAM_FIELD_SEMANTICS)
-    if canonical_field_set != semantic_field_set:
-        missing = sorted(canonical_field_set - semantic_field_set)
-        stale = sorted(semantic_field_set - canonical_field_set)
-        raise ValueError(
-            'Panchangam field classification is stale: '
-            f'missing={missing!r}; unused={stale!r}')
+    _validate_field_classifications(all_activities, ACTIVITY_RULES)
+    _validate_personal_config(PERSONAL_ELECTION_RULES)
 
-    if set(PRIMARY_ACTIVITY_CLAIM_FIELDS) != set(all_activities):
-        raise ValueError('Primary activity field-authority map is stale')
-    if set(PROJECT_HEURISTIC_FIELDS) != set(all_activities):
-        raise ValueError('Project heuristic field-authority map is stale')
-    classified_pairs: set[tuple[str, str]] = set()
-    actual_pairs: set[tuple[str, str]] = set()
-    for activity in all_activities:
-        actual_fields = (
-            set(ACTIVITY_RULES[activity]) - ACTIVITY_METADATA_FIELDS)
-        actual_pairs.update((activity, field) for field in actual_fields)
-        primary = set(PRIMARY_ACTIVITY_CLAIM_FIELDS[activity])
-        heuristic = set(PROJECT_HEURISTIC_FIELDS[activity])
-        shared = {
-            field for mapped_activity, field in SHARED_SOURCE_CLAIM_FIELDS
-            if mapped_activity == activity
-        }
-        overlaps = (
-            (primary & heuristic) | (primary & shared) | (heuristic & shared))
-        if overlaps:
-            raise ValueError(
-                f'{activity}: duplicate field-authority classifications: '
-                f'{sorted(overlaps)!r}')
-        classified_pairs.update(
-            (activity, field) for field in primary | heuristic | shared)
-    if classified_pairs != actual_pairs:
-        missing = sorted(actual_pairs - classified_pairs)
-        stale = sorted(classified_pairs - actual_pairs)
-        raise ValueError(
-            'Panchangam field-authority map is stale: '
-            f'missing={missing!r}; unused={stale!r}')
-
-    canonical_personal_ids = {
-        item[0]
-        for rules in PERSONAL_ELECTION_RULES.values()
-        for item in rules
-    }
-    if canonical_personal_ids != set(PERSONAL_PREDICATE_CONFIG):
-        raise ValueError('Personal predicate configuration is stale')
-
-    rows: list[dict[str, Any]] = []
+    builder = _CrosswalkBuilder(
+        resolve=resolve,
+        project_predicate_claim=project_predicate_claim,
+        scoring_policy_claim=scoring_policy_claim,
+        product_policy_claim=product_policy_claim,
+        contract=contract,
+        activity_rules=ACTIVITY_RULES,
+        personal_rules=PERSONAL_ELECTION_RULES,
+        chart_rules=ELECTION_CHART_RULES,
+        browser_field_set=browser_field_set,
+        chart_context={
+            'house_system': ELECTION_CHART_HOUSE_SYSTEM,
+            'node_convention': ELECTION_CHART_NODE_CONVENTION,
+            'planets': ELECTION_CHART_PLANETS,
+        },
+    )
+    rows = builder.rows
     activities: list[dict[str, Any]] = []
-    seen_rule_ids: set[str] = set()
-    expected_manual_ids: set[str] = set()
+    seen_rule_ids = builder.seen_rule_ids
+    expected_manual_ids = builder.expected_manual_ids
 
-    def append(row: dict[str, Any]) -> None:
-        rule_id = row['rule_id']
-        if rule_id in seen_rule_ids:
-            raise ValueError(f'Duplicate crosswalk rule ID {rule_id!r}')
-        seen_rule_ids.add(rule_id)
-        rows.append(row)
+    activities = [
+        builder.add_browser_activity(activity)
+        for activity in BROWSER_ACTIVITIES
+    ]
 
-    for activity in BROWSER_ACTIVITIES:
-        activity_rules = ACTIVITY_RULES[activity]
-        claim_field, claim_id = _claim_field(activity_rules)
-        claim = resolve(claim_id)
-        related_claims = [
-            resolve(item)
-            for item in activity_rules.get('related_claims', ())
-        ]
-        activity_row_ids: list[str] = []
-
-        for field, semantics in PANCHANGAM_FIELD_SEMANTICS.items():
-            if field not in activity_rules:
-                continue
-            rule_id = semantics.get(
-                'rule_id', f'{activity}.panchangam.{field}')
-            status = (
-                'automated_browser_and_python'
-                if field in browser_field_set
-                else 'automated_python_only_not_browser'
-            )
-            if field in PRIMARY_ACTIVITY_CLAIM_FIELDS[activity]:
-                field_claim_id = claim_id
-                field_claim = claim
-                authority_role = 'activity_source_claim'
-            elif (activity, field) in SHARED_SOURCE_CLAIM_FIELDS:
-                field_claim_id = SHARED_SOURCE_CLAIM_FIELDS[(activity, field)]
-                field_claim = resolve(field_claim_id)
-                authority_role = 'shared_source_claim'
-            else:
-                field_claim_id = PROJECT_PREDICATE_CLAIM
-                field_claim = project_predicate_claim
-                authority_role = 'explicit_project_heuristic'
-            append(_row(
-                activity=activity,
-                rule_id=rule_id,
-                predicate_class=semantics['predicate_class'],
-                configured_inputs={
-                    'activity_rule_field': field,
-                    'configured_value': activity_rules[field],
-                    'authority_role': authority_role,
-                },
-                source_claim_id=field_claim_id,
-                source_claim=field_claim,
-                implementation_status=status,
-                implementation_owner=semantics.get(
-                    'implementation_owner',
-                    _ACTIVITY_RULES_PATH),
-                ranking_effect=semantics['ranking_effect'],
-                automation_mode='automated',
-                automation_rationale=semantics['automation_rationale'],
-                implementation_note=semantics.get('implementation_note'),
-                decision_policy_claim=(
-                    scoring_policy_claim
-                    if _uses_project_decision_policy(semantics['ranking_effect'])
-                    else None
-                ),
-                interpretation_policy_claim=(
-                    resolve(semantics['interpretation_policy_claim_id'])
-                    if semantics.get('interpretation_policy_claim_id')
-                    else None
-                ),
-            ))
-            activity_row_ids.append(rule_id)
-
-        for item in PERSONAL_ELECTION_RULES.get(activity, ()):
-            rule_id, effect, personal_claim_id, predicate_locator = item
-            if not predicate_locator:
-                raise ValueError(
-                    f'Personal rule {rule_id!r} has no predicate locator')
-            personal_claim = resolve(personal_claim_id)
-            config = deepcopy(PERSONAL_PREDICATE_CONFIG[rule_id])
-            config['sample_aggregation'] = (
-                SAMPLED_REJECT_AGGREGATION
-                if effect == 'reject'
-                else SAMPLED_PREFERENCE_AGGREGATION
-            )
-            append(_row(
-                activity=activity,
-                rule_id=rule_id,
-                predicate_class='personal.exact-election-fact',
-                configured_inputs=config,
-                source_claim_id=personal_claim_id,
-                source_claim=personal_claim,
-                implementation_status=(
-                    'automated_exact_chart_browser_with_python_parity'),
-                implementation_owner=(
-                    'telugu_panchangam/personal/personal_election.py'),
-                ranking_effect=(
-                    'candidate_exclusion'
-                    if effect == 'reject'
-                    else 'post_screen_tie_break_preference'),
-                automation_mode='automated',
-                automation_rationale=(
-                    'The named natal and exact candidate facts support a '
-                    'bounded equality or cyclic-position predicate.'),
-                predicate_source_locator=predicate_locator,
-                decision_policy_claim=(
-                    scoring_policy_claim
-                    if effect != 'reject'
-                    else None
-                ),
-            ))
-            activity_row_ids.append(rule_id)
-
-        for rule in ELECTION_CHART_RULES.get(activity, ()):
-            rule_id = rule['id']
-            predicate_locator = rule.get('source_locator')
-            if not predicate_locator:
-                raise ValueError(
-                    f'Election-chart rule {rule_id!r} has no locator')
-            chart_claim_id = rule['source_claim']
-            chart_claim = resolve(chart_claim_id)
-            method_claims = tuple(
-                resolve(claim_id)
-                for claim_id in rule.get('method_claims', ())
-            )
-            source_backed_methods = tuple(
-                claim for claim in method_claims
-                if claim['authority_status'] == 'source_backed'
-            )
-            decision_policy = (
-                resolve(rule['decision_policy_claim'])
-                if rule.get('decision_policy_claim')
-                else scoring_policy_claim
-                if rule['effect'] == 'prefer'
-                else None
-            )
-            predicate_inputs = {
-                key: value
-                for key, value in rule.items()
-                if key not in {
-                    'id', 'label', 'kind', 'effect', 'source_claim',
-                    'source_locator',
-                }
-            }
-            append(_row(
-                activity=activity,
-                rule_id=rule_id,
-                predicate_class=f'election-chart.{rule["kind"]}',
-                configured_inputs={
-                    'house_system': ELECTION_CHART_HOUSE_SYSTEM,
-                    'node_convention': ELECTION_CHART_NODE_CONVENTION,
-                    'planet_set': list(ELECTION_CHART_PLANETS),
-                    'predicate': rule['kind'],
-                    'predicate_inputs': predicate_inputs,
-                    'sample_aggregation': (
-                        SAMPLED_REJECT_AGGREGATION
-                        if rule['effect'] == 'reject'
-                        else SAMPLED_TRANSITION_SAFE_QUALIFICATION_AGGREGATION
-                        if (
-                            rule['effect'] == 'qualify'
-                            and 'election_chart.gold_transition_envelope_v1'
-                            in rule.get('method_claims', ())
-                        )
-                        else SAMPLED_QUALIFICATION_AGGREGATION
-                        if rule['effect'] == 'qualify'
-                        else SAMPLED_PREFERENCE_AGGREGATION
-                    ),
-                },
-                source_claim_id=chart_claim_id,
-                source_claim=chart_claim,
-                implementation_status=(
-                    'automated_exact_chart_browser_with_python_parity'),
-                implementation_owner=(
-                    'telugu_panchangam/personal/'
-                    'election_chart_rules.py'),
-                ranking_effect=(
-                    'candidate_exclusion'
-                    if rule['effect'] == 'reject'
-                    else 'post_screen_tier_cap'
-                    if rule['effect'] == 'qualify'
-                    else 'post_screen_tie_break_preference'),
-                automation_mode='automated',
-                automation_rationale=(
-                    'The named, versioned interpretation convention is a '
-                    'bounded predicate over the exact nine-Graha election '
-                    'chart.'
-                    if rule.get('convention_id')
-                    else 'Whole Sign house occupancy is a bounded predicate '
-                    'over the exact nine-Graha election chart.'
-                ),
-                predicate_source_locator=predicate_locator,
-                decision_policy_claim=decision_policy,
-                supporting_claims=source_backed_methods,
-            ))
-            activity_row_ids.append(rule_id)
-
-        manual_checks = contract[activity]['manual_checks']
-        expected_manual_ids.update(item['id'] for item in manual_checks)
-        for manual in manual_checks:
-            rule_id = manual['id']
-            fallback_only = rule_id in AUTOMATED_CHART_FALLBACK_MANUAL_IDS
-            if rule_id in PRODUCT_POLICY_MANUAL_IDS:
-                manual_claim_id = (
-                    _PRODUCT_SAFETY_POLICY_CLAIM)
-                manual_claim = product_policy_claim
-                manual_authority_role = 'product_policy'
-            elif rule_id in MANUAL_ROW_CLAIM_OVERRIDES:
-                manual_claim_id = MANUAL_ROW_CLAIM_OVERRIDES[rule_id]
-                manual_claim = resolve(manual_claim_id)
-                manual_authority_role = 'related_context'
-            else:
-                manual_claim_id = claim_id
-                manual_claim = claim
-                manual_authority_role = 'activity_source_claim'
-            configured_manual = {
-                key: value
-                for key, value in manual.items()
-                if key != 'id'
-            }
-            manual_effect = _manual_effect(
-                manual,
-                profile_requires_review=bool(
-                    activity_rules.get('manual_prerequisites')),
-            )
-            append(_row(
-                activity=activity,
-                rule_id=rule_id,
-                predicate_class=_MANUAL_DISPLAY_ROW,
-                configured_inputs=configured_manual,
-                source_claim_id=manual_claim_id,
-                source_claim=manual_claim,
-                implementation_status='manual_displayed_not_computed',
-                implementation_owner=(
-                    'telugu_panchangam/personal/'
-                    'activity_check_contract.py'),
-                ranking_effect=(
-                    f'fallback_only_{manual_effect}'
-                    if fallback_only else manual_effect
-                ),
-                automation_mode='manual',
-                automation_rationale=(
-                    'Fallback source guidance only. In the supported Drik '
-                    'browser path, separately provenance-linked automated '
-                    'rules replace this broad clause.'
-                    if fallback_only else _manual_rationale(manual)
-                ),
-                implementation_note=(
-                    AUTOMATED_CHART_FALLBACK_MANUAL_NOTES.get(rule_id)
-                ),
-                applicability=(
-                    'python_or_mcp_or_non_drik_or_exact_chart_unavailable'
-                    if fallback_only else None
-                ),
-                decision_policy_claim=(
-                    scoring_policy_claim
-                    if _uses_project_decision_policy(manual_effect)
-                    else None
-                ),
-                related_context_claims=tuple(
-                    resolve(item)
-                    for item in MANUAL_RELATED_CONTEXT_CLAIMS.get(
-                        rule_id, ())
-                ),
-                supporting_claims=tuple(
-                    resolve(item)
-                    for item in MANUAL_SUPPORTING_CLAIMS.get(rule_id, ())
-                ),
-                authority_role=manual_authority_role,
-            ))
-            activity_row_ids.append(rule_id)
-
-        activities.append({
-            'activity': activity,
-            'label': activity_rules['label'],
-            'authority_claim_field': claim_field,
-            'source_claim_id': claim_id,
-            'source_claim': claim,
-            'related_claims': related_claims,
-            'source_scope': activity_rules.get('source_scope'),
-            'manual_prerequisites': bool(
-                activity_rules.get('manual_prerequisites')),
-            'surface_availability': 'browser_and_python',
-            'row_ids': activity_row_ids,
-            'row_count': len(activity_row_ids),
-        })
-
-    expert_rows: list[dict[str, Any]] = []
-    expert_activity_rows: list[dict[str, Any]] = []
-    expected_expert_ids: set[str] = set()
-    for activity in expert_activities:
-        activity_rules = ACTIVITY_RULES[activity]
-        claim_field, claim_id = _claim_field(activity_rules)
-        claim = resolve(claim_id)
-        related_claims = [
-            resolve(item)
-            for item in activity_rules.get('related_claims', ())
-        ]
-        activity_row_ids: list[str] = []
-
-        for field, semantics in PANCHANGAM_FIELD_SEMANTICS.items():
-            if field not in activity_rules:
-                continue
-            rule_id = f'{activity}.panchangam.{field}'
-            if field in PRIMARY_ACTIVITY_CLAIM_FIELDS[activity]:
-                field_claim_id = claim_id
-                field_claim = claim
-                authority_role = 'activity_source_claim'
-            elif (activity, field) in SHARED_SOURCE_CLAIM_FIELDS:
-                field_claim_id = SHARED_SOURCE_CLAIM_FIELDS[(activity, field)]
-                field_claim = resolve(field_claim_id)
-                authority_role = 'shared_source_claim'
-            else:
-                field_claim_id = PROJECT_PREDICATE_CLAIM
-                field_claim = project_predicate_claim
-                authority_role = 'explicit_project_heuristic'
-            expert_rows.append(_row(
-                activity=activity,
-                rule_id=rule_id,
-                predicate_class=semantics['predicate_class'],
-                configured_inputs={
-                    'activity_rule_field': field,
-                    'configured_value': activity_rules[field],
-                    'authority_role': authority_role,
-                },
-                source_claim_id=field_claim_id,
-                source_claim=field_claim,
-                implementation_status='automated_python_only_not_browser',
-                implementation_owner=(
-                    _ACTIVITY_RULES_PATH),
-                ranking_effect=semantics['ranking_effect'],
-                automation_mode='automated',
-                automation_rationale=semantics['automation_rationale'],
-                implementation_note=semantics.get('implementation_note'),
-                decision_policy_claim=(
-                    scoring_policy_claim
-                    if _uses_project_decision_policy(
-                        semantics['ranking_effect'])
-                    else None
-                ),
-            ))
-            activity_row_ids.append(rule_id)
-            expected_expert_ids.add(rule_id)
-
-        if PERSONAL_ELECTION_RULES.get(activity) or ELECTION_CHART_RULES.get(
-            activity
-        ):
-            raise ValueError(
-                f'{activity}: expert exact-chart rules require exporter '
-                'classification')
-
-        for manual in _expert_manual_checks(activity, activity_rules):
-            rule_id = manual['id']
-            if rule_id in PRODUCT_POLICY_MANUAL_IDS:
-                manual_claim_id = (
-                    _PRODUCT_SAFETY_POLICY_CLAIM)
-                manual_claim = product_policy_claim
-                manual_authority_role = 'product_policy'
-            else:
-                manual_claim_id = claim_id
-                manual_claim = claim
-                manual_authority_role = 'activity_source_claim'
-            expert_rows.append(_row(
-                activity=activity,
-                rule_id=rule_id,
-                predicate_class=_MANUAL_DISPLAY_ROW,
-                configured_inputs={
-                    key: value
-                    for key, value in manual.items()
-                    if key != 'id'
-                },
-                source_claim_id=manual_claim_id,
-                source_claim=manual_claim,
-                implementation_status='manual_python_mcp_not_computed',
-                implementation_owner=(
-                    _ACTIVITY_RULES_PATH),
-                ranking_effect=_manual_effect(
-                    manual,
-                    profile_requires_review=bool(
-                        activity_rules.get('manual_prerequisites')),
-                ),
-                automation_mode='manual',
-                automation_rationale=_manual_rationale(manual),
-                decision_policy_claim=(
-                    scoring_policy_claim
-                    if _uses_project_decision_policy(_manual_effect(
-                        manual,
-                        profile_requires_review=bool(
-                            activity_rules.get('manual_prerequisites')),
-                    ))
-                    else None
-                ),
-                authority_role=manual_authority_role,
-            ))
-            activity_row_ids.append(rule_id)
-            expected_expert_ids.add(rule_id)
-
-        expert_activity_rows.append({
-            'activity': activity,
-            'label': activity_rules['label'],
-            'authority_claim_field': claim_field,
-            'source_claim_id': claim_id,
-            'source_claim': claim,
-            'related_claims': related_claims,
-            'manual_prerequisites': bool(
-                activity_rules.get('manual_prerequisites')),
-            'surface_availability': 'python_and_mcp_only',
-            'row_ids': activity_row_ids,
-            'row_count': len(activity_row_ids),
-        })
-
-    expert_ids = [row['rule_id'] for row in expert_rows]
-    if len(expert_ids) != len(set(expert_ids)):
-        raise ValueError('Expert crosswalk rule IDs are not unique')
-    if set(expert_ids) != expected_expert_ids:
-        raise ValueError('Expert crosswalk coverage is incomplete')
-    if set(expert_ids) & seen_rule_ids:
-        raise ValueError('Browser and expert crosswalk rule IDs overlap')
-
-    counts_by_class: dict[str, int] = {}
-    counts_by_status: dict[str, int] = {}
-    counts_by_authority_status: dict[str, int] = {}
-    deterministic_by_authority_role: dict[str, int] = {}
-    for row in rows:
-        counts_by_class[row['predicate_class']] = (
-            counts_by_class.get(row['predicate_class'], 0) + 1)
-        status = row['implementation_status']
-        counts_by_status[status] = counts_by_status.get(status, 0) + 1
-        authority_status = row['source_claim']['authority_status']
-        counts_by_authority_status[authority_status] = (
-            counts_by_authority_status.get(authority_status, 0) + 1)
-        if row['predicate_class'].startswith(_PANCHANGAM_PREDICATE_PREFIX):
-            role = row['configured_inputs']['authority_role']
-            deterministic_by_authority_role[role] = (
-                deterministic_by_authority_role.get(role, 0) + 1)
+    expert_pairs = [
+        builder.add_expert_activity(activity)
+        for activity in expert_activities
+    ]
+    expert_activity_rows = [summary for summary, _rows in expert_pairs]
+    expert_rows = [row for _summary, activity_rows in expert_pairs for row in activity_rows]
+    _validate_expert_rows(expert_rows, seen_rule_ids)
+    counts = _row_counts(rows)
 
     result = {
         'schema_version': SCHEMA_VERSION,
@@ -1296,11 +1391,10 @@ def build_crosswalk(
             'manual_display_rows': sum(
                 row['predicate_class'] == _MANUAL_DISPLAY_ROW
                 for row in rows),
-            'by_predicate_class': counts_by_class,
-            'by_implementation_status': counts_by_status,
-            'by_authority_status': counts_by_authority_status,
-            'deterministic_by_authority_role': (
-                deterministic_by_authority_role),
+            'by_predicate_class': counts['class'],
+            'by_implementation_status': counts['status'],
+            'by_authority_status': counts['authority'],
+            'deterministic_by_authority_role': counts['role'],
         },
         'activities': activities,
         'rows': rows,
@@ -1327,6 +1421,76 @@ def build_crosswalk(
     return result
 
 
+def _validate_row_claim(row: Mapping[str, Any]) -> None:
+    claim = row['source_claim']
+    rule_id = row['rule_id']
+    if claim['id'] != row['source_claim_id']:
+        raise ValueError(f'{rule_id}: source claim did not resolve')
+    if not claim['locator']:
+        raise ValueError(f'{rule_id}: source locator is missing')
+    if claim['authority_status'] == 'provenance_gap':
+        raise ValueError(f'{rule_id}: unresolved provenance authority')
+    authority_role = (
+        row.get('authority_role')
+        or row['configured_inputs'].get('authority_role')
+    )
+    if (
+        claim['authority_status'] == 'documented_conflict'
+        and authority_role != 'related_context'
+    ):
+        raise ValueError(f'{rule_id}: conflict cannot authorize a predicate')
+
+
+def _validate_decision_policy(row: Mapping[str, Any]) -> None:
+    policy = row.get('decision_policy_claim')
+    if not policy:
+        return
+    if policy['id'] != row['decision_policy_claim_id']:
+        raise ValueError(f'{row["rule_id"]}: decision policy did not resolve')
+    if policy['authority_status'] != 'explicit_project_heuristic':
+        raise ValueError(f'{row["rule_id"]}: decision policy is not heuristic')
+
+
+def _validate_interpretation_policy(row: Mapping[str, Any]) -> None:
+    policy = row.get('interpretation_policy_claim')
+    if not policy:
+        return
+    rule_id = row['rule_id']
+    if policy['id'] != row['interpretation_policy_claim_id']:
+        raise ValueError(f'{rule_id}: interpretation policy did not resolve')
+    if policy['authority_status'] != 'explicit_project_heuristic':
+        raise ValueError(f'{rule_id}: interpretation policy is not heuristic')
+
+
+def _validate_supporting_claims(row: Mapping[str, Any]) -> None:
+    rule_id = row['rule_id']
+    for related in row.get('related_context_claims', ()):
+        if related['authority_status'] != 'documented_conflict':
+            raise ValueError(f'{rule_id}: related context is not a conflict')
+    for supporting in row.get('supporting_claims', ()):
+        if supporting['authority_status'] != 'source_backed':
+            raise ValueError(f'{rule_id}: supporting facet is not source-backed')
+
+
+def _validate_row(row: Mapping[str, Any]) -> None:
+    required = {
+        'activity', 'rule_id', 'predicate_class', 'configured_inputs',
+        'source_claim_id', 'source_claim', 'implementation_status',
+        'ranking_effect', 'automation_mode', 'automation_rationale',
+    }
+    missing = required - set(row)
+    if missing:
+        raise ValueError(
+            f'{row.get("rule_id", "unknown")}: missing {sorted(missing)}'
+        )
+    _validate_row_claim(row)
+    _validate_decision_policy(row)
+    _validate_interpretation_policy(row)
+    _validate_supporting_claims(row)
+    if row['automation_mode'] not in {'automated', 'manual'}:
+        raise ValueError(f'{row["rule_id"]}: invalid automation mode')
+
+
 def _validate_complete(
     result: Mapping[str, Any],
     crosswalk_activities: tuple[str, ...],
@@ -1340,75 +1504,12 @@ def _validate_complete(
     if len(ids) != len(set(ids)):
         raise ValueError('Crosswalk rule IDs are not unique')
     indexed_ids = {
-        rule_id
-        for activity in activities
-        for rule_id in activity['row_ids']
+        rule_id for activity in activities for rule_id in activity['row_ids']
     }
     if indexed_ids != set(ids):
         raise ValueError('Activity row indexes do not cover every rule')
     for row in rows:
-        required = {
-            'activity', 'rule_id', 'predicate_class', 'configured_inputs',
-            'source_claim_id', 'source_claim', 'implementation_status',
-            'ranking_effect', 'automation_mode', 'automation_rationale',
-        }
-        missing = required - set(row)
-        if missing:
-            raise ValueError(
-                f'{row.get("rule_id", "unknown")}: missing {sorted(missing)}')
-        claim = row['source_claim']
-        if claim['id'] != row['source_claim_id']:
-            raise ValueError(f'{row["rule_id"]}: source claim did not resolve')
-        if not claim['locator']:
-            raise ValueError(f'{row["rule_id"]}: source locator is missing')
-        if claim['authority_status'] == 'provenance_gap':
-            raise ValueError(
-                f'{row["rule_id"]}: unresolved provenance authority')
-        authority_role = (
-            row.get('authority_role')
-            or row['configured_inputs'].get('authority_role')
-        )
-        if (
-            claim['authority_status'] == 'documented_conflict'
-            and authority_role != 'related_context'
-        ):
-            raise ValueError(
-                f'{row["rule_id"]}: conflict cannot authorize a predicate')
-        policy = row.get('decision_policy_claim')
-        if policy:
-            if policy['id'] != row['decision_policy_claim_id']:
-                raise ValueError(
-                    f'{row["rule_id"]}: decision policy did not resolve')
-            if policy['authority_status'] != 'explicit_project_heuristic':
-                raise ValueError(
-                    f'{row["rule_id"]}: decision policy is not heuristic')
-        interpretation_policy = row.get('interpretation_policy_claim')
-        if interpretation_policy:
-            if (
-                interpretation_policy['id']
-                != row['interpretation_policy_claim_id']
-            ):
-                raise ValueError(
-                    f'{row["rule_id"]}: interpretation policy did not '
-                    'resolve')
-            if (
-                interpretation_policy['authority_status']
-                != 'explicit_project_heuristic'
-            ):
-                raise ValueError(
-                    f'{row["rule_id"]}: interpretation policy is not '
-                    'heuristic')
-        for related in row.get('related_context_claims', ()):
-            if related['authority_status'] != 'documented_conflict':
-                raise ValueError(
-                    f'{row["rule_id"]}: related context is not a conflict')
-        for supporting in row.get('supporting_claims', ()):
-            if supporting['authority_status'] != 'source_backed':
-                raise ValueError(
-                    f'{row["rule_id"]}: supporting facet is not source-backed')
-        if row['automation_mode'] not in {'automated', 'manual'}:
-            raise ValueError(f'{row["rule_id"]}: invalid automation mode')
-
+        _validate_row(row)
     actual_manual_ids = {
         row['rule_id']
         for row in rows

@@ -128,24 +128,25 @@ def _check_contains(
         )
 
 
-def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
-    """Return actionable drift errors for generated and public documentation."""
-    facts = facts or build_facts()
-    errors: list[str] = []
-
-    expected_facts = json.dumps(facts, indent=2, ensure_ascii=False) + '\n'
-    actual_facts = FACTS_PATH.read_text(encoding='utf-8') if FACTS_PATH.exists() else ''
-    if actual_facts != expected_facts:
-        errors.append(
+def _generated_facts_errors(facts: dict[str, Any]) -> list[str]:
+    expected = json.dumps(facts, indent=2, ensure_ascii=False) + '\n'
+    actual = FACTS_PATH.read_text(encoding='utf-8') if FACTS_PATH.exists() else ''
+    if actual == expected:
+        return []
+    return [
+        (
             'docs/reference/project-facts.json is stale; run '
             '`python tools/check_documentation_freshness.py --write`'
         )
+    ]
 
+
+def _count_contracts(facts: dict[str, Any]) -> dict[str, list[tuple[str, str]]]:
     city_count = facts['city_count']
     system_count = len(facts['calculation_systems'])
     feed_count = facts['base_feed_count']
     tool_count = len(facts['mcp_tools'])
-    count_contracts = {
+    return {
         'README.md': [
             (f'{city_count} cities', 'city count'),
             (f'{city_count} cities × {system_count} systems = {feed_count} feeds', 'feed count'),
@@ -169,16 +170,20 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
             (f'{city_count} pre-configured cities', 'city count'),
         ],
     }
-    for path, checks in count_contracts.items():
+
+
+def _count_contract_errors(facts: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    for path, checks in _count_contracts(facts).items():
         for expected, description in checks:
             _check_contains(errors, path, expected, description)
+    return errors
 
-    tool_docs = (
-        'docs/reference/04-user-facing-features.md',
-        _PYPI_README_PATH,
-    )
+
+def _tool_documentation_errors(facts: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
     expected_tools = set(facts['mcp_tools'])
-    for path in tool_docs:
+    for path in ('docs/reference/04-user-facing-features.md', _PYPI_README_PATH):
         documented = set(_PUBLIC_TOOL_RE.findall(_read(path)))
         missing = expected_tools - documented
         unknown = documented - expected_tools
@@ -189,21 +194,27 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
                 f'{path}: names obsolete or not public MCP tools: '
                 + ', '.join(sorted(unknown))
             )
+    return errors
 
+
+def _activity_documentation_errors(facts: dict[str, Any]) -> list[str]:
     package_readme = _read(_PYPI_README_PATH)
-    activity_facts = facts['muhurta_activities']
-    missing_activities = [
+    missing = [
         key
-        for key in activity_facts['accepted_keys']
+        for key in facts['muhurta_activities']['accepted_keys']
         if f'`{key}`' not in package_readme
     ]
-    if missing_activities:
-        errors.append(
-            'README_PYPI.md: missing accepted find_muhurta activity keys: '
-            + ', '.join(missing_activities)
-        )
+    if not missing:
+        return []
+    return [
+        'README_PYPI.md: missing accepted find_muhurta activity keys: '
+        + ', '.join(missing)
+    ]
 
-    stale_node_claims = {
+
+def _stale_node_claim_errors() -> list[str]:
+    errors: list[str] = []
+    stale_claims = {
         _PYPI_README_PATH: ('Rahu/Ketu set (3, 6, 11)',),
         'telugu_panchangam/mcp/server.py': ('Rahu/Ketu houses omit the 10th',),
         'docs/reference/08-provenance-and-authority.md': (
@@ -211,7 +222,7 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
         ),
         'docs/reference/README.md': ('known Rahu/Ketu conflict',),
     }
-    for path, phrases in stale_node_claims.items():
+    for path, phrases in stale_claims.items():
         text = _read(path)
         for phrase in phrases:
             if phrase in text:
@@ -219,8 +230,19 @@ def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
                     f'{path}: obsolete Gochara node claim {phrase!r}; '
                     'the configured houses are now 3, 6, 10 and 11'
                 )
-
     return errors
+
+
+def validate_documentation(facts: dict[str, Any] | None = None) -> list[str]:
+    """Return actionable drift errors for generated and public documentation."""
+    facts = facts or build_facts()
+    return [
+        *_generated_facts_errors(facts),
+        *_count_contract_errors(facts),
+        *_tool_documentation_errors(facts),
+        *_activity_documentation_errors(facts),
+        *_stale_node_claim_errors(),
+    ]
 
 
 def main() -> int:
