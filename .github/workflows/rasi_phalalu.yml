@@ -36,7 +36,7 @@ jobs:
         env:
           rasiphalalu: ${{ secrets.rasiphalalu }}
           PHALALU_OUT: ./public/rasi_phalalu
-        run: uv run --no-sync python scripts/generate_llm_phalalu.py
+        run: uv run --no-sync --no-build python scripts/generate_llm_phalalu.py
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4

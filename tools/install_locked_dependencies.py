@@ -16,6 +16,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+VENV = ROOT / ".venv"
 
 
 def _run(command: list[str]) -> None:
@@ -46,15 +47,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--extra", action="append", default=[])
     parser.add_argument("--group", action="append", default=[])
-    parser.add_argument("--venv", type=Path, default=ROOT / ".venv")
     args = parser.parse_args()
 
     selectors = [item for extra in args.extra for item in ("--extra", extra)]
     selectors += [item for group in args.group for item in ("--group", group)]
 
     _run(["uv", "lock", "--check"])
-    _run(["uv", "venv", str(args.venv), "--python", sys.executable])
-    python = _venv_python(args.venv)
+    _run(["uv", "venv", str(VENV), "--python", sys.executable])
+    python = _venv_python(VENV)
 
     needs_pyswisseph_build = sys.version_info >= (3, 12)
 

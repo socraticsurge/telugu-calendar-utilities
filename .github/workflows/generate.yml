@@ -36,10 +36,10 @@ jobs:
         run: python tools/install_locked_dependencies.py --extra test
 
       - name: Run tests
-        run: uv run --no-sync python -m pytest tests/ -v
+        run: uv run --no-sync --no-build python -m pytest tests/ -v
 
       - name: Generate feeds
-        run: uv run --no-sync python -m telugu_panchangam.generate
+        run: uv run --no-sync --no-build python -m telugu_panchangam.generate
 
       - name: Set up Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0

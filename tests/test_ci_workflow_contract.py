@@ -33,8 +33,8 @@ def test_ci_retains_supported_runtimes_and_browser_coverage():
     assert "run: npm test" not in backend
     assert "run: npm run lint" not in backend
     assert "run: npm run test:coverage" not in backend
-    assert "uv run --no-sync python tools/check_ruff_baseline.py" in backend
-    assert "uv run --no-sync python tools/check_complexity_baseline.py" in backend
+    assert "uv run --no-sync --no-build python tools/check_ruff_baseline.py" in backend
+    assert "uv run --no-sync --no-build python tools/check_complexity_baseline.py" in backend
     assert "--ignore=tests/test_browser_smoke.py" in backend
     assert "python-version: '3.11'" in frontend
     assert "--extra test --extra browser-test" in frontend

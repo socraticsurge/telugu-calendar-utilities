@@ -34,10 +34,10 @@ jobs:
         run: python tools/install_locked_dependencies.py --extra test
 
       - name: Run tests
-        run: uv run --no-sync python -m pytest tests/ -v
+        run: uv run --no-sync --no-build python -m pytest tests/ -v
 
       - name: Build lagna feeds
-        run: uv run --no-sync python -m scripts.build_lagna_json
+        run: uv run --no-sync --no-build python -m scripts.build_lagna_json
 
       # keep_files preserves feeds/, index.html and gochara.json on
       # gh-pages — we only add/replace the per-city *-lagna.json files.

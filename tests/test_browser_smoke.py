@@ -446,6 +446,27 @@ def _festival_navigation_feed_fixture():
     return feed_text
 
 
+def _current_day_feed_fixture():
+    """Shift the real three-day feed shape onto the browser's current date.
+
+    The responsive-shell test needs populated day-cycle markup, not a live
+    Panchangam claim. Keeping the request local makes that UI contract
+    deterministic while preserving the fixture's reviewed data shape.
+    """
+    feed_text = MUHURTA_FEED_FIXTURE.read_text(encoding='utf-8')
+    source_start = datetime.fromisoformat(MUHURTA_FIXTURE_DATE)
+    target_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    for offset in range(4):
+        source = source_start + timedelta(days=offset)
+        target = target_start + timedelta(days=offset)
+        feed_text = feed_text.replace(
+            source.strftime('%Y%m%d'), target.strftime('%Y%m%d'),
+        ).replace(
+            source.strftime('%Y-%m-%d'), target.strftime('%Y-%m-%d'),
+        )
+    return feed_text
+
+
 def _fixture_lagna_for_instant(instant, lagna_fixture=None):
     """Resolve the same canonical fixture Lagna the browser will project."""
     local = datetime.fromisoformat(instant.replace('Z', '+00:00')).astimezone(
@@ -1051,7 +1072,7 @@ def test_index_loads_without_referenceerror(docs_server, browser):
     page = browser.new_page()
     captured = _capture_console(page)
     try:
-        page.goto(docs_server, wait_until='networkidle', timeout=15000)
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
     finally:
         page.close()
     ref_errors = [
@@ -1127,7 +1148,15 @@ def test_daily_surface_is_responsive_and_navigation_remains_usable(
     """
     page = browser.new_page(viewport={'width': width, 'height': height})
     try:
-        page.goto(docs_server, wait_until='networkidle', timeout=15000)
+        page.route(
+            '**/feeds/*.ics',
+            lambda route: route.fulfill(
+                status=200,
+                content_type='text/calendar',
+                body=_current_day_feed_fixture(),
+            ),
+        )
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
         page.wait_for_selector('.day-cycle', timeout=10000)
         metrics = page.evaluate(
             """() => ({
@@ -2808,7 +2837,7 @@ def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browse
     page = browser.new_page()
     captured = _capture_console(page)
     try:
-        page.goto(docs_server, wait_until='networkidle', timeout=15000)
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
         # Pre-populate a Tarabalam profile so the muhurta scorer's
         # lagna code paths (the ones that crashed in v1.8.0) actually
         # run. Without people set, scoring stays on the fast path.
@@ -2816,7 +2845,7 @@ def test_muhurta_finder_search_does_not_throw_referenceerror(docs_server, browse
             "localStorage.setItem('tc-tb-profiles', JSON.stringify("
             "[{name:'Smoke',nak:'Krittika',pada:'1',lagna:'Mesha'}]));"
         )
-        page.reload(wait_until='networkidle', timeout=15000)
+        page.reload(wait_until='domcontentloaded', timeout=15000)
         # The "Find slots" button calls findMuhurta() directly. Call
         # it via JS — deterministic vs synthesising click events on a
         # headless DOM. If the function isn't on window the test
@@ -3003,7 +3032,11 @@ def test_gochara_unavailable_state_spans_the_chart(docs_server, browser):
     captured = _capture_console(page)
     try:
         page.route('**/gochara.json', lambda route: route.abort())
-        page.goto(f'{docs_server}/#gochara', wait_until='networkidle', timeout=15000)
+        page.goto(
+            f'{docs_server}/#gochara',
+            wait_until='domcontentloaded',
+            timeout=15000,
+        )
         error = page.locator('#go-chart > .preview-error')
         error.wait_for(state='visible')
         chart_box = page.locator('#go-chart').bounding_box()
@@ -3042,7 +3075,7 @@ def test_documentation_diagrams_and_tables_do_not_overflow_page(
             page.set_viewport_size({'width': width, 'height': height})
             page.goto(
                 f'{docs_server}/docs/reference/{route}.html',
-                wait_until='networkidle',
+                wait_until='domcontentloaded',
                 timeout=15000,
             )
             page.locator('.vp-doc .mermaid svg').first.wait_for(state='visible')
@@ -3085,7 +3118,7 @@ def test_gochara_rasi_view_renders_verdicts_and_phalalu(docs_server, vite_build,
     page = browser.new_page()
     captured = _capture_console(page)
     try:
-        page.goto(docs_server, wait_until='networkidle', timeout=15000)
+        page.goto(docs_server, wait_until='domcontentloaded', timeout=15000)
         page.evaluate("window.switchTool('gochara')")
         page.wait_for_function(
             "document.getElementById('go-view') && "

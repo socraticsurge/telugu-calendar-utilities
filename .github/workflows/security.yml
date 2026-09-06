@@ -78,4 +78,4 @@ jobs:
       - name: Run pip-audit (strict — fail on any known CVE)
         # Hash enforcement proves the audit input came from uv.lock; --strict
         # fails on collection errors as well as known vulnerabilities.
-        run: uv run --no-sync pip-audit --strict --disable-pip --require-hashes -r .audit-requirements.txt
+        run: uv run --no-sync --no-build pip-audit --strict --disable-pip --require-hashes -r .audit-requirements.txt

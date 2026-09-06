@@ -50,11 +50,11 @@ jobs:
 
       - name: Enforce static-analysis debt baselines
         run: |
-          uv run --no-sync python tools/check_ruff_baseline.py
-          uv run --no-sync python tools/check_complexity_baseline.py
+          uv run --no-sync --no-build python tools/check_ruff_baseline.py
+          uv run --no-sync --no-build python tools/check_complexity_baseline.py
 
       - name: Run tests
-        run: uv run --no-sync python -m pytest tests/ -v --ignore=tests/test_browser_smoke.py
+        run: uv run --no-sync --no-build python -m pytest tests/ -v --ignore=tests/test_browser_smoke.py
 
   frontend-and-browser:
     runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
         run: python tools/install_locked_dependencies.py --extra test --extra browser-test
 
       - name: Install Playwright
-        run: uv run --no-sync playwright install --with-deps chromium
+        run: uv run --no-sync --no-build playwright install --with-deps chromium
 
       - name: Set up Node 24
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -91,7 +91,7 @@ jobs:
       - name: Run browser smoke tests
         # The session-scoped fixture runs the production build once, then all
         # browser cases exercise the exact dist/ bytes deployed to Pages.
-        run: uv run --no-sync python -m pytest tests/test_browser_smoke.py -v
+        run: uv run --no-sync --no-build python -m pytest tests/test_browser_smoke.py -v
 
       - name: Lint TypeScript
         run: npm run lint

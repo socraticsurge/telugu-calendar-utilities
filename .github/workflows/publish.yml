@@ -97,13 +97,13 @@ jobs:
         run: python tools/install_locked_dependencies.py --extra test --group build
 
       - name: Run tests
-        run: uv run --no-sync python -m pytest tests/ -q
+        run: uv run --no-sync --no-build python -m pytest tests/ -q
 
       - name: Build package
-        run: uv run --no-sync python -m build --no-isolation
+        run: uv run --no-sync --no-build python -m build --no-isolation
 
       - name: Verify release artifacts
-        run: uv run --no-sync python tools/verify_release_artifacts.py dist
+        run: uv run --no-sync --no-build python tools/verify_release_artifacts.py dist
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
