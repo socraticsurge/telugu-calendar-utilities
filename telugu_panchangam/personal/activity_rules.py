@@ -54,6 +54,23 @@
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
 
+_CLAIM_PURCHASE_GENERAL = 'muhurta.purchase.general'
+_NAKSHATRA_UTTARA_ASHADHA = 'Uttara Ashadha'
+_NAKSHATRA_UTTARA_BHADRAPADA = 'Uttara Bhadrapada'
+_NAKSHATRA_UTTARA_PHALGUNI = 'Uttara Phalguni'
+_TITHI_KRISHNA_DASHAMI = 'Krishna Dashami'
+_TITHI_KRISHNA_DWITIYA = 'Krishna Dwitiya'
+_TITHI_KRISHNA_PRATIPAT = 'Krishna Pratipat'
+_TITHI_KRISHNA_TRITIYA = 'Krishna Tritiya'
+_TITHI_SHUKLA_DASHAMI = 'Shukla Dashami'
+_TITHI_SHUKLA_DWITIYA = 'Shukla Dwitiya'
+_TITHI_SHUKLA_EKADASHI = 'Shukla Ekadashi'
+_TITHI_SHUKLA_PANCHAMI = 'Shukla Panchami'
+_TITHI_SHUKLA_PRATIPAT = 'Shukla Pratipat'
+_TITHI_SHUKLA_SAPTAMI = 'Shukla Saptami'
+_TITHI_SHUKLA_TRAYODASHI = 'Shukla Trayodashi'
+_TITHI_SHUKLA_TRITIYA = 'Shukla Tritiya'
+
 _SAMSKARA_SKIP = ('Visha Yoga', 'Dagdha Yoga')
 
 # Source literature and practitioner-facing labels commonly use Ashwini and
@@ -98,7 +115,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                           + 'malefics in the 7th.',
                       ]},
     'purchase':      {'label': 'Purchase (general)',
-                      'source_claim': 'muhurta.purchase.general',
+                      'source_claim': _CLAIM_PURCHASE_GENERAL,
                       'prefer_choghadiya': ('Labh', 1),
                       'prefer_nakshatras': [
                           'Revati', 'Shatabhisha', 'Ashwini', 'Swati',
@@ -120,7 +137,7 @@ ACTIVITY_RULES: dict[str, dict] = {
     'business_inventory_purchase': {
                       'label': 'Trade inventory purchase',
                       'source_claim': 'muhurta.trade_inventory.purchase',
-                      'related_claims': ['muhurta.purchase.general'],
+                      'related_claims': [_CLAIM_PURCHASE_GENERAL],
                       'manual_prerequisites': True,
                       'allowed_varas': [
                           'Adivaram', 'Somavaram', 'Budhavaram',
@@ -182,7 +199,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'avoid_nakshatras': [
                           'Krittika', 'Magha', 'Moola', 'Shatabhisha',
-                          'Uttara Phalguni', 'Punarvasu',
+                          _NAKSHATRA_UTTARA_PHALGUNI, 'Punarvasu',
                       ],
                       'avoid_janma_nakshatra': True,
                       'avoid_vara_tithi_names': [
@@ -218,8 +235,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'avoid_tithi_numbers': [4, 8, 9, 14, 15],
                       'allowed_nakshatras': [
-                          'Ashwini', 'Pushya', 'Hasta', 'Uttara Phalguni',
-                          'Uttara Ashadha', 'Uttara Bhadrapada', 'Rohini',
+                          'Ashwini', 'Pushya', 'Hasta', _NAKSHATRA_UTTARA_PHALGUNI,
+                          _NAKSHATRA_UTTARA_ASHADHA, _NAKSHATRA_UTTARA_BHADRAPADA, 'Rohini',
                           'Revati', 'Shravana', 'Dhanishtha', 'Shatabhisha',
                           'Punarvasu', 'Swati', 'Anuradha', 'Magha',
                       ],
@@ -250,8 +267,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'allowed_nakshatras': [
                           'Anuradha', 'Ashwini', 'Pushya', 'Hasta',
                           'Shravana', 'Dhanishtha', 'Shatabhisha',
-                          'Punarvasu', 'Swati', 'Uttara Phalguni',
-                          'Uttara Ashadha', 'Uttara Bhadrapada', 'Rohini',
+                          'Punarvasu', 'Swati', _NAKSHATRA_UTTARA_PHALGUNI,
+                          _NAKSHATRA_UTTARA_ASHADHA, _NAKSHATRA_UTTARA_BHADRAPADA, 'Rohini',
                       ],
                       'allowed_lagnas': [
                           'Mithuna', 'Kanya', 'Dhanu', 'Meena'],
@@ -295,19 +312,19 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Shukravaram',
                       ],
                       'allowed_tithi_names': [
-                          'Shukla Pratipat', 'Shukla Dwitiya',
-                          'Shukla Tritiya', 'Shukla Panchami',
-                          'Shukla Saptami', 'Shukla Dashami',
-                          'Shukla Ekadashi', 'Shukla Trayodashi',
-                          'Krishna Pratipat', 'Krishna Dwitiya',
-                          'Krishna Tritiya', 'Krishna Panchami',
-                          'Krishna Saptami', 'Krishna Dashami',
+                          _TITHI_SHUKLA_PRATIPAT, _TITHI_SHUKLA_DWITIYA,
+                          _TITHI_SHUKLA_TRITIYA, _TITHI_SHUKLA_PANCHAMI,
+                          _TITHI_SHUKLA_SAPTAMI, _TITHI_SHUKLA_DASHAMI,
+                          _TITHI_SHUKLA_EKADASHI, _TITHI_SHUKLA_TRAYODASHI,
+                          _TITHI_KRISHNA_PRATIPAT, _TITHI_KRISHNA_DWITIYA,
+                          _TITHI_KRISHNA_TRITIYA, 'Krishna Panchami',
+                          'Krishna Saptami', _TITHI_KRISHNA_DASHAMI,
                       ],
                       'allowed_nakshatras': [
                           'Rohini', 'Mrigashira', 'Magha',
-                          'Uttara Phalguni', 'Hasta', 'Swati', 'Anuradha',
-                          'Moola', 'Uttara Ashadha',
-                          'Uttara Bhadrapada', 'Revati',
+                          _NAKSHATRA_UTTARA_PHALGUNI, 'Hasta', 'Swati', 'Anuradha',
+                          'Moola', _NAKSHATRA_UTTARA_ASHADHA,
+                          _NAKSHATRA_UTTARA_BHADRAPADA, 'Revati',
                       ],
                       'avoid_karana': ['Vishti'],
                       'avoid_nitya_yogas': [
@@ -353,8 +370,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Rohini', 'Krittika',
                           'Purva Phalguni', 'Purva Ashadha',
                           'Purva Bhadrapada',
-                          'Uttara Phalguni', 'Uttara Ashadha',
-                          'Uttara Bhadrapada',
+                          _NAKSHATRA_UTTARA_PHALGUNI, _NAKSHATRA_UTTARA_ASHADHA,
+                          _NAKSHATRA_UTTARA_BHADRAPADA,
                       ],
                       'manual_checks': [
                           'Verse 11 additionally requires a Shubha day, Tithi '
@@ -385,8 +402,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'allowed_nakshatras': [
                           'Anuradha', 'Punarvasu', 'Magha',
-                          'Uttara Phalguni', 'Uttara Ashadha',
-                          'Uttara Bhadrapada', 'Shatabhisha', 'Swati',
+                          _NAKSHATRA_UTTARA_PHALGUNI, _NAKSHATRA_UTTARA_ASHADHA,
+                          _NAKSHATRA_UTTARA_BHADRAPADA, 'Shatabhisha', 'Swati',
                           'Dhanishtha', 'Shravana', 'Rohini', 'Ashwini',
                           'Mrigashira', 'Revati', 'Hasta', 'Pushya',
                       ],
@@ -423,7 +440,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Ashwini', 'Mrigashira', 'Punarvasu',
                           'Dhanishtha', 'Pushya', 'Hasta', 'Swati',
                           'Anuradha', 'Shravana', 'Shatabhisha',
-                          'Uttara Phalguni', 'Chitra',
+                          _NAKSHATRA_UTTARA_PHALGUNI, 'Chitra',
                       ],
                       'avoid_tithi_numbers': [4, 6, 8, 12, 14, 15],
                       'allowed_lagnas': [
@@ -502,8 +519,8 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Punarvasu', 'Mrigashira', 'Dhanishtha',
                           'Shravana', 'Revati', 'Pushya', 'Chitra',
                           'Ashwini', 'Hasta', 'Swati', 'Rohini',
-                          'Shatabhisha', 'Uttara Phalguni',
-                          'Uttara Bhadrapada', 'Uttara Ashadha',
+                          'Shatabhisha', _NAKSHATRA_UTTARA_PHALGUNI,
+                          _NAKSHATRA_UTTARA_BHADRAPADA, _NAKSHATRA_UTTARA_ASHADHA,
                       ],
                       'prefer_nakshatras': [
                           'Punarvasu', 'Mrigashira', 'Dhanishtha',
@@ -549,17 +566,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Shukravaram',
                       ],
                       'allowed_tithi_names': [
-                          'Shukla Dwitiya', 'Shukla Tritiya',
-                          'Shukla Panchami', 'Shukla Saptami',
-                          'Shukla Dashami', 'Shukla Trayodashi',
-                          'Krishna Pratipat', 'Krishna Dwitiya',
-                          'Krishna Tritiya',
+                          _TITHI_SHUKLA_DWITIYA, _TITHI_SHUKLA_TRITIYA,
+                          _TITHI_SHUKLA_PANCHAMI, _TITHI_SHUKLA_SAPTAMI,
+                          _TITHI_SHUKLA_DASHAMI, _TITHI_SHUKLA_TRAYODASHI,
+                          _TITHI_KRISHNA_PRATIPAT, _TITHI_KRISHNA_DWITIYA,
+                          _TITHI_KRISHNA_TRITIYA,
                       ],
                       'allowed_nakshatras': [
                           'Anuradha', 'Hasta', 'Chitra', 'Swati',
                           'Shravana', 'Dhanishtha', 'Shatabhisha',
-                          'Uttara Phalguni', 'Uttara Ashadha',
-                          'Uttara Bhadrapada', 'Revati', 'Rohini',
+                          _NAKSHATRA_UTTARA_PHALGUNI, _NAKSHATRA_UTTARA_ASHADHA,
+                          _NAKSHATRA_UTTARA_BHADRAPADA, 'Revati', 'Rohini',
                           'Mrigashira', 'Ashwini', 'Punarvasu', 'Pushya',
                       ],
                       'allowed_lagnas': [
@@ -632,18 +649,18 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'allowed_nakshatras': [
                           'Rohini', 'Mrigashira', 'Punarvasu', 'Pushya',
-                          'Uttara Phalguni', 'Uttara Ashadha', 'Hasta',
+                          _NAKSHATRA_UTTARA_PHALGUNI, _NAKSHATRA_UTTARA_ASHADHA, 'Hasta',
                           'Shravana', 'Revati',
                       ],
                       'allowed_tithi_names': [
-                          'Shukla Pratipat', 'Shukla Dwitiya',
-                          'Shukla Tritiya', 'Shukla Panchami',
-                          'Shukla Saptami', 'Shukla Dashami',
-                          'Shukla Ekadashi', 'Shukla Dwadashi',
-                          'Shukla Trayodashi', 'Krishna Pratipat',
-                          'Krishna Dwitiya', 'Krishna Tritiya',
+                          _TITHI_SHUKLA_PRATIPAT, _TITHI_SHUKLA_DWITIYA,
+                          _TITHI_SHUKLA_TRITIYA, _TITHI_SHUKLA_PANCHAMI,
+                          _TITHI_SHUKLA_SAPTAMI, _TITHI_SHUKLA_DASHAMI,
+                          _TITHI_SHUKLA_EKADASHI, 'Shukla Dwadashi',
+                          _TITHI_SHUKLA_TRAYODASHI, _TITHI_KRISHNA_PRATIPAT,
+                          _TITHI_KRISHNA_DWITIYA, _TITHI_KRISHNA_TRITIYA,
                           'Krishna Panchami', 'Krishna Saptami',
-                          'Krishna Dashami', 'Krishna Ekadashi',
+                          _TITHI_KRISHNA_DASHAMI, 'Krishna Ekadashi',
                           'Krishna Dwadashi', 'Krishna Trayodashi',
                       ],
                       'allowed_lagnas': [
@@ -691,14 +708,14 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Vrishabha', 'Mithuna',
                       ],
                       'allowed_tithi_names': [
-                          'Krishna Pratipat', 'Shukla Dwitiya',
-                          'Shukla Tritiya', 'Shukla Panchami',
-                          'Shukla Saptami', 'Shukla Dashami',
-                          'Shukla Ekadashi', 'Shukla Trayodashi',
+                          _TITHI_KRISHNA_PRATIPAT, _TITHI_SHUKLA_DWITIYA,
+                          _TITHI_SHUKLA_TRITIYA, _TITHI_SHUKLA_PANCHAMI,
+                          _TITHI_SHUKLA_SAPTAMI, _TITHI_SHUKLA_DASHAMI,
+                          _TITHI_SHUKLA_EKADASHI, _TITHI_SHUKLA_TRAYODASHI,
                       ],
                       'allowed_nakshatras': [
-                          'Rohini', 'Mrigashira', 'Uttara Ashadha',
-                          'Chitra', 'Uttara Bhadrapada', 'Anuradha',
+                          'Rohini', 'Mrigashira', _NAKSHATRA_UTTARA_ASHADHA,
+                          'Chitra', _NAKSHATRA_UTTARA_BHADRAPADA, 'Anuradha',
                           'Revati',
                       ],
                       'allowed_lagnas': [
@@ -750,10 +767,10 @@ ACTIVITY_RULES: dict[str, dict] = {
                       ],
                       'allowed_nakshatras': [
                           'Ashwini', 'Rohini', 'Mrigashira', 'Punarvasu',
-                          'Pushya', 'Uttara Phalguni', 'Hasta', 'Swati',
-                          'Anuradha', 'Uttara Ashadha', 'Shravana',
+                          'Pushya', _NAKSHATRA_UTTARA_PHALGUNI, 'Hasta', 'Swati',
+                          'Anuradha', _NAKSHATRA_UTTARA_ASHADHA, 'Shravana',
                           'Dhanishtha', 'Shatabhisha',
-                          'Uttara Bhadrapada',
+                          _NAKSHATRA_UTTARA_BHADRAPADA,
                       ],
                       'avoid_tithi_numbers': [4, 9, 14],
                       'prefer_vara': [
@@ -774,7 +791,7 @@ ACTIVITY_RULES: dict[str, dict] = {
     'house_purchase': {
                       'label': 'Completed house purchase',
                       'source_claim': 'muhurta.house_purchase.completed',
-                      'related_claims': ['muhurta.purchase.general'],
+                      'related_claims': [_CLAIM_PURCHASE_GENERAL],
                       'manual_prerequisites': True,
                       'allowed_varas': ['Guruvaram', 'Shukravaram'],
                       'allowed_tithi_numbers': [1, 6, 11],
@@ -827,14 +844,14 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'allowed_solar_classes': ['Sthira', 'Chara'],
                       'allowed_nakshatras': [
                           'Rohini', 'Mrigashira', 'Chitra', 'Hasta',
-                          'Jyeshtha', 'Uttara Phalguni', 'Uttara Ashadha',
+                          'Jyeshtha', _NAKSHATRA_UTTARA_PHALGUNI, _NAKSHATRA_UTTARA_ASHADHA,
                           'Shravana', 'Swati', 'Pushya', 'Anuradha',
-                          'Ashwini', 'Shatabhisha', 'Uttara Bhadrapada',
+                          'Ashwini', 'Shatabhisha', _NAKSHATRA_UTTARA_BHADRAPADA,
                           'Revati',
                       ],
                       'prefer_nakshatras': [
                           'Rohini', 'Mrigashira', 'Chitra', 'Hasta',
-                          'Jyeshtha', 'Uttara Phalguni', 'Uttara Ashadha',
+                          'Jyeshtha', _NAKSHATRA_UTTARA_PHALGUNI, _NAKSHATRA_UTTARA_ASHADHA,
                           'Shravana',
                       ],
                       'allowed_tithi_numbers': [1, 2, 3, 5, 6, 7, 10, 11, 13, 15],
@@ -964,7 +981,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'avoid_tithi_numbers': [4, 6, 8, 9, 12, 14, 15],
                       'allowed_nakshatras': [
                           'Ashwini', 'Rohini', 'Mrigashira', 'Pushya',
-                          'Uttara Phalguni', 'Hasta', 'Chitra', 'Anuradha',
+                          _NAKSHATRA_UTTARA_PHALGUNI, 'Hasta', 'Chitra', 'Anuradha',
                           'Dhanishtha', 'Revati',
                       ],
                       # Raman also admits a non-Mesha Lagna when its Navamsa
@@ -1047,7 +1064,7 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'skip_on_panchaka_nakshatra': True,
                           'allowed_tithi_names': [
                               'Krishna Ashtami', 'Krishna Navami',
-                              'Krishna Dashami', 'Krishna Ekadashi',
+                              _TITHI_KRISHNA_DASHAMI, 'Krishna Ekadashi',
                               'Krishna Dwadashi', 'Krishna Trayodashi',
                               'Krishna Chaturdashi', 'Amavasya',
                           ],
@@ -1060,7 +1077,7 @@ ACTIVITY_RULES: dict[str, dict] = {
     'well_digging':      {'label': 'Well digging',
                           'source_claim': 'muhurta.well_digging',
                           'allowed_nakshatras': [
-                              'Revati', 'Uttara Bhadrapada', 'Hasta',
+                              'Revati', _NAKSHATRA_UTTARA_BHADRAPADA, 'Hasta',
                               'Anuradha', 'Magha', 'Shravana', 'Rohini',
                               'Pushya',
                           ],
@@ -1080,17 +1097,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'prefer_nakshatra_mukha': (['Urdhva'], 1),
                           'allowed_nakshatras': [
                               'Ashwini', 'Rohini', 'Mrigashira',
-                              'Punarvasu', 'Pushya', 'Uttara Phalguni',
-                              'Hasta', 'Anuradha', 'Uttara Ashadha',
-                              'Shravana', 'Uttara Bhadrapada', 'Revati',
+                              'Punarvasu', 'Pushya', _NAKSHATRA_UTTARA_PHALGUNI,
+                              'Hasta', 'Anuradha', _NAKSHATRA_UTTARA_ASHADHA,
+                              'Shravana', _NAKSHATRA_UTTARA_BHADRAPADA, 'Revati',
                           ],
                           'allowed_tithi_names': [
-                              'Shukla Pratipat', 'Shukla Dwitiya',
-                              'Shukla Tritiya', 'Shukla Panchami',
-                              'Shukla Saptami', 'Shukla Dashami',
-                              'Shukla Ekadashi', 'Shukla Trayodashi',
-                              'Pournami', 'Krishna Dwitiya',
-                              'Krishna Dashami',
+                              _TITHI_SHUKLA_PRATIPAT, _TITHI_SHUKLA_DWITIYA,
+                              _TITHI_SHUKLA_TRITIYA, _TITHI_SHUKLA_PANCHAMI,
+                              _TITHI_SHUKLA_SAPTAMI, _TITHI_SHUKLA_DASHAMI,
+                              _TITHI_SHUKLA_EKADASHI, _TITHI_SHUKLA_TRAYODASHI,
+                              'Pournami', _TITHI_KRISHNA_DWITIYA,
+                              _TITHI_KRISHNA_DASHAMI,
                           ],
                           'allowed_lagnas': [
                               'Mesha', 'Vrishabha', 'Mithuna', 'Karka',

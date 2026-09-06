@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "release": "1.18.2",
+  "parent_release": "1.18.1",
+  "activity": "literal-hygiene",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [],
+  "semantic_deltas": [],
+  "protected_source_transforms": [
+    {
+      "path": "telugu_panchangam/personal/muhurta.py",
+      "scope": "literal-hygiene_muhurta_constants",
+      "transforms": [
+        {
+          "before": "from telugu_panchangam.panchaka import evaluate_panchaka\n\nGOOD_CHOGHADIYA",
+          "after": "from telugu_panchangam.panchaka import evaluate_panchaka\n\n_ADHIKA_PREFIX = 'Adhika '\n\nGOOD_CHOGHADIYA"
+        },
+        {
+          "before": "        return karnavedha_daylight_drop_reason(daylight_assessment)\n\n    allowed_maasams = rules.get('allowed_maasams')\n    allowed_maasa_solar_pairs = {\n        tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}\n    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')",
+          "after": "        return karnavedha_daylight_drop_reason(daylight_assessment)\n\n    allowed_maasams = rules.get('allowed_maasams')\n    allowed_maasa_solar_pairs = {\n        tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}\n    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix(_ADHIKA_PREFIX)"
+        },
+        {
+          "before": "    if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):\n        return f'Adhika Maasa · {rules[\"label\"]} traditionally avoided'",
+          "after": "    if rules.get('skip_on_adhika') and day.maasam.startswith(_ADHIKA_PREFIX):\n        return f'Adhika Maasa · {rules[\"label\"]} traditionally avoided'"
+        },
+        {
+          "before": "    if rules.get('daytime_only') or rules.get('forenoon_only'):\n        return []\n\n    allowed_maasams = rules.get('allowed_maasams')\n    allowed_maasa_solar_pairs = {\n        tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}\n    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix('Adhika ')",
+          "after": "    if rules.get('daytime_only') or rules.get('forenoon_only'):\n        return []\n\n    allowed_maasams = rules.get('allowed_maasams')\n    allowed_maasa_solar_pairs = {\n        tuple(pair) for pair in rules.get('allowed_maasa_solar_pairs', ())}\n    normalized_maasam = day.maasam.removeprefix('Nija ').removeprefix(_ADHIKA_PREFIX)"
+        },
+        {
+          "before": "    if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:\n        return []\n    if rules.get('skip_on_adhika') and day.maasam.startswith('Adhika '):\n        return []",
+          "after": "    if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:\n        return []\n    if rules.get('skip_on_adhika') and day.maasam.startswith(_ADHIKA_PREFIX):\n        return []"
+        }
+      ]
+    },
+    {
+      "path": "telugu_panchangam/personal/slot_scorers.py",
+      "scope": "literal-hygiene_slot_scorer_constants",
+      "transforms": [
+        {
+          "before": "from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS\n\n_YOGA_BONUS = {'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,",
+          "after": "from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS\n\n_AMRITA_SIDDHI_YOGA = 'Amrita Siddhi Yoga'\n_SARVARTHA_SIDDHI_YOGA = 'Sarvartha Siddhi Yoga'\n\n_YOGA_BONUS = {_SARVARTHA_SIDDHI_YOGA: 2, _AMRITA_SIDDHI_YOGA: 2,"
+        },
+        {
+          "before": "        siddhi = [y for y in special_yogas\n                  if y in ('Sarvartha Siddhi Yoga', 'Amrita Siddhi Yoga')]",
+          "after": "        siddhi = [y for y in special_yogas\n                  if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)]"
+        },
+        {
+          "before": "    siddhi_yogas = [y for y in special_yogas\n                    if y in ('Sarvartha Siddhi Yoga', 'Amrita Siddhi Yoga')]",
+          "after": "    siddhi_yogas = [y for y in special_yogas\n                    if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)]"
+        }
+      ]
+    }
+  ]
+}
