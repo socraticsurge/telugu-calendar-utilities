@@ -71,8 +71,11 @@ def _relative_component(component: object, project_key: str) -> str:
 def _created_date(value: object) -> date:
     if not isinstance(value, str):
         raise InventoryError(f"Invalid creationDate: {value!r}")
+    normalized = value.replace("Z", "+00:00")
+    if len(normalized) >= 5 and normalized[-5] in "+-" and normalized[-4:].isdigit():
+        normalized = f"{normalized[:-2]}:{normalized[-2:]}"
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00")).date()
+        return datetime.fromisoformat(normalized).date()
     except ValueError as error:
         raise InventoryError(f"Invalid creationDate: {value!r}") from error
 
