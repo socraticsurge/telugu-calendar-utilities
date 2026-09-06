@@ -1,0 +1,75 @@
+{
+  "description": "Exact C901 hotspot scores; every change requires intentional review.",
+  "hotspots": {
+    "telugu_panchangam/engines/base.py": {
+      "_festivals": 22
+    },
+    "telugu_panchangam/generators/ics.py": {
+      "_description": 24
+    },
+    "telugu_panchangam/mcp/tools.py": {
+      "_validate_muhurta_inputs": 18,
+      "tool_find_tarabalam_days": 22
+    },
+    "telugu_panchangam/personal/activity_check_contract.py": {
+      "_validate_specs": 16
+    },
+    "telugu_panchangam/personal/election_assessors/primitives.py": {
+      "evaluate_well_situated": 15,
+      "gold_transition_uncertainty": 11
+    },
+    "telugu_panchangam/personal/election_chart.py": {
+      "_evaluate_rule": 11,
+      "evaluate_election_snapshots": 19
+    },
+    "telugu_panchangam/personal/llm_phalalu.py": {
+      "_verify": 17
+    },
+    "telugu_panchangam/personal/muhurta.py": {
+      "_day_skip_reason": 29,
+      "_evaluate_slot": 61,
+      "day_slots": 17,
+      "night_slots": 31
+    },
+    "telugu_panchangam/personal/slot_scorers.py": {
+      "score_lagna": 19
+    },
+    "tests/test_browser_smoke.py": {
+      "_muhurta_planets": 19,
+      "test_chart_aware_muhurta_built_browser_state_matrix": 21
+    },
+    "tests/test_raman_artifact_identity_audit.py": {
+      "_assert_non_overlapping_pointers": 12
+    },
+    "tools/analyze_computation_architecture.py": {
+      "_layer": 14,
+      "build_report": 11
+    },
+    "tools/audit_lagna_boundary_guard.py": {
+      "generate_report": 11
+    },
+    "tools/check_activity_provenance.py": {
+      "audit": 23
+    },
+    "tools/check_computation_inventory.py": {
+      "_validate_method": 20,
+      "validate_registry": 57
+    },
+    "tools/check_documentation_freshness.py": {
+      "validate_documentation": 11
+    },
+    "tools/export_muhurtam_rule_crosswalk.py": {
+      "_validate_complete": 22,
+      "build_crosswalk": 36
+    }
+  },
+  "max_complexity": 10,
+  "ruff_version": "0.16.2",
+  "schema_version": 1,
+  "targets": [
+    "telugu_panchangam",
+    "tests",
+    "tools",
+    "scripts"
+  ]
+}

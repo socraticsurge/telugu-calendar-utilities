@@ -4,13 +4,13 @@
 # differences in sunrise/nakshatra boundary computation.
 from datetime import date, datetime
 
-import pytz
 import pytest
+import pytz
 
+from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
-from telugu_panchangam.cities import CITIES
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 TZ = pytz.timezone(HYD.timezone)

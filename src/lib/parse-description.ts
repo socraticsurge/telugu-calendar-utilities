@@ -12,15 +12,64 @@ const ANGA_RE = new RegExp(`^(Tithi|Nakshatra|Yoga):\\s+(.+?)\\s+${TIME_PART}\\s
 const WINDOW_RE = new RegExp(`^\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s*$`);
 const CHOG_RE = new RegExp(`^\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s+(.+)$`);
 
-export function parseDescription(description: string) {
-  // Verbatim port: internal shape kept dynamic; panels type it on consumption.
-  const data: any = {
+type TimeRange = { start: string; end: string };
+type TimedEntry = TimeRange & {
+  name: string;
+  sflag: string | null;
+  eflag: string | null;
+};
+type ChoghadiyaEntry = TimeRange & { name: string };
+type EclipseEntry = {
+  kind: string;
+  subtype: string;
+  visible: boolean;
+  window: TimeRange | null;
+  sutak: TimeRange | null;
+};
+type Section =
+  | 'auspicious'
+  | 'inauspicious'
+  | 'choghadiya'
+  | 'nightChoghadiya'
+  | 'eclipse'
+  | 'specialyogas'
+  | null;
+
+export interface ParsedDescription {
+  meta: string;
+  tithi: TimedEntry | null;
+  nakshatra: TimedEntry | null;
+  yoga: TimedEntry | null;
+  karana: string | null;
+  sunrise: string | null;
+  sunset: string | null;
+  moonrise: string | null;
+  moonset: string | null;
+  auspicious: TimedEntry[];
+  inauspicious: TimedEntry[];
+  choghadiya: ChoghadiyaEntry[];
+  nightChoghadiya: ChoghadiyaEntry[];
+  eclipse: EclipseEntry | null;
+  yogas: string[];
+  ayanam: string | null;
+  rituvu: string | null;
+  special: string[];
+  samvatsara?: string;
+  maasam?: string;
+  paksham?: string;
+  vaaram?: string;
+  solarSign?: string;
+  lunarSign?: string;
+}
+
+export function parseDescription(description: string): ParsedDescription {
+  const data: ParsedDescription = {
     meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
     sunrise: null, sunset: null, moonrise: null, moonset: null,
     auspicious: [], inauspicious: [], choghadiya: [], nightChoghadiya: [],
     eclipse: null, yogas: [], ayanam: null, rituvu: null, special: [],
   };
-  let section: string | null = null;
+  let section: Section = null;
   for (const raw of description.split('\n')) {
     const line = raw.trimEnd();
     if (!line.trim()) { section = null; continue; }
@@ -58,7 +107,8 @@ export function parseDescription(description: string) {
     }
     // Pancha anga rows
     if ((m = line.match(ANGA_RE))) {
-      data[m[1].toLowerCase()] = { name: m[2].trim(), start: m[3], sflag: m[4] || null, end: m[5], eflag: m[6] || null };
+      const anga = m[1].toLowerCase() as 'tithi' | 'nakshatra' | 'yoga';
+      data[anga] = { name: m[2].trim(), start: m[3], sflag: m[4] || null, end: m[5], eflag: m[6] || null };
       continue;
     }
     if ((m = line.match(/^Karana:\s+(.+)$/))) {
@@ -113,5 +163,4 @@ export function parseDescription(description: string) {
   }
   return data;
 }
-
 

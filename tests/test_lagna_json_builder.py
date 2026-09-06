@@ -2,9 +2,9 @@
 indices, monotonic minute offsets, and timezone-aware sunrise."""
 from datetime import date
 
+from scripts.build_lagna_json import build_for_city
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.panchangam_names import RASHI_NAMES
-from scripts.build_lagna_json import build_for_city
 
 
 def _hyderabad():

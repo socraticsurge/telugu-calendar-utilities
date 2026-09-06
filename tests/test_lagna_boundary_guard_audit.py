@@ -1,5 +1,6 @@
 """Regression contract for the election-chart Lagna boundary review band."""
 
+import argparse
 import json
 from datetime import date
 from pathlib import Path
@@ -15,6 +16,7 @@ from tools.audit_lagna_boundary_guard import (
     first_new_minute_offset,
     generate_report,
     published_transition_instant,
+    repository_fixture_path,
 )
 
 FIXTURE = Path(__file__).parent / 'fixtures' / 'lagna-boundary-guard-audit.json'
@@ -24,6 +26,15 @@ METHOD_PAGE = (
     / 'reference'
     / '54-muhurtam-election-chart-screening.md'
 )
+
+
+def test_fixture_path_is_contained_within_the_repository(tmp_path):
+    assert repository_fixture_path(str(FIXTURE)) == FIXTURE.resolve()
+
+    outside = tmp_path / 'outside.json'
+    outside.write_text('{}', encoding='utf-8')
+    with pytest.raises(argparse.ArgumentTypeError, match='inside the repository'):
+        repository_fixture_path(str(outside))
 
 
 def test_exhaustive_audit_reproduces_the_committed_report():

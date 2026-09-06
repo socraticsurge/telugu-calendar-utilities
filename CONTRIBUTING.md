@@ -22,16 +22,20 @@ The most valuable reports are about **wrong panchangam values** (tithi/nakshatra
 
 ## Development setup
 
+Install Python 3.10+, [uv](https://docs.astral.sh/uv/), and Node.js 24, then run:
+
 ```bash
-pip install -r requirements.txt
-npm install
-python tools/verify_project.py
+uv sync --locked --extra test --extra browser-test --group dev
+uv run playwright install chromium
+npm ci --ignore-scripts
+uv run python tools/verify_project.py
 ```
 
 The verifier checks the provenance ledger links, generated browser activity
-data, computation inventory and documentation freshness, the Ruff debt
-baseline, the full Python suite, frontend tests, typecheck, and production
-build. Every gate must pass before any change merges.
+data, computation inventory and documentation freshness, the Ruff lint and
+complexity debt baselines, the full Python suite, zero-warning TypeScript lint,
+frontend tests with coverage, typecheck, and the production build. Every gate
+must pass before any change merges.
 
 For any new or changed calculation, follow
 **[Add or change a computation safely](docs/reference/10-computation-contributor-workflow.md)**
@@ -47,13 +51,32 @@ and publication approval gate.
 Ruff currently uses a reviewed per-file, per-rule baseline in
 `tools/ruff_baseline.json`. New lint debt fails CI. If a change reduces existing
 debt, regenerate the baseline with
-`python tools/check_ruff_baseline.py --update` and review that reduction in the
-same pull request. The optional local hooks use the same check:
+`uv run python tools/check_ruff_baseline.py --update` and review that reduction in the
+same pull request.
+
+Cyclomatic complexity is separately governed by the exact file, function and
+score inventory in `tools/complexity_baseline.json`. Increases, reductions,
+moves, renames, removals and new hotspots all require review and an intentional
+`uv run python tools/check_complexity_baseline.py --update`. This ratchet records
+the frozen-core hotspots; it does not authorize refactoring frozen code. The
+optional local hooks use the Ruff check:
 
 ```bash
-pip install pre-commit
-pre-commit install
+uv run pre-commit install
 ```
+
+Frontend coverage includes every `src/**/*.ts` production file, including the
+bootstrap and relaxed DOM panels; only test files are excluded. Its negative
+Vitest thresholds cap the absolute number of uncovered statements, branches,
+functions and lines, preventing percentage dilution as the app grows. This is
+a regression floor, not a claim that the current coverage is sufficient:
+cleanup in one file can offset uncovered code elsewhere, so reviewers must
+still require focused tests for every behavior change.
+
+ESLint runs with inline configuration disabled. The few immutable or legacy
+exceptions are counted exactly in `eslint-suppressions.json`; a new violation
+or a stale suppression fails the lint command. Regenerate that file only after
+reviewing the specific rule and file boundary.
 
 ## Ground rules for changes
 

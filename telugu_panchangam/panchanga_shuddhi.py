@@ -68,18 +68,28 @@ _NAK_ASHUDDHA = _NAK_TIKSHNA | _NAK_UGRA
 _NAK_MISHRA = frozenset({'Krittika', 'Vishakha'})   # mixed — treated as neutral
 
 _NAK_QUALITY: dict[str, str] = {}
-for _n in _NAK_SHUDDHA:  _NAK_QUALITY[_n] = 'shuddha'
-for _n in _NAK_ASHUDDHA: _NAK_QUALITY[_n] = 'ashuddha'
-for _n in _NAK_MISHRA:   _NAK_QUALITY[_n] = 'mixed'
+for _n in _NAK_SHUDDHA:
+    _NAK_QUALITY[_n] = 'shuddha'
+for _n in _NAK_ASHUDDHA:
+    _NAK_QUALITY[_n] = 'ashuddha'
+for _n in _NAK_MISHRA:
+    _NAK_QUALITY[_n] = 'mixed'
 
 _NAK_CATEGORY: dict[str, str] = {}
-for _n in _NAK_LAGHU:    _NAK_CATEGORY[_n] = 'Laghu (light)'
-for _n in _NAK_MRIDU:    _NAK_CATEGORY[_n] = 'Mridu (soft)'
-for _n in _NAK_DHRUVA:   _NAK_CATEGORY[_n] = 'Dhruva (fixed)'
-for _n in _NAK_CHARA:    _NAK_CATEGORY[_n] = 'Chara (movable)'
-for _n in _NAK_TIKSHNA:  _NAK_CATEGORY[_n] = 'Tikshna (sharp)'
-for _n in _NAK_UGRA:     _NAK_CATEGORY[_n] = 'Ugra (fierce)'
-for _n in _NAK_MISHRA:   _NAK_CATEGORY[_n] = 'Mishra (mixed)'
+for _n in _NAK_LAGHU:
+    _NAK_CATEGORY[_n] = 'Laghu (light)'
+for _n in _NAK_MRIDU:
+    _NAK_CATEGORY[_n] = 'Mridu (soft)'
+for _n in _NAK_DHRUVA:
+    _NAK_CATEGORY[_n] = 'Dhruva (fixed)'
+for _n in _NAK_CHARA:
+    _NAK_CATEGORY[_n] = 'Chara (movable)'
+for _n in _NAK_TIKSHNA:
+    _NAK_CATEGORY[_n] = 'Tikshna (sharp)'
+for _n in _NAK_UGRA:
+    _NAK_CATEGORY[_n] = 'Ugra (fierce)'
+for _n in _NAK_MISHRA:
+    _NAK_CATEGORY[_n] = 'Mishra (mixed)'
 
 # ── Weekday quality ───────────────────────────────────────────────────────────
 

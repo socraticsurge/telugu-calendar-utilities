@@ -11,7 +11,6 @@ from datetime import datetime
 from telugu_panchangam.engines.utils import datetime_to_jd
 from telugu_panchangam.panchangam_names import NAKSHATRA_NAMES, VAARAM_NAMES
 
-
 HOMAHUTI_GROUP_LORDS = (
     'Surya', 'Budha', 'Shukra', 'Shani', 'Chandra',
     'Mangala', 'Guru', 'Rahu', 'Ketu',

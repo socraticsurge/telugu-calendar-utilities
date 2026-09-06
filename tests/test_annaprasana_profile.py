@@ -1,6 +1,6 @@
 """Contract tests for Raman's Annaprasana election profile."""
-from datetime import date
 import json
+from datetime import date
 from pathlib import Path
 
 from telugu_panchangam.cities import CITIES
@@ -9,7 +9,6 @@ from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
 from telugu_panchangam.personal.muhurta import day_slots, diagnose_day
 from telugu_panchangam.personal.slot_scorers import slot_lagna_name
-
 
 HYDERABAD = next(city for city in CITIES if city.name == 'Hyderabad')
 ENGINE = DrikGanitaEngine()

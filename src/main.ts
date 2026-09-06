@@ -1,18 +1,13 @@
 import { getSelection, setSelection, initSelection, subscribeSelection } from './selection-store';
 import { selEl } from './lib/dom';
-import { parseDescription, TIME_PART } from './lib/parse-description';
-import { FEED_BASE_URL, feedFilename, loadFeed, slug } from './lib/feed-loader';
+import { FEED_BASE_URL, feedFilename } from './lib/feed-loader';
 import { CITY_GROUPS } from './data/cities';
 import { SYSTEMS } from './data/systems';
-import { fmtT, dayMark, fmtRange, fmtPlain } from './lib/format';
-import { htmlEsc } from './lib/html';
 import { gcEvent } from './lib/analytics';
-import { RASI_NAMES } from './data/rasis';
 import {
   initGocharaProfiles,
   loadGochara,
   renderGochara,
-  goBuildViewSelect,
   shareGocharaOnWhatsApp,
   goHasData,
 } from './panels/gochara';
@@ -27,8 +22,6 @@ import {
   tbHasDays, muHasLast, initTarabalamPanel, initTarabalamProfiles,
   invalidateMuhurtaSearch,
 } from './panels/tarabalam';
-import { loadLagna, lagnaDayFor } from './lib/lagna-loader';
-import { stampOf } from './lib/format';
 import {
   browserProfileStorage,
   createGuestProfileStore,
@@ -474,7 +467,8 @@ import {
 
     // --- resize: debounced re-apply, don't thrash on edge widths ---
     let rt;
-    (mq.addEventListener ? mq.addEventListener('change', schedule) : mq.addListener(schedule));
+    if (mq.addEventListener) mq.addEventListener('change', schedule);
+    else mq.addListener(schedule);
     function schedule() { clearTimeout(rt); rt = setTimeout(applyMode, 120); }
     window.addEventListener('resize', schedule);
 

@@ -27,6 +27,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: '0.11.8'
+          enable-cache: true
+
       # Fail-fast gates BEFORE we spend time installing deps. Both run
       # in <10s and catch the two release-procedure mistakes that have
       # historically been silent: tagging a version that doesn't match
@@ -88,16 +94,16 @@ jobs:
           PY
 
       - name: Install runtime + test deps
-        run: pip install -r requirements.txt
+        run: python tools/install_locked_dependencies.py --extra test --group build
 
       - name: Run tests
-        run: python -m pytest tests/ -q
-
-      - name: Install build tools
-        run: pip install build
+        run: uv run --no-sync --no-build python -m pytest tests/ -q
 
       - name: Build package
-        run: python -m build
+        run: uv run --no-sync --no-build python -m build --no-isolation
+
+      - name: Verify release artifacts
+        run: uv run --no-sync --no-build python tools/verify_release_artifacts.py dist
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1

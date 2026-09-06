@@ -2,10 +2,17 @@
 import pytest
 
 from telugu_panchangam.personal.lagna_position import (
-    lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,
-    LAGNA_KENDRA, LAGNA_TRIKONA,
-    LAGNA_CHARA, LAGNA_STHIRA, LAGNA_DVISVABHAVA,
-    lagna_class_of, lagnas_in_class,
+    LAGNA_CHARA,
+    LAGNA_DVISVABHAVA,
+    LAGNA_KENDRA,
+    LAGNA_STHIRA,
+    LAGNA_TRIKONA,
+    is_ashtama_lagna,
+    is_favourable_lagna,
+    lagna_class_of,
+    lagna_position,
+    lagna_verdict,
+    lagnas_in_class,
 )
 
 

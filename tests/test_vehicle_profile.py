@@ -1,13 +1,12 @@
 """Contract tests for Raman's vehicle-acquisition Nakshatra rule."""
-from datetime import date, timedelta
 import json
+from datetime import date, timedelta
 from pathlib import Path
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.muhurta import day_slots
-
 
 HYDERABAD = next(city for city in CITIES if city.name == 'Hyderabad')
 ENGINE = DrikGanitaEngine()

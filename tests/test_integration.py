@@ -1,7 +1,9 @@
 # tests/test_integration.py
 """Full pipeline: engine → ICS → parse. Runs for 3 days, 2 cities."""
 from datetime import date, timedelta
+
 from icalendar import Calendar
+
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.generators.ics import ICSGenerator

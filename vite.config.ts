@@ -20,5 +20,20 @@ export default defineConfig({
     environment: 'jsdom',
     globals: false,
     include: ['src/**/__tests__/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/__tests__/**'],
+      reporter: ['text', 'json-summary'],
+      reportsDirectory: 'coverage',
+      thresholds: {
+        // Negative thresholds cap absolute uncovered items, so growth cannot
+        // dilute the gate by keeping the same percentage.
+        statements: -2035,
+        branches: -2037,
+        functions: -279,
+        lines: -1601,
+      },
+    },
   },
 });

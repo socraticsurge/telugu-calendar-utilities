@@ -7,10 +7,10 @@ the rest of test_muhurta_finder.py.
 """
 from datetime import date
 
-from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.cities import CITIES
-from telugu_panchangam.personal.muhurta import day_slots
+from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.lagna_hora import get_lagna_transitions
+from telugu_panchangam.personal.muhurta import day_slots
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 ENGINE = DrikGanitaEngine()

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "release": "1.18.1",
+  "parent_release": "1.18.0",
+  "activity": "release-hygiene",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [],
+  "semantic_deltas": [],
+  "protected_source_transforms": []
+}

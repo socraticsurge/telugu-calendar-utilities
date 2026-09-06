@@ -223,6 +223,8 @@ function closeNativeDialog(dialog: HTMLDialogElement): void {
   dialog.remove();
 }
 
+let confirmDialogSequence = 0;
+
 function createConfirmDialog(config: {
   title: string;
   description: string;
@@ -231,7 +233,8 @@ function createConfirmDialog(config: {
   trigger: HTMLElement;
 }): HTMLDialogElement {
   const dialog = element('dialog', 'profiles-dialog');
-  const id = `profiles-dialog-${Math.random().toString(36).slice(2)}`;
+  confirmDialogSequence += 1;
+  const id = `profiles-dialog-${confirmDialogSequence}`;
   const title = element('h2', 'profiles-dialog__title', config.title);
   title.id = `${id}-title`;
   const description = element('p', 'profiles-dialog__description', config.description);
@@ -1029,12 +1032,6 @@ export function initProfilesPanel(
   let activeFormMethod: 'birth-details' | 'manual' = birthCalculationActive
     ? 'birth-details'
     : 'manual';
-  let renderBirthForm: (
-    mode: 'create' | 'edit',
-    context: ResolvedProfilesPanelContext,
-    profile?: GuestProfile,
-  ) => void;
-
   const renderManualForm = (
     mode: 'create' | 'edit',
     context: ResolvedProfilesPanelContext,
@@ -1350,7 +1347,7 @@ export function initProfilesPanel(
     nameInput.focus();
   };
 
-  renderBirthForm = (
+  const renderBirthForm = (
     mode: 'create' | 'edit',
     context: ResolvedProfilesPanelContext,
     profile?: GuestProfile,

@@ -1,9 +1,12 @@
 # Tarabalam counting verified against a reference tarabala table
 # (June 2026, four janma nakshatras; see feature/tarabalam PR).
 from telugu_panchangam.personal.tarabalam import (
-    tara_number, tara_name, is_auspicious_tara, taras_for_day, TARA_NAMES,
+    TARA_NAMES,
+    is_auspicious_tara,
+    tara_name,
+    tara_number,
+    taras_for_day,
 )
-
 
 # --- Counting rule: janma -> day nakshatra, inclusive, mod 9 ---
 # Reference rows for an Ashvini day:
@@ -76,6 +79,7 @@ def test_invalid_nakshatra_raises():
 
 def test_mcp_find_tarabalam_days():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_tarabalam_days
     result = json.loads(tool_find_tarabalam_days(
         ['Uttara Bhadrapada', 'Purva Ashadha', 'Shravana', 'Purva Phalguni'],
@@ -92,6 +96,7 @@ def test_mcp_find_tarabalam_days():
 
 def test_mcp_find_tarabalam_days_validates():
     import json
+
     from telugu_panchangam.mcp.tools import tool_find_tarabalam_days
     # Error convention matches the other MCP tools: {'error': ...} JSON
     assert 'error' in json.loads(tool_find_tarabalam_days(

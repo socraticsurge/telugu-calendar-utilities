@@ -1,13 +1,12 @@
 """Contract and runtime tests for Raman's journey rules."""
-from datetime import date, timedelta
 import json
+from datetime import date, timedelta
 from pathlib import Path
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.muhurta import day_slots
-
 
 ROOT = Path(__file__).resolve().parents[1]
 HYDERABAD = next(city for city in CITIES if city.name == 'Hyderabad')

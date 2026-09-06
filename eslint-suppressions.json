@@ -1,0 +1,27 @@
+{
+  ".vitepress/config.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 14
+    }
+  },
+  "src/__tests__/gochara-interpretation-evidence.test.ts": {
+    "@typescript-eslint/ban-ts-comment": {
+      "count": 1
+    }
+  },
+  "src/__tests__/today-festival-next.test.ts": {
+    "@typescript-eslint/ban-ts-comment": {
+      "count": 1
+    }
+  },
+  "src/__tests__/today-request-order.test.ts": {
+    "@typescript-eslint/ban-ts-comment": {
+      "count": 1
+    }
+  },
+  "src/muhurta-scorer.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    }
+  }
+}

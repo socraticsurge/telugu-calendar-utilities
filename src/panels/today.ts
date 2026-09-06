@@ -7,8 +7,8 @@
 import { getSelection } from '../selection-store';
 import { selEl } from '../lib/dom';
 import { parseDescription, TIME_PART } from '../lib/parse-description';
-import { loadFeed, slug } from '../lib/feed-loader';
-import { fmtT, dayMark, fmtRange, fmtPlain, stampOf } from '../lib/format';
+import { loadFeed } from '../lib/feed-loader';
+import { fmtT, fmtRange, fmtPlain, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { loadLagna, lagnaDayFor } from '../lib/lagna-loader';
@@ -553,7 +553,7 @@ function renderAll() {
   }
   renderUpcoming(LAST_EVENTS);
 }
-(window as any).renderAll = renderAll;
+(window as Window & { renderAll?: typeof renderAll }).renderAll = renderAll;
 
 async function loadPreview() {
   const city = getSelection().city;

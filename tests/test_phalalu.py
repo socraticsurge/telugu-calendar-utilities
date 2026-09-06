@@ -1,6 +1,6 @@
 # Daily Rasi Phalalu: deterministic text rendered from computed gochara,
 # chandrabalam and (optionally) tarabalam facts — never free-form fiction.
-from telugu_panchangam.personal.phalalu import rasi_phalalu, HOUSE_MEANINGS
+from telugu_panchangam.personal.phalalu import HOUSE_MEANINGS, rasi_phalalu
 
 # Jun 11 2026 sunrise sky (DP-verified rasis)
 SKY = {
@@ -24,7 +24,7 @@ def test_structure_and_counts():
 
 def test_sade_sati_is_stated():
     out = rasi_phalalu('Mesha', SKY)
-    assert any('Sade Sati' in l for l in out['lines'])
+    assert any('Sade Sati' in line for line in out['lines'])
 
 
 def test_moon_house_drives_day_quality():
@@ -46,15 +46,17 @@ def test_optional_tarabalam_line():
     out = rasi_phalalu('Meena', SKY, janma_nakshatra='Uttara Bhadrapada',
                        day_nakshatra='Revati')
     # U.Bh -> Revati = 2 Sampat
-    assert any('Sampat' in l for l in out['lines'])
+    assert any('Sampat' in line for line in out['lines'])
     out2 = rasi_phalalu('Meena', SKY)
-    assert not any('tara' in l.lower() for l in out2['lines'])
+    assert not any('tara' in line.lower() for line in out2['lines'])
 
 
 def test_vedha_blocked_line_names_obstructor():
     sky = dict(SKY, **{'Surya': 'Kumbha', 'Kuja': 'Simha'})  # Dhanu: Surya 3rd blocked by Kuja
     out = rasi_phalalu('Dhanu', sky)
-    assert any('vedha' in l.lower() and 'Kuja' in l for l in out['lines'])
+    assert any(
+        'vedha' in line.lower() and 'Kuja' in line for line in out['lines']
+    )
 
 
 def test_invalid_rasi_raises():
@@ -67,15 +69,17 @@ def test_invalid_rasi_raises():
 
 def test_mcp_get_rasi_phalalu():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rasi_phalalu
     result = json.loads(tool_get_rasi_phalalu('2026-06-11', 'Mesha', 'Hyderabad'))
     assert result['day_quality'] in ('good', 'mixed', 'difficult')
-    assert any('Sade Sati' in l for l in result['lines'])
+    assert any('Sade Sati' in line for line in result['lines'])
     assert 'disclaimer' in result
 
 def test_mcp_get_rasi_phalalu_with_star():
     import json
+
     from telugu_panchangam.mcp.tools import tool_get_rasi_phalalu
     result = json.loads(tool_get_rasi_phalalu('2026-06-11', 'Meena', 'Hyderabad',
                                               janma_nakshatra='Uttara Bhadrapada'))
-    assert any('Sampat' in l for l in result['lines'])
+    assert any('Sampat' in line for line in result['lines'])

@@ -1,7 +1,11 @@
-from datetime import datetime, timezone, timedelta
 import json
+from datetime import datetime, timedelta, timezone
+
 from telugu_panchangam.ghati import (
-    make_clock, civil_to_ghati, ghati_to_civil, ghati_window,
+    civil_to_ghati,
+    ghati_to_civil,
+    ghati_window,
+    make_clock,
 )
 
 
@@ -54,7 +58,9 @@ def test_ghati_clock_in_mcp_output():
 
 def test_ghati_clock_in_all_mcp_tool_responses():
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     # tool_get_panchangam — top-level ghati_clock
     out = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))

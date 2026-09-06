@@ -10,7 +10,6 @@ from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.muhurta import day_slots
 
-
 ROOT = Path(__file__).parents[1]
 CLAIM_ID = 'muhurta.purchase.general'
 PREFERRED = [

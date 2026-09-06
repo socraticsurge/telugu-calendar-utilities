@@ -1,5 +1,6 @@
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
+
 from telugu_panchangam.cities import CITIES
 
 _TF = TimezoneFinder()

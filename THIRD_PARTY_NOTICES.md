@@ -31,8 +31,8 @@ published at <https://www.astro.com/swisseph/swisseph.htm>.
 
 The remaining direct dependencies are installed as separate distributions and
 retain their respective licence and notice files. The authoritative dependency
-inventory is in `pyproject.toml` and `requirements.lock`; browser build
-dependencies are recorded in `package-lock.json`.
+declarations are in `pyproject.toml`, with the reproducible resolution in
+`uv.lock`; browser build dependencies are recorded in `package-lock.json`.
 
 ## Historical project copies
 

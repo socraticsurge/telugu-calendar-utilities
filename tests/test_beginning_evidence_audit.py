@@ -4,7 +4,6 @@ from pathlib import Path
 
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 
-
 ROOT = Path(__file__).parents[1]
 CLAIM_ID = 'muhurta.dharma_kriya.commencement'
 

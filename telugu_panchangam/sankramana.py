@@ -6,7 +6,8 @@ Total span = 32 ghatis (~12h48m). Different sources cite 16 vs 30 ghatis
 for Karkata/Makara (solstitial); we use the conservative 16 for all signs.
 """
 from datetime import datetime, timedelta
-from telugu_panchangam.models.panchangam_day import Window, GhatiClock
+
+from telugu_panchangam.models.panchangam_day import GhatiClock, Window
 
 
 def compute_sankramana_window(

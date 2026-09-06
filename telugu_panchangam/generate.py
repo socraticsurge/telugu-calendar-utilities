@@ -1,20 +1,23 @@
 # src/generate.py
 """Entry point: generate all Panchangam ICS feeds."""
-from datetime import date, timedelta
 import os
 import sys
+from datetime import date, timedelta
 
 from telugu_panchangam.cities import CITIES
-from telugu_panchangam.eclipses import list_eclipses_in_range, get_eclipse_from_precomputed
+from telugu_panchangam.eclipses import (
+    get_eclipse_from_precomputed,
+    list_eclipses_in_range,
+)
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
-from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.engines.utils import local_midnight_jd
-from telugu_panchangam.generators.ics import ICSGenerator
+from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.generators.anga_variants import (
     generate_festivals_feed,
     generate_tithi_observances_feed,
 )
+from telugu_panchangam.generators.ics import ICSGenerator
 
 ENGINES = {
     'drik': DrikGanitaEngine,

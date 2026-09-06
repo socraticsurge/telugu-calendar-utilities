@@ -3,7 +3,6 @@
 // Gochara panel: transit chart, vedha screening, and the daily
 // LLM/deterministic rasi phalalu reading.
 
-import { fmtT, fmtRange } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
 import { RASI_NAMES, rasiFromStar } from '../data/rasis';
@@ -260,7 +259,7 @@ async function loadGochara() {
     try {
       const r = await fetch('gochara.json', { cache: 'no-cache' });
       GO_DATA = await r.json();
-    } catch (e) {
+    } catch (_e) {
       document.getElementById('go-chart').innerHTML =
         '<p class="preview-error">Sky data unavailable — try again later.</p>';
       return;
@@ -345,7 +344,7 @@ function buildStableViewSelect(preferredValue?: string): GocharaSelectionResolut
   const sel = selEl('go-view');
   const snapshot = gocharaProfileStore!.getSnapshot();
   const hadOptions = sel.options.length > 0;
-  let selectionStorageUnavailable = false;
+  let selectionStorageUnavailable: boolean;
   let resolution: GocharaSelectionResolution;
 
   if (preferredValue === undefined && !hadOptions) {
@@ -529,6 +528,39 @@ function goCurrentView() {
 const GO_LAYOUT = { 11:[1,1], 0:[1,2], 1:[1,3], 2:[1,4], 3:[2,4], 4:[3,4],
                     5:[4,4], 6:[4,3], 7:[4,2], 8:[4,1], 9:[3,1], 10:[2,1] };
 
+function goElement(tag: string, className = '', text: unknown = null): HTMLElement {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== null) node.textContent = String(text);
+  return node;
+}
+
+function goPhalaluShareButton(): HTMLButtonElement {
+  const button = goElement(
+    'button',
+    'wa-share-mini go-phalalu-share',
+  ) as HTMLButtonElement;
+  button.type = 'button';
+  button.title = 'Share this reading on WhatsApp';
+  button.setAttribute('aria-label', 'Share on WhatsApp');
+  button.addEventListener('click', shareGocharaOnWhatsApp);
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', '14');
+  svg.setAttribute('height', '14');
+  svg.setAttribute('fill', 'currentColor');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute(
+    'd',
+    'M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z',
+  );
+  svg.append(path);
+  button.append(svg);
+  return button;
+}
+
 function renderGochara() {
   // A denied browser-storage write must never prevent the chart from rendering.
   persistGocharaSelection(selEl('go-view').value);
@@ -567,8 +599,6 @@ function renderGochara() {
 
   // Pre-compute occupants for the Moon-sign reference.
   const occRashi = (jr !== null) ? occupantsFor(jr) : null;
-  const houseOf = gi => jr === null ? null : houseFrom(gi, jr);
-
   // Chart colour is anchored to the documented Janma-Chandra frame.
   const verdictOf = gi => {
     if (jr === null) return null;
@@ -593,10 +623,23 @@ function renderGochara() {
   GO_DATA.grahas.forEach((g, gi) => { (byRasi[row[gi]] = byRasi[row[gi]] || []).push(gi); });
   const ord = n => `${n}${['st','nd','rd'][n-1] || 'th'}`;
   const verdictLabel = v => v === 'good' ? 'favourable' : v === 'blocked' ? 'vedha' : 'adverse';
-  let boxes = '';
+  const chartNodes = [];
   for (let r = 0; r < 12; r++) {
     const [gr, gc] = GO_LAYOUT[r];
-    const grahas = (byRasi[r] || []).map(gi => {
+    const isJanma = (jr === r);
+    const box = goElement('div', `go-box${isJanma ? ' janma' : ''}`);
+    box.style.gridRow = String(gr);
+    box.style.gridColumn = String(gc);
+    box.append(goElement(
+      'span',
+      'rname',
+      `${GO_DATA.rasis[r]}${isJanma ? ' · janma' : ''}`,
+    ));
+    if (jr !== null) {
+      box.append(goElement('span', 'house', ((r - jr + 12) % 12) + 1));
+    }
+    box.append(document.createElement('br'));
+    for (const gi of (byRasi[r] || [])) {
       const v = verdictOf(gi);
       const t = goTill(idx, gi);
       let perRef = '';
@@ -606,64 +649,121 @@ function renderGochara() {
       }
       const tip = `${GO_DATA.grahas[gi]} in ${GO_DATA.rasis[r]}${perRef}` +
         (t ? ` · till ${t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '');
-      return `<span class="go-g ${v || ''}" title="${htmlEsc(tip)}">${GO_DATA.grahas[gi]}${retro[gi] ? '<span class="go-retro">℞</span>' : ''}</span>`;
-    }).join('');
-    const house = jr !== null ? `<span class="house">${((r - jr + 12) % 12) + 1}</span>` : '';
-    const isJanma = (jr === r);
-    const classes = ['go-box'];
-    if (isJanma) classes.push('janma');
-    const label = isJanma ? ' · janma' : '';
-    boxes += `<div class="${classes.join(' ')}" style="grid-row:${gr};grid-column:${gc};">
-      <span class="rname">${GO_DATA.rasis[r]}${label}</span>${house}<br>${grahas}</div>`;
+      const graha = goElement('span', `go-g${v ? ` ${v}` : ''}`, GO_DATA.grahas[gi]);
+      graha.title = tip;
+      if (retro[gi]) graha.append(goElement('span', 'go-retro', '℞'));
+      box.append(graha);
+    }
+    chartNodes.push(box);
   }
-  document.getElementById('go-note').innerHTML = '';
-  const center = `<div class="go-center"><div class="d1">🪐 Gochara</div>
-    <div class="d2">${fmtD(dateShown)}</div>
-    <div class="d2">${jr !== null ? 'from ' + htmlEsc(view.label) : 'transits — choose a person or rashi above to personalise'}</div></div>`;
-  document.getElementById('go-chart').innerHTML = boxes + center;
+  document.getElementById('go-note').replaceChildren();
+  const center = goElement('div', 'go-center');
+  center.append(
+    goElement('div', 'd1', '🪐 Gochara'),
+    goElement('div', 'd2', fmtD(dateShown)),
+    goElement(
+      'div',
+      'd2',
+      jr !== null
+        ? `from ${view.label}`
+        : 'transits — choose a person or rashi above to personalise',
+    ),
+  );
+  document.getElementById('go-chart').replaceChildren(...chartNodes, center);
 
   // upcoming moves — fast planets only (Moon, Mercury, Sun change frequently enough to matter)
   const GO_FAST = new Set(['Chandra', 'Budha', 'Surya']);
   const moves = GO_DATA.grahas.map((g, gi) => ({ g, t: goTill(idx, gi) }))
     .filter(m => m.t && GO_FAST.has(m.g)).sort((a, b) => a.t.date - b.t.date);
-  document.getElementById('go-moves').innerHTML = moves.length
-    ? `<div class="go-moves"><b>Coming up:</b> ` + moves.map(m =>
-        `<span class="go-move">${m.g} → ${m.t.next} <b>${m.t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</b></span>`)
-        .join('<span class="go-move-sep"> &nbsp;·&nbsp; </span>') + `</div>` : '';
+  const movesRoot = document.getElementById('go-moves');
+  if (!moves.length) {
+    movesRoot.replaceChildren();
+  } else {
+    const movesBox = goElement('div', 'go-moves');
+    movesBox.append(goElement('b', '', 'Coming up:'), ' ');
+    moves.forEach((move, index) => {
+      if (index) movesBox.append(goElement('span', 'go-move-sep', ' \u00a0·\u00a0 '));
+      const item = goElement('span', 'go-move', `${move.g} → ${move.t.next} `);
+      item.append(goElement(
+        'b',
+        '',
+        move.t.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      ));
+      movesBox.append(item);
+    });
+    movesRoot.replaceChildren(movesBox);
+  }
 
   // rasi phalalu
   const phBox = document.getElementById('go-phalalu');
-  if (jr === null) { phBox.innerHTML = ''; }
+  if (jr === null) { phBox.replaceChildren(); }
   else {
     const ph = buildPhalalu(jr, row);
-    const phShare = `<button class="wa-share-mini go-phalalu-share" title="Share this reading on WhatsApp" aria-label="Share on WhatsApp" onclick="shareGocharaOnWhatsApp()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
     const llmRasiKey = RASI_NAMES[jr];
     const llmEntry = LLM_PHALALU?.rashis?.[llmRasiKey];
     const llmForToday = !!llmEntry;
-    const interpretationBoundary = llmForToday
-      ? `<p style="font-size:0.72rem;color:#746B5E;margin-top:0.65rem;">AI-written interpretation: cited transit positions and verdicts are engine-checked; prose and guidance are interpretive, not independently scripturally verified.</p>`
-      : '';
-    const adviceBlock = llmForToday && llmEntry.advice
-      ? `<div style="margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;">` +
-        `<span class="go-guidance-label" style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;">Today's guidance</span>` +
-        `<span style="font-size:0.84rem;color:#44403c;line-height:1.5;">${htmlEsc(llmEntry.advice)}</span></div>`
-      : '';
-    const computedDetails =
-      `<details class="go-phalalu-details"><summary>Why this guidance? View ${ph.detailLines.length} computed transit checks</summary>` +
-      `<div class="go-phalalu-detail-lines">${ph.detailLines.map(line => `<p>${line}</p>`).join('')}</div></details>`;
-    const computationBoundary =
-      `<p class="go-phalalu-boundary">The detailed checks are deterministic outputs from the documented Janma-Rashi transit rules.</p>`;
-    const interpretationDetails = llmForToday
-      ? `<details class="go-interpretation-details"><summary>Read today's interpretive guidance</summary>` +
-        `<div class="go-interpretation-content"><p>${htmlEsc(llmEntry.text)}</p>${adviceBlock}${interpretationBoundary}</div></details>`
-      : '';
-    phBox.innerHTML = `<div class="go-phalalu"><h4 class="go-phalalu-heading"><span class="go-phalalu-title">Rasi Phalalu — ${htmlEsc(view.label)}</span>
-      <span class="go-quality ${ph.quality}">${ph.quality} day</span>${phShare}</h4>` +
-      `<p class="go-phalalu-opener">${ph.opener}</p>` +
-      (ph.condition ? `<p class="go-phalalu-condition">${ph.condition}</p>` : '') +
-      `<p class="go-phalalu-summary">${ph.summary}</p>` +
-      `${computedDetails}${interpretationDetails}${computationBoundary}` +
-      `</div>`;
+    const reading = goElement('div', 'go-phalalu');
+    const heading = goElement('h4', 'go-phalalu-heading');
+    heading.append(
+      goElement('span', 'go-phalalu-title', `Rasi Phalalu — ${view.label}`),
+      goElement('span', `go-quality ${ph.quality}`, `${ph.quality} day`),
+      goPhalaluShareButton(),
+    );
+    reading.append(
+      heading,
+      goElement('p', 'go-phalalu-opener', ph.opener),
+    );
+    if (ph.condition) {
+      reading.append(goElement('p', 'go-phalalu-condition', ph.condition));
+    }
+    reading.append(goElement('p', 'go-phalalu-summary', ph.summary));
+
+    const computedDetails = goElement('details', 'go-phalalu-details');
+    computedDetails.append(goElement(
+      'summary',
+      '',
+      `Why this guidance? View ${ph.detailLines.length} computed transit checks`,
+    ));
+    const detailLines = goElement('div', 'go-phalalu-detail-lines');
+    ph.detailLines.forEach(line => detailLines.append(goElement('p', '', line)));
+    computedDetails.append(detailLines);
+    reading.append(computedDetails);
+
+    if (llmForToday) {
+      const interpretationDetails = goElement('details', 'go-interpretation-details');
+      interpretationDetails.append(goElement(
+        'summary',
+        '',
+        "Read today's interpretive guidance",
+      ));
+      const interpretation = goElement('div', 'go-interpretation-content');
+      interpretation.append(goElement('p', '', llmEntry.text));
+      if (llmEntry.advice) {
+        const advice = goElement('div');
+        advice.style.cssText = 'margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;';
+        const label = goElement('span', 'go-guidance-label', "Today's guidance");
+        label.style.cssText = 'font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;';
+        const guidance = goElement('span', '', llmEntry.advice);
+        guidance.style.cssText = 'font-size:0.84rem;color:#44403c;line-height:1.5;';
+        advice.append(label, guidance);
+        interpretation.append(advice);
+      }
+      const interpretationBoundary = goElement(
+        'p',
+        '',
+        'AI-written interpretation: cited transit positions and verdicts are engine-checked; prose and guidance are interpretive, not independently scripturally verified.',
+      );
+      interpretationBoundary.style.cssText = 'font-size:0.72rem;color:#746B5E;margin-top:0.65rem;';
+      interpretation.append(interpretationBoundary);
+      interpretationDetails.append(interpretation);
+      reading.append(interpretationDetails);
+    }
+    reading.append(goElement(
+      'p',
+      'go-phalalu-boundary',
+      'The detailed checks are deterministic outputs from the documented Janma-Rashi transit rules.',
+    ));
+    phBox.replaceChildren(reading);
   }
 
   // legend

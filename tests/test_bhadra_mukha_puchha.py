@@ -1,6 +1,7 @@
 from datetime import date
-from telugu_panchangam.engines.drik import DrikGanitaEngine
+
 from telugu_panchangam.cities import CITIES
+from telugu_panchangam.engines.drik import DrikGanitaEngine
 
 
 def _hyderabad():
@@ -29,6 +30,7 @@ def test_mukha_and_puchha_present_when_vishti_in_day():
 def test_tithi_specific_yama_quarters_and_widths():
     """Verse 44 assigns quarters; Mukha=5/30 and Puchha=3/30 of Vishti."""
     from datetime import datetime, timedelta, timezone
+
     from telugu_panchangam.ghati import make_clock
     from telugu_panchangam.karana_windows import compute_bhadra_windows
     from telugu_panchangam.models.panchangam_day import Span
@@ -58,7 +60,8 @@ def test_tithi_specific_yama_quarters_and_widths():
 def test_litigation_alias_does_not_turn_approximate_puchha_into_legal_bonus():
     """The compatibility alias must use Court rules without a Puchha score."""
     from datetime import timedelta
-    from telugu_panchangam.personal.muhurta import day_slots, GOOD_CHOGHADIYA
+
+    from telugu_panchangam.personal.muhurta import GOOD_CHOGHADIYA, day_slots
 
     eng = DrikGanitaEngine()
     city = _hyderabad()
@@ -93,6 +96,7 @@ def test_litigation_alias_does_not_turn_approximate_puchha_into_legal_bonus():
 def test_no_slot_overlaps_bhadra_mukha():
     """No auspicious slot may overlap day.bhadra_mukha (hard cut-out window)."""
     from datetime import timedelta
+
     from telugu_panchangam.personal.muhurta import day_slots
 
     eng = DrikGanitaEngine()
@@ -123,8 +127,11 @@ def test_no_slot_overlaps_bhadra_mukha():
 def test_bhadra_windows_in_all_mcp_tool_responses():
     """bhadra_mukha and bhadra_puchha must be serialized by all per-day MCP tools."""
     import json
+
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     # Pick a Vishti day for meaningful values.
     out1 = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))

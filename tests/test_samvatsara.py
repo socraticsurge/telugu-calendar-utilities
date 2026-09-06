@@ -3,11 +3,11 @@ from datetime import date
 import pytest
 
 from telugu_panchangam.cities import CITIES
-from telugu_panchangam.panchangam_names import SAMVATSARA_NAMES
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
 from telugu_panchangam.engines.vakya import VakyaEngine
 from telugu_panchangam.generate import default_feed_window
+from telugu_panchangam.panchangam_names import SAMVATSARA_NAMES
 
 HYD = next(c for c in CITIES if c.name == 'Hyderabad')
 

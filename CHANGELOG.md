@@ -7,6 +7,14 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+### Fixed
+
+- Pin PySwissEph to the reviewed and noticed `2.10.3.2` distribution, and gate
+  PyPI publication on wheel/sdist metadata, complete package source, the AGPL
+  license, third-party notices, and the absence of bundled native libraries.
+- Prepare MCP/PyPI patch metadata `1.18.1`; no release or deployment is made by
+  this change.
+
 ## [1.18.0] — 2026-09-05
 
 ### Added

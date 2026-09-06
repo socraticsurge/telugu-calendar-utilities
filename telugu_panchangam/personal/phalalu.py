@@ -4,7 +4,11 @@
 # Every sentence is traceable to a calculation; nothing is invented.
 from telugu_panchangam.gochara.rules import gochara_for, named_conditions
 from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict
-from telugu_panchangam.personal.tarabalam import tara_number, tara_name, is_auspicious_tara
+from telugu_panchangam.personal.tarabalam import (
+    is_auspicious_tara,
+    tara_name,
+    tara_number,
+)
 
 HOUSE_MEANINGS: dict[int, str] = {
     1: 'self and health', 2: 'wealth and family', 3: 'courage and effort',

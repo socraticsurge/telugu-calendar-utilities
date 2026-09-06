@@ -1,4 +1,5 @@
 import json
+
 import pytest
 
 
@@ -270,6 +271,7 @@ def test_get_daily_horas_first_hora_is_weekday_lord_each_weekday():
     Sweeps a full week (2027-08-29 Sunday → 2027-09-04 Saturday).
     """
     from datetime import date, timedelta
+
     from telugu_panchangam.mcp.tools import tool_get_daily_horas
     start = date(2027, 8, 29)  # Sunday
     for offset in range(7):

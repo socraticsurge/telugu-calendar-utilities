@@ -4,9 +4,10 @@ from pathlib import Path
 
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.homa import (
-    agnivasa_remainder, homa_election, homahuti_group,
+    agnivasa_remainder,
+    homa_election,
+    homahuti_group,
 )
-
 
 ROOT = Path(__file__).parents[1]
 CLAIM_ID = 'muhurta.homahuti'

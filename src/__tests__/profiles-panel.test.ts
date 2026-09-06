@@ -798,6 +798,26 @@ describe('readiness and hostile data', () => {
 });
 
 describe('safe destructive actions', () => {
+  test('gives each confirmation dialog its own accessible labels', () => {
+    store.create({ name: 'One' });
+    controller.render();
+    const trigger = query<HTMLButtonElement>('button[aria-label="Delete One"]');
+
+    trigger.click();
+    const first = query<HTMLDialogElement>('dialog');
+    const firstTitle = first.getAttribute('aria-labelledby');
+    const firstDescription = first.getAttribute('aria-describedby');
+    expect(first.querySelector(`#${firstTitle}`)?.textContent).toContain('Delete One?');
+    expect(first.querySelector(`#${firstDescription}`)?.textContent).toContain('cannot be undone');
+    buttonNamed('Cancel').click();
+
+    trigger.click();
+    const second = query<HTMLDialogElement>('dialog');
+    expect(second.getAttribute('aria-labelledby')).not.toBe(firstTitle);
+    expect(second.getAttribute('aria-describedby')).not.toBe(firstDescription);
+    buttonNamed('Cancel').click();
+  });
+
   test('cancels deletion through the native dialog and restores trigger focus', () => {
     store.create({ name: 'Anu' });
     controller.render();

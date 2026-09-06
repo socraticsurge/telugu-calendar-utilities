@@ -318,6 +318,30 @@ def _without_runtime(report: dict[str, Any]) -> dict[str, Any]:
     return stable
 
 
+def repository_fixture_path(value: str) -> Path:
+    """Resolve an existing fixture without allowing a repository escape."""
+
+    supplied = Path(value)
+    try:
+        candidate = (
+            supplied if supplied.is_absolute() else ROOT / supplied
+        ).resolve(strict=True)
+    except OSError as error:
+        raise argparse.ArgumentTypeError(
+            f'Fixture does not exist: {value}'
+        ) from error
+
+    try:
+        candidate.relative_to(ROOT)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(
+            'Fixture must resolve to a file inside the repository.'
+        ) from error
+    if not candidate.is_file():
+        raise argparse.ArgumentTypeError(f'Fixture is not a file: {value}')
+    return candidate
+
+
 def verify_fixture(actual: dict[str, Any], fixture_path: Path) -> None:
     expected = json.loads(fixture_path.read_text(encoding='utf-8'))
     if _without_runtime(actual) != _without_runtime(expected):
@@ -330,7 +354,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         '--verify',
-        type=Path,
+        type=repository_fixture_path,
         help='Compare stable audit fields with the committed JSON report.',
     )
     args = parser.parse_args()

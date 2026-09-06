@@ -1,7 +1,8 @@
 from datetime import date
+
+from telugu_panchangam.cities import CITIES
 from telugu_panchangam.disha_shoola import disha_shoola
 from telugu_panchangam.engines.drik import DrikGanitaEngine
-from telugu_panchangam.cities import CITIES
 
 
 def _hyderabad():
@@ -31,8 +32,11 @@ def test_engine_populates_disha_shoola():
 
 def test_disha_shoola_in_all_mcp_tool_responses():
     import json
+
     from telugu_panchangam.mcp.tools import (
-        tool_get_panchangam, tool_get_muhurta, tool_get_panchangam_range,
+        tool_get_muhurta,
+        tool_get_panchangam,
+        tool_get_panchangam_range,
     )
     out1 = json.loads(tool_get_panchangam('2026-06-11', city='Hyderabad'))
     assert 'disha_shoola_direction' in out1

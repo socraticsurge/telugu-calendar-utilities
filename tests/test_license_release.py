@@ -15,9 +15,10 @@ def test_package_and_mcp_metadata_publish_one_agpl_release() -> None:
     version_match = re.search(r'^version = "([^"]+)"$', pyproject, re.MULTILINE)
 
     assert version_match is not None
-    assert version_match.group(1) == "1.18.0"
+    assert version_match.group(1) == "1.18.1"
     assert 'license = "AGPL-3.0-or-later"' in pyproject
     assert 'license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]' in pyproject
+    assert '"pyswisseph==2.10.3.2"' in pyproject
     assert server["version"] == version_match.group(1)
     assert server["packages"][0]["version"] == version_match.group(1)
     assert "blob/master/LICENSE" in pyproject
@@ -40,3 +41,12 @@ def test_network_ui_offers_source_and_license() -> None:
 
     assert "Source &amp; AGPL license" in landing
     assert "https://github.com/socraticsurge/telugu-calendar-utilities" in landing
+
+
+def test_publish_verifies_artifacts_before_upload() -> None:
+    workflow = (ROOT / ".github/workflows/publish.yml").read_text(encoding="utf-8")
+
+    build = workflow.index("python -m build --no-isolation")
+    verify = workflow.index("python tools/verify_release_artifacts.py dist")
+    publish = workflow.index("pypa/gh-action-pypi-publish@")
+    assert build < verify < publish

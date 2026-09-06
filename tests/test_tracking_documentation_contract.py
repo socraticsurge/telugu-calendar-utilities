@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT_URL = 'https://github.com/users/socraticsurge/projects/2'
 ISSUES_URL = 'https://github.com/socraticsurge/telugu-calendar-utilities/issues'

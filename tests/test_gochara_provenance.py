@@ -5,7 +5,6 @@ from pathlib import Path
 from telugu_panchangam.gochara.rules import GOCHARA_PROVENANCE
 from telugu_panchangam.personal.llm_phalalu import LLM_PHALALU_PROVENANCE
 
-
 ROOT = Path(__file__).parents[1]
 
 

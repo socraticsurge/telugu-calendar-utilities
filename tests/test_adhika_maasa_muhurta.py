@@ -1,8 +1,10 @@
 from datetime import date, timedelta
+
 import pytest
+
+from telugu_panchangam.cities import CITIES
 from telugu_panchangam.engines.drik import DrikEngine
 from telugu_panchangam.personal.muhurta import day_slots
-from telugu_panchangam.cities import CITIES
 
 
 def _hyderabad():

@@ -1,40 +1,57 @@
-import json
 import calendar
+import json
 import logging
 from datetime import date, datetime, timedelta
 from typing import Optional
 
 import pytz
 
-_log = logging.getLogger(__name__)
-_MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
-
 from telugu_panchangam.cities import CITIES
-from telugu_panchangam.maudhya_calendar import combustion_periods, PLANET_NAMES
-from telugu_panchangam.graha_yuddha import graha_yuddha_periods, YUDDHA_PLANETS
-from telugu_panchangam.ingress import rashi_ingresses, INGRESS_PLANETS
+from telugu_panchangam.eclipses import (
+    get_eclipse_from_precomputed,
+    list_eclipses_in_range,
+)
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 from telugu_panchangam.engines.surya_siddhanta import SuryaSiddhantaEngine
+from telugu_panchangam.engines.utils import get_sunrise, jd_to_utc, local_midnight_jd
 from telugu_panchangam.engines.vakya import VakyaEngine
-from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
-from telugu_panchangam.personal.tarabalam import taras_for_day, _nak_index
-from telugu_panchangam.personal.chandrabalam import chandra_position, chandra_verdict, _rasi_index
 from telugu_panchangam.gochara.positions import graha_positions
 from telugu_panchangam.gochara.rules import (
-    GOCHARA_PROVENANCE, gochara_for, named_conditions,
+    GOCHARA_PROVENANCE,
+    gochara_for,
+    named_conditions,
+)
+from telugu_panchangam.graha_yuddha import YUDDHA_PLANETS, graha_yuddha_periods
+from telugu_panchangam.ingress import INGRESS_PLANETS, rashi_ingresses
+from telugu_panchangam.maudhya_calendar import PLANET_NAMES, combustion_periods
+from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
+from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
+from telugu_panchangam.panchanga_shuddhi import assess_shuddhi
+from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
+from telugu_panchangam.panchangam_provenance import panchangam_provenance
+from telugu_panchangam.personal.activity_rules import (
+    ACTIVITY_ALIASES,
+    get_activity_rules,
+)
+from telugu_panchangam.personal.chandrabalam import (
+    _rasi_index,
+    chandra_position,
+    chandra_verdict,
+)
+from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
+from telugu_panchangam.personal.muhurta import (
+    ACTIVITIES,
+    TIER_NAMES,
+    assign_tiers,
+    day_slots,
+    diagnose_day,
+    night_slots,
 )
 from telugu_panchangam.personal.phalalu import rasi_phalalu
-from telugu_panchangam.personal.muhurta import day_slots, night_slots, diagnose_day, assign_tiers, ACTIVITIES, TIER_NAMES
-from telugu_panchangam.personal.activity_rules import (
-    ACTIVITY_ALIASES, get_activity_rules,
-)
-from telugu_panchangam.panchangam_provenance import panchangam_provenance
-from telugu_panchangam.engines.utils import get_sunrise, local_midnight_jd, jd_to_utc
-from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
-from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
-from telugu_panchangam.eclipses import list_eclipses_in_range, get_eclipse_from_precomputed
-from telugu_panchangam.panchanga_shuddhi import assess_shuddhi
-from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
+from telugu_panchangam.personal.tarabalam import _nak_index, taras_for_day
+
+_log = logging.getLogger(__name__)
+_MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
 
 _ENGINES = {
     'drik': DrikGanitaEngine(),
@@ -207,16 +224,23 @@ def _special_events(day: PanchangamDay) -> list[str]:
     events = list(day.festivals)
     if day.nakshatra.name in GANDA_MOOLA_NAKSHATRAS:
         events.append(f'Ganda Moola ({day.nakshatra.name})')
-    if day.is_ekadashi:         events.append('Ekadashi — fasting day')
-    if day.is_amavasya:         events.append('Amavasya')
-    if day.is_pournami:         events.append('Pournami')
-    if day.is_shani_pradosham:  events.append('Shani Pradosham')
-    elif day.is_soma_pradosham: events.append('Soma Pradosham')
-    elif day.is_pradosham:      events.append('Pradosham')
+    if day.is_ekadashi:
+        events.append('Ekadashi — fasting day')
+    if day.is_amavasya:
+        events.append('Amavasya')
+    if day.is_pournami:
+        events.append('Pournami')
+    if day.is_shani_pradosham:
+        events.append('Shani Pradosham')
+    elif day.is_soma_pradosham:
+        events.append('Soma Pradosham')
+    elif day.is_pradosham:
+        events.append('Pradosham')
     if day.sankramanam and not (day.sankramanam == 'Makara'
                                 and 'Makara Sankranti' in day.festivals):
         events.append(f'{day.sankramanam} Sankramanam')
-    if day.eclipse:             events.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
+    if day.eclipse:
+        events.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
     return events
 
 
@@ -933,11 +957,11 @@ def _validate_muhurta_inputs(
         if not janma_nakshatras or len(janma_lagnas) != len(janma_nakshatras):
             raise ValueError('janma_lagnas must align with janma_nakshatras '
                              '(use null for people whose lagna is unknown).')
-        for l in janma_lagnas:
-            if l is not None:
-                if not isinstance(l, str) or len(l) > _MAX_NAME:
+        for lagna in janma_lagnas:
+            if lagna is not None:
+                if not isinstance(lagna, str) or len(lagna) > _MAX_NAME:
                     raise ValueError('Invalid lagna rashi name.')
-                _rasi_index(l)
+                _rasi_index(lagna)
 
 
 def _gather_muhurta_slots(
