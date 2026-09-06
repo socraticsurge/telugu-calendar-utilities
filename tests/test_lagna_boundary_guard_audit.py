@@ -11,12 +11,14 @@ from scripts.build_lagna_json import build_for_city
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 from tools.audit_lagna_boundary_guard import (
+    COMMITTED_FIXTURE,
     FIRST_NEW_MINUTE_LIMIT,
     GUARD_MINUTES,
+    committed_fixture_argument,
     first_new_minute_offset,
     generate_report,
     published_transition_instant,
-    repository_fixture_path,
+    verify_fixture,
 )
 
 FIXTURE = Path(__file__).parent / 'fixtures' / 'lagna-boundary-guard-audit.json'
@@ -28,13 +30,25 @@ METHOD_PAGE = (
 )
 
 
-def test_fixture_path_is_contained_within_the_repository(tmp_path):
-    assert repository_fixture_path(str(FIXTURE)) == FIXTURE.resolve()
+def test_verification_argument_allows_only_the_committed_fixture(tmp_path):
+    assert COMMITTED_FIXTURE == FIXTURE.resolve()
+    assert committed_fixture_argument(str(FIXTURE)) is True
+    assert committed_fixture_argument(
+        'tests/fixtures/../fixtures/lagna-boundary-guard-audit.json'
+    ) is True
+
+    with pytest.raises(argparse.ArgumentTypeError, match='committed'):
+        committed_fixture_argument('pyproject.toml')
 
     outside = tmp_path / 'outside.json'
     outside.write_text('{}', encoding='utf-8')
-    with pytest.raises(argparse.ArgumentTypeError, match='inside the repository'):
-        repository_fixture_path(str(outside))
+    with pytest.raises(argparse.ArgumentTypeError, match='committed'):
+        committed_fixture_argument(str(outside))
+
+    outside_link = tmp_path / 'outside-link.json'
+    outside_link.symlink_to(outside)
+    with pytest.raises(argparse.ArgumentTypeError, match='committed'):
+        committed_fixture_argument(str(outside_link))
 
 
 def test_exhaustive_audit_reproduces_the_committed_report():
@@ -42,6 +56,7 @@ def test_exhaustive_audit_reproduces_the_committed_report():
 
     expected = json.loads(FIXTURE.read_text(encoding='utf-8'))
     actual = generate_report()
+    verify_fixture(actual)
     expected.pop('runtime_seconds')
     actual.pop('runtime_seconds')
     assert actual == expected

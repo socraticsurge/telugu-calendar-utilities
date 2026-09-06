@@ -37,6 +37,9 @@ from zoneinfo import ZoneInfo
 import swisseph as swe
 
 ROOT = Path(__file__).resolve().parents[1]
+COMMITTED_FIXTURE = (
+    ROOT / 'tests' / 'fixtures' / 'lagna-boundary-guard-audit.json'
+)
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -318,8 +321,8 @@ def _without_runtime(report: dict[str, Any]) -> dict[str, Any]:
     return stable
 
 
-def repository_fixture_path(value: str) -> Path:
-    """Resolve an existing fixture without allowing a repository escape."""
+def committed_fixture_argument(value: str) -> bool:
+    """Accept only the one committed report used by verification mode."""
 
     supplied = Path(value)
     try:
@@ -331,19 +334,17 @@ def repository_fixture_path(value: str) -> Path:
             f'Fixture does not exist: {value}'
         ) from error
 
-    try:
-        candidate.relative_to(ROOT)
-    except ValueError as error:
+    if candidate != COMMITTED_FIXTURE:
         raise argparse.ArgumentTypeError(
-            'Fixture must resolve to a file inside the repository.'
-        ) from error
+            'Verification requires the committed Lagna boundary audit fixture.'
+        )
     if not candidate.is_file():
         raise argparse.ArgumentTypeError(f'Fixture is not a file: {value}')
-    return candidate
+    return True
 
 
-def verify_fixture(actual: dict[str, Any], fixture_path: Path) -> None:
-    expected = json.loads(fixture_path.read_text(encoding='utf-8'))
+def verify_fixture(actual: dict[str, Any]) -> None:
+    expected = json.loads(COMMITTED_FIXTURE.read_text(encoding='utf-8'))
     if _without_runtime(actual) != _without_runtime(expected):
         print('Lagna boundary audit fixture is stale.', file=sys.stderr)
         print(json.dumps(actual, indent=2), file=sys.stderr)
@@ -354,13 +355,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         '--verify',
-        type=repository_fixture_path,
+        type=committed_fixture_argument,
         help='Compare stable audit fields with the committed JSON report.',
     )
     args = parser.parse_args()
     report = generate_report()
     if args.verify:
-        verify_fixture(report, args.verify)
+        verify_fixture(report)
         print(
             'Lagna boundary guard audit passed: '
             f'{report["scope"]["city_date_count"]} city-dates, '
