@@ -23,7 +23,7 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "^20.14.0",
-    "@vitest/coverage-v8": "4.1.9",
+    "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.10.0",
     "jsdom": "^24.0.0",
     "mermaid": "11.17.2",
