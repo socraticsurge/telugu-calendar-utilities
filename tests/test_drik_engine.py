@@ -115,7 +115,8 @@ def test_durmuhurtham_count_is_two():
 
 def test_samvatsara_is_string():
     result = ENGINE.calculate(REF_DATE, HYD)
-    assert isinstance(result.samvatsara, str) and result.samvatsara != ''
+    assert isinstance(result.samvatsara, str)
+    assert result.samvatsara != ''
 
 def test_maasam_is_valid():
     from telugu_panchangam.panchangam_names import MAASAM_NAMES

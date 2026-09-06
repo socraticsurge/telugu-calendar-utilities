@@ -67,8 +67,10 @@ def test_planet_filter():
 
 
 def test_invalid_planet_raises():
+    start = date(2026, 1, 1)
+    end = date(2026, 12, 31)
     with pytest.raises(ValueError, match='Unknown'):
-        combustion_periods(date(2026, 1, 1), date(2026, 12, 31), HYD, planets=['Pluto'])
+        combustion_periods(start, end, HYD, planets=['Pluto'])
 
 
 # ── DP-verified dates (Hyderabad 2026) ────────────────────────────────────────

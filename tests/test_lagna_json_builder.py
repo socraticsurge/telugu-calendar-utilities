@@ -19,7 +19,8 @@ def test_build_shape_and_indices_for_hyderabad():
     assert len(data['days']) == 3
     for d in data['days']:
         assert 0 <= d['lagna0'] < 12
-        assert len(d['sunrise']) == 5 and d['sunrise'][2] == ':'
+        assert len(d['sunrise']) == 5
+        assert d['sunrise'][2] == ':'
         assert isinstance(d['guruCombust'], bool)
         assert isinstance(d['shukraCombust'], bool)
         # Transitions are minutes from sunrise; should be strictly

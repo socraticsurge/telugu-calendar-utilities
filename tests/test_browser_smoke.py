@@ -993,7 +993,11 @@ def _assert_visible_targets_are_44px(locator, surface_name):
     for target in visible:
         box = target.bounding_box()
         assert box is not None
-        assert box['width'] >= 44 and box['height'] >= 44, (
+        assert box['width'] >= 44, (
+            f'{surface_name} target {target.get_attribute("aria-label") or target.inner_text()!r} '
+            f'is {box["width"]:.1f}x{box["height"]:.1f}px; expected at least 44x44px'
+        )
+        assert box['height'] >= 44, (
             f'{surface_name} target {target.get_attribute("aria-label") or target.inner_text()!r} '
             f'is {box["width"]:.1f}x{box["height"]:.1f}px; expected at least 44x44px'
         )
@@ -1177,7 +1181,8 @@ def test_daily_surface_is_responsive_and_navigation_remains_usable(
         if expected_mode == 'mobile':
             title_box = page.locator('#m-page-title-main').bounding_box()
             subtitle_box = page.locator('#m-page-title-sub').bounding_box()
-            assert title_box is not None and subtitle_box is not None
+            assert title_box is not None
+            assert subtitle_box is not None
             assert subtitle_box['y'] >= title_box['y'] + title_box['height']
 
         docs_link = page.locator('#sidebar a[href="/docs/"]')
@@ -1187,7 +1192,9 @@ def test_daily_surface_is_responsive_and_navigation_remains_usable(
             assert sidebar.get_attribute('aria-hidden') == 'true'
             assert sidebar.evaluate('node => node.inert') is True
             box = nav_button.bounding_box()
-            assert box and box['width'] >= 44 and box['height'] >= 44
+            assert box
+            assert box['width'] >= 44
+            assert box['height'] >= 44
             nav_button.click()
             assert 'm-nav-open' in page.locator('body').get_attribute('class').split()
             assert sidebar.get_attribute('aria-hidden') is None
@@ -3041,7 +3048,8 @@ def test_gochara_unavailable_state_spans_the_chart(docs_server, browser):
         error.wait_for(state='visible')
         chart_box = page.locator('#go-chart').bounding_box()
         error_box = error.bounding_box()
-        assert chart_box is not None and error_box is not None
+        assert chart_box is not None
+        assert error_box is not None
         assert error_box['width'] >= chart_box['width'] * 0.8
         assert page.evaluate(
             'document.documentElement.scrollWidth === '

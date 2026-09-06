@@ -29,7 +29,8 @@ def test_counts_and_tiling():
     ms = named_muhurtas(day, nxt)
     day_ms = [m for m in ms if m['period'] == 'day']
     night_ms = [m for m in ms if m['period'] == 'night']
-    assert len(day_ms) == 15 and len(night_ms) == 15
+    assert len(day_ms) == 15
+    assert len(night_ms) == 15
 
     def close(a, b):  # sub-second: 15*(span/15) != span exactly in float
         return abs((a - b).total_seconds()) < 1
@@ -94,7 +95,9 @@ def test_brahma_is_fourteenth_night():
     day, nxt = _day_and_next(2026, 7, 21)
     ms = named_muhurtas(day, nxt)
     b = next(m for m in ms if m['period'] == 'night' and m['index'] == 14)
-    assert b['is_brahma'] and b['name'] == 'Brahma' and b['nature'] == 'auspicious'
+    assert b['is_brahma']
+    assert b['name'] == 'Brahma'
+    assert b['nature'] == 'auspicious'
 
 
 def test_natures_match_reference_table():
