@@ -70,14 +70,14 @@ def test_build_rows_records_age_overlaps_scope_and_deterministic_order():
     ],
 )
 def test_build_rows_fails_closed_on_incomplete_or_unsafe_data(payload, message):
+    options = {
+        "project_key": "project",
+        "as_of": date(2026, 9, 6),
+        "ruff_counts": {},
+        "complexity_hotspots": {},
+    }
     with pytest.raises(inventory.InventoryError, match=message):
-        inventory.build_rows(
-            payload,
-            project_key="project",
-            as_of=date(2026, 9, 6),
-            ruff_counts={},
-            complexity_hotspots={},
-        )
+        inventory.build_rows(payload, **options)
 
 
 def test_parse_json_document_rejects_duplicate_keys_at_every_level():
@@ -85,6 +85,16 @@ def test_parse_json_document_rejects_duplicate_keys_at_every_level():
 
     with pytest.raises(inventory.InventoryError, match="Duplicate JSON key: issues"):
         inventory.parse_json_document(document, "test response")
+
+
+def test_repository_path_rejects_escape_attempts():
+    assert inventory.repository_path(
+        inventory.ROOT / "sonar-response.json", "source"
+    ) == (inventory.ROOT / "sonar-response.json")
+
+    unsafe = inventory.ROOT / ".." / "outside.json"
+    with pytest.raises(inventory.InventoryError, match="Unsafe source path"):
+        inventory.repository_path(unsafe, "source")
 
 
 def test_write_csv_uses_a_stable_schema_and_lf_line_endings(tmp_path):

@@ -57,6 +57,16 @@ def read_json(path: Path) -> dict[str, object]:
     return parse_json_document(path.read_text(encoding="utf-8"), str(path))
 
 
+def repository_path(value: Path, label: str) -> Path:
+    """Resolve a CLI path while preventing access outside the repository."""
+    try:
+        resolved = (ROOT / value).resolve()
+        resolved.relative_to(ROOT)
+    except (OSError, RuntimeError, ValueError) as error:
+        raise InventoryError(f"Unsafe {label} path: {value}") from error
+    return resolved
+
+
 def _relative_component(component: object, project_key: str) -> str:
     prefix = f"{project_key}:"
     if not isinstance(component, str) or not component.startswith(prefix):
@@ -222,7 +232,9 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    payload = read_json(args.source)
+    source = repository_path(args.source, "source")
+    output = repository_path(args.output, "output")
+    payload = read_json(source)
     ruff_counts = read_json(RUFF_BASELINE)["counts"]
     complexity_hotspots = read_json(COMPLEXITY_BASELINE)["hotspots"]
     if not isinstance(ruff_counts, dict) or not isinstance(complexity_hotspots, dict):
@@ -234,8 +246,8 @@ def main() -> int:
         ruff_counts=ruff_counts,
         complexity_hotspots=complexity_hotspots,
     )
-    write_csv(rows, args.output)
-    print(f"Exported {len(rows)} unique open code smells to {args.output}")
+    write_csv(rows, output)
+    print(f"Exported {len(rows)} unique open code smells to {output.relative_to(ROOT)}")
     return 0
 
 
