@@ -45,6 +45,7 @@ interface ProfilesController {
 }
 
 interface TarabalamPanelModule {
+  muComplexityContracts: Record<string, (...args: never[]) => unknown>;
   initTarabalamProfiles(
     store: GuestProfileStore,
     actions: {
@@ -92,6 +93,56 @@ interface TarabalamPanelModule {
       reviewGatedCount: number;
     },
   ): string;
+  muChartOutcomeLabel(outcome: { effect: string; status: string }): string;
+  muChartBoundaryMessage(screening: {
+    boundaryConventionUncertain: boolean;
+    needsReview: boolean;
+    stable: boolean;
+    qualificationFailed: boolean;
+  }): string;
+  muDaylightOutcomeLabel(status: string): string;
+  muPersonalOutcomeLabel(outcome: { effect: string; status: string }): string;
+  muPluralSuffix(count: number): string;
+  muDroppedOutcomeLabel(status: string): string;
+  muChartRemovalRow(rule: {
+    label: string;
+    count: number;
+    evidence?: string[];
+  }): string;
+  muChartProvenanceParts(
+    sourceReferences: Array<{ claim: string; locator: string }>,
+    decisionPolicies: string[],
+    conventions: Array<{
+      id: string;
+      label: string;
+      formula: string;
+      claims: string[];
+    }>,
+  ): {
+    eventSourceSuffix: string;
+    decisionPolicyHtml: string;
+    conventionHtml: string;
+    rankingPolicyClaimsHtml: string;
+    conventionClaimsHtml: string;
+  };
+  muDayContextHtml(dayContext: unknown): string;
+  muDroppedOutcomeHtml(outcomes: unknown): string;
+  muChartReviewDetail(chartEnrichment: unknown): string;
+  muChartStatusDispositionClass(disposition: string | null): string;
+  muChartValidationItems(screening: unknown, reasonGroups: unknown): unknown;
+  muChartDispositionHtml(screening: unknown): string;
+  muSafetyTitle(activity: string): string;
+  tbChandraVerdict(position: number): string;
+  tbChandraPresentation(tara: {
+    good: boolean;
+    chandra?: { verdict: string; pos: number };
+  }): { chandraTag: string; cls: string };
+  muNatureBonus(isAbhijit: boolean, nature: string): number;
+  muAvoidKaranaWindows(karana: string, avoidNames: Set<unknown>): number[][];
+  muRoleStatus(
+    roleProfile: { name: string } | null,
+    chartEnrichment: { state: string; screenedCount: number } | null,
+  ): string;
   muChartScreeningDisposition(enrichment: {
     state: string;
     candidateLimitReached: boolean;
@@ -106,6 +157,31 @@ interface TarabalamPanelModule {
     activity: string,
     chartEnrichment: { state: string; screenedCount: number } | null,
   ): string | null;
+  muScoreParticipantTarabalam(
+    people: Participant[], nakshatra: string,
+  ): { score: number; reasons: string[]; unfavourableNames: string[] };
+  muScoreParticipantChandrabalam(
+    people: Participant[], lunarSign: string, chandraMode: string,
+  ): {
+    score: number;
+    reasons: string[];
+    avoidNames: string[];
+    pujaNames: string[];
+    hasAshtama: boolean;
+    drop: boolean;
+  };
+  muScoreParticipantLagna(
+    people: Participant[], slotLagna: string,
+  ): { score: number; reasons: string[]; ashtamaNames: string[] };
+  muScoreActivityLagna(
+    slotLagna: string | null,
+    requiredLagnaClass: string | null,
+    allowedLagnas: Set<string>,
+    preferLagnas: Set<string>,
+    preferLagnaClass: string | null,
+    lagnaCityData: unknown,
+    activityLabel: string,
+  ): { score: number; reasons: string[] } | null;
 }
 
 class MemoryStorage implements ProfileStorage {
@@ -272,6 +348,188 @@ afterAll(() => {
 });
 
 describe('Muhurtam saved-profile participants', () => {
+  test('keeps extracted search orchestration boundaries callable', () => {
+    const call = (name: string, ...args: unknown[]): unknown => (
+      panel.muComplexityContracts[name] as (...values: unknown[]) => unknown
+    )(...args);
+    const emptyRules = {};
+    const day = {
+      eclipse: null,
+      special: [],
+      maasam: 'Sravana',
+      solarSign: 'Simha',
+      vaaram: 'Somavaram',
+      paksham: 'Shukla',
+      inauspicious: [],
+      karana: null,
+      yogas: [],
+      yoga: null,
+      lunarSign: 'Mesha',
+    };
+
+    expect(call('muConfiguredDaylightPolicy', 'wedding', day, emptyRules)).toBeNull();
+    expect(call(
+      'muPrimaryDayDrop', { ...day, eclipse: { kind: 'Solar eclipse' } },
+      emptyRules, 'Wedding', null, null, '2026-09-07',
+    )).toEqual({
+      eclipse: true,
+      entry: { date: '2026-09-07', reason: 'Solar eclipse · auspicious activities deferred' },
+    });
+    expect(call('muCalendarDayDrop', day, emptyRules, 'Wedding', '2026-09-07')).toBeNull();
+    expect(call('muSolarDayDrop', day, emptyRules, 'Wedding', '2026-09-07')).toBeNull();
+    expect(call(
+      'muDayDrop', { ...day, eclipse: { kind: 'Lunar eclipse' } },
+      emptyRules, 'Wedding', null, null, '2026-09-07',
+    )).toMatchObject({ eclipse: true });
+    expect(call('muBadWindows', day, new Set())).toEqual([]);
+    expect(call('muYogaDayDropReason', day, new Set(), 'Wedding')).toBeNull();
+    expect(call('muChandraModeDayDropReason', day, [], 'strict')).toBeNull();
+    expect(call('muNoSlotDayReason', day, new Set(), 'Wedding', [], 'strict')).toBeNull();
+    const droppedDays: unknown[] = [];
+    call('muRecordNoSlotDay', {
+      slotsPerDay: new Set(['2026-09-07']), droppedDays,
+      isoDate: '2026-09-07', data: day, skipYogas: new Set(),
+      activityLabel: 'Wedding', people: [], chandraMode: 'strict',
+    });
+    expect(droppedDays).toEqual([]);
+
+    const facts = { tithi: 'Dwitiya', nakshatra: 'Rohini', specialYogas: [], yoga: 'Siddha' };
+    expect(call(
+      'muScoreSlotTithi', facts, null, 'Wedding', [], new Set(),
+    )).toMatchObject({ score: 0 });
+    expect(call('muScoreSpecialYogas', facts, new Set())).toEqual({ score: 0, reasons: [] });
+    expect(call(
+      'muScoreNityaYoga', facts, day, new Set(), new Set(), 600,
+    )).toMatchObject({ score: 1 });
+    expect(call('muScoreSlotPreferences', {
+      facts, varaReason: null, preferNakshatras: new Set(), amrita: [],
+      s0: 600, e0: 648, preferChog: null,
+      choghadiya: { name: 'Rog' }, avoidKaranaNames: new Set(),
+      activityLabel: 'Wedding',
+    })).toEqual({ score: 0, slotReasons: [], activityReasons: [] });
+    expect(call('muSlotDoctrinalNotes', {
+      cautionLagnaSolar: false, lagnaCityData: null, slotLagna: null,
+      solarSign: null, specialYogas: [], taraUnfavNames: [],
+      chandraAvoidNames: [], tithiFamily: null,
+    })).toEqual({ notes: [], siddhiYogas: [] });
+    expect(call('muPersonalDosha', {
+      chandraAvoidNames: [], hasAshtama: false, ashtamaLagnaNames: [],
+      chandraPujaNames: [], taraUnfavNames: [], siddhiYogas: [],
+    })).toBeNull();
+    expect(call('muSlotDayDosha', {
+      tithiFamily: null, facts, nityaYoga: 'Siddha', system: 'drik',
+      effectiveChartRemainder: [], rules: {}, manualGuidance: { chart: [] },
+      personal: { needsReview: false },
+    })).toBeNull();
+    expect(call('muDominantChoghadiya', [], 600, 648)).toEqual({
+      block: null, straddle: null,
+    });
+    const restrictions = {
+      allowedNakshatras: new Set(), avoidNakshatras: new Set(),
+      avoidJanmaNakshatra: false, allowedTithiNumbers: new Set(),
+      allowedTithiNames: new Set(), avoidTithiNumbers: new Set(),
+      avoidVaraTithiNames: new Set(),
+    };
+    expect(call(
+      'muSlotElectionReasons', facts, { require_homa_election: false },
+      restrictions, day, [],
+    )).toEqual([]);
+    expect(call('muActivityNeedsLagna', 'wedding', emptyRules)).toBe(true);
+    const slots: unknown[] = [];
+    call('muRankCandidateSlots', slots);
+    expect(slots).toEqual([]);
+    expect(call('muUnavailableChartEnrichment', [])).toMatchObject({
+      state: 'unavailable', slots: [], screenedCount: 0,
+    });
+    expect(call('muResultScopeDetail', 'wedding', null, true)).toContain(
+      'partial/provisional',
+    );
+    expect(call('muChartStatusFor', 'wedding', null, false, '')).toBeNull();
+    expect(call(
+      'muChartCompletionShareLines', 'wedding', {
+        candidateLimitReached: false, screenedCount: 0,
+      }, [], 0, 0,
+    )).toEqual([
+      'This event assessor is still partial/provisional; the event-specific clauses are computed, but they are not complete chart certification because the shared baseline remains unresolved.',
+      'All disclosed event chart clauses were evaluated and resolved under the documented interpretation convention.',
+    ]);
+  });
+
+  test('preserves Tarabalam group scoring and participant evidence', () => {
+    const people: Participant[] = [
+      { id: 'a', name: 'Anu', nak: 'Rohini', pada: 2, rasi: null, lagna: null },
+      { id: 'b', name: 'Bala', nak: 'Mrigashira', pada: 1, rasi: null, lagna: null },
+    ];
+
+    expect(panel.muScoreParticipantTarabalam(people, 'Mrigashira')).toEqual({
+      score: 0,
+      reasons: [
+        'Tarabalam favourable for #1 (Anu) (+1)',
+        'Tarabalam avoid for #2 (Bala) Janma (-1)',
+      ],
+      unfavourableNames: ['#2 (Bala)'],
+    });
+  });
+
+  test('preserves Chandrabalam modes, remedial evidence and Ashtama flags', () => {
+    const people: Participant[] = [
+      { id: 'a', name: 'Anu', nak: 'Rohini', pada: 2, rasi: 'Dhanu', lagna: null },
+      { id: 'b', name: 'Bala', nak: 'Hasta', pada: 1, rasi: 'Vrischika', lagna: null },
+      { id: 'c', name: 'Charu', nak: 'Ashwini', pada: 3, rasi: 'Vrishabha', lagna: null },
+    ];
+
+    expect(panel.muScoreParticipantChandrabalam(people, 'Dhanu', 'strict')).toEqual({
+      score: 0,
+      reasons: [
+        'Chandrabalam favourable for #1 (Anu) (+1)',
+        'Chandrabalam remedial for #2 (Bala) Moon@2 (puja recommended)',
+        'Chandrabalam avoid for #3 (Charu) Ashtama Moon@8 (-1)',
+      ],
+      avoidNames: ['#3 (Charu)'],
+      pujaNames: ['#2 (Bala)'],
+      hasAshtama: true,
+      drop: true,
+    });
+    expect(panel.muScoreParticipantChandrabalam(
+      [people[1]], 'Dhanu', 'puja_ok',
+    ).drop).toBe(false);
+  });
+
+  test('preserves dual natal-reference Lagna scoring', () => {
+    const people: Participant[] = [
+      { id: 'a', name: 'Anu', nak: 'Rohini', pada: 2, rasi: 'Kanya', lagna: 'Simha' },
+      { id: 'b', name: 'Bala', nak: 'Hasta', pada: 1, rasi: 'Kumbha', lagna: null },
+    ];
+
+    expect(panel.muScoreParticipantLagna(people, 'Kanya')).toEqual({
+      score: 0,
+      reasons: [
+        'Kanya lagna favourable for #1 (Anu) own@1 from Kanya (+1)',
+        'Kanya lagna Ashtama for #2 (Bala) lagna@8 from Kumbha (-1)',
+        'Kanya lagna neutral for #1 (Anu) 2nd from Simha lagna (no effect)',
+      ],
+      ashtamaNames: ['#2 (Bala)'],
+    });
+  });
+
+  test('preserves required, admitted and preferred activity-Lagna gates', () => {
+    expect(panel.muScoreActivityLagna(
+      'Simha', 'Sthira', new Set(['Simha']), new Set(['Simha']),
+      'Sthira', {}, 'Wedding',
+    )).toEqual({
+      score: 2,
+      reasons: [
+        'Simha lagna satisfies required Sthira class',
+        'Simha lagna is admitted for Wedding',
+        'Simha lagna specifically favoured for Wedding (+1)',
+        'Simha lagna (Sthira) favoured for Wedding (+1)',
+      ],
+    });
+    expect(panel.muScoreActivityLagna(
+      'Mesha', 'Sthira', new Set(), new Set(), null, {}, 'Wedding',
+    )).toBeNull();
+  });
+
   test('claims partial event clauses only after actual chart screening', () => {
     const completionCopy =
       'The event-specific clauses were computed, but the overall election-chart assessment remains partial/provisional until the shared baseline is complete.';
@@ -360,6 +618,216 @@ describe('Muhurtam saved-profile participants', () => {
       state: 'unavailable',
       screenedCount: 0,
     })).toBe(false);
+  });
+
+  test('keeps renderer status wording stable across every chart state', () => {
+    const profile = { name: 'Private Ananya' };
+    expect(panel.muRoleStatus(null, null)).toBe(
+      'No participant selected · source-specific personal checks remain unknown',
+    );
+    expect(panel.muRoleStatus(profile, { state: 'screened', screenedCount: 1 })).toBe(
+      'Private Ananya · evaluated locally against the source-specific personal rules',
+    );
+    expect(panel.muRoleStatus(profile, { state: 'unavailable', screenedCount: 1 })).toBe(
+      'Private Ananya · evaluated locally against the source-specific personal rules',
+    );
+    expect(panel.muRoleStatus(profile, { state: 'unsupported-system', screenedCount: 0 })).toBe(
+      'Private Ananya selected · source-specific personal checks were not run for this system',
+    );
+    expect(panel.muRoleStatus(profile, { state: 'not-run', screenedCount: 0 })).toBe(
+      'Private Ananya selected · there was no shortlisted slot to evaluate',
+    );
+    expect(panel.muRoleStatus(profile, { state: 'disabled', screenedCount: 0 })).toBe(
+      'Private Ananya selected · source-specific personal checks are not active in this build',
+    );
+    expect(panel.muRoleStatus(profile, { state: 'unavailable', screenedCount: 0 })).toBe(
+      'Private Ananya selected · source-specific personal checks could not run without exact chart facts',
+    );
+  });
+
+  test('keeps computed chart outcome labels stable', () => {
+    const cases = [
+      ['reject', 'pass', 'Required check passed'],
+      ['reject', 'unknown', 'Required check could not be verified'],
+      ['reject', 'fail', 'Removed by mandatory chart rule'],
+      ['qualify', 'pass', 'Qualification met'],
+      ['qualify', 'unknown', 'Indeterminate at calculation boundary · review needed'],
+      ['qualify', 'fail', 'Condition not met · slot retained · raw score unchanged · maximum rating Good'],
+      ['prefer', 'pass', 'Preference met · tie-break only'],
+      ['prefer', 'unknown', 'Preference could not be verified'],
+      ['prefer', 'fail', 'Preference not present · no penalty'],
+    ];
+    for (const [effect, status, label] of cases) {
+      expect(panel.muChartOutcomeLabel({ effect, status })).toBe(label);
+    }
+  });
+
+  test('keeps chart boundary explanations stable', () => {
+    const base = {
+      boundaryConventionUncertain: false,
+      needsReview: false,
+      stable: false,
+      qualificationFailed: false,
+    };
+    expect(panel.muChartBoundaryMessage({ ...base, boundaryConventionUncertain: true }))
+      .toBe('This window touches the five-minute Lagna convention guard at an edge. House-dependent checks remain unresolved; sign-based aspects are still evaluated.');
+    expect(panel.muChartBoundaryMessage({ ...base, needsReview: true, stable: true }))
+      .toBe('One or more event-specific facts are indeterminate at a calculation boundary. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.');
+    expect(panel.muChartBoundaryMessage({ ...base, needsReview: true }))
+      .toBe('Sampled states changed within this window, and one or more event-specific facts are indeterminate. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.');
+    expect(panel.muChartBoundaryMessage({ ...base, qualificationFailed: true }))
+      .toBe('At least one event-specific condition was conclusively not met. The slot is retained, its raw score is unchanged, and the maximum rating is Good; this is not an unknown or review result.');
+    expect(panel.muChartBoundaryMessage({ ...base, stable: true }))
+      .toBe('The result was stable across every sampled Lagna-stable state in this window.');
+    expect(panel.muChartBoundaryMessage(base))
+      .toBe('Sampled states changed, but every controlling outcome was resolved automatically.');
+  });
+
+  test('keeps daylight and profile-specific labels stable', () => {
+    expect(panel.muDaylightOutcomeLabel('pass')).toBe('Required daylight check passed');
+    expect(panel.muDaylightOutcomeLabel('fail')).toBe('Day removed by daylight rule');
+    expect(panel.muDaylightOutcomeLabel('unknown'))
+      .toBe('Boundary could not be verified · day removed');
+
+    expect(panel.muPersonalOutcomeLabel({ effect: 'reject', status: 'pass' })).toBe('Passed');
+    expect(panel.muPersonalOutcomeLabel({ effect: 'prefer', status: 'fail' }))
+      .toBe('Preference not present');
+    expect(panel.muPersonalOutcomeLabel({ effect: 'reject', status: 'unknown' }))
+      .toBe('Could not verify');
+    expect(panel.muPersonalOutcomeLabel({ effect: 'reject', status: 'fail' })).toBe('Not met');
+  });
+
+  test('keeps extracted result fragments text- and markup-equivalent', () => {
+    expect(panel.muPluralSuffix(1)).toBe('');
+    expect(panel.muPluralSuffix(2)).toBe('s');
+    expect(panel.muDroppedOutcomeLabel('pass')).toBe('passed');
+    expect(panel.muDroppedOutcomeLabel('fail')).toBe('failed');
+    expect(panel.muDroppedOutcomeLabel('unknown')).toBe('could not be verified');
+    expect(panel.muChartRemovalRow({
+      label: '<Vacant eighth>',
+      count: 2,
+      evidence: ['Mars & Saturn'],
+    })).toBe(
+      '<li><strong>&lt;Vacant eighth&gt;</strong> · 2 slots<small>Observed: Mars &amp; Saturn</small></li>',
+    );
+    expect(panel.muChartRemovalRow({ label: 'Required check', count: 1 }))
+      .toBe('<li><strong>Required check</strong> · 1 slot</li>');
+
+    const provenance = panel.muChartProvenanceParts(
+      [{ claim: 'claim.one', locator: 'Source <one>' }],
+      ['policy.one'],
+      [{
+        id: 'whole-sign',
+        label: 'Whole <sign>',
+        formula: 'house = sign & lagna',
+        claims: ['method.one'],
+      }],
+    );
+    expect(provenance.eventSourceSuffix).toBe('');
+    expect(provenance.decisionPolicyHtml).toContain('Product ranking policy:');
+    expect(provenance.conventionHtml).toContain('Whole &lt;sign&gt;');
+    expect(provenance.rankingPolicyClaimsHtml).toContain('<code>policy.one</code>');
+    expect(provenance.conventionClaimsHtml).toContain('<code>method.one</code>');
+
+    const dayContext = panel.muDayContextHtml({
+      tithi: 'Shukla Panchami',
+      nakshatra: 'Rohini',
+      yoga: 'Siddhi',
+      sunrise: '6:10 AM',
+      abhijit: '11:45 AM to 12:35 PM',
+      rahu: '7:30 AM to 9:00 AM',
+      auspicious: [{ name: 'Amrita Kalam', ranges: ['10:00 AM to 11:00 AM'] }],
+      avoid: [{ name: 'Rahu Kalam', ranges: ['7:30 AM to 9:00 AM'] }],
+    });
+    expect(dayContext).toContain('🌙 Shukla Panchami');
+    expect(dayContext).toContain('⭐ Rohini');
+    expect(dayContext).toContain('🧘 Siddhi yoga');
+    expect(dayContext).toContain('🌅 Sunrise 6:10 AM');
+    expect(dayContext).toContain('<b>Amrita Kalam</b> 10:00 AM to 11:00 AM');
+    expect(dayContext).toContain('<b>Rahu Kalam</b> 7:30 AM to 9:00 AM');
+    expect(panel.muDayContextHtml(null)).toBe('');
+
+    const droppedOutcomes = panel.muDroppedOutcomeHtml([{
+      status: 'fail',
+      label: '<Daylight rule>',
+      evidence: ['Boundary & sunset'],
+    }]);
+    expect(droppedOutcomes).toContain('mu-dropped-daylight--fail');
+    expect(droppedOutcomes).toContain('&lt;Daylight rule&gt;');
+    expect(droppedOutcomes).toContain('Boundary &amp; sunset');
+    expect(panel.muDroppedOutcomeHtml([])).toBe('');
+
+    expect(panel.muChartReviewDetail({ boundaryReviewCount: 1 }))
+      .toBe(' · boundary-adjacent house checks held for review');
+    expect(panel.muChartReviewDetail({ reviewGatedCount: 1 }))
+      .toBe(' · unresolved chart facts held for review');
+    expect(panel.muChartReviewDetail(null)).toBe('');
+    expect(panel.muChartStatusDispositionClass('capped'))
+      .toBe(' mu-chart-status--screened-capped');
+    expect(panel.muChartStatusDispositionClass(null)).toBe('');
+    expect(panel.muChartValidationItems(true, {
+      chart_remainder: ['Remainder'],
+      chart_validation: ['Validation'],
+    })).toEqual(['Remainder']);
+    expect(panel.muChartValidationItems(false, {
+      chart_remainder: ['Remainder'],
+      chart_validation: ['Validation'],
+    })).toEqual(['Validation']);
+    expect(panel.muChartDispositionHtml({ needsReview: true })).toContain('Review needed');
+    expect(panel.muChartDispositionHtml({ qualificationFailed: true })).toContain('max Good');
+    expect(panel.muChartDispositionHtml(null)).toBe('');
+    expect(panel.muSafetyTitle('surgery')).toBe('Medical care overrides timing');
+    expect(panel.muSafetyTitle('court')).toBe('Legal duties override timing');
+    expect(panel.tbChandraVerdict(1)).toBe('good');
+    expect(panel.tbChandraVerdict(2)).toBe('puja');
+    expect(panel.tbChandraVerdict(4)).toBe('bad');
+    expect(panel.tbChandraPresentation({
+      good: true,
+      chandra: { verdict: 'puja', pos: 2 },
+    })).toEqual({ chandraTag: ' · ° 2nd', cls: 'good' });
+    expect(panel.tbChandraPresentation({
+      good: false,
+      chandra: { verdict: 'bad', pos: 4 },
+    })).toEqual({ chandraTag: ' · ☾ 4th', cls: 'bad' });
+    expect(panel.tbChandraPresentation({
+      good: true,
+      chandra: { verdict: 'good', pos: 1 },
+    })).toEqual({ chandraTag: '', cls: 'good' });
+    expect(panel.muNatureBonus(true, 'inauspicious')).toBe(2);
+    expect(panel.muNatureBonus(false, 'auspicious')).toBe(1);
+    expect(panel.muNatureBonus(false, 'inauspicious')).toBe(-2);
+    expect(panel.muAvoidKaranaWindows(
+      'Bava 06:00 - 07:30 / Vishti 07:30 (+1) – 08:15 (+1)',
+      new Set(['Vishti']),
+    )).toEqual([[1890, 1935]]);
+    expect(panel.muAvoidKaranaWindows(
+      'Bava 06:00 - 07:30',
+      new Set(['Vishti']),
+    )).toEqual([]);
+
+    const dispositionBase = {
+      state: 'screened',
+      candidateLimitReached: false,
+      boundaryReviewCount: 0,
+      reviewGatedCount: 0,
+      qualificationCappedCount: 0,
+    };
+    expect(panel.muChartScreeningDisposition({
+      ...dispositionBase, state: 'unavailable',
+    })).toBeNull();
+    expect(panel.muChartScreeningDisposition({
+      ...dispositionBase, reviewGatedCount: 1,
+    })).toBe('review');
+    expect(panel.muChartScreeningDisposition({
+      ...dispositionBase, qualificationCappedCount: 1,
+    })).toBe('capped');
+    expect(panel.muChartScreeningDisposition(dispositionBase)).toBe('resolved');
+    expect(panel.muChartAssessmentTitle('gold', dispositionBase))
+      .toBe('Gold event-specific chart clauses resolved');
+    expect(panel.muChartAssessmentTitle('karnavedha', dispositionBase))
+      .toBe('Karnavedha event checks resolved');
+    expect(panel.muChartAssessmentTitle('purchase', dispositionBase))
+      .toBe('Exact chart screening applied');
   });
 
   test('samples both sides of every Lagna transition inside a slot', () => {

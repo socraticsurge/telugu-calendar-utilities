@@ -178,7 +178,8 @@ def test_rashi_ingresses_lahiri_vs_raman_differ():
                                                   planets=['Sun'], ayanamsa='lahiri'))
     raman  = json.loads(tool_get_rashi_ingresses('2026-06-01', '2026-09-30',
                                                   planets=['Sun'], ayanamsa='raman'))
-    assert lahiri['ingresses'] and raman['ingresses']
+    assert lahiri['ingresses']
+    assert raman['ingresses']
     from datetime import datetime
     t_l = datetime.strptime(lahiri['ingresses'][0]['enters'], '%Y-%m-%d %H:%M UTC')
     t_r = datetime.strptime(raman['ingresses'][0]['enters'],  '%Y-%m-%d %H:%M UTC')

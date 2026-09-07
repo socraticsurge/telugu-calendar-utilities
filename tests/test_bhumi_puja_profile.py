@@ -52,7 +52,8 @@ def test_positive_fixture_exposes_best_nakshatra_fixed_lagna_and_manual_checks()
 def test_source_profile_rejections_are_explained():
     # 2026-06-17 is Jyeshtha Maasa, explicitly outside the admitted list.
     reason = diagnose_day(_day(2026, 6, 17), activity='bhumi_puja')
-    assert reason and 'does not admit this lunar month' in reason
+    assert reason
+    assert 'does not admit this lunar month' in reason
 
 
 def test_mcp_and_browser_publish_same_foundation_constraints():

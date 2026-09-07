@@ -55,7 +55,8 @@ def test_every_slot_is_a_named_muhurta():
 
 def test_ranked_by_score_and_carries_reasons():
     slots = day_slots(_day(2026, 6, 17))
-    assert slots and all(slots[i]['score'] >= slots[i+1]['score'] for i in range(len(slots)-1))
+    assert slots
+    assert all(slots[i]['score'] >= slots[i+1]['score'] for i in range(len(slots)-1))
     assert all(s['reasons'] for s in slots)
 
 
@@ -163,7 +164,9 @@ def test_chandrabalam_scores_identical_across_modes():
     s_stars = day_slots(day, **args, chandra_mode='stars')
     s_puja = day_slots(day, **args, chandra_mode='puja_ok')
     s_strict = day_slots(day, **args, chandra_mode='strict')
-    assert s_stars and s_puja and s_strict
+    assert s_stars
+    assert s_puja
+    assert s_strict
     assert [s['score'] for s in s_stars] == [s['score'] for s in s_puja]
     assert [s['score'] for s in s_stars] == [s['score'] for s in s_strict]
 
@@ -180,8 +183,9 @@ def test_eclipse_day_returns_no_slots():
 # --- Validation ---
 
 def test_invalid_activity_raises():
+    day = _day(2026, 6, 17)
     with pytest.raises(ValueError):
-        day_slots(_day(2026, 6, 17), activity='not-a-real-activity')
+        day_slots(day, activity='not-a-real-activity')
 
 
 # --- Activity taxonomy (Batch D) ---
@@ -704,7 +708,8 @@ def test_diagnose_day_eclipse():
     # 2027-08-02: total solar eclipse, Hyderabad
     day = _day(2027, 8, 2, include_eclipse=True)
     reason = diagnose_day(day)
-    assert reason and 'eclipse' in reason.lower()
+    assert reason
+    assert 'eclipse' in reason.lower()
 
 
 def test_diagnose_day_samskara_skip_on_dagdha():
@@ -712,7 +717,8 @@ def test_diagnose_day_samskara_skip_on_dagdha():
     # 2026-06-17 has Dagdha Yoga — wedding defers
     day = _day(2026, 6, 17)
     reason = diagnose_day(day, activity='wedding')
-    assert reason and 'Dagdha' in reason
+    assert reason
+    assert 'Dagdha' in reason
 
 
 def test_diagnose_day_samskara_skip_on_vaidhriti():
@@ -720,7 +726,8 @@ def test_diagnose_day_samskara_skip_on_vaidhriti():
     # 2026-07-02 has Vaidhriti at sunrise
     day = _day(2026, 7, 2)
     reason = diagnose_day(day, activity='wedding')
-    assert reason and 'Vaidhriti' in reason
+    assert reason
+    assert 'Vaidhriti' in reason
 
 
 def test_diagnose_day_returns_none_when_clear():
@@ -745,8 +752,10 @@ def test_mcp_find_muhurta_emits_dropped_days():
     assert '2026-06-17' in dropped_dates, f'expected Dagdha day in dropped_days; got {result["dropped_days"]}'
     # Each dropped entry has a date and a reason
     for dd in result['dropped_days']:
-        assert 'date' in dd and 'reason' in dd
-        assert isinstance(dd['reason'], str) and dd['reason']
+        assert 'date' in dd
+        assert 'reason' in dd
+        assert isinstance(dd['reason'], str)
+        assert dd['reason']
 
 
 def test_mcp_find_muhurta_emits_tier_on_each_slot():
@@ -882,7 +891,9 @@ def test_score_tithi_class_avoid_gives_minus_one():
         avoid_tithi_class=['Jaya'])
     assert bonus == -1
     assert day_r is None
-    assert act_r is not None and 'inauspicious' in act_r and 'Jaya' in act_r
+    assert act_r is not None
+    assert 'inauspicious' in act_r
+    assert 'Jaya' in act_r
     assert fam == 'Jaya'
 
 
@@ -903,7 +914,8 @@ def test_score_tithi_class_prefer_wins_over_neutral_avoid_list():
         'Shukla Panchami', 'Purna', 'Wedding (Vivaha)',
         avoid_tithi_class=['Jaya'])
     assert bonus == 1
-    assert act_r is not None and 'favoured' in act_r
+    assert act_r is not None
+    assert 'favoured' in act_r
 
 
 def test_score_tithi_class_rikta_unaffected_by_avoid():
@@ -939,7 +951,8 @@ def test_tithi_class_scorer_still_supports_preferred_class():
         'Shukla Tritiya', 'Jaya', 'Example activity',
         avoid_tithi_class=['Purna'])
     assert bonus == 1
-    assert act_r is not None and 'favoured' in act_r
+    assert act_r is not None
+    assert 'favoured' in act_r
 
 
 def test_engine_kwarg_does_not_break_mcp_path():
@@ -966,14 +979,15 @@ def test_engine_kwarg_does_not_break_mcp_path():
 
 
 def test_invalid_chandra_mode_raises():
+    day = _day(2026, 6, 17)
     with pytest.raises(ValueError):
-        day_slots(_day(2026, 6, 17), chandra_mode='bogus')
+        day_slots(day, chandra_mode='bogus')
 
 
 def test_misaligned_rasis_raise():
+    day = _day(2026, 6, 17)
     with pytest.raises(ValueError):
-        day_slots(_day(2026, 6, 17),
-                  janma_nakshatras=['Pushya'],
+        day_slots(day, janma_nakshatras=['Pushya'],
                   janma_rasis=['Karka', 'Mesha'])
 
 

@@ -11,6 +11,108 @@ ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / 'docs' / 'reference' / 'provenance.json'
 
 
+def _related_claim_errors(
+    activity: str,
+    rules: dict,
+    claims: dict[str, dict],
+) -> list[str]:
+    errors: list[str] = []
+    for related_id in rules.get('related_claims', ()):
+        related = claims.get(related_id)
+        if related is None:
+            errors.append(f'{activity}: unknown related claim {related_id!r}')
+        elif related['surface'] != 'muhurtam':
+            errors.append(
+                f'{activity}: related claim {related_id!r} is not a '
+                'muhurtam claim'
+            )
+    return errors
+
+
+def _claim_field_errors(
+    activity: str,
+    claim_ids: tuple[str | None, str | None, str | None],
+) -> list[str]:
+    fields = [
+        field
+        for field, value in zip(
+            ('source_claim', 'audit_claim', 'heuristic_claim'),
+            claim_ids,
+            strict=True,
+        )
+        if value
+    ]
+    if len(fields) <= 1:
+        return []
+    return [
+        (
+            f'{activity}: provenance claim fields are mutually exclusive: '
+            f'{", ".join(fields)}'
+        )
+    ]
+
+
+def _register_special_claim(
+    *,
+    activity: str,
+    claim_id: str | None,
+    label: str,
+    duplicate_label: str,
+    required_state: str,
+    claims: dict[str, dict],
+    recorded: dict[str, dict[str, str]],
+) -> list[str]:
+    if not claim_id:
+        return []
+    if any(item['claim'] == claim_id for item in recorded.values()):
+        return [f'{activity}: duplicate {duplicate_label} claim {claim_id!r}']
+    claim = claims.get(claim_id)
+    if claim is None:
+        return [f'{activity}: unknown {label} claim {claim_id!r}']
+    if claim['surface'] != 'muhurtam':
+        return [f'{activity}: {label} claim {claim_id!r} is not a muhurtam claim']
+    if claim['verification_state'] != required_state:
+        return [
+            (
+                f'{activity}: {label} claim {claim_id!r} is '
+                f'{claim["verification_state"]!r}, not {required_state}'
+            )
+        ]
+    recorded[activity] = {
+        'claim': claim_id,
+        'state': claim['verification_state'],
+    }
+    return []
+
+
+def _register_source_claim(
+    *,
+    activity: str,
+    claim_id: str | None,
+    claims: dict[str, dict],
+    linked: dict[str, str],
+) -> list[str]:
+    if not claim_id:
+        return []
+    if claim_id in linked.values():
+        return [f'{activity}: duplicate activity source claim {claim_id!r}']
+    claim = claims.get(claim_id)
+    if claim is None:
+        return [f'{activity}: unknown provenance claim {claim_id!r}']
+
+    errors: list[str] = []
+    if claim['surface'] != 'muhurtam':
+        errors.append(f'{activity}: {claim_id!r} is not a muhurtam claim')
+    if claim['verification_state'] != 'verified':
+        errors.append(
+            f'{activity}: {claim_id!r} is {claim["verification_state"]!r}, '
+            'not verified'
+        )
+    if not errors:
+        linked[activity] = claim_id
+    return errors
+
+
 def audit() -> dict:
     sys.path.insert(0, str(ROOT))
     from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
@@ -26,92 +128,34 @@ def audit() -> dict:
         audit_id = rules.get('audit_claim')
         heuristic_id = rules.get('heuristic_claim')
         claim_id = rules.get('source_claim')
-        for related_id in rules.get('related_claims', ()):
-            related = claims.get(related_id)
-            if related is None:
-                errors.append(
-                    f'{activity}: unknown related claim {related_id!r}')
-            elif related['surface'] != 'muhurtam':
-                errors.append(
-                    f'{activity}: related claim {related_id!r} is not a '
-                    'muhurtam claim')
-        claim_fields = [
-            field for field, value in (
-                ('source_claim', claim_id),
-                ('audit_claim', audit_id),
-                ('heuristic_claim', heuristic_id),
-            ) if value
-        ]
-        if len(claim_fields) > 1:
-            errors.append(
-                f'{activity}: provenance claim fields are mutually exclusive: '
-                f'{", ".join(claim_fields)}')
-        if audit_id:
-            if any(item['claim'] == audit_id for item in audited.values()):
-                errors.append(f'{activity}: duplicate activity audit claim {audit_id!r}')
-                claim = None
-            else:
-                claim = claims.get(audit_id)
-            if claim is None and not any(
-                    item['claim'] == audit_id for item in audited.values()):
-                errors.append(f'{activity}: unknown audit claim {audit_id!r}')
-            elif claim['surface'] != 'muhurtam':
-                errors.append(f'{activity}: audit claim {audit_id!r} is not a muhurtam claim')
-            elif claim['verification_state'] != 'contradicted':
-                errors.append(
-                    f'{activity}: audit claim {audit_id!r} is '
-                    f'{claim["verification_state"]!r}, not contradicted')
-            else:
-                audited[activity] = {
-                    'claim': audit_id,
-                    'state': claim['verification_state'],
-                }
-        if heuristic_id:
-            if any(item['claim'] == heuristic_id for item in heuristic.values()):
-                errors.append(
-                    f'{activity}: duplicate heuristic claim {heuristic_id!r}')
-                heuristic_claim = None
-            else:
-                heuristic_claim = claims.get(heuristic_id)
-            if heuristic_claim is None:
-                if not any(
-                        item['claim'] == heuristic_id
-                        for item in heuristic.values()):
-                    errors.append(
-                        f'{activity}: unknown heuristic claim {heuristic_id!r}')
-            elif heuristic_claim['surface'] != 'muhurtam':
-                errors.append(
-                    f'{activity}: heuristic claim {heuristic_id!r} is not a '
-                    'muhurtam claim')
-            elif heuristic_claim['verification_state'] != 'heuristic':
-                errors.append(
-                    f'{activity}: heuristic claim {heuristic_id!r} is '
-                    f'{heuristic_claim["verification_state"]!r}, not heuristic')
-            else:
-                heuristic[activity] = {
-                    'claim': heuristic_id,
-                    'state': heuristic_claim['verification_state'],
-                }
-        if not claim_id:
-            continue
-        if claim_id in linked.values():
-            errors.append(f'{activity}: duplicate activity source claim {claim_id!r}')
-            continue
-        claim = claims.get(claim_id)
-        if claim is None:
-            errors.append(f'{activity}: unknown provenance claim {claim_id!r}')
-            continue
-        valid = True
-        if claim['surface'] != 'muhurtam':
-            errors.append(f'{activity}: {claim_id!r} is not a muhurtam claim')
-            valid = False
-        if claim['verification_state'] != 'verified':
-            errors.append(
-                f'{activity}: {claim_id!r} is {claim["verification_state"]!r}, '
-                'not verified')
-            valid = False
-        if valid:
-            linked[activity] = claim_id
+        errors.extend(_related_claim_errors(activity, rules, claims))
+        errors.extend(_claim_field_errors(
+            activity, (claim_id, audit_id, heuristic_id)
+        ))
+        errors.extend(_register_special_claim(
+            activity=activity,
+            claim_id=audit_id,
+            label='audit',
+            duplicate_label='activity audit',
+            required_state='contradicted',
+            claims=claims,
+            recorded=audited,
+        ))
+        errors.extend(_register_special_claim(
+            activity=activity,
+            claim_id=heuristic_id,
+            label='heuristic',
+            duplicate_label='heuristic',
+            required_state='heuristic',
+            claims=claims,
+            recorded=heuristic,
+        ))
+        errors.extend(_register_source_claim(
+            activity=activity,
+            claim_id=claim_id,
+            claims=claims,
+            linked=linked,
+        ))
 
     unlinked = sorted(
         set(ACTIVITY_RULES) - set(linked) - set(audited) - set(heuristic))

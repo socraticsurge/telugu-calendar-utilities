@@ -18,7 +18,8 @@ def test_structure_and_counts():
     out = rasi_phalalu('Mesha', SKY)
     assert out['janma_rasi'] == 'Mesha'
     assert out['favourable_count'] + out['blocked_count'] + out['adverse_count'] == 9
-    assert isinstance(out['lines'], list) and len(out['lines']) >= 4
+    assert isinstance(out['lines'], list)
+    assert len(out['lines']) >= 4
     assert out['day_quality'] in ('good', 'mixed', 'difficult')
 
 
@@ -37,7 +38,8 @@ def test_lines_are_traceable_to_verdicts():
     out = rasi_phalalu('Mesha', SKY)
     text = ' '.join(out['lines'])
     # Rahu favourable in the 11th -> gains house mentioned positively
-    assert 'Rahu' in text and HOUSE_MEANINGS[11] in text
+    assert 'Rahu' in text
+    assert HOUSE_MEANINGS[11] in text
     # Shani 12th adverse -> expenses house mentioned
     assert HOUSE_MEANINGS[12] in text
 

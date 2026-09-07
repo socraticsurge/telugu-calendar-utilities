@@ -84,8 +84,10 @@ def test_planet_filter():
 
 
 def test_invalid_planet_raises():
+    start = date(2026, 1, 1)
+    end = date(2026, 12, 31)
     with pytest.raises(ValueError, match='Unknown'):
-        graha_yuddha_periods(date(2026, 1, 1), date(2026, 12, 31), planets=['Pluto'])
+        graha_yuddha_periods(start, end, planets=['Pluto'])
 
 
 def test_empty_range_produces_no_error():

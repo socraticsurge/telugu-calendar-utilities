@@ -139,7 +139,8 @@ def _without_source_metadata(value):
 
 
 def _pointer_parts(pointer: str) -> tuple[str, ...]:
-    assert pointer.startswith("/") and pointer != "/"
+    assert pointer.startswith("/")
+    assert pointer != "/"
     return tuple(
         part.replace("~1", "/").replace("~0", "~") for part in pointer[1:].split("/")
     )
@@ -149,7 +150,8 @@ def _pointer_parent(document: dict, pointer: str) -> tuple[dict, str]:
     parts = _pointer_parts(pointer)
     current: Any = document
     for part in parts[:-1]:
-        assert isinstance(current, dict) and part in current
+        assert isinstance(current, dict)
+        assert part in current
         current = current[part]
     assert isinstance(current, dict)
     return current, parts[-1]
@@ -181,7 +183,8 @@ def _assert_non_overlapping_pointers(manifest: dict) -> None:
             assert pointer == f"/manual_remainders/{activity}"
         elif scope == f"{activity}_convention":
             assert artifact == "src/data/election-chart-rules.generated.json"
-            assert len(parts) == 2 and parts[0] == "conventions"
+            assert len(parts) == 2
+            assert parts[0] == "conventions"
         elif scope == "shared_schema":
             assert artifact == "src/data/election-chart-rules.generated.json"
             assert pointer in {"/schema_version", "/convention_schema_version"}
@@ -218,7 +221,8 @@ def _reverse_declared_rule_deltas(
             assert _json_sha256(parent[key]) == delta["after_sha256"]
 
             if delta["operation"] == "add":
-                assert "before" not in delta and "before_sha256" not in delta
+                assert "before" not in delta
+                assert "before_sha256" not in delta
                 del parent[key]
             else:
                 assert delta["operation"] == "replace"
@@ -368,15 +372,18 @@ def test_every_active_raman_claim_matches_the_revalidated_audit() -> None:
             relationship = expected["relationship"]
             if relationship == "successor_addition":
                 assert claim_id not in expected_current_ids
-                assert "before" not in expected and "before_sha256" not in expected
+                assert "before" not in expected
+                assert "before_sha256" not in expected
                 expected_current_ids.add(claim_id)
             elif relationship == "baseline_context_extension":
                 assert claim_id in audited
-                assert "before" in expected and "before_sha256" in expected
+                assert "before" in expected
+                assert "before_sha256" in expected
             else:
                 assert relationship == "successor_revision"
                 assert claim_id in expected_current_ids
-                assert "before" in expected and "before_sha256" in expected
+                assert "before" in expected
+                assert "before_sha256" in expected
 
     current_raman_claim_ids = {
         claim_id

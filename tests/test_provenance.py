@@ -32,7 +32,8 @@ def test_verified_textual_claims_require_precise_locators():
         if (claim['evidence_class'] == 'textual'
                 and claim['verification_state'] == 'verified'):
             assert claim['source_ids']
-            assert claim['locator'] and claim['locator'].strip()
+            assert claim['locator']
+            assert claim['locator'].strip()
 
 
 def test_contradicted_claims_require_inspected_evidence():
@@ -42,7 +43,8 @@ def test_contradicted_claims_require_inspected_evidence():
             continue
         assert claim['evidence_class'] == 'textual'
         assert claim['source_ids']
-        assert claim['locator'] and claim['locator'].strip()
+        assert claim['locator']
+        assert claim['locator'].strip()
         assert claim.get('last_reviewed')
 
 

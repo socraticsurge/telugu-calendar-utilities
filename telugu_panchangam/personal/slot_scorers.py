@@ -29,7 +29,10 @@ from telugu_panchangam.personal.nitya_yoga import (
 )
 from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS
 
-_YOGA_BONUS = {'Sarvartha Siddhi Yoga': 2, 'Amrita Siddhi Yoga': 2,
+_AMRITA_SIDDHI_YOGA = 'Amrita Siddhi Yoga'
+_SARVARTHA_SIDDHI_YOGA = 'Sarvartha Siddhi Yoga'
+
+_YOGA_BONUS = {_SARVARTHA_SIDDHI_YOGA: 2, _AMRITA_SIDDHI_YOGA: 2,
                'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1,
                'Siddha Yoga': 1}
 _YOGA_PENALTY = {'Visha Yoga': -2, 'Dagdha Yoga': -2}
@@ -300,7 +303,7 @@ def score_tithi_class(tithi_name, prefer_tithi_class, activity_label,
             return 0, (f'{tithi_name} (Rikta tithi) neutralised by Pushya '
                        f'nakshatra (0)'), None, fam
         siddhi = [y for y in special_yogas
-                  if y in ('Sarvartha Siddhi Yoga', 'Amrita Siddhi Yoga')]
+                  if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)]
         if siddhi:
             label = ' + '.join(siddhi)
             return -1, (f'{tithi_name} (Rikta tithi) partially offset by '
@@ -327,7 +330,7 @@ def doctrinal_notes(*, special_yogas, tara_unfav_names, chandra_avoid_names,
     """
     notes: list[str] = []
     siddhi_yogas = [y for y in special_yogas
-                    if y in ('Sarvartha Siddhi Yoga', 'Amrita Siddhi Yoga')]
+                    if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)]
     has_pushkara = any(y in ('Dvipushkara Yoga', 'Tripushkara Yoga')
                        for y in special_yogas)
 

@@ -22,9 +22,7 @@ DEFAULT_HISTORY_COMMITS = 200
 MAX_HISTORY_COMMITS = 10_000
 
 _GIT_REF_RE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._/-]{0,254}$')
-_TS_FROM_IMPORT_RE = re.compile(
-    r"(?:import|export)\s+[^'\"\n]*\bfrom\s+['\"]([^'\"\n]+)['\"]"
-)
+_TS_FROM_IMPORT_RE = re.compile(r"\bfrom\s+['\"]([^'\"\n]+)['\"]")
 _TS_SIDE_EFFECT_IMPORT_RE = re.compile(
     r"import\s+['\"]([^'\"\n]+)['\"]"
 )
@@ -265,10 +263,19 @@ def _python_imports(content: str) -> tuple[list[tuple[str, list[str]]], list[dic
 
 def _typescript_imports(content: str) -> list[str]:
     """Return static TypeScript imports without ambiguous regex backtracking."""
-    return [
-        *_TS_FROM_IMPORT_RE.findall(content),
-        *_TS_SIDE_EFFECT_IMPORT_RE.findall(content),
-    ]
+    imports: list[str] = []
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith(('import ', 'export ')):
+            continue
+        from_match = _TS_FROM_IMPORT_RE.search(stripped)
+        if from_match:
+            imports.append(from_match.group(1))
+            continue
+        side_effect_match = _TS_SIDE_EFFECT_IMPORT_RE.match(stripped)
+        if side_effect_match:
+            imports.append(side_effect_match.group(1))
+    return imports
 
 
 def _resolve_python_import(
@@ -300,6 +307,42 @@ def _registry_at(ref: str) -> dict[str, Any]:
     return json.loads(_read_at(ref, 'docs/reference/computations.json'))
 
 
+def _python_graph_details(
+    path: str,
+    content: str,
+    module_to_path: dict[str, str],
+) -> tuple[set[str], list[dict], list[dict]]:
+    targets: set[str] = set()
+    private_imports: list[dict] = []
+    imports, private_attributes = _python_imports(content)
+    for imported, names in imports:
+        target = _resolve_python_import(imported, module_to_path)
+        if not target or target == path:
+            continue
+        targets.add(target)
+        private_imports.extend(
+            {'importer': path, 'owner': target, 'symbol': name}
+            for name in names
+            if name.startswith('_')
+        )
+    return targets, private_imports, [
+        {'path': path, **item} for item in private_attributes
+    ]
+
+
+def _typescript_graph_targets(
+    path: str,
+    content: str,
+    all_paths: set[str],
+) -> set[str]:
+    return {
+        target
+        for imported in _typescript_imports(content)
+        if (target := _resolve_ts_import(path, imported, all_paths))
+        and target != path
+    }
+
+
 def _module_graph(
     ref: str, source_paths: list[str], all_paths: set[str]
 ) -> tuple[dict[str, list[str]], list[dict], list[dict]]:
@@ -312,29 +355,36 @@ def _module_graph(
     private_attributes: list[dict] = []
     for path in source_paths:
         content = _read_at(ref, path)
-        targets: set[str] = set()
         if path.endswith('.py'):
-            imports, attributes = _python_imports(content)
-            for imported, names in imports:
-                target = _resolve_python_import(imported, module_to_path)
-                if target and target != path:
-                    targets.add(target)
-                    for name in names:
-                        if name.startswith('_'):
-                            private_imports.append({
-                                'importer': path,
-                                'owner': target,
-                                'symbol': name,
-                            })
-            for item in attributes:
-                private_attributes.append({'path': path, **item})
+            targets, imports, attributes = _python_graph_details(
+                path, content, module_to_path
+            )
+            private_imports.extend(imports)
+            private_attributes.extend(attributes)
         else:
-            for imported in _typescript_imports(content):
-                target = _resolve_ts_import(path, imported, all_paths)
-                if target and target != path:
-                    targets.add(target)
+            targets = _typescript_graph_targets(path, content, all_paths)
         graph[path] = sorted(targets)
     return graph, private_imports, private_attributes
+
+
+def _test_import_targets(
+    path: str,
+    content: str,
+    module_to_path: dict[str, str],
+    all_paths: set[str],
+) -> set[str]:
+    if path.endswith('.py'):
+        imports, _ = _python_imports(content)
+        return {
+            target
+            for imported, _names in imports
+            if (target := _resolve_python_import(imported, module_to_path))
+        }
+    return {
+        target
+        for imported in _typescript_imports(content)
+        if (target := _resolve_ts_import(path, imported, all_paths))
+    }
 
 
 def _test_links(
@@ -351,17 +401,10 @@ def _test_links(
     }
     for path in test_paths:
         content = _read_at(ref, path)
-        if path.endswith('.py'):
-            imports, _ = _python_imports(content)
-            for imported, _names in imports:
-                target = _resolve_python_import(imported, module_to_path)
-                if target:
-                    links[target].add(path)
-        else:
-            for imported in _typescript_imports(content):
-                target = _resolve_ts_import(path, imported, all_paths)
-                if target:
-                    links[target].add(path)
+        for target in _test_import_targets(
+            path, content, module_to_path, all_paths
+        ):
+            links[target].add(path)
     for record in registry['computations']:
         for implementation in record['implementations']:
             links[implementation['path']].update(record['tests'])
@@ -478,6 +521,127 @@ def _duplicate_contracts(ref: str) -> list[dict]:
     return groups
 
 
+def _consumer_evidence(
+    registry: dict[str, Any],
+) -> tuple[dict[str, set[str]], list[dict]]:
+    linked: dict[str, set[str]] = defaultdict(set)
+    consumers: list[dict] = []
+    for record in registry['computations']:
+        owners: list[str] = []
+        mirrors: list[str] = []
+        for implementation in record['implementations']:
+            linked[implementation['path']].add(record['id'])
+            destination = owners if implementation['role'] == 'owner' else mirrors
+            destination.append(implementation['path'])
+        consumers.append({
+            'id': record['id'],
+            'owners': sorted(set(owners)),
+            'mirrors': sorted(set(mirrors)),
+            'surfaces': record['surfaces'],
+            'tests': record['tests'],
+        })
+    return linked, consumers
+
+
+def _edge_evidence(
+    graph: dict[str, list[str]],
+) -> tuple[dict[str, set[str]], Counter, list[dict]]:
+    incoming: dict[str, set[str]] = defaultdict(set)
+    cross_layer = Counter()
+    details: list[dict] = []
+    for source, targets in graph.items():
+        for target in targets:
+            incoming[target].add(source)
+            edge = (_layer(source), _layer(target))
+            if edge[0] == edge[1]:
+                continue
+            cross_layer[edge] += 1
+            details.append({
+                'from': source,
+                'from_layer': edge[0],
+                'to': target,
+                'to_layer': edge[1],
+            })
+    return incoming, cross_layer, details
+
+
+def _module_evidence(
+    *,
+    ref: str,
+    source_paths: list[str],
+    graph: dict[str, list[str]],
+    incoming: dict[str, set[str]],
+    linked_computations: dict[str, set[str]],
+    test_links: dict[str, set[str]],
+) -> tuple[list[dict], dict[str, dict[str, int]]]:
+    modules: list[dict] = []
+    layer_metrics: dict[str, dict[str, int]] = defaultdict(
+        lambda: {'files': 0, 'nonblank_lines': 0, 'definitions': 0}
+    )
+    for path in source_paths:
+        content = _read_at(ref, path)
+        nonblank = sum(bool(line.strip()) for line in content.splitlines())
+        definitions, largest = _definition_metrics(path, content)
+        layer = _layer(path)
+        layer_metrics[layer]['files'] += 1
+        layer_metrics[layer]['nonblank_lines'] += nonblank
+        layer_metrics[layer]['definitions'] += definitions
+        modules.append({
+            'path': path,
+            'layer': layer,
+            'scope_class': source_scope_class(path),
+            'nonblank_lines': nonblank,
+            'definitions': definitions,
+            'largest_definition_lines': largest,
+            'imports_out': graph[path],
+            'importers_in': sorted(incoming[path]),
+            'computation_ids': sorted(linked_computations[path]),
+            'linked_tests': sorted(test_links[path]),
+        })
+    return modules, layer_metrics
+
+
+def _attach_history(modules: list[dict], history: list[dict]) -> None:
+    history_by_path = {item['path']: item for item in history}
+    for module in modules:
+        module['history'] = history_by_path.get(
+            module['path'],
+            {'commits': 0, 'added': 0, 'deleted': 0, 'churn': 0},
+        )
+
+
+def _concrete_engine_imports(details: list[dict]) -> list[dict]:
+    public_engine_modules = {
+        'telugu_panchangam/engines/__init__.py',
+        'telugu_panchangam/engines/utils.py',
+    }
+    return [
+        detail
+        for detail in details
+        if detail['to_layer'] == 'engines'
+        and detail['from_layer'] != 'engines'
+        and detail['to'] not in public_engine_modules
+    ]
+
+
+def _top_blast_radius(modules: list[dict]) -> list[dict]:
+    return sorted(
+        (
+            {
+                'path': module['path'],
+                'linked_test_count': len(module['linked_tests']),
+                'linked_computation_count': len(module['computation_ids']),
+            }
+            for module in modules
+        ),
+        key=lambda item: (
+            -item['linked_test_count'],
+            -item['linked_computation_count'],
+            item['path'],
+        ),
+    )
+
+
 def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS) -> dict:
     """Build a deterministic architecture report for one Git tree and history."""
     if not 1 <= commit_limit <= MAX_HISTORY_COMMITS:
@@ -503,85 +667,22 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
         commit, test_paths, source_paths, all_paths, registry,
     )
 
-    linked_computations: dict[str, set[str]] = defaultdict(set)
-    consumer_map = []
-    for record in registry['computations']:
-        owners = []
-        mirrors = []
-        for implementation in record['implementations']:
-            linked_computations[implementation['path']].add(record['id'])
-            destination = owners if implementation['role'] == 'owner' else mirrors
-            destination.append(implementation['path'])
-        consumer_map.append({
-            'id': record['id'],
-            'owners': sorted(set(owners)),
-            'mirrors': sorted(set(mirrors)),
-            'surfaces': record['surfaces'],
-            'tests': record['tests'],
-        })
-
-    incoming: dict[str, set[str]] = defaultdict(set)
-    cross_layer = Counter()
-    cross_layer_details = []
-    for source, targets in graph.items():
-        for target in targets:
-            incoming[target].add(source)
-            edge = (_layer(source), _layer(target))
-            if edge[0] != edge[1]:
-                cross_layer[edge] += 1
-                cross_layer_details.append({
-                    'from': source,
-                    'from_layer': edge[0],
-                    'to': target,
-                    'to_layer': edge[1],
-                })
-
-    modules = []
-    layer_metrics: dict[str, dict[str, int]] = defaultdict(
-        lambda: {'files': 0, 'nonblank_lines': 0, 'definitions': 0}
+    linked_computations, consumer_map = _consumer_evidence(registry)
+    incoming, cross_layer, cross_layer_details = _edge_evidence(graph)
+    modules, layer_metrics = _module_evidence(
+        ref=commit,
+        source_paths=source_paths,
+        graph=graph,
+        incoming=incoming,
+        linked_computations=linked_computations,
+        test_links=test_links,
     )
-    for path in source_paths:
-        content = _read_at(commit, path)
-        nonblank = sum(bool(line.strip()) for line in content.splitlines())
-        definitions, largest = _definition_metrics(path, content)
-        layer = _layer(path)
-        layer_metrics[layer]['files'] += 1
-        layer_metrics[layer]['nonblank_lines'] += nonblank
-        layer_metrics[layer]['definitions'] += definitions
-        modules.append({
-            'path': path,
-            'layer': layer,
-            'scope_class': source_scope_class(path),
-            'nonblank_lines': nonblank,
-            'definitions': definitions,
-            'largest_definition_lines': largest,
-            'imports_out': graph[path],
-            'importers_in': sorted(incoming[path]),
-            'computation_ids': sorted(linked_computations[path]),
-            'linked_tests': sorted(test_links[path]),
-        })
 
     history, history_window = _history(
         commit, set(source_paths), commit_limit,
     )
-    history_by_path = {item['path']: item for item in history}
-    for module in modules:
-        module['history'] = history_by_path.get(
-            module['path'],
-            {'commits': 0, 'added': 0, 'deleted': 0, 'churn': 0},
-        )
-
-    concrete_engine_imports = []
-    for detail in cross_layer_details:
-        if (
-            detail['to_layer'] == 'engines'
-            and detail['from_layer'] != 'engines'
-            and detail['to'] not in {
-                'telugu_panchangam/engines/__init__.py',
-                'telugu_panchangam/engines/utils.py',
-            }
-        ):
-            concrete_engine_imports.append(detail)
+    _attach_history(modules, history)
+    concrete_engine_imports = _concrete_engine_imports(cross_layer_details)
 
     generated_contract = json.loads(
         _read_at(commit, _ACTIVITY_RULES_ARTIFACT)
@@ -590,20 +691,7 @@ def build_report(ref: str = 'HEAD', commit_limit: int = DEFAULT_HISTORY_COMMITS)
         (item['importer'], item['owner'], item['symbol'])
         for item in private_imports
     }
-    top_blast_radius = sorted(
-        (
-            {
-                'path': module['path'],
-                'linked_test_count': len(module['linked_tests']),
-                'linked_computation_count': len(module['computation_ids']),
-            }
-            for module in modules
-        ),
-        key=lambda item: (
-            -item['linked_test_count'], -item['linked_computation_count'],
-            item['path'],
-        ),
-    )
+    top_blast_radius = _top_blast_radius(modules)
 
     return {
         'schema_version': 1,

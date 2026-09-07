@@ -50,6 +50,15 @@ from telugu_panchangam.personal.muhurta import (
 from telugu_panchangam.personal.phalalu import rasi_phalalu
 from telugu_panchangam.personal.tarabalam import _nak_index, taras_for_day
 
+_CALCULATION_FAILED_ERROR = (
+    'Calculation failed. Please check your inputs and try again.'
+)
+_DATE_RANGE_LIMIT_ERROR = (
+    'Date range exceeds 366-day limit. Use multiple calls for longer spans.'
+)
+_END_DATE_ORDER_ERROR = 'end_date must be >= start_date.'
+_TOOL_CALL_FAILED_LOG = 'tool call failed'
+
 _log = logging.getLogger(__name__)
 _MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
 
@@ -350,8 +359,8 @@ def tool_get_panchangam(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_muhurta(
@@ -413,8 +422,8 @@ def tool_get_muhurta(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_daily_horas(
@@ -444,8 +453,8 @@ def tool_get_daily_horas(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_lagna_transitions(
@@ -475,8 +484,8 @@ def tool_get_lagna_transitions(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_panchangam_range(
@@ -494,7 +503,7 @@ def tool_get_panchangam_range(
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         if end < start:
-            raise ValueError("end_date must be >= start_date.")
+            raise ValueError(_END_DATE_ORDER_ERROR)
         if (end - start).days > 30:
             raise ValueError("Date range exceeds 31-day limit. Use multiple calls for longer spans.")
         _validate_system(system)
@@ -570,8 +579,8 @@ def tool_get_panchangam_range(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_special_days(
@@ -627,8 +636,8 @@ def tool_get_special_days(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_find_tarabalam_days(
@@ -717,8 +726,8 @@ def tool_find_tarabalam_days(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_graha_positions(
@@ -747,8 +756,8 @@ def tool_get_graha_positions(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_gochara(
@@ -795,8 +804,8 @@ def tool_get_gochara(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_rasi_phalalu(
@@ -834,8 +843,8 @@ def tool_get_rasi_phalalu(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def _resolve_city_with_alt(
@@ -876,9 +885,9 @@ def tool_get_combustion_calendar(
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         if end < start:
-            raise ValueError('end_date must be >= start_date.')
+            raise ValueError(_END_DATE_ORDER_ERROR)
         if (end - start).days > 365:
-            raise ValueError('Date range exceeds 366-day limit. Use multiple calls for longer spans.')
+            raise ValueError(_DATE_RANGE_LIMIT_ERROR)
         if planets is not None:
             bad = [p for p in planets if p not in set(PLANET_NAMES)]
             if bad:
@@ -919,8 +928,8 @@ def tool_get_combustion_calendar(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def _validate_muhurta_inputs(
@@ -1155,8 +1164,8 @@ def tool_find_muhurta(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_graha_yuddha(
@@ -1169,9 +1178,9 @@ def tool_get_graha_yuddha(
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         if end < start:
-            raise ValueError('end_date must be >= start_date.')
+            raise ValueError(_END_DATE_ORDER_ERROR)
         if (end - start).days > 365:
-            raise ValueError('Date range exceeds 366-day limit. Use multiple calls for longer spans.')
+            raise ValueError(_DATE_RANGE_LIMIT_ERROR)
         if planets is not None:
             bad = [p for p in planets if p not in set(YUDDHA_PLANETS)]
             if bad:
@@ -1212,8 +1221,8 @@ def tool_get_graha_yuddha(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_rashi_ingresses(
@@ -1229,9 +1238,9 @@ def tool_get_rashi_ingresses(
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         if end < start:
-            raise ValueError('end_date must be >= start_date.')
+            raise ValueError(_END_DATE_ORDER_ERROR)
         if (end - start).days > 365:
-            raise ValueError('Date range exceeds 366-day limit. Use multiple calls for longer spans.')
+            raise ValueError(_DATE_RANGE_LIMIT_ERROR)
         if planets is not None:
             bad = [p for p in planets if p not in set(INGRESS_PLANETS)]
             if bad:
@@ -1266,8 +1275,8 @@ def tool_get_rashi_ingresses(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_eclipse_calendar(
@@ -1284,7 +1293,7 @@ def tool_get_eclipse_calendar(
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         if end < start:
-            raise ValueError('end_date must be >= start_date.')
+            raise ValueError(_END_DATE_ORDER_ERROR)
         if (end - start).days > 730:
             raise ValueError('Date range exceeds 730-day limit.')
         loc = _resolve_city(city, latitude, longitude, timezone)
@@ -1337,8 +1346,8 @@ def tool_get_eclipse_calendar(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
 
 
 def tool_get_panchanga_shuddhi(
@@ -1383,5 +1392,5 @@ def tool_get_panchanga_shuddhi(
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
-        _log.exception('tool call failed')
-        return json.dumps({'error': 'Calculation failed. Please check your inputs and try again.'})
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})

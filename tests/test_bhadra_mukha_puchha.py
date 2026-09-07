@@ -49,7 +49,8 @@ def test_tithi_specific_yama_quarters_and_widths():
             [Span('Vishti', start, end)], clock,
             tithi_at=lambda _dt, name=tithi: name,
         )
-        assert mukha is not None and puchha is not None
+        assert mukha is not None
+        assert puchha is not None
         total = (end - start).total_seconds()
         assert abs((mukha.start - start).total_seconds() - total * (mq - 1) / 4) < 1
         assert abs((mukha.end - mukha.start).total_seconds() - total * 5 / 30) < 1

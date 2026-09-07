@@ -15,6 +15,17 @@ from __future__ import annotations
 
 from .election_assessors.conventions import ELECTION_CHART_CONVENTIONS
 
+_CLAIM_ANNAPRASANA_CHART = 'muhurta.annaprasana.raman_transcription_chart'
+_CLAIM_GOLD_PURCHASE = 'muhurta.gold_jewelry.purchase'
+_CLAIM_LAND_PURCHASE = 'muhurta.land_purchase.building'
+_CLAIM_PURCHASE_GENERAL = 'muhurta.purchase.general'
+_CLAIM_SEEMANTHA = 'muhurta.seemantha'
+_CLAIM_SHANTIKA_PAUSHTIKA = 'muhurta.shantika_paushtika'
+_CLAIM_WEDDING = 'muhurta.wedding'
+_EIGHTH_HOUSE_VACANT = '8th house is vacant'
+_GOLD_QUALIFICATION_POLICY = 'election_chart.gold_qualification_policy_v1'
+_KUJA_OUTSIDE_EIGHTH = 'Mangala (Kuja) is outside the 8th house'
+
 ELECTION_CHART_RULE_SCHEMA_VERSION = 4
 ELECTION_CHART_HOUSE_SYSTEM = 'whole_sign'
 ELECTION_CHART_NODE_CONVENTION = 'mean'
@@ -26,12 +37,12 @@ ELECTION_CHART_COMPLETE_ASSESSORS = ('gold', 'annaprasana', 'karnavedha')
 VIDYARAMBHA_SOURCE_CLAIM = 'muhurta.vidyarambha'
 
 ELECTION_CHART_SOURCE_LOCATORS = {
-    'muhurta.wedding': (
+    _CLAIM_WEDDING: (
         "B. V. Raman, Chapter IX, 'Electing a time for marriage,' inspected "
         'in the 2020 Chistabo derivative at internal printed pp. 41-42 '
         '(physical PDF pp. 45-46), from the lunar-month paragraph through '
         'the election-chart conditions'),
-    'muhurta.annaprasana.raman_transcription_chart': (
+    _CLAIM_ANNAPRASANA_CHART: (
         "B. V. Raman, Chapter VIII, 'First feeding on rice "
         "(Annaprasana),' inspected in the 2020 Chistabo derivative at "
         'internal printed p. 22 '
@@ -44,7 +55,7 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "B. V. Raman, Chapter VIII, 'Commencing education "
         "(Aksharabhyasa),' inspected in the 2020 Chistabo derivative at "
         'internal printed p. 23 (physical PDF p. 26)'),
-    'muhurta.seemantha': (
+    _CLAIM_SEEMANTHA: (
         "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected "
         'in the 2020 Chistabo derivative at internal printed pp. 21-22 '
         '(physical PDF pp. 24-25)'),
@@ -52,23 +63,23 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "B. V. Raman, Chapter XII, 'House building,' section 'Entering a "
         "new house,' inspected in the 2020 Chistabo derivative at internal "
         'printed pp. 52-54 (physical PDF pp. 56-58)'),
-    'muhurta.land_purchase.building': (
+    _CLAIM_LAND_PURCHASE: (
         "B. V. Raman, Chapter XII, 'Buying Lands for Buildings,' inspected "
         'in the 2020 Chistabo derivative at internal printed p. 54 '
         '(physical PDF p. 58)'),
     'muhurta.house_purchase.completed': (
         "B. V. Raman, Chapter XII, 'Buying Houses,' inspected in the 2020 "
         'Chistabo derivative at internal printed p. 54 (physical PDF p. 58)'),
-    'muhurta.gold_jewelry.purchase': (
+    _CLAIM_GOLD_PURCHASE: (
         "B. V. Raman, Chapter X, 'Buying Jewelry,' inspected in the 2020 "
         'Chistabo derivative at internal printed p. 45 (physical PDF p. 49)'),
-    'muhurta.purchase.general': (
+    _CLAIM_PURCHASE_GENERAL: (
         'Nakshatra-prakarana, purchase Muhurta verse 16, printed '
         'pp. 33-34, and marketplace verse 17, printed pp. 34-35'),
     'muhurta.service_entry': (
         "Nakshatra-prakarana, 'Entering the service of a master,' verse 26, "
         'printed p. 38'),
-    'muhurta.shantika_paushtika': (
+    _CLAIM_SHANTIKA_PAUSHTIKA: (
         "Nakshatra-prakarana, 'Shantika and Paushtika Muhurta,' verse 34, "
         'printed pp. 42-43'),
     'muhurta.pilgrimage': (
@@ -121,31 +132,31 @@ def _rule(
 ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
     'wedding': (
         _rule('wedding.house-7-vacant', '7th house is vacant',
-              'house_empty', 'reject', 'muhurta.wedding', house=7),
-        _rule('wedding.kuja-not-8', 'Mangala (Kuja) is outside the 8th house',
-              'planet_not_house', 'reject', 'muhurta.wedding', planet='Kuja', house=8),
+              'house_empty', 'reject', _CLAIM_WEDDING, house=7),
+        _rule('wedding.kuja-not-8', _KUJA_OUTSIDE_EIGHTH,
+              'planet_not_house', 'reject', _CLAIM_WEDDING, planet='Kuja', house=8),
         _rule('wedding.shukra-not-6', 'Shukra is outside the 6th house',
-              'planet_not_house', 'reject', 'muhurta.wedding', planet='Shukra', house=6),
+              'planet_not_house', 'reject', _CLAIM_WEDDING, planet='Shukra', house=6),
     ),
     'annaprasana': (
         _rule(
             'annaprasana.house-10-vacant', '10th house is vacant',
             'house_empty', 'reject',
-            'muhurta.annaprasana.raman_transcription_chart',
+            _CLAIM_ANNAPRASANA_CHART,
             convention_id='whole-sign-physical-occupation-v1', house=10,
         ),
         _rule(
             'annaprasana.budha-not-7', 'Budha is outside the 7th house',
             'planet_not_house', 'reject',
-            'muhurta.annaprasana.raman_transcription_chart',
+            _CLAIM_ANNAPRASANA_CHART,
             convention_id='whole-sign-physical-occupation-v1',
             planet='Budha', house=7,
         ),
         _rule(
             'annaprasana.kuja-not-8',
-            'Mangala (Kuja) is outside the 8th house',
+            _KUJA_OUTSIDE_EIGHTH,
             'planet_not_house', 'reject',
-            'muhurta.annaprasana.raman_transcription_chart',
+            _CLAIM_ANNAPRASANA_CHART,
             convention_id='whole-sign-physical-occupation-v1',
             planet='Kuja', house=8,
         ),
@@ -153,7 +164,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'annaprasana.shukra-not-9',
             'Shukra is outside the 9th house',
             'planet_not_house', 'reject',
-            'muhurta.annaprasana.raman_transcription_chart',
+            _CLAIM_ANNAPRASANA_CHART,
             convention_id='whole-sign-physical-occupation-v1',
             planet='Shukra', house=9,
         ),
@@ -161,7 +172,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'annaprasana.benefic-occupies-lagna',
             'Budha, Guru or Shukra occupies Lagna',
             'any_planet_in_houses', 'prefer',
-            'muhurta.annaprasana.raman_transcription_chart',
+            _CLAIM_ANNAPRASANA_CHART,
             convention_id='whole-sign-physical-occupation-v1',
             decision_policy_claim=(
                 'election_chart.annaprasana.'
@@ -172,7 +183,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'annaprasana.no-natural-malefic-in-lagna',
             'No natural malefic occupies Lagna',
             'house_free_of_natural_malefics', 'reject',
-            'muhurta.annaprasana.raman_transcription_chart',
+            _CLAIM_ANNAPRASANA_CHART,
             convention_id='annaprasana-natural-malefic-lagna-v1',
             house=1,
             fixed_malefics=['Surya', 'Kuja', 'Shani', 'Rahu', 'Ketu'],
@@ -180,28 +191,28 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
         ),
     ),
     'karnavedha': (
-        _rule('karnavedha.house-8-vacant', '8th house is vacant',
+        _rule('karnavedha.house-8-vacant', _EIGHTH_HOUSE_VACANT,
               'house_empty', 'reject', 'muhurta.karnavedha', house=8),
     ),
     'seemantha': (
-        _rule('seemantha.house-8-vacant', '8th house is vacant',
-              'house_empty', 'reject', 'muhurta.seemantha', house=8),
+        _rule('seemantha.house-8-vacant', _EIGHTH_HOUSE_VACANT,
+              'house_empty', 'reject', _CLAIM_SEEMANTHA, house=8),
         _rule('seemantha.chandra-not-8', 'Chandra is outside the 8th house',
-              'planet_not_house', 'reject', 'muhurta.seemantha', planet='Chandra', house=8),
+              'planet_not_house', 'reject', _CLAIM_SEEMANTHA, planet='Chandra', house=8),
     ),
     'gruhapravesha': (
-        _rule('gruhapravesha.house-8-vacant', '8th house is vacant',
+        _rule('gruhapravesha.house-8-vacant', _EIGHTH_HOUSE_VACANT,
               'house_empty', 'reject', 'muhurta.gruhapravesha', house=8),
     ),
     'property': (
         _rule('property.guru-kendra-trikona', 'Guru occupies a Kendra or Trikona',
-              'planet_in_houses', 'prefer', 'muhurta.land_purchase.building',
+              'planet_in_houses', 'prefer', _CLAIM_LAND_PURCHASE,
               planet='Guru', houses=[1, 4, 5, 7, 9, 10]),
         _rule('property.kuja-11', 'Mangala (Kuja) occupies the 11th house',
-              'planet_in_houses', 'prefer', 'muhurta.land_purchase.building',
+              'planet_in_houses', 'prefer', _CLAIM_LAND_PURCHASE,
               planet='Kuja', houses=[11]),
         _rule('property.kuja-not-lagna', 'Mangala (Kuja) is outside Lagna',
-              'planet_not_house', 'reject', 'muhurta.land_purchase.building', planet='Kuja', house=1),
+              'planet_not_house', 'reject', _CLAIM_LAND_PURCHASE, planet='Kuja', house=1),
     ),
     'house_purchase': (
         _rule('house-purchase.kuja-not-lagna', 'Mangala (Kuja) is outside Lagna',
@@ -212,9 +223,9 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'gold.surya-well-situated',
             'Surya is well situated under the disclosed v1 convention',
             'planet_well_situated', 'qualify',
-            'muhurta.gold_jewelry.purchase',
+            _CLAIM_GOLD_PURCHASE,
             convention_id='phaladeepika-well-placed-v1',
-            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            decision_policy_claim=_GOLD_QUALIFICATION_POLICY,
             planet='Surya', avoid_houses=[6, 8, 12],
             enemy_rashis=['Vrishabha', 'Tula', 'Makara', 'Kumbha'],
             debilitation_rashi='Tula',
@@ -224,9 +235,9 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'gold.chandra-well-situated',
             'Chandra is well situated under the disclosed v1 convention',
             'planet_well_situated', 'qualify',
-            'muhurta.gold_jewelry.purchase',
+            _CLAIM_GOLD_PURCHASE,
             convention_id='phaladeepika-well-placed-v1',
-            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            decision_policy_claim=_GOLD_QUALIFICATION_POLICY,
             planet='Chandra', avoid_houses=[6, 8, 12], enemy_rashis=[],
             debilitation_rashi='Vrischika',
             navamsa_debilitation_rashi='Vrischika',
@@ -237,9 +248,9 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'gold.surya-fully-aspected',
             'Surya receives at least one full classical Graha Drishti',
             'planet_receives_full_aspect', 'qualify',
-            'muhurta.gold_jewelry.purchase',
+            _CLAIM_GOLD_PURCHASE,
             convention_id='phaladeepika-full-graha-drishti-v1',
-            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            decision_policy_claim=_GOLD_QUALIFICATION_POLICY,
             planet='Surya',
             aspectors=['Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani'],
         ),
@@ -247,9 +258,9 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
             'gold.chandra-fully-aspected',
             'Chandra receives at least one full classical Graha Drishti',
             'planet_receives_full_aspect', 'qualify',
-            'muhurta.gold_jewelry.purchase',
+            _CLAIM_GOLD_PURCHASE,
             convention_id='phaladeepika-full-graha-drishti-v1',
-            decision_policy_claim='election_chart.gold_qualification_policy_v1',
+            decision_policy_claim=_GOLD_QUALIFICATION_POLICY,
             planet='Chandra',
             aspectors=['Surya', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani'],
         ),
@@ -257,7 +268,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
     'vidyarambha': (
         _rule(
             'vidyarambha.house-8-vacant',
-            '8th house is vacant',
+            _EIGHTH_HOUSE_VACANT,
             'house_empty',
             'reject',
             VIDYARAMBHA_SOURCE_CLAIM,
@@ -279,10 +290,10 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
     ),
     'purchase': (
         _rule('purchase.chandra-lagna', 'Chandra occupies Lagna',
-              'planet_in_houses', 'prefer', 'muhurta.purchase.general',
+              'planet_in_houses', 'prefer', _CLAIM_PURCHASE_GENERAL,
               planet='Chandra', houses=[1]),
         _rule('purchase.shukra-lagna', 'Shukra occupies Lagna',
-              'planet_in_houses', 'prefer', 'muhurta.purchase.general',
+              'planet_in_houses', 'prefer', _CLAIM_PURCHASE_GENERAL,
               planet='Shukra', houses=[1]),
     ),
     'job': (
@@ -292,13 +303,13 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
     ),
     'ceremony': (
         _rule('ceremony.surya-10', 'Surya occupies the 10th house',
-              'planet_in_houses', 'prefer', 'muhurta.shantika_paushtika',
+              'planet_in_houses', 'prefer', _CLAIM_SHANTIKA_PAUSHTIKA,
               planet='Surya', houses=[10]),
         _rule('ceremony.chandra-4', 'Chandra occupies the 4th house',
-              'planet_in_houses', 'prefer', 'muhurta.shantika_paushtika',
+              'planet_in_houses', 'prefer', _CLAIM_SHANTIKA_PAUSHTIKA,
               planet='Chandra', houses=[4]),
         _rule('ceremony.guru-lagna', 'Guru occupies Lagna',
-              'planet_in_houses', 'prefer', 'muhurta.shantika_paushtika',
+              'planet_in_houses', 'prefer', _CLAIM_SHANTIKA_PAUSHTIKA,
               planet='Guru', houses=[1]),
     ),
     'pilgrimage': (
@@ -307,11 +318,11 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
               planet='Guru', houses=[1, 9]),
     ),
     'travel': (
-        _rule('travel.kuja-not-8', 'Mangala (Kuja) is outside the 8th house',
+        _rule('travel.kuja-not-8', _KUJA_OUTSIDE_EIGHTH,
               'planet_not_house', 'reject', 'muhurta.travel', planet='Kuja', house=8),
     ),
     'surgery': (
-        _rule('surgery.house-8-vacant', '8th house is vacant',
+        _rule('surgery.house-8-vacant', _EIGHTH_HOUSE_VACANT,
               'house_empty', 'reject', 'muhurta.surgery', house=8),
     ),
 }

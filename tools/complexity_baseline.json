@@ -42,25 +42,7 @@
       "_assert_non_overlapping_pointers": 12
     },
     "tools/analyze_computation_architecture.py": {
-      "_layer": 14,
-      "build_report": 11
-    },
-    "tools/audit_lagna_boundary_guard.py": {
-      "generate_report": 11
-    },
-    "tools/check_activity_provenance.py": {
-      "audit": 23
-    },
-    "tools/check_computation_inventory.py": {
-      "_validate_method": 20,
-      "validate_registry": 57
-    },
-    "tools/check_documentation_freshness.py": {
-      "validate_documentation": 11
-    },
-    "tools/export_muhurtam_rule_crosswalk.py": {
-      "_validate_complete": 22,
-      "build_crosswalk": 36
+      "_layer": 14
     }
   },
   "max_complexity": 10,

@@ -1,8 +1,11 @@
+_NAKSHATRA_UTTARA_ASHADHA = 'Uttara Ashadha'
+_NAKSHATRA_UTTARA_PHALGUNI = 'Uttara Phalguni'
+
 # Weekday -> set of nakshatras forming Sarvartha Siddhi Yoga.
 _SARVARTHA_SIDDHI: dict[str, set[str]] = {
     'Adivaram':    {'Hasta', 'Mula', 'Pushya', 'Ashvini', 'Punarvasu', 'Anuradha', 'Shravana', 'Revati'},
     'Somavaram':   {'Shravana', 'Rohini', 'Mrigashira', 'Pushya', 'Anuradha'},
-    'Mangalavaram': {'Ashvini', 'Krittika', 'Ashlesha', 'Uttara Ashadha', 'Uttara Phalguni', 'Uttara Bhadrapada'},
+    'Mangalavaram': {'Ashvini', 'Krittika', 'Ashlesha', _NAKSHATRA_UTTARA_ASHADHA, _NAKSHATRA_UTTARA_PHALGUNI, 'Uttara Bhadrapada'},
     'Budhavaram':  {'Krittika', 'Rohini', 'Hasta', 'Anuradha', 'Mrigashira'},
     'Guruvaram':   {'Ashvini', 'Punarvasu', 'Anuradha', 'Revati', 'Pushya', 'Swati'},
     'Shukravaram': {'Revati', 'Anuradha', 'Ashvini', 'Pushya', 'Shravana', 'Punarvasu'},
@@ -48,8 +51,8 @@ _DVIPUSHKARA_NAKSHATRAS: set[str] = {'Mrigashira', 'Chitra', 'Dhanishtha'}
 
 _TRIPUSHKARA_TITHIS: set[int] = {2, 7, 12}
 _TRIPUSHKARA_NAKSHATRAS: set[str] = {
-    'Krittika', 'Punarvasu', 'Uttara Phalguni',
-    'Vishakha', 'Uttara Ashadha', 'Purva Bhadrapada',
+    'Krittika', 'Punarvasu', _NAKSHATRA_UTTARA_PHALGUNI,
+    'Vishakha', _NAKSHATRA_UTTARA_ASHADHA, 'Purva Bhadrapada',
 }
 
 
@@ -122,8 +125,8 @@ _VAARA_OFFSET = {
 _NAKSHATRA_ORDER = [
     'Ashvini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra',
     'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni',
-    'Uttara Phalguni', 'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha',
-    'Jyeshtha', 'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana',
+    _NAKSHATRA_UTTARA_PHALGUNI, 'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha',
+    'Jyeshtha', 'Mula', 'Purva Ashadha', _NAKSHATRA_UTTARA_ASHADHA, 'Shravana',
     'Dhanishtha', 'Shatabhisha', 'Purva Bhadrapada', 'Uttara Bhadrapada',
     'Revati',
 ]

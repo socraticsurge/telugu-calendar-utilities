@@ -179,9 +179,11 @@ def test_relative_day_markers_on_anga_times():
     tithi_line = next(
         line for line in description.split('\n') if line.startswith('Tithi:')
     )
-    assert '(-1)' in nakshatra_line and '(+1)' not in nakshatra_line
+    assert '(-1)' in nakshatra_line
+    assert '(+1)' not in nakshatra_line
     assert '(+1)' in yoga_line
-    assert '(+1)' not in tithi_line and '(-1)' not in tithi_line
+    assert '(+1)' not in tithi_line
+    assert '(-1)' not in tithi_line
 
 
 # --- Festivals in the feed ---
