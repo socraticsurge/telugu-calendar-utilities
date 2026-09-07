@@ -386,10 +386,11 @@ describe('Muhurtam saved-profile participants', () => {
     expect(call('muChandraModeDayDropReason', day, [], 'strict')).toBeNull();
     expect(call('muNoSlotDayReason', day, new Set(), 'Wedding', [], 'strict')).toBeNull();
     const droppedDays: unknown[] = [];
-    call(
-      'muRecordNoSlotDay', new Set(['2026-09-07']), droppedDays,
-      '2026-09-07', day, new Set(), 'Wedding', [], 'strict',
-    );
+    call('muRecordNoSlotDay', {
+      slotsPerDay: new Set(['2026-09-07']), droppedDays,
+      isoDate: '2026-09-07', data: day, skipYogas: new Set(),
+      activityLabel: 'Wedding', people: [], chandraMode: 'strict',
+    });
     expect(droppedDays).toEqual([]);
 
     const facts = { tithi: 'Dwitiya', nakshatra: 'Rohini', specialYogas: [], yoga: 'Siddha' };

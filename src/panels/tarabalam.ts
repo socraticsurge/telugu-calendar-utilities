@@ -1918,16 +1918,11 @@ function muNoSlotDayReason(data, skipYogas, activityLabel, people, chandraMode) 
     || muChandraModeDayDropReason(data, people, chandraMode);
 }
 
-function muRecordNoSlotDay(
-  slotsPerDay,
-  droppedDays,
-  isoDate: string,
-  data,
-  skipYogas,
-  activityLabel,
-  people,
-  chandraMode,
-): void {
+function muRecordNoSlotDay(options): void {
+  const {
+    slotsPerDay, droppedDays, isoDate, data, skipYogas,
+    activityLabel, people, chandraMode,
+  } = options;
   if (slotsPerDay.has(isoDate)) return;
   const reason = muNoSlotDayReason(
     data, skipYogas, activityLabel, people, chandraMode,
@@ -2075,9 +2070,9 @@ export function muScoreParticipantLagna(people, slotLagna) {
   ]) {
     const entries = groups[key];
     if (!entries.length) continue;
-    const suffix = key.startsWith('ashtama')
-      ? ` (-${entries.length})`
-      : key.startsWith('neutral') ? ' (no effect)' : ` (+${entries.length})`;
+    let suffix = ` (+${entries.length})`;
+    if (key.startsWith('ashtama')) suffix = ` (-${entries.length})`;
+    if (key.startsWith('neutral')) suffix = ' (no effect)';
     reasons.push(`${slotLagna} lagna ${label} for ${entries.join(', ')}${suffix}`);
   }
   return { score, reasons, ashtamaNames };
@@ -2361,8 +2356,10 @@ function muInitialSlotScore(foundation, electionReasons) {
   const natureBonus = muNatureBonus(isAbhijit, muRow[2]);
   const muLabel = muRow[0] + (isAbhijit ? ' (Abhijit)' : '');
   const muDeity = muRow[1] ? ` · ${muRow[1]}` : '';
-  const chogDescription = `${choghadiya.name} choghadiya${
-    dominant.straddle ? ` (spans ${dominant.straddle})` : ''}`;
+  const straddleDescription = dominant.straddle
+    ? ` (spans ${dominant.straddle})`
+    : '';
+  const chogDescription = `${choghadiya.name} choghadiya${straddleDescription}`;
   const chogLine = base ? `${chogDescription} (+${base})` : chogDescription;
   return {
     score: base + natureBonus,
@@ -2752,10 +2749,10 @@ async function findMuhurta() {
       for (let mi = 0; mi < 15; mi++) processSlot(mi);
       // Diagnose: if the day produced no slots and it wasn't an eclipse,
       // record the most likely reason (samskara skip, mode filter, etc.).
-      muRecordNoSlotDay(
+      muRecordNoSlotDay({
         slotsPerDay, droppedDays, isoDate, data, skipYogas,
         activityLabel, people, chandraMode,
-      );
+      });
     };
     for (let i = 0; i < nDays; i++) {
       const d = new Date(from); d.setDate(d.getDate() + i);
