@@ -132,6 +132,10 @@ interface TarabalamPanelModule {
   muChartDispositionHtml(screening: unknown): string;
   muSafetyTitle(activity: string): string;
   tbChandraVerdict(position: number): string;
+  tbChandraPresentation(tara: {
+    good: boolean;
+    chandra?: { verdict: string; pos: number };
+  }): { chandraTag: string; cls: string };
   muNatureBonus(isAbhijit: boolean, nature: string): number;
   muAvoidKaranaWindows(karana: string, avoidNames: Set<unknown>): number[][];
   muRoleStatus(
@@ -434,24 +438,20 @@ describe('Muhurtam saved-profile participants', () => {
   });
 
   test('keeps computed chart outcome labels stable', () => {
-    expect(panel.muChartOutcomeLabel({ effect: 'reject', status: 'pass' }))
-      .toBe('Required check passed');
-    expect(panel.muChartOutcomeLabel({ effect: 'reject', status: 'unknown' }))
-      .toBe('Required check could not be verified');
-    expect(panel.muChartOutcomeLabel({ effect: 'reject', status: 'fail' }))
-      .toBe('Removed by mandatory chart rule');
-    expect(panel.muChartOutcomeLabel({ effect: 'qualify', status: 'pass' }))
-      .toBe('Qualification met');
-    expect(panel.muChartOutcomeLabel({ effect: 'qualify', status: 'unknown' }))
-      .toBe('Indeterminate at calculation boundary · review needed');
-    expect(panel.muChartOutcomeLabel({ effect: 'qualify', status: 'fail' }))
-      .toBe('Condition not met · slot retained · raw score unchanged · maximum rating Good');
-    expect(panel.muChartOutcomeLabel({ effect: 'prefer', status: 'pass' }))
-      .toBe('Preference met · tie-break only');
-    expect(panel.muChartOutcomeLabel({ effect: 'prefer', status: 'unknown' }))
-      .toBe('Preference could not be verified');
-    expect(panel.muChartOutcomeLabel({ effect: 'prefer', status: 'fail' }))
-      .toBe('Preference not present · no penalty');
+    const cases = [
+      ['reject', 'pass', 'Required check passed'],
+      ['reject', 'unknown', 'Required check could not be verified'],
+      ['reject', 'fail', 'Removed by mandatory chart rule'],
+      ['qualify', 'pass', 'Qualification met'],
+      ['qualify', 'unknown', 'Indeterminate at calculation boundary · review needed'],
+      ['qualify', 'fail', 'Condition not met · slot retained · raw score unchanged · maximum rating Good'],
+      ['prefer', 'pass', 'Preference met · tie-break only'],
+      ['prefer', 'unknown', 'Preference could not be verified'],
+      ['prefer', 'fail', 'Preference not present · no penalty'],
+    ];
+    for (const [effect, status, label] of cases) {
+      expect(panel.muChartOutcomeLabel({ effect, status })).toBe(label);
+    }
   });
 
   test('keeps chart boundary explanations stable', () => {
@@ -573,6 +573,18 @@ describe('Muhurtam saved-profile participants', () => {
     expect(panel.tbChandraVerdict(1)).toBe('good');
     expect(panel.tbChandraVerdict(2)).toBe('puja');
     expect(panel.tbChandraVerdict(4)).toBe('bad');
+    expect(panel.tbChandraPresentation({
+      good: true,
+      chandra: { verdict: 'puja', pos: 2 },
+    })).toEqual({ chandraTag: ' · ° 2nd', cls: 'good' });
+    expect(panel.tbChandraPresentation({
+      good: false,
+      chandra: { verdict: 'bad', pos: 4 },
+    })).toEqual({ chandraTag: ' · ☾ 4th', cls: 'bad' });
+    expect(panel.tbChandraPresentation({
+      good: true,
+      chandra: { verdict: 'good', pos: 1 },
+    })).toEqual({ chandraTag: '', cls: 'good' });
     expect(panel.muNatureBonus(true, 'inauspicious')).toBe(2);
     expect(panel.muNatureBonus(false, 'auspicious')).toBe(1);
     expect(panel.muNatureBonus(false, 'inauspicious')).toBe(-2);

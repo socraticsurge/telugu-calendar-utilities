@@ -1054,6 +1054,20 @@ function tbPersonGood(t) {
   return true;  // stars: chandra annotates, never blocks
 }
 
+export function tbChandraPresentation(t): { chandraTag: string; cls: string } {
+  const passes = tbPersonGood(t);
+  let caveat = t.chandra?.verdict || null;
+  if (caveat === 'good') caveat = null;
+  const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+  let chandraTag = '';
+  if (caveat === 'puja') chandraTag = ` · ° ${ord(t.chandra.pos)}`;
+  else if (caveat) chandraTag = ` · ☾ ${ord(t.chandra.pos)}`;
+  let cls = 'good';
+  if (!passes) cls = 'bad';
+  else if (TB_MODE === 'puja_ok' && caveat === 'puja') cls = 'puja';
+  return { chandraTag, cls };
+}
+
 function tbToggleShowAll() {
   TB_SHOW_ALL = inpEl('tb-show-all').checked;
   renderTarabalam();
@@ -1159,19 +1173,10 @@ function renderTarabalam(profiles?) {
     const chips = r.taras.map(t => {
       // chip colour = verdict under the chosen ✦ standard; the Moon is a
       // marked caveat (° puja, ☾ moon-avoid), never a silent veto
-      const passes = tbPersonGood(t);
-      let caveat = t.chandra?.verdict || null;
-      if (caveat === 'good') caveat = null;
-      const ord = n => n + (['st','nd','rd'][n-1] || 'th');
-      let chandraTag = '';
-      if (caveat === 'puja') chandraTag = ` · ° ${ord(t.chandra.pos)}`;
-      else if (caveat) chandraTag = ` · ☾ ${ord(t.chandra.pos)}`;
+      const { chandraTag, cls } = tbChandraPresentation(t);
       // colour follows the chosen standard: under 'Stars only' the chips are
       // pure star verdicts; amber only when the standard admits a day on the
       // condition of a remedial puja
-      let cls = 'good';
-      if (!passes) cls = 'bad';
-      else if (TB_MODE === 'puja_ok' && caveat === 'puja') cls = 'puja';
       let chandraDetail = '';
       if (t.chandra) {
         let chandraVerdict = t.chandra.verdict;
@@ -1216,16 +1221,7 @@ function renderTarabalam(profiles?) {
   const cards = rows.map(r => {
     const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const personRows = r.taras.map((t, i) => {
-      const passes = tbPersonGood(t);
-      let caveat = t.chandra?.verdict || null;
-      if (caveat === 'good') caveat = null;
-      const ord = n => n + (['st','nd','rd'][n-1] || 'th');
-      let chandraTag = '';
-      if (caveat === 'puja') chandraTag = ` · ° ${ord(t.chandra.pos)}`;
-      else if (caveat) chandraTag = ` · ☾ ${ord(t.chandra.pos)}`;
-      let cls = 'good';
-      if (!passes) cls = 'bad';
-      else if (TB_MODE === 'puja_ok' && caveat === 'puja') cls = 'puja';
+      const { chandraTag, cls } = tbChandraPresentation(t);
       // Mobile card sub-line: name · nak · optional rashi/lagna.
       const p = profiles[i];
       let subText = '';
