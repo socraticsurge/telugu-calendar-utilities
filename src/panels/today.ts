@@ -269,7 +269,7 @@ function angaTile(label, kind, entry) {
 
 function karanaTile(karana) {
   if (!karana) return '';
-  const rows = karana.split(/\s+\/\s+/).map(value => {
+  const rows = karana.split('/').map(value => value.trim()).map(value => {
     const range = parseKaranaRange(value);
     if (!range) return `<div class="anga-time">${value}</div>`;
     return `<div class="anga-time"><b>${range.name}</b> ${fmtRange(range.start, range.end, '–', range.sflag, range.eflag)}</div>`;
@@ -674,7 +674,7 @@ function shareAngaLine(label, entry) {
 
 function shareKaranaLines(karana) {
   if (!karana) return [];
-  const ranges = karana.split(/\s+\/\s+/).map(value => {
+  const ranges = karana.split('/').map(value => value.trim()).map(value => {
     const range = parseKaranaRange(value);
     if (!range) return value;
     return `${range.name} ${fmtPlain(range.start, range.sflag)}–${fmtPlain(range.end, range.eflag)}`;
