@@ -56,7 +56,8 @@ def test_taras_for_day_group():
     out = taras_for_day('Ashvini', ['Uttara Bhadrapada', 'Purva Ashadha'])
     assert out[0] == {'janma_nakshatra': 'Uttara Bhadrapada', 'tara': 3,
                       'name': 'Vipat', 'auspicious': False}
-    assert out[1]['name'] == 'Parama Mitra' and out[1]['auspicious'] is True
+    assert out[1]['name'] == 'Parama Mitra'
+    assert out[1]['auspicious'] is True
 
 def test_good_for_all_requires_every_tara_auspicious():
     from telugu_panchangam.personal.tarabalam import good_for_all

@@ -38,6 +38,8 @@ ANNAPRASANA_OUTPUT_DIR = (
 )
 PREFERENCE_MET_COPY = 'Preference met · tie-break only'
 PREFERENCE_NOT_PRESENT_COPY = 'Preference not present · no penalty'
+PANCHANGAM_SHORTLIST_SHOWN_COPY = 'Panchangam shortlist shown'
+MUHURTA_RESULT_SELECTOR = '#mu-result'
 
 
 def _load_smoke_module():
@@ -133,12 +135,12 @@ CAPTURES = (
     Capture(
         'fixture-offline-unavailable-mobile-390x844.png',
         'offline', 'purchase', 'drik', 390, 844, 'unavailable',
-        'Panchangam shortlist shown',
+        PANCHANGAM_SHORTLIST_SHOWN_COPY,
     ),
     Capture(
         'fixture-malformed-response-unavailable-desktop-1440x900.png',
         'malformed', 'purchase', 'drik', 1440, 900, 'unavailable',
-        'Panchangam shortlist shown',
+        PANCHANGAM_SHORTLIST_SHOWN_COPY,
     ),
 )
 
@@ -272,7 +274,7 @@ def _configure_search(page, smoke, base_url: str, activity: str) -> None:
 
 
 def _capture_page(
-    page, path: Path, anchor: str = '#mu-result', top_margin: int = 0,
+    page, path: Path, anchor: str = MUHURTA_RESULT_SELECTOR, top_margin: int = 0,
 ) -> None:
     locator = page.locator(anchor).first
     if top_margin:
@@ -311,7 +313,7 @@ def _capture_regular(
             activity=capture.activity,
             system=capture.system,
         )
-        result = page.locator('#mu-result')
+        result = page.locator(MUHURTA_RESULT_SELECTOR)
         status = result.locator(f'.mu-chart-status--{capture.expected_state}')
         if status.count() != 1 or not status.is_visible():
             classes = result.locator('.mu-chart-status').all()
@@ -353,7 +355,7 @@ def _capture_regular(
                     '.mu-chart-rule--prefer.mu-chart-rule--fail'),
                 'annaprasana-hard-fail': '.mu-chart-removals',
                 'annaprasana-unknown': '.mu-chart-rule--unknown',
-            }.get(capture.scenario, '#mu-result')
+            }.get(capture.scenario, MUHURTA_RESULT_SELECTOR)
         top_margin = 300 if capture.filename == (
             'fixture-annaprasana-pass-mobile-390x844.png'
         ) else 0
@@ -370,10 +372,10 @@ def _capture_loading_and_timeout(browser, smoke, base_url: str) -> list[dict]:
     try:
         _configure_search(page, smoke, base_url, 'purchase')
         page.get_by_role('button', name='Show Slots', exact=True).click()
-        busy = page.locator('#mu-result[aria-busy="true"]')
+        busy = page.locator(f'{MUHURTA_RESULT_SELECTOR}[aria-busy="true"]')
         busy.wait_for(state='visible', timeout=15000)
         page.wait_for_function(
-            "document.querySelector('#mu-result')?.textContent.includes('Shortlist ready')",
+            f"document.querySelector('{MUHURTA_RESULT_SELECTOR}')?.textContent.includes('Shortlist ready')",
             timeout=15000,
         )
         busy_text = busy.inner_text()
@@ -387,14 +389,16 @@ def _capture_loading_and_timeout(browser, smoke, base_url: str) -> list[dict]:
         _capture_page(page, loading_path)
         rows.append(_manifest_row(loading, loading_path))
 
-        unavailable = page.locator('#mu-result .mu-chart-status--unavailable')
+        unavailable = page.locator(
+            f'{MUHURTA_RESULT_SELECTOR} .mu-chart-status--unavailable'
+        )
         unavailable.wait_for(state='visible', timeout=25000)
-        assert page.locator('#mu-result').get_attribute('aria-busy') == 'false'
-        assert 'Panchangam shortlist shown' in unavailable.inner_text()
+        assert page.locator(MUHURTA_RESULT_SELECTOR).get_attribute('aria-busy') == 'false'
+        assert PANCHANGAM_SHORTLIST_SHOWN_COPY in unavailable.inner_text()
         timeout = Capture(
             'fixture-timeout-unavailable-tablet-768x1024.png',
             'timeout', 'purchase', 'drik', 768, 1024, 'unavailable',
-            'Panchangam shortlist shown',
+            PANCHANGAM_SHORTLIST_SHOWN_COPY,
         )
         page.set_viewport_size({'width': timeout.width, 'height': timeout.height})
         timeout_path = OUTPUT_DIR / timeout.filename

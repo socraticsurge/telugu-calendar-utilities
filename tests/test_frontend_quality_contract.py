@@ -19,8 +19,8 @@ def test_frontend_quality_tools_and_runner_are_exactly_pinned():
         "eslint": "10.10.0",
         "@eslint/js": "10.0.1",
         "typescript-eslint": "8.69.0",
-        "vitest": "4.1.9",
-        "@vitest/coverage-v8": "4.1.9",
+        "vitest": "4.1.11",
+        "@vitest/coverage-v8": "4.1.11",
     }
     assert {
         name: package["devDependencies"][name]

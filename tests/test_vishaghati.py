@@ -47,8 +47,10 @@ def test_vishaghati_in_mcp_output():
     windows = out.get('inauspicious', {}).get('vishaghati') or out.get('vishaghati') or []
     assert isinstance(windows, list)
     for w in windows:
-        assert 'start' in w and 'end' in w
-        assert 'start_ghati' in w and 'end_ghati' in w
+        assert 'start' in w
+        assert 'end' in w
+        assert 'start_ghati' in w
+        assert 'end_ghati' in w
 
 
 def test_vishaghati_offsets_table_has_27():

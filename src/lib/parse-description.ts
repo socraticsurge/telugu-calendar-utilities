@@ -6,11 +6,7 @@
 // Extracted verbatim from main.ts (one-shell decomposition).
 
 // A time plus optional (+1)/(-1) relative-day marker, as emitted by the feed.
-export const TIME_PART = '(\\d{2}:\\d{2})(?:\\s*\\(([+-]1)\\))?';
-// \s+ not \s{2,}: long names (Krishna Chaturdashi, named Ekadashis) overflow the column padding
-const ANGA_RE = new RegExp(`^(Tithi|Nakshatra|Yoga):\\s+(.+?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`);
-const WINDOW_RE = new RegExp(`^\\s+(.+?)\\s{2,}${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s*$`);
-const CHOG_RE = new RegExp(`^\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}\\s+(.+)$`);
+export const TIME_PART = String.raw`(\d{2}:\d{2})(?:\s*\(([+-]1)\))?`;
 
 type TimeRange = { start: string; end: string };
 type TimedEntry = TimeRange & {
@@ -34,6 +30,16 @@ type Section =
   | 'eclipse'
   | 'specialyogas'
   | null;
+
+type ActiveSection = Exclude<Section, null>;
+type TimeToken = { value: string; flag: string | null; rest: string };
+type ParsedRange = {
+  prefix: string;
+  start: string;
+  sflag: string | null;
+  end: string;
+  eflag: string | null;
+};
 
 export interface ParsedDescription {
   meta: string;
@@ -62,105 +68,399 @@ export interface ParsedDescription {
   lunarSign?: string;
 }
 
-export function parseDescription(description: string): ParsedDescription {
-  const data: ParsedDescription = {
+const SECTION_HEADERS = new Map<string, ActiveSection>([
+  ['─ Auspicious ─', 'auspicious'],
+  ['─ Inauspicious ─', 'inauspicious'],
+  ['─ Choghadiya ─', 'choghadiya'],
+  ['─ Night Choghadiya ─', 'nightChoghadiya'],
+  ['─ Eclipse ─', 'eclipse'],
+  ['─ Special Yogas ─', 'specialyogas'],
+]);
+
+function emptyDescription(): ParsedDescription {
+  return {
     meta: '', tithi: null, nakshatra: null, yoga: null, karana: null,
     sunrise: null, sunset: null, moonrise: null, moonset: null,
     auspicious: [], inauspicious: [], choghadiya: [], nightChoghadiya: [],
     eclipse: null, yogas: [], ayanam: null, rituvu: null, special: [],
   };
+}
+
+function isWhitespace(value: string): boolean {
+  return value.length === 1 && value.trim() === '';
+}
+
+function isTime(value: string): boolean {
+  if (value.length !== 5 || value[2] !== ':') return false;
+  return [value[0], value[1], value[3], value[4]].every(
+    digit => digit >= '0' && digit <= '9',
+  );
+}
+
+function takeTrailingTime(input: string): TimeToken | null {
+  let remainder = input.trimEnd();
+  let flag: string | null = null;
+  const marker = remainder.slice(-4);
+  if (marker === '(+1)' || marker === '(-1)') {
+    flag = marker.slice(1, 3);
+    remainder = remainder.slice(0, -4).trimEnd();
+  }
+  const value = remainder.slice(-5);
+  if (!isTime(value)) return null;
+  return { value, flag, rest: remainder.slice(0, -5) };
+}
+
+function takeTrailingRange(input: string): ParsedRange | null {
+  const end = takeTrailingTime(input);
+  if (!end) return null;
+  const beforeEnd = end.rest.trimEnd();
+  const delimiter = beforeEnd.at(-1);
+  if (delimiter !== '–' && delimiter !== '-') return null;
+  const start = takeTrailingTime(beforeEnd.slice(0, -1));
+  if (!start) return null;
+  return {
+    prefix: start.rest,
+    start: start.value,
+    sflag: start.flag,
+    end: end.value,
+    eflag: end.flag,
+  };
+}
+
+function splitName(prefix: string, minimumWhitespace: number): string | null {
+  let nameEnd = prefix.length;
+  while (nameEnd > 0 && isWhitespace(prefix[nameEnd - 1])) nameEnd -= 1;
+  if (prefix.length - nameEnd < minimumWhitespace) return null;
+  const name = prefix.slice(0, nameEnd).trim();
+  return name;
+}
+
+function labeledPayload(line: string, label: string): string | null {
+  const prefix = `${label}:`;
+  if (!line.startsWith(prefix)) return null;
+  const remainder = line.slice(prefix.length);
+  if (!remainder || !isWhitespace(remainder[0])) return null;
+  const payload = remainder.trimStart();
+  return payload;
+}
+
+function stripSamvatsaraLabel(value: string): string {
+  const trimmed = value.trim();
+  for (const label of ['Nama Samvatsara', 'Samvatsara']) {
+    if (!trimmed.toLowerCase().endsWith(label.toLowerCase())) continue;
+    const prefix = trimmed.slice(0, -label.length);
+    if (prefix && isWhitespace(prefix.at(-1) ?? '')) return prefix.trimEnd();
+  }
+  return trimmed;
+}
+
+function splitMiddotLine(line: string): string[] {
+  const parts: string[] = [];
+  let partStart = 0;
+  let index = 0;
+  while (index < line.length) {
+    if (line[index] !== '·') {
+      index += 1;
+      continue;
+    }
+    let left = index;
+    while (left > partStart && isWhitespace(line[left - 1])) left -= 1;
+    if (left === index) {
+      index += 1;
+      continue;
+    }
+    let right = index + 1;
+    while (right < line.length && isWhitespace(line[right])) right += 1;
+    if (right === index + 1) {
+      index += 1;
+      continue;
+    }
+    parts.push(line.slice(partStart, left));
+    partStart = right;
+    index = right;
+  }
+  parts.push(line.slice(partStart));
+  return parts;
+}
+
+function parseHeader(line: string, data: ParsedDescription): boolean {
+  const parts = splitMiddotLine(line);
+  if (
+    parts.length !== 4
+    || !parts[1].endsWith(' Maasam')
+    || !parts[2].endsWith(' Paksham')
+  ) return false;
+  const yearRaw = stripSamvatsaraLabel(parts[0]);
+  const maasam = parts[1].slice(0, -' Maasam'.length).trim();
+  const paksham = parts[2].slice(0, -' Paksham'.length).trim();
+  const vaaram = parts[3].trim();
+  data.samvatsara = yearRaw;
+  data.maasam = maasam;
+  data.paksham = paksham;
+  data.vaaram = vaaram;
+  data.meta = `${yearRaw} Nama Samvatsara · ${maasam} Maasam · ${paksham} Paksham · ${vaaram}`;
+  return true;
+}
+
+function parseSky(line: string, data: ParsedDescription): boolean {
+  const parts = splitMiddotLine(line);
+  const labels = ['Sunrise ', 'Sunset ', 'Moonrise ', 'Moonset '];
+  if (parts.length !== labels.length) return false;
+  const values = parts.map((part, index) => {
+    const label = labels[index];
+    return part.startsWith(label) ? part.slice(label.length) : '';
+  });
+  if (!values.every(isTime)) return false;
+  [data.sunrise, data.sunset, data.moonrise, data.moonset] = values;
+  return true;
+}
+
+function parseTextPair(
+  line: string,
+  leftLabel: string,
+  rightLabel: string,
+): [string, string] | null {
+  const parts = splitMiddotLine(line);
+  if (parts.length !== 2) return null;
+  const left = labeledPayload(parts[0], leftLabel);
+  const right = labeledPayload(parts[1], rightLabel);
+  if (!left || !right) return null;
+  return [left.trim(), right.trim()];
+}
+
+function parseAyanam(line: string, data: ParsedDescription): boolean {
+  const values = parseTextPair(line, 'Ayanam', 'Rituvu');
+  if (!values) return false;
+  [data.ayanam, data.rituvu] = values;
+  return true;
+}
+
+function parseSigns(line: string, data: ParsedDescription): boolean {
+  const values = parseTextPair(line, 'Solar sign', 'Lunar sign');
+  if (!values) return false;
+  [data.solarSign, data.lunarSign] = values;
+  return true;
+}
+
+function parseAnga(line: string, data: ParsedDescription): boolean {
+  for (const label of ['Tithi', 'Nakshatra', 'Yoga'] as const) {
+    const payload = labeledPayload(line, label);
+    if (!payload) continue;
+    const range = takeTrailingRange(payload);
+    if (!range) return false;
+    const name = splitName(range.prefix, 1);
+    if (!name) return false;
+    const key = label.toLowerCase() as 'tithi' | 'nakshatra' | 'yoga';
+    data[key] = {
+      name,
+      start: range.start,
+      sflag: range.sflag,
+      end: range.end,
+      eflag: range.eflag,
+    };
+    return true;
+  }
+  return false;
+}
+
+function parseKarana(line: string, data: ParsedDescription): boolean {
+  const payload = labeledPayload(line, 'Karana');
+  if (!payload) return false;
+  data.karana = payload.trim();
+  return true;
+}
+
+function parseLegacyYogas(line: string, data: ParsedDescription): boolean {
+  const payload = labeledPayload(line, 'Yogas');
+  if (!payload) return false;
+  data.yogas = payload.trim().split(',').map((value, index) => {
+    return index === 0 ? value : value.trimStart();
+  });
+  return true;
+}
+
+function parseSpecialDay(line: string, data: ParsedDescription): boolean {
+  if (!line.startsWith('⚡')) return false;
+  const payload = line.slice('⚡'.length).trimStart();
+  if (!payload) return false;
+  data.special = splitMiddotLine(payload).map(value => value.trim());
+  return true;
+}
+
+const COMMON_LINE_PARSERS = [
+  parseHeader,
+  parseSky,
+  parseAyanam,
+  parseSigns,
+  parseAnga,
+  parseKarana,
+  parseLegacyYogas,
+  parseSpecialDay,
+];
+
+function parseCommonLine(line: string, data: ParsedDescription): boolean {
+  return COMMON_LINE_PARSERS.some(parser => parser(line, data));
+}
+
+function parseWindow(
+  line: string,
+  section: 'auspicious' | 'inauspicious',
+  data: ParsedDescription,
+): void {
+  if (!isWhitespace(line[0] ?? '')) return;
+  const range = takeTrailingRange(line.trimStart());
+  if (!range) return;
+  const name = splitName(range.prefix, 2);
+  if (!name) return;
+  data[section].push({
+    name,
+    start: range.start,
+    sflag: range.sflag,
+    end: range.end,
+    eflag: range.eflag,
+  });
+}
+
+function skipWhitespace(value: string, start: number): number {
+  let cursor = start;
+  while (cursor < value.length && isWhitespace(value[cursor])) cursor += 1;
+  return cursor;
+}
+
+function takeLeadingTime(input: string, start: number): { value: string; next: number } | null {
+  const value = input.slice(start, start + 5);
+  if (!isTime(value)) return null;
+  let next = start + 5;
+  const markerStart = skipWhitespace(input, next);
+  const marker = input.slice(markerStart, markerStart + 4);
+  if (marker === '(+1)' || marker === '(-1)') next = markerStart + 4;
+  return { value, next };
+}
+
+function parseChoghadiya(
+  line: string,
+  section: 'choghadiya' | 'nightChoghadiya',
+  data: ParsedDescription,
+): void {
+  if (!isWhitespace(line[0] ?? '')) return;
+  const payload = line.trimStart();
+  const start = takeLeadingTime(payload, 0);
+  if (!start) return;
+  let cursor = skipWhitespace(payload, start.next);
+  if (payload[cursor] !== '–' && payload[cursor] !== '-') return;
+  cursor = skipWhitespace(payload, cursor + 1);
+  const end = takeLeadingTime(payload, cursor);
+  if (!end) return;
+  const nameStart = skipWhitespace(payload, end.next);
+  if (nameStart === end.next) return;
+  const name = payload.slice(nameStart).trim();
+  data[section].push({ start: start.value, end: end.value, name });
+}
+
+function parseEclipseDetail(line: string, data: ParsedDescription): boolean {
+  const payload = line.trimStart();
+  const iconEnd = payload.search(/\s/);
+  if (iconEnd < 1) return false;
+  const detail = payload.slice(skipWhitespace(payload, iconEnd));
+  let kind: 'Solar' | 'Lunar';
+  if (detail.startsWith('Solar Eclipse (')) kind = 'Solar';
+  else if (detail.startsWith('Lunar Eclipse (')) kind = 'Lunar';
+  else return false;
+  const subtypeStart = `${kind} Eclipse (`.length;
+  const subtypeEnd = detail.indexOf(')', subtypeStart);
+  if (subtypeEnd === -1) return false;
+  const subtype = detail.slice(subtypeStart, subtypeEnd);
+  let cursor = skipWhitespace(detail, subtypeEnd + 1);
+  if (detail[cursor] !== '—' && detail[cursor] !== '-') return false;
+  cursor = skipWhitespace(detail, cursor + 1);
+  const visibility = detail.slice(cursor);
+  if (!subtype || !visibility) return false;
+  data.eclipse = {
+    kind,
+    subtype,
+    visible: !visibility.includes('not visible'),
+    window: null,
+    sutak: null,
+  };
+  return true;
+}
+
+function splitRangeText(payload: string): TimeRange | null {
+  let delimiterIndex = -1;
+  for (let index = 0; index < payload.length; index += 1) {
+    if (payload[index] === '–' || payload[index] === '-') {
+      delimiterIndex = index;
+      break;
+    }
+  }
+  if (delimiterIndex === -1) return null;
+  const start = payload.slice(0, delimiterIndex).trim();
+  const end = payload.slice(delimiterIndex + 1).trim();
+  return start && end ? { start, end } : null;
+}
+
+function parseEclipseRange(line: string, data: ParsedDescription): boolean {
+  if (!data.eclipse || !isWhitespace(line[0] ?? '')) return false;
+  const trimmed = line.trimStart();
+  for (const key of ['window', 'sutak'] as const) {
+    const label = key === 'window' ? 'Window' : 'Sutak';
+    const payload = labeledPayload(trimmed, label);
+    if (!payload) continue;
+    const range = splitRangeText(payload);
+    if (!range) return false;
+    data.eclipse[key] = range;
+    return true;
+  }
+  return false;
+}
+
+function parseEclipse(line: string, data: ParsedDescription): void {
+  if (parseEclipseDetail(line, data)) return;
+  parseEclipseRange(line, data);
+}
+
+function parseSpecialYoga(line: string, data: ParsedDescription): void {
+  if (!isWhitespace(line[0] ?? '')) return;
+  const name = line.trim();
+  data.yogas.push(name);
+}
+
+function parseSectionLine(
+  line: string,
+  section: ActiveSection,
+  data: ParsedDescription,
+): void {
+  if (section === 'auspicious' || section === 'inauspicious') {
+    parseWindow(line, section, data);
+    return;
+  }
+  if (section === 'choghadiya' || section === 'nightChoghadiya') {
+    parseChoghadiya(line, section, data);
+    return;
+  }
+  if (section === 'eclipse') {
+    parseEclipse(line, data);
+    return;
+  }
+  parseSpecialYoga(line, data);
+}
+
+export function parseDescription(description: string): ParsedDescription {
+  const data = emptyDescription();
   let section: Section = null;
   for (const raw of description.split('\n')) {
     const line = raw.trimEnd();
-    if (!line.trim()) { section = null; continue; }
-
-    let m: RegExpMatchArray | null;
-    // Header: "<year> [Nama Samvatsara]  ·  Maasam  ·  Paksham  ·  Vaaram".
-    // The " Nama Samvatsara" suffix is the new (devotee-preferred)
-    // form; older deployed feeds still have just "<year>" — strip
-    // whichever shows up so data.samvatsara is always the bare year.
-    if ((m = line.match(/^(.+?)\s+·\s+(.+?) Maasam\s+·\s+(.+?) Paksham\s+·\s+(.+)$/))) {
-      const yearRaw = m[1].trim().replace(/\s+Nama Samvatsara$/i, '').replace(/\s+Samvatsara$/i, '');
-      data.samvatsara = yearRaw;
-      data.maasam = m[2].trim();
-      data.paksham = m[3].trim();
-      data.vaaram = m[4].trim();
-      data.meta = `${yearRaw} Nama Samvatsara · ${m[2]} Maasam · ${m[3]} Paksham · ${m[4].trim()}`;
+    if (!line.trim()) {
+      section = null;
       continue;
     }
-    // Sky: "Sunrise HH:MM  ·  Sunset HH:MM  ·  Moonrise HH:MM  ·  Moonset HH:MM"
-    if ((m = line.match(/^Sunrise (\d{2}:\d{2})\s+·\s+Sunset (\d{2}:\d{2})\s+·\s+Moonrise (\d{2}:\d{2})\s+·\s+Moonset (\d{2}:\d{2})$/))) {
-      [, data.sunrise, data.sunset, data.moonrise, data.moonset] = m;
+    const nextSection = SECTION_HEADERS.get(line);
+    if (nextSection) {
+      section = nextSection;
       continue;
     }
-    // Ayanam / Rituvu: "Ayanam: X  ·  Rituvu: Y"
-    if ((m = line.match(/^Ayanam:\s+(.+?)\s+·\s+Rituvu:\s+(.+)$/))) {
-      data.ayanam = m[1].trim();
-      data.rituvu = m[2].trim();
-      continue;
-    }
-    // Signs: "Solar sign: X  ·  Lunar sign: Y" (solar sign drives Vaikunta Ekadashi naming)
-    if ((m = line.match(/^Solar sign:\s+(.+?)\s+·\s+Lunar sign:\s+(.+)$/))) {
-      data.solarSign = m[1].trim();
-      data.lunarSign = m[2].trim();
-      continue;
-    }
-    // Pancha anga rows
-    if ((m = line.match(ANGA_RE))) {
-      const anga = m[1].toLowerCase() as 'tithi' | 'nakshatra' | 'yoga';
-      data[anga] = { name: m[2].trim(), start: m[3], sflag: m[4] || null, end: m[5], eflag: m[6] || null };
-      continue;
-    }
-    if ((m = line.match(/^Karana:\s+(.+)$/))) {
-      data.karana = m[1].trim();
-      continue;
-    }
-    // Section headers
-    if (line === '─ Auspicious ─') { section = 'auspicious'; continue; }
-    if (line === '─ Inauspicious ─') { section = 'inauspicious'; continue; }
-    if (line === '─ Choghadiya ─') { section = 'choghadiya'; continue; }
-    if (line === '─ Night Choghadiya ─') { section = 'nightChoghadiya'; continue; }
-    if (line === '─ Eclipse ─') { section = 'eclipse'; continue; }
-    if (line === '─ Special Yogas ─') { section = 'specialyogas'; continue; }
-    // Auspicious / inauspicious entries: "  Name           HH:MM – HH:MM (+1)"
-    if ((section === 'auspicious' || section === 'inauspicious') && (m = line.match(WINDOW_RE))) {
-      data[section].push({ name: m[1].trim(), start: m[2], sflag: m[3] || null, end: m[4], eflag: m[5] || null });
-      continue;
-    }
-    // Choghadiya entries: "  HH:MM – HH:MM  Name"
-    if ((section === 'choghadiya' || section === 'nightChoghadiya') && (m = line.match(CHOG_RE))) {
-      data[section].push({ start: m[1], end: m[3], name: m[5].trim() });
-      continue;
-    }
-    // Eclipse detail line: "  🌒 Solar Eclipse (Total) — visible/not visible..."
-    if (section === 'eclipse' && (m = line.match(/^\s*\S+\s+(Solar|Lunar) Eclipse \((.+?)\)\s*[—-]\s*(.+)$/))) {
-      data.eclipse = { kind: m[1], subtype: m[2], visible: !m[3].includes('not visible'), window: null, sutak: null };
-      continue;
-    }
-    if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Window:\s+(.+?)\s*[–-]\s*(.+)$/))) {
-      data.eclipse.window = { start: m[1].trim(), end: m[2].trim() };
-      continue;
-    }
-    if (section === 'eclipse' && data.eclipse && (m = line.match(/^\s+Sutak:\s+(.+?)\s*[–-]\s*(.+)$/))) {
-      data.eclipse.sutak = { start: m[1].trim(), end: m[2].trim() };
-      continue;
-    }
-    // Special yoga entries: "  Yoga Name" (new format)
-    if (section === 'specialyogas' && (m = line.match(/^\s+(.+)$/))) {
-      data.yogas.push(m[1].trim());
-      continue;
-    }
-    // Backward compat: old "Yogas: X, Y" single-line format
-    if ((m = line.match(/^Yogas:\s+(.+)$/))) {
-      data.yogas = m[1].trim().split(/,\s*/);
-      continue;
-    }
-    // Trailing special-day line: "⚡ Ekadashi — fasting day  ·  Pradosham"
-    if ((m = line.match(/^⚡\s*(.+)$/))) {
-      data.special = m[1].split(/\s+·\s+/).map(s => s.trim());
-      continue;
-    }
+    if (parseCommonLine(line, data)) continue;
+    if (section) parseSectionLine(line, section, data);
   }
   return data;
 }
-

@@ -92,8 +92,10 @@ def test_mcp_get_graha_positions():
     assert result['date'] == '2026-06-11'
     assert len(result['grahas']) == 9
     shani = next(g for g in result['grahas'] if g['graha'] == 'Shani')
-    assert shani['rasi'] == 'Meena' and shani['nakshatra'] == 'Revati'
-    assert 'rasi_until' in shani and 'retrograde' in shani
+    assert shani['rasi'] == 'Meena'
+    assert shani['nakshatra'] == 'Revati'
+    assert 'rasi_until' in shani
+    assert 'retrograde' in shani
 
 
 def test_mcp_get_graha_positions_validates():

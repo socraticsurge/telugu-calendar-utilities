@@ -24,7 +24,8 @@ def test_all_entries_are_rashi_ingress():
     for r in results:
         assert isinstance(r, RashiIngress)
         assert r.planet in INGRESS_PLANETS
-        assert isinstance(r.rashi, str) and len(r.rashi) > 0
+        assert isinstance(r.rashi, str)
+        assert len(r.rashi) > 0
         assert isinstance(r.enters, datetime)
         assert r.exits is None or isinstance(r.exits, datetime)
 
@@ -49,8 +50,10 @@ def test_planet_filter():
 
 
 def test_invalid_planet_raises():
+    start = date(2026, 1, 1)
+    end = date(2026, 12, 31)
     with pytest.raises(ValueError, match='Unknown'):
-        rashi_ingresses(date(2026, 1, 1), date(2026, 12, 31), planets=['Neptune'])
+        rashi_ingresses(start, end, planets=['Neptune'])
 
 
 # ── Reference date tests ───────────────────────────────────────────────────────
@@ -95,8 +98,10 @@ def test_rahu_ketu_ingress_dec_2026():
     results = rashi_ingresses(date(2026, 11, 1), date(2026, 12, 31), planets=['Rahu', 'Ketu'])
     rahu  = next((r for r in results if r.planet == 'Rahu'), None)
     ketu  = next((r for r in results if r.planet == 'Ketu'), None)
-    assert rahu is not None and rahu.rashi == 'Makara'
-    assert ketu is not None and ketu.rashi == 'Karka'
+    assert rahu is not None
+    assert rahu.rashi == 'Makara'
+    assert ketu is not None
+    assert ketu.rashi == 'Karka'
     assert abs((rahu.enters - ketu.enters).total_seconds()) < 60, (
         'Rahu and Ketu must enter their respective signs simultaneously'
     )

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-server-panchangam"
-version = "1.18.1"
+version = "1.18.2"
 description = "MCP server for Panchangam calculations — Tithi, Nakshatra, Yoga, Muhurtas for any city"
 readme = "README_PYPI.md"
 requires-python = ">=3.10"
@@ -26,7 +26,7 @@ dependencies = [
 # `pip install -e .[test]` so existing tooling keeps working.
 test = [
     "pytest>=8.0.0",
-    "ruff==0.16.2",
+    "ruff==0.16.6",
 ]
 # Browser-smoke deps. Heavy install (~100 MB chromium); kept separate
 # so plain `pip install -e .[test]` stays light for local dev — the
