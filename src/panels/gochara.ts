@@ -223,6 +223,35 @@ function renderSelectedProfileState(
   appendProfileActions(root, ...incompleteProfileActions(profiles));
 }
 
+function renderSpecificGocharaProfileState(
+  root: HTMLElement,
+  resolution: GocharaSelectionResolution,
+  profiles: readonly Readonly<GuestProfile>[],
+): boolean {
+  const requestedProfileId = profileIdFromSelection(resolution.requestedValue);
+  const requestedProfile = requestedProfileId
+    ? profiles.find(profile => profile.id === requestedProfileId) || null
+    : null;
+  if (requestedProfile && resolution.fallback?.code === 'profile-not-horoscope-ready') {
+    renderIncompleteProfileState(root, requestedProfile, resolution, profiles);
+    return true;
+  }
+
+  if (resolution.kind === 'profile' && resolution.profile) {
+    renderSelectedProfileState(root, resolution, profiles);
+    return true;
+  }
+
+  if (profiles.length === 0) {
+    appendProfileContext(root, 'Create a profile to reuse a birth star here and in Muhurtam. It stays only in this browser.');
+    if (gocharaProfileActions) {
+      appendProfileActions(root, stateAction('Create profile', 'create', trigger => gocharaProfileActions?.createProfile(trigger), true));
+    }
+    return true;
+  }
+  return false;
+}
+
 function renderGocharaProfileState(
   resolution: GocharaSelectionResolution,
   selectionStorageUnavailable = false,
@@ -237,11 +266,6 @@ function renderGocharaProfileState(
 
   const snapshot = gocharaProfileStore?.getSnapshot();
   const profiles = snapshot?.profiles || [];
-  const requestedProfileId = profileIdFromSelection(resolution.requestedValue);
-  const requestedProfile = requestedProfileId
-    ? profiles.find(profile => profile.id === requestedProfileId) || null
-    : null;
-
   if (resolution.fallback) appendProfileNotice(root, resolution.fallback.message);
   if (
     !resolution.fallback &&
@@ -250,23 +274,7 @@ function renderGocharaProfileState(
     appendProfileNotice(root, 'Your horoscope choice works for this page, but this browser cannot save it.');
   }
 
-  if (requestedProfile && resolution.fallback?.code === 'profile-not-horoscope-ready') {
-    renderIncompleteProfileState(root, requestedProfile, resolution, profiles);
-    restoreProfileActionFocus(root, focusKey);
-    return;
-  }
-
-  if (resolution.kind === 'profile' && resolution.profile) {
-    renderSelectedProfileState(root, resolution, profiles);
-    restoreProfileActionFocus(root, focusKey);
-    return;
-  }
-
-  if (profiles.length === 0) {
-    appendProfileContext(root, 'Create a profile to reuse a birth star here and in Muhurtam. It stays only in this browser.');
-    if (gocharaProfileActions) {
-      appendProfileActions(root, stateAction('Create profile', 'create', trigger => gocharaProfileActions?.createProfile(trigger), true));
-    }
+  if (renderSpecificGocharaProfileState(root, resolution, profiles)) {
     restoreProfileActionFocus(root, focusKey);
     return;
   }

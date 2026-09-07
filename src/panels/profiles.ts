@@ -375,16 +375,21 @@ function wallTimeErrorMessage(error: unknown): string | null {
   return null;
 }
 
+interface BirthValidationFields {
+  dateInput: HTMLInputElement;
+  dateError: HTMLElement;
+  timeInput: HTMLInputElement;
+  timeError: HTMLElement;
+  placeInput: HTMLInputElement;
+  placeError: HTMLElement;
+}
+
 function validatedBirthInstant(
-  dateInput: HTMLInputElement,
-  dateError: HTMLElement,
-  timeInput: HTMLInputElement,
-  timeError: HTMLElement,
-  placeInput: HTMLInputElement,
-  placeError: HTMLElement,
+  fields: BirthValidationFields,
   place: BirthPlaceCandidate,
   now: Date,
 ): string | null {
+  const { dateInput, dateError, timeInput, timeError, placeInput, placeError } = fields;
   const maxDate = isoDateInTimeZone(now, place.timezone);
   if (!maxDate) {
     showFieldError(placeInput, placeError, 'The selected birthplace has an invalid time zone.');
@@ -977,6 +982,39 @@ export function initProfilesPanel(
     return 'Needs Nakshatra';
   };
 
+  const appendExistingProfiles = (
+    fragment: DocumentFragment,
+    mode: 'create' | 'edit',
+    context: ResolvedProfilesPanelContext,
+    profiles: readonly Readonly<GuestProfile>[],
+  ): void => {
+    if (mode !== 'create' || (!context.returnTo && !context.requiredFor) || profiles.length === 0) return;
+    const existing = element('section', 'profiles-form__existing');
+    existing.setAttribute('aria-labelledby', 'profiles-existing-title');
+    const existingTitle = element('h2', 'profiles-form__existing-title', 'Already saved');
+    existingTitle.id = 'profiles-existing-title';
+    const existingHint = element(
+      'p',
+      'profiles-form__existing-hint',
+      'If this person is already listed, cancel and edit that profile instead of creating a duplicate.',
+    );
+    const existingList = element('ul', 'profiles-form__existing-list');
+    for (const existingProfile of profiles) {
+      const item = element('li', 'profiles-form__existing-item');
+      item.append(
+        element('span', 'profiles-form__existing-name', displayName(existingProfile)),
+        element(
+          'span',
+          'profiles-form__existing-readiness',
+          contextualReadinessText(existingProfile, context.requiredFor),
+        ),
+      );
+      existingList.append(item);
+    }
+    existing.append(existingTitle, existingHint, existingList);
+    fragment.append(existing);
+  };
+
   const renderDetailFacts = (
     rows: ReadonlyArray<readonly [string, string]>,
   ): HTMLDListElement => {
@@ -1301,31 +1339,7 @@ export function initProfilesPanel(
     const issue = renderIssue(snapshot);
     if (issue) fragment.append(issue);
 
-    if (mode === 'create' && (context.returnTo || context.requiredFor) && snapshot.profiles.length > 0) {
-      const existing = element('section', 'profiles-form__existing');
-      existing.setAttribute('aria-labelledby', 'profiles-existing-title');
-      const existingTitle = element('h2', 'profiles-form__existing-title', 'Already saved');
-      existingTitle.id = 'profiles-existing-title';
-      const existingHint = element(
-        'p',
-        'profiles-form__existing-hint',
-        'If this person is already listed, cancel and edit that profile instead of creating a duplicate.',
-      );
-      const existingList = element('ul', 'profiles-form__existing-list');
-      for (const existingProfile of snapshot.profiles) {
-        const item = element('li', 'profiles-form__existing-item');
-        const name = element('span', 'profiles-form__existing-name', displayName(existingProfile));
-        const readiness = element(
-          'span',
-          'profiles-form__existing-readiness',
-          contextualReadinessText(existingProfile, context.requiredFor),
-        );
-        item.append(name, readiness);
-        existingList.append(item);
-      }
-      existing.append(existingTitle, existingHint, existingList);
-      fragment.append(existing);
-    }
+    appendExistingProfiles(fragment, mode, context, snapshot.profiles);
     if (methods) fragment.append(methods);
 
     const form = element('form', 'profiles-form');
@@ -1572,32 +1586,7 @@ export function initProfilesPanel(
     const issue = renderIssue(snapshot);
     if (issue) fragment.append(issue);
 
-    if (mode === 'create' && (context.returnTo || context.requiredFor) && snapshot.profiles.length > 0) {
-      const existing = element('section', 'profiles-form__existing');
-      existing.setAttribute('aria-labelledby', 'profiles-existing-title');
-      const existingTitle = element('h2', 'profiles-form__existing-title', 'Already saved');
-      existingTitle.id = 'profiles-existing-title';
-      const existingHint = element(
-        'p',
-        'profiles-form__existing-hint',
-        'If this person is already listed, cancel and edit that profile instead of creating a duplicate.',
-      );
-      const existingList = element('ul', 'profiles-form__existing-list');
-      for (const existingProfile of snapshot.profiles) {
-        const item = element('li', 'profiles-form__existing-item');
-        item.append(
-          element('span', 'profiles-form__existing-name', displayName(existingProfile)),
-          element(
-            'span',
-            'profiles-form__existing-readiness',
-            contextualReadinessText(existingProfile, context.requiredFor),
-          ),
-        );
-        existingList.append(item);
-      }
-      existing.append(existingTitle, existingHint, existingList);
-      fragment.append(existing);
-    }
+    appendExistingProfiles(fragment, mode, context, snapshot.profiles);
 
     const methods = element('section', 'profiles-methods');
     methods.setAttribute('aria-labelledby', 'profile-method-title');
@@ -1982,12 +1971,7 @@ export function initProfilesPanel(
       if (!calculationPlace) return;
       const now = new Date();
       const birthInstant = validatedBirthInstant(
-        dateInput,
-        dateError,
-        timeInput,
-        timeError,
-        placeInput,
-        placeError,
+        { dateInput, dateError, timeInput, timeError, placeInput, placeError },
         calculationPlace,
         now,
       );
