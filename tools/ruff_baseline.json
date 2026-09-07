@@ -31,5 +31,5 @@
     }
   },
   "description": "Ruff E/F/I debt baseline; counts may only change intentionally.",
-  "ruff_version": "0.16.2"
+  "ruff_version": "0.16.6"
 }

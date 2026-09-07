@@ -46,7 +46,7 @@
     }
   },
   "max_complexity": 10,
-  "ruff_version": "0.16.2",
+  "ruff_version": "0.16.6",
   "schema_version": 1,
   "targets": [
     "telugu_panchangam",
