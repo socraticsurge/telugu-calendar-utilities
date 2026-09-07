@@ -2,6 +2,7 @@
 // @ts-nocheck -- imports the intentionally relaxed legacy panel at runtime.
 
 import { beforeAll, beforeEach, expect, test, vi } from 'vitest';
+import dayFixture from './fixtures/hyderabad-2026-07-18-drik.json';
 
 const harness = vi.hoisted(() => ({
   selection: { city: 'Slow City', system: 'drik', timeFmt: '12' },
@@ -28,6 +29,7 @@ vi.mock('../lib/lagna-loader', () => ({
 
 let initTodayPanel;
 let loadPreview;
+let shareTodayOnWhatsApp;
 
 beforeAll(async () => {
   // Keep the relaxed panel out of the strict core TypeScript graph while
@@ -35,6 +37,7 @@ beforeAll(async () => {
   const module = await import('../panels/' + 'today');
   initTodayPanel = module.initTodayPanel;
   loadPreview = module.loadPreview;
+  shareTodayOnWhatsApp = module.shareTodayOnWhatsApp;
 });
 
 function deferred() {
@@ -71,6 +74,8 @@ function lagnaData(rashi) {
 
 beforeEach(() => {
   document.body.innerHTML = `
+    <select id="tp-city"><option selected>Hyderabad</option></select>
+    <select id="tp-system"><option selected>Drik</option></select>
     <div id="tp-result" aria-busy="false"></div>
     <div id="upcoming-result"></div>
   `;
@@ -138,4 +143,43 @@ test('announces only the active request failure and clears busy state', async ()
     .toContain('Unavailable');
   expect(document.getElementById('tp-result')?.getAttribute('aria-busy')).toBe('false');
   expect(document.getElementById('upcoming-result')?.getAttribute('aria-busy')).toBe('false');
+});
+
+test('preserves the complete daily card and WhatsApp share contract', async () => {
+  harness.selection.city = 'Hyderabad';
+  harness.loadFeed.mockResolvedValue(new Map([
+    ['20260829', {
+      summary: `🪔 Sample Festival — ${dayFixture.summary}`,
+      description: dayFixture.description,
+    }],
+    ['20260830', {
+      summary: 'Tomorrow',
+      description: 'Sunrise 05:51',
+    }],
+  ]));
+  harness.loadLagna.mockResolvedValue(null);
+
+  await loadPreview();
+
+  const card = document.querySelector('.preview-card');
+  expect(card?.textContent).toContain('Parabhava Nama Samvatsara');
+  expect(card?.textContent).toContain('Sunrise5:50am');
+  expect(card?.textContent).toContain('Shukla Panchami');
+  expect(card?.textContent).toContain('Bava');
+  expect(document.querySelectorAll('.anga-cell')).toHaveLength(4);
+  expect(document.querySelectorAll('.win-grid')).toHaveLength(2);
+  expect(document.querySelectorAll('.chog-grid .chog-cell')).toHaveLength(16);
+  expect(document.querySelectorAll('.hora-grid .hora-cell')).toHaveLength(24);
+  expect(card?.textContent).toContain('At sunrise · Kaal Choghadiya · Saturn Hora');
+
+  const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+  shareTodayOnWhatsApp();
+  const shareUrl = open.mock.calls[0][0] as string;
+  const shareText = decodeURIComponent(shareUrl.split('text=')[1]);
+  expect(shareText).toContain('🪔 *Sample Festival*');
+  expect(shareText).toContain('*Tithi:* Shukla Panchami');
+  expect(shareText).toContain('*Karana:* Bava 4:43am–4:07pm / Balava 4:07pm–3:43am (next day)');
+  expect(shareText).toContain('⚠️ *Avoid:*');
+  expect(shareText).toContain('• Gulika Kalam 5:50am–7:28am');
+  expect(shareText).toContain('https://panchangam.astrochaganti.com/?src=share-today');
 });

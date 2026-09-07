@@ -33,7 +33,7 @@ const EKADASHI_NAMES = {
 function ekadashiName(maasam, paksham, solarSign) {
   if (!maasam || !paksham) return null;
   if (maasam.startsWith('Adhika')) return paksham === 'Shukla' ? 'Padmini' : 'Parama';
-  const name = (EKADASHI_NAMES[maasam.replace(/^Nija /, '')] || {})[paksham];
+  const name = EKADASHI_NAMES[maasam.replace(/^Nija /, '')]?.[paksham];
   if (!name) return null;
   // Vaikunta (Mukkoti) Ekadashi is the Shukla Ekadashi of Dhanurmasa.
   if (paksham === 'Shukla' && solarSign === 'Dhanu') return `${name} (Vaikunta)`;
@@ -52,7 +52,7 @@ function chipEmoji(s, summary) {
 }
 
 function specialLabel(s, data) {
-  if (/^Ekadashi/.test(s)) {
+  if (s.startsWith('Ekadashi')) {
     const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
     if (name) return s.replace(/^Ekadashi/, `${name} Ekadashi`);
   }
@@ -217,6 +217,20 @@ function formatToday() {
   return selectedDate().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+const KARANA_RANGE_PATTERN = new RegExp(String.raw`${TIME_PART}\s*[–-]\s*${TIME_PART}$`);
+
+function parseKaranaRange(value) {
+  const match = KARANA_RANGE_PATTERN.exec(value);
+  if (!match) return null;
+  return {
+    name: value.slice(0, match.index).trimEnd(),
+    start: match[1],
+    sflag: match[2],
+    end: match[3],
+    eflag: match[4],
+  };
+}
+
 function eclipseChip(e) {
   const emoji = e.kind === 'Solar' ? '🌒' : '🌕';
   let txt = `${emoji} ${e.kind} Eclipse (${e.subtype}) — ${e.visible ? 'visible here' : 'not visible here'}`;
@@ -225,51 +239,65 @@ function eclipseChip(e) {
   return `<span class="special-chip">${txt}</span>`;
 }
 
-function renderPreview(container, event, events, renderSequence, renderKey) {
-  const data = parseDescription(event.description);
-  const special = event.summary.includes('🪔')
-    ? '<span class="badge">Festival</span>'
-    : (event.summary.includes('⚡') ? '<span class="badge">Special day</span>' : '');
-  // 1 · Why today is special — flags right under the header, with the reason.
-  let flags = '';
-  data.special
-    .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-    .forEach(s => { flags += `<span class="special-chip">${chipEmoji(s, event.summary)} ${specialLabel(s, data)}</span>`; });
-  if (data.eclipse) flags += eclipseChip(data.eclipse);
-  data.yogas.forEach(y => { flags += `<span class="yoga-chip">✨ ${y}</span>`; });
-  const flagStrip = flags ? `<div class="flag-strip">${flags}</div>` : '';
+function specialBadge(summary) {
+  if (summary.includes('🪔')) return '<span class="badge">Festival</span>';
+  if (summary.includes('⚡')) return '<span class="badge">Special day</span>';
+  return '';
+}
 
-  // 2 · What the day is — Pancha Anga as hero tiles, sky as a slim strip.
-  const angaTile = (label, kind, entry) => entry
-    ? `<div class="anga-cell" data-kind="${kind}"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${fmtRange(entry.start, entry.end, undefined, entry.sflag, entry.eflag)}</div></div>`
-    : '';
-  // Older feeds carry the bare paksham tithi ("Krishna Ekadashi") — name it
-  // here; regenerated feeds arrive already named ("Parama Ekadashi").
-  let tithiEntry = data.tithi;
-  if (tithiEntry && /^(Shukla|Krishna) Ekadashi$/.test(tithiEntry.name)) {
-    const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
-    if (name) tithiEntry = { ...tithiEntry, name: `${name} Ekadashi` };
-  }
-  let anga = angaTile('Tithi', 'tithi', tithiEntry) + angaTile('Nakshatra', 'nakshatra', data.nakshatra) + angaTile('Nitya Yoga', 'yoga', data.yoga);
-  if (data.karana) {
-    const karanas = data.karana.split(/\s+\/\s+/).map(k => {
-      const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-      return m ? `<div class="anga-time"><b>${m[1]}</b> ${fmtRange(m[2], m[4], '–', m[3], m[5])}</div>` : `<div class="anga-time">${k}</div>`;
-    }).join('');
-    anga += `<div class="anga-cell" data-kind="karana"><div class="anga-label">Karana</div>${karanas}</div>`;
-  }
-  const angaGrid = anga ? `<div class="anga-grid">${anga}</div>` : '';
+function renderFlagStrip(data, summary) {
+  const specialChips = data.special
+    .filter(s => !(data.eclipse && s.includes('Eclipse')))
+    .map(s => `<span class="special-chip">${chipEmoji(s, summary)} ${specialLabel(s, data)}</span>`);
+  const eclipseChips = data.eclipse ? [eclipseChip(data.eclipse)] : [];
+  const yogaChips = data.yogas.map(y => `<span class="yoga-chip">✨ ${y}</span>`);
+  const flags = [...specialChips, ...eclipseChips, ...yogaChips].join('');
+  return flags ? `<div class="flag-strip">${flags}</div>` : '';
+}
 
-  // Header context lines: year context · month context. The Sun/Moon timings
-  // become their own living day-cycle band immediately below the header.
-  const metaLines = data.samvatsara
-    ? `<div class="meta">${data.samvatsara} Nama Samvatsara${data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : ''}</div>
-       <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>`
-    : `<div class="meta">${data.meta}</div>`;
+function namedTithi(data) {
+  const tithi = data.tithi;
+  if (!tithi || !/^(Shukla|Krishna) Ekadashi$/.test(tithi.name)) return tithi;
+  const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
+  return name ? { ...tithi, name: `${name} Ekadashi` } : tithi;
+}
 
+function angaTile(label, kind, entry) {
+  if (!entry) return '';
+  return `<div class="anga-cell" data-kind="${kind}"><div class="anga-label">${label}</div><div class="anga-name">${entry.name}</div><div class="anga-time">${fmtRange(entry.start, entry.end, undefined, entry.sflag, entry.eflag)}</div></div>`;
+}
+
+function karanaTile(karana) {
+  if (!karana) return '';
+  const rows = karana.split(/\s+\/\s+/).map(value => {
+    const range = parseKaranaRange(value);
+    if (!range) return `<div class="anga-time">${value}</div>`;
+    return `<div class="anga-time"><b>${range.name}</b> ${fmtRange(range.start, range.end, '–', range.sflag, range.eflag)}</div>`;
+  }).join('');
+  return `<div class="anga-cell" data-kind="karana"><div class="anga-label">Karana</div>${rows}</div>`;
+}
+
+function renderAngaGrid(data) {
+  const anga = [
+    angaTile('Tithi', 'tithi', namedTithi(data)),
+    angaTile('Nakshatra', 'nakshatra', data.nakshatra),
+    angaTile('Nitya Yoga', 'yoga', data.yoga),
+    karanaTile(data.karana),
+  ].join('');
+  return anga ? `<div class="anga-grid">${anga}</div>` : '';
+}
+
+function renderMetaLines(data) {
+  if (!data.samvatsara) return `<div class="meta">${data.meta}</div>`;
+  const season = data.ayanam ? ` · ${data.ayanam} · ${data.rituvu} Rituvu` : '';
+  return `<div class="meta">${data.samvatsara} Nama Samvatsara${season}</div>
+       <div class="meta">${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}</div>`;
+}
+
+function renderSkyCycle(data) {
+  if (!(data.sunrise || data.sunset || data.moonrise || data.moonset)) return '';
   const skyValue = value => value ? fmtT(value) : '—';
-  const skyCycle = (data.sunrise || data.sunset || data.moonrise || data.moonset)
-    ? `<div class="day-cycle" aria-label="Sun and Moon timings">
+  return `<div class="day-cycle" aria-label="Sun and Moon timings">
          <div class="day-cycle-group day-cycle-sun">
            <span class="day-cycle-icon" aria-hidden="true">
              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
@@ -284,98 +312,151 @@ function renderPreview(container, event, events, renderSequence, renderKey) {
            <dl class="day-cycle-time"><dt>Moonrise</dt><dd>${skyValue(data.moonrise)}</dd></dl>
            <dl class="day-cycle-time"><dt>Moonset</dt><dd>${skyValue(data.moonset)}</dd></dl>
          </div>
-       </div>`
-    : '';
+       </div>`;
+}
 
-  // 3 · When to act or avoid — tile strips in the same language as Choghadiya,
-  // in clock order so the day scans morning → evening.
-  // An observance occurring twice (e.g. Durmuhurtham) is one tile, two windows.
-  const groupWins = list => {
-    const order = [];
-    const byName = new Map();
-    [...list].sort((a, b) => a.start.localeCompare(b.start)).forEach(e => {
-      if (!byName.has(e.name)) { byName.set(e.name, []); order.push(e.name); }
-      byName.get(e.name).push(fmtRange(e.start, e.end, '–', e.sflag, e.eflag));
-    });
-    return order.map(name => ({ name, times: byName.get(name) }));
-  };
-  const winCell = (e, cls) =>
-    `<div class="chog-cell ${cls}"><div class="chog-name">${e.name}</div>${e.times.map(t => `<div class="chog-time">${t}</div>`).join('')}</div>`;
-  let windows = '';
-  if (data.auspicious.length) {
-    windows += `<div class="tile-strip"><div class="strip-title good-t">🟢 Auspicious</div><div class="win-grid">${groupWins(data.auspicious).map(e => winCell(e, 'good')).join('')}</div></div>`;
-  }
-  if (data.inauspicious.length) {
-    windows += `<div class="tile-strip avoid-strip"><div class="strip-title bad-t">🔴 Avoid</div><div class="win-grid">${groupWins(data.inauspicious).map(e => winCell(e, 'bad')).join('')}</div></div>`;
-  }
+function groupWindows(list) {
+  const order = [];
+  const byName = new Map();
+  [...list].sort((a, b) => a.start.localeCompare(b.start)).forEach(entry => {
+    if (!byName.has(entry.name)) {
+      byName.set(entry.name, []);
+      order.push(entry.name);
+    }
+    byName.get(entry.name).push(fmtRange(entry.start, entry.end, '–', entry.sflag, entry.eflag));
+  });
+  return order.map(name => ({ name, times: byName.get(name) }));
+}
 
-  // 4 · The day's timeline — Choghadiya as full-width colour-coded strips,
-  // day from the feed, night computed from sunset → tomorrow's sunrise.
-  const CHOG_GOOD = new Set(['Amrit', 'Shubh', 'Labh', 'Char']);
-  const chogCell = c =>
-    `<div class="chog-cell ${CHOG_GOOD.has(c.name) ? 'good' : 'bad'}"><div class="chog-name">${c.name}</div><div class="chog-time">${fmtRange(c.start, c.end, '–<wbr>')}</div></div>`;
-  let chog = '';
-  const atSunrise = [];
+function windowCell(entry, className) {
+  const times = entry.times.map(time => `<div class="chog-time">${time}</div>`).join('');
+  return `<div class="chog-cell ${className}"><div class="chog-name">${entry.name}</div>${times}</div>`;
+}
+
+function windowStrip(list, title, className, stripClass = '') {
+  if (!list.length) return '';
+  const cells = groupWindows(list).map(entry => windowCell(entry, className)).join('');
+  return `<div class="tile-strip${stripClass}"><div class="strip-title ${className}-t">${title}</div><div class="win-grid">${cells}</div></div>`;
+}
+
+function renderWindows(data) {
+  return windowStrip(data.auspicious, '🟢 Auspicious', 'good')
+    + windowStrip(data.inauspicious, '🔴 Avoid', 'bad', ' avoid-strip');
+}
+
+function nextSunrise(events) {
+  if (!events) return null;
+  const tomorrow = new Date(selectedDate());
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return events.get(stampOf(tomorrow))?.description.match(/Sunrise (\d{2}:\d{2})/)?.[1] ?? null;
+}
+
+function choghadiyaCell(entry) {
+  const good = new Set(['Amrit', 'Shubh', 'Labh', 'Char']).has(entry.name);
+  const className = good ? 'good' : 'bad';
+  return `<div class="chog-cell ${className}"><div class="chog-name">${entry.name}</div><div class="chog-time">${fmtRange(entry.start, entry.end, '–<wbr>')}</div></div>`;
+}
+
+function renderChoghadiya(data, events, tomorrowSr, atSunrise) {
+  let dayHtml = '';
   if (data.choghadiya.length) {
     atSunrise.push(`${data.choghadiya[0].name} Choghadiya`);
-    chog = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — day in 8 blocks</div><div class="chog-grid">${data.choghadiya.map(chogCell).join('')}</div></div>`;
+    dayHtml = `<div class="tile-strip"><div class="strip-title">🕐 Choghadiya — day in 8 blocks</div><div class="chog-grid">${data.choghadiya.map(choghadiyaCell).join('')}</div></div>`;
   }
-  // Prefer the feed's night section; compute it locally only for older feeds.
   let night = data.nightChoghadiya;
-  if (!night.length && data.sunset && events) {
-    const tomorrow = new Date(selectedDate());
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const next = events.get(stampOf(tomorrow));
-    const m = next && next.description.match(/Sunrise (\d{2}:\d{2})/);
-    if (m) night = nightChoghadiya(selectedDate().getDay(), data.sunset, m[1]);
+  if (!night.length && data.sunset && tomorrowSr && events) {
+    night = nightChoghadiya(selectedDate().getDay(), data.sunset, tomorrowSr);
   }
-  if (night.length) {
-    chog += `<div class="tile-strip"><div class="strip-title">🌙 Choghadiya — night in 8 blocks</div><div class="chog-grid">${night.map(chogCell).join('')}</div></div>`;
-  }
+  const nightHtml = night.length
+    ? `<div class="tile-strip"><div class="strip-title">🌙 Choghadiya — night in 8 blocks</div><div class="chog-grid">${night.map(choghadiyaCell).join('')}</div></div>`
+    : '';
+  return dayHtml + nightHtml;
+}
 
-  // Horas + lagna — horas are derived client-side from sunrise/sunset/
-  // tomorrow's sunrise; lagna is fetched asynchronously and injected
-  // into the placeholder once it loads.
-  let tomorrowSr = null;
-  if (data.sunset && events) {
-    const tomorrow = new Date(selectedDate());
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const next = events.get(stampOf(tomorrow));
-    const m = next && next.description.match(/Sunrise (\d{2}:\d{2})/);
-    if (m) tomorrowSr = m[1];
-  }
-  let horaHtml = '';
-  if (data.sunrise && data.sunset && tomorrowSr) {
-    const horas = computeHoras(selectedDate().getDay(), data.sunrise, data.sunset, tomorrowSr);
-    if (horas.day.length) atSunrise.push(`${horas.day[0].lord} Hora`);
-    // Day horas live entirely within one calendar day; night horas
-    // cross midnight, so feed them through the marker pass with
-    // sunset as the "today" anchor.
-    const nightFlagged = markFirstMidnightCrossing(horas.night, data.sunset);
-    horaHtml = `<div class="tile-strip"><div class="strip-title">🕒 Horas — day</div><div class="hora-grid">${horas.day.map(horaCell).join('')}</div></div>`;
-    horaHtml += `<div class="tile-strip"><div class="strip-title">🌙 Horas — night</div><div class="hora-grid">${nightFlagged.map(horaCell).join('')}</div></div>`;
-  }
-  const isoDate = `${selectedDate().getFullYear()}-${String(selectedDate().getMonth()+1).padStart(2,'0')}-${String(selectedDate().getDate()).padStart(2,'0')}`;
-  const lagnaPlaceholder = `<div class="tile-strip" id="lagna-strip" data-iso="${isoDate}" data-render-sequence="${renderSequence}">`
-    + `<div class="strip-title">🌅 Lagna — rising sign</div>`
-    + `<div class="lagna-ribbon" id="lagna-ribbon">`
-    + `<div class="preview-note" style="grid-column:1/-1;margin:0;padding:0.4rem;text-align:center;">Loading lagna data…</div>`
-    + `</div></div>`;
+function renderHoras(data, tomorrowSr, atSunrise) {
+  if (!(data.sunrise && data.sunset && tomorrowSr)) return '';
+  const horas = computeHoras(selectedDate().getDay(), data.sunrise, data.sunset, tomorrowSr);
+  if (horas.day.length) atSunrise.push(`${horas.day[0].lord} Hora`);
+  const nightFlagged = markFirstMidnightCrossing(horas.night, data.sunset);
+  const day = `<div class="tile-strip"><div class="strip-title">🕒 Horas — day</div><div class="hora-grid">${horas.day.map(horaCell).join('')}</div></div>`;
+  const night = `<div class="tile-strip"><div class="strip-title">🌙 Horas — night</div><div class="hora-grid">${nightFlagged.map(horaCell).join('')}</div></div>`;
+  return day + night;
+}
 
-  const detailedMeta = atSunrise.length
+function selectedIsoDate() {
+  const date = selectedDate();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function lagnaPlaceholder(isoDate, renderSequence) {
+  return `<div class="tile-strip" id="lagna-strip" data-iso="${isoDate}" data-render-sequence="${renderSequence}">`
+    + '<div class="strip-title">🌅 Lagna — rising sign</div>'
+    + '<div class="lagna-ribbon" id="lagna-ribbon">'
+    + '<div class="preview-note" style="grid-column:1/-1;margin:0;padding:0.4rem;text-align:center;">Loading lagna data…</div>'
+    + '</div></div>';
+}
+
+function renderDetailedTimings(data, events, renderSequence, isoDate) {
+  const atSunrise = [];
+  const tomorrowSr = data.sunset ? nextSunrise(events) : null;
+  const choghadiya = renderChoghadiya(data, events, tomorrowSr, atSunrise);
+  const horas = renderHoras(data, tomorrowSr, atSunrise);
+  const content = choghadiya + horas + lagnaPlaceholder(isoDate, renderSequence);
+  const meta = atSunrise.length
     ? `At sunrise · ${htmlEsc(atSunrise.join(' · '))}`
     : 'Choghadiya · Hora · Lagna';
-
-  const detailedTimings = (chog || horaHtml || lagnaPlaceholder)
-    ? `<details class="daily-details">
+  return `<details class="daily-details">
          <summary>
            <span class="daily-details-title">Detailed timings</span>
-           <span class="daily-details-meta">${detailedMeta}</span>
+           <span class="daily-details-meta">${meta}</span>
            <span class="daily-details-chevron" aria-hidden="true"></span>
          </summary>
-         <div class="daily-details-body">${chog}${horaHtml}${lagnaPlaceholder}</div>
-       </details>`
-    : '';
+         <div class="daily-details-body">${content}</div>
+       </details>`;
+}
+
+function renderLagnaResult(data, isoDate) {
+  const ribbon = document.getElementById('lagna-ribbon');
+  const dayData = lagnaDayFor(data, isoDate);
+  const segments = lagnaSegments(dayData);
+  if (segments.length) {
+    const flagged = markFirstMidnightCrossing(segments, dayData.sunrise);
+    ribbon.innerHTML = flagged.map(lagnaCell).join('');
+    return;
+  }
+  const note = document.createElement('div');
+  note.className = 'preview-note';
+  note.style.cssText = 'grid-column:1/-1;margin:0;padding:0.5rem;text-align:center;';
+  note.textContent = data
+    ? 'Lagna data is generated ~18 months ahead. This date is outside the current window — it will appear once the next monthly build runs.'
+    : 'Lagna data is loading from a separate feed. If this persists, the feed may be unreachable from your network.';
+  ribbon.replaceChildren(note);
+}
+
+function loadLagnaRibbon(city, isoDate, renderSequence, renderKey) {
+  if (!city) return;
+  loadLagna(city).then(data => {
+    const strip = document.getElementById('lagna-strip');
+    if (
+      !document.getElementById('lagna-ribbon')
+      || strip?.dataset.iso !== isoDate
+      || strip.dataset.renderSequence !== String(renderSequence)
+      || currentPreviewKey() !== renderKey
+    ) return;
+    renderLagnaResult(data, isoDate);
+  });
+}
+
+function renderPreview(container, event, events, renderSequence, renderKey) {
+  const data = parseDescription(event.description);
+  const isoDate = selectedIsoDate();
+  const special = specialBadge(event.summary);
+  const metaLines = renderMetaLines(data);
+  const skyCycle = renderSkyCycle(data);
+  const flagStrip = renderFlagStrip(data, event.summary);
+  const angaGrid = renderAngaGrid(data);
+  const windows = renderWindows(data);
+  const detailedTimings = renderDetailedTimings(data, events, renderSequence, isoDate);
 
   container.innerHTML = `
     <div class="preview-card">
@@ -395,114 +476,81 @@ function renderPreview(container, event, events, renderSequence, renderKey) {
     </div>
   `;
 
-  // Async lagna fetch — guarded by date, city/system and render sequence so a
-  // quick context change before the fetch resolves cannot paint stale data.
-  const cityForLagna = getSelection().city;
-  if (cityForLagna) {
-    loadLagna(cityForLagna).then(d => {
-      const ribbon = document.getElementById('lagna-ribbon');
-      const strip = document.getElementById('lagna-strip');
-      if (
-        !ribbon
-        || !strip
-        || strip.dataset.iso !== isoDate
-        || strip.dataset.renderSequence !== String(renderSequence)
-        || currentPreviewKey() !== renderKey
-      ) return;
-      const dayData = lagnaDayFor(d, isoDate);
-      const segs = lagnaSegments(dayData);
-      if (segs.length) {
-        // Anchor midnight detection on sunrise — the first cell that
-        // crosses past midnight gets *+1 and subsequent cells stay
-        // unmarked (matches the existing Choghadiya convention).
-        const flagged = markFirstMidnightCrossing(segs, dayData.sunrise);
-        ribbon.innerHTML = flagged.map(lagnaCell).join('');
-      } else {
-        // Date is outside the generated lagna window (we precompute
-        // ~18 months ahead per city). Keep the strip visible with a
-        // clear explanation instead of vanishing silently. Built via
-        // DOM API + textContent so no string ever reaches innerHTML.
-        const note = document.createElement('div');
-        note.className = 'preview-note';
-        note.style.cssText = 'grid-column:1/-1;margin:0;padding:0.5rem;text-align:center;';
-        note.textContent = d
-          ? 'Lagna data is generated ~18 months ahead. This date is outside the current window — it will appear once the next monthly build runs.'
-          : 'Lagna data is loading from a separate feed. If this persists, the feed may be unreachable from your network.';
-        ribbon.replaceChildren(note);
-      }
-    });
-  }
+  loadLagnaRibbon(getSelection().city, isoDate, renderSequence, renderKey);
 }
 
 // --- Festivals & observances — full calendar year, accordion by month ---
 
-function renderUpcoming(events) {
-  const container = document.getElementById('upcoming-result');
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const year = today.getFullYear();
-  const currentMonth = today.getMonth();
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
 
-  const MONTH_NAMES = ['January','February','March','April','May','June',
-                       'July','August','September','October','November','December'];
+function observanceChips(event, data) {
+  const special = data.special
+    .filter(item => !(data.eclipse && item.includes('Eclipse')))
+    .map(item => `<span class="special-chip">${chipEmoji(item, event.summary)} ${specialLabel(item, data)}</span>`);
+  const eclipse = data.eclipse ? [eclipseChip(data.eclipse)] : [];
+  return [...special, ...eclipse].join('');
+}
 
-  const buckets: Map<number, string[]> = new Map();
-  let nextObservance = '';
-
-  const d = new Date(year, 0, 1);
-  const yearEnd = new Date(year, 11, 31);
-  while (d <= yearEnd) {
-    const ev = events.get(stampOf(d));
-    if (ev && (ev.summary.includes('⚡') || ev.summary.includes('🪔'))) {
-      const data = parseDescription(ev.description);
-      let chips = '';
-      data.special
-        .filter(s => !(data.eclipse && /Eclipse/.test(s)))
-        .forEach(s => { chips += `<span class="special-chip">${chipEmoji(s, ev.summary)} ${specialLabel(s, data)}</span>`; });
-      if (data.eclipse) chips += eclipseChip(data.eclipse);
-      if (chips) {
-        const m = d.getMonth();
-        if (!buckets.has(m)) buckets.set(m, []);
-        const isToday = d.getTime() === today.getTime();
-        const isFestival = ev.summary.includes('🪔');
-        const dow = d.toLocaleDateString('en-US', { weekday: 'short' });
-        const day = d.getDate();
-        const monthAbbr = MONTH_NAMES[m].slice(0, 3);
-        let cls = 'upcoming-row';
-        if (isFestival) cls += ' upcoming-festival';
-        if (isToday)   cls += ' upcoming-today';
-        const isoDate = `${year}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const row = `<div class="${cls}">
-            <span class="upcoming-date"><span class="dow">${dow}</span> ${monthAbbr} ${day}${isToday ? '<span class="upcoming-today-badge">today</span>' : ''}</span>
+function observanceEntry(events, date, today, year) {
+  const event = events.get(stampOf(date));
+  if (!event || !(event.summary.includes('⚡') || event.summary.includes('🪔'))) return null;
+  const chips = observanceChips(event, parseDescription(event.description));
+  if (!chips) return null;
+  const month = date.getMonth();
+  const isToday = date.getTime() === today.getTime();
+  const rowClasses = [
+    'upcoming-row',
+    ...(event.summary.includes('🪔') ? ['upcoming-festival'] : []),
+    ...(isToday ? ['upcoming-today'] : []),
+  ].join(' ');
+  const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+  const day = date.getDate();
+  const monthAbbr = MONTH_NAMES[month].slice(0, 3);
+  const todayBadge = isToday ? '<span class="upcoming-today-badge">today</span>' : '';
+  const isoDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const row = `<div class="${rowClasses}">
+            <span class="upcoming-date"><span class="dow">${weekday}</span> ${monthAbbr} ${day}${todayBadge}</span>
             <span class="upcoming-chips">${chips}</span>
           </div>`;
-        buckets.get(m).push(row);
-        if (!nextObservance && d >= today) {
-          nextObservance = `<section class="upcoming-next" aria-labelledby="upcoming-next-title">
+  const next = `<section class="upcoming-next" aria-labelledby="upcoming-next-title">
             <div class="upcoming-next-copy">
               <p class="upcoming-next-kicker">Next observance</p>
-              <h3 id="upcoming-next-title">${dow}, ${monthAbbr} ${day}</h3>
+              <h3 id="upcoming-next-title">${weekday}, ${monthAbbr} ${day}</h3>
               <div class="upcoming-chips">${chips}</div>
             </div>
             <button class="upcoming-next-action" onclick="switchTool('today'); openFestivalDate('${isoDate}')">View Panchangam</button>
           </section>`;
-        }
-      }
+  return { month, row, next };
+}
+
+function collectObservances(events, today, year) {
+  const buckets: Map<number, string[]> = new Map();
+  let nextObservance = '';
+  const date = new Date(year, 0, 1);
+  const yearEnd = new Date(year, 11, 31);
+  while (date <= yearEnd) {
+    const entry = observanceEntry(events, date, today, year);
+    if (entry) {
+      const rows = buckets.get(entry.month);
+      if (rows) rows.push(entry.row);
+      else buckets.set(entry.month, [entry.row]);
+      if (!nextObservance && date >= today) nextObservance = entry.next;
     }
-    d.setDate(d.getDate() + 1);
+    date.setDate(date.getDate() + 1);
   }
+  return { buckets, nextObservance };
+}
 
-  if (!buckets.size) {
-    container.innerHTML = `<p class="preview-note">No festivals found for ${year}.</p>`;
-    return;
-  }
-
+function renderObservanceMonths(buckets, currentMonth, year) {
   let html = '';
-  for (const [m, rows] of buckets) {
-    const isOpen = m === currentMonth;
+  for (const [month, rows] of buckets) {
+    const isOpen = month === currentMonth;
     html += `<div class="upcoming-month${isOpen ? ' open' : ''}">
       <button class="upcoming-month-header" onclick="toggleFestivalMonth(this)" aria-expanded="${isOpen}">
-        <span>${MONTH_NAMES[m]} ${year}</span>
+        <span>${MONTH_NAMES[month]} ${year}</span>
         <span class="upcoming-chevron" aria-hidden="true"></span>
       </button>
       <div class="upcoming-month-body">
@@ -510,7 +558,21 @@ function renderUpcoming(events) {
       </div>
     </div>`;
   }
-  container.innerHTML = nextObservance + html;
+  return html;
+}
+
+function renderUpcoming(events) {
+  const container = document.getElementById('upcoming-result');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const year = today.getFullYear();
+  const currentMonth = today.getMonth();
+  const { buckets, nextObservance } = collectObservances(events, today, year);
+  if (!buckets.size) {
+    container.innerHTML = `<p class="preview-note">No festivals found for ${year}.</p>`;
+    return;
+  }
+  container.innerHTML = nextObservance + renderObservanceMonths(buckets, currentMonth, year);
 }
 
 function toggleFestivalMonth(btn) {
@@ -592,6 +654,49 @@ async function loadPreview() {
 
 // --- Share today's panchangam on WhatsApp (plain-text forward) ---
 
+function shareYearLines(data) {
+  if (!data.samvatsara) return [];
+  const yearBits = [
+    `${data.samvatsara} Nama Samvatsara`,
+    data.ayanam,
+    data.rituvu ? `${data.rituvu} Rituvu` : null,
+  ].filter(Boolean);
+  return [
+    yearBits.join(' · '),
+    `${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}`,
+  ];
+}
+
+function shareAngaLine(label, entry) {
+  if (!entry) return [];
+  return [`*${label}:* ${entry.name} — ${fmtPlain(entry.start, entry.sflag)} to ${fmtPlain(entry.end, entry.eflag)}`];
+}
+
+function shareKaranaLines(karana) {
+  if (!karana) return [];
+  const ranges = karana.split(/\s+\/\s+/).map(value => {
+    const range = parseKaranaRange(value);
+    if (!range) return value;
+    return `${range.name} ${fmtPlain(range.start, range.sflag)}–${fmtPlain(range.end, range.eflag)}`;
+  });
+  return [`*Karana:* ${ranges.join(' / ')}`];
+}
+
+function shareWindowLines(title, list) {
+  if (!list.length) return [];
+  const windows = list.map(entry => (
+    `• ${entry.name} ${fmtPlain(entry.start, entry.sflag)}–${fmtPlain(entry.end, entry.eflag)}`
+  ));
+  return ['', title, ...windows];
+}
+
+function shareExtraLines(data, festivals) {
+  const extras = data.special.filter(item => !festivals.some(festival => item.startsWith(festival)));
+  return extras.length
+    ? ['', `⚡ ${extras.map(item => specialLabel(item, data)).join(' · ')}`]
+    : [];
+}
+
 function buildShareText(event) {
   const data = parseDescription(event.description);
   const d = selectedDate();
@@ -600,61 +705,36 @@ function buildShareText(event) {
   const sysSel = selEl('tp-system');
   const cityLabel = citySel.options[citySel.selectedIndex].textContent;
   const sysLabel = sysSel.options[sysSel.selectedIndex].textContent;
-  const lines = [];
   const fests = festivalNames(event.summary);
-  if (fests.length) lines.push(`🪔 *${fests.join(' · ')}*`);
-  lines.push(`*Panchangam — ${dateLabel}*`);
-  lines.push(`📍 ${cityLabel} · ${sysLabel}`);
-  lines.push('');
-  if (data.samvatsara) {
-    const yearBits = [data.samvatsara + ' Nama Samvatsara', data.ayanam, data.rituvu ? data.rituvu + ' Rituvu' : null].filter(Boolean);
-    lines.push(yearBits.join(' · '));
-    lines.push(`${data.maasam} Maasam · ${data.paksham} Paksham · ${data.vaaram}`);
-  }
-  const anga = (label, e) => e && lines.push(`*${label}:* ${e.name} — ${fmtPlain(e.start, e.sflag)} to ${fmtPlain(e.end, e.eflag)}`);
-  let tithi = data.tithi;
-  if (tithi && /^(Shukla|Krishna) Ekadashi$/.test(tithi.name)) {
-    const name = ekadashiName(data.maasam, data.paksham, data.solarSign);
-    if (name) tithi = { ...tithi, name: `${name} Ekadashi` };
-  }
-  anga('Tithi', tithi);
-  anga('Nakshatra', data.nakshatra);
-  anga('Yoga', data.yoga);
-  if (data.karana) {
-    const karana = data.karana.split(/\s+\/\s+/).map(k => {
-      const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-      return m ? `${m[1]} ${fmtPlain(m[2], m[3])}–${fmtPlain(m[4], m[5])}` : k;
-    }).join(' / ');
-    lines.push(`*Karana:* ${karana}`);
-  }
-  if (data.sunrise) lines.push(`🌅 Sunrise ${fmtT(data.sunrise)} · Sunset ${fmtT(data.sunset)}`);
-  if (data.moonrise) lines.push(`🌙 Moonrise ${fmtT(data.moonrise)} · Moonset ${fmtT(data.moonset)}`);
-  const winList = (title, list) => {
-    if (!list.length) return;
-    lines.push('');
-    lines.push(title);
-    list.forEach(w => lines.push(`• ${w.name} ${fmtPlain(w.start, w.sflag)}–${fmtPlain(w.end, w.eflag)}`));
-  };
-  winList('⚠️ *Avoid:*', data.inauspicious);
-  winList('✅ *Good times:*', data.auspicious);
-  const extras = data.special.filter(sp => !fests.some(f => sp.startsWith(f)));
-  if (extras.length) {
-    lines.push('');
-    lines.push(`⚡ ${extras.map(sp => specialLabel(sp, data)).join(' · ')}`);
-  }
-  if (data.yogas.length) lines.push(`✨ ${data.yogas.join(' · ')}`);
-  if (data.eclipse) {
-    lines.push(`🌒 ${data.eclipse.kind} Eclipse (${data.eclipse.subtype}) — ${data.eclipse.visible ? 'visible here, Sutak applies' : 'not visible from this location'}`);
-  }
-  lines.push('');
-  lines.push('📅 Full panchangam & free calendar feeds:');
-  lines.push('https://panchangam.astrochaganti.com/?src=share-today');
+  const lines = [
+    ...(fests.length ? [`🪔 *${fests.join(' · ')}*`] : []),
+    `*Panchangam — ${dateLabel}*`,
+    `📍 ${cityLabel} · ${sysLabel}`,
+    '',
+    ...shareYearLines(data),
+    ...shareAngaLine('Tithi', namedTithi(data)),
+    ...shareAngaLine('Nakshatra', data.nakshatra),
+    ...shareAngaLine('Yoga', data.yoga),
+    ...shareKaranaLines(data.karana),
+    ...(data.sunrise ? [`🌅 Sunrise ${fmtT(data.sunrise)} · Sunset ${fmtT(data.sunset)}`] : []),
+    ...(data.moonrise ? [`🌙 Moonrise ${fmtT(data.moonrise)} · Moonset ${fmtT(data.moonset)}`] : []),
+    ...shareWindowLines('⚠️ *Avoid:*', data.inauspicious),
+    ...shareWindowLines('✅ *Good times:*', data.auspicious),
+    ...shareExtraLines(data, fests),
+    ...(data.yogas.length ? [`✨ ${data.yogas.join(' · ')}`] : []),
+    ...(data.eclipse
+      ? [`🌒 ${data.eclipse.kind} Eclipse (${data.eclipse.subtype}) — ${data.eclipse.visible ? 'visible here, Sutak applies' : 'not visible from this location'}`]
+      : []),
+    '',
+    '📅 Full panchangam & free calendar feeds:',
+    'https://panchangam.astrochaganti.com/?src=share-today',
+  ];
   gcEvent('share-today');
   return lines.join('\n');
 }
 
 function shareTodayOnWhatsApp() {
-  const event = LAST_EVENTS && LAST_EVENTS.get(stampOf(selectedDate()));
+  const event = LAST_EVENTS?.get(stampOf(selectedDate()));
   if (!event) return;
   window.open('https://wa.me/?text=' + encodeURIComponent(buildShareText(event)), '_blank');
 }
