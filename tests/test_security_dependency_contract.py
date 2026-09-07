@@ -4,9 +4,24 @@ import subprocess
 import sys
 from pathlib import Path
 
+import yaml
+
 from tools import install_locked_dependencies
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_security_workflow_scopes_token_permissions_per_job():
+    workflow = yaml.safe_load((ROOT / ".github/workflows/security.yml").read_text())
+
+    assert workflow["permissions"] == {}
+    assert set(workflow["jobs"]) == {"codeql", "pip-audit"}
+    assert workflow["jobs"]["codeql"]["permissions"] == {
+        "contents": "read",
+        "security-events": "write",
+        "actions": "read",
+    }
+    assert workflow["jobs"]["pip-audit"]["permissions"] == {"contents": "read"}
 
 
 def test_security_workflow_audits_the_uv_locked_runtime_input():
