@@ -153,12 +153,20 @@ function taraOf(janmaName, dayName) {
   return ((d - j + 27) % 27) % 9 + 1;
 }
 
+export function tbChandraVerdict(pos: number): string {
+  if (CHANDRA_GOOD.has(pos)) return 'good';
+  if (CHANDRA_PUJA.has(pos)) return 'puja';
+  return 'bad';
+}
+
 function chandraOf(janmaRasi, dayRasi) {
   const j = TB_RASIS.indexOf(janmaRasi), d = TB_RASIS.indexOf(dayRasi);
   if (j < 0 || d < 0) return null;
   const pos = ((d - j + 12) % 12) + 1;
-  return { pos, verdict: CHANDRA_GOOD.has(pos) ? 'good' : (CHANDRA_PUJA.has(pos) ? 'puja' : 'bad') };
+  return { pos, verdict: tbChandraVerdict(pos) };
 }
+
+type TarabalamPada = 1 | 2 | 3 | 4;
 
 export interface TarabalamProfileActions {
   createProfile(trigger: HTMLElement): void;
@@ -179,7 +187,7 @@ interface ManualParticipant {
   id: string;
   name: string;
   nak: string;
-  pada: 1 | 2 | 3 | 4 | null;
+  pada: TarabalamPada | null;
   lagna: string | null;
 }
 
@@ -284,17 +292,17 @@ export function tbProfiles(): JourneyGuestProfile[] {
     if (!nakshatra) continue;
     const rawPada = padaInput?.value ?? previous.pada;
     const padaNumber = Number(rawPada);
-    const pada = ([1, 2, 3, 4] as const).includes(padaNumber as 1 | 2 | 3 | 4)
-      ? padaNumber as 1 | 2 | 3 | 4
+    const pada = ([1, 2, 3, 4] as const).includes(padaNumber as TarabalamPada)
+      ? padaNumber as TarabalamPada
       : null;
     const rawLagna = lagnaInput?.value ?? previous.lagna;
     const lagna = typeof rawLagna === 'string' && TB_RASIS.includes(rawLagna)
       ? rawLagna
       : null;
     const rawName = nameInput?.value ?? previous.name;
-    const name = typeof rawName === 'string' && rawName.trim()
-      ? rawName.trim()
-      : (index === 0 ? 'You' : `Person ${index + 1}`);
+    let name = `Person ${index + 1}`;
+    if (typeof rawName === 'string' && rawName.trim()) name = rawName.trim();
+    else if (index === 0) name = 'You';
     participants.push({
       id: typeof previous.id === 'string' ? previous.id : `legacy_${index}`,
       name,
@@ -414,12 +422,14 @@ export function initTarabalamProfiles(
     if (!readiness.muhurta) {
       details.push('Needs Nakshatra before Muhurtam');
     } else {
-      details.push(profile.pada
-        ? `${profile.nakshatra}, Padam ${profile.pada}`
-        : String(profile.nakshatra));
-      details.push(readiness.janmaRasi
-        ? `${readiness.janmaRasi} Janma Rashi`
-        : 'Add Padam to derive Janma Rashi');
+      details.push(
+        profile.pada
+          ? `${profile.nakshatra}, Padam ${profile.pada}`
+          : String(profile.nakshatra),
+        readiness.janmaRasi
+          ? `${readiness.janmaRasi} Janma Rashi`
+          : 'Add Padam to derive Janma Rashi',
+      );
       if (profile.lagna) details.push(`${profile.lagna} Lagna`);
     }
     const detail = tbNode('span', 'muhurta-profile-option__details', details.join(' · '));
@@ -534,7 +544,7 @@ export function initTarabalamProfiles(
       participant.pada ? String(participant.pada) : '',
       [['', 'Not known'], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']],
       value => {
-        participant.pada = value ? Number(value) as 1 | 2 | 3 | 4 : null;
+        participant.pada = value ? Number(value) as TarabalamPada : null;
       },
       participant.id,
       'pada',
@@ -642,11 +652,12 @@ export function initTarabalamProfiles(
       root.append(intro, summary);
 
       const storeIssue = tbProfileStoreIssue(snapshot);
-      const roleStorageIssue = roleSelectionState.storageIssue === 'storage-unavailable'
-        ? 'Role choices work for this page, but this browser cannot save them.'
-        : roleSelectionState.storageIssue === 'malformed-storage'
-          ? 'Saved role choices were unreadable and have been reset safely.'
-          : null;
+      let roleStorageIssue: string | null = null;
+      if (roleSelectionState.storageIssue === 'storage-unavailable') {
+        roleStorageIssue = 'Role choices work for this page, but this browser cannot save them.';
+      } else if (roleSelectionState.storageIssue === 'malformed-storage') {
+        roleStorageIssue = 'Saved role choices were unreadable and have been reset safely.';
+      }
       for (const message of [
         storeIssue, selection.message, roleStorageIssue, transientIssue,
       ].filter(Boolean)) {
@@ -1011,7 +1022,8 @@ async function calcTarabalam() {
                      moonRasi: data.lunarSign || '', tithi: data.tithi ? data.tithi.name : '', taras });
     }
     renderTarabalam(profiles);
-  } catch (_e) {
+  } catch {
+    // Feed details are intentionally withheld; the user gets a stable retry message.
     resBox.innerHTML = '<p class="preview-error">Could not load the feed. Try again.</p>';
   }
 }
@@ -1042,6 +1054,20 @@ function tbPersonGood(t) {
   return true;  // stars: chandra annotates, never blocks
 }
 
+export function tbChandraPresentation(t): { chandraTag: string; cls: string } {
+  const passes = tbPersonGood(t);
+  let caveat = t.chandra?.verdict || null;
+  if (caveat === 'good') caveat = null;
+  const ord = n => n + (['st','nd','rd'][n-1] || 'th');
+  let chandraTag = '';
+  if (caveat === 'puja') chandraTag = ` · ° ${ord(t.chandra.pos)}`;
+  else if (caveat) chandraTag = ` · ☾ ${ord(t.chandra.pos)}`;
+  let cls = 'good';
+  if (!passes) cls = 'bad';
+  else if (TB_MODE === 'puja_ok' && caveat === 'puja') cls = 'puja';
+  return { chandraTag, cls };
+}
+
 function tbToggleShowAll() {
   TB_SHOW_ALL = inpEl('tb-show-all').checked;
   renderTarabalam();
@@ -1060,8 +1086,8 @@ function tbDayGoodForAll(profiles, nak, moonRasi) {
     if (!TARA_GOOD.has(taraOf(pr.nak, nak))) return false;
     if (TB_MODE !== 'stars' && pr.rasi && moonRasi) {
       const c = chandraOf(pr.rasi, moonRasi);
-      if (c && c.verdict === 'bad') return false;
-      if (c && TB_MODE === 'strict' && c.verdict !== 'good') return false;
+      if (c?.verdict === 'bad') return false;
+      if (c?.verdict !== undefined && TB_MODE === 'strict' && c.verdict !== 'good') return false;
     }
     return true;
   });
@@ -1075,7 +1101,7 @@ function tbNextGoodBeyondRange(profiles) {
     const ev = TB_EVENTS.get(stampOf(d));
     if (!ev) return null;  // feed horizon reached
     const data = parseDescription(ev.description);
-    const nak = data.nakshatra && data.nakshatra.name;
+    const nak = data.nakshatra?.name;
     if (nak && tbDayGoodForAll(profiles, nak, data.lunarSign)) return d;
   }
   return null;
@@ -1094,7 +1120,9 @@ function renderTarabalam(profiles?) {
   selEl('tb-mode').value = TB_MODE;
   const goodDays = TB_DAYS.filter(r => r.allGood);
   const next = goodDays[0];
-  const who = group ? 'everyone' : (profiles[0] ? profiles[0].name : 'you');
+  let who = 'you';
+  if (group) who = 'everyone';
+  else if (profiles[0]) who = profiles[0].name;
   let summary = `<span class="count">${goodDays.length} of ${TB_DAYS.length}</span>&nbsp;days are favourable for ${htmlEsc(who)}`;
   if (next) {
     summary += ` · next: <span class="count">${next.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>`;
@@ -1145,31 +1173,34 @@ function renderTarabalam(profiles?) {
     const chips = r.taras.map(t => {
       // chip colour = verdict under the chosen ✦ standard; the Moon is a
       // marked caveat (° puja, ☾ moon-avoid), never a silent veto
-      const passes = tbPersonGood(t);
-      const caveat = t.chandra && t.chandra.verdict !== 'good' ? t.chandra.verdict : null;
-      const ord = n => n + (['st','nd','rd'][n-1] || 'th');
-      const chandraTag = t.chandra && t.chandra.verdict !== 'good'
-        ? (caveat === 'puja' ? ` · ° ${ord(t.chandra.pos)}` : ` · ☾ ${ord(t.chandra.pos)}`)
-        : '';
+      const { chandraTag, cls } = tbChandraPresentation(t);
       // colour follows the chosen standard: under 'Stars only' the chips are
       // pure star verdicts; amber only when the standard admits a day on the
       // condition of a remedial puja
-      const cls = !passes ? 'bad'
-        : (TB_MODE === 'puja_ok' && caveat === 'puja' ? 'puja' : 'good');
-      const detail = `Tara: ${t.tara} ${t.label} (${t.good ? 'good' : 'avoid'})` +
-        (t.chandra ? ` · Chandra: ${t.chandra.pos}${['st','nd','rd'][t.chandra.pos-1] || 'th'} from rashi (${t.chandra.verdict === 'puja' ? 'needs puja' : t.chandra.verdict})` : '') +
-        (r.moonRasi ? ` · Moon in ${r.moonRasi}` : '');
+      let chandraDetail = '';
+      if (t.chandra) {
+        let chandraVerdict = t.chandra.verdict;
+        if (chandraVerdict === 'puja') chandraVerdict = 'needs puja';
+        chandraDetail = ` · Chandra: ${t.chandra.pos}${['st','nd','rd'][t.chandra.pos-1] || 'th'} from rashi (${chandraVerdict})`;
+      }
+      const moonDetail = r.moonRasi ? ` · Moon in ${r.moonRasi}` : '';
+      const detail = `Tara: ${t.tara} ${t.label} (${t.good ? 'good' : 'avoid'})`
+        + chandraDetail + moonDetail;
       return `<td><span class="tara-chip ${cls}" title="${detail}">${t.tara} ${t.label}${chandraTag}</span></td>`;
     }).join('');
-    const all = profiles.length > 1 ? `<td>${r.allGood ? '<span class="tb-star">✦</span>' : ''}</td>` : '';
+    let all = '';
+    if (profiles.length > 1) {
+      const allGood = r.allGood ? '<span class="tb-star">✦</span>' : '';
+      all = `<td>${allGood}</td>`;
+    }
     return `<tr class="${r.allGood && profiles.length > 1 ? 'tb-all' : ''}">
       <td class="tb-date-cell">${dlabel}</td>
       <td>${r.nak}<div class="tb-sub">till ${fmtT(r.nakUntil)}${r.nakEflag === '+1' ? ' +1' : ''}</div></td>
       <td>${r.tithi}</td>${chips}${all}</tr>`;
   }).join('');
   const shown = TB_DAYS.filter(r => TB_SHOW_ALL || r.allGood);
-  const hasPuja = shown.some(r => r.taras.some(t => t.chandra && t.chandra.verdict === 'puja'));
-  const hasMoonBad = shown.some(r => r.taras.some(t => t.chandra && t.chandra.verdict === 'bad'));
+  const hasPuja = shown.some(r => r.taras.some(t => t.chandra?.verdict === 'puja'));
+  const hasMoonBad = shown.some(r => r.taras.some(t => t.chandra?.verdict === 'bad'));
   const modeLabel = { stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE];
   let legend = `<div class="tb-readme"><div class="tb-readme-title">How to read this table</div>
     <div><span class="tara-chip good">green</span> a good day for that person, under your standard (<em>${modeLabel}</em>).</div>
@@ -1190,14 +1221,7 @@ function renderTarabalam(profiles?) {
   const cards = rows.map(r => {
     const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const personRows = r.taras.map((t, i) => {
-      const passes = tbPersonGood(t);
-      const caveat = t.chandra && t.chandra.verdict !== 'good' ? t.chandra.verdict : null;
-      const ord = n => n + (['st','nd','rd'][n-1] || 'th');
-      const chandraTag = t.chandra && t.chandra.verdict !== 'good'
-        ? (caveat === 'puja' ? ` · ° ${ord(t.chandra.pos)}` : ` · ☾ ${ord(t.chandra.pos)}`)
-        : '';
-      const cls = !passes ? 'bad'
-        : (TB_MODE === 'puja_ok' && caveat === 'puja' ? 'puja' : 'good');
+      const { chandraTag, cls } = tbChandraPresentation(t);
       // Mobile card sub-line: name · nak · optional rashi/lagna.
       const p = profiles[i];
       let subText = '';
@@ -1239,15 +1263,19 @@ function shareTarabalamOnWhatsApp() {
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const lines = [];
   const anyRasi = profiles.some(pr => pr.rasi);
-  lines.push(`✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`);
-  lines.push(`📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} to ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`);
-  lines.push('Saved profile names and birth-star details are intentionally omitted from this share.');
-  lines.push(`Standard: ${{ stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE]}`);
-  lines.push('');
+  lines.push(
+    `✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`,
+    `📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} to ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`,
+    'Saved profile names and birth-star details are intentionally omitted from this share.',
+    `Standard: ${{ stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE]}`,
+    '',
+  );
   goodDays.forEach(r => lines.push(`✅ ${fmtD(r.date)} · ${r.nak} · ${r.tithi}`));
-  lines.push('');
-  lines.push('Check your own birth star:');
-  lines.push('https://panchangam.astrochaganti.com/?src=share-tarabalam#tarabalam');
+  lines.push(
+    '',
+    'Check your own birth star:',
+    'https://panchangam.astrochaganti.com/?src=share-tarabalam#tarabalam',
+  );
   gcEvent('share-tarabalam');
   window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
 }
@@ -1300,7 +1328,33 @@ const MU_NITYA_AUSPICIOUS_BONUS = 1;
 
 function muMin(t, flag?) {
   const [h, m] = t.split(':').map(Number);
-  return h * 60 + m + (flag === '+1' ? 1440 : flag === '-1' ? -1440 : 0);
+  let offset = 0;
+  if (flag === '+1') offset = 1440;
+  else if (flag === '-1') offset = -1440;
+  return h * 60 + m + offset;
+}
+
+export function muNatureBonus(isAbhijit: boolean, nature: string): number {
+  if (isAbhijit) return 2;
+  if (nature === 'auspicious') return 1;
+  return -2;
+}
+
+export function muAvoidKaranaWindows(
+  karana: string,
+  avoidKaranaNames: Set<unknown>,
+): number[][] {
+  const windows: number[][] = [];
+  const karanaWindowPattern = new RegExp(
+    String.raw`^(.*?)\s+${TIME_PART}\s*[–-]\s*${TIME_PART}$`,
+  );
+  for (const rawKarana of karana.split('/')) {
+    const match = karanaWindowPattern.exec(rawKarana.trim());
+    if (match && avoidKaranaNames.has(match[1].trim())) {
+      windows.push([muMin(match[2], match[3]), muMin(match[4], match[5])]);
+    }
+  }
+  return windows;
 }
 
 /**
@@ -1470,13 +1524,13 @@ const MU_TRI_NAKS   = new Set(['Krittika','Punarvasu','Uttara Phalguni',
 
 function muSpecialYogasAt(vaaram, tithiName, nakshatraName) {
   const yogas = [];
-  if (MU_SARVARTHA[vaaram] && MU_SARVARTHA[vaaram].has(nakshatraName))
+  if (MU_SARVARTHA[vaaram]?.has(nakshatraName))
     yogas.push('Sarvartha Siddhi Yoga');
   if (MU_AMRITA_SIDDHI[vaaram] === nakshatraName)
     yogas.push('Amrita Siddhi Yoga');
   const tithiBase = MU_TITHI_LIST_FULL.indexOf(tithiName) % 15 + 1;
   if (tithiBase === MU_VISHA_TITHI[vaaram]) yogas.push('Visha Yoga');
-  if (MU_DAGDHA_TITHI[vaaram] && MU_DAGDHA_TITHI[vaaram].has(tithiBase))
+  if (MU_DAGDHA_TITHI[vaaram]?.has(tithiBase))
     yogas.push('Dagdha Yoga');
   if (MU_PUSHKARA_VARAS.has(vaaram)) {
     if (MU_DVI_TITHIS.has(tithiBase) && MU_DVI_NAKS.has(nakshatraName))
@@ -1839,10 +1893,7 @@ async function findMuhurta() {
 
       const bad = data.inauspicious.map(w => [muMin(w.start, w.sflag), muMin(w.end, w.eflag)]);
       if (avoidKaranaNames.size && data.karana) {
-        for (const k of data.karana.split(/\s+\/\s+/)) {
-          const m = k.match(new RegExp(`^(.*?)\\s+${TIME_PART}\\s*[–-]\\s*${TIME_PART}$`));
-          if (m && avoidKaranaNames.has(m[1].trim())) bad.push([muMin(m[2], m[3]), muMin(m[4], m[5])]);
-        }
+        bad.push(...muAvoidKaranaWindows(data.karana, avoidKaranaNames));
       }
       const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
       const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
@@ -1905,7 +1956,7 @@ async function findMuhurta() {
           const base = MU_GOOD_CHOG[c.name] || 0;
           const muRow = MUHURTA_DAY[mi];
           const isAbhijit = mi === 7 && !!abhijit;   // no Abhijit on Wednesday (feed omits it)
-          const natureBonus = isAbhijit ? 2 : (muRow[2] === 'auspicious' ? 1 : -2);
+          const natureBonus = muNatureBonus(isAbhijit, muRow[2]);
 
           // Convert the displayed city-local wall time to an exact instant
           // before evaluating slot facts. Using the browser's own timezone
@@ -2005,8 +2056,11 @@ async function findMuhurta() {
             if (puja.length) groupFit.push(`Chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
             if (avoid.length) groupFit.push(`Chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
 
-            if (chandraMode === 'strict' && (puja.length || avoid.length)) dropSlot = true;
-            else if (chandraMode === 'puja_ok' && avoid.length) dropSlot = true;
+            dropSlot = (
+              chandraMode === 'strict' && (puja.length > 0 || avoid.length > 0)
+            ) || (
+              chandraMode === 'puja_ok' && avoid.length > 0
+            );
           }
           if (dropSlot) { droppedModeSlots++; continue; }
 
@@ -2101,7 +2155,7 @@ async function findMuhurta() {
           // Dvisvabhava). Mirrors _score_lagna_activity in Python.
           if (preferLagnaClass && lagnaCityData) {
             const favoured = muLagnasInClass(preferLagnaClass);
-            if (slotLagna && favoured && favoured.has(slotLagna)) {
+            if (slotLagna && favoured?.has(slotLagna)) {
               score += 1;
               activityMatch.push(
                 `${slotLagna} lagna (${preferLagnaClass}) favoured for ${activityLabel} (+1)`);
@@ -2168,7 +2222,7 @@ async function findMuhurta() {
           if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
             score += 2; slotQuality.push('overlaps Amrita Kalam (+2)');
           }
-          if (preferChog && c.name === preferChog[0]) {
+          if (preferChog?.[0] === c.name) {
             score += preferChog[1];
             activityMatch.push(`${c.name} favoured for ${activityLabel} (+${preferChog[1]})`);
           }
@@ -2371,8 +2425,9 @@ async function findMuhurta() {
       context: searchContext,
     };
     renderMuhurta();
-  } catch (_e) {
+  } catch {
     if (chartAbort.signal.aborted || searchSequence !== MU_SEARCH_SEQUENCE) return;
+    // Internal feed or chart details stay private; expose one stable recovery action.
     muSetResultMessage(box, 'Could not load the feed. Try again.', 'alert');
   } finally {
     if (MU_CHART_ABORT === chartAbort && searchSequence === MU_SEARCH_SEQUENCE) {
@@ -2429,6 +2484,252 @@ type MuChartCompletionState = {
 type MuChartDispositionState = MuChartCompletionState & {
   qualificationCappedCount: number;
 };
+
+type MuChartOutcomeState = {
+  effect: string;
+  status: string;
+};
+
+type MuChartBoundaryState = {
+  boundaryConventionUncertain: boolean;
+  needsReview: boolean;
+  stable: boolean;
+  qualificationFailed: boolean;
+};
+
+type MuRoleEnrichmentState = {
+  state: string;
+  screenedCount: number;
+};
+
+export function muPluralSuffix(count: number): string {
+  return count === 1 ? '' : 's';
+}
+
+export function muChartOutcomeLabel(outcome: MuChartOutcomeState): string {
+  if (outcome.effect === 'reject') {
+    if (outcome.status === 'pass') return 'Required check passed';
+    if (outcome.status === 'unknown') return 'Required check could not be verified';
+    return 'Removed by mandatory chart rule';
+  }
+  if (outcome.effect === 'qualify') {
+    if (outcome.status === 'pass') return 'Qualification met';
+    if (outcome.status === 'unknown') {
+      return 'Indeterminate at calculation boundary · review needed';
+    }
+    return 'Condition not met · slot retained · raw score unchanged · maximum rating Good';
+  }
+  if (outcome.status === 'pass') return 'Preference met · tie-break only';
+  if (outcome.status === 'unknown') return 'Preference could not be verified';
+  return 'Preference not present · no penalty';
+}
+
+export function muChartBoundaryMessage(screening: MuChartBoundaryState): string {
+  if (screening.boundaryConventionUncertain) {
+    return 'This window touches the five-minute Lagna convention guard at an edge. House-dependent checks remain unresolved; sign-based aspects are still evaluated.';
+  }
+  if (screening.needsReview) {
+    if (screening.stable) {
+      return 'One or more event-specific facts are indeterminate at a calculation boundary. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.';
+    }
+    return 'Sampled states changed within this window, and one or more event-specific facts are indeterminate. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.';
+  }
+  if (screening.qualificationFailed) {
+    return 'At least one event-specific condition was conclusively not met. The slot is retained, its raw score is unchanged, and the maximum rating is Good; this is not an unknown or review result.';
+  }
+  if (screening.stable) {
+    return 'The result was stable across every sampled Lagna-stable state in this window.';
+  }
+  return 'Sampled states changed, but every controlling outcome was resolved automatically.';
+}
+
+export function muDaylightOutcomeLabel(status: string): string {
+  if (status === 'pass') return 'Required daylight check passed';
+  if (status === 'fail') return 'Day removed by daylight rule';
+  return 'Boundary could not be verified · day removed';
+}
+
+export function muPersonalOutcomeLabel(outcome: MuChartOutcomeState): string {
+  if (outcome.status === 'pass') return 'Passed';
+  if (outcome.effect === 'prefer' && outcome.status === 'fail') {
+    return 'Preference not present';
+  }
+  if (outcome.status === 'unknown') return 'Could not verify';
+  return 'Not met';
+}
+
+export function muRoleStatus(
+  roleProfile: { name: string } | null,
+  chartEnrichment: MuRoleEnrichmentState | null,
+): string {
+  if (!roleProfile) {
+    return 'No participant selected · source-specific personal checks remain unknown';
+  }
+  if (chartEnrichment?.state === 'screened' || chartEnrichment?.screenedCount) {
+    return `${roleProfile.name} · evaluated locally against the source-specific personal rules`;
+  }
+  if (chartEnrichment?.state === 'unsupported-system') {
+    return `${roleProfile.name} selected · source-specific personal checks were not run for this system`;
+  }
+  if (chartEnrichment?.state === 'not-run') {
+    return `${roleProfile.name} selected · there was no shortlisted slot to evaluate`;
+  }
+  if (chartEnrichment?.state === 'disabled') {
+    return `${roleProfile.name} selected · source-specific personal checks are not active in this build`;
+  }
+  return `${roleProfile.name} selected · source-specific personal checks could not run without exact chart facts`;
+}
+
+export function muDroppedOutcomeLabel(status: string): string {
+  if (status === 'pass') return 'passed';
+  if (status === 'fail') return 'failed';
+  return 'could not be verified';
+}
+
+export function muChartRemovalRow(rule): string {
+  let evidence = '';
+  if (rule.evidence?.length) {
+    evidence = `<small>Observed: ${htmlEsc(rule.evidence.join(' '))}</small>`;
+  }
+  return `<li><strong>${htmlEsc(rule.label)}</strong> · ${rule.count} slot${muPluralSuffix(rule.count)}${evidence}</li>`;
+}
+
+export function muChartProvenanceParts(
+  sourceReferences,
+  decisionPolicies,
+  conventions,
+) {
+  const eventSourceSuffix = muPluralSuffix(sourceReferences.length);
+  let decisionPolicyHtml = '';
+  if (decisionPolicies.length) {
+    decisionPolicyHtml = `<p class="mu-rule-reference mu-rule-policy">
+                  <strong>Product ranking policy:</strong>
+                  The source defines the chart condition. This project policy defines how a resolved failure or an unresolved fact changes removal, rating caps, or tie-break ordering.
+                </p>`;
+  }
+  const conventionHtml = conventions.map(convention => (
+    `<p class="mu-rule-reference mu-rule-convention">
+                  <strong>Interpretation convention:</strong> ${htmlEsc(convention.label)}<br>
+                  ${htmlEsc(convention.formula)}
+                </p>`
+  )).join('');
+  let rankingPolicyClaimsHtml = '';
+  if (decisionPolicies.length) {
+    const claims = decisionPolicies.map(claim => `<code>${htmlEsc(claim)}</code>`).join(' · ');
+    rankingPolicyClaimsHtml = `<p><strong>Ranking policy claim${muPluralSuffix(decisionPolicies.length)}:</strong> ${claims}</p>`;
+  }
+  const conventionClaimsHtml = conventions.map(convention => {
+    let methodClaimsHtml = '';
+    if (convention.claims.length) {
+      const claims = convention.claims.map(claim => `<code>${htmlEsc(claim)}</code>`).join(' · ');
+      methodClaimsHtml = `<br><strong>Method claims:</strong> ${claims}`;
+    }
+    return `<p><strong>Convention:</strong> <code>${htmlEsc(convention.id)}</code>${methodClaimsHtml}</p>`;
+  }).join('');
+  return {
+    eventSourceSuffix,
+    decisionPolicyHtml,
+    conventionHtml,
+    rankingPolicyClaimsHtml,
+    conventionClaimsHtml,
+  };
+}
+
+export function muDayContextHtml(dc): string {
+  if (!dc) return '';
+  const winList = wins => wins.map(w => (
+    `<span class="mu-tim"><b>${w.name}</b> ${w.ranges.join(', ')}</span>`
+  )).join('');
+  const tithiHtml = dc.tithi ? `<span class="mu-angachip">🌙 ${dc.tithi}</span>` : '';
+  const nakshatraHtml = dc.nakshatra ? `<span class="mu-angachip">⭐ ${dc.nakshatra}</span>` : '';
+  const yogaHtml = dc.yoga ? `<span class="mu-angachip">🧘 ${dc.yoga} yoga</span>` : '';
+  const sunriseHtml = dc.sunrise ? `<span>🌅 Sunrise ${dc.sunrise}</span>` : '';
+  const abhijitHtml = dc.abhijit ? `<span class="mu-t-aus">✨ Abhijit ${dc.abhijit}</span>` : '';
+  const rahuHtml = dc.rahu ? `<span class="mu-t-warn">⛔ Rahu Kalam ${dc.rahu}</span>` : '';
+  let auspiciousHtml = '';
+  if (dc.auspicious.length) {
+    auspiciousHtml = `<div class="mu-tim-row">
+                    <span class="mu-tim-lbl mu-t-aus">🟢 Auspicious</span>
+                    <span class="mu-tim-wins mu-t-aus">${winList(dc.auspicious)}</span></div>`;
+  }
+  let avoidHtml = '';
+  if (dc.avoid.length) {
+    avoidHtml = `<div class="mu-tim-row">
+                    <span class="mu-tim-lbl mu-t-warn">🔴 Avoid</span>
+                    <span class="mu-tim-wins mu-t-warn">${winList(dc.avoid)}</span></div>`;
+  }
+  return `<div class="mu-dayctx">
+              <div class="mu-anga">
+                ${tithiHtml}
+                ${nakshatraHtml}
+                ${yogaHtml}
+              </div>
+              <details class="mu-timings-d">
+                <summary class="mu-timings">
+                  ${sunriseHtml}
+                  ${abhijitHtml}
+                  ${rahuHtml}
+                  <span class="mu-tim-toggle">all timings</span>
+                </summary>
+                <div class="mu-timings-full">
+                  ${auspiciousHtml}
+                  ${avoidHtml}
+                </div>
+              </details>
+            </div>`;
+}
+
+export function muDroppedOutcomeHtml(outcomes): string {
+  if (!outcomes?.length) return '';
+  return `<ul class="mu-dropped-daylight" aria-label="Karnavedha daylight rule outcomes">
+         ${outcomes.map(outcome => {
+           const evidence = outcome.evidence?.length
+             ? `<small>${htmlEsc(outcome.evidence.join(' '))}</small>`
+             : '';
+           return `<li class="mu-dropped-daylight--${outcome.status}">
+           <strong>${htmlEsc(outcome.label)}</strong> · ${htmlEsc(muDroppedOutcomeLabel(outcome.status))}
+           ${evidence}
+         </li>`;
+         }).join('')}
+       </ul>`;
+}
+
+export function muChartReviewDetail(chartEnrichment): string {
+  if (chartEnrichment?.boundaryReviewCount) {
+    return ' · boundary-adjacent house checks held for review';
+  }
+  if (chartEnrichment?.reviewGatedCount) {
+    return ' · unresolved chart facts held for review';
+  }
+  return '';
+}
+
+export function muChartStatusDispositionClass(disposition: string | null): string {
+  return disposition ? ` mu-chart-status--screened-${disposition}` : '';
+}
+
+export function muChartValidationItems(screening, reasonGroups) {
+  if (screening && Array.isArray(reasonGroups?.chart_remainder)) {
+    return reasonGroups.chart_remainder;
+  }
+  return reasonGroups?.chart_validation;
+}
+
+export function muChartDispositionHtml(screening): string {
+  if (screening?.needsReview) {
+    return '<span class="mu-chart-disposition mu-chart-disposition--review">Review needed</span>';
+  }
+  if (screening?.qualificationFailed) {
+    return '<span class="mu-chart-disposition mu-chart-disposition--capped">Condition not met · max Good</span>';
+  }
+  return '';
+}
+
+export function muSafetyTitle(activity: string): string {
+  return activity === 'surgery'
+    ? 'Medical care overrides timing'
+    : 'Legal duties override timing';
+}
 
 export function muChartAssessorCanClaimComplete(
   activity: string,
@@ -2506,24 +2807,9 @@ function renderMuhurta() {
     const [y, mo, da] = iso.split('-').map(Number);
     return new Date(y, mo - 1, da).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
-  const droppedOutcomeHtml = outcomes => outcomes?.length
-    ? `<ul class="mu-dropped-daylight" aria-label="Karnavedha daylight rule outcomes">
-         ${outcomes.map(outcome => `<li class="mu-dropped-daylight--${outcome.status}">
-           <strong>${htmlEsc(outcome.label)}</strong> · ${htmlEsc(
-             outcome.status === 'pass'
-               ? 'passed'
-               : outcome.status === 'fail'
-                 ? 'failed'
-                 : 'could not be verified')}
-           ${outcome.evidence?.length
-             ? `<small>${htmlEsc(outcome.evidence.join(' '))}</small>`
-             : ''}
-         </li>`).join('')}
-       </ul>`
-    : '';
   const droppedHtml = droppedDays.length
-    ? `<details class="mu-dropped"><summary>${droppedDays.length} day${droppedDays.length>1?'s':''} filtered · see why</summary>
-         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}${droppedOutcomeHtml(dd.daylightOutcomes)}</li>`).join('')}</ul>
+    ? `<details class="mu-dropped"><summary>${droppedDays.length} day${muPluralSuffix(droppedDays.length)} filtered · see why</summary>
+         <ul>${droppedDays.map(dd => `<li><span class="dd-date">${fmtIso(dd.date)}</span> · ${htmlEsc(dd.reason)}${muDroppedOutcomeHtml(dd.daylightOutcomes)}</li>`).join('')}</ul>
        </details>`
     : '';
   const partialAssessor = automatedRulesFor(activity).length > 0
@@ -2567,7 +2853,7 @@ function renderMuhurta() {
       screened: {
         title: muChartAssessmentTitle(activity, chartEnrichment),
         detail: chartEnrichment.engine
-          ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${chartEnrichment.boundaryReviewCount ? ' · boundary-adjacent house checks held for review' : chartEnrichment.reviewGatedCount ? ' · unresolved chart facts held for review' : ''}${scopeDetail}`
+          ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${muChartReviewDetail(chartEnrichment)}${scopeDetail}`
           : 'Every sampled Lagna-stable state checked',
       },
       'not-run': {
@@ -2606,7 +2892,7 @@ function renderMuhurta() {
     const message = !roleForActivity(activity)
       ? chartEnrichment.message.replace('chart or profile facts', 'chart facts')
       : chartEnrichment.message;
-    return `<section class="mu-chart-status mu-chart-status--${chartEnrichment.state}${disposition ? ` mu-chart-status--screened-${disposition}` : ''}" aria-label="Election-chart assessment status">
+    return `<section class="mu-chart-status mu-chart-status--${chartEnrichment.state}${muChartStatusDispositionClass(disposition)}" aria-label="Election-chart assessment status">
               <strong>${htmlEsc(chartStatus.title)}</strong>
               <span>${htmlEsc(message)}</span>
               <small>${htmlEsc(chartStatus.detail)}</small>
@@ -2617,17 +2903,7 @@ function renderMuhurta() {
   };
   const chartStatusHtml = renderChartStatus();
   const roleRequirement = roleForActivity(activity);
-  const roleStatus = !roleProfile
-    ? 'No participant selected · source-specific personal checks remain unknown'
-    : chartEnrichment?.state === 'screened' || chartEnrichment?.screenedCount
-      ? `${roleProfile.name} · evaluated locally against the source-specific personal rules`
-      : chartEnrichment?.state === 'unsupported-system'
-        ? `${roleProfile.name} selected · source-specific personal checks were not run for this system`
-      : chartEnrichment?.state === 'not-run'
-          ? `${roleProfile.name} selected · there was no shortlisted slot to evaluate`
-          : chartEnrichment?.state === 'disabled'
-            ? `${roleProfile.name} selected · source-specific personal checks are not active in this build`
-          : `${roleProfile.name} selected · source-specific personal checks could not run without exact chart facts`;
+  const roleStatus = muRoleStatus(roleProfile, chartEnrichment);
   const personalRoleHtml = roleRequirement
     ? `<div class="mu-personal-role">
          <strong>${htmlEsc(roleRequirement.label)}</strong>
@@ -2638,21 +2914,21 @@ function renderMuhurta() {
     ?? droppedPersonalRules.reduce((total, rule) => total + rule.count, 0);
   const personalRemovalHtml = personalRemovalCount
     ? `<details class="mu-personal-removals">
-         <summary>${personalRemovalCount} candidate slot${personalRemovalCount === 1 ? '' : 's'} removed by profile-specific source rules</summary>
-         <ul>${droppedPersonalRules.map(rule => `<li>${htmlEsc(rule.label)} · ${rule.count} slot${rule.count === 1 ? '' : 's'}</li>`).join('')}</ul>
+         <summary>${personalRemovalCount} candidate slot${muPluralSuffix(personalRemovalCount)} removed by profile-specific source rules</summary>
+         <ul>${droppedPersonalRules.map(rule => `<li>${htmlEsc(rule.label)} · ${rule.count} slot${muPluralSuffix(rule.count)}</li>`).join('')}</ul>
        </details>`
     : '';
   const chartRemovedRules = chartEnrichment?.chartRemovedRules || [];
   const chartRemovalHtml = chartEnrichment?.chartRemovedCount
     ? `<details class="mu-chart-removals">
-         <summary>${chartEnrichment.chartRemovedCount} candidate slot${chartEnrichment.chartRemovedCount === 1 ? '' : 's'} removed by exact event-chart rules</summary>
-         <ul>${chartRemovedRules.map(rule => `<li><strong>${htmlEsc(rule.label)}</strong> · ${rule.count} slot${rule.count === 1 ? '' : 's'}${rule.evidence?.length ? `<small>Observed: ${htmlEsc(rule.evidence.join(' '))}</small>` : ''}</li>`).join('')}</ul>
+         <summary>${chartEnrichment.chartRemovedCount} candidate slot${muPluralSuffix(chartEnrichment.chartRemovedCount)} removed by exact event-chart rules</summary>
+         <ul>${chartRemovedRules.map(rule => muChartRemovalRow(rule)).join('')}</ul>
        </details>`
     : '';
   const safetyOverride = muSafetyOverrideFor(activity);
   const safetyHtml = safetyOverride
     ? `<aside class="mu-safety-override" role="note">
-         <strong>${activity === 'surgery' ? 'Medical care overrides timing' : 'Legal duties override timing'}</strong>
+         <strong>${muSafetyTitle(activity)}</strong>
          <span>${htmlEsc(safetyOverride)}</span>
        </aside>`
     : '';
@@ -2691,7 +2967,7 @@ function renderMuhurta() {
   };
   const muCapitalize = (item) => item.charAt(0).toUpperCase() + item.slice(1);
   const renderGroup = (label, items, extraClass = '') => {
-    if (!items || !items.length) return '';
+    if (!items?.length) return '';
     const lis = items.map(it => `<li class="${muLineClass(it)}">${htmlEsc(muCapitalize(it))}</li>`).join('');
     return `<div class="mu-rg ${extraClass}">
               <span class="mu-rg-label">${htmlEsc(label)}</span>
@@ -2699,7 +2975,7 @@ function renderMuhurta() {
             </div>`;
   };
   const renderChartValidation = items => {
-    if (!items || !items.length) return '';
+    if (!items?.length) return '';
     const lis = items.map(it => `<li>${htmlEsc(muCapitalize(it))}</li>`).join('');
     return `<div class="mu-rg mu-rg-validation">
               <span class="mu-rg-label">Still needs practitioner review</span>
@@ -2712,23 +2988,7 @@ function renderMuhurta() {
   const renderComputedChart = screening => {
     if (!screening?.outcomes?.length) return '';
     const lis = screening.outcomes.map(outcome => {
-      const label = outcome.effect === 'reject'
-        ? outcome.status === 'pass'
-          ? 'Required check passed'
-          : outcome.status === 'unknown'
-            ? 'Required check could not be verified'
-            : 'Removed by mandatory chart rule'
-        : outcome.effect === 'qualify'
-          ? outcome.status === 'pass'
-            ? 'Qualification met'
-            : outcome.status === 'unknown'
-              ? 'Indeterminate at calculation boundary · review needed'
-              : 'Condition not met · slot retained · raw score unchanged · maximum rating Good'
-          : outcome.status === 'pass'
-            ? 'Preference met · tie-break only'
-            : outcome.status === 'unknown'
-              ? 'Preference could not be verified'
-              : 'Preference not present · no penalty';
+      const label = muChartOutcomeLabel(outcome);
       const evidence = Array.isArray(outcome.evidence) && outcome.evidence.length
         ? `<small>Observed: ${htmlEsc(outcome.evidence.join(' '))}</small>`
         : '';
@@ -2738,17 +2998,7 @@ function renderMuhurta() {
                 ${evidence}
               </li>`;
     }).join('');
-    const boundary = screening.boundaryConventionUncertain
-      ? 'This window touches the five-minute Lagna convention guard at an edge. House-dependent checks remain unresolved; sign-based aspects are still evaluated.'
-      : screening.needsReview
-        ? screening.stable
-          ? 'One or more event-specific facts are indeterminate at a calculation boundary. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.'
-          : 'Sampled states changed within this window, and one or more event-specific facts are indeterminate. The slot is retained, its raw score is unchanged, and the maximum rating is Good pending review.'
-        : screening.qualificationFailed
-          ? 'At least one event-specific condition was conclusively not met. The slot is retained, its raw score is unchanged, and the maximum rating is Good; this is not an unknown or review result.'
-          : screening.stable
-            ? 'The result was stable across every sampled Lagna-stable state in this window.'
-            : 'Sampled states changed, but every controlling outcome was resolved automatically.';
+    const boundary = muChartBoundaryMessage(screening);
     const sourceReferences = Array.from(new Map<string, { claim: string; locator: string }>(
       screening.outcomes.map(outcome => [
         outcome.sourceClaim,
@@ -2770,27 +3020,28 @@ function renderMuhurta() {
         formula: outcome.formula || '',
         claims: outcome.methodClaims || [],
       }])).values());
+    const {
+      eventSourceSuffix,
+      decisionPolicyHtml,
+      conventionHtml,
+      rankingPolicyClaimsHtml,
+      conventionClaimsHtml,
+    } = muChartProvenanceParts(sourceReferences, decisionPolicies, conventions);
     return `<section class="mu-rg mu-rg-computed" aria-label="Computed election-chart checks">
               <h4 class="mu-rg-label">Computed chart checks</h4>
               <div class="mu-rg-content">
                 <ul class="mu-rg-items">${lis}</ul>
                 <p class="mu-chart-boundary">${boundary}</p>
-                <p class="mu-rule-reference"><strong>Event source${sourceReferences.length === 1 ? '' : 's'}:</strong>
+                <p class="mu-rule-reference"><strong>Event source${eventSourceSuffix}:</strong>
                   ${sourceReferences.map(reference => htmlEsc(reference.locator)).join('<br>')}
                 </p>
-                ${decisionPolicies.length ? `<p class="mu-rule-reference mu-rule-policy">
-                  <strong>Product ranking policy:</strong>
-                  The source defines the chart condition. This project policy defines how a resolved failure or an unresolved fact changes removal, rating caps, or tie-break ordering.
-                </p>` : ''}
-                ${conventions.map(convention => `<p class="mu-rule-reference mu-rule-convention">
-                  <strong>Interpretation convention:</strong> ${htmlEsc(convention.label)}<br>
-                  ${htmlEsc(convention.formula)}
-                </p>`).join('')}
+                ${decisionPolicyHtml}
+                ${conventionHtml}
                 <details class="mu-technical-provenance">
                   <summary>Technical provenance</summary>
-                  <p><strong>Event claim${sourceReferences.length === 1 ? '' : 's'}:</strong> ${sourceReferences.map(reference => `<code>${htmlEsc(reference.claim)}</code>`).join(' · ')}</p>
-                  ${decisionPolicies.length ? `<p><strong>Ranking policy claim${decisionPolicies.length === 1 ? '' : 's'}:</strong> ${decisionPolicies.map(claim => `<code>${htmlEsc(claim)}</code>`).join(' · ')}</p>` : ''}
-                  ${conventions.map(convention => `<p><strong>Convention:</strong> <code>${htmlEsc(convention.id)}</code>${convention.claims.length ? `<br><strong>Method claims:</strong> ${convention.claims.map(claim => `<code>${htmlEsc(claim)}</code>`).join(' · ')}` : ''}</p>`).join('')}
+                  <p><strong>Event claim${eventSourceSuffix}:</strong> ${sourceReferences.map(reference => `<code>${htmlEsc(reference.claim)}</code>`).join(' · ')}</p>
+                  ${rankingPolicyClaimsHtml}
+                  ${conventionClaimsHtml}
                 </details>
                 <p class="mu-rule-reference"><a href="${MU_CHART_METHOD_URL}">Method, formulas, assumptions and exact references</a></p>
               </div>
@@ -2799,11 +3050,7 @@ function renderMuhurta() {
   const renderComputedDaylight = outcomes => {
     if (!outcomes?.length) return '';
     const lis = outcomes.map(outcome => {
-      const label = outcome.status === 'pass'
-        ? 'Required daylight check passed'
-        : outcome.status === 'fail'
-          ? 'Day removed by daylight rule'
-          : 'Boundary could not be verified · day removed';
+      const label = muDaylightOutcomeLabel(outcome.status);
       const evidence = Array.isArray(outcome.evidence) && outcome.evidence.length
         ? `<small>Observed: ${htmlEsc(outcome.evidence.join(' '))}</small>`
         : '';
@@ -2832,11 +3079,7 @@ function renderMuhurta() {
     if (!outcomes?.length) return renderGroup(
       'Profile-specific check', evidence, 'mu-rg-personal');
     const lis = outcomes.map((outcome, index) => {
-      const label = outcome.status === 'pass'
-        ? 'Passed'
-        : outcome.effect === 'prefer' && outcome.status === 'fail'
-          ? 'Preference not present'
-          : outcome.status === 'unknown' ? 'Could not verify' : 'Not met';
+      const label = muPersonalOutcomeLabel(outcome);
       return `<li class="mu-personal-rule mu-personal-rule--${outcome.status}">
                 <span>${htmlEsc(muCapitalize(outcome.label))}</span>
                 <b>${label}</b>
@@ -2866,11 +3109,7 @@ function renderMuhurta() {
              ${renderGroup('Activity', rg.activity_match)}
              ${renderComputedDaylight(rg.day_source_outcomes)}
              ${renderComputedChart(s.chartScreening)}
-             ${renderChartValidation(
-               s.chartScreening && Array.isArray(rg.chart_remainder)
-                 ? rg.chart_remainder
-                 : rg.chart_validation
-             )}
+             ${renderChartValidation(muChartValidationItems(s.chartScreening, rg))}
              ${renderGroup('About this election', rg.information, 'mu-rg-information')}
              ${renderGroup('Practical checks', rg.practical, 'mu-rg-practical')}
              ${renderGroup('Important nuance', rg.notes, 'mu-rg-notes')}
@@ -2879,37 +3118,8 @@ function renderMuhurta() {
       : `<details class="mu-reason-details"><summary>Why this slot ranked here</summary><span class="mu-reasons">${s.reasons.map(reason => htmlEsc(reason)).join(' · ')}</span></details>`;
     const tier = s.tier || muScoreTier(s.score);
     const tierClass = `mu-tier-${tier.toLowerCase()}`;
-    const chartDisposition = s.chartScreening?.needsReview
-      ? '<span class="mu-chart-disposition mu-chart-disposition--review">Review needed</span>'
-      : s.chartScreening?.qualificationFailed
-        ? '<span class="mu-chart-disposition mu-chart-disposition--capped">Condition not met · max Good</span>'
-        : '';
-    const dc = s.dayCtx;
-    const winList = (wins) => wins.map(w =>
-      `<span class="mu-tim"><b>${w.name}</b> ${w.ranges.join(', ')}</span>`).join('');
-    const dayCtxHtml = dc ? `<div class="mu-dayctx">
-              <div class="mu-anga">
-                ${dc.tithi ? `<span class="mu-angachip">🌙 ${dc.tithi}</span>` : ''}
-                ${dc.nakshatra ? `<span class="mu-angachip">⭐ ${dc.nakshatra}</span>` : ''}
-                ${dc.yoga ? `<span class="mu-angachip">🧘 ${dc.yoga} yoga</span>` : ''}
-              </div>
-              <details class="mu-timings-d">
-                <summary class="mu-timings">
-                  ${dc.sunrise ? `<span>🌅 Sunrise ${dc.sunrise}</span>` : ''}
-                  ${dc.abhijit ? `<span class="mu-t-aus">✨ Abhijit ${dc.abhijit}</span>` : ''}
-                  ${dc.rahu ? `<span class="mu-t-warn">⛔ Rahu Kalam ${dc.rahu}</span>` : ''}
-                  <span class="mu-tim-toggle">all timings</span>
-                </summary>
-                <div class="mu-timings-full">
-                  ${dc.auspicious.length ? `<div class="mu-tim-row">
-                    <span class="mu-tim-lbl mu-t-aus">🟢 Auspicious</span>
-                    <span class="mu-tim-wins mu-t-aus">${winList(dc.auspicious)}</span></div>` : ''}
-                  ${dc.avoid.length ? `<div class="mu-tim-row">
-                    <span class="mu-tim-lbl mu-t-warn">🔴 Avoid</span>
-                    <span class="mu-tim-wins mu-t-warn">${winList(dc.avoid)}</span></div>` : ''}
-                </div>
-              </details>
-            </div>` : '';
+    const chartDisposition = muChartDispositionHtml(s.chartScreening);
+    const dayCtxHtml = muDayContextHtml(s.dayCtx);
     return `<div class="mu-slot">
               <span class="mu-when">${fmtD(s.d)} · ${muToT(s.s0)} to ${muToT(s.e0)}</span>
               <span class="mu-tier ${tierClass}">${tier}</span>
@@ -2920,7 +3130,7 @@ function renderMuhurta() {
             </div>`;
   };
   box.innerHTML =
-    `<div class="tb-summary"><span class="count">${top.length}</span>&nbsp;slot${top.length > 1 ? 's' : ''} found · ranked by tier, then score, then source preference${share}</div>`
+    `<div class="tb-summary"><span class="count">${top.length}</span>&nbsp;slot${muPluralSuffix(top.length)} found · ranked by tier, then score, then source preference${share}</div>`
     + safetyHtml
     + chartStatusHtml
     + personalRoleHtml
@@ -2944,11 +3154,11 @@ function renderMuhurta() {
     const reviewCount = chartEnrichment?.reviewGatedCount || 0;
     const overlapCount = chartEnrichment?.overlappingDispositionCount || 0;
     const chartCounts = chartEnrichment?.state === 'screened' ? (
-      ` ${cappedCount} retained ${cappedCount === 1 ? 'slot' : 'slots'} capped by a conclusive miss; `
-      + `${reviewCount} retained ${reviewCount === 1 ? 'slot' : 'slots'} review-gated by an unknown; `
+      ` ${cappedCount} retained slot${muPluralSuffix(cappedCount)} capped by a conclusive miss; `
+      + `${reviewCount} retained slot${muPluralSuffix(reviewCount)} review-gated by an unknown; `
       + `${overlapCount} included in both counts.`
     ) : '';
-    announcement.textContent = `${top.length} slot${top.length === 1 ? '' : 's'} found. ${chartStatus?.title || 'Search complete'}.${chartCounts}`;
+    announcement.textContent = `${top.length} slot${muPluralSuffix(top.length)} found. ${chartStatus?.title || 'Search complete'}.${chartCounts}`;
   }
 }
 
@@ -2981,12 +3191,14 @@ export function muChartShareIncludesRemainder(chartEnrichment) {
 }
 
 function shareMuhurtaOnWhatsApp() {
-  if (!MU_LAST || !MU_LAST.top.length) return;
+  if (!MU_LAST?.top.length) return;
   const { top, activity, chartEnrichment, context } = MU_LAST;
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const lines = [];
-  lines.push(`⏱ *Good time slots · ${MU_ACT_LABEL[activity]}*`);
-  lines.push(`📍 ${context.cityLabel} · ${context.fromIso} to ${context.toIso}`);
+  lines.push(
+    `⏱ *Good time slots · ${MU_ACT_LABEL[activity]}*`,
+    `📍 ${context.cityLabel} · ${context.fromIso} to ${context.toIso}`,
+  );
   if (roleForActivity(activity)) {
     lines.push('Source-specific personal checks were applied locally when possible; profile details are intentionally omitted from this share.');
   }
@@ -3033,8 +3245,10 @@ function shareMuhurtaOnWhatsApp() {
         lines.push('All disclosed event chart clauses were evaluated and resolved under the documented interpretation convention.');
       }
     } else {
-      lines.push('The automated, source-backed election-chart clauses were checked across every sampled Lagna-stable state.');
-      lines.push('Qualitative chart or ritual checks still require practitioner review; see the result details.');
+      lines.push(
+        'The automated, source-backed election-chart clauses were checked across every sampled Lagna-stable state.',
+        'Qualitative chart or ritual checks still require practitioner review; see the result details.',
+      );
     }
     if (qualificationCapped) {
       lines.push(`${qualificationCapped} shown slot${qualificationCapped === 1 ? '' : 's'} had a conclusive event-specific condition miss; ${qualificationCapped === 1 ? 'it was' : 'they were'} retained with unchanged raw score and a maximum Good rating.`);
@@ -3053,9 +3267,11 @@ function shareMuhurtaOnWhatsApp() {
     const shareableReasons = muShareableMuhurtaReasons(s);
     if (shareableReasons.length) lines.push(`   ${shareableReasons.join(' · ')}`);
   });
-  lines.push('');
-  lines.push('Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.');
-  lines.push('Find your own: https://panchangam.astrochaganti.com/?src=share-slots#tarabalam');
+  lines.push(
+    '',
+    'Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.',
+    'Find your own: https://panchangam.astrochaganti.com/?src=share-slots#tarabalam',
+  );
   gcEvent('share-slots');
   window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
 }
@@ -3070,7 +3286,7 @@ export {
 };
 
 export function tbHasDays() { return !!TB_DAYS; }
-export function muHasLast() { return typeof MU_LAST !== 'undefined' && !!MU_LAST; }
+export function muHasLast() { return Boolean(MU_LAST); }
 
 /** Wire panel-internal seeds; called once from Init. */
 export function initTarabalamPanel(todayISO) {
