@@ -155,12 +155,18 @@ function normalizedName(value: string): string {
 }
 
 function restoreFocus(node: HTMLElement | null): void {
-  if (node && node.isConnected) {
+  if (node?.isConnected) {
     node.focus();
     if (document.activeElement === node) return;
   }
   const heading = document.querySelector<HTMLElement>('#profiles-title');
   heading?.focus();
+}
+
+function replacementScopeId(target: HTMLElement): string | null {
+  if (target.closest('#profiles-root')) return 'profiles-root';
+  if (target.closest('#tb-profiles')) return 'tb-profiles';
+  return null;
 }
 
 function replacementFocusResolver(
@@ -177,11 +183,7 @@ function replacementFocusResolver(
 
   const action = target.dataset.action;
   const profileId = target.closest<HTMLElement>('[data-profile-id]')?.dataset.profileId;
-  const scopeId = target.closest('#profiles-root')
-    ? 'profiles-root'
-    : target.closest('#tb-profiles')
-      ? 'tb-profiles'
-      : null;
+  const scopeId = replacementScopeId(target);
   if (!action || !scopeId) return undefined;
 
   return () => {
@@ -193,6 +195,235 @@ function replacementFocusResolver(
       return candidate.closest<HTMLElement>('[data-profile-id]')?.dataset.profileId === profileId;
     }) || null;
   };
+}
+
+function updateProfileDuplicateWarning(
+  duplicate: HTMLElement,
+  nameInput: HTMLInputElement,
+  store: GuestProfileStore,
+  profileId?: string,
+): void {
+  const candidate = normalizedName(nameInput.value);
+  const duplicateProfile = candidate
+    ? store.getSnapshot().profiles.find(existing => (
+      existing.id !== profileId && normalizedName(existing.name) === candidate
+    ))
+    : undefined;
+  duplicate.hidden = !duplicateProfile;
+  duplicate.textContent = duplicateProfile
+    ? `A profile named ${displayName(duplicateProfile)} already exists. You can still save this profile.`
+    : '';
+}
+
+function manualIntroText(requiredFor?: ProfilesPanelContext['requiredFor']): string {
+  if (requiredFor === 'horoscope') {
+    return 'Add the birth details needed for Daily Horoscope. Nakshatra is required; Padam is required only when the birth star spans two Rashis. Lagna remains optional.';
+  }
+  if (requiredFor === 'muhurta') {
+    return 'Add a name and Nakshatra to use this profile in Muhurtam. Padam and Lagna are optional for this journey.';
+  }
+  return 'Start with a name. Nakshatra makes the profile ready for Muhurtam; Padam may be needed to derive Janma Rashi for Daily Horoscope.';
+}
+
+function nakshatraHelpText(requiredFor?: ProfilesPanelContext['requiredFor']): string {
+  if (requiredFor === 'horoscope') {
+    return 'Required to derive Janma Rashi for Daily Horoscope.';
+  }
+  if (requiredFor === 'muhurta') return 'Required for Muhurtam.';
+  return 'Required for Muhurtam and for deriving Janma Rashi.';
+}
+
+function manualPada(value: string): GuestProfile['pada'] {
+  const parsed = Number(value);
+  if (parsed === 1 || parsed === 2 || parsed === 3 || parsed === 4) return parsed;
+  return null;
+}
+
+function manualProfileCandidate(
+  profile: GuestProfile | undefined,
+  name: string,
+  nakshatra: string,
+  pada: string,
+  lagna: string,
+): GuestProfile {
+  return {
+    id: profile?.id || 'profile-preview',
+    schemaVersion: GUEST_PROFILE_SCHEMA_VERSION,
+    source: 'manual',
+    name,
+    nakshatra: nakshatra || null,
+    pada: manualPada(pada),
+    lagna: lagna || null,
+    janmaRasi: null,
+    birthDetails: null,
+    natalChart: null,
+    calculation: null,
+  };
+}
+
+function validateManualProfileName(
+  name: string,
+  input: HTMLInputElement,
+  error: HTMLElement,
+): boolean {
+  if (name) return true;
+  input.setAttribute('aria-invalid', 'true');
+  error.textContent = 'Enter a name for this profile.';
+  error.hidden = false;
+  input.focus();
+  return false;
+}
+
+function validateManualJourney(
+  context: ResolvedProfilesPanelContext,
+  candidate: GuestProfile,
+  nakshatraSelect: HTMLSelectElement,
+  nakshatraError: HTMLElement,
+  padaSelect: HTMLSelectElement,
+  padaError: HTMLElement,
+): boolean {
+  const readiness = guestProfileReadiness(candidate);
+  if (context.requiredFor && !readiness.muhurta) {
+    nakshatraSelect.setAttribute('aria-invalid', 'true');
+    nakshatraError.textContent = context.requiredFor === 'horoscope'
+      ? 'Add a Nakshatra to use this profile in Daily Horoscope.'
+      : 'Add a Nakshatra to use this profile in Muhurtam.';
+    nakshatraError.hidden = false;
+    nakshatraSelect.focus();
+    return false;
+  }
+  if (context.requiredFor !== 'horoscope' || readiness.missingForHoroscope !== 'pada') {
+    return true;
+  }
+  padaSelect.setAttribute('aria-invalid', 'true');
+  padaError.textContent = `Select a Padam because ${nakshatraSelect.value} spans two Rashis.`;
+  padaError.hidden = false;
+  padaSelect.focus();
+  return false;
+}
+
+function saveManualProfile(
+  store: GuestProfileStore,
+  mode: 'create' | 'edit',
+  profile: GuestProfile | undefined,
+  draft: GuestProfileDraft,
+): GuestProfile {
+  if (mode === 'edit' && profile) return store.update(profile.id, draft);
+  return store.create(draft);
+}
+
+function manualSaveFailureView(
+  mode: 'create' | 'edit',
+  profile: GuestProfile | undefined,
+  context: ResolvedProfilesPanelContext,
+): PanelView {
+  if (mode === 'edit' && profile) return { kind: 'edit', profileId: profile.id, context };
+  return { kind: 'create', context };
+}
+
+function manualSaveErrorMessage(error: unknown): string {
+  if (error instanceof GuestProfileStoreError && error.code === 'profile-limit') {
+    return `You can save up to ${MAX_GUEST_PROFILES} profiles. Delete one before adding another.`;
+  }
+  if (error instanceof GuestProfileStoreError && error.code === 'profile-not-found') {
+    return 'This profile is no longer available. Return to Profiles and try again.';
+  }
+  return 'The profile could not be saved. Check the details and try again.';
+}
+
+function showFieldError(input: HTMLElement, error: HTMLElement, message: string): void {
+  input.setAttribute('aria-invalid', 'true');
+  error.textContent = message;
+  error.hidden = false;
+}
+
+function validateRequiredBirthInputs(
+  dateInput: HTMLInputElement,
+  dateError: HTMLElement,
+  timeInput: HTMLInputElement,
+  timeError: HTMLElement,
+  placeInput: HTMLInputElement,
+  placeError: HTMLElement,
+  selectedPlace: BirthPlaceCandidate | null,
+): BirthPlaceCandidate | null {
+  let invalid: HTMLElement | null = null;
+  if (!dateInput.value) {
+    showFieldError(dateInput, dateError, 'Enter a valid birth date that is not in the future.');
+    invalid ||= dateInput;
+  }
+  if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(timeInput.value)) {
+    showFieldError(timeInput, timeError, 'Enter the recorded local birth time.');
+    invalid ||= timeInput;
+  }
+  if (!selectedPlace) {
+    showFieldError(placeInput, placeError, 'Find and select a birthplace from the results.');
+    invalid ||= placeInput;
+  }
+  if (!invalid && selectedPlace) return selectedPlace;
+  invalid?.focus();
+  return null;
+}
+
+function wallTimeErrorMessage(error: unknown): string | null {
+  if (!(error instanceof ElectionChartApiError)) return null;
+  if (error.message.includes('ambiguous')) {
+    return 'This local time occurred twice at the selected birthplace. Enter known astrology details manually instead.';
+  }
+  if (error.message.includes('does not exist')) {
+    return 'This local time did not occur at the selected birthplace because the clocks changed. Enter known astrology details manually instead.';
+  }
+  return null;
+}
+
+function validatedBirthInstant(
+  dateInput: HTMLInputElement,
+  dateError: HTMLElement,
+  timeInput: HTMLInputElement,
+  timeError: HTMLElement,
+  placeInput: HTMLInputElement,
+  placeError: HTMLElement,
+  place: BirthPlaceCandidate,
+  now: Date,
+): string | null {
+  const maxDate = isoDateInTimeZone(now, place.timezone);
+  if (!maxDate) {
+    showFieldError(placeInput, placeError, 'The selected birthplace has an invalid time zone.');
+    placeInput.focus();
+    return null;
+  }
+  dateInput.max = maxDate;
+  if (dateInput.value > maxDate) {
+    showFieldError(dateInput, dateError, 'Enter a valid birth date that is not in the future.');
+    dateInput.focus();
+    return null;
+  }
+  const [birthHour, birthMinute] = timeInput.value.split(':').map(Number);
+  let birthInstant: string;
+  try {
+    birthInstant = localWallTimeToInstant(
+      dateInput.value,
+      birthHour * 60 + birthMinute,
+      place.timezone,
+    );
+  } catch (error) {
+    const timeMessage = wallTimeErrorMessage(error);
+    if (timeMessage) {
+      showFieldError(timeInput, timeError, timeMessage);
+      timeInput.focus();
+      return null;
+    }
+    showFieldError(placeInput, placeError, 'The selected birthplace or time zone is invalid.');
+    placeInput.focus();
+    return null;
+  }
+  if (Date.parse(birthInstant) <= now.getTime()) return birthInstant;
+  showFieldError(
+    timeInput,
+    timeError,
+    'Birth date and time cannot be in the future at the selected birthplace.',
+  );
+  timeInput.focus();
+  return null;
 }
 
 function resolvePanelContext(
@@ -478,6 +709,161 @@ function renderNatalReview(result: BirthProfileDerivation): HTMLElement {
   });
 }
 
+function focusUsableElement(target: HTMLElement | null | undefined): boolean {
+  if (!target || (target instanceof HTMLButtonElement && target.disabled)) return false;
+  target.focus();
+  return document.activeElement === target;
+}
+
+function focusSavedJourney(
+  context: ResolvedProfilesPanelContext,
+  savedProfile: GuestProfile,
+): boolean {
+  if (context.returnTo === 'gochara') {
+    document.getElementById('go-view')?.focus();
+    return true;
+  }
+  if (context.returnTo !== 'tarabalam') return false;
+  const selectedProfile = Array.from(
+    document.querySelectorAll<HTMLInputElement>('[data-profile-selection]'),
+  ).find(candidate => candidate.dataset.profileSelection === savedProfile.id);
+  return focusUsableElement(selectedProfile);
+}
+
+function focusOriginFallback(context: ResolvedProfilesPanelContext): boolean {
+  if (context.returnTo === 'gochara') {
+    document.getElementById('go-view')?.focus();
+    return true;
+  }
+  if (context.returnTo !== 'tarabalam') return false;
+  document.querySelector<HTMLElement>('#tb-profiles [data-action]')?.focus();
+  return true;
+}
+
+function focusSavedEdit(root: HTMLElement, profileId: string): boolean {
+  const savedEdit = Array.from(
+    root.querySelectorAll<HTMLElement>('[data-profile-id] [data-action="edit-profile"]'),
+  ).find(candidate => (
+    candidate.closest<HTMLElement>('[data-profile-id]')?.dataset.profileId === profileId
+  ));
+  return focusUsableElement(savedEdit);
+}
+
+type DetailFactsRenderer = (
+  rows: ReadonlyArray<readonly [string, string]>,
+) => HTMLDListElement;
+
+function profileFactsSection(
+  profile: GuestProfile,
+  renderFacts: DetailFactsRenderer,
+): HTMLElement {
+  if (profile.birthDetails) {
+    const section = element('section', 'profiles-detail__section');
+    section.setAttribute('aria-labelledby', 'profile-detail-birth-title');
+    const title = element('h2', 'profiles-detail__section-title', 'Saved birth details');
+    title.id = 'profile-detail-birth-title';
+    section.append(title, renderFacts([
+      ['Date of birth', profile.birthDetails.dateOfBirth],
+      ['Time of birth', profile.birthDetails.timeOfBirth],
+      ['Place of birth', profile.birthDetails.placeLabel],
+      ['Time zone', profile.birthDetails.timezone],
+    ]));
+    return section;
+  }
+  const section = element('section', 'profiles-detail__section');
+  section.setAttribute('aria-labelledby', 'profile-detail-facts-title');
+  const title = element('h2', 'profiles-detail__section-title', 'Saved astrology details');
+  title.id = 'profile-detail-facts-title';
+  section.append(title, renderFacts([
+    ['Nakshatra', profile.nakshatra || 'Not added'],
+    ['Padam', profile.pada ? String(profile.pada) : 'Not added'],
+    ['Janma Rashi', profile.janmaRasi || 'Not available'],
+    ['Lagna', profile.lagna || 'Not added'],
+  ]));
+  return section;
+}
+
+function savedAstrologySection(details: NatalProfileDetails | null): HTMLElement | null {
+  if (!details) return null;
+  const section = element('section', 'profiles-birth-review profiles-detail__natal');
+  section.setAttribute('aria-labelledby', 'profile-detail-astrology-title');
+  const title = element('h2', 'profiles-birth-review__title', 'Astrology details');
+  title.id = 'profile-detail-astrology-title';
+  section.append(
+    element('p', 'profiles-birth-review__eyebrow', 'Saved calculation'),
+    title,
+    element(
+      'p',
+      'profiles-birth-review__intro',
+      'These results were saved from the birth calculation. The original inputs remain visible above so you can verify them before reviewing the chart.',
+    ),
+    renderNatalFacts(details),
+  );
+  return section;
+}
+
+function journeyReadinessSection(
+  profile: GuestProfile,
+  renderReadiness: (profile: GuestProfile) => HTMLDListElement,
+  options: ProfilesPanelOptions,
+): HTMLElement {
+  const section = element('section', 'profiles-detail__section profiles-detail__readiness');
+  section.setAttribute('aria-labelledby', 'profile-detail-readiness-title');
+  const title = element('h2', 'profiles-detail__section-title', 'Ready to use');
+  title.id = 'profile-detail-readiness-title';
+  section.append(
+    title,
+    element(
+      'p',
+      'profiles-detail__section-copy',
+      'These checks show which personalized journeys can use the saved details as they are.',
+    ),
+    renderReadiness(profile),
+  );
+  const readiness = guestProfileReadiness(profile);
+  const actions = element('div', 'profiles-form__actions');
+  if (readiness.horoscope) {
+    const horoscope = button('View Daily Horoscope', 'profiles-button profiles-button--primary');
+    horoscope.dataset.action = 'view-daily-horoscope';
+    horoscope.addEventListener('click', () => {
+      if (options.onViewDailyHoroscope) options.onViewDailyHoroscope(profile.id);
+      else options.navigate('gochara');
+    });
+    actions.append(horoscope);
+  }
+  if (readiness.muhurta) {
+    const muhurta = button('Find Muhurtam', 'profiles-button profiles-button--secondary');
+    muhurta.dataset.action = 'find-muhurtam';
+    muhurta.addEventListener('click', () => {
+      if (options.onFindMuhurtam) options.onFindMuhurtam(profile.id);
+      else options.navigate('tarabalam');
+    });
+    actions.append(muhurta);
+  }
+  if (actions.childElementCount > 0) section.append(actions);
+  return section;
+}
+
+function natalChartSection(details: NatalProfileDetails | null): HTMLElement {
+  const sectionClass = details
+    ? 'profiles-detail__section profiles-detail__chart'
+    : 'profiles-detail__section profiles-detail__unavailable';
+  const section = element('section', sectionClass);
+  section.setAttribute('aria-labelledby', 'profile-detail-chart-title');
+  const title = element(
+    'h2',
+    'profiles-detail__section-title',
+    details ? 'D1 Rashi chart' : 'Natal chart and calculation',
+  );
+  title.id = 'profile-detail-chart-title';
+  const copy = details
+    ? 'The South Indian chart and accessible planet table below are the saved result; opening this page does not calculate them again.'
+    : 'Natal chart and calculation details are available only for profiles calculated from birth details.';
+  section.append(title, element('p', 'profiles-detail__section-copy', copy));
+  if (details) section.append(renderNatalChartContent(details));
+  return section;
+}
+
 export function initProfilesPanel(
   store: GuestProfileStore,
   options: ProfilesPanelOptions,
@@ -500,48 +886,15 @@ export function initProfilesPanel(
 
     // A completed contextual save changes the task state. Focus the selected
     // result control instead of the now-stale creation/edit trigger.
-    if (savedProfile && context.returnTo === 'gochara') {
-      document.getElementById('go-view')?.focus();
-      return;
-    }
-    if (savedProfile && context.returnTo === 'tarabalam') {
-      const selectedProfile = Array.from(
-        document.querySelectorAll<HTMLInputElement>('[data-profile-selection]'),
-      ).find(candidate => candidate.dataset.profileSelection === savedProfile.id);
-      if (selectedProfile) {
-        selectedProfile.focus();
-        return;
-      }
-    }
+    if (savedProfile && focusSavedJourney(context, savedProfile)) return;
 
     const originalTarget = context.focusTarget;
     const focusTarget = originalTarget?.isConnected
       ? originalTarget
       : context.resolveFocusTarget?.();
-    if (focusTarget && !(focusTarget instanceof HTMLButtonElement && focusTarget.disabled)) {
-      focusTarget.focus();
-      if (document.activeElement === focusTarget) return;
-    }
-
-    if (context.returnTo === 'gochara') {
-      document.getElementById('go-view')?.focus();
-      return;
-    }
-    if (context.returnTo === 'tarabalam') {
-      document.querySelector<HTMLElement>('#tb-profiles [data-action]')?.focus();
-      return;
-    }
-
-    if (savedProfile) {
-      const savedEdit = Array.from(
-        root.querySelectorAll<HTMLElement>('[data-profile-id] [data-action="edit-profile"]'),
-      ).find(candidate =>
-        candidate.closest<HTMLElement>('[data-profile-id]')?.dataset.profileId === savedProfile.id);
-      if (savedEdit) {
-        savedEdit.focus();
-        return;
-      }
-    }
+    if (focusUsableElement(focusTarget)) return;
+    if (focusOriginFallback(context)) return;
+    if (savedProfile && focusSavedEdit(root, savedProfile.id)) return;
     restoreFocus(null);
   };
 
@@ -714,149 +1067,15 @@ export function initProfilesPanel(
       detail.append(calculationNotice);
     }
 
-    if (profile.birthDetails) {
-      const birthSection = element('section', 'profiles-detail__section');
-      birthSection.setAttribute('aria-labelledby', 'profile-detail-birth-title');
-      const birthTitle = element('h2', 'profiles-detail__section-title', 'Saved birth details');
-      birthTitle.id = 'profile-detail-birth-title';
-      birthSection.append(
-        birthTitle,
-        renderDetailFacts([
-          ['Date of birth', profile.birthDetails.dateOfBirth],
-          ['Time of birth', profile.birthDetails.timeOfBirth],
-          ['Place of birth', profile.birthDetails.placeLabel],
-          ['Time zone', profile.birthDetails.timezone],
-        ]),
-      );
-      detail.append(birthSection);
-    } else {
-      const factsSection = element('section', 'profiles-detail__section');
-      factsSection.setAttribute('aria-labelledby', 'profile-detail-facts-title');
-      const factsTitle = element('h2', 'profiles-detail__section-title', 'Saved astrology details');
-      factsTitle.id = 'profile-detail-facts-title';
-      factsSection.append(
-        factsTitle,
-        renderDetailFacts([
-          ['Nakshatra', profile.nakshatra || 'Not added'],
-          ['Padam', profile.pada ? String(profile.pada) : 'Not added'],
-          ['Janma Rashi', profile.janmaRasi || 'Not available'],
-          ['Lagna', profile.lagna || 'Not added'],
-        ]),
-      );
-      detail.append(factsSection);
-    }
+    detail.append(profileFactsSection(profile, renderDetailFacts));
 
     const natalDetails = savedNatalDetails(profile);
-    if (natalDetails) {
-      const astrologySection = element(
-        'section',
-        'profiles-birth-review profiles-detail__natal',
-      );
-      astrologySection.setAttribute('aria-labelledby', 'profile-detail-astrology-title');
-      const astrologyEyebrow = element(
-        'p',
-        'profiles-birth-review__eyebrow',
-        'Saved calculation',
-      );
-      const astrologyTitle = element(
-        'h2',
-        'profiles-birth-review__title',
-        'Astrology details',
-      );
-      astrologyTitle.id = 'profile-detail-astrology-title';
-      const astrologyIntro = element(
-        'p',
-        'profiles-birth-review__intro',
-        'These results were saved from the birth calculation. The original inputs remain visible above so you can verify them before reviewing the chart.',
-      );
-      astrologySection.append(
-        astrologyEyebrow,
-        astrologyTitle,
-        astrologyIntro,
-        renderNatalFacts(natalDetails),
-      );
-      detail.append(astrologySection);
-    }
-
-    const readinessSection = element('section', 'profiles-detail__section profiles-detail__readiness');
-    readinessSection.setAttribute('aria-labelledby', 'profile-detail-readiness-title');
-    const readinessTitle = element('h2', 'profiles-detail__section-title', 'Ready to use');
-    readinessTitle.id = 'profile-detail-readiness-title';
-    const readinessIntro = element(
-      'p',
-      'profiles-detail__section-copy',
-      'These checks show which personalized journeys can use the saved details as they are.',
+    const astrologySection = savedAstrologySection(natalDetails);
+    if (astrologySection) detail.append(astrologySection);
+    detail.append(
+      journeyReadinessSection(profile, renderReadiness, options),
+      natalChartSection(natalDetails),
     );
-    readinessSection.append(readinessTitle, readinessIntro, renderReadiness(profile));
-
-    const readiness = guestProfileReadiness(profile);
-    const journeyActions = element('div', 'profiles-form__actions');
-    if (readiness.horoscope) {
-      const horoscope = button(
-        'View Daily Horoscope',
-        'profiles-button profiles-button--primary',
-      );
-      horoscope.dataset.action = 'view-daily-horoscope';
-      horoscope.addEventListener('click', () => {
-        if (options.onViewDailyHoroscope) {
-          options.onViewDailyHoroscope(profile.id);
-        } else {
-          options.navigate('gochara');
-        }
-      });
-      journeyActions.append(horoscope);
-    }
-    if (readiness.muhurta) {
-      const muhurta = button(
-        'Find Muhurtam',
-        'profiles-button profiles-button--secondary',
-      );
-      muhurta.dataset.action = 'find-muhurtam';
-      muhurta.addEventListener('click', () => {
-        if (options.onFindMuhurtam) {
-          options.onFindMuhurtam(profile.id);
-        } else {
-          options.navigate('tarabalam');
-        }
-      });
-      journeyActions.append(muhurta);
-    }
-    if (journeyActions.childElementCount > 0) readinessSection.append(journeyActions);
-    detail.append(readinessSection);
-
-    if (natalDetails) {
-      const chartSection = element('section', 'profiles-detail__section profiles-detail__chart');
-      chartSection.setAttribute('aria-labelledby', 'profile-detail-chart-title');
-      const chartTitle = element('h2', 'profiles-detail__section-title', 'D1 Rashi chart');
-      chartTitle.id = 'profile-detail-chart-title';
-      const chartIntro = element(
-        'p',
-        'profiles-detail__section-copy',
-        'The South Indian chart and accessible planet table below are the saved result; opening this page does not calculate them again.',
-      );
-      chartSection.append(
-        chartTitle,
-        chartIntro,
-        renderNatalChartContent(natalDetails),
-      );
-      detail.append(chartSection);
-    } else {
-      const unavailable = element('section', 'profiles-detail__section profiles-detail__unavailable');
-      unavailable.setAttribute('aria-labelledby', 'profile-detail-chart-title');
-      const unavailableTitle = element(
-        'h2',
-        'profiles-detail__section-title',
-        'Natal chart and calculation',
-      );
-      unavailableTitle.id = 'profile-detail-chart-title';
-      const unavailableCopy = element(
-        'p',
-        'profiles-detail__section-copy',
-        'Natal chart and calculation details are available only for profiles calculated from birth details.',
-      );
-      unavailable.append(unavailableTitle, unavailableCopy);
-      detail.append(unavailable);
-    }
 
     root.replaceChildren(detail);
     if (focusHeading) {
@@ -1042,17 +1261,10 @@ export function initProfilesPanel(
     const heading = element('h1', 'profiles-title', mode === 'create' ? 'Create profile manually' : 'Edit profile manually');
     heading.id = 'profiles-title';
     heading.tabIndex = -1;
-    let introText = 'Start with a name. Nakshatra makes the profile ready for Muhurtam; Padam may be needed to derive Janma Rashi for Daily Horoscope.';
-    if (context.requiredFor === 'horoscope') {
-      introText = 'Add the birth details needed for Daily Horoscope. Nakshatra is required; Padam is required only when the birth star spans two Rashis. Lagna remains optional.';
-    }
-    if (context.requiredFor === 'muhurta') {
-      introText = 'Add a name and Nakshatra to use this profile in Muhurtam. Padam and Lagna are optional for this journey.';
-    }
     const intro = element(
       'p',
       'profiles-form__intro',
-      introText,
+      manualIntroText(context.requiredFor),
     );
     const privacy = element(
       'p',
@@ -1155,11 +1367,7 @@ export function initProfilesPanel(
     const nakshatraHelp = element(
       'p',
       'profiles-field__help',
-      context.requiredFor === 'horoscope'
-        ? 'Required to derive Janma Rashi for Daily Horoscope.'
-        : context.requiredFor === 'muhurta'
-          ? 'Required for Muhurtam.'
-          : 'Required for Muhurtam and for deriving Janma Rashi.',
+      nakshatraHelpText(context.requiredFor),
     );
     nakshatraHelp.id = 'profile-nakshatra-help';
     const nakshatraError = element('p', 'profiles-field__error');
@@ -1219,17 +1427,9 @@ export function initProfilesPanel(
     fragment.append(form);
     root.replaceChildren(fragment);
 
-    const updateDuplicateWarning = (): void => {
-      const candidate = normalizedName(nameInput.value);
-      const duplicateProfile = candidate
-        ? store.getSnapshot().profiles.find(existing =>
-          existing.id !== profile?.id && normalizedName(existing.name) === candidate)
-        : undefined;
-      duplicate.hidden = !duplicateProfile;
-      duplicate.textContent = duplicateProfile
-        ? `A profile named ${displayName(duplicateProfile)} already exists. You can still save this profile.`
-        : '';
-    };
+    const updateDuplicateWarning = updateProfileDuplicateWarning.bind(
+      null, duplicate, nameInput, store, profile?.id,
+    );
     nameInput.addEventListener('input', () => {
       if (nameInput.value.trim()) {
         nameInput.removeAttribute('aria-invalid');
@@ -1267,13 +1467,7 @@ export function initProfilesPanel(
     form.addEventListener('submit', event => {
       event.preventDefault();
       const name = nameInput.value.trim();
-      if (!name) {
-        nameInput.setAttribute('aria-invalid', 'true');
-        nameError.textContent = 'Enter a name for this profile.';
-        nameError.hidden = false;
-        nameInput.focus();
-        return;
-      }
+      if (!validateManualProfileName(name, nameInput, nameError)) return;
 
       formError.hidden = true;
       formError.textContent = '';
@@ -1287,61 +1481,30 @@ export function initProfilesPanel(
         natalChart: null,
         calculation: null,
       };
-      const padaValue = Number(padaSelect.value);
-      const candidate: GuestProfile = {
-        id: profile?.id || 'profile-preview',
-        schemaVersion: GUEST_PROFILE_SCHEMA_VERSION,
-        source: 'manual',
+      const candidate = manualProfileCandidate(
+        profile,
         name,
-        nakshatra: nakshatraSelect.value || null,
-        pada: padaValue === 1 || padaValue === 2 || padaValue === 3 || padaValue === 4
-          ? padaValue
-          : null,
-        lagna: lagnaSelect.value || null,
-        janmaRasi: null,
-        birthDetails: null,
-        natalChart: null,
-        calculation: null,
-      };
-      const readiness = guestProfileReadiness(candidate);
-      if (context.requiredFor && !readiness.muhurta) {
-        nakshatraSelect.setAttribute('aria-invalid', 'true');
-        nakshatraError.textContent = context.requiredFor === 'horoscope'
-          ? 'Add a Nakshatra to use this profile in Daily Horoscope.'
-          : 'Add a Nakshatra to use this profile in Muhurtam.';
-        nakshatraError.hidden = false;
-        nakshatraSelect.focus();
-        return;
-      }
-      if (context.requiredFor === 'horoscope' && readiness.missingForHoroscope === 'pada') {
-        padaSelect.setAttribute('aria-invalid', 'true');
-        padaError.textContent = `Select a Padam because ${nakshatraSelect.value} spans two Rashis.`;
-        padaError.hidden = false;
-        padaSelect.focus();
-        return;
-      }
+        nakshatraSelect.value,
+        padaSelect.value,
+        lagnaSelect.value,
+      );
+      if (!validateManualJourney(
+        context,
+        candidate,
+        nakshatraSelect,
+        nakshatraError,
+        padaSelect,
+        padaError,
+      )) return;
       view = { kind: 'list' };
       try {
-        let savedProfile: GuestProfile;
-        if (mode === 'edit' && profile) {
-          savedProfile = store.update(profile.id, draft);
-        } else {
-          savedProfile = store.create(draft);
-        }
+        const savedProfile = saveManualProfile(store, mode, profile, draft);
         renderList();
         returnToOrigin(context, savedProfile);
       } catch (error) {
-        view = mode === 'edit' && profile
-          ? { kind: 'edit', profileId: profile.id, context }
-          : { kind: 'create', context };
+        view = manualSaveFailureView(mode, profile, context);
         formError.hidden = false;
-        if (error instanceof GuestProfileStoreError && error.code === 'profile-limit') {
-          formError.textContent = `You can save up to ${MAX_GUEST_PROFILES} profiles. Delete one before adding another.`;
-        } else if (error instanceof GuestProfileStoreError && error.code === 'profile-not-found') {
-          formError.textContent = 'This profile is no longer available. Return to Profiles and try again.';
-        } else {
-          formError.textContent = 'The profile could not be saved. Check the details and try again.';
-        }
+        formError.textContent = manualSaveErrorMessage(error);
       }
     });
     nameInput.focus();
@@ -1691,17 +1854,9 @@ export function initProfilesPanel(
       error.hidden = true;
       error.textContent = '';
     };
-    const updateDuplicateWarning = (): void => {
-      const candidate = normalizedName(nameInput.value);
-      const duplicateProfile = candidate
-        ? store.getSnapshot().profiles.find(existing =>
-          existing.id !== profile?.id && normalizedName(existing.name) === candidate)
-        : undefined;
-      duplicate.hidden = !duplicateProfile;
-      duplicate.textContent = duplicateProfile
-        ? `A profile named ${displayName(duplicateProfile)} already exists. You can still save this profile.`
-        : '';
-    };
+    const updateDuplicateWarning = updateProfileDuplicateWarning.bind(
+      null, duplicate, nameInput, store, profile?.id,
+    );
     const showPlaceResults = (
       results: BirthPlaceCandidate[],
       attribution: string,
@@ -1801,7 +1956,7 @@ export function initProfilesPanel(
       placeStatus.textContent = '';
       placeResults.replaceChildren();
       placeSearchSequence += 1;
-      if (!selectedPlace || placeInput.value.trim() !== selectedPlace.label) {
+      if (placeInput.value.trim() !== selectedPlace?.label) {
         selectedPlace = null;
         updateSelectedPlace();
         invalidateCalculation();
@@ -1815,86 +1970,30 @@ export function initProfilesPanel(
     searchButton.addEventListener('click', () => { void runPlaceSearch(); });
 
     calculateButton.addEventListener('click', async () => {
-      let invalid: HTMLElement | null = null;
-      if (!dateInput.value) {
-        dateInput.setAttribute('aria-invalid', 'true');
-        dateError.textContent = 'Enter a valid birth date that is not in the future.';
-        dateError.hidden = false;
-        invalid ||= dateInput;
-      }
-      if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(timeInput.value)) {
-        timeInput.setAttribute('aria-invalid', 'true');
-        timeError.textContent = 'Enter the recorded local birth time.';
-        timeError.hidden = false;
-        invalid ||= timeInput;
-      }
-      if (!selectedPlace) {
-        placeInput.setAttribute('aria-invalid', 'true');
-        placeError.textContent = 'Find and select a birthplace from the results.';
-        placeError.hidden = false;
-        invalid ||= placeInput;
-      }
-      if (invalid || !selectedPlace) {
-        invalid?.focus();
-        return;
-      }
-
+      const calculationPlace = validateRequiredBirthInputs(
+        dateInput,
+        dateError,
+        timeInput,
+        timeError,
+        placeInput,
+        placeError,
+        selectedPlace,
+      );
+      if (!calculationPlace) return;
       const now = new Date();
-      const maxDate = isoDateInTimeZone(now, selectedPlace.timezone);
-      if (!maxDate) {
-        placeInput.setAttribute('aria-invalid', 'true');
-        placeError.textContent = 'The selected birthplace has an invalid time zone.';
-        placeError.hidden = false;
-        placeInput.focus();
-        return;
-      }
-      dateInput.max = maxDate;
-      if (dateInput.value > maxDate) {
-        dateInput.setAttribute('aria-invalid', 'true');
-        dateError.textContent = 'Enter a valid birth date that is not in the future.';
-        dateError.hidden = false;
-        dateInput.focus();
-        return;
-      }
-      const [birthHour, birthMinute] = timeInput.value.split(':').map(Number);
-      let birthInstant: string;
-      try {
-        birthInstant = localWallTimeToInstant(
-          dateInput.value,
-          birthHour * 60 + birthMinute,
-          selectedPlace.timezone,
-        );
-      } catch (error) {
-        if (error instanceof ElectionChartApiError && error.message.includes('ambiguous')) {
-          timeError.textContent = 'This local time occurred twice at the selected birthplace. Enter known astrology details manually instead.';
-          timeInput.setAttribute('aria-invalid', 'true');
-          timeError.hidden = false;
-          timeInput.focus();
-          return;
-        }
-        if (error instanceof ElectionChartApiError && error.message.includes('does not exist')) {
-          timeError.textContent = 'This local time did not occur at the selected birthplace because the clocks changed. Enter known astrology details manually instead.';
-          timeInput.setAttribute('aria-invalid', 'true');
-          timeError.hidden = false;
-          timeInput.focus();
-          return;
-        }
-        placeInput.setAttribute('aria-invalid', 'true');
-        placeError.textContent = 'The selected birthplace or time zone is invalid.';
-        placeError.hidden = false;
-        placeInput.focus();
-        return;
-      }
-      if (Date.parse(birthInstant) > now.getTime()) {
-        timeInput.setAttribute('aria-invalid', 'true');
-        timeError.textContent = 'Birth date and time cannot be in the future at the selected birthplace.';
-        timeError.hidden = false;
-        timeInput.focus();
-        return;
-      }
+      const birthInstant = validatedBirthInstant(
+        dateInput,
+        dateError,
+        timeInput,
+        timeError,
+        placeInput,
+        placeError,
+        calculationPlace,
+        now,
+      );
+      if (!birthInstant) return;
 
       const sequence = ++calculationSequence;
-      const calculationPlace = selectedPlace;
       calculateButton.disabled = true;
       calculateButton.setAttribute('aria-busy', 'true');
       calculationError.hidden = true;
