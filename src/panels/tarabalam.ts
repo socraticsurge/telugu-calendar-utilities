@@ -270,6 +270,45 @@ function tbManualProfile(
   };
 }
 
+function tbKnownProfileValue(rawValue, values): string | null {
+  return typeof rawValue === 'string' && values.includes(rawValue)
+    ? rawValue
+    : null;
+}
+
+function tbLegacyPada(rawValue): TarabalamPada | null {
+  const value = Number(rawValue);
+  return ([1, 2, 3, 4] as const).includes(value as TarabalamPada)
+    ? value as TarabalamPada
+    : null;
+}
+
+function tbLegacyName(rawValue, index: number): string {
+  if (typeof rawValue === 'string' && rawValue.trim()) return rawValue.trim();
+  return index === 0 ? 'You' : `Person ${index + 1}`;
+}
+
+function tbLegacyParticipant(previous, index: number): JourneyGuestProfile | null {
+  const valueOf = (field: string, fallback) => {
+    const input = document.getElementById(`tb-${field}-${index}`) as HTMLInputElement | null;
+    return input?.value ?? fallback;
+  };
+  const nakshatra = tbKnownProfileValue(
+    valueOf('nak', previous.nak),
+    TB_NAKSHATRAS,
+  );
+  if (!nakshatra) return null;
+  const pada = tbLegacyPada(valueOf('pada', previous.pada));
+  return {
+    id: typeof previous.id === 'string' ? previous.id : `legacy_${index}`,
+    name: tbLegacyName(valueOf('name', previous.name), index),
+    nak: nakshatra,
+    pada,
+    rasi: rasiFromStar(nakshatra, pada),
+    lagna: tbKnownProfileValue(valueOf('lagna', previous.lagna), TB_RASIS),
+  };
+}
+
 /** The exact participant adapter consumed by Tarabalam and findMuhurta. */
 export function tbProfiles(): JourneyGuestProfile[] {
   if (TB_PROFILE_CONTROLLER) return TB_PROFILE_CONTROLLER.getParticipants();
@@ -280,37 +319,8 @@ export function tbProfiles(): JourneyGuestProfile[] {
   const saved = readLegacyGuestProfileRows(localStorage);
   const participants: JourneyGuestProfile[] = [];
   for (let index = 0; index < TB_LEGACY_ROWS; index += 1) {
-    const previous = saved[index] || {};
-    const nameInput = document.getElementById(`tb-name-${index}`) as HTMLInputElement | null;
-    const nakshatraInput = document.getElementById(`tb-nak-${index}`) as HTMLSelectElement | null;
-    const padaInput = document.getElementById(`tb-pada-${index}`) as HTMLSelectElement | null;
-    const lagnaInput = document.getElementById(`tb-lagna-${index}`) as HTMLSelectElement | null;
-    const rawNakshatra = nakshatraInput?.value ?? previous.nak;
-    const nakshatra = typeof rawNakshatra === 'string' && TB_NAKSHATRAS.includes(rawNakshatra)
-      ? rawNakshatra
-      : '';
-    if (!nakshatra) continue;
-    const rawPada = padaInput?.value ?? previous.pada;
-    const padaNumber = Number(rawPada);
-    const pada = ([1, 2, 3, 4] as const).includes(padaNumber as TarabalamPada)
-      ? padaNumber as TarabalamPada
-      : null;
-    const rawLagna = lagnaInput?.value ?? previous.lagna;
-    const lagna = typeof rawLagna === 'string' && TB_RASIS.includes(rawLagna)
-      ? rawLagna
-      : null;
-    const rawName = nameInput?.value ?? previous.name;
-    let name = `Person ${index + 1}`;
-    if (typeof rawName === 'string' && rawName.trim()) name = rawName.trim();
-    else if (index === 0) name = 'You';
-    participants.push({
-      id: typeof previous.id === 'string' ? previous.id : `legacy_${index}`,
-      name,
-      nak: nakshatra,
-      pada,
-      rasi: rasiFromStar(nakshatra, pada),
-      lagna,
-    });
+    const participant = tbLegacyParticipant(saved[index] || {}, index);
+    if (participant) participants.push(participant);
   }
   return participants;
 }
@@ -636,6 +646,110 @@ export function initTarabalamProfiles(
     clearButton.addEventListener('click', onClear);
   }
 
+  const renderNotices = (): void => {
+    const storeIssue = tbProfileStoreIssue(snapshot);
+    let roleStorageIssue: string | null = null;
+    if (roleSelectionState.storageIssue === 'storage-unavailable') {
+      roleStorageIssue = 'Role choices work for this page, but this browser cannot save them.';
+    } else if (roleSelectionState.storageIssue === 'malformed-storage') {
+      roleStorageIssue = 'Saved role choices were unreadable and have been reset safely.';
+    }
+    for (const message of [
+      storeIssue, selection.message, roleStorageIssue, transientIssue,
+    ].filter(Boolean)) {
+      const notice = tbNode('p', 'preview-error muhurta-profile-notice', message as string);
+      notice.setAttribute('role', 'status');
+      root.append(notice);
+    }
+  };
+
+  const renderSavedProfiles = (): void => {
+    if (!snapshot.profiles.length) {
+      root.append(tbNode(
+        'p',
+        'muhurta-profile-empty',
+        'No saved profiles yet. You can still search without personal screening or add someone for this search.',
+      ));
+      return;
+    }
+    const fieldset = tbNode('fieldset', 'muhurta-saved-profiles');
+    const legend = tbNode('legend', 'muhurta-saved-profiles__legend', 'Saved profiles');
+    const list = tbNode('ul', 'muhurta-saved-profiles__list');
+    for (const profile of snapshot.profiles) list.append(renderSavedProfile(profile));
+    fieldset.append(legend, list);
+    root.append(fieldset);
+  };
+
+  const renderManualProfiles = (): void => {
+    if (!manualParticipants.length) return;
+    const manual = tbNode('div', 'muhurta-manual-profiles');
+    const heading = tbNode('h3', 'muhurta-manual-profiles__title', 'Just for this search');
+    manual.append(heading);
+    manualParticipants.forEach((participant, index) => {
+      manual.append(renderManualParticipant(participant, index));
+    });
+    root.append(manual);
+  };
+
+  const renderProfileActions = (): void => {
+    const actionsRow = tbNode('div', 'muhurta-profile-actions');
+    const addManual = tbButton('Add someone for this search');
+    addManual.dataset.action = 'add-manual';
+    addManual.disabled = occupiedSlots() >= MAX_GUEST_PROFILES;
+    addManual.addEventListener('click', addManualParticipant);
+    const create = tbButton('Create saved profile', 'tb-add muhurta-profile-create');
+    create.dataset.action = 'create-profile';
+    create.disabled = snapshot.profiles.length >= MAX_GUEST_PROFILES;
+    create.addEventListener('click', event => {
+      actions.createProfile(event.currentTarget as HTMLElement);
+    });
+    const manage = tbButton('Manage profiles', 'tb-reset muhurta-profile-manage');
+    manage.dataset.action = 'manage-profiles';
+    manage.addEventListener('click', event => {
+      actions.manageProfiles(event.currentTarget as HTMLElement);
+    });
+    actionsRow.append(addManual, create, manage);
+    root.append(actionsRow);
+  };
+
+  const renderRoleSelection = (): void => {
+    const activity = activitySelect?.value || 'any';
+    const role = roleForActivity(activity);
+    if (!role) return;
+    const participants = currentParticipants();
+    const roleBlock = tbNode('div', 'muhurta-role-selection');
+    const prompt = tbNode('p', 'muhurta-role-selection__prompt', role.prompt);
+    const label = tbNode('label', 'muhurta-role-selection__field');
+    const labelText = tbNode('span', 'muhurta-role-selection__label', role.label);
+    const roleSelect = tbNode('select') as HTMLSelectElement;
+    roleSelect.dataset.muhurtaRole = role.role;
+    if (!participants.length) {
+      tbAppendOption(roleSelect, '', 'Select or add a participant first');
+      roleSelect.disabled = true;
+    } else {
+      for (const participant of participants) {
+        tbAppendOption(roleSelect, participant.id, participant.name);
+      }
+      const requested = roleSelections.get(activity);
+      const selected = participants.some(participant => participant.id === requested)
+        ? requested as string
+        : participants[0].id;
+      roleSelections.set(activity, selected);
+      if (roleSelectionState.selections[activity] !== selected) {
+        persistRoleSelection(activity, selected);
+      }
+      roleSelect.value = selected;
+      roleSelect.addEventListener('change', () => {
+        invalidateMuhurtaSearch();
+        roleSelections.set(activity, roleSelect.value);
+        persistRoleSelection(activity, roleSelect.value);
+      });
+    }
+    label.append(labelText, roleSelect);
+    roleBlock.append(prompt, label);
+    root.append(roleBlock);
+  };
+
   const controller: InternalTarabalamProfilesController = {
     render(): void {
       snapshot = store.getSnapshot();
@@ -650,103 +764,11 @@ export function initTarabalamProfiles(
       summary.dataset.muhurtaSelectionSummary = '';
       summary.setAttribute('aria-live', 'polite');
       root.append(intro, summary);
-
-      const storeIssue = tbProfileStoreIssue(snapshot);
-      let roleStorageIssue: string | null = null;
-      if (roleSelectionState.storageIssue === 'storage-unavailable') {
-        roleStorageIssue = 'Role choices work for this page, but this browser cannot save them.';
-      } else if (roleSelectionState.storageIssue === 'malformed-storage') {
-        roleStorageIssue = 'Saved role choices were unreadable and have been reset safely.';
-      }
-      for (const message of [
-        storeIssue, selection.message, roleStorageIssue, transientIssue,
-      ].filter(Boolean)) {
-        const notice = tbNode('p', 'preview-error muhurta-profile-notice', message as string);
-        notice.setAttribute('role', 'status');
-        root.append(notice);
-      }
-
-      if (snapshot.profiles.length) {
-        const fieldset = tbNode('fieldset', 'muhurta-saved-profiles');
-        const legend = tbNode('legend', 'muhurta-saved-profiles__legend', 'Saved profiles');
-        const list = tbNode('ul', 'muhurta-saved-profiles__list');
-        for (const profile of snapshot.profiles) list.append(renderSavedProfile(profile));
-        fieldset.append(legend, list);
-        root.append(fieldset);
-      } else {
-        root.append(tbNode(
-          'p',
-          'muhurta-profile-empty',
-          'No saved profiles yet. You can still search without personal screening or add someone for this search.',
-        ));
-      }
-
-      if (manualParticipants.length) {
-        const manual = tbNode('div', 'muhurta-manual-profiles');
-        const heading = tbNode('h3', 'muhurta-manual-profiles__title', 'Just for this search');
-        manual.append(heading);
-        manualParticipants.forEach((participant, index) => {
-          manual.append(renderManualParticipant(participant, index));
-        });
-        root.append(manual);
-      }
-
-      const actionsRow = tbNode('div', 'muhurta-profile-actions');
-      const addManual = tbButton('Add someone for this search');
-      addManual.dataset.action = 'add-manual';
-      addManual.disabled = occupiedSlots() >= MAX_GUEST_PROFILES;
-      addManual.addEventListener('click', addManualParticipant);
-      const create = tbButton('Create saved profile', 'tb-add muhurta-profile-create');
-      create.dataset.action = 'create-profile';
-      create.disabled = snapshot.profiles.length >= MAX_GUEST_PROFILES;
-      create.addEventListener('click', event => {
-        actions.createProfile(event.currentTarget as HTMLElement);
-      });
-      const manage = tbButton('Manage profiles', 'tb-reset muhurta-profile-manage');
-      manage.dataset.action = 'manage-profiles';
-      manage.addEventListener('click', event => {
-        actions.manageProfiles(event.currentTarget as HTMLElement);
-      });
-      actionsRow.append(addManual, create, manage);
-      root.append(actionsRow);
-
-      const activity = activitySelect?.value || 'any';
-      const role = roleForActivity(activity);
-      if (role) {
-        const participants = currentParticipants();
-        const roleBlock = tbNode('div', 'muhurta-role-selection');
-        const prompt = tbNode('p', 'muhurta-role-selection__prompt', role.prompt);
-        const label = tbNode('label', 'muhurta-role-selection__field');
-        const labelText = tbNode('span', 'muhurta-role-selection__label', role.label);
-        const roleSelect = tbNode('select') as HTMLSelectElement;
-        roleSelect.dataset.muhurtaRole = role.role;
-        if (!participants.length) {
-          tbAppendOption(roleSelect, '', 'Select or add a participant first');
-          roleSelect.disabled = true;
-        } else {
-          for (const participant of participants) {
-            tbAppendOption(roleSelect, participant.id, participant.name);
-          }
-          const requested = roleSelections.get(activity);
-          const selected = participants.some(participant => participant.id === requested)
-            ? requested as string
-            : participants[0].id;
-          roleSelections.set(activity, selected);
-          if (roleSelectionState.selections[activity] !== selected) {
-            persistRoleSelection(activity, selected);
-          }
-          roleSelect.value = selected;
-          roleSelect.addEventListener('change', () => {
-            invalidateMuhurtaSearch();
-            roleSelections.set(activity, roleSelect.value);
-            persistRoleSelection(activity, roleSelect.value);
-          });
-        }
-        label.append(labelText, roleSelect);
-        roleBlock.append(prompt, label);
-        root.append(roleBlock);
-      }
-
+      renderNotices();
+      renderSavedProfiles();
+      renderManualProfiles();
+      renderProfileActions();
+      renderRoleSelection();
       root.dataset.selectedCount = String(participantCount());
     },
     destroy(): void {
@@ -1112,96 +1134,52 @@ function tbExtendTo(iso) {
   calcTarabalam();
 }
 
-function renderTarabalam(profiles?) {
-  if (!TB_DAYS) return;
-  profiles = profiles || tbProfiles();
-  const group = profiles.length > 1;
-  TB_DAYS.forEach(r => { r.allGood = r.taras.every(tbPersonGood); });
-  selEl('tb-mode').value = TB_MODE;
-  const goodDays = TB_DAYS.filter(r => r.allGood);
-  const next = goodDays[0];
-  let who = 'you';
-  if (group) who = 'everyone';
-  else if (profiles[0]) who = profiles[0].name;
-  let summary = `<span class="count">${goodDays.length} of ${TB_DAYS.length}</span>&nbsp;days are favourable for ${htmlEsc(who)}`;
-  if (next) {
-    summary += ` · next: <span class="count">${next.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>`;
+function tbTarabalamProfileHeader(profile): string {
+  const parts = [htmlEsc(profile.nak)];
+  if (profile.rasi) parts.push(`${htmlEsc(profile.rasi)} rashi`);
+  if (profile.lagna) parts.push(`${htmlEsc(profile.lagna)} lagna`);
+  return `<th>${htmlEsc(profile.name)}<div class="tb-sub">${parts.join(' · ')}</div></th>`;
+}
+
+function tbTarabalamChip(tara, row): string {
+  const { chandraTag, cls } = tbChandraPresentation(tara);
+  let chandraDetail = '';
+  if (tara.chandra) {
+    const verdict = tara.chandra.verdict === 'puja'
+      ? 'needs puja'
+      : tara.chandra.verdict;
+    chandraDetail = ` · Chandra: ${tara.chandra.pos}${['st','nd','rd'][tara.chandra.pos-1] || 'th'} from rashi (${verdict})`;
   }
-  const share = goodDays.length
-    ? `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;" title="Share these good days on WhatsApp" aria-label="Share on WhatsApp" onclick="shareTarabalamOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`
-    : '';
-  const toggle = `<label class="tb-toggle"><input type="checkbox" id="tb-show-all" ${TB_SHOW_ALL ? 'checked' : ''} onchange="tbToggleShowAll()"> show all days</label>${share}`;
-  document.getElementById('tb-summary').innerHTML =
-    `<div class="tb-summary">${group ? '<span class="tb-star">✦</span>' : '🟢'} ${summary}${toggle}</div>`;
-  const rows = TB_DAYS.filter(r => TB_SHOW_ALL || r.allGood);
-  if (!rows.length) {
-    if (!tbCycleHasGoodDay(profiles)) {
-      document.getElementById('tb-result').innerHTML =
-        `<p class="preview-error">This combination of birth stars never aligns; tarabalam repeats over the
-         27 nakshatras, and no day is favourable for ${group ? 'all ' + profiles.length + ' people' : htmlEsc(who)} at once.
-         Tick "show all days" to plan by individual taras, or consult your purohit.</p>`;
-      return;
-    }
-    const nextGood = tbNextGoodBeyondRange(profiles);
-    if (nextGood) {
-      const iso = `${nextGood.getFullYear()}-${String(nextGood.getMonth()+1).padStart(2,'0')}-${String(nextGood.getDate()).padStart(2,'0')}`;
-      const label = nextGood.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-      document.getElementById('tb-result').innerHTML =
-        `<p class="preview-error">No favourable days for ${htmlEsc(who)} in this range.
-         The next one is <strong>${label}</strong>:
-         <button class="read-more" style="color:var(--indigo);" onclick="tbExtendTo('${iso}')">extend the range to include it</button>,
-         or tick "show all days".</p>`;
-    } else {
-      document.getElementById('tb-result').innerHTML =
-        `<p class="preview-error">No favourable days for ${htmlEsc(who)} in this range, and none found in the months ahead.
-         Tick "show all days" to plan by individual taras.</p>`;
-    }
-    return;
+  const moonDetail = row.moonRasi ? ` · Moon in ${row.moonRasi}` : '';
+  const detail = `Tara: ${tara.tara} ${tara.label} (${tara.good ? 'good' : 'avoid'})`
+    + chandraDetail + moonDetail;
+  return `<td><span class="tara-chip ${cls}" title="${detail}">${tara.tara} ${tara.label}${chandraTag}</span></td>`;
+}
+
+function tbTarabalamDesktopRow(row, profiles): string {
+  const dlabel = row.date.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  });
+  const chips = row.taras.map(tara => tbTarabalamChip(tara, row)).join('');
+  let all = '';
+  if (profiles.length > 1) {
+    const allGood = row.allGood ? '<span class="tb-star">✦</span>' : '';
+    all = `<td>${allGood}</td>`;
   }
-  const head = `<tr><th>Date</th><th>Moon in</th><th>Tithi</th>${profiles.map(p => {
-    // Sub-line surfaces nakshatra + derived rashi + (when set)
-    // natal lagna so the user can see which Jyotisha frame each
-    // column is being scored against. Lagna only appears when
-    // the optional dropdown was filled for that profile.
-    const parts = [htmlEsc(p.nak)];
-    if (p.rasi) parts.push(`${htmlEsc(p.rasi)} rashi`);
-    if (p.lagna) parts.push(`${htmlEsc(p.lagna)} lagna`);
-    return `<th>${htmlEsc(p.name)}<div class="tb-sub">${parts.join(' · ')}</div></th>`;
-  }).join('')}${profiles.length > 1 ? '<th title="Auspicious for everyone selected">All ✦</th>' : ''}</tr>`;
-  const body = rows.map(r => {
-    const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const chips = r.taras.map(t => {
-      // chip colour = verdict under the chosen ✦ standard; the Moon is a
-      // marked caveat (° puja, ☾ moon-avoid), never a silent veto
-      const { chandraTag, cls } = tbChandraPresentation(t);
-      // colour follows the chosen standard: under 'Stars only' the chips are
-      // pure star verdicts; amber only when the standard admits a day on the
-      // condition of a remedial puja
-      let chandraDetail = '';
-      if (t.chandra) {
-        let chandraVerdict = t.chandra.verdict;
-        if (chandraVerdict === 'puja') chandraVerdict = 'needs puja';
-        chandraDetail = ` · Chandra: ${t.chandra.pos}${['st','nd','rd'][t.chandra.pos-1] || 'th'} from rashi (${chandraVerdict})`;
-      }
-      const moonDetail = r.moonRasi ? ` · Moon in ${r.moonRasi}` : '';
-      const detail = `Tara: ${t.tara} ${t.label} (${t.good ? 'good' : 'avoid'})`
-        + chandraDetail + moonDetail;
-      return `<td><span class="tara-chip ${cls}" title="${detail}">${t.tara} ${t.label}${chandraTag}</span></td>`;
-    }).join('');
-    let all = '';
-    if (profiles.length > 1) {
-      const allGood = r.allGood ? '<span class="tb-star">✦</span>' : '';
-      all = `<td>${allGood}</td>`;
-    }
-    return `<tr class="${r.allGood && profiles.length > 1 ? 'tb-all' : ''}">
+  return `<tr class="${row.allGood && profiles.length > 1 ? 'tb-all' : ''}">
       <td class="tb-date-cell">${dlabel}</td>
-      <td>${r.nak}<div class="tb-sub">till ${fmtT(r.nakUntil)}${r.nakEflag === '+1' ? ' +1' : ''}</div></td>
-      <td>${r.tithi}</td>${chips}${all}</tr>`;
-  }).join('');
-  const shown = TB_DAYS.filter(r => TB_SHOW_ALL || r.allGood);
-  const hasPuja = shown.some(r => r.taras.some(t => t.chandra?.verdict === 'puja'));
-  const hasMoonBad = shown.some(r => r.taras.some(t => t.chandra?.verdict === 'bad'));
-  const modeLabel = { stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE];
+      <td>${row.nak}<div class="tb-sub">till ${fmtT(row.nakUntil)}${row.nakEflag === '+1' ? ' +1' : ''}</div></td>
+      <td>${row.tithi}</td>${chips}${all}</tr>`;
+}
+
+function tbTarabalamLegend(rows, group: boolean): string {
+  const hasPuja = rows.some(row => row.taras.some(tara => tara.chandra?.verdict === 'puja'));
+  const hasMoonBad = rows.some(row => row.taras.some(tara => tara.chandra?.verdict === 'bad'));
+  const modeLabel = {
+    stars: 'Stars only (classic)',
+    puja_ok: 'Stars + Moon, puja ok',
+    strict: 'Stars + Moon, strict',
+  }[TB_MODE];
   let legend = `<div class="tb-readme"><div class="tb-readme-title">How to read this table</div>
     <div><span class="tara-chip good">green</span> a good day for that person, under your standard (<em>${modeLabel}</em>).</div>
     <div><span class="tara-chip bad">red</span> not suitable for that person.</div>`;
@@ -1216,34 +1194,101 @@ function renderTarabalam(profiles?) {
   if (group) {
     legend += `<div><span class="tb-star">✦</span> the day is favourable for <strong>everyone</strong>, under your standard.</div>`;
   }
-  legend += `</div>`;
-  // Mobile-only stacked cards: same data, no horizontal swipe
-  const cards = rows.map(r => {
-    const dlabel = r.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const personRows = r.taras.map((t, i) => {
-      const { chandraTag, cls } = tbChandraPresentation(t);
-      // Mobile card sub-line: name · nak · optional rashi/lagna.
-      const p = profiles[i];
-      let subText = '';
-      if (p) {
-        const extras = [htmlEsc(p.nak)];
-        if (p.rasi) extras.push(`${htmlEsc(p.rasi)} rashi`);
-        if (p.lagna) extras.push(`${htmlEsc(p.lagna)} lagna`);
-        subText = `<span class="tb-sub">${htmlEsc(p.name)}<span style="color:#DDD2BC"> · ${extras.join(' · ')}</span></span>`;
-      }
-      const sub = subText;
-      return `<div class="tb-card-row">${sub}<span class="tara-chip ${cls}">${t.tara} ${t.label}${chandraTag}</span></div>`;
-    }).join('');
-    const star = (r.allGood && profiles.length > 1) ? '<span class="tb-star">✦</span> good for everyone' : '&nbsp;';
-    return `<div class="tb-card ${r.allGood && profiles.length > 1 ? 'tb-all' : ''}">
+  return `${legend}</div>`;
+}
+
+function tbTarabalamPersonCard(tara, profile): string {
+  const { chandraTag, cls } = tbChandraPresentation(tara);
+  let subText = '';
+  if (profile) {
+    const extras = [htmlEsc(profile.nak)];
+    if (profile.rasi) extras.push(`${htmlEsc(profile.rasi)} rashi`);
+    if (profile.lagna) extras.push(`${htmlEsc(profile.lagna)} lagna`);
+    subText = `<span class="tb-sub">${htmlEsc(profile.name)}<span style="color:#DDD2BC"> · ${extras.join(' · ')}</span></span>`;
+  }
+  return `<div class="tb-card-row">${subText}<span class="tara-chip ${cls}">${tara.tara} ${tara.label}${chandraTag}</span></div>`;
+}
+
+function tbTarabalamMobileCard(row, profiles): string {
+  const dlabel = row.date.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  });
+  const personRows = row.taras
+    .map((tara, index) => tbTarabalamPersonCard(tara, profiles[index]))
+    .join('');
+  const goodForEveryone = row.allGood && profiles.length > 1;
+  const star = goodForEveryone
+    ? '<span class="tb-star">✦</span> good for everyone'
+    : '&nbsp;';
+  return `<div class="tb-card ${goodForEveryone ? 'tb-all' : ''}">
       <div class="tb-card-head">
         <span class="tb-date-cell">${dlabel}</span>
         <span class="tb-card-flag">${star}</span>
       </div>
-      <div class="tb-card-sub">${r.nak} till ${fmtT(r.nakUntil)}${r.nakEflag === '+1' ? ' +1' : ''} · ${r.tithi}</div>
+      <div class="tb-card-sub">${row.nak} till ${fmtT(row.nakUntil)}${row.nakEflag === '+1' ? ' +1' : ''} · ${row.tithi}</div>
       ${personRows}
     </div>`;
-  }).join('');
+}
+
+function tbRenderNoFavourableRows(profiles, group: boolean, who: string): void {
+  const result = document.getElementById('tb-result');
+  if (!tbCycleHasGoodDay(profiles)) {
+    result.innerHTML =
+      `<p class="preview-error">This combination of birth stars never aligns; tarabalam repeats over the
+         27 nakshatras, and no day is favourable for ${group ? 'all ' + profiles.length + ' people' : htmlEsc(who)} at once.
+         Tick "show all days" to plan by individual taras, or consult your purohit.</p>`;
+    return;
+  }
+  const nextGood = tbNextGoodBeyondRange(profiles);
+  if (!nextGood) {
+    result.innerHTML =
+      `<p class="preview-error">No favourable days for ${htmlEsc(who)} in this range, and none found in the months ahead.
+         Tick "show all days" to plan by individual taras.</p>`;
+    return;
+  }
+  const iso = `${nextGood.getFullYear()}-${String(nextGood.getMonth()+1).padStart(2,'0')}-${String(nextGood.getDate()).padStart(2,'0')}`;
+  const label = nextGood.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  });
+  result.innerHTML =
+    `<p class="preview-error">No favourable days for ${htmlEsc(who)} in this range.
+         The next one is <strong>${label}</strong>:
+         <button class="read-more" style="color:var(--indigo);" onclick="tbExtendTo('${iso}')">extend the range to include it</button>,
+         or tick "show all days".</p>`;
+}
+
+function tbRenderSummary(goodDays, profiles, group: boolean, who: string): void {
+  const next = goodDays[0];
+  let summary = `<span class="count">${goodDays.length} of ${TB_DAYS.length}</span>&nbsp;days are favourable for ${htmlEsc(who)}`;
+  if (next) {
+    summary += ` · next: <span class="count">${next.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>`;
+  }
+  const share = goodDays.length
+    ? `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;" title="Share these good days on WhatsApp" aria-label="Share on WhatsApp" onclick="shareTarabalamOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`
+    : '';
+  const toggle = `<label class="tb-toggle"><input type="checkbox" id="tb-show-all" ${TB_SHOW_ALL ? 'checked' : ''} onchange="tbToggleShowAll()"> show all days</label>${share}`;
+  document.getElementById('tb-summary').innerHTML =
+    `<div class="tb-summary">${group ? '<span class="tb-star">✦</span>' : '🟢'} ${summary}${toggle}</div>`;
+}
+
+function renderTarabalam(profiles?) {
+  if (!TB_DAYS) return;
+  const participants = profiles || tbProfiles();
+  const group = participants.length > 1;
+  const who = group ? 'everyone' : participants[0]?.name || 'you';
+  TB_DAYS.forEach(row => { row.allGood = row.taras.every(tbPersonGood); });
+  selEl('tb-mode').value = TB_MODE;
+  const goodDays = TB_DAYS.filter(row => row.allGood);
+  tbRenderSummary(goodDays, participants, group, who);
+  const rows = TB_DAYS.filter(row => TB_SHOW_ALL || row.allGood);
+  if (!rows.length) {
+    tbRenderNoFavourableRows(participants, group, who);
+    return;
+  }
+  const head = `<tr><th>Date</th><th>Moon in</th><th>Tithi</th>${participants.map(tbTarabalamProfileHeader).join('')}${group ? '<th title="Auspicious for everyone selected">All ✦</th>' : ''}</tr>`;
+  const body = rows.map(row => tbTarabalamDesktopRow(row, participants)).join('');
+  const cards = rows.map(row => tbTarabalamMobileCard(row, participants)).join('');
+  const legend = tbTarabalamLegend(rows, group);
   document.getElementById('tb-result').innerHTML =
     `<div class="tb-table-wrap"><table class="tb-table">${head}${body}</table></div>` +
     `<div class="tb-cards">${cards}</div>${legend}`;
@@ -1713,6 +1758,712 @@ function muCurrentSearchFingerprint() {
   });
 }
 
+function muConfiguredDaylightPolicy(activity, data, rules) {
+  return activity === 'karnavedha'
+    ? evaluateConfiguredKarnavedhaDaylight(
+      data,
+      rules.require_single_daylight_tithi,
+      rules.require_single_daylight_nakshatra,
+    )
+    : null;
+}
+
+function muPrimaryDayDrop(
+  data,
+  rules,
+  activityLabel: string,
+  daylightPolicy,
+  lagnaCityData,
+  isoDate: string,
+) {
+  if (data.eclipse) {
+    const kind = data.eclipse.kind || 'Eclipse';
+    return {
+      eclipse: true,
+      entry: { date: isoDate, reason: `${kind} · auspicious activities deferred` },
+    };
+  }
+  if (daylightPolicy && !daylightPolicy.admissible) {
+    return {
+      eclipse: false,
+      entry: {
+        date: isoDate,
+        reason: karnavedhaDaylightDropReason(daylightPolicy),
+        daylightOutcomes: daylightPolicy.outcomes,
+      },
+    };
+  }
+  if (rules.skip_on_sankramana && data.special.some(
+      item => /Sankraman/i.test(item))) {
+    return {
+      eclipse: false,
+      entry: {
+        date: isoDate,
+        reason: `Sankramana · ${activityLabel} source profile avoids this day`,
+      },
+    };
+  }
+  const combustionReason = muCombustionDropReason(
+    lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null,
+    rules.skip_on_combust || [], activityLabel,
+  );
+  return combustionReason
+    ? { eclipse: false, entry: { date: isoDate, reason: combustionReason } }
+    : null;
+}
+
+function muCalendarDayDrop(data, rules, activityLabel: string, isoDate: string) {
+  const normalizedMaasam = (data.maasam || '').replace(/^(?:Nija|Adhika)\s+/, '');
+  const maasaSolarAdmitted = (rules.allowed_maasa_solar_pairs || []).some(pair =>
+    pair[0] === normalizedMaasam && pair[1] === data.solarSign);
+  if ((rules.allowed_maasams?.length || rules.allowed_maasa_solar_pairs?.length) &&
+      !rules.allowed_maasams?.includes(normalizedMaasam) && !maasaSolarAdmitted) {
+    return { date: isoDate,
+      reason: `${data.maasam} Maasa · ${activityLabel} source profile does not admit this lunar month` };
+  }
+  if (rules.allowed_varas?.length && !rules.allowed_varas.includes(data.vaaram)) {
+    return { date: isoDate,
+      reason: `${data.vaaram} · ${activityLabel} source profile does not admit this weekday` };
+  }
+  if (rules.allowed_pakshams?.length && !rules.allowed_pakshams.includes(data.paksham)) {
+    return { date: isoDate,
+      reason: `${data.paksham} Paksha · ${activityLabel} source profile does not admit this lunar fortnight` };
+  }
+  if ((rules.avoid_vara_paksha || []).some(pair =>
+    pair[0] === data.vaaram && pair[1] === data.paksham)) {
+    return { date: isoDate,
+      reason: `${data.vaaram} during ${data.paksham} Paksha · ${activityLabel} source profile rejects this combination` };
+  }
+  return null;
+}
+
+function muSolarDayDrop(data, rules, activityLabel: string, isoDate: string) {
+  const solarClass = data.solarSign ? muLagnaClassOf(data.solarSign) : null;
+  if (rules.allowed_solar_classes?.length &&
+      (!solarClass || !rules.allowed_solar_classes.includes(solarClass))) {
+    return { date: isoDate,
+      reason: `Surya in ${data.solarSign} (${solarClass}) · ${activityLabel} source profile does not admit this Rasi class` };
+  }
+  if (rules.allowed_solar_signs?.length &&
+      !rules.allowed_solar_signs.includes(data.solarSign)) {
+    return { date: isoDate,
+      reason: `Surya in ${data.solarSign} · ${activityLabel} source profile does not admit this solar Rasi` };
+  }
+  return null;
+}
+
+function muDayDrop(
+  data,
+  rules,
+  activityLabel: string,
+  daylightPolicy,
+  lagnaCityData,
+  isoDate: string,
+) {
+  const primary = muPrimaryDayDrop(
+    data, rules, activityLabel, daylightPolicy, lagnaCityData, isoDate,
+  );
+  if (primary) return primary;
+  const entry = muCalendarDayDrop(data, rules, activityLabel, isoDate)
+    || muSolarDayDrop(data, rules, activityLabel, isoDate);
+  return entry ? { eclipse: false, entry } : null;
+}
+
+function muBadWindows(data, avoidKaranaNames) {
+  const windows = data.inauspicious.map(
+    window => [muMin(window.start, window.sflag), muMin(window.end, window.eflag)],
+  );
+  if (avoidKaranaNames.size && data.karana) {
+    windows.push(...muAvoidKaranaWindows(data.karana, avoidKaranaNames));
+  }
+  return windows;
+}
+
+function muYogaDayDropReason(data, skipYogas, activityLabel: string): string | null {
+  for (const yoga of data.yogas) {
+    if (skipYogas.has(yoga)) {
+      return `${yoga} · ${activityLabel} traditionally avoids this day`;
+    }
+  }
+  if (skipYogas.size && data.yoga && MU_NITYA_HARD_AVOID.has(data.yoga.name)) {
+    return `${data.yoga.name} yoga · samskaras traditionally defer`;
+  }
+  return null;
+}
+
+function muChandraModeDayDropReason(data, people, chandraMode): string | null {
+  if (!people.length || chandraMode === 'stars' || !data.lunarSign) return null;
+  let hasAvoid = false;
+  let hasRemedial = false;
+  for (const person of people) {
+    if (!person.rasi) continue;
+    const chandra = chandraOf(person.rasi, data.lunarSign);
+    if (!chandra) continue;
+    if (!MU_CHANDRA_GOOD.has(chandra.pos) && !MU_CHANDRA_PUJA.has(chandra.pos)) {
+      hasAvoid = true;
+    } else if (MU_CHANDRA_PUJA.has(chandra.pos)) {
+      hasRemedial = true;
+    }
+  }
+  if (chandraMode === 'strict' && (hasAvoid || hasRemedial)) {
+    return 'chandra_mode=strict · Moon at sunrise fails for at least one person';
+  }
+  return chandraMode === 'puja_ok' && hasAvoid
+    ? 'chandra_mode=puja_ok · someone has Moon-avoid (4/8/12)'
+    : null;
+}
+
+function muNoSlotDayReason(data, skipYogas, activityLabel, people, chandraMode) {
+  return muYogaDayDropReason(data, skipYogas, activityLabel)
+    || muChandraModeDayDropReason(data, people, chandraMode);
+}
+
+function muRecordNoSlotDay(
+  slotsPerDay,
+  droppedDays,
+  isoDate: string,
+  data,
+  skipYogas,
+  activityLabel,
+  people,
+  chandraMode,
+): void {
+  if (slotsPerDay.has(isoDate)) return;
+  const reason = muNoSlotDayReason(
+    data, skipYogas, activityLabel, people, chandraMode,
+  );
+  if (reason) droppedDays.push({ date: isoDate, reason });
+}
+
+function muParticipantLabel(person, index: number): string {
+  return `#${index + 1} (${person.name || person.nak})`;
+}
+
+export function muScoreParticipantTarabalam(people, nakshatra) {
+  const favourable = [];
+  const unfavourable = [];
+  const unfavourableNames = [];
+  let score = 0;
+  people.forEach((person, index) => {
+    const tara = taroOf_safe(person.nak, nakshatra);
+    const label = muParticipantLabel(person, index);
+    if (TARA_GOOD.has(tara)) {
+      favourable.push(label);
+      score += 1;
+    } else {
+      unfavourable.push(`${label} ${TARA_NAMES[tara - 1]}`);
+      unfavourableNames.push(label);
+      score -= 1;
+    }
+  });
+  const reasons = [];
+  if (favourable.length) {
+    reasons.push(`Tarabalam favourable for ${favourable.join(', ')} (+${favourable.length})`);
+  }
+  if (unfavourable.length) {
+    reasons.push(`Tarabalam avoid for ${unfavourable.join(', ')} (-${unfavourable.length})`);
+  }
+  return { score, reasons, unfavourableNames };
+}
+
+function muParticipantChandraResult(person, index: number, lunarSign) {
+  if (!person.rasi) return null;
+  const chandra = chandraOf(person.rasi, lunarSign);
+  if (!chandra) return null;
+  const label = muParticipantLabel(person, index);
+  if (MU_CHANDRA_GOOD.has(chandra.pos)) return { kind: 'good', label, score: 1 };
+  if (MU_CHANDRA_PUJA.has(chandra.pos)) {
+    return { kind: 'puja', label, text: `${label} Moon@${chandra.pos}`, score: 0 };
+  }
+  const ashtama = chandra.pos === 8;
+  return {
+    kind: 'avoid', label, ashtama,
+    text: `${label}${ashtama ? ' Ashtama' : ''} Moon@${chandra.pos}`,
+    score: -1,
+  };
+}
+
+export function muScoreParticipantChandrabalam(people, lunarSign, chandraMode) {
+  const good = [];
+  const puja = [];
+  const avoid = [];
+  const avoidNames = [];
+  const pujaNames = [];
+  let hasAshtama = false;
+  let score = 0;
+  people.forEach((person, index) => {
+    const result = muParticipantChandraResult(person, index, lunarSign);
+    if (!result) return;
+    score += result.score;
+    if (result.kind === 'good') good.push(result.label);
+    if (result.kind === 'puja') {
+      puja.push(result.text);
+      pujaNames.push(result.label);
+    }
+    if (result.kind === 'avoid') {
+      avoid.push(result.text);
+      avoidNames.push(result.label);
+      hasAshtama ||= result.ashtama;
+    }
+  });
+  const reasons = [];
+  if (good.length) reasons.push(`Chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
+  if (puja.length) reasons.push(`Chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
+  if (avoid.length) reasons.push(`Chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
+  const drop = (
+    chandraMode === 'strict' && (puja.length > 0 || avoid.length > 0)
+  ) || (
+    chandraMode === 'puja_ok' && avoid.length > 0
+  );
+  return { score, reasons, avoidNames, pujaNames, hasAshtama, drop };
+}
+
+function muLagnaReferenceOutcome(
+  label: string,
+  reference,
+  slotLagna,
+  suffix: string,
+  includeNeutral: boolean,
+) {
+  if (!reference) return null;
+  const position = muLagnaPosition(reference, slotLagna);
+  if (position === 8) {
+    return { kind: 'ashtama', label, score: -1, text: `${label} lagna@8 from ${reference}${suffix}` };
+  }
+  if (position && muIsFavourableLagna(position)) {
+    return {
+      kind: 'favourable', label, score: 1,
+      text: `${label} ${muLagnaVerdict(position)}@${position} from ${reference}${suffix}`,
+    };
+  }
+  return includeNeutral && position
+    ? { kind: 'neutral', label, score: 0, text: `${label} ${muOrdinal(position)} from ${reference}${suffix}` }
+    : null;
+}
+
+export function muScoreParticipantLagna(people, slotLagna) {
+  const groups = {
+    favourableRashi: [], favourableLagna: [],
+    ashtamaRashi: [], ashtamaLagna: [],
+    neutralRashi: [], neutralLagna: [],
+  };
+  const ashtamaNames = [];
+  let score = 0;
+  people.forEach((person, index) => {
+    const label = muParticipantLabel(person, index);
+    const outcomes: Array<[
+      string,
+      ReturnType<typeof muLagnaReferenceOutcome>,
+    ]> = [
+      ['Rashi', muLagnaReferenceOutcome(label, person.rasi, slotLagna, '', !!person.lagna)],
+      ['Lagna', muLagnaReferenceOutcome(label, person.lagna, slotLagna, ' lagna', true)],
+    ];
+    for (const [source, outcome] of outcomes) {
+      if (!outcome) continue;
+      score += outcome.score;
+      groups[`${outcome.kind}${source}`].push(outcome.text);
+      if (outcome.kind === 'ashtama' && !ashtamaNames.includes(label)) {
+        ashtamaNames.push(label);
+      }
+    }
+  });
+  const reasons = [];
+  for (const [key, label] of [
+    ['favourableRashi', 'favourable'], ['favourableLagna', 'favourable'],
+    ['ashtamaRashi', 'Ashtama'], ['ashtamaLagna', 'Ashtama'],
+    ['neutralRashi', 'neutral'], ['neutralLagna', 'neutral'],
+  ]) {
+    const entries = groups[key];
+    if (!entries.length) continue;
+    const suffix = key.startsWith('ashtama')
+      ? ` (-${entries.length})`
+      : key.startsWith('neutral') ? ' (no effect)' : ` (+${entries.length})`;
+    reasons.push(`${slotLagna} lagna ${label} for ${entries.join(', ')}${suffix}`);
+  }
+  return { score, reasons, ashtamaNames };
+}
+
+export function muScoreActivityLagna(
+  slotLagna,
+  requiredLagnaClass,
+  allowedLagnas,
+  preferLagnas,
+  preferLagnaClass,
+  lagnaCityData,
+  activityLabel: string,
+) {
+  const reasons = [];
+  let score = 0;
+  if (requiredLagnaClass) {
+    const required = muLagnasInClass(requiredLagnaClass);
+    if (!slotLagna || !required?.has(slotLagna)) return null;
+    reasons.push(`${slotLagna} lagna satisfies required ${requiredLagnaClass} class`);
+  }
+  if (allowedLagnas.size) {
+    if (!slotLagna || !allowedLagnas.has(slotLagna)) return null;
+    reasons.push(`${slotLagna} lagna is admitted for ${activityLabel}`);
+  }
+  if (slotLagna && preferLagnas.has(slotLagna)) {
+    score += 1;
+    reasons.push(`${slotLagna} lagna specifically favoured for ${activityLabel} (+1)`);
+  }
+  if (preferLagnaClass && lagnaCityData) {
+    const favoured = muLagnasInClass(preferLagnaClass);
+    if (slotLagna && favoured?.has(slotLagna)) {
+      score += 1;
+      reasons.push(`${slotLagna} lagna (${preferLagnaClass}) favoured for ${activityLabel} (+1)`);
+    }
+  }
+  return { score, reasons };
+}
+
+function muScoreSlotTithi(
+  facts,
+  preferTithiClass,
+  activityLabel: string,
+  avoidTithiClasses,
+  preferTithiNumbers,
+) {
+  const result = muScoreTithiClass(
+    facts.tithi, preferTithiClass, activityLabel, facts.nakshatra,
+    facts.specialYogas, avoidTithiClasses,
+  );
+  const dayReasons = result.dayReason ? [result.dayReason] : [];
+  const activityReasons = result.activityReason ? [result.activityReason] : [];
+  let score = result.bonus;
+  const tithiNumber = activityTithiNumber(facts.tithi);
+  if (tithiNumber && preferTithiNumbers.has(tithiNumber)) {
+    score += 1;
+    activityReasons.push(`${facts.tithi} specifically favoured for ${activityLabel} (+1)`);
+  }
+  return { score, family: result.family, dayReasons, activityReasons };
+}
+
+function muScoreSpecialYogas(facts, skipYogas) {
+  let score = 0;
+  const reasons = [];
+  for (const yoga of facts.specialYogas) {
+    if (MU_YOGA_BONUS[yoga]) {
+      score += MU_YOGA_BONUS[yoga];
+      reasons.push(`${yoga} day (+${MU_YOGA_BONUS[yoga]})`);
+    }
+    if (MU_YOGA_PENALTY[yoga] === undefined) continue;
+    if (skipYogas.has(yoga)) return null;
+    score += MU_YOGA_PENALTY[yoga];
+    reasons.push(`${yoga} day (${MU_YOGA_PENALTY[yoga]})`);
+  }
+  return { score, reasons };
+}
+
+function muScoreNityaYoga(facts, data, skipYogas, avoidNityaYogas, startMinute: number) {
+  const yoga = facts.yoga;
+  if (avoidNityaYogas.has(yoga)) return null;
+  if (MU_NITYA_HARD_AVOID.has(yoga)) {
+    if (skipYogas.size) return null;
+    return { score: MU_NITYA_HARD_PENALTY, reason: `${yoga} yoga (${MU_NITYA_HARD_PENALTY})` };
+  }
+  if (MU_NITYA_PARTIAL_WINDOW_MIN[yoga] !== undefined && data.yoga) {
+    const windowMin = MU_NITYA_PARTIAL_WINDOW_MIN[yoga];
+    const yogaStartMin = yoga === data.yoga.name
+      ? muMin(data.yoga.start, data.yoga.sflag)
+      : muMin(data.yoga.end, data.yoga.eflag);
+    return startMinute - yogaStartMin <= windowMin
+      ? { score: MU_NITYA_PARTIAL_PENALTY, reason: `${yoga} yoga dosha-window (${MU_NITYA_PARTIAL_PENALTY})` }
+      : { score: 0, reason: null };
+  }
+  return MU_NITYA_AUSPICIOUS.has(yoga)
+    ? { score: MU_NITYA_AUSPICIOUS_BONUS, reason: `${yoga} yoga (+${MU_NITYA_AUSPICIOUS_BONUS})` }
+    : { score: 0, reason: null };
+}
+
+function muScoreSlotPreferences(options) {
+  const {
+    facts, varaReason, preferNakshatras, amrita, s0, e0,
+    preferChog, choghadiya, avoidKaranaNames, activityLabel,
+  } = options;
+  const slotReasons = [];
+  const activityReasons = [];
+  let score = 0;
+  if (varaReason) {
+    score += 1;
+    activityReasons.push(varaReason);
+  }
+  if (preferNakshatras.has(facts.nakshatra)) {
+    score += 1;
+    activityReasons.push(`${facts.nakshatra} specifically favoured for ${activityLabel} (+1)`);
+  }
+  if (amrita.some(window =>
+    s0 < muMin(window.end, window.eflag)
+    && muMin(window.start, window.sflag) < e0)) {
+    score += 2;
+    slotReasons.push('overlaps Amrita Kalam (+2)');
+  }
+  if (preferChog?.[0] === choghadiya.name) {
+    score += preferChog[1];
+    activityReasons.push(`${choghadiya.name} favoured for ${activityLabel} (+${preferChog[1]})`);
+  }
+  for (const karana of avoidKaranaNames) {
+    activityReasons.push(`${karana} karana avoided`);
+  }
+  return { score, slotReasons, activityReasons };
+}
+
+function muSlotDoctrinalNotes(options): { notes: string[]; siddhiYogas: string[] } {
+  const {
+    cautionLagnaSolar, lagnaCityData, slotLagna, solarSign,
+    specialYogas, taraUnfavNames, chandraAvoidNames, tithiFamily,
+  } = options;
+  const notes = [];
+  if (cautionLagnaSolar && lagnaCityData && slotLagna === solarSign) {
+    notes.push(`Source caution · ${slotLagna} Lagna is occupied by Surya; ` +
+      'Raman associates this with delay from hard rock.');
+  }
+  const siddhiYogas = specialYogas.filter(yoga =>
+    yoga === 'Sarvartha Siddhi Yoga' || yoga === 'Amrita Siddhi Yoga');
+  const hasPushkara = specialYogas.some(yoga =>
+    yoga === 'Dvipushkara Yoga' || yoga === 'Tripushkara Yoga');
+  if (siddhiYogas.length && taraUnfavNames.length) {
+    notes.push(`${siddhiYogas.join(' + ')} traditionally rectifies tara dosha ` +
+      `(Muhurta Chintamani) · ${taraUnfavNames.join(', ')} mitigated.`);
+  }
+  if (siddhiYogas.length && chandraAvoidNames.length) {
+    notes.push('Chandra dosha is not rectified by Siddhi yogas · ' +
+      `${chandraAvoidNames.join(', ')} remains a personal caution.`);
+  }
+  if (hasPushkara && tithiFamily === 'Rikta') {
+    notes.push(`Pushkara amplifies the day's nature; combined with Rikta tithi, ` +
+      'even small inauspicious factors magnify.');
+  }
+  return { notes, siddhiYogas };
+}
+
+function muPersonalDosha(options): string | null {
+  const {
+    chandraAvoidNames, hasAshtama, ashtamaLagnaNames,
+    chandraPujaNames, taraUnfavNames, siddhiYogas,
+  } = options;
+  if (chandraAvoidNames.length) {
+    return hasAshtama ? 'ashtama_chandra' : 'chandra_avoid';
+  }
+  if (ashtamaLagnaNames.length) return 'ashtama_lagna';
+  if (chandraPujaNames.length) return 'chandra_remedial';
+  return taraUnfavNames.length && !siddhiYogas.length ? 'tara_dosha' : null;
+}
+
+function muSlotDayDosha(options) {
+  const {
+    tithiFamily, facts, nityaYoga, system, effectiveChartRemainder,
+    rules, manualGuidance, personal,
+  } = options;
+  const computed = computeDayDosha({
+    tithiFamily,
+    isAmavasya: /Amavasya/i.test(facts.tithi),
+    hasYogaPenalty: facts.specialYogas.some(
+      yoga => MU_YOGA_PENALTY[yoga] !== undefined),
+    nityaHardAvoid: MU_NITYA_HARD_AVOID.has(nityaYoga),
+  });
+  const unresolvedSourcePrerequisite = (
+    system === 'drik' && effectiveChartRemainder !== null
+      ? effectiveChartRemainder.length > 0
+      : !!rules.manual_prerequisites || manualGuidance.chart.length > 0
+  );
+  return computed || (unresolvedSourcePrerequisite || personal.needsReview
+    ? 'practitioner_review'
+    : null);
+}
+
+function muDominantChoghadiya(choghadiya, startMinute: number, endMinute: number) {
+  let best = null;
+  let bestOverlap = 0;
+  const touched = [];
+  for (const block of choghadiya) {
+    const blockStart = muMin(block.start);
+    const blockEnd = muMin(block.end);
+    const overlap = Math.min(endMinute, blockEnd) - Math.max(startMinute, blockStart);
+    if (overlap <= 0) continue;
+    touched.push(block.name);
+    if (overlap > bestOverlap) {
+      best = block;
+      bestOverlap = overlap;
+    }
+  }
+  return {
+    block: best,
+    straddle: best ? touched.find(name => name !== best.name) || null : null,
+  };
+}
+
+function muSlotTimeFoundation(options) {
+  const {
+    mi, srMin, ssMin, muLen, rules, bad, data, abhijit,
+    chartLocation, isoDate, date, lagnaCityData, system, activity,
+  } = options;
+  const s0 = Math.round(srMin + mi * muLen);
+  const e0 = Math.round(srMin + (mi + 1) * muLen);
+  if (rules.forenoon_only && !muEndsBySolarNoon(e0, srMin, ssMin)) return null;
+  if (bad.some(([start, end]) => s0 < end && start < e0)) return null;
+  const dominant = muDominantChoghadiya(data.choghadiya, s0, e0);
+  if (!dominant.block) return null;
+  const slotStart = chartLocation
+    ? new Date(localWallTimeToInstant(isoDate, s0, chartLocation.timezone))
+    : new Date(date.getTime() + s0 * 60000);
+  const facts = muFactsAt(slotStart, data.vaaram);
+  const lagnaDay = lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null;
+  return {
+    s0,
+    e0,
+    dominant,
+    choghadiya: dominant.block,
+    base: MU_GOOD_CHOG[dominant.block.name] || 0,
+    muRow: MUHURTA_DAY[mi],
+    isAbhijit: mi === 7 && !!abhijit,
+    facts,
+    lagnaDay,
+    slotLagna: lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null,
+    personal: {
+      rejected: false,
+      needsReview: system !== 'drik' && !!roleForActivity(activity),
+      preferencePasses: 0,
+      evidence: system !== 'drik' && roleForActivity(activity)
+        ? ['Source-specific personal screening is currently limited to Drik/Lahiri.']
+        : [],
+      outcomes: [],
+      stable: true,
+    },
+  };
+}
+
+function muSlotElectionReasons(facts, rules, restrictions, data, people) {
+  let reasons = [];
+  if (rules.require_homa_election) {
+    const election = muHomaElection(facts);
+    if (!election.admitted) return null;
+    reasons = election.reasons;
+  }
+  if (restrictions.allowedNakshatras.size &&
+      !restrictions.allowedNakshatras.has(facts.nakshatra)) return null;
+  if (restrictions.avoidNakshatras.has(facts.nakshatra)) return null;
+  if (restrictions.avoidJanmaNakshatra && people.some(
+    person => muCanonicalNakshatra(person.nak) === facts.nakshatra)) return null;
+  const tithiNumber = activityTithiNumber(facts.tithi);
+  if (restrictions.allowedTithiNumbers.size &&
+      !restrictions.allowedTithiNumbers.has(tithiNumber)) return null;
+  if (restrictions.allowedTithiNames.size &&
+      !restrictions.allowedTithiNames.has(facts.tithi)) return null;
+  if (restrictions.avoidTithiNumbers.has(tithiNumber)) return null;
+  return restrictions.avoidVaraTithiNames.has(`${data.vaaram}|${facts.tithi}`)
+    ? null
+    : reasons;
+}
+
+function muInitialSlotScore(foundation, electionReasons) {
+  const { base, muRow, isAbhijit, dominant, choghadiya } = foundation;
+  const natureBonus = muNatureBonus(isAbhijit, muRow[2]);
+  const muLabel = muRow[0] + (isAbhijit ? ' (Abhijit)' : '');
+  const muDeity = muRow[1] ? ` · ${muRow[1]}` : '';
+  const chogDescription = `${choghadiya.name} choghadiya${
+    dominant.straddle ? ` (spans ${dominant.straddle})` : ''}`;
+  const chogLine = base ? `${chogDescription} (+${base})` : chogDescription;
+  return {
+    score: base + natureBonus,
+    slotQuality: [
+      `${muLabel} muhurta${muDeity} · ${muRow[2]} (${natureBonus >= 0 ? '+' : ''}${natureBonus})`,
+      chogLine,
+    ],
+    dayQuality: [],
+    groupFit: [],
+    activityMatch: [...electionReasons],
+  };
+}
+
+function muActivityNeedsLagna(activity: string, rules): boolean {
+  return Boolean(
+    rules.prefer_lagna_class
+    || rules.required_lagna_class
+    || rules.allowed_lagnas?.length
+    || rules.skip_on_combust?.length
+    || automatedRulesFor(activity).length
+  );
+}
+
+function muRankCandidateSlots(slots): void {
+  muAssignTiers(slots);
+  slots.sort((a, b) => MU_TIER_NAMES.indexOf(b.tier) - MU_TIER_NAMES.indexOf(a.tier)
+    || b.score - a.score
+    || (b.personalPreferencePasses || 0) - (a.personalPreferencePasses || 0)
+    || (Number(!!a.personalDosha) - Number(!!b.personalDosha))
+    || a.d - b.d
+    || a.s0 - b.s0);
+}
+
+function muSearchIsStale(searchSequence: number, fingerprint: string, box): boolean {
+  if (searchSequence !== MU_SEARCH_SEQUENCE) return true;
+  if (fingerprint === muCurrentSearchFingerprint()) return false;
+  box.setAttribute('aria-busy', 'false');
+  muSetResultMessage(box, 'Search inputs changed · find slots again.');
+  return true;
+}
+
+function muSetShortlistProgress(box, slots): void {
+  if (!slots.length) return;
+  if (electionChartCalculationEnabled()) {
+    muSetResultMessage(box, 'Shortlist ready · screening exact election charts…');
+    return;
+  }
+  muSetResultMessage(
+    box,
+    'Shortlist ready · exact chart screening is not active in this build.',
+  );
+}
+
+function muUnavailableChartEnrichment(slots) {
+  return {
+    state: 'unavailable',
+    slots: slots.slice(0, 10).map(slot => ({
+      ...slot,
+      tier: slot.tier === 'Excellent' ? 'Good' : slot.tier,
+      dayDosha: slot.dayDosha || 'practitioner_review',
+    })),
+    screenedCount: 0,
+    removedCount: 0,
+    candidateLimitReached: false,
+    chartRemovedCount: 0,
+    chartRemovedRules: [],
+    personalRemovedCount: 0,
+    personalRemovedRules: [],
+    boundaryReviewCount: 0,
+    qualificationCappedCount: 0,
+    reviewGatedCount: slots.length,
+    overlappingDispositionCount: 0,
+    message: 'Panchangam-ranked; exact chart screening is unavailable for this city.',
+    engine: null,
+  };
+}
+
+async function muEnrichCandidateSlots(options) {
+  const {
+    slots, activity, system, city, roleProfile,
+    lagnaCityData, signal,
+  } = options;
+  const location = CITY_LOCATIONS[city];
+  if (!location) return muUnavailableChartEnrichment(slots);
+  return enrichElectionChartSlots(slots, {
+    activity,
+    system,
+    location,
+    personalParticipant: roleProfile ? {
+      id: roleProfile.id,
+      name: roleProfile.name,
+      nakshatra: roleProfile.nak || null,
+      janmaRashi: roleProfile.rasi || null,
+      janmaLagna: roleProfile.lagna || null,
+    } : null,
+    boundarySupportAvailable: !!lagnaCityData
+      && slots.every(slot => slot.chartBoundarySupported === true),
+    signal,
+  });
+}
+
 async function findMuhurta() {
   const searchSequence = ++MU_SEARCH_SEQUENCE;
   MU_CHART_ABORT?.abort();
@@ -1751,10 +2502,7 @@ async function findMuhurta() {
     // activity has a preferred lagna class (Sthira/Chara/...).
     // Cached per session, shared with the day-card's lagna ribbon.
     const activityRules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
-    const activityNeedsLagna = !!(
-      activityRules.prefer_lagna_class || activityRules.required_lagna_class ||
-      activityRules.allowed_lagnas?.length || activityRules.skip_on_combust?.length ||
-      automatedRulesFor(activity).length);
+    const activityNeedsLagna = muActivityNeedsLagna(activity, activityRules);
     const lagnaCityData = (people.length || activityNeedsLagna)
       ? await loadLagna(city) : null;
     const slots = [];
@@ -1763,20 +2511,9 @@ async function findMuhurta() {
     let droppedModeSlots = 0;
     const droppedDays = [];
     const slotsPerDay = new Map();   // YYYY-MM-DD → count
-    for (let i = 0; i < nDays; i++) {
-      const d = new Date(from); d.setDate(d.getDate() + i);
-      const ev = events.get(stampOf(d));
-      if (!ev) continue;
+    const processDay = (d, ev): void => {
       const data = parseDescription(ev.description);
       const isoDate = stampOf(d).replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
-
-      // Eclipse: auspicious activities are deferred outright.
-      if (data.eclipse) {
-        droppedEclipseDays++;
-        const kind = data.eclipse.kind || 'Eclipse';
-        droppedDays.push({ date: isoDate, reason: `${kind} · auspicious activities deferred` });
-        continue;
-      }
 
       const rules = MU_ACTIVITY[activity] || MU_ACTIVITY.any;
       const skipYogas = new Set(rules.skip_on_yoga || []);
@@ -1816,74 +2553,14 @@ async function findMuhurta() {
         ? [MU_PARTIAL_ASSESSOR_DISCLOSURE]
         : chartManualRemainder;
       const activityLabel = rules.label;
-      const daylightPolicy = activity === 'karnavedha'
-        ? evaluateConfiguredKarnavedhaDaylight(
-          data,
-          rules.require_single_daylight_tithi,
-          rules.require_single_daylight_nakshatra,
-        )
-        : null;
-      if (daylightPolicy && !daylightPolicy.admissible) {
-        droppedDays.push({
-          date: isoDate,
-          reason: karnavedhaDaylightDropReason(daylightPolicy),
-          daylightOutcomes: daylightPolicy.outcomes,
-        });
-        continue;
-      }
-      if (rules.skip_on_sankramana && data.special.some(
-          item => /Sankraman/i.test(item))) {
-        droppedDays.push({
-          date: isoDate,
-          reason: `Sankramana · ${activityLabel} source profile avoids this day`,
-        });
-        continue;
-      }
-      const combustionReason = muCombustionDropReason(
-        lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null,
-        rules.skip_on_combust || [], activityLabel);
-      if (combustionReason) {
-        droppedDays.push({ date: isoDate, reason: combustionReason });
-        continue;
-      }
-
-      const normalizedMaasam = (data.maasam || '').replace(/^(?:Nija|Adhika)\s+/, '');
-      const maasaSolarAdmitted = (rules.allowed_maasa_solar_pairs || []).some(pair =>
-        pair[0] === normalizedMaasam && pair[1] === data.solarSign);
-      if ((rules.allowed_maasams?.length || rules.allowed_maasa_solar_pairs?.length) &&
-          !rules.allowed_maasams?.includes(normalizedMaasam) && !maasaSolarAdmitted) {
-        droppedDays.push({ date: isoDate,
-          reason: `${data.maasam} Maasa · ${activityLabel} source profile does not admit this lunar month` });
-        continue;
-      }
-      if (rules.allowed_varas?.length && !rules.allowed_varas.includes(data.vaaram)) {
-        droppedDays.push({ date: isoDate,
-          reason: `${data.vaaram} · ${activityLabel} source profile does not admit this weekday` });
-        continue;
-      }
-      if (rules.allowed_pakshams?.length && !rules.allowed_pakshams.includes(data.paksham)) {
-        droppedDays.push({ date: isoDate,
-          reason: `${data.paksham} Paksha · ${activityLabel} source profile does not admit this lunar fortnight` });
-        continue;
-      }
-      if ((rules.avoid_vara_paksha || []).some(pair =>
-        pair[0] === data.vaaram && pair[1] === data.paksham)) {
-        droppedDays.push({ date: isoDate,
-          reason: `${data.vaaram} during ${data.paksham} Paksha · ${activityLabel} source profile rejects this combination` });
-        continue;
-      }
-      const solarClass = data.solarSign ? muLagnaClassOf(data.solarSign) : null;
-      if (rules.allowed_solar_classes?.length &&
-          (!solarClass || !rules.allowed_solar_classes.includes(solarClass))) {
-        droppedDays.push({ date: isoDate,
-          reason: `Surya in ${data.solarSign} (${solarClass}) · ${activityLabel} source profile does not admit this Rasi class` });
-        continue;
-      }
-      if (rules.allowed_solar_signs?.length &&
-          !rules.allowed_solar_signs.includes(data.solarSign)) {
-        droppedDays.push({ date: isoDate,
-          reason: `Surya in ${data.solarSign} · ${activityLabel} source profile does not admit this solar Rasi` });
-        continue;
+      const daylightPolicy = muConfiguredDaylightPolicy(activity, data, rules);
+      const dayDrop = muDayDrop(
+        data, rules, activityLabel, daylightPolicy, lagnaCityData, isoDate,
+      );
+      if (dayDrop) {
+        if (dayDrop.eclipse) droppedEclipseDays++;
+        droppedDays.push(dayDrop.entry);
+        return;
       }
 
       // Vara is sunrise-anchored — compute once per day.
@@ -1891,10 +2568,7 @@ async function findMuhurta() {
       const varaReason = varaBonus
         ? `${data.vaaram} favoured for ${activityLabel} (+1)` : null;
 
-      const bad = data.inauspicious.map(w => [muMin(w.start, w.sflag), muMin(w.end, w.eflag)]);
-      if (avoidKaranaNames.size && data.karana) {
-        bad.push(...muAvoidKaranaWindows(data.karana, avoidKaranaNames));
-      }
+      const bad = muBadWindows(data, avoidKaranaNames);
       const abhijit = data.auspicious.find(w => w.name === 'Abhijit Muhurta');
       const amrita = data.auspicious.filter(w => w.name === 'Amrita Kalam');
 
@@ -1929,329 +2603,108 @@ async function findMuhurta() {
       const srMin = muMin(data.sunrise);
       const ssMin = muMin(data.sunset);
       const muLen = (ssMin - srMin) / 15;
-      // Dominant choghadiya by overlap — a scoring attribute, not a gate;
-      // straddle disclosed. Mirrors Python _dominant_choghadiya.
-      const dominantChog = (s, e) => {
-        let best = null, bestOv = 0; const touched = [];
-        for (const blk of data.choghadiya) {
-          const bs = muMin(blk.start), be = muMin(blk.end);
-          const ov = Math.min(e, be) - Math.max(s, bs);
-          if (ov > 0) { touched.push(blk.name); if (ov > bestOv) { best = blk; bestOv = ov; } }
-        }
-        return { block: best, straddle: best ? (touched.find(n => n !== best.name) || null) : null };
-      };
       // Iterate the 15 named daytime muhurtas (sunrise->sunset /15). Mirrors
       // Python day_slots: exclude a muhurta overlapping any inauspicious
       // window, else score it by nature + dominant choghadiya + all factors.
-      for (let mi = 0; mi < 15; mi++) {
-          // Round muhurta bounds to whole minutes (display + integer-minute
-          // math); contiguous because both edges round the same expression.
-          const s0 = Math.round(srMin + mi * muLen);
-          const e0 = Math.round(srMin + (mi + 1) * muLen);
-          if (rules.forenoon_only && !muEndsBySolarNoon(e0, srMin, ssMin)) continue;
-          if (bad.some(([b0, b1]) => s0 < b1 && b0 < e0)) continue;  // decision 1
-          const dom = dominantChog(s0, e0);
-          const c = dom.block;
-          if (!c) continue;
-          const base = MU_GOOD_CHOG[c.name] || 0;
-          const muRow = MUHURTA_DAY[mi];
-          const isAbhijit = mi === 7 && !!abhijit;   // no Abhijit on Wednesday (feed omits it)
-          const natureBonus = muNatureBonus(isAbhijit, muRow[2]);
-
-          // Convert the displayed city-local wall time to an exact instant
-          // before evaluating slot facts. Using the browser's own timezone
-          // here would shift international-city personal rules by hours.
-          const slotStart = chartLocation
-            ? new Date(localWallTimeToInstant(isoDate, s0, chartLocation.timezone))
-            : new Date(d.getTime() + s0 * 60000);
-          const facts = muFactsAt(slotStart, data.vaaram);
-          const lagnaDay = lagnaCityData ? lagnaDayFor(lagnaCityData, isoDate) : null;
-          const slotLagna = lagnaDay ? muLagnaAtMin(lagnaDay, s0) : null;
-          // Keep the existing generic participant scoring intact while the
-          // shortlist is built. Source-specific personal rules are evaluated
-          // later from the same exact DashaFlow snapshots as the chart rules;
-          // approximate browser Moon/Lagna facts never reject or prefer here.
-          const personal = {
-            rejected: false,
-            needsReview: system !== 'drik' && !!roleForActivity(activity),
-            preferencePasses: 0,
-            evidence: system !== 'drik' && roleForActivity(activity)
-              ? ['Source-specific personal screening is currently limited to Drik/Lahiri.']
-              : [],
-            outcomes: [],
-            stable: true,
-          };
-          let electionReasons = [];
-          if (rules.require_homa_election) {
-            const election = muHomaElection(facts);
-            if (!election.admitted) continue;
-            electionReasons = election.reasons;
-          }
-          if (allowedNakshatras.size && !allowedNakshatras.has(facts.nakshatra)) continue;
-          if (avoidNakshatras.has(facts.nakshatra)) continue;
-          if (avoidJanmaNakshatra && people.some(
-              person => muCanonicalNakshatra(person.nak) === facts.nakshatra)) continue;
-          if (allowedTithiNumbers.size &&
-              !allowedTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
-          if (allowedTithiNames.size && !allowedTithiNames.has(facts.tithi)) continue;
-          if (avoidTithiNumbers.has(activityTithiNumber(facts.tithi))) continue;
-          if (avoidVaraTithiNames.has(`${data.vaaram}|${facts.tithi}`)) continue;
+      const processSlot = (mi: number): void => {
+          const foundation = muSlotTimeFoundation({
+            mi, srMin, ssMin, muLen, rules, bad, data, abhijit,
+            chartLocation, isoDate, date: d, lagnaCityData, system, activity,
+          });
+          if (!foundation) return;
+          const {
+            s0, e0, facts, lagnaDay, slotLagna, personal,
+            choghadiya: c,
+          } = foundation;
+          const electionReasons = muSlotElectionReasons(
+            facts,
+            rules,
+            {
+              allowedNakshatras, avoidNakshatras, avoidJanmaNakshatra,
+              allowedTithiNumbers, allowedTithiNames,
+              avoidTithiNumbers, avoidVaraTithiNames,
+            },
+            data,
+            people,
+          );
+          if (!electionReasons) return;
 
           // Build reason groups as we score — slot_quality, day_quality,
           // group_fit, activity_match, notes — mirroring Python's
           // day_slots() reason_groups field.
-          let score = base + natureBonus;
-          const muLabel = muRow[0] + (isAbhijit ? ' (Abhijit)' : '');
-          const muDeity = muRow[1] ? ` · ${muRow[1]}` : '';
-          let chogDesc = `${c.name} choghadiya`;
-          if (dom.straddle) chogDesc += ` (spans ${dom.straddle})`;
-          const chogLine = base ? `${chogDesc} (+${base})` : chogDesc;
-          // Middot separators (no em-dash); no "clear of inauspicious
-          // windows" line — every surviving muhurta is clear by construction.
-          const slotQuality = [
-            `${muLabel} muhurta${muDeity} · ${muRow[2]} (${natureBonus >= 0 ? '+' : ''}${natureBonus})`,
-            chogLine];
-          const dayQuality = [];
-          const groupFit = [];
-          const activityMatch = [...electionReasons];
-          const taraUnfavNames = [];
-          const chandraAvoidNames = [];
-          const chandraPujaNames = [];
-          let hasAshtama = false;
+          const initial = muInitialSlotScore(foundation, electionReasons);
+          let { score } = initial;
+          const { slotQuality, dayQuality, groupFit, activityMatch } = initial;
+          const tarabalam = muScoreParticipantTarabalam(people, facts.nakshatra);
+          score += tarabalam.score;
+          groupFit.push(...tarabalam.reasons);
+          const taraUnfavNames = tarabalam.unfavourableNames;
 
-          // Tarabalam — slot-time nakshatra (per-person)
-          if (people.length) {
-            const fav = [], unfav = [];
-            for (let pi = 0; pi < people.length; pi++) {
-              const pr = people[pi];
-              const t = taroOf_safe(pr.nak, facts.nakshatra);
-              const label = `#${pi + 1} (${pr.name || pr.nak})`;
-              if (TARA_GOOD.has(t)) { fav.push(label); score += 1; }
-              else { unfav.push(`${label} ${TARA_NAMES[t - 1]}`); taraUnfavNames.push(label); score -= 1; }
-            }
-            if (fav.length) groupFit.push(`Tarabalam favourable for ${fav.join(', ')} (+${fav.length})`);
-            if (unfav.length) groupFit.push(`Tarabalam avoid for ${unfav.join(', ')} (-${unfav.length})`);
-          }
+          const chandrabalam = muScoreParticipantChandrabalam(
+            people, facts.lunarSign, chandraMode,
+          );
+          score += chandrabalam.score;
+          groupFit.push(...chandrabalam.reasons);
+          const chandraAvoidNames = chandrabalam.avoidNames;
+          const chandraPujaNames = chandrabalam.pujaNames;
+          const hasAshtama = chandrabalam.hasAshtama;
+          if (chandrabalam.drop) { droppedModeSlots++; return; }
 
-          // Chandrabalam — slot-time moon rashi (per-person + mode filter)
-          let dropSlot = false;
-          if (people.length) {
-            const good = [], puja = [], avoid = [];
-            for (let pi = 0; pi < people.length; pi++) {
-              const pr = people[pi];
-              if (!pr.rasi) continue;
-              const c2 = chandraOf(pr.rasi, facts.lunarSign);
-              if (!c2) continue;
-              const pos = c2.pos;
-              const label = `#${pi + 1} (${pr.name || pr.nak})`;
-              if (MU_CHANDRA_GOOD.has(pos)) { good.push(label); score += 1; }
-              else if (MU_CHANDRA_PUJA.has(pos)) { puja.push(`${label} Moon@${pos}`); chandraPujaNames.push(label); }
-              else {
-                const ashtama = pos === 8 ? ' Ashtama' : '';
-                if (pos === 8) hasAshtama = true;
-                avoid.push(`${label}${ashtama} Moon@${pos}`); chandraAvoidNames.push(label); score -= 1;
-              }
-            }
-            if (good.length) groupFit.push(`Chandrabalam favourable for ${good.join(', ')} (+${good.length})`);
-            if (puja.length) groupFit.push(`Chandrabalam remedial for ${puja.join(', ')} (puja recommended)`);
-            if (avoid.length) groupFit.push(`Chandrabalam avoid for ${avoid.join(', ')} (-${avoid.length})`);
+          const lagnaScore = people.length && lagnaCityData && slotLagna
+            ? muScoreParticipantLagna(people, slotLagna)
+            : { score: 0, reasons: [], ashtamaNames: [] };
+          score += lagnaScore.score;
+          groupFit.push(...lagnaScore.reasons);
+          const ashtamaLagnaNames = lagnaScore.ashtamaNames;
 
-            dropSlot = (
-              chandraMode === 'strict' && (puja.length > 0 || avoid.length > 0)
-            ) || (
-              chandraMode === 'puja_ok' && avoid.length > 0
-            );
-          }
-          if (dropSlot) { droppedModeSlots++; continue; }
-
-          // Lagna position vs janma rashi — kendra/trikona favour,
-          // Ashtama is the rising-sign-axis personal dosha. Mirrors
-          // telugu_panchangam/personal/muhurta._score_lagna. Only
-          // runs when lagna data was loaded (people.length > 0).
-          const ashtamaLagnaNames = [];
-          if (people.length && lagnaCityData) {
-            if (slotLagna) {
-              // Two independent checks per person. Both run when both
-              // references are set; each contributes its own +1/-1.
-              // When the user opted into Lagna Shuddhi (provided lagna
-              // too), we ALSO emit neutral chips so both lenses always
-              // appear — no asymmetric silences across slots.
-              const favRashi = [], ashRashi = [], neutRashi = [];
-              const favLagna = [], ashLagna = [], neutLagna = [];
-              const recordAshtama = (label) => {
-                if (!ashtamaLagnaNames.includes(label)) ashtamaLagnaNames.push(label);
-              };
-              for (let pi = 0; pi < people.length; pi++) {
-                const pr = people[pi];
-                const label = `#${pi + 1} (${pr.name || pr.nak})`;
-                const hasLagna = !!pr.lagna;
-                // Always: from janma rashi (Chandra-Rashi-as-lagna).
-                if (pr.rasi) {
-                  const pos = muLagnaPosition(pr.rasi, slotLagna);
-                  if (pos === 8) {
-                    ashRashi.push(`${label} lagna@8 from ${pr.rasi}`);
-                    recordAshtama(label);
-                    score -= 1;
-                  } else if (pos && muIsFavourableLagna(pos)) {
-                    favRashi.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.rasi}`);
-                    score += 1;
-                  } else if (hasLagna && pos) {
-                    // Symmetry chip — opt-in via janma_lagna.
-                    neutRashi.push(`${label} ${muOrdinal(pos)} from ${pr.rasi}`);
-                  }
-                }
-                // Additionally: from janma lagna (strict Lagna Shuddhi).
-                if (hasLagna) {
-                  const pos = muLagnaPosition(pr.lagna, slotLagna);
-                  if (pos === 8) {
-                    ashLagna.push(`${label} lagna@8 from ${pr.lagna} lagna`);
-                    recordAshtama(label);
-                    score -= 1;
-                  } else if (pos && muIsFavourableLagna(pos)) {
-                    favLagna.push(`${label} ${muLagnaVerdict(pos)}@${pos} from ${pr.lagna} lagna`);
-                    score += 1;
-                  } else if (pos) {
-                    neutLagna.push(`${label} ${muOrdinal(pos)} from ${pr.lagna} lagna`);
-                  }
-                }
-              }
-              if (favRashi.length) groupFit.push(
-                `${slotLagna} lagna favourable for ${favRashi.join(', ')} (+${favRashi.length})`);
-              if (favLagna.length) groupFit.push(
-                `${slotLagna} lagna favourable for ${favLagna.join(', ')} (+${favLagna.length})`);
-              if (ashRashi.length) groupFit.push(
-                `${slotLagna} lagna Ashtama for ${ashRashi.join(', ')} (-${ashRashi.length})`);
-              if (ashLagna.length) groupFit.push(
-                `${slotLagna} lagna Ashtama for ${ashLagna.join(', ')} (-${ashLagna.length})`);
-              if (neutRashi.length) groupFit.push(
-                `${slotLagna} lagna neutral for ${neutRashi.join(', ')} (no effect)`);
-              if (neutLagna.length) groupFit.push(
-                `${slotLagna} lagna neutral for ${neutLagna.join(', ')} (no effect)`);
-            }
-          }
-
-          if (requiredLagnaClass) {
-            const required = muLagnasInClass(requiredLagnaClass);
-            if (!slotLagna || !required?.has(slotLagna)) continue;
-            activityMatch.push(
-              `${slotLagna} lagna satisfies required ${requiredLagnaClass} class`);
-          }
-          if (allowedLagnas.size) {
-            if (!slotLagna || !allowedLagnas.has(slotLagna)) continue;
-            activityMatch.push(`${slotLagna} lagna is admitted for ${activityLabel}`);
-          }
-          if (preferLagnas.size) {
-            if (slotLagna && preferLagnas.has(slotLagna)) {
-              score += 1;
-              activityMatch.push(
-                `${slotLagna} lagna specifically favoured for ${activityLabel} (+1)`);
-            }
-          }
-
-          // Activity-class lagna preference (Muhurta Chintamani):
-          // independent of any personal kendra/trikona check —
-          // this is about the activity's nature (wedding wants
-          // Sthira, travel wants Chara, learning rites want
-          // Dvisvabhava). Mirrors _score_lagna_activity in Python.
-          if (preferLagnaClass && lagnaCityData) {
-            const favoured = muLagnasInClass(preferLagnaClass);
-            if (slotLagna && favoured?.has(slotLagna)) {
-              score += 1;
-              activityMatch.push(
-                `${slotLagna} lagna (${preferLagnaClass}) favoured for ${activityLabel} (+1)`);
-            }
-          }
+          const activityLagna = muScoreActivityLagna(
+            slotLagna, requiredLagnaClass, allowedLagnas, preferLagnas,
+            preferLagnaClass, lagnaCityData, activityLabel,
+          );
+          if (!activityLagna) return;
+          score += activityLagna.score;
+          activityMatch.push(...activityLagna.reasons);
 
           // Tithi family — slot-time tithi (Rikta → day_quality penalty;
           // activity class match → activity_match bonus)
-          const tithiScore = muScoreTithiClass(
-            facts.tithi, preferTithiClass, activityLabel, facts.nakshatra,
-            facts.specialYogas, avoidTithiClasses);
+          const tithiScore = muScoreSlotTithi(
+            facts, preferTithiClass, activityLabel,
+            avoidTithiClasses, preferTithiNumbers,
+          );
           const tFam = tithiScore.family;
-          score += tithiScore.bonus;
-          if (tithiScore.dayReason) dayQuality.push(tithiScore.dayReason);
-          if (tithiScore.activityReason) activityMatch.push(tithiScore.activityReason);
-          const activeTithiNumber = activityTithiNumber(facts.tithi);
-          if (activeTithiNumber && preferTithiNumbers.has(activeTithiNumber)) {
-            score += 1;
-            activityMatch.push(
-              `${facts.tithi} specifically favoured for ${activityLabel} (+1)`);
-          }
+          score += tithiScore.score;
+          dayQuality.push(...tithiScore.dayReasons);
+          activityMatch.push(...tithiScore.activityReasons);
 
           // Special yogas — slot-time
-          let yogaSkip = false;
-          for (const y of facts.specialYogas) {
-            if (MU_YOGA_BONUS[y]) { score += MU_YOGA_BONUS[y]; dayQuality.push(`${y} day (+${MU_YOGA_BONUS[y]})`); }
-            if (MU_YOGA_PENALTY[y] !== undefined) {
-              if (skipYogas.has(y)) { yogaSkip = true; break; }
-              score += MU_YOGA_PENALTY[y]; dayQuality.push(`${y} day (${MU_YOGA_PENALTY[y]})`);
-            }
-          }
-          if (yogaSkip) continue;
+          const specialYogaScore = muScoreSpecialYogas(facts, skipYogas);
+          if (!specialYogaScore) return;
+          score += specialYogaScore.score;
+          dayQuality.push(...specialYogaScore.reasons);
 
           // Nitya yoga — slot-time (samskara skip on Vyatipata/Vaidhriti)
           const ny = facts.yoga;
-          if (avoidNityaYogas.has(ny)) continue;
-          if (MU_NITYA_HARD_AVOID.has(ny)) {
-            if (skipYogas.size) { continue; }
-            score += MU_NITYA_HARD_PENALTY;
-            dayQuality.push(`${ny} yoga (${MU_NITYA_HARD_PENALTY})`);
-          } else if (MU_NITYA_PARTIAL_WINDOW_MIN[ny] !== undefined && data.yoga) {
-            const windowMin = MU_NITYA_PARTIAL_WINDOW_MIN[ny];
-            const yogaStartMin = (ny === data.yoga.name)
-              ? muMin(data.yoga.start, data.yoga.sflag)
-              : muMin(data.yoga.end, data.yoga.eflag);
-            if (s0 - yogaStartMin <= windowMin) {
-              score += MU_NITYA_PARTIAL_PENALTY;
-              dayQuality.push(`${ny} yoga dosha-window (${MU_NITYA_PARTIAL_PENALTY})`);
-            }
-          } else if (MU_NITYA_AUSPICIOUS.has(ny)) {
-            score += MU_NITYA_AUSPICIOUS_BONUS;
-            dayQuality.push(`${ny} yoga (+${MU_NITYA_AUSPICIOUS_BONUS})`);
-          }
+          const nityaYogaScore = muScoreNityaYoga(
+            facts, data, skipYogas, avoidNityaYogas, s0,
+          );
+          if (!nityaYogaScore) return;
+          score += nityaYogaScore.score;
+          if (nityaYogaScore.reason) dayQuality.push(nityaYogaScore.reason);
 
-          // Vara — activity_match (day-level)
-          if (varaReason) { score += 1; activityMatch.push(varaReason); }
-          if (preferNakshatras.has(facts.nakshatra)) {
-            score += 1;
-            activityMatch.push(`${facts.nakshatra} specifically favoured for ${activityLabel} (+1)`);
-          }
-
-          // Slot-overlap bonuses → slot_quality (Abhijit is now scored as
-          // the 8th muhurta's nature above).
-          if (amrita.some(a => s0 < muMin(a.end, a.eflag) && muMin(a.start, a.sflag) < e0)) {
-            score += 2; slotQuality.push('overlaps Amrita Kalam (+2)');
-          }
-          if (preferChog?.[0] === c.name) {
-            score += preferChog[1];
-            activityMatch.push(`${c.name} favoured for ${activityLabel} (+${preferChog[1]})`);
-          }
-          for (const kn of avoidKaranaNames) activityMatch.push(`${kn} karana avoided`);
+          const preferenceScore = muScoreSlotPreferences({
+            facts, varaReason, preferNakshatras, amrita, s0, e0,
+            preferChog, choghadiya: c, avoidKaranaNames, activityLabel,
+          });
+          score += preferenceScore.score;
+          slotQuality.push(...preferenceScore.slotReasons);
+          activityMatch.push(...preferenceScore.activityReasons);
 
           // Doctrinal notes — explanatory, no score effect
-          const notes = [];
-          if (cautionLagnaSolar && lagnaCityData) {
-            if (slotLagna && slotLagna === data.solarSign) {
-              notes.push(`Source caution · ${slotLagna} Lagna is occupied by Surya; ` +
-                         `Raman associates this with delay from hard rock.`);
-            }
-          }
-          const siddhiYogas = facts.specialYogas.filter(y =>
-            y === 'Sarvartha Siddhi Yoga' || y === 'Amrita Siddhi Yoga');
-          const hasPushkara = facts.specialYogas.some(y =>
-            y === 'Dvipushkara Yoga' || y === 'Tripushkara Yoga');
-          if (siddhiYogas.length && taraUnfavNames.length) {
-            notes.push(`${siddhiYogas.join(' + ')} traditionally rectifies tara dosha ` +
-                       `(Muhurta Chintamani) · ${taraUnfavNames.join(', ')} mitigated.`);
-          }
-          if (siddhiYogas.length && chandraAvoidNames.length) {
-            notes.push(`Chandra dosha is not rectified by Siddhi yogas · ` +
-                       `${chandraAvoidNames.join(', ')} remains a personal caution.`);
-          }
-          if (hasPushkara && tFam === 'Rikta') {
-            notes.push(`Pushkara amplifies the day's nature; combined with Rikta tithi, ` +
-                       `even small inauspicious factors magnify.`);
-          }
+          const { notes, siddhiYogas } = muSlotDoctrinalNotes({
+            cautionLagnaSolar, lagnaCityData, slotLagna,
+            solarSign: data.solarSign, specialYogas: facts.specialYogas,
+            taraUnfavNames, chandraAvoidNames, tithiFamily: tFam,
+          });
 
           const reasonGroups = {
             slot_quality: slotQuality, day_quality: dayQuality,
@@ -2270,32 +2723,18 @@ async function findMuhurta() {
           // Personal (chandra) dosha is never fully rectified by
           // group-level yogas — cap the tier below Excellent and flag
           // it so equally-scored clean slots sort first.
-          let personalDosha = null;
-          if (chandraAvoidNames.length) personalDosha = hasAshtama ? 'ashtama_chandra' : 'chandra_avoid';
-          else if (ashtamaLagnaNames.length) personalDosha = 'ashtama_lagna';
-          else if (chandraPujaNames.length) personalDosha = 'chandra_remedial';
-          // tara_dosha: unrectified by Sarvartha/Amrita Siddhi. Last
-          // in the cascade — matches the Python order in muhurta.py.
-          else if (taraUnfavNames.length && !siddhiYogas.length) personalDosha = 'tara_dosha';
+          const personalDosha = muPersonalDosha({
+            chandraAvoidNames, hasAshtama, ashtamaLagnaNames,
+            chandraPujaNames, taraUnfavNames, siddhiYogas,
+          });
 
           // Day-level dosha (Rikta tithi, Visha/Dagdha yoga, Vyatipata/
           // Vaidhriti) — same "can't be Excellent" treatment as a
           // personal chandra dosha.
-          let dayDosha = computeDayDosha({
-            tithiFamily: tFam,
-            isAmavasya: /Amavasya/i.test(facts.tithi),
-            hasYogaPenalty: facts.specialYogas.some(
-              y => MU_YOGA_PENALTY[y] !== undefined),
-            nityaHardAvoid: MU_NITYA_HARD_AVOID.has(ny),
+          const dayDosha = muSlotDayDosha({
+            tithiFamily: tFam, facts, nityaYoga: ny,
+            system, effectiveChartRemainder, rules, manualGuidance, personal,
           });
-          const unresolvedSourcePrerequisite = (
-            system === 'drik' && effectiveChartRemainder !== null
-              ? effectiveChartRemainder.length > 0
-              : !!rules.manual_prerequisites || manualGuidance.chart.length > 0
-          );
-          if (!dayDosha && (
-            unresolvedSourcePrerequisite || personal.needsReview
-          )) dayDosha = 'practitioner_review';
 
           const chartCheckMinutes = muChartCheckMinutes(lagnaDay, s0, e0);
 
@@ -2309,108 +2748,30 @@ async function findMuhurta() {
             chartBoundaryNeedsReview: muChartBoundaryNeedsReview(lagnaDay, s0, e0),
           });
           slotsPerDay.set(isoDate, (slotsPerDay.get(isoDate) || 0) + 1);
-      }
+      };
+      for (let mi = 0; mi < 15; mi++) processSlot(mi);
       // Diagnose: if the day produced no slots and it wasn't an eclipse,
       // record the most likely reason (samskara skip, mode filter, etc.).
-      if (!slotsPerDay.has(isoDate)) {
-        let reason = null;
-        // Samskara skip on Visha/Dagdha
-        for (const y of data.yogas) {
-          if (skipYogas.has(y)) {
-            reason = `${y} · ${activityLabel} traditionally avoids this day`;
-            break;
-          }
-        }
-        // Samskara skip on Vyatipata/Vaidhriti (Nitya yoga at sunrise)
-        if (!reason && skipYogas.size && data.yoga && MU_NITYA_HARD_AVOID.has(data.yoga.name)) {
-          reason = `${data.yoga.name} yoga · samskaras traditionally defer`;
-        }
-        // chandra_mode filter at the day level
-        if (!reason && people.length && chandraMode !== 'stars' && data.lunarSign) {
-          let hasAvoid = false, hasRemedial = false;
-          for (const pr of people) {
-            if (!pr.rasi) continue;
-            const c2 = chandraOf(pr.rasi, data.lunarSign);
-            if (!c2) continue;
-            if (!MU_CHANDRA_GOOD.has(c2.pos) && !MU_CHANDRA_PUJA.has(c2.pos)) hasAvoid = true;
-            else if (MU_CHANDRA_PUJA.has(c2.pos)) hasRemedial = true;
-          }
-          if (chandraMode === 'strict' && (hasAvoid || hasRemedial)) {
-            reason = 'chandra_mode=strict · Moon at sunrise fails for at least one person';
-          } else if (chandraMode === 'puja_ok' && hasAvoid) {
-            reason = 'chandra_mode=puja_ok · someone has Moon-avoid (4/8/12)';
-          }
-        }
-        if (reason) droppedDays.push({ date: isoDate, reason });
-      }
+      muRecordNoSlotDay(
+        slotsPerDay, droppedDays, isoDate, data, skipYogas,
+        activityLabel, people, chandraMode,
+      );
+    };
+    for (let i = 0; i < nDays; i++) {
+      const d = new Date(from); d.setDate(d.getDate() + i);
+      const ev = events.get(stampOf(d));
+      if (ev) processDay(d, ev);
     }
     droppedModeDays = droppedModeSlots;
-    // Re-tier across the whole search — "Excellent" means the best of
-    // what turned up over the full date range, not a fixed bar.
-    muAssignTiers(slots);
-    slots.sort((a, b) => MU_TIER_NAMES.indexOf(b.tier) - MU_TIER_NAMES.indexOf(a.tier)
-      || b.score - a.score
-      || (b.personalPreferencePasses || 0) - (a.personalPreferencePasses || 0)
-      || (Number(!!a.personalDosha) - Number(!!b.personalDosha)) || a.d - b.d || a.s0 - b.s0);
-    if (searchSequence !== MU_SEARCH_SEQUENCE) return;
-    if (searchFingerprint !== muCurrentSearchFingerprint()) {
-      box.setAttribute('aria-busy', 'false');
-      muSetResultMessage(box, 'Search inputs changed · find slots again.');
-      return;
-    }
-    const chartCalculationEnabled = electionChartCalculationEnabled();
-    if (slots.length && chartCalculationEnabled) {
-      muSetResultMessage(box, 'Shortlist ready · screening exact election charts…');
-    } else if (slots.length) {
-      muSetResultMessage(
-        box,
-        'Shortlist ready · exact chart screening is not active in this build.',
-      );
-    }
-    const location = CITY_LOCATIONS[city];
-    const chartEnrichment = location
-      ? await enrichElectionChartSlots(slots, {
-        activity,
-        system,
-        location,
-        personalParticipant: roleProfile ? {
-          id: roleProfile.id,
-          name: roleProfile.name,
-          nakshatra: roleProfile.nak || null,
-          janmaRashi: roleProfile.rasi || null,
-          janmaLagna: roleProfile.lagna || null,
-        } : null,
-        boundarySupportAvailable: !!lagnaCityData
-          && slots.every(slot => slot.chartBoundarySupported === true),
-        signal: chartAbort.signal,
-      })
-      : {
-        state: 'unavailable',
-        slots: slots.slice(0, 10).map(slot => ({
-          ...slot,
-          tier: slot.tier === 'Excellent' ? 'Good' : slot.tier,
-          dayDosha: slot.dayDosha || 'practitioner_review',
-        })),
-        screenedCount: 0,
-        removedCount: 0,
-        candidateLimitReached: false,
-        chartRemovedCount: 0,
-        chartRemovedRules: [],
-        personalRemovedCount: 0,
-        personalRemovedRules: [],
-        boundaryReviewCount: 0,
-        qualificationCappedCount: 0,
-        reviewGatedCount: slots.length,
-        overlappingDispositionCount: 0,
-        message: 'Panchangam-ranked; exact chart screening is unavailable for this city.',
-        engine: null,
-      };
-    if (searchSequence !== MU_SEARCH_SEQUENCE) return;
-    if (searchFingerprint !== muCurrentSearchFingerprint()) {
-      box.setAttribute('aria-busy', 'false');
-      muSetResultMessage(box, 'Search inputs changed · find slots again.');
-      return;
-    }
+    // "Excellent" means the best result across the full requested range.
+    muRankCandidateSlots(slots);
+    if (muSearchIsStale(searchSequence, searchFingerprint, box)) return;
+    muSetShortlistProgress(box, slots);
+    const chartEnrichment = await muEnrichCandidateSlots({
+      slots, activity, system, city, roleProfile,
+      lagnaCityData, signal: chartAbort.signal,
+    });
+    if (muSearchIsStale(searchSequence, searchFingerprint, box)) return;
     MU_LAST = {
       top: chartEnrichment.slots,
       chartEnrichment,
@@ -2789,6 +3150,148 @@ function muToT(mm) {
   return fmtT(`${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`);
 }
 
+function muResultScopeDetail(activity, chartEnrichment, partialAssessor: boolean): string {
+  const hasScreeningReview = !!(
+    chartEnrichment?.boundaryReviewCount
+    || chartEnrichment?.reviewGatedCount
+  );
+  if (activity === 'gold') {
+    return hasScreeningReview
+      ? ' · all four Gold v1 event-specific clauses attempted; unresolved outcomes remain review-gated; the general election-chart baseline is not assessed'
+      : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed';
+  }
+  if (activity === 'annaprasana') {
+    return muChartAssessorCanClaimComplete(activity, chartEnrichment)
+      ? ' · all six Annaprasana event-specific clauses resolved; the general election-chart baseline #284 remains open'
+      : ' · all six Annaprasana event-specific clauses attempted; unresolved or bounded outcomes remain review-gated; the general election-chart baseline #284 remains open';
+  }
+  if (activity === 'karnavedha') {
+    if (hasScreeningReview) {
+      return ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate has an unresolved fact; the general election-chart baseline is not assessed';
+    }
+    if (chartEnrichment?.candidateLimitReached) {
+      return ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate was attempted on a bounded candidate set; the general election-chart baseline is not assessed';
+    }
+    return ' · daylight Tithi, daylight Nakshatra and vacant-8th outcomes all resolved';
+  }
+  if (partialAssessor) {
+    return ' · event-specific clauses computed; overall assessment remains partial/provisional because the shared baseline is not complete';
+  }
+  return hasScreeningReview ? '' : ' · every implemented event-specific outcome resolved';
+}
+
+function muChartStatusFor(
+  activity,
+  chartEnrichment,
+  hasManualChartGuidance: boolean,
+  scopeDetail: string,
+) {
+  if (!chartEnrichment) return null;
+  return {
+    screened: {
+      title: muChartAssessmentTitle(activity, chartEnrichment),
+      detail: chartEnrichment.engine
+        ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${muChartReviewDetail(chartEnrichment)}${scopeDetail}`
+        : 'Every sampled Lagna-stable state checked',
+    },
+    'not-run': {
+      title: 'Chart screening not run',
+      detail: 'There was no Panchangam-shortlisted slot to send for chart projection.',
+    },
+    'manual-only': {
+      title: hasManualChartGuidance
+        ? 'Panchangam shortlist complete; chart review remains manual'
+        : 'Panchangam shortlist complete',
+      detail: hasManualChartGuidance
+        ? 'This activity’s source guidance is qualitative and stays with a practitioner.'
+        : 'No source-specific election-chart condition is defined for this general search.',
+    },
+    'unsupported-system': {
+      title: 'Selected system kept separate',
+      detail: 'Exact chart screening currently uses Drik/Lahiri, so it was not blended into this result.',
+    },
+    disabled: {
+      title: 'Panchangam shortlist shown · review needed',
+      detail: 'Exact chart screening is intentionally not active in this public build; no slot is presented as chart-screened.',
+    },
+    unavailable: {
+      title: chartEnrichment.screenedCount
+        ? 'Partial exact chart screening applied'
+        : 'Panchangam shortlist shown',
+      detail: chartEnrichment.screenedCount
+        ? 'Only already-screened survivors are shown; every unprocessed candidate was withheld.'
+        : 'Exact chart screening could not be reached; no slot is presented as chart-screened.',
+    },
+  }[chartEnrichment.state];
+}
+
+function muChartStatusHtml(
+  activity,
+  chartEnrichment,
+  chartStatus,
+  sourceScope,
+  partialAssessorDisclosure,
+): string {
+  if (!chartEnrichment || !chartStatus) return '';
+  const disposition = muChartScreeningDisposition(chartEnrichment);
+  const message = roleForActivity(activity)
+    ? chartEnrichment.message
+    : chartEnrichment.message.replace('chart or profile facts', 'chart facts');
+  return `<section class="mu-chart-status mu-chart-status--${chartEnrichment.state}${muChartStatusDispositionClass(disposition)}" aria-label="Election-chart assessment status">
+              <strong>${htmlEsc(chartStatus.title)}</strong>
+              <span>${htmlEsc(message)}</span>
+              <small>${htmlEsc(chartStatus.detail)}</small>
+              ${sourceScope ? `<small class="mu-chart-source-scope"><b>Source scope:</b> ${htmlEsc(sourceScope)}</small>` : ''}
+              ${partialAssessorDisclosure ? `<small class="mu-chart-assessment-boundary"><b>Assessment boundary:</b> ${htmlEsc(partialAssessorDisclosure)}</small>` : ''}
+              <a href="${MU_CHART_METHOD_URL}">Verify the method and sources</a>
+            </section>`;
+}
+
+function muNoSlotsResultHtml(options) {
+  const {
+    droppedEclipseDays, droppedModeDays, chartEnrichment,
+    personalRemovalCount, droppedDays, safetyHtml, chartStatusHtml,
+    personalRoleHtml, chartRemovalHtml, personalRemovalHtml, droppedHtml,
+  } = options;
+  const notes = [];
+  if (droppedEclipseDays) notes.push(`${droppedEclipseDays} eclipse day(s) deferred`);
+  if (droppedModeDays) notes.push(`${droppedModeDays} slot(s) filtered by chandra mode`);
+  if (chartEnrichment?.chartRemovedCount) {
+    notes.push(`${chartEnrichment.chartRemovedCount} shortlisted slot(s) failed an exact chart requirement`);
+  }
+  if (personalRemovalCount) {
+    notes.push(`${personalRemovalCount} candidate slot(s) failed a profile-specific source rule`);
+  }
+  const daylightDropped = droppedDays.filter(
+    day => Array.isArray(day.daylightOutcomes) && day.daylightOutcomes.length,
+  );
+  if (daylightDropped.length) {
+    notes.push(
+      `${daylightDropped.length} Karnavedha day(s) filtered: ${daylightDropped[0].reason}`,
+    );
+  }
+  const suffix = notes.length ? ` · ${notes.join(', ')}` : '';
+  const message = `No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.`;
+  return {
+    message,
+    html: `${safetyHtml}${chartStatusHtml}${personalRoleHtml}<p class="preview-error">${htmlEsc(message)}</p>${chartRemovalHtml}${personalRemovalHtml}${droppedHtml}`,
+  };
+}
+
+function muAnnounceResult(top, chartEnrichment, chartStatus): void {
+  const announcement = document.getElementById('mu-result-announcement');
+  if (!announcement) return;
+  const cappedCount = chartEnrichment?.qualificationCappedCount || 0;
+  const reviewCount = chartEnrichment?.reviewGatedCount || 0;
+  const overlapCount = chartEnrichment?.overlappingDispositionCount || 0;
+  const chartCounts = chartEnrichment?.state === 'screened' ? (
+    ` ${cappedCount} retained slot${muPluralSuffix(cappedCount)} capped by a conclusive miss; `
+    + `${reviewCount} retained slot${muPluralSuffix(reviewCount)} review-gated by an unknown; `
+    + `${overlapCount} included in both counts.`
+  ) : '';
+  announcement.textContent = `${top.length} slot${muPluralSuffix(top.length)} found. ${chartStatus?.title || 'Search complete'}.${chartCounts}`;
+}
+
 function renderMuhurta() {
   if (!MU_LAST) return;
   const box = document.getElementById('mu-result');
@@ -2822,86 +3325,13 @@ function renderMuhurta() {
     activity,
     chartEnrichment,
   );
-  const hasScreeningReview = !!(
-    chartEnrichment?.boundaryReviewCount
-    || chartEnrichment?.reviewGatedCount
+  const scopeDetail = muResultScopeDetail(activity, chartEnrichment, partialAssessor);
+  const chartStatus = muChartStatusFor(
+    activity, chartEnrichment, hasManualChartGuidance, scopeDetail,
   );
-  let scopeDetail = '';
-  if (activity === 'gold') {
-    scopeDetail = hasScreeningReview
-      ? ' · all four Gold v1 event-specific clauses attempted; unresolved outcomes remain review-gated; the general election-chart baseline is not assessed'
-      : ' · all four Gold v1 event-specific outcomes resolved; the general election-chart baseline is not assessed';
-  } else if (activity === 'annaprasana') {
-    scopeDetail = muChartAssessorCanClaimComplete(activity, chartEnrichment)
-      ? ' · all six Annaprasana event-specific clauses resolved; the general election-chart baseline #284 remains open'
-      : ' · all six Annaprasana event-specific clauses attempted; unresolved or bounded outcomes remain review-gated; the general election-chart baseline #284 remains open';
-  } else if (activity === 'karnavedha') {
-    if (hasScreeningReview) {
-      scopeDetail = ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate has an unresolved fact; the general election-chart baseline is not assessed';
-    } else if (chartEnrichment?.candidateLimitReached) {
-      scopeDetail = ' · daylight Tithi and Nakshatra gates resolved; the vacant-8th chart gate was attempted on a bounded candidate set; the general election-chart baseline is not assessed';
-    } else {
-      scopeDetail = ' · daylight Tithi, daylight Nakshatra and vacant-8th outcomes all resolved';
-    }
-  } else if (partialAssessor) {
-    scopeDetail = ' · event-specific clauses computed; overall assessment remains partial/provisional because the shared baseline is not complete';
-  } else if (!hasScreeningReview) {
-    scopeDetail = ' · every implemented event-specific outcome resolved';
-  }
-  const chartStatus = chartEnrichment
-    ? {
-      screened: {
-        title: muChartAssessmentTitle(activity, chartEnrichment),
-        detail: chartEnrichment.engine
-          ? `${chartEnrichment.engine.name} ${chartEnrichment.engine.version} · ${chartEnrichment.engine.ayanamsha} · ${chartEnrichment.engine.ephemeris} planetary positions · ${chartEnrichment.engine.nodeConvention} lunar nodes · local Drik/Lahiri Lagna frame · whole-sign houses${muChartReviewDetail(chartEnrichment)}${scopeDetail}`
-          : 'Every sampled Lagna-stable state checked',
-      },
-      'not-run': {
-        title: 'Chart screening not run',
-        detail: 'There was no Panchangam-shortlisted slot to send for chart projection.',
-      },
-      'manual-only': {
-        title: hasManualChartGuidance
-          ? 'Panchangam shortlist complete; chart review remains manual'
-          : 'Panchangam shortlist complete',
-        detail: hasManualChartGuidance
-          ? 'This activity’s source guidance is qualitative and stays with a practitioner.'
-          : 'No source-specific election-chart condition is defined for this general search.',
-      },
-      'unsupported-system': {
-        title: 'Selected system kept separate',
-        detail: 'Exact chart screening currently uses Drik/Lahiri, so it was not blended into this result.',
-      },
-      disabled: {
-        title: 'Panchangam shortlist shown · review needed',
-        detail: 'Exact chart screening is intentionally not active in this public build; no slot is presented as chart-screened.',
-      },
-      unavailable: {
-        title: chartEnrichment.screenedCount
-          ? 'Partial exact chart screening applied'
-          : 'Panchangam shortlist shown',
-        detail: chartEnrichment.screenedCount
-          ? 'Only already-screened survivors are shown; every unprocessed candidate was withheld.'
-          : 'Exact chart screening could not be reached; no slot is presented as chart-screened.',
-      },
-    }[chartEnrichment.state]
-    : null;
-  const renderChartStatus = () => {
-    if (!chartEnrichment || !chartStatus) return '';
-    const disposition = muChartScreeningDisposition(chartEnrichment);
-    const message = !roleForActivity(activity)
-      ? chartEnrichment.message.replace('chart or profile facts', 'chart facts')
-      : chartEnrichment.message;
-    return `<section class="mu-chart-status mu-chart-status--${chartEnrichment.state}${muChartStatusDispositionClass(disposition)}" aria-label="Election-chart assessment status">
-              <strong>${htmlEsc(chartStatus.title)}</strong>
-              <span>${htmlEsc(message)}</span>
-              <small>${htmlEsc(chartStatus.detail)}</small>
-              ${sourceScope ? `<small class="mu-chart-source-scope"><b>Source scope:</b> ${htmlEsc(sourceScope)}</small>` : ''}
-              ${partialAssessorDisclosure ? `<small class="mu-chart-assessment-boundary"><b>Assessment boundary:</b> ${htmlEsc(partialAssessorDisclosure)}</small>` : ''}
-              <a href="${MU_CHART_METHOD_URL}">Verify the method and sources</a>
-            </section>`;
-  };
-  const chartStatusHtml = renderChartStatus();
+  const chartStatusHtml = muChartStatusHtml(
+    activity, chartEnrichment, chartStatus, sourceScope, partialAssessorDisclosure,
+  );
   const roleRequirement = roleForActivity(activity);
   const roleStatus = muRoleStatus(roleProfile, chartEnrichment);
   const personalRoleHtml = roleRequirement
@@ -2933,28 +3363,14 @@ function renderMuhurta() {
        </aside>`
     : '';
   if (!top.length) {
-    const notes = [];
-    if (droppedEclipseDays) notes.push(`${droppedEclipseDays} eclipse day(s) deferred`);
-    if (droppedModeDays) notes.push(`${droppedModeDays} slot(s) filtered by chandra mode`);
-    if (chartEnrichment?.chartRemovedCount) {
-      notes.push(`${chartEnrichment.chartRemovedCount} shortlisted slot(s) failed an exact chart requirement`);
-    }
-    if (personalRemovalCount) {
-      notes.push(`${personalRemovalCount} candidate slot(s) failed a profile-specific source rule`);
-    }
-    const daylightDropped = droppedDays.filter(
-      day => Array.isArray(day.daylightOutcomes) && day.daylightOutcomes.length,
-    );
-    if (daylightDropped.length) {
-      notes.push(
-        `${daylightDropped.length} Karnavedha day(s) filtered: ${daylightDropped[0].reason}`,
-      );
-    }
-    const suffix = notes.length ? ` · ${notes.join(', ')}` : '';
-    const noSlotsMessage = `No clear slots found${suffix}. Try more days, relax the standard, or clear the people above.`;
-    box.innerHTML = `${safetyHtml}${chartStatusHtml}${personalRoleHtml}<p class="preview-error">${htmlEsc(noSlotsMessage)}</p>${chartRemovalHtml}${personalRemovalHtml}${droppedHtml}`;
+    const noSlots = muNoSlotsResultHtml({
+      droppedEclipseDays, droppedModeDays, chartEnrichment,
+      personalRemovalCount, droppedDays, safetyHtml, chartStatusHtml,
+      personalRoleHtml, chartRemovalHtml, personalRemovalHtml, droppedHtml,
+    });
+    box.innerHTML = noSlots.html;
     const announcement = document.getElementById('mu-result-announcement');
-    if (announcement) announcement.textContent = noSlotsMessage;
+    if (announcement) announcement.textContent = noSlots.message;
     return;
   }
   const share = `<button class="wa-share-mini" style="position:static;width:28px;height:28px;flex:none;margin-left:auto;" title="Share these slots on WhatsApp" aria-label="Share on WhatsApp" onclick="shareMuhurtaOnWhatsApp()"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.46 15.1L2 22l5.05-1.55A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3 .92.93-2.92-.2-.3a8.2 8.2 0 1 1 6.75 3.63zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.22-.08-.39-.12-.55.13-.17.24-.64.8-.78.96-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.35-2.93c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.43h-.47c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.04 0 1.2.88 2.36 1 2.52.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.4.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg></button>`;
@@ -3148,18 +3564,7 @@ function renderMuhurta() {
        mandatory rule removes the slot, a conclusive qualification miss retains it with unchanged raw score and a maximum Good rating, and a source preference only breaks ties. Houses use the same local Drik/Lahiri
        Lagna frame as the shortlist. A window touching the five-minute transition-convention guard at either edge remains
        review-gated.</p>`;
-  const announcement = document.getElementById('mu-result-announcement');
-  if (announcement) {
-    const cappedCount = chartEnrichment?.qualificationCappedCount || 0;
-    const reviewCount = chartEnrichment?.reviewGatedCount || 0;
-    const overlapCount = chartEnrichment?.overlappingDispositionCount || 0;
-    const chartCounts = chartEnrichment?.state === 'screened' ? (
-      ` ${cappedCount} retained slot${muPluralSuffix(cappedCount)} capped by a conclusive miss; `
-      + `${reviewCount} retained slot${muPluralSuffix(reviewCount)} review-gated by an unknown; `
-      + `${overlapCount} included in both counts.`
-    ) : '';
-    announcement.textContent = `${top.length} slot${muPluralSuffix(top.length)} found. ${chartStatus?.title || 'Search complete'}.${chartCounts}`;
-  }
+  muAnnounceResult(top, chartEnrichment, chartStatus);
 }
 
 /** Select only non-personal result evidence for the public share payload. */
@@ -3190,6 +3595,136 @@ export function muChartShareIncludesRemainder(chartEnrichment) {
     || (chartEnrichment?.state === 'unavailable' && chartEnrichment.screenedCount > 0);
 }
 
+function muShownSlotNeedsReview(slot): boolean {
+  return Boolean(slot.chartScreening?.needsReview) || (
+    Array.isArray(slot.reasonGroups?.personal_outcomes)
+    && slot.reasonGroups.personal_outcomes.some(
+      outcome => outcome?.status === 'unknown')
+  );
+}
+
+function muEventShareScopeLine(activity: string): string | null {
+  if (activity === 'gold') {
+    return 'Gold v1 assesses four event-specific clauses; the general election-chart baseline is not assessed.';
+  }
+  if (activity === 'annaprasana') {
+    return 'Annaprasana v1 assesses six event-specific chart clauses; the general election-chart baseline #284 remains open.';
+  }
+  if (activity === 'karnavedha') {
+    return 'Karnavedha v1 assesses two daylight-limb gates and the vacant-eighth chart clause; the general election-chart baseline is not assessed.';
+  }
+  return null;
+}
+
+function muChartCompletionShareLines(
+  activity,
+  chartEnrichment,
+  remainder,
+  qualificationCapped: number,
+  reviewGated: number,
+): string[] {
+  const lines: string[] = [];
+  const assessorPartial = automatedRulesFor(activity).length > 0
+    && !chartAssessorCompleteFor(activity);
+  if (assessorPartial) {
+    lines.push('This event assessor is still partial/provisional; the event-specific clauses are computed, but they are not complete chart certification because the shared baseline remains unresolved.');
+  }
+  if (chartEnrichment.candidateLimitReached) {
+    lines.push(`The chart-search safety budget was reached after ${chartEnrichment.screenedCount} candidate${chartEnrichment.screenedCount === 1 ? '' : 's'}; every shown slot was screened, but lower-ranked candidates were not assessed.`);
+    return lines;
+  }
+  if (activity === 'annaprasana' && !remainder.length) {
+    lines.push(reviewGated
+      ? 'All six Annaprasana event-specific chart clauses were attempted; unresolved facts still require review.'
+      : 'All six Annaprasana event-specific chart clauses were evaluated and resolved.');
+    return lines;
+  }
+  if (!remainder.length) {
+    if (reviewGated) {
+      lines.push('All disclosed event chart clauses were attempted; unresolved facts still require review.');
+    } else if (qualificationCapped) {
+      lines.push('All disclosed event chart clauses were evaluated; one or more qualifications were not met and the affected ratings were capped.');
+    } else {
+      lines.push('All disclosed event chart clauses were evaluated and resolved under the documented interpretation convention.');
+    }
+    return lines;
+  }
+  lines.push(
+    'The automated, source-backed election-chart clauses were checked across every sampled Lagna-stable state.',
+    'Qualitative chart or ritual checks still require practitioner review; see the result details.',
+  );
+  return lines;
+}
+
+function muChartCountShareLines(
+  qualificationCapped: number,
+  reviewGated: number,
+  overlapping: number,
+): string[] {
+  const lines: string[] = [];
+  if (qualificationCapped) {
+    lines.push(`${qualificationCapped} shown slot${qualificationCapped === 1 ? '' : 's'} had a conclusive event-specific condition miss; ${qualificationCapped === 1 ? 'it was' : 'they were'} retained with unchanged raw score and a maximum Good rating.`);
+  }
+  if (reviewGated) {
+    lines.push(`${reviewGated} shown slot${reviewGated === 1 ? '' : 's'} ${reviewGated === 1 ? 'is' : 'are'} indeterminate at a calculation boundary or missing fact and ${reviewGated === 1 ? 'remains' : 'remain'} review-gated.`);
+  }
+  if (overlapping) {
+    lines.push(`${overlapping} shown slot${overlapping === 1 ? ' is' : 's are'} included in both counts because a conclusive miss and a separate unknown coexist.`);
+  }
+  return lines;
+}
+
+function muChartShareDetailLines(top, activity, chartEnrichment): string[] {
+  const remainder = chartManualRemaindersFor(activity) || [];
+  const qualificationCapped = top.filter(
+    slot => slot.chartScreening?.qualificationFailed).length;
+  const reviewGated = top.filter(muShownSlotNeedsReview).length;
+  const overlapping = top.filter(
+    slot => slot.chartScreening?.qualificationFailed
+      && muShownSlotNeedsReview(slot)).length;
+  const scopeLine = muEventShareScopeLine(activity);
+  return [
+    ...(scopeLine ? [scopeLine] : []),
+    ...muChartCompletionShareLines(
+      activity, chartEnrichment, remainder, qualificationCapped, reviewGated,
+    ),
+    ...muChartCountShareLines(qualificationCapped, reviewGated, overlapping),
+    `Method: https://panchangam.astrochaganti.com${MU_CHART_METHOD_URL}`,
+  ];
+}
+
+// Narrow test seam for the orchestration helpers extracted from the legacy
+// panel. The browser-smoke suite covers their integrated paths; Vitest calls
+// these boundaries directly so a structural refactor cannot create hidden
+// function-coverage debt.
+export const muComplexityContracts = {
+  muConfiguredDaylightPolicy,
+  muPrimaryDayDrop,
+  muCalendarDayDrop,
+  muSolarDayDrop,
+  muDayDrop,
+  muBadWindows,
+  muYogaDayDropReason,
+  muChandraModeDayDropReason,
+  muNoSlotDayReason,
+  muRecordNoSlotDay,
+  muScoreSlotTithi,
+  muScoreSpecialYogas,
+  muScoreNityaYoga,
+  muScoreSlotPreferences,
+  muSlotDoctrinalNotes,
+  muPersonalDosha,
+  muSlotDayDosha,
+  muDominantChoghadiya,
+  muSlotElectionReasons,
+  muActivityNeedsLagna,
+  muRankCandidateSlots,
+  muUnavailableChartEnrichment,
+  muResultScopeDetail,
+  muChartStatusFor,
+  muChartCompletionShareLines,
+};
+
 function shareMuhurtaOnWhatsApp() {
   if (!MU_LAST?.top.length) return;
   const { top, activity, chartEnrichment, context } = MU_LAST;
@@ -3204,62 +3739,7 @@ function shareMuhurtaOnWhatsApp() {
   }
   lines.push(muChartShareScreeningLine(chartEnrichment));
   if (muChartShareIncludesRemainder(chartEnrichment)) {
-    const remainder = chartManualRemaindersFor(activity) || [];
-    const assessorPartial = automatedRulesFor(activity).length > 0
-      && !chartAssessorCompleteFor(activity);
-    const shownNeedsReview = slot => slot.chartScreening?.needsReview || (
-      Array.isArray(slot.reasonGroups?.personal_outcomes)
-      && slot.reasonGroups.personal_outcomes.some(
-        outcome => outcome?.status === 'unknown')
-    );
-    const qualificationCapped = top.filter(
-      slot => slot.chartScreening?.qualificationFailed).length;
-    const reviewGated = top.filter(shownNeedsReview).length;
-    const overlapping = top.filter(
-      slot => slot.chartScreening?.qualificationFailed
-        && shownNeedsReview(slot)).length;
-    if (activity === 'gold') {
-      lines.push('Gold v1 assesses four event-specific clauses; the general election-chart baseline is not assessed.');
-    } else if (activity === 'annaprasana') {
-      lines.push('Annaprasana v1 assesses six event-specific chart clauses; the general election-chart baseline #284 remains open.');
-    } else if (activity === 'karnavedha') {
-      lines.push('Karnavedha v1 assesses two daylight-limb gates and the vacant-eighth chart clause; the general election-chart baseline is not assessed.');
-    }
-    if (assessorPartial) {
-      lines.push('This event assessor is still partial/provisional; the event-specific clauses are computed, but they are not complete chart certification because the shared baseline remains unresolved.');
-    }
-    if (chartEnrichment.candidateLimitReached) {
-      lines.push(`The chart-search safety budget was reached after ${chartEnrichment.screenedCount} candidate${chartEnrichment.screenedCount === 1 ? '' : 's'}; every shown slot was screened, but lower-ranked candidates were not assessed.`);
-    } else if (activity === 'annaprasana' && !remainder.length) {
-      if (reviewGated || chartEnrichment.candidateLimitReached) {
-        lines.push('All six Annaprasana event-specific chart clauses were attempted; unresolved facts still require review.');
-      } else {
-        lines.push('All six Annaprasana event-specific chart clauses were evaluated and resolved.');
-      }
-    } else if (!remainder.length) {
-      if (reviewGated) {
-        lines.push('All disclosed event chart clauses were attempted; unresolved facts still require review.');
-      } else if (qualificationCapped) {
-        lines.push('All disclosed event chart clauses were evaluated; one or more qualifications were not met and the affected ratings were capped.');
-      } else {
-        lines.push('All disclosed event chart clauses were evaluated and resolved under the documented interpretation convention.');
-      }
-    } else {
-      lines.push(
-        'The automated, source-backed election-chart clauses were checked across every sampled Lagna-stable state.',
-        'Qualitative chart or ritual checks still require practitioner review; see the result details.',
-      );
-    }
-    if (qualificationCapped) {
-      lines.push(`${qualificationCapped} shown slot${qualificationCapped === 1 ? '' : 's'} had a conclusive event-specific condition miss; ${qualificationCapped === 1 ? 'it was' : 'they were'} retained with unchanged raw score and a maximum Good rating.`);
-    }
-    if (reviewGated) {
-      lines.push(`${reviewGated} shown slot${reviewGated === 1 ? '' : 's'} ${reviewGated === 1 ? 'is' : 'are'} indeterminate at a calculation boundary or missing fact and ${reviewGated === 1 ? 'remains' : 'remain'} review-gated.`);
-    }
-    if (overlapping) {
-      lines.push(`${overlapping} shown slot${overlapping === 1 ? ' is' : 's are'} included in both counts because a conclusive miss and a separate unknown coexist.`);
-    }
-    lines.push(`Method: https://panchangam.astrochaganti.com${MU_CHART_METHOD_URL}`);
+    lines.push(...muChartShareDetailLines(top, activity, chartEnrichment));
   }
   lines.push('');
   top.slice(0, 5).forEach(s => {

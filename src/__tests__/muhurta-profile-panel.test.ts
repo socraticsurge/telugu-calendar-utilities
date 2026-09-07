@@ -45,6 +45,7 @@ interface ProfilesController {
 }
 
 interface TarabalamPanelModule {
+  muComplexityContracts: Record<string, (...args: never[]) => unknown>;
   initTarabalamProfiles(
     store: GuestProfileStore,
     actions: {
@@ -156,6 +157,31 @@ interface TarabalamPanelModule {
     activity: string,
     chartEnrichment: { state: string; screenedCount: number } | null,
   ): string | null;
+  muScoreParticipantTarabalam(
+    people: Participant[], nakshatra: string,
+  ): { score: number; reasons: string[]; unfavourableNames: string[] };
+  muScoreParticipantChandrabalam(
+    people: Participant[], lunarSign: string, chandraMode: string,
+  ): {
+    score: number;
+    reasons: string[];
+    avoidNames: string[];
+    pujaNames: string[];
+    hasAshtama: boolean;
+    drop: boolean;
+  };
+  muScoreParticipantLagna(
+    people: Participant[], slotLagna: string,
+  ): { score: number; reasons: string[]; ashtamaNames: string[] };
+  muScoreActivityLagna(
+    slotLagna: string | null,
+    requiredLagnaClass: string | null,
+    allowedLagnas: Set<string>,
+    preferLagnas: Set<string>,
+    preferLagnaClass: string | null,
+    lagnaCityData: unknown,
+    activityLabel: string,
+  ): { score: number; reasons: string[] } | null;
 }
 
 class MemoryStorage implements ProfileStorage {
@@ -322,6 +348,187 @@ afterAll(() => {
 });
 
 describe('Muhurtam saved-profile participants', () => {
+  test('keeps extracted search orchestration boundaries callable', () => {
+    const call = (name: string, ...args: unknown[]): unknown => (
+      panel.muComplexityContracts[name] as (...values: unknown[]) => unknown
+    )(...args);
+    const emptyRules = {};
+    const day = {
+      eclipse: null,
+      special: [],
+      maasam: 'Sravana',
+      solarSign: 'Simha',
+      vaaram: 'Somavaram',
+      paksham: 'Shukla',
+      inauspicious: [],
+      karana: null,
+      yogas: [],
+      yoga: null,
+      lunarSign: 'Mesha',
+    };
+
+    expect(call('muConfiguredDaylightPolicy', 'wedding', day, emptyRules)).toBeNull();
+    expect(call(
+      'muPrimaryDayDrop', { ...day, eclipse: { kind: 'Solar eclipse' } },
+      emptyRules, 'Wedding', null, null, '2026-09-07',
+    )).toEqual({
+      eclipse: true,
+      entry: { date: '2026-09-07', reason: 'Solar eclipse · auspicious activities deferred' },
+    });
+    expect(call('muCalendarDayDrop', day, emptyRules, 'Wedding', '2026-09-07')).toBeNull();
+    expect(call('muSolarDayDrop', day, emptyRules, 'Wedding', '2026-09-07')).toBeNull();
+    expect(call(
+      'muDayDrop', { ...day, eclipse: { kind: 'Lunar eclipse' } },
+      emptyRules, 'Wedding', null, null, '2026-09-07',
+    )).toMatchObject({ eclipse: true });
+    expect(call('muBadWindows', day, new Set())).toEqual([]);
+    expect(call('muYogaDayDropReason', day, new Set(), 'Wedding')).toBeNull();
+    expect(call('muChandraModeDayDropReason', day, [], 'strict')).toBeNull();
+    expect(call('muNoSlotDayReason', day, new Set(), 'Wedding', [], 'strict')).toBeNull();
+    const droppedDays: unknown[] = [];
+    call(
+      'muRecordNoSlotDay', new Set(['2026-09-07']), droppedDays,
+      '2026-09-07', day, new Set(), 'Wedding', [], 'strict',
+    );
+    expect(droppedDays).toEqual([]);
+
+    const facts = { tithi: 'Dwitiya', nakshatra: 'Rohini', specialYogas: [], yoga: 'Siddha' };
+    expect(call(
+      'muScoreSlotTithi', facts, null, 'Wedding', [], new Set(),
+    )).toMatchObject({ score: 0 });
+    expect(call('muScoreSpecialYogas', facts, new Set())).toEqual({ score: 0, reasons: [] });
+    expect(call(
+      'muScoreNityaYoga', facts, day, new Set(), new Set(), 600,
+    )).toMatchObject({ score: 1 });
+    expect(call('muScoreSlotPreferences', {
+      facts, varaReason: null, preferNakshatras: new Set(), amrita: [],
+      s0: 600, e0: 648, preferChog: null,
+      choghadiya: { name: 'Rog' }, avoidKaranaNames: new Set(),
+      activityLabel: 'Wedding',
+    })).toEqual({ score: 0, slotReasons: [], activityReasons: [] });
+    expect(call('muSlotDoctrinalNotes', {
+      cautionLagnaSolar: false, lagnaCityData: null, slotLagna: null,
+      solarSign: null, specialYogas: [], taraUnfavNames: [],
+      chandraAvoidNames: [], tithiFamily: null,
+    })).toEqual({ notes: [], siddhiYogas: [] });
+    expect(call('muPersonalDosha', {
+      chandraAvoidNames: [], hasAshtama: false, ashtamaLagnaNames: [],
+      chandraPujaNames: [], taraUnfavNames: [], siddhiYogas: [],
+    })).toBeNull();
+    expect(call('muSlotDayDosha', {
+      tithiFamily: null, facts, nityaYoga: 'Siddha', system: 'drik',
+      effectiveChartRemainder: [], rules: {}, manualGuidance: { chart: [] },
+      personal: { needsReview: false },
+    })).toBeNull();
+    expect(call('muDominantChoghadiya', [], 600, 648)).toEqual({
+      block: null, straddle: null,
+    });
+    const restrictions = {
+      allowedNakshatras: new Set(), avoidNakshatras: new Set(),
+      avoidJanmaNakshatra: false, allowedTithiNumbers: new Set(),
+      allowedTithiNames: new Set(), avoidTithiNumbers: new Set(),
+      avoidVaraTithiNames: new Set(),
+    };
+    expect(call(
+      'muSlotElectionReasons', facts, { require_homa_election: false },
+      restrictions, day, [],
+    )).toEqual([]);
+    expect(call('muActivityNeedsLagna', 'wedding', emptyRules)).toBe(true);
+    const slots: unknown[] = [];
+    call('muRankCandidateSlots', slots);
+    expect(slots).toEqual([]);
+    expect(call('muUnavailableChartEnrichment', [])).toMatchObject({
+      state: 'unavailable', slots: [], screenedCount: 0,
+    });
+    expect(call('muResultScopeDetail', 'wedding', null, true)).toContain(
+      'partial/provisional',
+    );
+    expect(call('muChartStatusFor', 'wedding', null, false, '')).toBeNull();
+    expect(call(
+      'muChartCompletionShareLines', 'wedding', {
+        candidateLimitReached: false, screenedCount: 0,
+      }, [], 0, 0,
+    )).toEqual([
+      'This event assessor is still partial/provisional; the event-specific clauses are computed, but they are not complete chart certification because the shared baseline remains unresolved.',
+      'All disclosed event chart clauses were evaluated and resolved under the documented interpretation convention.',
+    ]);
+  });
+
+  test('preserves Tarabalam group scoring and participant evidence', () => {
+    const people: Participant[] = [
+      { id: 'a', name: 'Anu', nak: 'Rohini', pada: 2, rasi: null, lagna: null },
+      { id: 'b', name: 'Bala', nak: 'Mrigashira', pada: 1, rasi: null, lagna: null },
+    ];
+
+    expect(panel.muScoreParticipantTarabalam(people, 'Mrigashira')).toEqual({
+      score: 0,
+      reasons: [
+        'Tarabalam favourable for #1 (Anu) (+1)',
+        'Tarabalam avoid for #2 (Bala) Janma (-1)',
+      ],
+      unfavourableNames: ['#2 (Bala)'],
+    });
+  });
+
+  test('preserves Chandrabalam modes, remedial evidence and Ashtama flags', () => {
+    const people: Participant[] = [
+      { id: 'a', name: 'Anu', nak: 'Rohini', pada: 2, rasi: 'Dhanu', lagna: null },
+      { id: 'b', name: 'Bala', nak: 'Hasta', pada: 1, rasi: 'Vrischika', lagna: null },
+      { id: 'c', name: 'Charu', nak: 'Ashwini', pada: 3, rasi: 'Vrishabha', lagna: null },
+    ];
+
+    expect(panel.muScoreParticipantChandrabalam(people, 'Dhanu', 'strict')).toEqual({
+      score: 0,
+      reasons: [
+        'Chandrabalam favourable for #1 (Anu) (+1)',
+        'Chandrabalam remedial for #2 (Bala) Moon@2 (puja recommended)',
+        'Chandrabalam avoid for #3 (Charu) Ashtama Moon@8 (-1)',
+      ],
+      avoidNames: ['#3 (Charu)'],
+      pujaNames: ['#2 (Bala)'],
+      hasAshtama: true,
+      drop: true,
+    });
+    expect(panel.muScoreParticipantChandrabalam(
+      [people[1]], 'Dhanu', 'puja_ok',
+    ).drop).toBe(false);
+  });
+
+  test('preserves dual natal-reference Lagna scoring', () => {
+    const people: Participant[] = [
+      { id: 'a', name: 'Anu', nak: 'Rohini', pada: 2, rasi: 'Kanya', lagna: 'Simha' },
+      { id: 'b', name: 'Bala', nak: 'Hasta', pada: 1, rasi: 'Kumbha', lagna: null },
+    ];
+
+    expect(panel.muScoreParticipantLagna(people, 'Kanya')).toEqual({
+      score: 0,
+      reasons: [
+        'Kanya lagna favourable for #1 (Anu) own@1 from Kanya (+1)',
+        'Kanya lagna Ashtama for #2 (Bala) lagna@8 from Kumbha (-1)',
+        'Kanya lagna neutral for #1 (Anu) 2nd from Simha lagna (no effect)',
+      ],
+      ashtamaNames: ['#2 (Bala)'],
+    });
+  });
+
+  test('preserves required, admitted and preferred activity-Lagna gates', () => {
+    expect(panel.muScoreActivityLagna(
+      'Simha', 'Sthira', new Set(['Simha']), new Set(['Simha']),
+      'Sthira', {}, 'Wedding',
+    )).toEqual({
+      score: 2,
+      reasons: [
+        'Simha lagna satisfies required Sthira class',
+        'Simha lagna is admitted for Wedding',
+        'Simha lagna specifically favoured for Wedding (+1)',
+        'Simha lagna (Sthira) favoured for Wedding (+1)',
+      ],
+    });
+    expect(panel.muScoreActivityLagna(
+      'Mesha', 'Sthira', new Set(), new Set(), null, {}, 'Wedding',
+    )).toBeNull();
+  });
+
   test('claims partial event clauses only after actual chart screening', () => {
     const completionCopy =
       'The event-specific clauses were computed, but the overall election-chart assessment remains partial/provisional until the shared baseline is complete.';
