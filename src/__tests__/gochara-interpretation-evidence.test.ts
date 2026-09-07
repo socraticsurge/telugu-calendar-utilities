@@ -133,12 +133,21 @@ test('keeps deterministic Janma-Rashi evidence available when interpretive prose
   ).not.toContain('lagna');
   expect(document.getElementById('go-phalalu').textContent.toLowerCase())
     .not.toContain('from lagna');
+  expect(document.querySelectorAll('#go-chart .go-box')).toHaveLength(12);
+  expect(document.querySelectorAll('#go-chart .go-g')).toHaveLength(9);
+  expect(document.querySelector('#go-chart .go-center')?.textContent)
+    .toContain('from Vrishabha Janma Rashi');
 
   const open = vi.spyOn(window, 'open').mockImplementation(() => null);
   panel.shareGocharaOnWhatsApp();
   const shareUrl = String(open.mock.calls[0]?.[0] || '');
-  expect(decodeURIComponent(shareUrl).toLowerCase()).not.toContain('from lagna');
-  expect(decodeURIComponent(shareUrl)).not.toContain('Reference profile');
+  const shareText = decodeURIComponent(shareUrl.split('text=')[1]);
+  expect(shareText).toContain('📜 *Rasi Phalalu —');
+  expect(shareText).toContain('Vrishabha Janma Rashi ·');
+  expect(shareText.match(/^\u2022 /gm)).toHaveLength(10);
+  expect(shareText).toContain('https://panchangam.astrochaganti.com/?src=share-phalalu#gochara');
+  expect(shareText.toLowerCase()).not.toContain('from lagna');
+  expect(shareText).not.toContain('Reference profile');
   controller.destroy();
 });
 
