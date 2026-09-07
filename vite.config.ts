@@ -7,13 +7,13 @@ export default defineConfig({
     port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
     strictPort: false,
   },
-  publicDir: resolve(__dirname, 'public'),
+  publicDir: resolve(import.meta.dirname, 'public'),
   build: {
-    outDir: resolve(__dirname, 'dist'),
+    outDir: resolve(import.meta.dirname, 'dist'),
     emptyOutDir: true,
     sourcemap: true,
     rollupOptions: {
-      input: resolve(__dirname, 'index.html'),
+      input: resolve(import.meta.dirname, 'index.html'),
     },
   },
   test: {
