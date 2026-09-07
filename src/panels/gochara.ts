@@ -118,6 +118,111 @@ function profileIdFromSelection(value: string | null): string | null {
   return match ? match[1] : null;
 }
 
+function appendProfileNotice(root: HTMLElement, message: string): void {
+  const notice = document.createElement('p');
+  notice.className = 'go-profile-notice';
+  notice.setAttribute('role', 'status');
+  notice.textContent = message;
+  root.append(notice);
+}
+
+function appendProfileContext(root: HTMLElement, message: string): void {
+  const context = document.createElement('p');
+  context.className = 'go-profile-context';
+  context.textContent = message;
+  root.append(context);
+}
+
+function appendProfileActions(root: HTMLElement, ...buttons: HTMLButtonElement[]): void {
+  if (!buttons.length) return;
+  const actions = document.createElement('div');
+  actions.className = 'go-profile-actions';
+  actions.append(...buttons);
+  root.append(actions);
+}
+
+function incompleteProfileActions(
+  profiles: readonly Readonly<GuestProfile>[],
+  excludeId: string | null = null,
+): HTMLButtonElement[] {
+  if (!gocharaProfileActions) return [];
+  return profiles.flatMap(profile => {
+    if (profile.id === excludeId) return [];
+    const readiness = guestProfileReadiness(profile);
+    if (readiness.horoscope) return [];
+    const missing = readiness.missingForHoroscope === 'pada' ? 'Padam' : 'Nakshatra';
+    return [stateAction(
+      `Complete ${profileDisplayName(profile)} · Needs ${missing}`,
+      'edit',
+      trigger => gocharaProfileActions?.editProfile(profile.id, trigger),
+      false,
+      profile.id,
+    )];
+  });
+}
+
+function restoreProfileActionFocus(root: HTMLElement, focusKey: string | null): void {
+  if (!focusKey) return;
+  const replacement = Array.from(
+    root.querySelectorAll<HTMLElement>('[data-go-profile-focus]'),
+  ).find(candidate => candidate.dataset.goProfileFocus === focusKey);
+  replacement?.focus();
+}
+
+function renderIncompleteProfileState(
+  root: HTMLElement,
+  profile: Readonly<GuestProfile>,
+  resolution: GocharaSelectionResolution,
+  profiles: readonly Readonly<GuestProfile>[],
+): void {
+  const missing = resolution.fallback?.missingField === 'pada' ? 'Padam' : 'Nakshatra';
+  appendProfileContext(
+    root,
+    `Add ${missing} to ${profileDisplayName(profile)} before using this profile here.`,
+  );
+  if (gocharaProfileActions) {
+    appendProfileActions(
+      root,
+      stateAction(
+        `Complete ${profileDisplayName(profile)}`,
+        'edit',
+        trigger => gocharaProfileActions?.editProfile(profile.id, trigger),
+        true,
+        profile.id,
+      ),
+      stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
+    );
+  }
+  appendProfileActions(root, ...incompleteProfileActions(profiles, profile.id));
+}
+
+function renderSelectedProfileState(
+  root: HTMLElement,
+  resolution: GocharaSelectionResolution,
+  profiles: readonly Readonly<GuestProfile>[],
+): void {
+  const profile = resolution.profile!;
+  appendProfileContext(
+    root,
+    `Using ${profile.name || 'this profile'}'s saved birth star: ${profile.rasi} Janma Rashi. `
+      + 'Daily Horoscope is Moon-sign based; Lagna stays with the profile for supported natal-chart details and Muhurtam.',
+  );
+  if (gocharaProfileActions) {
+    appendProfileActions(
+      root,
+      stateAction(
+        `Edit ${profile.name || 'profile'}`,
+        'edit',
+        trigger => gocharaProfileActions?.editProfile(profile.id, trigger),
+        false,
+        profile.id,
+      ),
+      stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
+    );
+  }
+  appendProfileActions(root, ...incompleteProfileActions(profiles));
+}
+
 function renderGocharaProfileState(
   resolution: GocharaSelectionResolution,
   selectionStorageUnavailable = false,
@@ -137,120 +242,45 @@ function renderGocharaProfileState(
     ? profiles.find(profile => profile.id === requestedProfileId) || null
     : null;
 
-  const addNotice = (message: string): void => {
-    const notice = document.createElement('p');
-    notice.className = 'go-profile-notice';
-    notice.setAttribute('role', 'status');
-    notice.textContent = message;
-    root.append(notice);
-  };
-  const addContext = (message: string): void => {
-    const context = document.createElement('p');
-    context.className = 'go-profile-context';
-    context.textContent = message;
-    root.append(context);
-  };
-  const addActions = (...buttons: HTMLButtonElement[]): void => {
-    if (!buttons.length) return;
-    const actions = document.createElement('div');
-    actions.className = 'go-profile-actions';
-    actions.append(...buttons);
-    root.append(actions);
-  };
-  const addIncompleteProfileActions = (excludeId: string | null = null): void => {
-    if (!gocharaProfileActions) return;
-    const buttons = profiles.flatMap(profile => {
-      if (profile.id === excludeId) return [];
-      const readiness = guestProfileReadiness(profile);
-      if (readiness.horoscope) return [];
-      const missing = readiness.missingForHoroscope === 'pada' ? 'Padam' : 'Nakshatra';
-      return [stateAction(
-        `Complete ${profileDisplayName(profile)} · Needs ${missing}`,
-        'edit',
-        trigger => gocharaProfileActions?.editProfile(profile.id, trigger),
-        false,
-        profile.id,
-      )];
-    });
-    addActions(...buttons);
-  };
-  const restoreActionFocus = (): void => {
-    if (!focusKey) return;
-    const replacement = Array.from(
-      root.querySelectorAll<HTMLElement>('[data-go-profile-focus]'),
-    ).find(candidate => candidate.dataset.goProfileFocus === focusKey);
-    replacement?.focus();
-  };
-
-  if (resolution.fallback) addNotice(resolution.fallback.message);
+  if (resolution.fallback) appendProfileNotice(root, resolution.fallback.message);
   if (
     !resolution.fallback &&
     (selectionStorageUnavailable || snapshot?.persistence === 'memory')
   ) {
-    addNotice('Your horoscope choice works for this page, but this browser cannot save it.');
+    appendProfileNotice(root, 'Your horoscope choice works for this page, but this browser cannot save it.');
   }
 
   if (requestedProfile && resolution.fallback?.code === 'profile-not-horoscope-ready') {
-    const missing = resolution.fallback.missingField === 'pada' ? 'Padam' : 'Nakshatra';
-    addContext(`Add ${missing} to ${profileDisplayName(requestedProfile)} before using this profile here.`);
-    if (gocharaProfileActions) {
-      addActions(
-        stateAction(
-          `Complete ${profileDisplayName(requestedProfile)}`,
-          'edit',
-          trigger => gocharaProfileActions?.editProfile(requestedProfile.id, trigger),
-          true,
-          requestedProfile.id,
-        ),
-        stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
-      );
-    }
-    addIncompleteProfileActions(requestedProfile.id);
-    restoreActionFocus();
+    renderIncompleteProfileState(root, requestedProfile, resolution, profiles);
+    restoreProfileActionFocus(root, focusKey);
     return;
   }
 
   if (resolution.kind === 'profile' && resolution.profile) {
-    addContext(
-      `Using ${resolution.profile.name || 'this profile'}'s saved birth star: ${resolution.profile.rasi} Janma Rashi. ` +
-      'Daily Horoscope is Moon-sign based; Lagna stays with the profile for supported natal-chart details and Muhurtam.',
-    );
-    if (gocharaProfileActions) {
-      addActions(
-        stateAction(
-          `Edit ${resolution.profile.name || 'profile'}`,
-          'edit',
-          trigger => gocharaProfileActions?.editProfile(resolution.profile!.id, trigger),
-          false,
-          resolution.profile.id,
-        ),
-        stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)),
-      );
-    }
-    addIncompleteProfileActions();
-    restoreActionFocus();
+    renderSelectedProfileState(root, resolution, profiles);
+    restoreProfileActionFocus(root, focusKey);
     return;
   }
 
   if (profiles.length === 0) {
-    addContext('Create a profile to reuse a birth star here and in Muhurtam. It stays only in this browser.');
+    appendProfileContext(root, 'Create a profile to reuse a birth star here and in Muhurtam. It stays only in this browser.');
     if (gocharaProfileActions) {
-      addActions(stateAction('Create profile', 'create', trigger => gocharaProfileActions?.createProfile(trigger), true));
+      appendProfileActions(root, stateAction('Create profile', 'create', trigger => gocharaProfileActions?.createProfile(trigger), true));
     }
-    restoreActionFocus();
+    restoreProfileActionFocus(root, focusKey);
     return;
   }
 
   if (resolution.kind === 'rashi') {
-    addContext('This is a one-off Rashi view. Choose a saved profile above to return to a personal horoscope faster.');
+    appendProfileContext(root, 'This is a one-off Rashi view. Choose a saved profile above to return to a personal horoscope faster.');
   } else {
-    addContext('Choose a saved profile above for a personal Daily Horoscope, or select any Rashi for a one-off view.');
+    appendProfileContext(root, 'Choose a saved profile above for a personal Daily Horoscope, or select any Rashi for a one-off view.');
   }
   if (gocharaProfileActions) {
-    addActions(stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)));
+    appendProfileActions(root, stateAction('Manage profiles', 'manage', trigger => gocharaProfileActions?.manageProfiles(trigger)));
   }
-  addIncompleteProfileActions();
-  restoreActionFocus();
+  appendProfileActions(root, ...incompleteProfileActions(profiles));
+  restoreProfileActionFocus(root, focusKey);
 }
 
 async function loadGochara() {
@@ -259,7 +289,8 @@ async function loadGochara() {
     try {
       const r = await fetch('gochara.json', { cache: 'no-cache' });
       GO_DATA = await r.json();
-    } catch (_e) {
+    } catch (error) {
+      console.error('Unable to load Gochara sky data:', error);
       document.getElementById('go-chart').innerHTML =
         '<p class="preview-error">Sky data unavailable — try again later.</p>';
       return;
@@ -313,7 +344,7 @@ function goSavedPeople() {
     saved = [];
   }
   return saved.map((v, i) => {
-    if (!v || !v.nak) return null;
+    if (!v?.nak) return null;
     const rasi = rasiFromStar(v.nak, Number(v.pada) || null);
     if (!rasi) return null;
     // Lagna remains a factual profile detail in the selector; the surrounding
@@ -352,7 +383,7 @@ function buildStableViewSelect(preferredValue?: string): GocharaSelectionResolut
     resolution = loaded;
     selectionStorageUnavailable = loaded.storageIssue === 'storage-unavailable';
   } else {
-    const requestedValue = preferredValue === undefined ? sel.value : preferredValue;
+    const requestedValue = preferredValue ?? sel.value;
     resolution = resolveGocharaSelection(requestedValue, snapshot.profiles);
     selectionStorageUnavailable = !persistGocharaSelection(resolution.value);
   }
@@ -508,7 +539,7 @@ function goCurrentView() {
   // 'p<i>' — legacy profile-keyed view. Daily Horoscope is deliberately
   // anchored only to Janma Rashi; a saved Lagna remains a profile fact for
   // the natal chart and Muhurtam, not a second Gochara reference.
-  const profMatch = val.match(/^p(\d+)$/);
+  const profMatch = /^p(\d+)$/.exec(val);
   if (profMatch) {
     const k = goSavedPeople()[Number(profMatch[1])];
     if (!k) return { jr: null, jl: null, label: null };
@@ -528,7 +559,7 @@ function goCurrentView() {
 const GO_LAYOUT = { 11:[1,1], 0:[1,2], 1:[1,3], 2:[1,4], 3:[2,4], 4:[3,4],
                     5:[4,4], 6:[4,3], 7:[4,2], 8:[4,1], 9:[3,1], 10:[2,1] };
 
-function goElement(tag: string, className = '', text: unknown = null): HTMLElement {
+function goElement(tag: string, className = '', text: string | number | null = null): HTMLElement {
   const node = document.createElement(tag);
   if (className) node.className = className;
   if (text !== null) node.textContent = String(text);
@@ -561,6 +592,248 @@ function goPhalaluShareButton(): HTMLButtonElement {
   return button;
 }
 
+function goHouseFrom(row, grahaIndex, reference) {
+  return ((row[grahaIndex] - reference + 12) % 12) + 1;
+}
+
+function goOccupants(row, reference) {
+  const occupants = {};
+  GO_DATA.grahas.forEach((graha, grahaIndex) => {
+    const house = goHouseFrom(row, grahaIndex, reference);
+    const houseOccupants = occupants[house] ?? [];
+    houseOccupants.push(graha);
+    occupants[house] = houseOccupants;
+  });
+  return occupants;
+}
+
+function goVerdict(row, grahaIndex, reference, occupants) {
+  const graha = GO_DATA.grahas[grahaIndex];
+  const position = goHouseFrom(row, grahaIndex, reference);
+  if (!GO_FAV[graha].includes(position)) return 'bad';
+  if (GO_NODES.has(graha)) return 'good';
+  const vedhaHouse = GO_VEDHA[graha][position];
+  for (const other of (occupants[vedhaHouse] || [])) {
+    const isVedha = other !== graha
+      && !GO_NODES.has(other)
+      && !GO_EXEMPT.has(`${graha}|${other}`);
+    if (isVedha) return 'blocked';
+  }
+  return 'good';
+}
+
+function renderShaniCondition(row, janmaRasi) {
+  const conditionRoot = document.getElementById('go-conditions');
+  if (janmaRasi === null) {
+    conditionRoot.replaceChildren();
+    return;
+  }
+  const shaniIdx = GO_DATA.grahas.indexOf('Shani');
+  const houseFrom = (grahaIndex, reference) => goHouseFrom(row, grahaIndex, reference);
+  const jr = janmaRasi;
+  const condition = shaniConditionFromMoonHouse(houseFrom(shaniIdx, jr));
+  if (!condition) {
+    conditionRoot.replaceChildren();
+    return;
+  }
+  const conditionLabel = `${condition} — from Moon sign`;
+  const runningLabel = conditionLabel.split(' — ')[0].split(' (')[0];
+  conditionRoot.innerHTML = `<div class="go-cond"><span class="chip">⚠️ ${htmlEsc(conditionLabel)}</span>
+       <div class="tb-sub" style="margin-top:0.25rem;">Running ${runningLabel}? Personalised guidance:
+       <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a></div></div>`;
+}
+
+function grahasByRasi(row) {
+  const grouped = {};
+  GO_DATA.grahas.forEach((_graha, grahaIndex) => {
+    const rasi = row[grahaIndex];
+    const grahas = grouped[rasi] ?? [];
+    grahas.push(grahaIndex);
+    grouped[rasi] = grahas;
+  });
+  return grouped;
+}
+
+function goOrdinal(value) {
+  return `${value}${['st', 'nd', 'rd'][value - 1] || 'th'}`;
+}
+
+function goVerdictLabel(verdict) {
+  if (verdict === 'good') return 'favourable';
+  if (verdict === 'blocked') return 'vedha';
+  return 'adverse';
+}
+
+function transitTitle(row, grahaIndex, rasi, janmaRasi, verdict, transition) {
+  let title = `${GO_DATA.grahas[grahaIndex]} in ${GO_DATA.rasis[rasi]}`;
+  if (janmaRasi !== null) {
+    const house = goHouseFrom(row, grahaIndex, janmaRasi);
+    title += ` — ${goOrdinal(house)} from Janma Rashi (${goVerdictLabel(verdict)})`;
+  }
+  if (transition) {
+    const date = transition.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    title += ` · till ${date}`;
+  }
+  return title;
+}
+
+function grahaNode(row, grahaIndex, rasi, janmaRasi, verdict, retrograde, dateIndex) {
+  const transition = goTill(dateIndex, grahaIndex);
+  const className = verdict ? `go-g ${verdict}` : 'go-g';
+  const graha = goElement('span', className, GO_DATA.grahas[grahaIndex]);
+  graha.title = transitTitle(row, grahaIndex, rasi, janmaRasi, verdict, transition);
+  if (retrograde) graha.append(goElement('span', 'go-retro', '℞'));
+  return graha;
+}
+
+function rasiBox(row, retrograde, grouped, rasi, janmaRasi, verdictOf, dateIndex) {
+  const [gridRow, gridColumn] = GO_LAYOUT[rasi];
+  const isJanma = janmaRasi === rasi;
+  const className = isJanma ? 'go-box janma' : 'go-box';
+  const box = goElement('div', className);
+  box.style.gridRow = String(gridRow);
+  box.style.gridColumn = String(gridColumn);
+  const janmaLabel = isJanma ? ' · janma' : '';
+  box.append(goElement('span', 'rname', `${GO_DATA.rasis[rasi]}${janmaLabel}`));
+  if (janmaRasi !== null) {
+    box.append(goElement('span', 'house', ((rasi - janmaRasi + 12) % 12) + 1));
+  }
+  box.append(document.createElement('br'));
+  for (const grahaIndex of (grouped[rasi] || [])) {
+    box.append(grahaNode(
+      row,
+      grahaIndex,
+      rasi,
+      janmaRasi,
+      verdictOf(grahaIndex),
+      retrograde[grahaIndex],
+      dateIndex,
+    ));
+  }
+  return box;
+}
+
+function renderTransitChart(row, retrograde, view, dateShown, verdictOf, dateIndex) {
+  const grouped = grahasByRasi(row);
+  const chartNodes = Array.from(
+    { length: 12 },
+    (_unused, rasi) => rasiBox(row, retrograde, grouped, rasi, view.jr, verdictOf, dateIndex),
+  );
+  document.getElementById('go-note').replaceChildren();
+  const centerContext = view.jr !== null
+    ? `from ${view.label}`
+    : 'transits — choose a person or rashi above to personalise';
+  const dateLabel = dateShown.toLocaleDateString(
+    'en-US',
+    { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' },
+  );
+  const center = goElement('div', 'go-center');
+  center.append(
+    goElement('div', 'd1', '🪐 Gochara'),
+    goElement('div', 'd2', dateLabel),
+    goElement('div', 'd2', centerContext),
+  );
+  document.getElementById('go-chart').replaceChildren(...chartNodes, center);
+}
+
+function renderUpcomingMoves(index) {
+  const fastGrahas = new Set(['Chandra', 'Budha', 'Surya']);
+  const moves = GO_DATA.grahas
+    .map((graha, grahaIndex) => ({ graha, transition: goTill(index, grahaIndex) }))
+    .filter(move => move.transition && fastGrahas.has(move.graha))
+    .sort((left, right) => left.transition.date - right.transition.date);
+  const root = document.getElementById('go-moves');
+  if (!moves.length) {
+    root.replaceChildren();
+    return;
+  }
+  const movesBox = goElement('div', 'go-moves');
+  movesBox.append(goElement('b', '', 'Coming up:'), ' ');
+  moves.forEach((move, moveIndex) => {
+    if (moveIndex) movesBox.append(goElement('span', 'go-move-sep', '  ·  '));
+    const item = goElement('span', 'go-move', `${move.graha} → ${move.transition.next} `);
+    const date = move.transition.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    item.append(goElement('b', '', date));
+    movesBox.append(item);
+  });
+  root.replaceChildren(movesBox);
+}
+
+function interpretationDetails(entry) {
+  const details = goElement('details', 'go-interpretation-details');
+  details.append(goElement('summary', '', "Read today's interpretive guidance"));
+  const interpretation = goElement('div', 'go-interpretation-content');
+  interpretation.append(goElement('p', '', entry.text));
+  if (entry.advice) {
+    const advice = goElement('div');
+    advice.style.cssText = 'margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;';
+    const label = goElement('span', 'go-guidance-label', "Today's guidance");
+    label.style.cssText = 'font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;';
+    const guidance = goElement('span', '', entry.advice);
+    guidance.style.cssText = 'font-size:0.84rem;color:#44403c;line-height:1.5;';
+    advice.append(label, guidance);
+    interpretation.append(advice);
+  }
+  const boundary = goElement(
+    'p',
+    '',
+    'AI-written interpretation: cited transit positions and verdicts are engine-checked; prose and guidance are interpretive, not independently scripturally verified.',
+  );
+  boundary.style.cssText = 'font-size:0.72rem;color:#746B5E;margin-top:0.65rem;';
+  interpretation.append(boundary);
+  details.append(interpretation);
+  return details;
+}
+
+function renderPhalalu(janmaRasi, row, view) {
+  const root = document.getElementById('go-phalalu');
+  if (janmaRasi === null) {
+    root.replaceChildren();
+    return;
+  }
+  const phalalu = buildPhalalu(janmaRasi, row);
+  const llmEntry = LLM_PHALALU?.rashis?.[RASI_NAMES[janmaRasi]];
+  const reading = goElement('div', 'go-phalalu');
+  const heading = goElement('h4', 'go-phalalu-heading');
+  heading.append(
+    goElement('span', 'go-phalalu-title', `Rasi Phalalu — ${view.label}`),
+    goElement('span', `go-quality ${phalalu.quality}`, `${phalalu.quality} day`),
+    goPhalaluShareButton(),
+  );
+  reading.append(heading, goElement('p', 'go-phalalu-opener', phalalu.opener));
+  if (phalalu.condition) {
+    reading.append(goElement('p', 'go-phalalu-condition', phalalu.condition));
+  }
+  reading.append(goElement('p', 'go-phalalu-summary', phalalu.summary));
+  const computedDetails = goElement('details', 'go-phalalu-details');
+  computedDetails.append(goElement(
+    'summary',
+    '',
+    `Why this guidance? View ${phalalu.detailLines.length} computed transit checks`,
+  ));
+  const detailLines = goElement('div', 'go-phalalu-detail-lines');
+  phalalu.detailLines.forEach(line => detailLines.append(goElement('p', '', line)));
+  computedDetails.append(detailLines);
+  reading.append(computedDetails);
+  if (llmEntry) reading.append(interpretationDetails(llmEntry));
+  reading.append(goElement(
+    'p',
+    'go-phalalu-boundary',
+    'The detailed checks are deterministic outputs from the documented Janma-Rashi transit rules.',
+  ));
+  root.replaceChildren(reading);
+}
+
+function renderGocharaLegend(janmaRasi) {
+  document.getElementById('go-legend').innerHTML = janmaRasi === null ? '' :
+    `<div class="tb-legend" style="margin-top:0.5rem;">
+      <span class="tb-legend-item"><span class="go-g good">favourable</span></span>
+      <span class="tb-legend-item"><span class="go-g blocked">blocked by vedha</span></span>
+      <span class="tb-legend-item"><span class="go-g bad">adverse</span></span>
+      <span class="tb-legend-item"><span class="go-g">℞ retrograde</span></span>
+      </div>`;
+}
+
 function renderGochara() {
   // A denied browser-storage write must never prevent the chart from rendering.
   persistGocharaSelection(selEl('go-view').value);
@@ -571,209 +844,18 @@ function renderGochara() {
   const jr = view.jr;
   const dateShown = new Date(GO_DATA.start + 'T00:00:00');
   dateShown.setDate(dateShown.getDate() + idx);
-  const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-
-  // Per-graha verdicts are computed from Janma Rashi (the natal Moon sign).
-  // This keeps the implementation aligned with the documented Gochara
-  // evidence contract; Lagna is not used as a second reference here.
-  const houseFrom = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
-  const occupantsFor = (ref) => {
-    const o = {};
-    GO_DATA.grahas.forEach((g, gi) => {
-      const h = houseFrom(gi, ref);
-      (o[h] = o[h] || []).push(g);
-    });
-    return o;
-  };
-  const verdictFrom = (gi, ref, occ) => {
-    const g = GO_DATA.grahas[gi], pos = houseFrom(gi, ref);
-    if (!GO_FAV[g].includes(pos)) return 'bad';
-    if (!GO_NODES.has(g)) {
-      const vh = GO_VEDHA[g][pos];
-      for (const other of (occ[vh] || [])) {
-        if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return 'blocked';
-      }
-    }
-    return 'good';
-  };
-
-  // Pre-compute occupants for the Moon-sign reference.
-  const occRashi = (jr !== null) ? occupantsFor(jr) : null;
-  // Chart colour is anchored to the documented Janma-Chandra frame.
+  const occupants = jr !== null ? goOccupants(row, jr) : null;
   const verdictOf = gi => {
     if (jr === null) return null;
-    return verdictFrom(gi, jr, occRashi);
+    return goVerdict(row, gi, jr, occupants);
   };
+  renderShaniCondition(row, jr);
+  renderTransitChart(row, retro, view, dateShown, verdictOf, idx);
 
-  // Named Shani conditions are reckoned only from Janma Chandra.
-  const condBox = document.getElementById('go-conditions');
-  const shaniIdx = GO_DATA.grahas.indexOf('Shani');
-  const conds = [];
-  if (jr !== null) {
-    const condition = shaniConditionFromMoonHouse(houseFrom(shaniIdx, jr));
-    if (condition) conds.push(`${condition} — from Moon sign`);
-  }
-  condBox.innerHTML = conds.length
-    ? `<div class="go-cond">${conds.map(c => `<span class="chip">⚠️ ${htmlEsc(c)}</span>`).join('')}
-       <div class="tb-sub" style="margin-top:0.25rem;">Running ${conds[0].split(' — ')[0].split(' (')[0]}? Personalised guidance:
-       <a href="https://astrochaganti.com" target="_blank" rel="noopener" style="color:var(--indigo);font-weight:600;">astrochaganti.com</a></div></div>` : '';
+  renderUpcomingMoves(idx);
 
-  // chart
-  const byRasi = {};
-  GO_DATA.grahas.forEach((g, gi) => { (byRasi[row[gi]] = byRasi[row[gi]] || []).push(gi); });
-  const ord = n => `${n}${['st','nd','rd'][n-1] || 'th'}`;
-  const verdictLabel = v => v === 'good' ? 'favourable' : v === 'blocked' ? 'vedha' : 'adverse';
-  const chartNodes = [];
-  for (let r = 0; r < 12; r++) {
-    const [gr, gc] = GO_LAYOUT[r];
-    const isJanma = (jr === r);
-    const box = goElement('div', `go-box${isJanma ? ' janma' : ''}`);
-    box.style.gridRow = String(gr);
-    box.style.gridColumn = String(gc);
-    box.append(goElement(
-      'span',
-      'rname',
-      `${GO_DATA.rasis[r]}${isJanma ? ' · janma' : ''}`,
-    ));
-    if (jr !== null) {
-      box.append(goElement('span', 'house', ((r - jr + 12) % 12) + 1));
-    }
-    box.append(document.createElement('br'));
-    for (const gi of (byRasi[r] || [])) {
-      const v = verdictOf(gi);
-      const t = goTill(idx, gi);
-      let perRef = '';
-      if (jr !== null) {
-        const hr = houseFrom(gi, jr);
-        perRef = ` — ${ord(hr)} from Janma Rashi (${verdictLabel(v)})`;
-      }
-      const tip = `${GO_DATA.grahas[gi]} in ${GO_DATA.rasis[r]}${perRef}` +
-        (t ? ` · till ${t.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '');
-      const graha = goElement('span', `go-g${v ? ` ${v}` : ''}`, GO_DATA.grahas[gi]);
-      graha.title = tip;
-      if (retro[gi]) graha.append(goElement('span', 'go-retro', '℞'));
-      box.append(graha);
-    }
-    chartNodes.push(box);
-  }
-  document.getElementById('go-note').replaceChildren();
-  const center = goElement('div', 'go-center');
-  center.append(
-    goElement('div', 'd1', '🪐 Gochara'),
-    goElement('div', 'd2', fmtD(dateShown)),
-    goElement(
-      'div',
-      'd2',
-      jr !== null
-        ? `from ${view.label}`
-        : 'transits — choose a person or rashi above to personalise',
-    ),
-  );
-  document.getElementById('go-chart').replaceChildren(...chartNodes, center);
-
-  // upcoming moves — fast planets only (Moon, Mercury, Sun change frequently enough to matter)
-  const GO_FAST = new Set(['Chandra', 'Budha', 'Surya']);
-  const moves = GO_DATA.grahas.map((g, gi) => ({ g, t: goTill(idx, gi) }))
-    .filter(m => m.t && GO_FAST.has(m.g)).sort((a, b) => a.t.date - b.t.date);
-  const movesRoot = document.getElementById('go-moves');
-  if (!moves.length) {
-    movesRoot.replaceChildren();
-  } else {
-    const movesBox = goElement('div', 'go-moves');
-    movesBox.append(goElement('b', '', 'Coming up:'), ' ');
-    moves.forEach((move, index) => {
-      if (index) movesBox.append(goElement('span', 'go-move-sep', ' \u00a0·\u00a0 '));
-      const item = goElement('span', 'go-move', `${move.g} → ${move.t.next} `);
-      item.append(goElement(
-        'b',
-        '',
-        move.t.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      ));
-      movesBox.append(item);
-    });
-    movesRoot.replaceChildren(movesBox);
-  }
-
-  // rasi phalalu
-  const phBox = document.getElementById('go-phalalu');
-  if (jr === null) { phBox.replaceChildren(); }
-  else {
-    const ph = buildPhalalu(jr, row);
-    const llmRasiKey = RASI_NAMES[jr];
-    const llmEntry = LLM_PHALALU?.rashis?.[llmRasiKey];
-    const llmForToday = !!llmEntry;
-    const reading = goElement('div', 'go-phalalu');
-    const heading = goElement('h4', 'go-phalalu-heading');
-    heading.append(
-      goElement('span', 'go-phalalu-title', `Rasi Phalalu — ${view.label}`),
-      goElement('span', `go-quality ${ph.quality}`, `${ph.quality} day`),
-      goPhalaluShareButton(),
-    );
-    reading.append(
-      heading,
-      goElement('p', 'go-phalalu-opener', ph.opener),
-    );
-    if (ph.condition) {
-      reading.append(goElement('p', 'go-phalalu-condition', ph.condition));
-    }
-    reading.append(goElement('p', 'go-phalalu-summary', ph.summary));
-
-    const computedDetails = goElement('details', 'go-phalalu-details');
-    computedDetails.append(goElement(
-      'summary',
-      '',
-      `Why this guidance? View ${ph.detailLines.length} computed transit checks`,
-    ));
-    const detailLines = goElement('div', 'go-phalalu-detail-lines');
-    ph.detailLines.forEach(line => detailLines.append(goElement('p', '', line)));
-    computedDetails.append(detailLines);
-    reading.append(computedDetails);
-
-    if (llmForToday) {
-      const interpretationDetails = goElement('details', 'go-interpretation-details');
-      interpretationDetails.append(goElement(
-        'summary',
-        '',
-        "Read today's interpretive guidance",
-      ));
-      const interpretation = goElement('div', 'go-interpretation-content');
-      interpretation.append(goElement('p', '', llmEntry.text));
-      if (llmEntry.advice) {
-        const advice = goElement('div');
-        advice.style.cssText = 'margin-top:0.65rem;padding:0.5rem 0.65rem;background:#FFF8ED;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;';
-        const label = goElement('span', 'go-guidance-label', "Today's guidance");
-        label.style.cssText = 'font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;display:block;margin-bottom:0.2rem;';
-        const guidance = goElement('span', '', llmEntry.advice);
-        guidance.style.cssText = 'font-size:0.84rem;color:#44403c;line-height:1.5;';
-        advice.append(label, guidance);
-        interpretation.append(advice);
-      }
-      const interpretationBoundary = goElement(
-        'p',
-        '',
-        'AI-written interpretation: cited transit positions and verdicts are engine-checked; prose and guidance are interpretive, not independently scripturally verified.',
-      );
-      interpretationBoundary.style.cssText = 'font-size:0.72rem;color:#746B5E;margin-top:0.65rem;';
-      interpretation.append(interpretationBoundary);
-      interpretationDetails.append(interpretation);
-      reading.append(interpretationDetails);
-    }
-    reading.append(goElement(
-      'p',
-      'go-phalalu-boundary',
-      'The detailed checks are deterministic outputs from the documented Janma-Rashi transit rules.',
-    ));
-    phBox.replaceChildren(reading);
-  }
-
-  // legend
-  document.getElementById('go-legend').innerHTML = jr === null ? '' :
-    `<div class="tb-legend" style="margin-top:0.5rem;">
-      <span class="tb-legend-item"><span class="go-g good">favourable</span></span>
-      <span class="tb-legend-item"><span class="go-g blocked">blocked by vedha</span></span>
-      <span class="tb-legend-item"><span class="go-g bad">adverse</span></span>
-      <span class="tb-legend-item"><span class="go-g">℞ retrograde</span></span>
-      </div>`;
+  renderPhalalu(jr, row, view);
+  renderGocharaLegend(jr);
 }
 
 const HOUSE_MEANINGS = { 1:'self and health', 2:'wealth and family', 3:'courage and effort',
@@ -786,55 +868,68 @@ const PHALALU_OPENERS = {
 const PHALALU_ORDER = ['Shani','Guru','Rahu','Ketu','Kuja','Surya','Shukra','Budha'];
 const ordinal = n => n + (['st','nd','rd'][n-1] || 'th');
 
+function detailedVerdict(row, grahaIndex, reference, occupants) {
+  const graha = GO_DATA.grahas[grahaIndex];
+  const position = goHouseFrom(row, grahaIndex, reference);
+  if (!GO_FAV[graha].includes(position)) return { v: 'adverse' };
+  if (GO_NODES.has(graha)) return { v: 'favourable' };
+  const vedhaHouse = GO_VEDHA[graha][position];
+  for (const other of (occupants[vedhaHouse] || [])) {
+    const isVedha = other !== graha
+      && !GO_NODES.has(other)
+      && !GO_EXEMPT.has(`${graha}|${other}`);
+    if (isVedha) return { v: 'blocked', by: other };
+  }
+  return { v: 'favourable' };
+}
+
+function moonVerdict(moonPosition) {
+  if (CHANDRA_GOOD.has(moonPosition)) return 'good';
+  if (CHANDRA_PUJA.has(moonPosition)) return 'puja';
+  return 'bad';
+}
+
+function phalaluQuality(moon, favourableCount) {
+  if (moon === 'good' && favourableCount >= 4) return 'good';
+  if (moon === 'bad' && favourableCount <= 2) return 'difficult';
+  return 'mixed';
+}
+
+function phalaluDetailLine(graha, detail) {
+  const meaning = HOUSE_MEANINGS[detail.posR];
+  if (detail.v === 'favourable') {
+    return `${graha} in your ${ordinal(detail.posR)} house favours ${meaning}.`;
+  }
+  if (detail.v === 'blocked') {
+    return `${graha}'s good ${ordinal(detail.posR)}-house transit is under vedha by ${detail.by} — ${meaning} may face friction.`;
+  }
+  return `${graha} in the ${ordinal(detail.posR)} house tests ${meaning}; avoid forcing matters there.`;
+}
+
 function buildPhalalu(jr, row) {
   // Daily Horoscope is a single-reference Janma-Rashi computation.
-  const houseFromRef = (gi, ref) => ((row[gi] - ref + 12) % 12) + 1;
-  const occFor = (ref) => {
-    const o = {};
-    GO_DATA.grahas.forEach((g, gi) => {
-      const h = houseFromRef(gi, ref);
-      (o[h] = o[h] || []).push(g);
-    });
-    return o;
-  };
-  const verdictForRef = (gi, ref, occ) => {
-    const g = GO_DATA.grahas[gi], pos = houseFromRef(gi, ref);
-    if (!GO_FAV[g].includes(pos)) return { v: 'adverse' };
-    if (!GO_NODES.has(g)) {
-      const vh = GO_VEDHA[g][pos];
-      for (const other of (occ[vh] || [])) {
-        if (other !== g && !GO_NODES.has(other) && !GO_EXEMPT.has(g + '|' + other)) return { v: 'blocked', by: other };
-      }
-    }
-    return { v: 'favourable' };
-  };
-  const occR = occFor(jr);
+  const occupants = goOccupants(row, jr);
+  const houseFromRef = (grahaIndex, reference) => goHouseFrom(row, grahaIndex, reference);
   const houseOf = gi => houseFromRef(gi, jr);
   const moonPos = houseOf(GO_DATA.grahas.indexOf('Chandra'));
-  const mv = CHANDRA_GOOD.has(moonPos) ? 'good' : (CHANDRA_PUJA.has(moonPos) ? 'puja' : 'bad');
+  const mv = moonVerdict(moonPos);
   let fav = 0, blocked = 0;
   const detail = {};
   GO_DATA.grahas.forEach((g, gi) => {
-    const r = verdictForRef(gi, jr, occR);
+    const r = detailedVerdict(row, gi, jr, occupants);
     detail[g] = { ...r, posR: houseOf(gi) };
     if (r.v === 'favourable') fav++; else if (r.v === 'blocked') blocked++;
   });
-  const quality = (mv === 'good' && fav >= 4) ? 'good' : (mv === 'bad' && fav <= 2) ? 'difficult' : 'mixed';
+  const quality = phalaluQuality(mv, fav);
   const opener = PHALALU_OPENERS[mv];
 
   // Named Shani conditions are Moon-sign constructs.
   const shaniIdx = GO_DATA.grahas.indexOf('Shani');
   const condition = shaniConditionFromMoonHouse(houseFromRef(shaniIdx, jr));
   const conditionLine = condition ? shaniConditionLine(condition) : null;
-  const detailLines = [];
-  for (const g of PHALALU_ORDER) {
-    const d = detail[g];
-    const meaning = HOUSE_MEANINGS[d.posR];
-    detailLines.push(d.v === 'favourable' ? `${g} in your ${ordinal(d.posR)} house favours ${meaning}.`
-      : d.v === 'blocked' ? `${g}'s good ${ordinal(d.posR)}-house transit is under vedha by ${d.by} — ${meaning} may face friction.`
-      : `${g} in the ${ordinal(d.posR)} house tests ${meaning}; avoid forcing matters there.`);
-  }
-  const summary = `${fav} of 9 grahas favour you today${blocked ? `, ${blocked} under vedha` : ''} (from your Janma Rashi).`;
+  const detailLines = PHALALU_ORDER.map(graha => phalaluDetailLine(graha, detail[graha]));
+  const blockedSummary = blocked ? `, ${blocked} under vedha` : '';
+  const summary = `${fav} of 9 grahas favour you today${blockedSummary} (from your Janma Rashi).`;
   return {
     quality,
     opener,
@@ -843,6 +938,13 @@ function buildPhalalu(jr, row) {
     summary,
     lines: [opener, ...(conditionLine ? [conditionLine] : []), ...detailLines, summary],
   };
+}
+
+function gocharaShareIdentity(jr, ph) {
+  const lines = [];
+  // Saved profile names and birth details are intentionally omitted.
+  lines.push(`${RASI_NAMES[jr]} Janma Rashi · ${ph.quality} day`);
+  return lines;
 }
 
 function shareGocharaOnWhatsApp() {
@@ -854,15 +956,16 @@ function shareGocharaOnWhatsApp() {
   const row = GO_DATA.days[idx];
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const ph = buildPhalalu(jr, row);
-  const lines = [];
   const shown = new Date(GO_DATA.start + 'T00:00:00'); shown.setDate(shown.getDate() + idx);
-  lines.push(`📜 *Rasi Phalalu — ${fmtD(shown)}*`);
-  lines.push(`${RASI_NAMES[jr]} Janma Rashi · ${ph.quality} day`);
-  lines.push('');
-  ph.lines.forEach(l => lines.push('• ' + l));
-  lines.push('');
-  lines.push('Check your rashi:');
-  lines.push('https://panchangam.astrochaganti.com/?src=share-phalalu#gochara');
+  const lines = [
+    `📜 *Rasi Phalalu — ${fmtD(shown)}*`,
+    ...gocharaShareIdentity(jr, ph),
+    '',
+    ...ph.lines.map(line => `• ${line}`),
+    '',
+    'Check your rashi:',
+    'https://panchangam.astrochaganti.com/?src=share-phalalu#gochara',
+  ];
   gcEvent('share-phalalu');
   window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
 }
