@@ -26,6 +26,7 @@ dependencies = [
 # `pip install -e .[test]` so existing tooling keeps working.
 test = [
     "pytest>=8.0.0",
+    "pyyaml==6.0.3",
     "ruff==0.16.6",
 ]
 # Browser-smoke deps. Heavy install (~100 MB chromium); kept separate
