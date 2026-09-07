@@ -182,7 +182,7 @@ describe('Gochara stable selection', () => {
   });
 
   test('rejects malformed selections and an out-of-range Rashi safely', () => {
-    for (const invalid of ['12', '-1', 'profile:', 'not-a-view']) {
+    for (const invalid of ['12', '-1', 'profile:', 'not-a-view', 7, {}, ['profile:guest']]) {
       const result = resolveGocharaSelection(invalid, []);
       expect(result.value).toBe('');
       expect(result.fallback).toMatchObject({ code: 'invalid-selection' });

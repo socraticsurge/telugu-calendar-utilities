@@ -7,7 +7,7 @@ import { parseEvents } from './ics';
 export const FEED_BASE_URL = 'https://panchangam.astrochaganti.com/feeds/';
 
 export function slug(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '');
+  return name.toLowerCase().replaceAll(/\s+/g, '-').replaceAll(',', '');
 }
 
 export function feedFilename(city: string, system: string, variant = ''): string {

@@ -83,7 +83,10 @@ function minute(time: unknown, flag: unknown = null): number | null {
     return null;
   }
   const [hour, value] = time.split(':').map(Number);
-  return hour * 60 + value + (flag === '+1' ? 1_440 : flag === '-1' ? -1_440 : 0);
+  let dayOffset = 0;
+  if (flag === '+1') dayOffset = 1_440;
+  if (flag === '-1') dayOffset = -1_440;
+  return hour * 60 + value + dayOffset;
 }
 
 function boundaryLabel(time: string, flag: string | null | undefined): string {

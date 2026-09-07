@@ -3,6 +3,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import { extname, join, relative } from 'node:path'
 
 import { JSDOM } from 'jsdom'
+import { mermaidDiagrams } from './markdown-mermaid-fences.mjs'
 
 
 const root = process.cwd()
@@ -35,13 +36,12 @@ async function markdownFiles(directory) {
 
 let diagramCount = 0
 const failures = []
-const mermaidFence = /^```mermaid\s*\n([\s\S]*?)^```\s*$/gm
 for (const path of await markdownFiles(docsRoot)) {
   const source = await readFile(path, 'utf8')
-  for (const match of source.matchAll(mermaidFence)) {
+  for (const diagram of mermaidDiagrams(source)) {
     diagramCount += 1
     try {
-      await mermaid.parse(match[1])
+      await mermaid.parse(diagram)
     } catch (error) {
       failures.push(`${relative(root, path)}: ${error.message}`)
     }

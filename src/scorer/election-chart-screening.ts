@@ -123,54 +123,54 @@ function evaluateRule(
       evidence: ['Complete Whole Sign house facts are unavailable.'],
     };
   }
-  let passed: boolean;
-  let evidence: string[];
   if (rule.kind === 'house_empty') {
     const occupants = Array.from(houses.entries())
       .filter(([, house]) => house === rule.house)
       .map(([name]) => name);
-    passed = occupants.length === 0;
-    evidence = [
-      `House ${rule.house} occupants: ${occupants.length ? occupants.join(', ') : 'none'}.`,
-    ];
-  } else if (rule.kind === 'planet_not_house') {
+    return {
+      status: occupants.length === 0 ? 'pass' : 'fail',
+      evidence: [`House ${rule.house} occupants: ${occupants.length ? occupants.join(', ') : 'none'}.`],
+    };
+  }
+  if (rule.kind === 'planet_not_house') {
     const observed = houses.get(rule.planet as string) as number;
-    passed = observed !== rule.house;
-    evidence = [
-      `${rule.planet} occupies house ${observed}${passed
+    const passed = observed !== rule.house;
+    return {
+      status: passed ? 'pass' : 'fail',
+      evidence: [`${rule.planet} occupies house ${observed}${passed
         ? `, outside house ${rule.house}.`
-        : ', which is prohibited.'}`,
-    ];
-  } else if (rule.kind === 'planet_in_houses') {
+        : ', which is prohibited.'}`],
+    };
+  }
+  if (rule.kind === 'planet_in_houses') {
     const observed = houses.get(rule.planet as string) as number;
-    passed = (rule.houses || []).includes(observed);
-    evidence = [
-      `${rule.planet} occupies house ${observed}; target houses: ${(rule.houses || []).join(', ')}.`,
-    ];
-  } else if (rule.kind === 'any_planet_in_houses') {
+    return {
+      status: (rule.houses || []).includes(observed) ? 'pass' : 'fail',
+      evidence: [`${rule.planet} occupies house ${observed}; target houses: ${(rule.houses || []).join(', ')}.`],
+    };
+  }
+  if (rule.kind === 'any_planet_in_houses') {
     const matching = (rule.planets || []).filter(planet =>
       (rule.houses || []).includes(houses.get(planet) as number));
-    passed = matching.length > 0;
+    let detail: string;
     if ((rule.houses || []).length === 1 && rule.houses?.[0] === 1) {
       const planets = rule.planets || [];
       const named = planets.length > 1
         ? `${planets.slice(0, -1).join(', ')} and ${planets.at(-1)}`
         : planets.join('');
-      evidence = [
-        `Lagna occupants among ${named}: ${matching.length ? matching.join(', ') : 'none'}.`,
-      ];
+      detail = `Lagna occupants among ${named}: ${matching.length ? matching.join(', ') : 'none'}.`;
     } else {
-      evidence = [
-        `Matching grahas: ${matching.length ? matching.join(', ') : 'none'}; target houses: ${(rule.houses || []).join(', ')}.`,
-      ];
+      detail = `Matching grahas: ${matching.length ? matching.join(', ') : 'none'}; target houses: ${(rule.houses || []).join(', ')}.`;
     }
-  } else {
     return {
-      status: 'unknown',
-      evidence: [`Unsupported election-chart rule kind: ${String(rule.kind)}.`],
+      status: matching.length > 0 ? 'pass' : 'fail',
+      evidence: [detail],
     };
   }
-  return { status: passed ? 'pass' : 'fail', evidence };
+  return {
+    status: 'unknown',
+    evidence: [`Unsupported election-chart rule kind: ${String(rule.kind)}.`],
+  };
 }
 
 function ruleOutcome(
@@ -250,6 +250,18 @@ function goldTransitionEvidence(
   return evidence;
 }
 
+function combinedRuleStatus(
+  effect: ElectionRuleEffect,
+  statuses: readonly ElectionRuleStatus[],
+): ElectionRuleStatus {
+  if ((effect === 'reject' || effect === 'qualify') && statuses.includes('fail')) return 'fail';
+  if (statuses.includes('unknown')) return 'unknown';
+  if (effect === 'reject') return 'pass';
+  if (statuses.every(value => value === 'pass')) return 'pass';
+  if (statuses.every(value => value === 'fail')) return 'fail';
+  return 'unknown';
+}
+
 export function evaluateElectionChart(
   activity: string,
   chart: ElectionChartSnapshot,
@@ -292,23 +304,7 @@ export function evaluateElectionSnapshots(
       result.outcomes.find(outcome => outcome.ruleId === firstOutcome.ruleId)?.status
       || 'unknown');
     if (!statuses.every(status => status === statuses[0])) stable = false;
-    let status: ElectionRuleStatus;
-    if (
-      (firstOutcome.effect === 'reject' || firstOutcome.effect === 'qualify')
-      && statuses.includes('fail')
-    ) {
-      status = 'fail';
-    } else if (statuses.includes('unknown')) {
-      status = 'unknown';
-    } else if (firstOutcome.effect === 'reject') {
-      status = statuses.includes('fail') ? 'fail' : 'pass';
-    } else if (statuses.every(value => value === 'pass')) {
-      status = 'pass';
-    } else if (statuses.every(value => value === 'fail')) {
-      status = 'fail';
-    } else {
-      status = 'unknown';
-    }
+    let status = combinedRuleStatus(firstOutcome.effect, statuses);
     const extraEvidence = transitionEvidence.get(firstOutcome.ruleId) || [];
     const transitionApplied = status === 'pass' && extraEvidence.length > 0;
     if (transitionApplied) {

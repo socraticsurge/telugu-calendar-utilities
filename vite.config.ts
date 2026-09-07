@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 export default defineConfig({
   base: '/',
   server: {
-    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
+    port: process.env.PORT ? Number.parseInt(process.env.PORT) : 5173,
     strictPort: false,
   },
   publicDir: resolve(import.meta.dirname, 'public'),

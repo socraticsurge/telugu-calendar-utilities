@@ -87,6 +87,9 @@ explanation.
 :::`
   }
 
+  const notes = record.method.notes
+    ? `### Method notes\n\n${list(record.method.notes)}`
+    : ''
   return `**Method type:** \`${record.method.kind}\`
 
 ${record.method.summary}
@@ -97,7 +100,7 @@ ${numberedList(record.method.steps)}
 
 ${renderFormulae(record.method.formulae)}
 ${renderWorkedExamples(record.method.worked_examples)}
-${record.method.notes ? `### Method notes\n\n${list(record.method.notes)}` : ''}`
+${notes}`
 }
 
 function sourceList(claim, sourcesById) {

@@ -6,7 +6,7 @@ import { getSelection } from '../selection-store';
 
 export function fmtT(t: string): string {
   if (getSelection().timeFmt === '24') return t;
-  const m = t.match(/^(\d{2}):(\d{2})$/);
+  const m = /^(\d{2}):(\d{2})$/.exec(t);
   if (!m) return t;
   const h = Number(m[1]);
   return `${h % 12 || 12}:${m[2]}${h < 12 ? 'am' : 'pm'}`;
@@ -27,7 +27,10 @@ export function fmtRange(start: string, end: string, sep?: string, sflag?: strin
 }
 
 export function fmtPlain(t: string, flag?: string | null): string {
-  return fmtT(t) + (flag === '+1' ? ' (next day)' : flag === '-1' ? ' (prev day)' : '');
+  let day = '';
+  if (flag === '+1') day = ' (next day)';
+  else if (flag === '-1') day = ' (prev day)';
+  return fmtT(t) + day;
 }
 
 // Date → feed key (YYYYMMDD)

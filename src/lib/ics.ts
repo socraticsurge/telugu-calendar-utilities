@@ -2,7 +2,7 @@
 // Extracted verbatim from main.ts (one-shell decomposition).
 
 export function unfoldICS(text: string): string[] {
-  return text.replace(/\r\n/g, '\n').split('\n').reduce((lines: string[], line: string) => {
+  return text.replaceAll('\r\n', '\n').split('\n').reduce((lines: string[], line: string) => {
     if (line.startsWith(' ') && lines.length) {
       lines[lines.length - 1] += line.slice(1);
     } else {
@@ -27,10 +27,10 @@ export function parseEvents(text: string): Map<string, { summary: string; descri
           const summary = (current.find(l => l.startsWith('SUMMARY:')) || '').slice('SUMMARY:'.length);
           const descLine = current.find(l => l.startsWith('DESCRIPTION:')) || '';
           const description = descLine.slice('DESCRIPTION:'.length)
-            .replace(/\\n/g, '\n')
-            .replace(/\\,/g, ',')
-            .replace(/\\;/g, ';')
-            .replace(/\\\\/g, '\\');
+            .replaceAll('\\n', '\n')
+            .replaceAll('\\,', ',')
+            .replaceAll('\\;', ';')
+            .replaceAll('\\\\', '\\');
           events.set(dtstart.slice('DTSTART;VALUE=DATE:'.length), { summary, description });
         }
       }
@@ -41,4 +41,3 @@ export function parseEvents(text: string): Map<string, { summary: string; descri
   }
   return events;
 }
-

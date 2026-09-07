@@ -71,7 +71,7 @@ describe('birth profile API routing', () => {
     );
     expect(birthProfileApiBase(
       { hostname: 'localhost' } as Location,
-      'http://localhost:4310/api/guest/',
+      'http://localhost:4310/api/guest////',
     )).toBe('http://localhost:4310/api/guest');
     expect(birthProfileApiBase(
       { hostname: 'panchangam.astrochaganti.com' } as Location,
@@ -83,7 +83,7 @@ describe('birth profile API routing', () => {
     )).toBe('https://astrochaganti.com/api/guest');
     expect(birthProfileApiBase(
       { hostname: 'panchangam.astrochaganti.com' } as Location,
-      'https://astrochaganti.com/api/guest/',
+      'https://astrochaganti.com/api/guest////',
     )).toBe('https://astrochaganti.com/api/guest');
   });
 

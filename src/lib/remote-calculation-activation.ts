@@ -3,11 +3,7 @@ export interface RemoteCalculationActivation {
   source: 'explicit' | 'local-default' | 'disabled';
 }
 
-export type BirthProfileCalculationActivation = RemoteCalculationActivation;
-export type ElectionChartCalculationActivation = RemoteCalculationActivation;
-export type RemoteCalculationLocation = Pick<Location, 'hostname'> | undefined;
-export type BirthProfileLocation = RemoteCalculationLocation;
-export type ElectionChartLocation = RemoteCalculationLocation;
+export type RemoteCalculationLocation = Pick<Location, 'hostname'>;
 
 function configuredBirthProfileFlag(): string | undefined {
   return (
@@ -25,15 +21,21 @@ export function isLoopbackHostname(hostname: string): boolean {
   return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
 }
 
+export function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value[end - 1] === '/') end -= 1;
+  return value.slice(0, end);
+}
+
 /**
  * A missing flag keeps loopback development convenient. Every public build
  * and every explicit local configuration fails closed unless the value is the
  * exact, case-sensitive string `true`.
  */
-export function birthProfileCalculationActivation(
-  locationLike: BirthProfileLocation = globalThis.location,
-  flag: string | undefined = configuredBirthProfileFlag(),
-): BirthProfileCalculationActivation {
+function remoteCalculationActivation(
+  locationLike: RemoteCalculationLocation | undefined,
+  flag: string | undefined,
+): RemoteCalculationActivation {
   if (flag !== undefined) {
     return flag === 'true'
       ? { enabled: true, source: 'explicit' }
@@ -45,8 +47,15 @@ export function birthProfileCalculationActivation(
   return { enabled: false, source: 'disabled' };
 }
 
+export function birthProfileCalculationActivation(
+  locationLike: RemoteCalculationLocation = globalThis.location,
+  flag: string | undefined = configuredBirthProfileFlag(),
+): RemoteCalculationActivation {
+  return remoteCalculationActivation(locationLike, flag);
+}
+
 export function birthProfileCalculationEnabled(
-  locationLike?: BirthProfileLocation,
+  locationLike?: RemoteCalculationLocation,
   flag?: string,
 ): boolean {
   return birthProfileCalculationActivation(locationLike, flag).enabled;
@@ -59,22 +68,14 @@ export function birthProfileCalculationEnabled(
  * exact, case-sensitive string `true`.
  */
 export function electionChartCalculationActivation(
-  locationLike: ElectionChartLocation = globalThis.location,
+  locationLike: RemoteCalculationLocation = globalThis.location,
   flag: string | undefined = configuredElectionChartFlag(),
-): ElectionChartCalculationActivation {
-  if (flag !== undefined) {
-    return flag === 'true'
-      ? { enabled: true, source: 'explicit' }
-      : { enabled: false, source: 'disabled' };
-  }
-  if (locationLike && isLoopbackHostname(locationLike.hostname)) {
-    return { enabled: true, source: 'local-default' };
-  }
-  return { enabled: false, source: 'disabled' };
+): RemoteCalculationActivation {
+  return remoteCalculationActivation(locationLike, flag);
 }
 
 export function electionChartCalculationEnabled(
-  locationLike?: ElectionChartLocation,
+  locationLike?: RemoteCalculationLocation,
   flag?: string,
 ): boolean {
   return electionChartCalculationActivation(locationLike, flag).enabled;

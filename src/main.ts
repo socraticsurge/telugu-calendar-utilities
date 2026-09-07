@@ -173,47 +173,57 @@ import {
     container.removeAttribute('role');
     container.removeAttribute('aria-modal');
     container.removeEventListener('keydown', _modalTrapTab);
-    if (_modalRestoreFocus && _modalRestoreFocus.focus) _modalRestoreFocus.focus();
+    if (_modalRestoreFocus?.focus) _modalRestoreFocus.focus();
     _modalRestoreFocus = null;
   }
   function _modalTrapTab(e) {
     if (e.key !== 'Tab') return;
     const f = _focusables(e.currentTarget);
     if (!f.length) return;
-    const first = f[0], last = f[f.length - 1];
+    const first = f[0], last = f.at(-1);
     if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
     else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
   }
 
-  const TOOL_PANELS = ['today', 'tarabalam', 'gochara'];
+  const TOOL_PANELS = new Set(['today', 'tarabalam', 'gochara']);
 
-  function switchTool(which) {
-    const activeTrigger = document.activeElement;
-    const focusHeading = activeTrigger instanceof Element
-      && activeTrigger.matches('#sidebar .sidebar-item, .tool-tab');
-    // Tool panels: show/hide the three original panels
-    for (const t of TOOL_PANELS) {
-      const active = t === which;
-      const panel = document.getElementById('panel-' + t);
-      const tab = document.getElementById('tab-' + t);
+  function updateToolPanels(which) {
+    for (const tool of TOOL_PANELS) {
+      const active = tool === which;
+      const panel = document.getElementById('panel-' + tool);
+      const tab = document.getElementById('tab-' + tool);
       panel.style.display = active ? '' : 'none';
       panel.setAttribute('aria-hidden', active ? 'false' : 'true');
       tab.classList.toggle('active', active);
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
       tab.setAttribute('tabindex', active ? '0' : '-1');
     }
-    document.body.dataset.tool = which;
-    // sidebar stays in sync on desktop
-    document.querySelectorAll('#sidebar .sidebar-item[id]').forEach(b => {
-      const active = b.id === 'sidebar-' + which;
-      b.classList.toggle('active', active);
-      if (active) b.setAttribute('aria-current', 'page');
-      else b.removeAttribute('aria-current');
+  }
+
+  function updateSidebar(which) {
+    document.querySelectorAll('#sidebar .sidebar-item[id]').forEach(button => {
+      const active = button.id === 'sidebar-' + which;
+      button.classList.toggle('active', active);
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
     });
-    const titles = PAGE_TITLES[which];
-    document.getElementById('m-page-title-main').textContent = titles ? titles[0] : '';
-    document.getElementById('m-page-title-sub').textContent = titles ? titles[1] : '';
-    if (focusHeading && TOOL_PANELS.includes(which)) {
+  }
+
+  function updatePageTitle(which) {
+    const [main = '', sub = ''] = PAGE_TITLES[which] || [];
+    document.getElementById('m-page-title-main').textContent = main;
+    document.getElementById('m-page-title-sub').textContent = sub;
+  }
+
+  function switchTool(which) {
+    const activeTrigger = document.activeElement;
+    const focusHeading = activeTrigger instanceof Element
+      && activeTrigger.matches('#sidebar .sidebar-item, .tool-tab');
+    updateToolPanels(which);
+    document.body.dataset.tool = which;
+    updateSidebar(which);
+    updatePageTitle(which);
+    if (focusHeading && TOOL_PANELS.has(which)) {
       queueMicrotask(() => document.getElementById('m-page-title')?.focus());
     }
     if (history.replaceState) history.replaceState(null, '', which === 'today' ? '#' : '#' + which);
@@ -367,16 +377,19 @@ import {
   document.querySelectorAll('.sidebar-icon').forEach(icon => {
     icon.setAttribute('aria-hidden', 'true');
   });
+  function nextTabIndex(key, current, length) {
+    if (key === 'Home') return 0;
+    if (key === 'End') return length - 1;
+    const direction = key === 'ArrowRight' ? 1 : -1;
+    return (current + direction + length) % length;
+  }
+
   document.querySelectorAll<HTMLElement>('.app-tab').forEach(tab => {
     tab.addEventListener('keydown', event => {
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
       const tabs = [...document.querySelectorAll<HTMLElement>('.app-tab')];
       const current = tabs.indexOf(tab);
-      const next = event.key === 'Home'
-        ? 0
-        : event.key === 'End'
-          ? tabs.length - 1
-          : (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      const next = nextTabIndex(event.key, current, tabs.length);
       event.preventDefault();
       showAppTab(tabs[next].dataset.app);
       tabs[next].focus();
@@ -467,8 +480,7 @@ import {
 
     // --- resize: debounced re-apply, don't thrash on edge widths ---
     let rt;
-    if (mq.addEventListener) mq.addEventListener('change', schedule);
-    else mq.addListener(schedule);
+    mq.addEventListener('change', schedule);
     function schedule() { clearTimeout(rt); rt = setTimeout(applyMode, 120); }
     window.addEventListener('resize', schedule);
 
@@ -489,7 +501,7 @@ import {
   })();
   document.addEventListener('click', function (e) {
     const t = e.target as Element;
-    const a = t.closest && t.closest('a');
+    const a = t.closest?.('a');
     if (!a) return;
     if (a.href.includes('astrochaganti.com') && !a.href.includes('panchangam.')) gcEvent('consult-click');
     if (a.href.includes('pypi.org')) gcEvent('pypi-click');

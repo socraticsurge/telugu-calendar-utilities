@@ -10,7 +10,7 @@ import {
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../data/rasis';
 import {
   electionChartCalculationEnabled,
-  type ElectionChartLocation as ElectionChartBrowserLocation,
+  type RemoteCalculationLocation as ElectionChartBrowserLocation,
 } from '../lib/remote-calculation-activation';
 import {
   automatedRulesFor,
@@ -274,6 +274,33 @@ interface ChartCheckPlan {
   lagnas: string[];
 }
 
+interface EnrichmentProgress<TSlot extends EnrichableMuhurtamSlot> {
+  survivors: TSlot[];
+  processed: number;
+  removedCount: number;
+  chartRemovedCount: number;
+  personalRemovedCount: number;
+  boundaryReviewCount: number;
+  qualificationCappedCount: number;
+  reviewGatedCount: number;
+  overlappingDispositionCount: number;
+  chartRemovedRules: Map<string, {
+    ruleId: string;
+    label: string;
+    count: number;
+    evidence: string[];
+  }>;
+  personalRemovedRules: Map<string, { ruleId: string; label: string; count: number }>;
+  engine: ElectionChartDerivation['engine'] | null;
+  requestCount: number;
+}
+
+interface ChartChunk<TSlot extends EnrichableMuhurtamSlot> {
+  slots: TSlot[];
+  samplePlans: number[][];
+  canonicalLagnaPlans: string[][];
+}
+
 function chartCheckPlan(slot: EnrichableMuhurtamSlot): ChartCheckPlan {
   const endMinute = Math.max(slot.s0, slot.e0 - 1);
   const minutes = [...new Set([
@@ -296,6 +323,264 @@ function chartCheckPlan(slot: EnrichableMuhurtamSlot): ChartCheckPlan {
     throw new Error('Canonical Lagna mapping is unavailable.');
   }
   return { minutes, lagnas: lagnas as string[] };
+}
+
+function nextChartChunk<TSlot extends EnrichableMuhurtamSlot>(
+  baseSlots: readonly TSlot[],
+  processed: number,
+): ChartChunk<TSlot> {
+  const slots: TSlot[] = [];
+  const samplePlans: number[][] = [];
+  const canonicalLagnaPlans: string[][] = [];
+  let instantCount = 0;
+  while (processed + slots.length < baseSlots.length) {
+    const candidate = baseSlots[processed + slots.length];
+    const plan = chartCheckPlan(candidate);
+    if (slots.length && instantCount + plan.minutes.length > MAX_INSTANTS_PER_REQUEST) break;
+    slots.push(candidate);
+    samplePlans.push(plan.minutes);
+    canonicalLagnaPlans.push(plan.lagnas);
+    instantCount += plan.minutes.length;
+    if (instantCount >= MAX_INSTANTS_PER_REQUEST) break;
+  }
+  return { slots, samplePlans, canonicalLagnaPlans };
+}
+
+function recordPersonalRejection<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+  personal: ReturnType<typeof evaluatePersonalElectionSnapshots>,
+): void {
+  progress.removedCount += 1;
+  progress.personalRemovedCount += 1;
+  for (const outcome of personal.outcomes) {
+    if (outcome.effect !== 'reject' || outcome.status !== 'fail') continue;
+    const item = progress.personalRemovedRules.get(outcome.ruleId) || {
+      ruleId: outcome.ruleId, label: outcome.label, count: 0,
+    };
+    item.count += 1;
+    progress.personalRemovedRules.set(outcome.ruleId, item);
+  }
+}
+
+function recordChartRejection<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+  screening: ElectionChartScreening,
+): void {
+  progress.removedCount += 1;
+  progress.chartRemovedCount += 1;
+  for (const outcome of screening.outcomes) {
+    if (outcome.effect !== 'reject' || outcome.status !== 'fail') continue;
+    const item = progress.chartRemovedRules.get(outcome.ruleId) || {
+      ruleId: outcome.ruleId,
+      label: outcome.label,
+      count: 0,
+      evidence: [],
+    };
+    item.count += 1;
+    for (const observed of outcome.evidence || []) {
+      if (!item.evidence.includes(observed) && item.evidence.length < 3) {
+        item.evidence.push(observed);
+      }
+    }
+    progress.chartRemovedRules.set(outcome.ruleId, item);
+  }
+}
+
+function retainScreenedSlot<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+  sourceSlot: TSlot,
+  personal: ReturnType<typeof evaluatePersonalElectionSnapshots>,
+  screening: ElectionChartScreening,
+): void {
+  const slot = {
+    ...sourceSlot,
+    personalPreferencePasses: personal.preferencePasses,
+    chartScreening: screening,
+    reasonGroups: {
+      ...sourceSlot.reasonGroups,
+      personal_source: personal.evidence,
+      personal_outcomes: personal.outcomes,
+    },
+  };
+  const qualificationFailed = screening.qualificationFailed;
+  const needsReview = screening.needsReview || personal.needsReview;
+  if (qualificationFailed) {
+    progress.qualificationCappedCount += 1;
+    if (slot.tier === 'Excellent') slot.tier = 'Good';
+    slot.dayDosha ||= 'chart_qualification';
+  }
+  if (needsReview) {
+    progress.reviewGatedCount += 1;
+    if (slot.tier === 'Excellent') slot.tier = 'Good';
+    if (!slot.dayDosha || slot.dayDosha === 'chart_qualification') {
+      slot.dayDosha = 'practitioner_review';
+    }
+  }
+  if (qualificationFailed && needsReview) progress.overlappingDispositionCount += 1;
+  progress.survivors.push(slot);
+}
+
+async function screenChartChunk<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+  chunk: ChartChunk<TSlot>,
+  options: ElectionChartEnrichmentOptions,
+  derive: DeriveElectionCharts,
+  screeningDeadline: number,
+): Promise<void> {
+  const instants = chunk.slots.flatMap((slot, index) =>
+    chunk.samplePlans[index].map(minute =>
+      localWallTimeToInstant(slot.isoDate, minute, options.location.timezone)));
+  const remainingTimeoutMs = screeningDeadline - Date.now();
+  if (remainingTimeoutMs <= 0) {
+    throw new Error('Election-chart screening deadline exceeded.');
+  }
+  const response = await derive(
+    { location: options.location, instants },
+    {
+      activationFlag: options.activationFlag,
+      locationLike: options.locationLike,
+      signal: options.signal,
+      timeoutMs: remainingTimeoutMs,
+    },
+  );
+  progress.requestCount += 1;
+  progress.engine = mergeEngineProvenance(progress.engine, response.engine);
+  let chartOffset = 0;
+  for (let index = 0; index < chunk.slots.length; index += 1) {
+    const charts = response.charts.slice(
+      chartOffset,
+      chartOffset + chunk.samplePlans[index].length,
+    );
+    chartOffset += chunk.samplePlans[index].length;
+    const canonicalCharts = charts.map((chart, chartIndex) =>
+      projectCanonicalWholeSignHouses(
+        chart,
+        chunk.canonicalLagnaPlans[index][chartIndex],
+      ));
+    const sourceSlot = chunk.slots[index];
+    const boundaryAffectsGeneric = Boolean(sourceSlot.chartBoundaryNeedsReview)
+      && automatedRulesFor(options.activity).length > 0;
+    const boundaryAffectsPersonal = Boolean(sourceSlot.chartBoundaryNeedsReview)
+      && (options.activity === 'travel' || options.activity === 'gruhapravesha');
+    if (boundaryAffectsGeneric || boundaryAffectsPersonal) progress.boundaryReviewCount += 1;
+    const personal = evaluatePersonalElectionSnapshots(
+      options.activity,
+      options.personalParticipant || null,
+      canonicalCharts.map((chart, chartIndex) => {
+        const facts = exactPersonalFacts(chart, chunk.canonicalLagnaPlans[index][chartIndex]);
+        return boundaryAffectsPersonal ? { ...facts, lagna: null } : facts;
+      }),
+    );
+    const screening: ElectionChartScreening = {
+      ...evaluateElectionSnapshots(options.activity, canonicalCharts, {
+        houseFrameUncertain: boundaryAffectsGeneric,
+      }),
+      ...(boundaryAffectsGeneric ? { boundaryConventionUncertain: true } : {}),
+    };
+    if (personal.rejected) recordPersonalRejection(progress, personal);
+    else if (screening.rejected) recordChartRejection(progress, screening);
+    else retainScreenedSlot(progress, sourceSlot, personal, screening);
+  }
+  progress.processed += chunk.slots.length;
+}
+
+function newEnrichmentProgress<TSlot extends EnrichableMuhurtamSlot>(): EnrichmentProgress<TSlot> {
+  return {
+    survivors: [],
+    processed: 0,
+    removedCount: 0,
+    chartRemovedCount: 0,
+    personalRemovedCount: 0,
+    boundaryReviewCount: 0,
+    qualificationCappedCount: 0,
+    reviewGatedCount: 0,
+    overlappingDispositionCount: 0,
+    chartRemovedRules: new Map(),
+    personalRemovedRules: new Map(),
+    engine: null,
+    requestCount: 0,
+  };
+}
+
+function removalSummary<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+): string {
+  const parts: string[] = [];
+  if (progress.chartRemovedCount) {
+    parts.push(`${progress.chartRemovedCount} failed an exact chart requirement`);
+  }
+  if (progress.personalRemovedCount) {
+    parts.push(`${progress.personalRemovedCount} failed a profile-specific source requirement`);
+  }
+  return parts.length ? ` ${parts.join('; ')}.` : '';
+}
+
+function dispositionSummary<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+): string {
+  const parts: string[] = [];
+  if (progress.qualificationCappedCount) {
+    const verb = progress.qualificationCappedCount === 1 ? 'has' : 'have';
+    parts.push(`${progress.qualificationCappedCount} retained slot${progress.qualificationCappedCount === 1 ? '' : 's'} ${verb} a conclusive event-specific condition miss; the raw score is unchanged and the maximum rating is Good`);
+  }
+  if (progress.reviewGatedCount) {
+    const verb = progress.reviewGatedCount === 1 ? 'is' : 'are';
+    parts.push(`${progress.reviewGatedCount} retained slot${progress.reviewGatedCount === 1 ? '' : 's'} ${verb} indeterminate at a calculation boundary or missing fact; the raw score is unchanged and the maximum rating is Good pending review`);
+  }
+  return parts.length ? ` ${parts.join('; ')}.` : '';
+}
+
+function overlapSummary<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+): string {
+  const count = progress.overlappingDispositionCount;
+  if (!count) return '';
+  const verb = count === 1 ? 'is' : 'are';
+  return ` ${count} retained slot${count === 1 ? '' : 's'} ${verb} included in both disposition counts because a conclusive miss and a separate unknown can coexist.`;
+}
+
+function partialUnavailableResult<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+  baseSlotCount: number,
+  error: unknown,
+): ElectionChartEnrichment<TSlot> {
+  const shown = rank(progress.survivors).slice(0, RESULT_LIMIT);
+  const shownPhrase = shown.length === 1 ? 'survivor is' : 'survivors are';
+  return {
+    state: 'unavailable',
+    slots: shown,
+    screenedCount: progress.processed,
+    removedCount: progress.removedCount,
+    candidateLimitReached: progress.processed < baseSlotCount,
+    chartRemovedCount: progress.chartRemovedCount,
+    chartRemovedRules: [...progress.chartRemovedRules.values()],
+    personalRemovedCount: progress.personalRemovedCount,
+    personalRemovedRules: [...progress.personalRemovedRules.values()],
+    boundaryReviewCount: progress.boundaryReviewCount,
+    qualificationCappedCount: progress.qualificationCappedCount,
+    reviewGatedCount: progress.reviewGatedCount,
+    overlappingDispositionCount: progress.overlappingDispositionCount,
+    message: `${progress.processed} highest-ranked candidates received exact chart screening before screening stopped early; only ${shown.length} already-screened ${shownPhrase} shown.${removalSummary(progress)} Unprocessed candidates were not shown. ${unavailableMessage(error)}`,
+    engine: progress.engine,
+  };
+}
+
+function screenedMessage<TSlot extends EnrichableMuhurtamSlot>(
+  progress: EnrichmentProgress<TSlot>,
+  candidateLimitReached: boolean,
+): string {
+  const removals = removalSummary(progress);
+  const dispositions = dispositionSummary(progress);
+  const overlap = overlapSummary(progress);
+  if (candidateLimitReached) {
+    const shown = Math.min(progress.survivors.length, RESULT_LIMIT);
+    const suffix = shown === 1 ? '' : 's';
+    return `${progress.processed} highest-ranked candidates received chart screening; the per-search safety budget was reached, so ${shown} surviving slot${suffix} are shown.${removals}${dispositions}${overlap}`;
+  }
+  if (progress.removedCount) {
+    return `${progress.processed} shortlisted slots received chart screening.${removals}${dispositions}${overlap}`;
+  }
+  return `${progress.processed} shortlisted slots received exact chart screening across every sampled state.${dispositions}${overlap}`;
 }
 
 export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamSlot>(
@@ -338,200 +623,27 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
   }
 
   const derive = options.derive || deriveElectionCharts;
-  const survivors: TSlot[] = [];
-  let processed = 0;
-  let removedCount = 0;
-  let chartRemovedCount = 0;
-  let personalRemovedCount = 0;
-  let boundaryReviewCount = 0;
-  let qualificationCappedCount = 0;
-  let reviewGatedCount = 0;
-  let overlappingDispositionCount = 0;
-  const chartRemovedRules = new Map<string, {
-    ruleId: string;
-    label: string;
-    count: number;
-    evidence: string[];
-  }>();
-  const personalRemovedRules = new Map<string, { ruleId: string; label: string; count: number }>();
-  let engine: ElectionChartDerivation['engine'] | null = null;
-  let requestCount = 0;
+  const progress = newEnrichmentProgress<TSlot>();
   const screeningDeadline = Date.now() + Math.max(
     1,
     options.screeningTimeoutMs ?? DEFAULT_SCREENING_TIMEOUT_MS,
   );
 
   try {
-    while (processed < baseSlots.length && requestCount < MAX_CHART_REQUESTS) {
-      const chunk: TSlot[] = [];
-      const samplePlans: number[][] = [];
-      const canonicalLagnaPlans: string[][] = [];
-      let instantCount = 0;
-      while (processed + chunk.length < baseSlots.length) {
-        const candidate = baseSlots[processed + chunk.length];
-        const plan = chartCheckPlan(candidate);
-        if (chunk.length && instantCount + plan.minutes.length > MAX_INSTANTS_PER_REQUEST) break;
-        chunk.push(candidate);
-        samplePlans.push(plan.minutes);
-        canonicalLagnaPlans.push(plan.lagnas);
-        instantCount += plan.minutes.length;
-        if (instantCount >= MAX_INSTANTS_PER_REQUEST) break;
-      }
-      const instants = chunk.flatMap((slot, index) =>
-        samplePlans[index].map(minute =>
-          localWallTimeToInstant(slot.isoDate, minute, options.location.timezone)));
-      const remainingTimeoutMs = screeningDeadline - Date.now();
-      if (remainingTimeoutMs <= 0) {
-        throw new Error('Election-chart screening deadline exceeded.');
-      }
-      const response = await derive(
-        { location: options.location, instants },
-        {
-          activationFlag: options.activationFlag,
-          locationLike: options.locationLike,
-          signal: options.signal,
-          timeoutMs: remainingTimeoutMs,
-        },
-      );
-      requestCount += 1;
-      engine = mergeEngineProvenance(engine, response.engine);
-      let chartOffset = 0;
-      for (let index = 0; index < chunk.length; index += 1) {
-        const charts = response.charts.slice(
-          chartOffset,
-          chartOffset + samplePlans[index].length,
-        );
-        chartOffset += samplePlans[index].length;
-        const canonicalCharts = charts.map((chart, chartIndex) =>
-          projectCanonicalWholeSignHouses(
-            chart,
-            canonicalLagnaPlans[index][chartIndex],
-          ));
-        const boundaryAffectsGeneric = !!chunk[index].chartBoundaryNeedsReview
-          && automatedRulesFor(options.activity).length > 0;
-        const boundaryAffectsPersonal = !!chunk[index].chartBoundaryNeedsReview
-          && (options.activity === 'travel' || options.activity === 'gruhapravesha');
-        const boundaryNeedsReview = boundaryAffectsGeneric || boundaryAffectsPersonal;
-        if (boundaryNeedsReview) boundaryReviewCount += 1;
-        const personal = evaluatePersonalElectionSnapshots(
-          options.activity,
-          options.personalParticipant || null,
-          canonicalCharts.map((chart, chartIndex) => {
-            const facts = exactPersonalFacts(chart, canonicalLagnaPlans[index][chartIndex]);
-            return boundaryAffectsPersonal ? { ...facts, lagna: null } : facts;
-          }),
-        );
-        const screening = {
-          ...evaluateElectionSnapshots(options.activity, canonicalCharts, {
-            houseFrameUncertain: boundaryAffectsGeneric,
-          }),
-          ...(boundaryAffectsGeneric
-            ? { boundaryConventionUncertain: true }
-            : {}),
-        };
-        if (personal.rejected) {
-          removedCount += 1;
-          personalRemovedCount += 1;
-          for (const outcome of personal.outcomes) {
-            if (outcome.effect !== 'reject' || outcome.status !== 'fail') continue;
-            const item = personalRemovedRules.get(outcome.ruleId) || {
-              ruleId: outcome.ruleId, label: outcome.label, count: 0,
-            };
-            item.count += 1;
-            personalRemovedRules.set(outcome.ruleId, item);
-          }
-          continue;
-        }
-        if (screening.rejected) {
-          removedCount += 1;
-          chartRemovedCount += 1;
-          for (const outcome of screening.outcomes) {
-            if (outcome.effect !== 'reject' || outcome.status !== 'fail') continue;
-            const item = chartRemovedRules.get(outcome.ruleId) || {
-              ruleId: outcome.ruleId,
-              label: outcome.label,
-              count: 0,
-              evidence: [],
-            };
-            item.count += 1;
-            for (const observed of outcome.evidence || []) {
-              if (!item.evidence.includes(observed) && item.evidence.length < 3) {
-                item.evidence.push(observed);
-              }
-            }
-            chartRemovedRules.set(outcome.ruleId, item);
-          }
-          continue;
-        }
-        const slot = {
-          ...chunk[index],
-          personalPreferencePasses: personal.preferencePasses,
-          chartScreening: screening,
-          reasonGroups: {
-            ...chunk[index].reasonGroups,
-            personal_source: personal.evidence,
-            personal_outcomes: personal.outcomes,
-          },
-        };
-        const qualificationFailed = screening.qualificationFailed;
-        const needsReview = screening.needsReview || personal.needsReview;
-        if (qualificationFailed) {
-          qualificationCappedCount += 1;
-          if (slot.tier === 'Excellent') slot.tier = 'Good';
-          slot.dayDosha ||= 'chart_qualification';
-        }
-        if (needsReview) {
-          reviewGatedCount += 1;
-          if (slot.tier === 'Excellent') slot.tier = 'Good';
-          if (!slot.dayDosha || slot.dayDosha === 'chart_qualification') {
-            slot.dayDosha = 'practitioner_review';
-          }
-        }
-        if (qualificationFailed && needsReview) {
-          overlappingDispositionCount += 1;
-        }
-        survivors.push(slot);
-      }
-      processed += chunk.length;
-      const ranked = rank(survivors);
+    while (progress.processed < baseSlots.length && progress.requestCount < MAX_CHART_REQUESTS) {
+      const chunk = nextChartChunk(baseSlots, progress.processed);
+      await screenChartChunk(progress, chunk, options, derive, screeningDeadline);
+      const ranked = rank(progress.survivors);
       if (ranked.length >= RESULT_LIMIT) {
         const boundary = ranked[RESULT_LIMIT - 1];
-        const next = baseSlots[processed];
+        const next = baseSlots[progress.processed];
         if (!next || !canUnprocessedBeat(next, boundary)) break;
       }
     }
   } catch (error) {
     if (options.signal?.aborted) throw error;
-    if (processed > 0) {
-      const shown = rank(survivors).slice(0, RESULT_LIMIT);
-      const removalParts = [
-        chartRemovedCount
-          ? `${chartRemovedCount} failed an exact chart requirement`
-          : '',
-        personalRemovedCount
-          ? `${personalRemovedCount} failed a profile-specific source requirement`
-          : '',
-      ].filter(Boolean);
-      const removalSummary = removalParts.length
-        ? ` ${removalParts.join('; ')}.`
-        : '';
-      return {
-        state: 'unavailable',
-        slots: shown,
-        screenedCount: processed,
-        removedCount,
-        candidateLimitReached: processed < baseSlots.length,
-        chartRemovedCount,
-        chartRemovedRules: [...chartRemovedRules.values()],
-        personalRemovedCount,
-        personalRemovedRules: [...personalRemovedRules.values()],
-        boundaryReviewCount,
-        qualificationCappedCount,
-        reviewGatedCount,
-        overlappingDispositionCount,
-        message: `${processed} highest-ranked candidates received exact chart screening before screening stopped early; only ${shown.length} already-screened survivor${shown.length === 1 ? ' is' : 's are'} shown.${removalSummary} Unprocessed candidates were not shown. ${unavailableMessage(error)}`,
-        engine,
-      };
+    if (progress.processed > 0) {
+      return partialUnavailableResult(progress, baseSlots.length, error);
     }
     return unavailableResult(
       baseSlots,
@@ -539,51 +651,24 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
     );
   }
 
-  const candidateLimitReached = requestCount >= MAX_CHART_REQUESTS
-    && processed < baseSlots.length;
-  const removalParts = [
-    chartRemovedCount
-      ? `${chartRemovedCount} failed an exact chart requirement`
-      : '',
-    personalRemovedCount
-      ? `${personalRemovedCount} failed a profile-specific source requirement`
-      : '',
-  ].filter(Boolean);
-  const removalSummary = removalParts.length ? ` ${removalParts.join('; ')}.` : '';
-  const dispositionParts = [
-    qualificationCappedCount
-      ? `${qualificationCappedCount} retained slot${qualificationCappedCount === 1 ? ' has' : 's have'} a conclusive event-specific condition miss; the raw score is unchanged and the maximum rating is Good`
-      : '',
-    reviewGatedCount
-      ? `${reviewGatedCount} retained slot${reviewGatedCount === 1 ? ' is' : 's are'} indeterminate at a calculation boundary or missing fact; the raw score is unchanged and the maximum rating is Good pending review`
-      : '',
-  ].filter(Boolean);
-  const dispositionSummary = dispositionParts.length
-    ? ` ${dispositionParts.join('; ')}.`
-    : '';
-  const overlapSummary = overlappingDispositionCount
-    ? ` ${overlappingDispositionCount} retained slot${overlappingDispositionCount === 1 ? ' is' : 's are'} included in both disposition counts because a conclusive miss and a separate unknown can coexist.`
-    : '';
+  const candidateLimitReached = progress.requestCount >= MAX_CHART_REQUESTS
+    && progress.processed < baseSlots.length;
 
   return {
     state: 'screened',
-    slots: rank(survivors).slice(0, RESULT_LIMIT),
-    screenedCount: processed,
-    removedCount,
+    slots: rank(progress.survivors).slice(0, RESULT_LIMIT),
+    screenedCount: progress.processed,
+    removedCount: progress.removedCount,
     candidateLimitReached,
-    chartRemovedCount,
-    chartRemovedRules: [...chartRemovedRules.values()],
-    personalRemovedCount,
-    personalRemovedRules: [...personalRemovedRules.values()],
-    boundaryReviewCount,
-    qualificationCappedCount,
-    reviewGatedCount,
-    overlappingDispositionCount,
-    message: candidateLimitReached
-      ? `${processed} highest-ranked candidates received chart screening; the per-search safety budget was reached, so ${Math.min(survivors.length, RESULT_LIMIT)} surviving slot${Math.min(survivors.length, RESULT_LIMIT) === 1 ? '' : 's'} are shown.${removalSummary}${dispositionSummary}${overlapSummary}`
-      : removedCount
-        ? `${processed} shortlisted slots received chart screening.${removalSummary}${dispositionSummary}${overlapSummary}`
-        : `${processed} shortlisted slots received exact chart screening across every sampled state.${dispositionSummary}${overlapSummary}`,
-    engine,
+    chartRemovedCount: progress.chartRemovedCount,
+    chartRemovedRules: [...progress.chartRemovedRules.values()],
+    personalRemovedCount: progress.personalRemovedCount,
+    personalRemovedRules: [...progress.personalRemovedRules.values()],
+    boundaryReviewCount: progress.boundaryReviewCount,
+    qualificationCappedCount: progress.qualificationCappedCount,
+    reviewGatedCount: progress.reviewGatedCount,
+    overlappingDispositionCount: progress.overlappingDispositionCount,
+    message: screenedMessage(progress, candidateLimitReached),
+    engine: progress.engine,
   };
 }
