@@ -1263,8 +1263,8 @@ function shareTarabalamOnWhatsApp() {
   const fmtD = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const lines = [];
   const anyRasi = profiles.some(pr => pr.rasi);
-  lines.push(`✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`);
   lines.push(
+    `✦ *Good days ${group ? 'for all of us' : 'for me'} (${anyRasi ? 'Tarabalam · Chandrabalam' : 'Tarabalam'})*`,
     `📍 ${cityLabel} · ${fmtD(TB_DAYS[0].date)} to ${fmtD(TB_DAYS[TB_DAYS.length-1].date)}`,
     'Saved profile names and birth-star details are intentionally omitted from this share.',
     `Standard: ${{ stars: 'Stars only (classic)', puja_ok: 'Stars + Moon, puja ok', strict: 'Stars + Moon, strict' }[TB_MODE]}`,
@@ -3267,8 +3267,8 @@ function shareMuhurtaOnWhatsApp() {
     const shareableReasons = muShareableMuhurtaReasons(s);
     if (shareableReasons.length) lines.push(`   ${shareableReasons.join(' · ')}`);
   });
-  lines.push('');
   lines.push(
+    '',
     'Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.',
     'Find your own: https://panchangam.astrochaganti.com/?src=share-slots#tarabalam',
   );
