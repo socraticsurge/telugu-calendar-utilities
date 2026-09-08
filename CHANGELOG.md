@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.3` while decomposing mutable runtime
+  orchestration behind unchanged calculation, ranking, result-shape, and MCP
+  contracts.
 - Prepare MCP/PyPI patch metadata `1.18.2` while centralizing repeated public
   messages, identifiers, and rule vocabulary without changing their values.
 - Pin PySwissEph to the reviewed and noticed `2.10.3.2` distribution, and gate

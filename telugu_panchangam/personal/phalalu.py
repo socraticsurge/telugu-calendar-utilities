@@ -11,10 +11,18 @@ from telugu_panchangam.personal.tarabalam import (
 )
 
 HOUSE_MEANINGS: dict[int, str] = {
-    1: 'self and health', 2: 'wealth and family', 3: 'courage and effort',
-    4: 'home and comfort', 5: 'children and learning', 6: 'health and rivals',
-    7: 'partnerships', 8: 'obstacles', 9: 'fortune and dharma',
-    10: 'career and standing', 11: 'gains and income', 12: 'expenses and rest',
+    1: 'self and health',
+    2: 'wealth and family',
+    3: 'courage and effort',
+    4: 'home and comfort',
+    5: 'children and learning',
+    6: 'health and rivals',
+    7: 'partnerships',
+    8: 'obstacles',
+    9: 'fortune and dharma',
+    10: 'career and standing',
+    11: 'gains and income',
+    12: 'expenses and rest',
 }
 
 _GOOD_OPENERS = {
@@ -32,18 +40,54 @@ def _graha_line(v: dict) -> str:
     if v['verdict'] == 'favourable':
         return f'{g} in your {_ord(pos)} house favours {meaning}.'
     if v['verdict'] == 'blocked':
-        return (f"{g}'s good {_ord(pos)}-house transit is under vedha by {v['vedha_by']} — "
-                f'gains in {meaning} may arrive with friction.')
+        return (
+            f"{g}'s good {_ord(pos)}-house transit is under vedha by {v['vedha_by']} — "
+            f'gains in {meaning} may arrive with friction.'
+        )
     return f'{g} in the {_ord(pos)} house tests {meaning}; avoid forcing matters there.'
 
 
 def _ord(n: int) -> str:
-    return f"{n}{['st', 'nd', 'rd'][n - 1] if n <= 3 else 'th'}"
+    return f'{n}{["st", "nd", "rd"][n - 1] if n <= 3 else "th"}'
 
 
-def rasi_phalalu(janma_rasi: str, sky: dict[str, str],
-                 janma_nakshatra: str | None = None,
-                 day_nakshatra: str | None = None) -> dict:
+def _day_quality(moon_verdict: str, favourable_count: int) -> str:
+    if moon_verdict == 'good' and favourable_count >= 4:
+        return 'good'
+    if moon_verdict == 'bad' and favourable_count <= 2:
+        return 'difficult'
+    return 'mixed'
+
+
+def _tara_line(janma_nakshatra: str, day_nakshatra: str) -> str:
+    number = tara_number(janma_nakshatra, day_nakshatra)
+    guidance = (
+        'a supportive day for beginnings.'
+        if is_auspicious_tara(number)
+        else 'better suited to routine than to new starts.'
+    )
+    return f"From your star, today's tara is {number} {tara_name(number)} — {guidance}"
+
+
+def _condition_line(condition: str) -> str:
+    if condition.startswith('Sade Sati'):
+        return f'{condition} is running — Shani asks for patience, discipline and steady work.'
+    if condition == 'Ashtama Shani':
+        return 'Ashtama Shani is running — avoid risks and keep commitments minimal.'
+    return f'{condition} is running — go slower than usual on big steps.'
+
+
+def _summary_line(favourable_count: int, blocked_count: int) -> str:
+    blocked = f', {blocked_count} under vedha' if blocked_count else ''
+    return f'{favourable_count} of 9 grahas favour you today{blocked}.'
+
+
+def rasi_phalalu(
+    janma_rasi: str,
+    sky: dict[str, str],
+    janma_nakshatra: str | None = None,
+    day_nakshatra: str | None = None,
+) -> dict:
     verdicts = {v['graha']: v for v in gochara_for(janma_rasi, sky)}
     conditions = named_conditions(janma_rasi, sky)
 
@@ -54,35 +98,16 @@ def rasi_phalalu(janma_rasi: str, sky: dict[str, str],
     blocked = sum(1 for v in verdicts.values() if v['verdict'] == 'blocked')
     adverse = 9 - fav - blocked
 
-    if moon_verdict == 'good' and fav >= 4:
-        day_quality = 'good'
-    elif moon_verdict == 'bad' and fav <= 2:
-        day_quality = 'difficult'
-    else:
-        day_quality = 'mixed'
-
     lines = [_GOOD_OPENERS[moon_verdict]]
     if janma_nakshatra and day_nakshatra:
-        n = tara_number(janma_nakshatra, day_nakshatra)
-        lines.append(
-            f"From your star, today's tara is {n} {tara_name(n)} — "
-            + ('a supportive day for beginnings.' if is_auspicious_tara(n)
-               else 'better suited to routine than to new starts.'))
-    for c in conditions:
-        if c.startswith('Sade Sati'):
-            lines.append(f'{c} is running — Shani asks for patience, discipline and steady work.')
-        elif c == 'Ashtama Shani':
-            lines.append('Ashtama Shani is running — avoid risks and keep commitments minimal.')
-        else:
-            lines.append(f'{c} is running — go slower than usual on big steps.')
-    for g in _GRAHA_ORDER:
-        lines.append(_graha_line(verdicts[g]))
-    lines.append(f'{fav} of 9 grahas favour you today'
-                 + (f', {blocked} under vedha' if blocked else '') + '.')
+        lines.append(_tara_line(janma_nakshatra, day_nakshatra))
+    lines.extend(_condition_line(condition) for condition in conditions)
+    lines.extend(_graha_line(verdicts[graha]) for graha in _GRAHA_ORDER)
+    lines.append(_summary_line(fav, blocked))
 
     return {
         'janma_rasi': janma_rasi,
-        'day_quality': day_quality,
+        'day_quality': _day_quality(moon_verdict, fav),
         'moon_house': moon_pos,
         'favourable_count': fav,
         'blocked_count': blocked,

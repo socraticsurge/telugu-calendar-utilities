@@ -26,6 +26,7 @@ needed. The longitude difference between two planets is identical in both
 tropical and sidereal frames (ayanamsa cancels in subtraction), so tropical
 coordinates are used for efficiency.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -40,31 +41,32 @@ YUDDHA_PLANETS: list[str] = ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']
 
 _SWE_BODY: dict[str, int] = {
     'Mercury': swe.MERCURY,
-    'Venus':   swe.VENUS,
-    'Mars':    swe.MARS,
+    'Venus': swe.VENUS,
+    'Mars': swe.MARS,
     'Jupiter': swe.JUPITER,
-    'Saturn':  swe.SATURN,
+    'Saturn': swe.SATURN,
 }
 
-THRESHOLD_DEG: float = 1.0   # classical 1° ecliptic longitude criterion
-_STEP: float = 0.25          # 6-hour coarse scan (safe for Mercury's max ~2°/day)
-_LOOKBACK: float = 120.0     # days; handles Jupiter-Saturn wars (~60-day max)
-_LOOKAHEAD: float = 60.0     # days beyond end to detect exits of late-starting wars
+THRESHOLD_DEG: float = 1.0  # classical 1° ecliptic longitude criterion
+_STEP: float = 0.25  # 6-hour coarse scan (safe for Mercury's max ~2°/day)
+_LOOKBACK: float = 120.0  # days; handles Jupiter-Saturn wars (~60-day max)
+_LOOKAHEAD: float = 60.0  # days beyond end to detect exits of late-starting wars
 
 
 @dataclass
 class GrahaYuddha:
-    planet1: str                  # first combatant (as passed in `planets` order)
-    planet2: str                  # second combatant
-    winner: str                   # higher ecliptic latitude at exact conjunction
+    planet1: str  # first combatant (as passed in `planets` order)
+    planet2: str  # second combatant
+    winner: str  # higher ecliptic latitude at exact conjunction
     loser: str
-    starts: datetime              # UTC: separation first drops below 1°
-    exact: datetime               # UTC: minimum longitudinal separation
-    ends: datetime | None         # UTC: separation rises above 1° again; None = ongoing
+    starts: datetime  # UTC: separation first drops below 1°
+    exact: datetime  # UTC: minimum longitudinal separation
+    ends: datetime | None  # UTC: separation rises above 1° again; None = ongoing
     min_separation_arcmin: float  # minimum separation at exact (arc-minutes)
 
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
+
 
 def _date_to_jd(d: date) -> float:
     return swe.julday(d.year, d.month, d.day, 0.0)
@@ -113,8 +115,12 @@ def _min_jd(jd_a: float, jd_b: float, b1: int, b2: int) -> float:
 
 
 def _record(
-    p1: str, p2: str, b1: int, b2: int,
-    jd_entry: float, jd_exit: float | None,
+    p1: str,
+    p2: str,
+    b1: int,
+    b2: int,
+    jd_entry: float,
+    jd_exit: float | None,
     jd_scan_end: float,
 ) -> GrahaYuddha:
     jd_search_end = jd_exit if jd_exit is not None else jd_scan_end
@@ -122,11 +128,13 @@ def _record(
     lat1 = _latitude(jd_exact, b1)
     lat2 = _latitude(jd_exact, b2)
     winner = p1 if lat1 >= lat2 else p2
-    loser  = p2 if winner == p1 else p1
+    loser = p2 if winner == p1 else p1
     min_sep = round(_separation(jd_exact, b1, b2) * 60.0, 3)
     return GrahaYuddha(
-        planet1=p1, planet2=p2,
-        winner=winner, loser=loser,
+        planet1=p1,
+        planet2=p2,
+        winner=winner,
+        loser=loser,
         starts=jd_to_utc(jd_entry),
         exact=jd_to_utc(jd_exact),
         ends=jd_to_utc(jd_exit) if jd_exit is not None else None,
@@ -134,7 +142,64 @@ def _record(
     )
 
 
+def _validated_planets(planets: list[str] | None) -> list[str]:
+    if planets is None:
+        return YUDDHA_PLANETS
+    bad = [planet for planet in planets if planet not in YUDDHA_PLANETS]
+    if bad:
+        raise ValueError(f'Unknown planet(s): {bad}. Valid: {YUDDHA_PLANETS}')
+    return planets
+
+
+def _append_completed_war(
+    results: list[GrahaYuddha],
+    pair: tuple[str, str, int, int],
+    jd_entry: float | None,
+    jd_exit: float,
+    requested: tuple[float, float],
+    jd_scan_to: float,
+) -> None:
+    if jd_entry is None:
+        return
+    jd_req_start, jd_req_end = requested
+    if jd_exit >= jd_req_start and jd_entry < jd_req_end:
+        results.append(_record(*pair, jd_entry, jd_exit, jd_scan_to))
+
+
+def _pair_periods(
+    p1: str,
+    p2: str,
+    requested: tuple[float, float],
+    scanned: tuple[float, float],
+) -> list[GrahaYuddha]:
+    _, jd_req_end = requested
+    jd_scan_from, jd_scan_to = scanned
+    b1, b2 = _SWE_BODY[p1], _SWE_BODY[p2]
+    pair = (p1, p2, b1, b2)
+    results = []
+    jd = jd_scan_from
+    prev_in = _separation(jd, b1, b2) < THRESHOLD_DEG
+    jd_entry: float | None = jd if prev_in else None
+    while jd < jd_scan_to:
+        jd_next = min(jd + _STEP, jd_scan_to)
+        in_war = _separation(jd_next, b1, b2) < THRESHOLD_DEG
+        if not prev_in and in_war:
+            jd_entry = _bisect(jd, jd_next, b1, b2, entering=True)
+        elif prev_in and not in_war:
+            jd_exit = _bisect(jd, jd_next, b1, b2, entering=False)
+            _append_completed_war(
+                results, pair, jd_entry, jd_exit, requested, jd_scan_to
+            )
+            jd_entry = None
+        prev_in = in_war
+        jd = jd_next
+    if prev_in and jd_entry is not None and jd_entry < jd_req_end:
+        results.append(_record(*pair, jd_entry, None, jd_scan_to))
+    return results
+
+
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def graha_yuddha_periods(
     start: date,
@@ -158,48 +223,20 @@ def graha_yuddha_periods(
     ``ends=None`` means the war was still ongoing at the scan horizon
     (*end* + 60 days).
     """
-    if planets is None:
-        planets = YUDDHA_PLANETS
-    else:
-        bad = [p for p in planets if p not in set(YUDDHA_PLANETS)]
-        if bad:
-            raise ValueError(f'Unknown planet(s): {bad}. Valid: {YUDDHA_PLANETS}')
+    planets = _validated_planets(planets)
 
     jd_req_start = _date_to_jd(start)
-    jd_req_end   = _date_to_jd(end) + 1.0
+    jd_req_end = _date_to_jd(end) + 1.0
     jd_scan_from = jd_req_start - _LOOKBACK
-    jd_scan_to   = jd_req_end   + _LOOKAHEAD
+    jd_scan_to = jd_req_end + _LOOKAHEAD
 
-    results: list[GrahaYuddha] = []
-
-    for p1, p2 in combinations(planets, 2):
-        b1, b2 = _SWE_BODY[p1], _SWE_BODY[p2]
-
-        jd = jd_scan_from
-        prev_in = _separation(jd, b1, b2) < THRESHOLD_DEG
-        jd_entry: float | None = jd if prev_in else None
-
-        while jd < jd_scan_to:
-            jd_next = min(jd + _STEP, jd_scan_to)
-            in_war = _separation(jd_next, b1, b2) < THRESHOLD_DEG
-
-            if not prev_in and in_war:
-                jd_entry = _bisect(jd, jd_next, b1, b2, entering=True)
-
-            elif prev_in and not in_war:
-                if jd_entry is not None:
-                    jd_exit = _bisect(jd, jd_next, b1, b2, entering=False)
-                    # Include if war overlaps the requested range
-                    if jd_exit >= jd_req_start and jd_entry < jd_req_end:
-                        results.append(_record(p1, p2, b1, b2, jd_entry, jd_exit, jd_scan_to))
-                jd_entry = None
-
-            prev_in = in_war
-            jd = jd_next
-
-        # Still in war at scan horizon
-        if prev_in and jd_entry is not None and jd_entry < jd_req_end:
-            results.append(_record(p1, p2, b1, b2, jd_entry, None, jd_scan_to))
+    requested = (jd_req_start, jd_req_end)
+    scanned = (jd_scan_from, jd_scan_to)
+    results = [
+        war
+        for p1, p2 in combinations(planets, 2)
+        for war in _pair_periods(p1, p2, requested, scanned)
+    ]
 
     results.sort(key=lambda w: w.starts)
     return results

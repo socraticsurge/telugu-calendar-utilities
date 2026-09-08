@@ -11,30 +11,44 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from telugu_panchangam.personal.chandrabalam import (
+    CHANDRA_GOOD,
+    CHANDRA_PUJA,
+    chandra_position,
+)
 from telugu_panchangam.personal.lagna_position import (
-    lagna_position, lagna_verdict, is_favourable_lagna, is_ashtama_lagna,
+    is_ashtama_lagna,
+    is_favourable_lagna,
+    lagna_position,
+    lagna_verdict,
     lagnas_in_class,
 )
-from telugu_panchangam.personal.tarabalam import (
-    AUSPICIOUS_TARAS, tara_number, tara_name,
+from telugu_panchangam.personal.nitya_yoga import (
+    NITYA_AUSPICIOUS,
+    NITYA_AUSPICIOUS_BONUS,
+    NITYA_HARD_AVOID,
+    NITYA_HARD_PENALTY,
+    NITYA_PARTIAL_DOSHA_WINDOW,
+    NITYA_PARTIAL_PENALTY,
 )
-from telugu_panchangam.personal.chandrabalam import (
-    CHANDRA_GOOD, CHANDRA_PUJA, chandra_position,
+from telugu_panchangam.personal.tarabalam import (
+    AUSPICIOUS_TARAS,
+    tara_name,
+    tara_number,
 )
 from telugu_panchangam.personal.tithi_class import tithi_family
-from telugu_panchangam.personal.nitya_yoga import (
-    NITYA_HARD_AVOID, NITYA_HARD_PENALTY,
-    NITYA_PARTIAL_DOSHA_WINDOW, NITYA_PARTIAL_PENALTY,
-    NITYA_AUSPICIOUS, NITYA_AUSPICIOUS_BONUS,
-)
 from telugu_panchangam.special_yogas import ANANDADI_AUSPICIOUS, ANANDADI_INAUSPICIOUS
 
 _AMRITA_SIDDHI_YOGA = 'Amrita Siddhi Yoga'
 _SARVARTHA_SIDDHI_YOGA = 'Sarvartha Siddhi Yoga'
 
-_YOGA_BONUS = {_SARVARTHA_SIDDHI_YOGA: 2, _AMRITA_SIDDHI_YOGA: 2,
-               'Dvipushkara Yoga': 1, 'Tripushkara Yoga': 1,
-               'Siddha Yoga': 1}
+_YOGA_BONUS = {
+    _SARVARTHA_SIDDHI_YOGA: 2,
+    _AMRITA_SIDDHI_YOGA: 2,
+    'Dvipushkara Yoga': 1,
+    'Tripushkara Yoga': 1,
+    'Siddha Yoga': 1,
+}
 _YOGA_PENALTY = {'Visha Yoga': -2, 'Dagdha Yoga': -2}
 
 
@@ -43,9 +57,10 @@ _YOGA_PENALTY = {'Visha Yoga': -2, 'Dagdha Yoga': -2}
 # _evaluate_slot() invocation so the function signature stays manageable.
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class _DayContext:
-    day: object                             # PanchangamDay (avoid circular import)
+    day: object  # PanchangamDay (avoid circular import)
     skip_yogas: frozenset
     janma_nakshatras: list[str] | None
     janma_rasis: list[str | None] | None
@@ -56,9 +71,9 @@ class _DayContext:
     label: str
     vara_bonus: int
     vara_reason: str | None
-    abhijit: object | None                  # Window | None
-    amrita: list                            # list[Window]
-    prefer_chog: tuple | None               # ('BlockName', bonus) | None
+    abhijit: object | None  # Window | None
+    amrita: list  # list[Window]
+    prefer_chog: tuple | None  # ('BlockName', bonus) | None
     avoid_karana_names: frozenset
     horas: list | None
     prefer_varas: frozenset
@@ -67,7 +82,7 @@ class _DayContext:
     required_lagna_class: str | None
     prefer_bhadra_puchha: int
     simha_stha_shukra_penalty: int
-    prefer_nakshatra_mukha: tuple | None    # ([classes], bonus) | None
+    prefer_nakshatra_mukha: tuple | None  # ([classes], bonus) | None
     allowed_nakshatras: frozenset
     avoid_nakshatras: frozenset
     prefer_nakshatras: frozenset
@@ -89,6 +104,7 @@ class _DayContext:
 # Utilities
 # ---------------------------------------------------------------------------
 
+
 def _label(janma: str, idx: int) -> str:
     return f'#{idx + 1} ({janma})'
 
@@ -96,6 +112,7 @@ def _label(janma: str, idx: int) -> str:
 # ---------------------------------------------------------------------------
 # Personal-fit scorers  (tara, chandra, lagna)
 # ---------------------------------------------------------------------------
+
 
 def score_tara(janma_nakshatras, day_nakshatra_name):
     """Per-person tarabalam against a specific nakshatra.
@@ -110,16 +127,17 @@ def score_tara(janma_nakshatras, day_nakshatra_name):
         t = tara_number(janma, day_nakshatra_name)
         label = _label(janma, i)
         if t in AUSPICIOUS_TARAS:
-            fav.append(label); bonus += 1
+            fav.append(label)
+            bonus += 1
         else:
             unfav.append(f'{label} {tara_name(t)}')
             unfav_names.append(label)
             bonus -= 1
     reasons = []
     if fav:
-        reasons.append(f"tarabalam favourable for {', '.join(fav)} (+{len(fav)})")
+        reasons.append(f'tarabalam favourable for {", ".join(fav)} (+{len(fav)})')
     if unfav:
-        reasons.append(f"tarabalam avoid for {', '.join(unfav)} (-{len(unfav)})")
+        reasons.append(f'tarabalam avoid for {", ".join(unfav)} (-{len(unfav)})')
     return bonus, reasons, unfav_names
 
 
@@ -140,7 +158,8 @@ def score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
         label = _label(janma_label, i)
         pos = chandra_position(rasi, lunar_sign)
         if pos in CHANDRA_GOOD:
-            good.append(label); bonus += 1
+            good.append(label)
+            bonus += 1
         elif pos in CHANDRA_PUJA:
             puja.append(f'{label} Moon@{pos}')
             puja_names.append(label)
@@ -151,13 +170,16 @@ def score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
             bonus -= 1
     reasons = []
     if good:
-        reasons.append(f"chandrabalam favourable for {', '.join(good)} (+{len(good)})")
+        reasons.append(f'chandrabalam favourable for {", ".join(good)} (+{len(good)})')
     if puja:
-        reasons.append(f"chandrabalam remedial for {', '.join(puja)} (puja recommended)")
+        reasons.append(
+            f'chandrabalam remedial for {", ".join(puja)} (puja recommended)'
+        )
     if avoid:
-        reasons.append(f"chandrabalam avoid for {', '.join(avoid)} (-{len(avoid)})")
-    dropped = (chandra_mode == 'strict' and (puja or avoid)) \
-              or (chandra_mode == 'puja_ok' and avoid)
+        reasons.append(f'chandrabalam avoid for {", ".join(avoid)} (-{len(avoid)})')
+    dropped = (chandra_mode == 'strict' and (puja or avoid)) or (
+        chandra_mode == 'puja_ok' and avoid
+    )
     return bonus, reasons, bool(dropped), avoid_names, puja_names
 
 
@@ -181,9 +203,56 @@ def score_lagna_activity(prefer_lagna_class, slot_lagna, activity_label):
         return 0, None
     favoured = lagnas_in_class(prefer_lagna_class)
     if slot_lagna in favoured:
-        return 1, (f'{slot_lagna} lagna ({prefer_lagna_class}) '
-                   f'favoured for {activity_label} (+1)')
+        return 1, (
+            f'{slot_lagna} lagna ({prefer_lagna_class}) '
+            f'favoured for {activity_label} (+1)'
+        )
     return 0, None
+
+
+def _ordinal(number: int) -> str:
+    suffixes = {1: 'st', 2: 'nd', 3: 'rd'}
+    return f'{number}{suffixes.get(number, "th")}'
+
+
+def _score_lagna_origin(
+    origin: str,
+    slot_lagna: str,
+    label: str,
+    favourable: list[str],
+    ashtama: list[str],
+    neutral: list[str],
+    ashtama_names: list[str],
+    *,
+    record_neutral: bool = True,
+) -> int:
+    position = lagna_position(origin.replace(' lagna', ''), slot_lagna)
+    if is_ashtama_lagna(position):
+        ashtama.append(f'{label} lagna@{position} from {origin}')
+        if label not in ashtama_names:
+            ashtama_names.append(label)
+        return -1
+    if is_favourable_lagna(position):
+        favourable.append(f'{label} {lagna_verdict(position)}@{position} from {origin}')
+        return 1
+    if record_neutral:
+        neutral.append(f'{label} {_ordinal(position)} from {origin}')
+    return 0
+
+
+def _lagna_reason_lines(
+    slot_lagna: str,
+    groups: list[tuple[list[str], str, str | None]],
+) -> list[str]:
+    reasons = []
+    for details, verdict, sign in groups:
+        if not details:
+            continue
+        effect = f'({sign}{len(details)})' if sign else '(no effect)'
+        reasons.append(
+            f'{slot_lagna} lagna {verdict} for {", ".join(details)} {effect}'
+        )
+    return reasons
 
 
 def score_lagna(janma_nakshatras, janma_rasis, slot_lagna, janma_lagnas=None):
@@ -201,79 +270,45 @@ def score_lagna(janma_nakshatras, janma_rasis, slot_lagna, janma_lagnas=None):
     fav_lagna, ash_lagna, neut_lagna = [], [], []
     ashtama_names: list[str] = []
 
-    def _record_ashtama(label):
-        if label not in ashtama_names:
-            ashtama_names.append(label)
-
-    _ord_suffix = {1: 'st', 2: 'nd', 3: 'rd'}
-    def _ord(n):
-        return f'{n}{_ord_suffix.get(n, "th")}'
-
     for i, rasi in enumerate(janma_rasis):
         if rasi is None:
             continue
         janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
         label = _label(janma_label, i)
-        has_lagna = bool(janma_lagnas and i < len(janma_lagnas)
-                         and janma_lagnas[i])
-        pos_r = lagna_position(rasi, slot_lagna)
-        if is_ashtama_lagna(pos_r):
-            ash_rashi.append(f'{label} lagna@{pos_r} from {rasi}')
-            _record_ashtama(label)
-            bonus -= 1
-        elif is_favourable_lagna(pos_r):
-            fav_rashi.append(
-                f'{label} {lagna_verdict(pos_r)}@{pos_r} from {rasi}'
-            )
-            bonus += 1
-        elif has_lagna:
-            neut_rashi.append(f'{label} {_ord(pos_r)} from {rasi}')
+        has_lagna = bool(janma_lagnas and i < len(janma_lagnas) and janma_lagnas[i])
+        bonus += _score_lagna_origin(
+            rasi,
+            slot_lagna,
+            label,
+            fav_rashi,
+            ash_rashi,
+            neut_rashi,
+            ashtama_names,
+            record_neutral=has_lagna,
+        )
         if has_lagna:
             jl = janma_lagnas[i]
-            pos_l = lagna_position(jl, slot_lagna)
-            if is_ashtama_lagna(pos_l):
-                ash_lagna.append(f'{label} lagna@{pos_l} from {jl} lagna')
-                _record_ashtama(label)
-                bonus -= 1
-            elif is_favourable_lagna(pos_l):
-                fav_lagna.append(
-                    f'{label} {lagna_verdict(pos_l)}@{pos_l} from {jl} lagna'
-                )
-                bonus += 1
-            else:
-                neut_lagna.append(f'{label} {_ord(pos_l)} from {jl} lagna')
+            bonus += _score_lagna_origin(
+                f'{jl} lagna',
+                slot_lagna,
+                label,
+                fav_lagna,
+                ash_lagna,
+                neut_lagna,
+                ashtama_names,
+            )
 
-    reasons = []
-    if fav_rashi:
-        reasons.append(
-            f"{slot_lagna} lagna favourable for {', '.join(fav_rashi)} "
-            f"(+{len(fav_rashi)})"
-        )
-    if fav_lagna:
-        reasons.append(
-            f"{slot_lagna} lagna favourable for {', '.join(fav_lagna)} "
-            f"(+{len(fav_lagna)})"
-        )
-    if ash_rashi:
-        reasons.append(
-            f"{slot_lagna} lagna Ashtama for {', '.join(ash_rashi)} "
-            f"(-{len(ash_rashi)})"
-        )
-    if ash_lagna:
-        reasons.append(
-            f"{slot_lagna} lagna Ashtama for {', '.join(ash_lagna)} "
-            f"(-{len(ash_lagna)})"
-        )
-    if neut_rashi:
-        reasons.append(
-            f"{slot_lagna} lagna neutral for {', '.join(neut_rashi)} "
-            f"(no effect)"
-        )
-    if neut_lagna:
-        reasons.append(
-            f"{slot_lagna} lagna neutral for {', '.join(neut_lagna)} "
-            f"(no effect)"
-        )
+    reasons = _lagna_reason_lines(
+        slot_lagna,
+        [
+            (fav_rashi, 'favourable', '+'),
+            (fav_lagna, 'favourable', '+'),
+            (ash_rashi, 'Ashtama', '-'),
+            (ash_lagna, 'Ashtama', '-'),
+            (neut_rashi, 'neutral', None),
+            (neut_lagna, 'neutral', None),
+        ],
+    )
     return bonus, reasons, ashtama_names
 
 
@@ -281,8 +316,15 @@ def score_lagna(janma_nakshatras, janma_rasis, slot_lagna, janma_lagnas=None):
 # Calendar-quality scorers  (tithi, yoga, nitya yoga, anandadi)
 # ---------------------------------------------------------------------------
 
-def score_tithi_class(tithi_name, prefer_tithi_class, activity_label,
-                      nakshatra=None, special_yogas=(), avoid_tithi_class=()):
+
+def score_tithi_class(
+    tithi_name,
+    prefer_tithi_class,
+    activity_label,
+    nakshatra=None,
+    special_yogas=(),
+    avoid_tithi_class=(),
+):
     """Tithi-family scoring: Rikta -2; activity-preferred +1; activity-avoided -1.
 
     Classical neutralization (Muhurta Chintamani / B.V. Raman Muhurtha):
@@ -300,39 +342,62 @@ def score_tithi_class(tithi_name, prefer_tithi_class, activity_label,
 
     if fam == 'Rikta':
         if nakshatra == 'Pushya':
-            return 0, (f'{tithi_name} (Rikta tithi) neutralised by Pushya '
-                       f'nakshatra (0)'), None, fam
-        siddhi = [y for y in special_yogas
-                  if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)]
+            return (
+                0,
+                (f'{tithi_name} (Rikta tithi) neutralised by Pushya nakshatra (0)'),
+                None,
+                fam,
+            )
+        siddhi = [
+            y
+            for y in special_yogas
+            if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)
+        ]
         if siddhi:
             label = ' + '.join(siddhi)
-            return -1, (f'{tithi_name} (Rikta tithi) partially offset by '
-                        f'{label} (-1)'), None, fam
+            return (
+                -1,
+                (f'{tithi_name} (Rikta tithi) partially offset by {label} (-1)'),
+                None,
+                fam,
+            )
         return -2, f'{tithi_name} (Rikta tithi) (-2)', None, fam
 
     if 'Amavasya' in tithi_name:
         return -2, f'{tithi_name} (-2)', None, 'Amavasya'
     if prefer_tithi_class and fam == prefer_tithi_class:
-        return 1, None, (f'{tithi_name} ({prefer_tithi_class} tithi) '
-                         f'favoured for {activity_label} (+1)'), fam
+        return (
+            1,
+            None,
+            (
+                f'{tithi_name} ({prefer_tithi_class} tithi) '
+                f'favoured for {activity_label} (+1)'
+            ),
+            fam,
+        )
     if fam in avoid_tithi_class:
-        return -1, None, (f'{tithi_name} ({fam} tithi) '
-                          f'inauspicious for {activity_label} (-1)'), fam
+        return (
+            -1,
+            None,
+            (f'{tithi_name} ({fam} tithi) inauspicious for {activity_label} (-1)'),
+            fam,
+        )
     return 0, None, None, fam
 
 
-def doctrinal_notes(*, special_yogas, tara_unfav_names, chandra_avoid_names,
-                    tithi_fam):
+def doctrinal_notes(*, special_yogas, tara_unfav_names, chandra_avoid_names, tithi_fam):
     """Explanatory notes from classical doctrine — do not change the score.
 
     Surfaces relationships the numeric reasons can't communicate on their own.
     Sources: Muhurta Chintamani, Muhurta Martanda, TTD Panchanga Nirnayam.
     """
     notes: list[str] = []
-    siddhi_yogas = [y for y in special_yogas
-                    if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)]
-    has_pushkara = any(y in ('Dvipushkara Yoga', 'Tripushkara Yoga')
-                       for y in special_yogas)
+    siddhi_yogas = [
+        y for y in special_yogas if y in (_SARVARTHA_SIDDHI_YOGA, _AMRITA_SIDDHI_YOGA)
+    ]
+    has_pushkara = any(
+        y in ('Dvipushkara Yoga', 'Tripushkara Yoga') for y in special_yogas
+    )
 
     if siddhi_yogas and tara_unfav_names:
         siddhi_label = ' + '.join(siddhi_yogas)
@@ -386,12 +451,18 @@ def score_nitya_yoga(yoga_name, slot_start, day, skip_on_hard_avoid):
         else:
             yoga_start = day.yoga.end
         if slot_start - yoga_start <= window:
-            return NITYA_PARTIAL_PENALTY, \
-                [f'{yoga_name} yoga dosha-window ({NITYA_PARTIAL_PENALTY})'], False
+            return (
+                NITYA_PARTIAL_PENALTY,
+                [f'{yoga_name} yoga dosha-window ({NITYA_PARTIAL_PENALTY})'],
+                False,
+            )
         return 0, [], False
     if yoga_name in NITYA_AUSPICIOUS:
-        return NITYA_AUSPICIOUS_BONUS, \
-               [f'{yoga_name} yoga (+{NITYA_AUSPICIOUS_BONUS})'], False
+        return (
+            NITYA_AUSPICIOUS_BONUS,
+            [f'{yoga_name} yoga (+{NITYA_AUSPICIOUS_BONUS})'],
+            False,
+        )
     return 0, [], False
 
 

@@ -7,32 +7,9 @@
     "telugu_panchangam/generators/ics.py": {
       "_description": 24
     },
-    "telugu_panchangam/mcp/tools.py": {
-      "_validate_muhurta_inputs": 18,
-      "tool_find_tarabalam_days": 22
-    },
-    "telugu_panchangam/personal/activity_check_contract.py": {
-      "_validate_specs": 16
-    },
     "telugu_panchangam/personal/election_assessors/primitives.py": {
       "evaluate_well_situated": 15,
       "gold_transition_uncertainty": 11
-    },
-    "telugu_panchangam/personal/election_chart.py": {
-      "_evaluate_rule": 11,
-      "evaluate_election_snapshots": 19
-    },
-    "telugu_panchangam/personal/llm_phalalu.py": {
-      "_verify": 17
-    },
-    "telugu_panchangam/personal/muhurta.py": {
-      "_day_skip_reason": 29,
-      "_evaluate_slot": 61,
-      "day_slots": 17,
-      "night_slots": 31
-    },
-    "telugu_panchangam/personal/slot_scorers.py": {
-      "score_lagna": 19
     },
     "tests/test_browser_smoke.py": {
       "_muhurta_planets": 19,

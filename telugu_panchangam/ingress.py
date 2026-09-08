@@ -9,6 +9,7 @@ and retreat to the previous sign before re-entering. All transitions appear.
 
 Sidereal coordinates (ayanamsa-configurable, Lahiri by default).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,32 +21,40 @@ from telugu_panchangam.engines.utils import AYANAMSA_MODES, jd_to_utc
 from telugu_panchangam.panchangam_names import RASHI_NAMES
 
 INGRESS_PLANETS: list[str] = [
-    'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu',
+    'Sun',
+    'Mercury',
+    'Venus',
+    'Mars',
+    'Jupiter',
+    'Saturn',
+    'Rahu',
+    'Ketu',
 ]
 
 _SWE_BODY: dict[str, int] = {
-    'Sun':     swe.SUN,
+    'Sun': swe.SUN,
     'Mercury': swe.MERCURY,
-    'Venus':   swe.VENUS,
-    'Mars':    swe.MARS,
+    'Venus': swe.VENUS,
+    'Mars': swe.MARS,
     'Jupiter': swe.JUPITER,
-    'Saturn':  swe.SATURN,
-    'Rahu':    swe.MEAN_NODE,
-    'Ketu':    swe.MEAN_NODE,   # Ketu = Rahu + 180°
+    'Saturn': swe.SATURN,
+    'Rahu': swe.MEAN_NODE,
+    'Ketu': swe.MEAN_NODE,  # Ketu = Rahu + 180°
 }
 
-_MAX_INGRESS_DAYS: float = 1200.0   # Saturn can sit ~900 days in one sign
+_MAX_INGRESS_DAYS: float = 1200.0  # Saturn can sit ~900 days in one sign
 
 
 @dataclass
 class RashiIngress:
     planet: str
-    enters: datetime       # UTC: moment the planet crosses into this rashi
-    rashi: str             # the rashi being entered
-    exits: datetime | None # UTC: next sign change; None if > _MAX_INGRESS_DAYS away
+    enters: datetime  # UTC: moment the planet crosses into this rashi
+    rashi: str  # the rashi being entered
+    exits: datetime | None  # UTC: next sign change; None if > _MAX_INGRESS_DAYS away
 
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
+
 
 def _date_to_jd(d: date) -> float:
     return swe.julday(d.year, d.month, d.day, 0.0)
@@ -91,7 +100,42 @@ def _find_next_ingress(
     return None
 
 
+def _validated_planets(planets: list[str] | None) -> list[str]:
+    if planets is None:
+        return INGRESS_PLANETS
+    bad = [planet for planet in planets if planet not in INGRESS_PLANETS]
+    if bad:
+        raise ValueError(f'Unknown planet(s): {bad}. Valid: {INGRESS_PLANETS}')
+    return planets
+
+
+def _planet_ingresses(
+    planet: str,
+    jd_start: float,
+    jd_end: float,
+) -> list[RashiIngress]:
+    results = []
+    jd = jd_start
+    while (result := _find_next_ingress(jd, planet)) is not None:
+        jd_ingress, rashi_idx = result
+        if jd_ingress > jd_end:
+            break
+        exit_result = _find_next_ingress(jd_ingress + 0.01, planet)
+        jd_exit = exit_result[0] if exit_result else None
+        results.append(
+            RashiIngress(
+                planet=planet,
+                enters=jd_to_utc(jd_ingress),
+                rashi=RASHI_NAMES[rashi_idx],
+                exits=jd_to_utc(jd_exit) if jd_exit else None,
+            )
+        )
+        jd = jd_ingress + 0.01
+    return results
+
+
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def rashi_ingresses(
     start: date,
@@ -118,40 +162,18 @@ def rashi_ingresses(
     change for the planet (may fall outside the requested range); it is None
     if no further ingress is found within ``_MAX_INGRESS_DAYS``.
     """
-    if planets is None:
-        planets = INGRESS_PLANETS
-    else:
-        bad = [p for p in planets if p not in set(INGRESS_PLANETS)]
-        if bad:
-            raise ValueError(f'Unknown planet(s): {bad}. Valid: {INGRESS_PLANETS}')
+    planets = _validated_planets(planets)
 
     jd_start = _date_to_jd(start)
-    jd_end   = _date_to_jd(end) + 1.0
+    jd_end = _date_to_jd(end) + 1.0
 
     swe.set_sid_mode(AYANAMSA_MODES[ayanamsa])
     try:
-        results: list[RashiIngress] = []
-
-        for planet in planets:
-            # Start the scan from jd_start to find all ingresses within range.
-            jd = jd_start
-            while True:
-                result = _find_next_ingress(jd, planet)
-                if result is None:
-                    break
-                jd_ingress, rashi_idx = result
-                if jd_ingress > jd_end:
-                    break
-                # Find when this rashi period ends (the following ingress).
-                exit_result = _find_next_ingress(jd_ingress + 0.01, planet)
-                jd_exit = exit_result[0] if exit_result else None
-                results.append(RashiIngress(
-                    planet=planet,
-                    enters=jd_to_utc(jd_ingress),
-                    rashi=RASHI_NAMES[rashi_idx],
-                    exits=jd_to_utc(jd_exit) if jd_exit else None,
-                ))
-                jd = jd_ingress + 0.01  # just past this ingress to find the next
+        results = [
+            ingress
+            for planet in planets
+            for ingress in _planet_ingresses(planet, jd_start, jd_end)
+        ]
     finally:
         swe.set_sid_mode(swe.SIDM_LAHIRI)
 

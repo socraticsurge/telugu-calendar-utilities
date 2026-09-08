@@ -31,8 +31,13 @@ MANUAL_CHECK_CLASS = 'manual-only'
 MANUAL_CHECK_DISPLAY_SECTIONS = ('chart', 'information', 'practical')
 MANUAL_CHECK_PURPOSES = ('safety_override',)
 CANONICAL_VARAS = (
-    'Adivaram', 'Somavaram', 'Mangalavaram', 'Budhavaram',
-    'Guruvaram', 'Shukravaram', 'Shanivaram',
+    'Adivaram',
+    'Somavaram',
+    'Mangalavaram',
+    'Budhavaram',
+    'Guruvaram',
+    'Shukravaram',
+    'Shanivaram',
 )
 
 
@@ -131,18 +136,31 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     'any': _activity(),
     'wedding': _activity(
         panchangam_fields=(
-            'avoid_karana', 'skip_on_yoga', 'skip_on_sankramana',
-            'prefer_vara', 'allowed_maasams', 'allowed_maasa_solar_pairs',
-            'allowed_varas', 'allowed_nakshatras', 'avoid_nitya_yogas',
-            'allowed_lagnas', 'prefer_lagnas', 'allowed_tithi_names',
+            'avoid_karana',
+            'skip_on_yoga',
+            'skip_on_sankramana',
+            'prefer_vara',
+            'allowed_maasams',
+            'allowed_maasa_solar_pairs',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'avoid_nitya_yogas',
+            'allowed_lagnas',
+            'prefer_lagnas',
+            'allowed_tithi_names',
             'skip_on_combust',
         ),
         election_chart_rule_ids=(
-            'wedding.house-7-vacant', 'wedding.kuja-not-8',
+            'wedding.house-7-vacant',
+            'wedding.kuja-not-8',
             'wedding.shukra-not-6',
         ),
         manual_sections=(
-            'information', 'information', 'chart', 'chart', 'practical',
+            'information',
+            'information',
+            'chart',
+            'chart',
+            'practical',
             'information',
         ),
     ),
@@ -152,25 +170,42 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     ),
     'naming': _activity(
         panchangam_fields=(
-            'prefer_lagna_class', 'prefer_choghadiya', 'skip_on_yoga',
-            'skip_on_sankramana', 'prefer_tithi_class',
-            'avoid_tithi_class', 'allowed_varas', 'allowed_nakshatras',
+            'prefer_lagna_class',
+            'prefer_choghadiya',
+            'skip_on_yoga',
+            'skip_on_sankramana',
+            'prefer_tithi_class',
+            'avoid_tithi_class',
+            'allowed_varas',
+            'allowed_nakshatras',
             'avoid_tithi_numbers',
         ),
         manual_sections=(
-            'information', 'chart', 'chart', 'chart', 'chart',
+            'information',
+            'chart',
+            'chart',
+            'chart',
+            'chart',
             'information',
         ),
     ),
     'annaprasana': _activity(
         panchangam_fields=(
-            'prefer_choghadiya', 'skip_on_yoga', 'skip_on_sankramana',
-            'prefer_tithi_class', 'avoid_tithi_class', 'allowed_varas',
-            'allowed_nakshatras', 'avoid_tithi_numbers', 'allowed_lagnas',
+            'prefer_choghadiya',
+            'skip_on_yoga',
+            'skip_on_sankramana',
+            'prefer_tithi_class',
+            'avoid_tithi_class',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'avoid_tithi_numbers',
+            'allowed_lagnas',
         ),
         election_chart_rule_ids=(
-            'annaprasana.house-10-vacant', 'annaprasana.budha-not-7',
-            'annaprasana.kuja-not-8', 'annaprasana.shukra-not-9',
+            'annaprasana.house-10-vacant',
+            'annaprasana.budha-not-7',
+            'annaprasana.kuja-not-8',
+            'annaprasana.shukra-not-9',
             'annaprasana.benefic-occupies-lagna',
             'annaprasana.no-natural-malefic-in-lagna',
         ),
@@ -178,9 +213,14 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     ),
     'karnavedha': _activity(
         panchangam_fields=(
-            'skip_on_yoga', 'skip_on_sankramana', 'prefer_tithi_class',
-            'avoid_tithi_class', 'allowed_varas', 'avoid_tithi_numbers',
-            'allowed_lagnas', 'daytime_only',
+            'skip_on_yoga',
+            'skip_on_sankramana',
+            'prefer_tithi_class',
+            'avoid_tithi_class',
+            'allowed_varas',
+            'avoid_tithi_numbers',
+            'allowed_lagnas',
+            'daytime_only',
             'require_single_daylight_tithi',
             'require_single_daylight_nakshatra',
         ),
@@ -189,32 +229,55 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     ),
     'mundana': _activity(
         panchangam_fields=(
-            'skip_on_yoga', 'skip_on_sankramana', 'prefer_tithi_class',
-            'avoid_tithi_class', 'allowed_varas', 'allowed_nakshatras',
-            'prefer_nakshatras', 'allowed_tithi_numbers', 'allowed_lagnas',
-            'forenoon_only', 'allowed_pakshams', 'skip_on_combust',
+            'skip_on_yoga',
+            'skip_on_sankramana',
+            'prefer_tithi_class',
+            'avoid_tithi_class',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'prefer_nakshatras',
+            'allowed_tithi_numbers',
+            'allowed_lagnas',
+            'forenoon_only',
+            'allowed_pakshams',
+            'skip_on_combust',
         ),
         manual_sections=('information', 'chart', 'chart', 'chart', 'chart'),
     ),
     'upanayana': _activity(
         panchangam_fields=(
-            'skip_on_yoga', 'skip_on_sankramana', 'prefer_tithi_class',
-            'avoid_tithi_class', 'allowed_maasams', 'allowed_varas',
-            'allowed_nakshatras', 'allowed_lagnas', 'forenoon_only',
-            'allowed_solar_signs', 'allowed_tithi_names',
+            'skip_on_yoga',
+            'skip_on_sankramana',
+            'prefer_tithi_class',
+            'avoid_tithi_class',
+            'allowed_maasams',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'allowed_lagnas',
+            'forenoon_only',
+            'allowed_solar_signs',
+            'allowed_tithi_names',
         ),
         manual_sections=(
             'information',
             _manual('chart', applicable_varas=('Budhavaram',)),
-            'chart', 'chart', 'chart', 'chart',
+            'chart',
+            'chart',
+            'chart',
+            'chart',
             'information',
         ),
     ),
     'vidyarambha': _activity(
         panchangam_fields=(
-            'prefer_choghadiya', 'skip_on_yoga', 'skip_on_sankramana',
-            'prefer_tithi_class', 'avoid_tithi_class', 'allowed_varas',
-            'allowed_nakshatras', 'allowed_lagnas',
+            'prefer_choghadiya',
+            'skip_on_yoga',
+            'skip_on_sankramana',
+            'prefer_tithi_class',
+            'avoid_tithi_class',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'allowed_lagnas',
         ),
         election_chart_rule_ids=(
             'vidyarambha.house-8-vacant',
@@ -224,60 +287,85 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     ),
     'seemantha': _activity(
         panchangam_fields=(
-            'allowed_varas', 'allowed_nakshatras', 'allowed_lagnas',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'allowed_lagnas',
             'allowed_tithi_names',
         ),
         personal_rule_ids=('personal.seemantha.birth-star-exclusions',),
         election_chart_rule_ids=(
-            'seemantha.house-8-vacant', 'seemantha.chandra-not-8',
+            'seemantha.house-8-vacant',
+            'seemantha.chandra-not-8',
         ),
         manual_sections=(
-            'information', 'information', 'chart', 'chart', 'chart',
-            'information', 'practical',
+            'information',
+            'information',
+            'chart',
+            'chart',
+            'chart',
+            'information',
+            'practical',
         ),
     ),
     'gruhapravesha': _activity(
         panchangam_fields=(
-            'prefer_lagna_class', 'allowed_varas', 'allowed_nakshatras',
-            'allowed_lagnas', 'allowed_solar_signs', 'allowed_tithi_names',
+            'prefer_lagna_class',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'allowed_lagnas',
+            'allowed_solar_signs',
+            'allowed_tithi_names',
         ),
-        personal_rule_ids=(
-            'personal.gruhapravesha.natal-anchor-match',
-        ),
+        personal_rule_ids=('personal.gruhapravesha.natal-anchor-match',),
         election_chart_rule_ids=('gruhapravesha.house-8-vacant',),
         manual_sections=(
-            'information', 'chart', 'chart',
-            _GRUHAPRAVESHA_OWNER_RITUAL_SPLIT, 'practical', 'information',
+            'information',
+            'chart',
+            'chart',
+            _GRUHAPRAVESHA_OWNER_RITUAL_SPLIT,
+            'practical',
+            'information',
         ),
     ),
     'vehicle': _activity(
         panchangam_fields=(
-            'prefer_lagna_class', 'prefer_choghadiya', 'prefer_vara',
-            'prefer_tithi_class', 'prefer_nakshatras',
+            'prefer_lagna_class',
+            'prefer_choghadiya',
+            'prefer_vara',
+            'prefer_tithi_class',
+            'prefer_nakshatras',
         ),
     ),
     'property': _activity(
         panchangam_fields=(
-            'prefer_lagna_class', 'prefer_vara', 'allowed_varas',
-            'allowed_nakshatras', 'avoid_tithi_numbers',
+            'prefer_lagna_class',
+            'prefer_vara',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'avoid_tithi_numbers',
         ),
         election_chart_rule_ids=(
-            'property.guru-kendra-trikona', 'property.kuja-11',
+            'property.guru-kendra-trikona',
+            'property.kuja-11',
             'property.kuja-not-lagna',
         ),
         manual_sections=('chart', 'chart', 'chart', 'chart'),
     ),
     'house_purchase': _activity(
         panchangam_fields=(
-            'allowed_varas', 'allowed_nakshatras',
-            'allowed_tithi_numbers', 'prefer_lagnas',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'allowed_tithi_numbers',
+            'prefer_lagnas',
         ),
         election_chart_rule_ids=('house-purchase.kuja-not-lagna',),
         manual_sections=('information', 'chart', 'chart', 'practical'),
     ),
     'gold': _activity(
         panchangam_fields=(
-            'prefer_lagna_class', 'prefer_choghadiya', 'prefer_vara',
+            'prefer_lagna_class',
+            'prefer_choghadiya',
+            'prefer_vara',
             'prefer_tithi_class',
         ),
         election_chart_rule_ids=(
@@ -290,50 +378,73 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     ),
     'business_inventory_purchase': _activity(
         panchangam_fields=(
-            'prefer_vara', 'allowed_varas', 'prefer_nakshatras',
+            'prefer_vara',
+            'allowed_varas',
+            'prefer_nakshatras',
             'prefer_tithi_numbers',
         ),
         manual_sections=(
             'information',
             _manual('information', applicable_varas=('Shanivaram',)),
-            'chart', 'chart', 'practical',
+            'chart',
+            'chart',
+            'practical',
         ),
     ),
     'purchase': _activity(
         panchangam_fields=('prefer_choghadiya', 'prefer_nakshatras'),
         election_chart_rule_ids=(
-            'purchase.chandra-lagna', 'purchase.shukra-lagna',
+            'purchase.chandra-lagna',
+            'purchase.shukra-lagna',
         ),
         manual_sections=('information', 'chart', 'information'),
     ),
     'borrowing_money': _activity(
         panchangam_fields=('avoid_nakshatras', 'avoid_janma_nakshatra'),
         manual_sections=(
-            'information', 'chart', 'chart', 'chart', 'practical',
+            'information',
+            'chart',
+            'chart',
+            'chart',
+            'practical',
         ),
     ),
     'lending_money': _activity(
         panchangam_fields=(
-            'allowed_varas', 'avoid_nakshatras',
-            'avoid_janma_nakshatra', 'avoid_vara_tithi_names',
+            'allowed_varas',
+            'avoid_nakshatras',
+            'avoid_janma_nakshatra',
+            'avoid_vara_tithi_names',
         ),
         manual_sections=(
-            'information', 'chart', 'chart', 'chart', 'information',
+            'information',
+            'chart',
+            'chart',
+            'chart',
+            'information',
             'practical',
         ),
     ),
     'bhumi_puja': _activity(
         panchangam_fields=(
-            'skip_on_yoga', 'prefer_vara', 'required_lagna_class',
-            'allowed_maasams', 'allowed_varas', 'avoid_vara_paksha',
-            'allowed_solar_classes', 'allowed_nakshatras',
-            'prefer_nakshatras', 'allowed_tithi_numbers',
+            'skip_on_yoga',
+            'prefer_vara',
+            'required_lagna_class',
+            'allowed_maasams',
+            'allowed_varas',
+            'avoid_vara_paksha',
+            'allowed_solar_classes',
+            'allowed_nakshatras',
+            'prefer_nakshatras',
+            'allowed_tithi_numbers',
         ),
         manual_sections=('chart', 'chart', 'information'),
     ),
     'well_digging': _activity(
         panchangam_fields=(
-            'allowed_nakshatras', 'allowed_lagnas', 'caution_lagna_solar',
+            'allowed_nakshatras',
+            'allowed_lagnas',
+            'caution_lagna_solar',
         ),
         manual_sections=('chart', 'chart'),
     ),
@@ -345,7 +456,9 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
                 'chart',
                 applicable_varas=('Somavaram', 'Shukravaram'),
             ),
-            'chart', 'chart', 'practical',
+            'chart',
+            'chart',
+            'practical',
         ),
     ),
     'business': _activity(
@@ -363,50 +476,65 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     ),
     'pilgrimage': _activity(
         panchangam_fields=(
-            'avoid_karana', 'prefer_lagna_class', 'prefer_nakshatras',
-            'avoid_tithi_numbers', 'skip_on_combust',
+            'avoid_karana',
+            'prefer_lagna_class',
+            'prefer_nakshatras',
+            'avoid_tithi_numbers',
+            'skip_on_combust',
         ),
         election_chart_rule_ids=('pilgrimage.guru-lagna-or-9',),
         manual_sections=('chart',),
     ),
     'ceremony': _activity(
         panchangam_fields=(
-            'skip_on_sankramana', 'allowed_varas', 'allowed_nakshatras',
+            'skip_on_sankramana',
+            'allowed_varas',
+            'allowed_nakshatras',
             'avoid_tithi_numbers',
         ),
         election_chart_rule_ids=(
-            'ceremony.surya-10', 'ceremony.chandra-4',
+            'ceremony.surya-10',
+            'ceremony.chandra-4',
             'ceremony.guru-lagna',
         ),
         manual_sections=('information', 'chart', 'chart', 'information'),
     ),
     'court': _activity(
         panchangam_fields=(
-            'allowed_varas', 'allowed_nakshatras',
-            'avoid_tithi_numbers', 'allowed_lagnas',
+            'allowed_varas',
+            'allowed_nakshatras',
+            'avoid_tithi_numbers',
+            'allowed_lagnas',
         ),
         manual_sections=(
-            'information', 'information', 'chart', 'chart', 'chart',
+            'information',
+            'information',
+            'chart',
+            'chart',
+            'chart',
             _manual('practical', purpose='safety_override'),
         ),
     ),
     'surgery': _activity(
         panchangam_fields=(
-            'avoid_karana', 'allowed_varas', 'allowed_nakshatras',
+            'avoid_karana',
+            'allowed_varas',
+            'allowed_nakshatras',
             'allowed_tithi_names',
         ),
-        personal_rule_ids=(
-            'personal.surgery.chandra-outside-janma-rashi',
-        ),
+        personal_rule_ids=('personal.surgery.chandra-outside-janma-rashi',),
         election_chart_rule_ids=('surgery.house-8-vacant',),
         manual_sections=(
             _manual('practical', purpose='safety_override'),
-            'chart', 'chart',
+            'chart',
+            'chart',
         ),
     ),
     'travel': _activity(
         panchangam_fields=(
-            'avoid_karana', 'prefer_lagna_class', 'avoid_nakshatras',
+            'avoid_karana',
+            'prefer_lagna_class',
+            'avoid_nakshatras',
             'prefer_nakshatras',
         ),
         personal_rule_ids=(
@@ -433,17 +561,22 @@ def _display_rows(
     specification: Any,
 ) -> list[dict[str, Any]]:
     if isinstance(specification, str):
-        presentations = ({
-            'display_section': specification,
-            'text': source_text,
-        },)
+        presentations = (
+            {
+                'display_section': specification,
+                'text': source_text,
+            },
+        )
     elif isinstance(specification, Mapping):
         presentations = ({**specification, 'text': source_text},)
     else:
-        presentations = tuple({
-            'display_section': section,
-            'text': text,
-        } for section, text in specification)
+        presentations = tuple(
+            {
+                'display_section': section,
+                'text': text,
+            }
+            for section, text in specification
+        )
 
     rows = []
     for part_index, presentation in enumerate(presentations):
@@ -464,47 +597,71 @@ def _display_rows(
     return rows
 
 
+def _validate_deterministic_inventory(
+    activity: str,
+    specification: Mapping[str, Any],
+    source_rule: Mapping[str, Any],
+    allowed_fields: set[str],
+) -> None:
+    fields = specification['deterministic_panchangam_fields']
+    expected_fields = tuple(
+        field for field in DETERMINISTIC_PANCHANGAM_FIELDS if field in source_rule
+    )
+    if fields != expected_fields:
+        raise ValueError(
+            f'{activity}: deterministic Panchangam field inventory is stale'
+        )
+    unknown_fields = set(fields) - allowed_fields
+    if unknown_fields:
+        raise ValueError(f'{activity}: unknown deterministic fields {unknown_fields!r}')
+    missing_fields = [field for field in fields if field not in source_rule]
+    if missing_fields:
+        raise ValueError(
+            f'{activity}: deterministic fields absent from source rule '
+            f'{missing_fields!r}'
+        )
+
+
+def _validate_rule_ids(activity: str, specification: Mapping[str, Any]) -> None:
+    personal_ids = _rule_ids(PERSONAL_ELECTION_RULES.get(activity, ()))
+    if specification['personal_rule_ids'] != personal_ids:
+        raise ValueError(f'{activity}: personal rule IDs are stale')
+    election_ids = _rule_ids(ELECTION_CHART_RULES.get(activity, ()))
+    if specification['election_chart_rule_ids'] != election_ids:
+        raise ValueError(f'{activity}: election-chart rule IDs are stale')
+
+
+def _validate_manual_count(
+    activity: str,
+    source_checks: tuple,
+    manual_specs: tuple,
+) -> None:
+    if len(manual_specs) != len(source_checks):
+        raise ValueError(
+            f'{activity}: expected {len(source_checks)} manual '
+            f'classifications, found {len(manual_specs)}'
+        )
+
+
 def _validate_specs() -> None:
     if tuple(ACTIVITY_CHECK_SPECS) != BROWSER_ACTIVITIES:
         raise ValueError(
-            'Activity-check specs must match the ordered browser catalogue')
+            'Activity-check specs must match the ordered browser catalogue'
+        )
 
     allowed_fields = set(DETERMINISTIC_PANCHANGAM_FIELDS)
     allowed_sections = set(MANUAL_CHECK_DISPLAY_SECTIONS)
     for activity, specification in ACTIVITY_CHECK_SPECS.items():
         source_rule = ACTIVITY_RULES[activity]
-        fields = specification['deterministic_panchangam_fields']
-        expected_fields = tuple(
-            field for field in DETERMINISTIC_PANCHANGAM_FIELDS
-            if field in source_rule
+        _validate_deterministic_inventory(
+            activity, specification, source_rule, allowed_fields
         )
-        if fields != expected_fields:
-            raise ValueError(
-                f'{activity}: deterministic Panchangam field inventory is '
-                'stale')
-        unknown_fields = set(fields) - allowed_fields
-        if unknown_fields:
-            raise ValueError(
-                f'{activity}: unknown deterministic fields {unknown_fields!r}')
-        missing_fields = [field for field in fields if field not in source_rule]
-        if missing_fields:
-            raise ValueError(
-                f'{activity}: deterministic fields absent from source rule '
-                f'{missing_fields!r}')
 
-        personal_ids = _rule_ids(PERSONAL_ELECTION_RULES.get(activity, ()))
-        if specification['personal_rule_ids'] != personal_ids:
-            raise ValueError(f'{activity}: personal rule IDs are stale')
-        election_ids = _rule_ids(ELECTION_CHART_RULES.get(activity, ()))
-        if specification['election_chart_rule_ids'] != election_ids:
-            raise ValueError(f'{activity}: election-chart rule IDs are stale')
+        _validate_rule_ids(activity, specification)
 
         source_checks = tuple(source_rule.get('manual_checks', ()))
         manual_specs = specification['manual_sections']
-        if len(manual_specs) != len(source_checks):
-            raise ValueError(
-                f'{activity}: expected {len(source_checks)} manual '
-                f'classifications, found {len(manual_specs)}')
+        _validate_manual_count(activity, source_checks, manual_specs)
         for manual_spec in manual_specs:
             if isinstance(manual_spec, str):
                 sections = (manual_spec,)
@@ -512,14 +669,16 @@ def _validate_specs() -> None:
                 purpose = None
             elif isinstance(manual_spec, Mapping):
                 unknown_keys = set(manual_spec) - {
-                    'display_section', 'applicable_varas', 'purpose'}
+                    'display_section',
+                    'applicable_varas',
+                    'purpose',
+                }
                 if unknown_keys:
                     raise ValueError(
-                        f'{activity}: unknown manual metadata '
-                        f'{unknown_keys!r}')
+                        f'{activity}: unknown manual metadata {unknown_keys!r}'
+                    )
                 sections = (manual_spec.get('display_section'),)
-                applicable_varas = tuple(
-                    manual_spec.get('applicable_varas', ()))
+                applicable_varas = tuple(manual_spec.get('applicable_varas', ()))
                 purpose = manual_spec.get('purpose')
             else:
                 sections = tuple(item[0] for item in manual_spec)
@@ -527,14 +686,15 @@ def _validate_specs() -> None:
                 purpose = None
             if not sections or set(sections) - allowed_sections:
                 raise ValueError(
-                    f'{activity}: invalid manual display sections {sections!r}')
+                    f'{activity}: invalid manual display sections {sections!r}'
+                )
             unknown_varas = set(applicable_varas) - set(CANONICAL_VARAS)
             if unknown_varas:
                 raise ValueError(
-                    f'{activity}: unknown applicable Varas {unknown_varas!r}')
+                    f'{activity}: unknown applicable Varas {unknown_varas!r}'
+                )
             if purpose is not None and purpose not in MANUAL_CHECK_PURPOSES:
-                raise ValueError(
-                    f'{activity}: unknown manual purpose {purpose!r}')
+                raise ValueError(f'{activity}: unknown manual purpose {purpose!r}')
 
 
 def build_activity_check_contract() -> dict[str, Any]:
@@ -544,15 +704,16 @@ def build_activity_check_contract() -> dict[str, Any]:
     for activity, specification in ACTIVITY_CHECK_SPECS.items():
         rows = []
         source_checks = ACTIVITY_RULES[activity].get('manual_checks', ())
-        for index, (text, manual_spec) in enumerate(zip(
-                source_checks, specification['manual_sections'], strict=True)):
+        for index, (text, manual_spec) in enumerate(
+            zip(source_checks, specification['manual_sections'], strict=True)
+        ):
             rows.extend(_display_rows(activity, index, text, manual_spec))
         activities[activity] = {
             'deterministic_panchangam_fields': list(
-                specification['deterministic_panchangam_fields']),
+                specification['deterministic_panchangam_fields']
+            ),
             'personal_rule_ids': list(specification['personal_rule_ids']),
-            'election_chart_rule_ids': list(
-                specification['election_chart_rule_ids']),
+            'election_chart_rule_ids': list(specification['election_chart_rule_ids']),
             'manual_checks': rows,
         }
     return {

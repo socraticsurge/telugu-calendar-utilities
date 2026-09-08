@@ -25,6 +25,7 @@ Location dependency
 Heliacal visibility depends on the observer's geographic position, so a
 ``Location`` (city) is required.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -44,45 +45,45 @@ _OUTER = frozenset({'Mars', 'Jupiter', 'Saturn'})
 # Approximate synodic periods in days (used for look-back window).
 _SYNODIC: dict[str, int] = {
     'Mercury': 116,
-    'Venus':   584,
-    'Mars':    780,
+    'Venus': 584,
+    'Mars': 780,
     'Jupiter': 399,
-    'Saturn':  378,
+    'Saturn': 378,
 }
 
 # Observer Snellen ratios per (planet, event-type), calibrated to Drik Panchang.
 # Values > 1 = more acute than average; < 1 = below-average.
 # Calibrated from 2026 Hyderabad reference dates; accuracy ≈ 1–2 days.
 _SNELLEN: dict[str, dict[int, float]] = {
-    'Saturn':  {
-        swe.HELIACAL_SETTING: 5.0,   # 26 min from DP
-        swe.HELIACAL_RISING:  1.0,   # 24 min from DP
-        swe.MORNING_LAST:     5.0,
-        swe.EVENING_FIRST:    1.0,
+    'Saturn': {
+        swe.HELIACAL_SETTING: 5.0,  # 26 min from DP
+        swe.HELIACAL_RISING: 1.0,  # 24 min from DP
+        swe.MORNING_LAST: 5.0,
+        swe.EVENING_FIRST: 1.0,
     },
     'Jupiter': {
-        swe.HELIACAL_SETTING: 3.0,   # 47 min from DP
-        swe.HELIACAL_RISING:  3.0,   # 23 h from DP (same day)
-        swe.MORNING_LAST:     3.0,
-        swe.EVENING_FIRST:    3.0,
+        swe.HELIACAL_SETTING: 3.0,  # 47 min from DP
+        swe.HELIACAL_RISING: 3.0,  # 23 h from DP (same day)
+        swe.MORNING_LAST: 3.0,
+        swe.EVENING_FIRST: 3.0,
     },
     'Mars': {
         swe.HELIACAL_SETTING: 5.0,
-        swe.HELIACAL_RISING:  0.9,   # ~24 h from DP
-        swe.MORNING_LAST:     5.0,
-        swe.EVENING_FIRST:    0.9,
+        swe.HELIACAL_RISING: 0.9,  # ~24 h from DP
+        swe.MORNING_LAST: 5.0,
+        swe.EVENING_FIRST: 0.9,
     },
     'Mercury': {
         swe.HELIACAL_SETTING: 3.0,
-        swe.HELIACAL_RISING:  3.0,
-        swe.MORNING_LAST:     3.0,
-        swe.EVENING_FIRST:    3.0,
+        swe.HELIACAL_RISING: 3.0,
+        swe.MORNING_LAST: 3.0,
+        swe.EVENING_FIRST: 3.0,
     },
     'Venus': {
         swe.HELIACAL_SETTING: 3.0,
-        swe.HELIACAL_RISING:  3.0,
-        swe.MORNING_LAST:     3.0,
-        swe.EVENING_FIRST:    3.0,   # 7 min from DP
+        swe.HELIACAL_RISING: 3.0,
+        swe.MORNING_LAST: 3.0,
+        swe.EVENING_FIRST: 3.0,  # 7 min from DP
     },
 }
 
@@ -91,14 +92,18 @@ _STD_ATMO: list[float] = [1013.25, 15.0, 40.0, 0.0]
 
 # ── Output type ───────────────────────────────────────────────────────────────
 
+
 @dataclass
 class CombustionPeriod:
     planet: str
-    enters: datetime          # UTC: planet becomes invisible (Asta)
-    exits:  datetime | None   # UTC: planet re-emerges (Udaya); None = ongoing at range end
+    enters: datetime  # UTC: planet becomes invisible (Asta)
+    exits: (
+        datetime | None
+    )  # UTC: planet re-emerges (Udaya); None = ongoing at range end
 
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
+
 
 def _date_to_jd(d: date) -> float:
     return swe.julday(d.year, d.month, d.day, 0.0)
@@ -114,7 +119,13 @@ def _next_event(
     observer = [36.0, snellen, 0.0, 0.0, 0.0, 0.0]
     try:
         result = swe.heliacal_ut(
-            jd_from, geopos, _STD_ATMO, observer, planet, evt_type, swe.FLG_SWIEPH,
+            jd_from,
+            geopos,
+            _STD_ATMO,
+            observer,
+            planet,
+            evt_type,
+            swe.FLG_SWIEPH,
         )
         return float(result[0])
     except swe.Error:
@@ -149,7 +160,7 @@ def _inner_periods(
     pairs: list[tuple[float, float | None]] = []
 
     for entry_evt, exit_evt in (
-        (swe.MORNING_LAST,     swe.EVENING_FIRST),   # around superior conjunction
+        (swe.MORNING_LAST, swe.EVENING_FIRST),  # around superior conjunction
         (swe.HELIACAL_SETTING, swe.HELIACAL_RISING),  # around inferior conjunction
     ):
         jd_entry = _next_event(planet, jd_from, entry_evt, geopos)
@@ -162,7 +173,55 @@ def _inner_periods(
     return pairs
 
 
+def _validated_planets(planets: list[str] | None) -> list[str]:
+    if planets is None:
+        return PLANET_NAMES
+    bad = [planet for planet in planets if planet not in PLANET_NAMES]
+    if bad:
+        raise ValueError(f'Unknown planet(s): {bad}. Valid: {PLANET_NAMES}')
+    return planets
+
+
+def _raw_periods(
+    planet: str,
+    jd_start: float,
+    jd_end: float,
+    geopos: list[float],
+) -> list[tuple[float, float | None]]:
+    jd_lookback = jd_start - 120.0
+    if planet in _OUTER:
+        return _outer_periods(planet, jd_lookback, jd_end, geopos)
+    return _inner_periods(planet, jd_lookback, jd_end, geopos)
+
+
+def _period_overlaps(
+    jd_entry: float,
+    jd_exit: float | None,
+    jd_start: float,
+    jd_end: float,
+) -> bool:
+    return (jd_exit is None or jd_exit >= jd_start) and jd_entry <= jd_end
+
+
+def _planet_combustion_periods(
+    planet: str,
+    jd_start: float,
+    jd_end: float,
+    geopos: list[float],
+) -> list[CombustionPeriod]:
+    return [
+        CombustionPeriod(
+            planet=planet,
+            enters=jd_to_utc(jd_entry),
+            exits=jd_to_utc(jd_exit) if jd_exit is not None else None,
+        )
+        for jd_entry, jd_exit in _raw_periods(planet, jd_start, jd_end, geopos)
+        if _period_overlaps(jd_entry, jd_exit, jd_start, jd_end)
+    ]
+
+
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def combustion_periods(
     start: date,
@@ -187,43 +246,17 @@ def combustion_periods(
     before *start* and exits within the range, ``enters`` will be before
     *start*.  If still Asta at *end*, ``exits`` is None.
     """
-    if planets is None:
-        planets = PLANET_NAMES
-    else:
-        bad = [p for p in planets if p not in set(PLANET_NAMES)]
-        if bad:
-            raise ValueError(f'Unknown planet(s): {bad}. Valid: {PLANET_NAMES}')
+    planets = _validated_planets(planets)
 
     geopos = [city.lon, city.lat, city.alt]
     jd_start = _date_to_jd(start)
-    jd_end   = _date_to_jd(end) + 1.0
+    jd_end = _date_to_jd(end) + 1.0
 
-    results: list[CombustionPeriod] = []
-
-    for planet in planets:
-        # 120-day lookback: enough to capture any Asta that started before the
-        # range but is still ongoing (Mars the extreme case at ~90 days), while
-        # avoiding the *previous* synodic period's Asta which would cause the
-        # search to chain through an extra iteration and introduce JD drift.
-        jd_lookback = jd_start - 120.0
-
-        if planet in _OUTER:
-            raw = _outer_periods(planet, jd_lookback, jd_end, geopos)
-        else:
-            raw = _inner_periods(planet, jd_lookback, jd_end, geopos)
-
-        for jd_entry, jd_exit in raw:
-            # Filter: keep only periods overlapping [jd_start, jd_end]
-            if jd_exit is not None and jd_exit < jd_start:
-                continue   # ended before range
-            if jd_entry > jd_end:
-                continue   # starts after range
-
-            results.append(CombustionPeriod(
-                planet=planet,
-                enters=jd_to_utc(jd_entry),
-                exits=jd_to_utc(jd_exit) if jd_exit is not None else None,
-            ))
+    results = [
+        period
+        for planet in planets
+        for period in _planet_combustion_periods(planet, jd_start, jd_end, geopos)
+    ]
 
     results.sort(key=lambda p: p.enters)
     return results
