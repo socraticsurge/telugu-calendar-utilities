@@ -11,6 +11,8 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_PATH = ROOT / "tests/fixtures/raman-artifact-identity-audit-v1.json"
 CLAIM_BASELINE_PATH = (
@@ -157,44 +159,54 @@ def _pointer_parent(document: dict, pointer: str) -> tuple[dict, str]:
     return current, parts[-1]
 
 
-def _assert_non_overlapping_pointers(manifest: dict) -> None:
-    by_artifact: dict[str, list[tuple[str, ...]]] = {}
-    for delta in manifest["semantic_deltas"]:
-        activity = manifest["activity"]
-        scope = delta["scope"]
-        artifact = delta["artifact"]
-        pointer = delta["json_pointer"]
-        parts = _pointer_parts(pointer)
+def _activity_pointer_contracts(activity: str) -> dict[str, tuple[str, str]]:
+    activity_rules = "src/data/activity-rules.generated.json"
+    election_rules = "src/data/election-chart-rules.generated.json"
+    return {
+        f"{activity}_contract": (
+            activity_rules,
+            f"/check_contract/activities/{activity}",
+        ),
+        f"{activity}_activity_rules": (activity_rules, f"/rules/{activity}"),
+        f"{activity}_consumed_fields": (activity_rules, "/consumed_fields"),
+        f"{activity}_rules": (election_rules, f"/rules/{activity}"),
+        f"{activity}_remainder": (
+            election_rules,
+            f"/manual_remainders/{activity}",
+        ),
+    }
 
-        if scope == f"{activity}_contract":
-            assert artifact == "src/data/activity-rules.generated.json"
-            assert pointer == f"/check_contract/activities/{activity}"
-        elif scope == f"{activity}_activity_rules":
-            assert artifact == "src/data/activity-rules.generated.json"
-            assert pointer == f"/rules/{activity}"
-        elif scope == f"{activity}_consumed_fields":
-            assert artifact == "src/data/activity-rules.generated.json"
-            assert pointer == "/consumed_fields"
-        elif scope == f"{activity}_rules":
-            assert artifact == "src/data/election-chart-rules.generated.json"
-            assert pointer == f"/rules/{activity}"
-        elif scope == f"{activity}_remainder":
-            assert artifact == "src/data/election-chart-rules.generated.json"
-            assert pointer == f"/manual_remainders/{activity}"
-        elif scope == f"{activity}_convention":
-            assert artifact == "src/data/election-chart-rules.generated.json"
-            assert len(parts) == 2
-            assert parts[0] == "conventions"
-        elif scope == "shared_schema":
-            assert artifact == "src/data/election-chart-rules.generated.json"
-            assert pointer in {"/schema_version", "/convention_schema_version"}
-        else:
-            assert scope == "completion_registry"
-            assert artifact == "src/data/election-chart-rules.generated.json"
-            assert pointer == "/complete_assessors"
 
-        by_artifact.setdefault(delta["artifact"], []).append(parts)
+def _validated_semantic_delta_pointer(
+    activity: str,
+    delta: dict,
+) -> tuple[str, tuple[str, ...]]:
+    scope = delta["scope"]
+    artifact = delta["artifact"]
+    pointer = delta["json_pointer"]
+    parts = _pointer_parts(pointer)
+    expected = _activity_pointer_contracts(activity).get(scope)
 
+    if expected is not None:
+        assert (artifact, pointer) == expected
+    elif scope == f"{activity}_convention":
+        assert artifact == "src/data/election-chart-rules.generated.json"
+        assert len(parts) == 2
+        assert parts[0] == "conventions"
+    elif scope == "shared_schema":
+        assert artifact == "src/data/election-chart-rules.generated.json"
+        assert pointer in {"/schema_version", "/convention_schema_version"}
+    else:
+        assert scope == "completion_registry"
+        assert artifact == "src/data/election-chart-rules.generated.json"
+        assert pointer == "/complete_assessors"
+
+    return artifact, parts
+
+
+def _assert_non_overlapping_pointer_groups(
+    by_artifact: dict[str, list[tuple[str, ...]]],
+) -> None:
     for pointers in by_artifact.values():
         for index, left in enumerate(pointers):
             for right in pointers[index + 1 :]:
@@ -203,6 +215,101 @@ def _assert_non_overlapping_pointers(manifest: dict) -> None:
                     "A successor manifest may not declare duplicate or "
                     "ancestor/descendant JSON pointers"
                 )
+
+
+def _assert_non_overlapping_pointers(manifest: dict) -> None:
+    by_artifact: dict[str, list[tuple[str, ...]]] = {}
+    for delta in manifest["semantic_deltas"]:
+        artifact, parts = _validated_semantic_delta_pointer(
+            manifest["activity"],
+            delta,
+        )
+        by_artifact.setdefault(artifact, []).append(parts)
+    _assert_non_overlapping_pointer_groups(by_artifact)
+
+
+@pytest.mark.parametrize(
+    ("scope", "artifact", "pointer"),
+    [
+        (
+            "example_contract",
+            "src/data/activity-rules.generated.json",
+            "/check_contract/activities/example",
+        ),
+        (
+            "example_activity_rules",
+            "src/data/activity-rules.generated.json",
+            "/rules/example",
+        ),
+        (
+            "example_consumed_fields",
+            "src/data/activity-rules.generated.json",
+            "/consumed_fields",
+        ),
+        (
+            "example_rules",
+            "src/data/election-chart-rules.generated.json",
+            "/rules/example",
+        ),
+        (
+            "example_remainder",
+            "src/data/election-chart-rules.generated.json",
+            "/manual_remainders/example",
+        ),
+        (
+            "example_convention",
+            "src/data/election-chart-rules.generated.json",
+            "/conventions/example-rule-v1",
+        ),
+        (
+            "shared_schema",
+            "src/data/election-chart-rules.generated.json",
+            "/schema_version",
+        ),
+        (
+            "shared_schema",
+            "src/data/election-chart-rules.generated.json",
+            "/convention_schema_version",
+        ),
+        (
+            "completion_registry",
+            "src/data/election-chart-rules.generated.json",
+            "/complete_assessors",
+        ),
+    ],
+)
+def test_semantic_delta_pointer_contract_accepts_each_declared_scope(
+    scope: str,
+    artifact: str,
+    pointer: str,
+) -> None:
+    assert _validated_semantic_delta_pointer(
+        "example",
+        {"scope": scope, "artifact": artifact, "json_pointer": pointer},
+    ) == (artifact, _pointer_parts(pointer))
+
+
+@pytest.mark.parametrize(
+    "pointers",
+    [
+        [("rules", "example"), ("rules", "example")],
+        [("rules",), ("rules", "example")],
+        [("rules", "example"), ("rules",)],
+    ],
+    ids=["duplicate", "ancestor", "descendant"],
+)
+def test_pointer_overlap_contract_rejects_colliding_paths(
+    pointers: list[tuple[str, ...]],
+) -> None:
+    with pytest.raises(AssertionError, match="duplicate or ancestor/descendant"):
+        _assert_non_overlapping_pointer_groups({"artifact.json": pointers})
+
+
+def test_pointer_overlap_contract_is_scoped_per_artifact() -> None:
+    pointer = ("rules", "example")
+    _assert_non_overlapping_pointer_groups(
+        {"first.json": [pointer], "second.json": [pointer]}
+    )
 
 
 def _reverse_declared_rule_deltas(
