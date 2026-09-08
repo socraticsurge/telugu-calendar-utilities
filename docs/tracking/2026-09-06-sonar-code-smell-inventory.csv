@@ -282,10 +282,10 @@ AaBbSRHtjK1myYTdWYsm,python:S3358,MAJOR,telugu_panchangam/personal/personal_elec
 AZ_4lyD84HbJenSxEGOc,python:S9073,MAJOR,tests/test_ayanamsa.py,181,2026-06-17,81,,,mutable
 AZ_4lyEG4HbJenSxEGOd,python:S9073,MAJOR,tests/test_bhadra_mukha_puchha.py,52,2026-07-22,46,,,mutable
 AZ_4lyEi4HbJenSxEGOg,python:S9073,MAJOR,tests/test_bhumi_puja_profile.py,55,2026-07-21,47,,,mutable
-AaBbSROXjK1myYTdWYso,python:S9073,MAJOR,tests/test_browser_smoke.py,996,2026-08-31,6,,_muhurta_planets=19;test_chart_aware_muhurta_built_browser_state_matrix=21,mutable
-AaBbSROXjK1myYTdWYsp,python:S9073,MAJOR,tests/test_browser_smoke.py,1180,2026-08-31,6,,_muhurta_planets=19;test_chart_aware_muhurta_built_browser_state_matrix=21,mutable
-AaBbSROXjK1myYTdWYsq,python:S9073,MAJOR,tests/test_browser_smoke.py,1190,2026-08-31,6,,_muhurta_planets=19;test_chart_aware_muhurta_built_browser_state_matrix=21,mutable
-AaBbSROXjK1myYTdWYsr,python:S9073,MAJOR,tests/test_browser_smoke.py,3044,2026-09-01,5,,_muhurta_planets=19;test_chart_aware_muhurta_built_browser_state_matrix=21,mutable
+AaBbSROXjK1myYTdWYso,python:S9073,MAJOR,tests/test_browser_smoke.py,996,2026-08-31,6,,,mutable
+AaBbSROXjK1myYTdWYsp,python:S9073,MAJOR,tests/test_browser_smoke.py,1180,2026-08-31,6,,,mutable
+AaBbSROXjK1myYTdWYsq,python:S9073,MAJOR,tests/test_browser_smoke.py,1190,2026-08-31,6,,,mutable
+AaBbSROXjK1myYTdWYsr,python:S9073,MAJOR,tests/test_browser_smoke.py,3044,2026-09-01,5,,,mutable
 AZ_4lyGM4HbJenSxEGOy,python:S9073,MAJOR,tests/test_drik_engine.py,118,2026-06-10,88,,,mutable
 AZ_4lyHj4HbJenSxEGPA,python:S9073,MAJOR,tests/test_ghati.py,55,2026-06-17,81,,,mutable
 AZ_4lyHj4HbJenSxEGPB,python:S9073,MAJOR,tests/test_ghati.py,67,2026-06-17,81,,,mutable
