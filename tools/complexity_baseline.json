@@ -7,10 +7,6 @@
     "telugu_panchangam/generators/ics.py": {
       "_description": 24
     },
-    "tests/test_browser_smoke.py": {
-      "_muhurta_planets": 19,
-      "test_chart_aware_muhurta_built_browser_state_matrix": 21
-    },
     "tests/test_raman_artifact_identity_audit.py": {
       "_assert_non_overlapping_pointers": 12
     },

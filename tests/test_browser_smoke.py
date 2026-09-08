@@ -562,91 +562,97 @@ def _gold_pass_planets(canonical_lagnas):
     return planets
 
 
-def _muhurta_planets(
-    scenario, chart_index, canonical_lagna, gold_template=None,
-):
-    """Return strict planets whose Rashis encode scenario-specific houses."""
-    if scenario in {'gold-pass', 'gold-cap', 'gold-unknown'}:
-        # A request may include samples on both sides of a Lagna transition.
-        # Keep the planetary longitudes coherent across that request and only
-        # recompute their Whole Sign houses against each sampled Lagna.
-        planets = [
-            dict(planet)
-            for planet in (
-                gold_template or _gold_pass_planets(canonical_lagna)
-            )
-        ]
-        rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
-        lagna_index = rashis.index(canonical_lagna)
-        for planet in planets:
-            planet['house'] = (
-                rashis.index(planet['rashi']) - lagna_index
-            ) % 12 + 1
-        if scenario == 'gold-cap':
-            for name, rashi in (('Surya', 'Tula'), ('Chandra', 'Vrischika')):
-                next(item for item in planets if item['name'] == name).update({
-                    'rashi': rashi,
-                    'degree': 1.0,
-                    'house': (rashis.index(rashi) - lagna_index) % 12 + 1,
-                })
-        elif scenario == 'gold-unknown':
-            next(item for item in planets if item['name'] == 'Surya')[
-                'degree'
-            ] = 10.0
-        return planets
-    houses = {name: 2 for name in MUHURTA_PLANET_NAMES}
-    if scenario in {
-        'annaprasana-pass', 'annaprasana-preference-miss',
-        'annaprasana-hard-fail', 'annaprasana-unknown',
-    }:
-        if scenario != 'annaprasana-preference-miss':
-            houses['Guru'] = 1
-        if scenario == 'annaprasana-hard-fail':
-            houses['Surya'] = 1
-        elif scenario == 'annaprasana-unknown':
-            houses.update({'Chandra': 1, 'Surya': 7})
-    elif scenario in {
-        'karnavedha-pass', 'karnavedha-chart-unknown',
-        'karnavedha-bounded',
-    }:
-        # Mean nodes remain opposite while neither occupies house 8.
-        houses.update({'Rahu': 1, 'Ketu': 7})
-    elif scenario in {'positive', 'profile'}:
-        # Both generic-purchase preferences pass; travel's Kuja exclusion also
-        # passes. Other houses deliberately stay compact and deterministic.
-        houses.update({'Chandra': 1, 'Shukra': 1, 'Kuja': 2})
-    elif scenario == 'failure':
-        houses['Kuja'] = 8
-    elif scenario == 'mixed':
-        # Every slot has at least its first and last minute sampled. Alternating
-        # Chandra across those snapshots makes the source preference genuinely
-        # mixed within the offered window without inventing a hard rejection.
-        houses.update({
-            'Chandra': 1 if chart_index % 2 == 0 else 2,
-            'Shukra': 1,
-        })
-    elif scenario in {
-        'vidyarambha-pass',
-        'vidyarambha-preference-miss',
-        'vidyarambha-hard-fail',
-        'vidyarambha-unknown',
-    }:
-        houses.update({
-            'Budha': 9,
-            'Shukra': 9,
-            'Guru': 9,
-            'Rahu': 5,
-        })
-        if scenario == 'vidyarambha-preference-miss':
-            houses['Guru'] = 10
-        elif scenario == 'vidyarambha-hard-fail':
-            houses['Surya'] = 8
-        elif scenario == 'vidyarambha-unknown' and chart_index % 2:
-            houses['Guru'] = 10
-    houses['Ketu'] = (houses['Rahu'] + 5) % 12 + 1
+_GOLD_SCENARIOS = {'gold-pass', 'gold-cap', 'gold-unknown'}
+_ANNAPRASANA_CHART_SCENARIOS = {
+    'annaprasana-pass',
+    'annaprasana-preference-miss',
+    'annaprasana-hard-fail',
+    'annaprasana-unknown',
+}
+_KARNAVEDHA_CHART_SCENARIOS = {
+    'karnavedha-pass', 'karnavedha-chart-unknown', 'karnavedha-bounded',
+}
+_VIDYARAMBHA_CHART_SCENARIOS = {
+    'vidyarambha-pass',
+    'vidyarambha-preference-miss',
+    'vidyarambha-hard-fail',
+    'vidyarambha-unknown',
+}
+
+
+def _gold_muhurta_planets(scenario, canonical_lagna, gold_template):
+    """Keep longitudes coherent while applying a controlled Gold outcome."""
+    planets = [
+        dict(planet)
+        for planet in (gold_template or _gold_pass_planets(canonical_lagna))
+    ]
     rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
     lagna_index = rashis.index(canonical_lagna)
-    planets = [
+    for planet in planets:
+        planet['house'] = (
+            rashis.index(planet['rashi']) - lagna_index
+        ) % 12 + 1
+    if scenario == 'gold-cap':
+        for name, rashi in (('Surya', 'Tula'), ('Chandra', 'Vrischika')):
+            next(item for item in planets if item['name'] == name).update({
+                'rashi': rashi,
+                'degree': 1.0,
+                'house': (rashis.index(rashi) - lagna_index) % 12 + 1,
+            })
+    elif scenario == 'gold-unknown':
+        next(item for item in planets if item['name'] == 'Surya')[
+            'degree'
+        ] = 10.0
+    return planets
+
+
+def _annaprasana_house_overrides(scenario):
+    overrides = {}
+    if scenario != 'annaprasana-preference-miss':
+        overrides['Guru'] = 1
+    if scenario == 'annaprasana-hard-fail':
+        overrides['Surya'] = 1
+    elif scenario == 'annaprasana-unknown':
+        overrides.update({'Chandra': 1, 'Surya': 7})
+    return overrides
+
+
+def _vidyarambha_house_overrides(scenario, chart_index):
+    overrides = {'Budha': 9, 'Shukra': 9, 'Guru': 9, 'Rahu': 5}
+    if scenario == 'vidyarambha-preference-miss':
+        overrides['Guru'] = 10
+    elif scenario == 'vidyarambha-hard-fail':
+        overrides['Surya'] = 8
+    elif scenario == 'vidyarambha-unknown' and chart_index % 2:
+        overrides['Guru'] = 10
+    return overrides
+
+
+def _muhurta_house_overrides(scenario, chart_index):
+    if scenario in _ANNAPRASANA_CHART_SCENARIOS:
+        return _annaprasana_house_overrides(scenario)
+    if scenario in _KARNAVEDHA_CHART_SCENARIOS:
+        # Mean nodes remain opposite while neither occupies house 8.
+        return {'Rahu': 1, 'Ketu': 7}
+    if scenario in {'positive', 'profile'}:
+        # Both generic-purchase preferences pass; travel's Kuja exclusion also
+        # passes. Other houses deliberately stay compact and deterministic.
+        return {'Chandra': 1, 'Shukra': 1, 'Kuja': 2}
+    if scenario == 'failure':
+        return {'Kuja': 8}
+    if scenario == 'mixed':
+        # Alternating Chandra makes the preference genuinely mixed within the
+        # offered window without inventing a hard rejection.
+        return {'Chandra': 1 if chart_index % 2 == 0 else 2, 'Shukra': 1}
+    if scenario in _VIDYARAMBHA_CHART_SCENARIOS:
+        return _vidyarambha_house_overrides(scenario, chart_index)
+    return {}
+
+
+def _planets_from_houses(houses, canonical_lagna):
+    rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
+    lagna_index = rashis.index(canonical_lagna)
+    return [
         {
             'name': name,
             'rashi': rashis[(lagna_index + houses[name] - 1) % 12],
@@ -656,12 +662,102 @@ def _muhurta_planets(
         }
         for index, name in enumerate(MUHURTA_PLANET_NAMES)
     ]
+
+
+def _muhurta_planets(
+    scenario, chart_index, canonical_lagna, gold_template=None,
+):
+    """Return strict planets whose Rashis encode scenario-specific houses."""
+    if scenario in _GOLD_SCENARIOS:
+        return _gold_muhurta_planets(
+            scenario, canonical_lagna, gold_template,
+        )
+    houses = {name: 2 for name in MUHURTA_PLANET_NAMES}
+    houses.update(_muhurta_house_overrides(scenario, chart_index))
+    houses['Ketu'] = (houses['Rahu'] + 5) % 12 + 1
+    planets = _planets_from_houses(houses, canonical_lagna)
     if scenario == 'annaprasana-unknown':
         next(item for item in planets if item['name'] == 'Surya')[
             'degree'] = 10.0
         next(item for item in planets if item['name'] == 'Chandra')[
             'degree'] = 10.0
     return planets
+
+
+@pytest.mark.parametrize(
+    ('scenario', 'chart_index', 'expected_houses'),
+    (
+        ('positive', 0, {'Chandra': 1, 'Shukra': 1, 'Kuja': 2}),
+        ('profile', 0, {'Chandra': 1, 'Shukra': 1, 'Kuja': 2}),
+        ('failure', 0, {'Kuja': 8}),
+        ('mixed', 0, {'Chandra': 1, 'Shukra': 1}),
+        ('mixed', 1, {'Chandra': 2, 'Shukra': 1}),
+        ('annaprasana-pass', 0, {'Guru': 1}),
+        ('annaprasana-preference-miss', 0, {'Guru': 2}),
+        ('annaprasana-hard-fail', 0, {'Guru': 1, 'Surya': 1}),
+        (
+            'annaprasana-unknown', 0,
+            {'Guru': 1, 'Chandra': 1, 'Surya': 7},
+        ),
+        ('karnavedha-bounded', 0, {'Rahu': 1, 'Ketu': 7}),
+        (
+            'vidyarambha-pass', 0,
+            {'Budha': 9, 'Shukra': 9, 'Guru': 9, 'Rahu': 5, 'Ketu': 11},
+        ),
+        (
+            'vidyarambha-preference-miss', 0,
+            {'Budha': 9, 'Shukra': 9, 'Guru': 10, 'Rahu': 5, 'Ketu': 11},
+        ),
+        (
+            'vidyarambha-hard-fail', 0,
+            {
+                'Budha': 9, 'Shukra': 9, 'Guru': 9,
+                'Rahu': 5, 'Ketu': 11, 'Surya': 8,
+            },
+        ),
+        (
+            'vidyarambha-unknown', 1,
+            {'Budha': 9, 'Shukra': 9, 'Guru': 10, 'Rahu': 5, 'Ketu': 11},
+        ),
+    ),
+)
+def test_muhurta_planet_fixture_preserves_scenario_houses(
+    scenario, chart_index, expected_houses,
+):
+    planets = _muhurta_planets(scenario, chart_index, 'Mesha')
+    by_name = {planet['name']: planet for planet in planets}
+    for name, house in expected_houses.items():
+        assert by_name[name]['house'] == house
+    assert by_name['Ketu']['house'] == (by_name['Rahu']['house'] + 5) % 12 + 1
+    if scenario == 'annaprasana-unknown':
+        assert by_name['Surya']['degree'] == 10.0
+        assert by_name['Chandra']['degree'] == 10.0
+
+
+def test_gold_planet_fixture_preserves_cap_unknown_and_lagna_projection():
+    template = _muhurta_planets('gold-pass', 0, 'Mesha')
+    capped = _muhurta_planets('gold-cap', 0, 'Mesha', template)
+    unknown = _muhurta_planets('gold-unknown', 0, 'Mesha', template)
+    projected = _muhurta_planets('gold-pass', 0, 'Vrishabha', template)
+    capped_by_name = {planet['name']: planet for planet in capped}
+    unknown_by_name = {planet['name']: planet for planet in unknown}
+    rashis = list(MUHURTA_PLANET_RASHIS) + ['Makara', 'Kumbha', 'Meena']
+    lagna_index = rashis.index('Vrishabha')
+
+    assert (capped_by_name['Surya']['rashi'], capped_by_name['Surya']['degree']) == (
+        'Tula', 1.0,
+    )
+    assert (
+        capped_by_name['Chandra']['rashi'], capped_by_name['Chandra']['degree'],
+    ) == ('Vrischika', 1.0)
+    assert unknown_by_name['Surya']['degree'] == 10.0
+    assert [planet['rashi'] for planet in projected] == [
+        planet['rashi'] for planet in template
+    ]
+    assert [planet['house'] for planet in projected] == [
+        (rashis.index(planet['rashi']) - lagna_index) % 12 + 1
+        for planet in template
+    ]
 
 
 def _muhurta_chart_payload(request_payload, scenario, lagna_fixture=None):
@@ -2130,6 +2226,273 @@ def test_guest_profile_storage_events_refresh_consumers_without_losing_a_draft(
     assert not app_errors, f'two-tab profile flow raised page errors: {app_errors[:3]}'
 
 
+def _muhurta_share_text(page, result):
+    page.evaluate(
+        """() => {
+            window.__muhurtaShareOpen = null;
+            window.open = (url, target) => {
+                window.__muhurtaShareOpen = { url, target };
+                return null;
+            };
+        }"""
+    )
+    result.locator('button[aria-label="Share on WhatsApp"]').click()
+    opened = page.evaluate('window.__muhurtaShareOpen')
+    return parse_qs(urlparse(opened['url']).query)['text'][0]
+
+
+def _assert_positive_muhurta_result(_page, result, status, calls, _scenario):
+    assert 'Exact chart screening applied' in status.inner_text()
+    assert result.locator('.mu-slot').count() > 0
+    assert result.locator('.mu-rg-computed').count() > 0
+    assert result.locator('.mu-chart-rule--pass').count() > 0
+    assert calls
+
+
+def _assert_gold_disposition(result, status, computed_text, scenario):
+    if scenario == 'gold-cap':
+        assert result.locator('.mu-chart-disposition--capped').count() > 0
+        assert result.locator('.mu-chart-status--screened-capped').is_visible()
+        assert (
+            'Condition not met · slot retained · raw score unchanged '
+            '· maximum rating Good'
+        ) in computed_text
+        assert 'Gold event-specific chart clauses resolved' in status.inner_text()
+        assert 'general election-chart baseline is not assessed' in (
+            status.inner_text()
+        )
+        assert result.locator('.mu-chart-disposition--review').count() == 0
+    elif scenario == 'gold-unknown':
+        assert result.locator('.mu-chart-disposition--review').count() > 0
+        assert result.locator('.mu-chart-status--screened-review').is_visible()
+        assert 'Indeterminate at calculation boundary · review needed' in (
+            computed_text
+        )
+        assert 'all four Gold v1 event-specific clauses attempted' in (
+            status.inner_text()
+        )
+        assert result.locator('.mu-chart-disposition--capped').count() == 0
+    else:
+        assert 'Gold event-specific chart clauses resolved' in status.inner_text()
+        assert 'general election-chart baseline is not assessed' in (
+            status.inner_text()
+        )
+        assert result.locator('.mu-chart-disposition--capped').count() == 0
+        assert result.locator('.mu-chart-disposition--review').count() == 0
+        assert result.locator('.mu-chart-rule--fail').count() == 0
+        assert result.locator('.mu-chart-rule--unknown').count() == 0
+
+
+def _assert_gold_share_text(share_text, result):
+    assert 'general election-chart baseline is not assessed' in share_text
+    if result.locator('.mu-chart-status--screened-review').count():
+        assert (
+            'All disclosed event chart clauses were attempted; '
+            'unresolved facts still require review.'
+        ) in share_text
+    elif result.locator('.mu-chart-status--screened-capped').count():
+        assert (
+            'All disclosed event chart clauses were evaluated; '
+            'one or more qualifications were not met'
+        ) in share_text
+    else:
+        assert (
+            'All disclosed event chart clauses were evaluated and resolved'
+        ) in share_text
+    assert 'Method: https://panchangam.astrochaganti.com/docs/' in share_text
+    assert (
+        'Qualitative chart or ritual checks still require practitioner review'
+    ) not in share_text
+
+
+def _assert_gold_muhurta_result(page, result, status, calls, scenario):
+    assert 'chart review remains manual' not in status.inner_text()
+    assert result.locator('.mu-slot').count() > 0
+    computed = result.locator('.mu-rg-computed').first
+    assert computed.count() == 1
+    computed_text = computed.text_content()
+    assert 'Product ranking policy' in computed_text
+    assert 'election_chart.gold_qualification_policy_v1' in computed_text
+    assert 'Event source' in computed_text
+    assert 'Interpretation convention' in computed_text
+    assert result.locator('.mu-rg-validation').count() == 0
+    assert calls
+    assert 'general election-chart baseline is not assessed' in (
+        status.inner_text()
+    )
+    _assert_gold_disposition(result, status, computed_text, scenario)
+    _assert_gold_share_text(_muhurta_share_text(page, result), result)
+
+
+def _assert_annaprasana_muhurta_result(page, result, status, calls, scenario):
+    assert calls
+    if scenario == 'annaprasana-hard-fail':
+        assert 'failed an exact chart requirement' in result.inner_text()
+        assert 'No clear slots found' in result.inner_text()
+        assert result.locator('.mu-slot').count() == 0
+        failed_rules = result.locator('.mu-chart-removals')
+        assert failed_rules.is_visible()
+        failed_rules.locator(':scope > summary').click()
+        assert 'No natural malefic occupies Lagna' in failed_rules.inner_text()
+        assert 'Natural malefics in Lagna: Surya.' in failed_rules.inner_text()
+        return
+
+    assert result.locator('.mu-slot').count() > 0
+    computed = result.locator('.mu-rg-computed').first
+    assert computed.count() == 1
+    assert computed.locator('.mu-chart-rule').count() == 6
+    computed_text = computed.text_content()
+    assert 'muhurta.annaprasana.raman_transcription_chart' in computed_text
+    assert 'election_chart.annaprasana.raman_transcription_policy_v1' in (
+        computed_text
+    )
+    assert 'printed p. 22' in computed_text
+    assert 'physical PDF p. 25' in computed_text
+    assert 'Annaprasana natural-malefic Lagna convention v1' in computed_text
+    assert result.locator('.mu-rg-validation').count() == 0
+    assert 'general election-chart baseline #284 remains open' in (
+        status.inner_text()
+    )
+    if scenario == 'annaprasana-pass':
+        assert 'Annaprasana event-specific chart assessment complete' in (
+            status.inner_text()
+        )
+        assert result.locator('.mu-chart-rule--pass').count() >= 6
+        assert result.locator('.mu-chart-disposition--review').count() == 0
+    elif scenario == 'annaprasana-preference-miss':
+        assert 'Annaprasana event-specific chart assessment complete' in (
+            status.inner_text()
+        )
+        assert result.locator(
+            '.mu-chart-rule--prefer.mu-chart-rule--fail'
+        ).count() > 0
+        assert 'Preference not present · no penalty' in computed_text
+        assert result.locator('.mu-chart-disposition--review').count() == 0
+    else:
+        assert 'unresolved facts' in status.inner_text()
+        assert result.locator('.mu-chart-rule--unknown').count() > 0
+        assert result.locator('.mu-chart-disposition--review').count() > 0
+
+    share_text = _muhurta_share_text(page, result)
+    assert 'general election-chart baseline #284 remains open' in share_text
+    if scenario == 'annaprasana-unknown':
+        assert (
+            'All six Annaprasana event-specific chart clauses were attempted; '
+            'unresolved facts still require review.'
+        ) in share_text
+    else:
+        assert (
+            'All six Annaprasana event-specific chart clauses were evaluated '
+            'and resolved.'
+        ) in share_text
+        assert 'practitioner review' not in share_text
+
+
+def _assert_failure_muhurta_result(_page, result, _status, calls, _scenario):
+    assert 'failed an exact chart requirement' in result.inner_text()
+    assert 'No clear slots found' in result.inner_text()
+    assert result.locator('.mu-slot').count() == 0
+    assert calls
+
+
+def _assert_mixed_muhurta_result(_page, result, _status, calls, _scenario):
+    assert result.locator('.mu-slot').count() > 0
+    assert result.locator('.mu-chart-rule--unknown').count() > 0
+    assert 'changed within this window' in result.locator(
+        '.mu-chart-boundary'
+    ).first.text_content()
+    assert result.locator('.mu-tier-excellent').count() == 0
+    assert calls
+
+
+def _assert_unsupported_muhurta_result(
+    _page, result, status, calls, _scenario,
+):
+    assert 'Selected system kept separate' in status.inner_text()
+    assert 'was not blended into this result' in status.inner_text()
+    assert result.locator('.mu-slot').count() > 0
+    assert calls == []
+    assert 'assessment complete' not in status.inner_text()
+
+
+def _assert_manual_only_muhurta_result(
+    _page, result, status, calls, _scenario,
+):
+    assert 'Panchangam shortlist complete' in status.inner_text()
+    assert 'chart review remains manual' not in status.inner_text()
+    assert 'no exact chart request was needed' in status.inner_text()
+    assert result.locator('.mu-slot').count() > 0
+    assert calls == []
+
+
+def _assert_not_run_muhurta_result(_page, result, status, calls, _scenario):
+    assert 'Chart screening not run' in status.inner_text()
+    assert 'No clear slots found' in result.inner_text()
+    assert result.locator('.mu-slot').count() == 0
+    assert calls == []
+
+
+def _assert_unavailable_muhurta_result(
+    _page, result, status, calls, scenario,
+):
+    assert 'Panchangam shortlist shown' in status.inner_text()
+    assert 'no slot is presented as chart-screened' in status.inner_text()
+    assert result.locator('.mu-slot').count() > 0
+    assert result.locator('.mu-tier-excellent').count() == 0
+    assert 'assessment complete' not in status.inner_text()
+    if scenario == 'malformed':
+        assert calls
+
+
+_MUHURTA_SCENARIO_ASSERTIONS = {
+    'positive': _assert_positive_muhurta_result,
+    'gold-pass': _assert_gold_muhurta_result,
+    'gold-cap': _assert_gold_muhurta_result,
+    'gold-unknown': _assert_gold_muhurta_result,
+    'annaprasana-pass': _assert_annaprasana_muhurta_result,
+    'annaprasana-preference-miss': _assert_annaprasana_muhurta_result,
+    'annaprasana-hard-fail': _assert_annaprasana_muhurta_result,
+    'annaprasana-unknown': _assert_annaprasana_muhurta_result,
+    'annaprasana-unsupported': _assert_unsupported_muhurta_result,
+    'annaprasana-offline': _assert_unavailable_muhurta_result,
+    'karnavedha-unsupported': _assert_unsupported_muhurta_result,
+    'karnavedha-offline': _assert_unavailable_muhurta_result,
+    'failure': _assert_failure_muhurta_result,
+    'mixed': _assert_mixed_muhurta_result,
+    'unsupported': _assert_unsupported_muhurta_result,
+    'offline': _assert_unavailable_muhurta_result,
+    'malformed': _assert_unavailable_muhurta_result,
+    'manual-only': _assert_manual_only_muhurta_result,
+    'not-run': _assert_not_run_muhurta_result,
+}
+
+
+def _assert_muhurta_result_for_scenario(page, result, status, calls, scenario):
+    _MUHURTA_SCENARIO_ASSERTIONS[scenario](
+        page, result, status, calls, scenario,
+    )
+
+
+def _assert_muhurta_result_common(
+    page, result, status, scenario, expected_state, width,
+):
+    if expected_state != 'screened':
+        status_text = status.inner_text()
+        assert 'event-specific clauses were computed' not in status_text
+        assert 'event-specific clauses computed' not in status_text
+
+    details = result.locator('.mu-reason-details')
+    if details.count():
+        details.first.locator(':scope > summary').click()
+    if scenario in {'karnavedha-unsupported', 'karnavedha-offline'}:
+        validation = result.locator('.mu-rg-validation').first
+        assert validation.is_visible()
+        assert 'leave the 8th house unoccupied' in validation.inner_text()
+    _assert_no_horizontal_overflow(
+        page, f'{scenario} chart-aware Muhurtam at {width}px',
+    )
+
+
 @pytest.mark.parametrize(
     ('scenario', 'activity', 'system', 'expected_state'),
     (
@@ -2185,263 +2548,11 @@ def test_chart_aware_muhurta_built_browser_state_matrix(
         assert status.is_visible()
         assert page.locator('body').get_attribute('data-mode') == expected_mode
 
-        if scenario == 'positive':
-            assert 'Exact chart screening applied' in status.inner_text()
-            assert result.locator('.mu-slot').count() > 0
-            assert result.locator('.mu-rg-computed').count() > 0
-            assert result.locator('.mu-chart-rule--pass').count() > 0
-            assert calls
-        elif scenario in {'gold-pass', 'gold-cap', 'gold-unknown'}:
-            assert 'chart review remains manual' not in status.inner_text()
-            assert result.locator('.mu-slot').count() > 0
-            computed = result.locator('.mu-rg-computed').first
-            assert computed.count() == 1
-            computed_text = computed.text_content()
-            assert 'Product ranking policy' in computed_text
-            assert 'election_chart.gold_qualification_policy_v1' in (
-                computed_text)
-            assert 'Event source' in computed_text
-            assert 'Interpretation convention' in computed_text
-            assert result.locator('.mu-rg-validation').count() == 0
-            assert calls
-            assert 'general election-chart baseline is not assessed' in (
-                status.inner_text())
-
-            if scenario == 'gold-cap':
-                assert result.locator(
-                    '.mu-chart-disposition--capped'
-                ).count() > 0
-                assert result.locator(
-                    '.mu-chart-status--screened-capped'
-                ).is_visible()
-                assert (
-                    'Condition not met · slot retained · raw score unchanged '
-                    '· maximum rating Good'
-                ) in computed_text
-                assert 'Gold event-specific chart clauses resolved' in (
-                    status.inner_text()
-                )
-                assert 'general election-chart baseline is not assessed' in (
-                    status.inner_text()
-                )
-                assert result.locator(
-                    '.mu-chart-disposition--review'
-                ).count() == 0
-            elif scenario == 'gold-unknown':
-                assert result.locator(
-                    '.mu-chart-disposition--review'
-                ).count() > 0
-                assert result.locator(
-                    '.mu-chart-status--screened-review'
-                ).is_visible()
-                assert (
-                    'Indeterminate at calculation boundary · review needed'
-                ) in computed_text
-                assert 'all four Gold v1 event-specific clauses attempted' in (
-                    status.inner_text())
-                assert result.locator(
-                    '.mu-chart-disposition--capped'
-                ).count() == 0
-            else:
-                assert 'Gold event-specific chart clauses resolved' in (
-                    status.inner_text()
-                )
-                assert 'general election-chart baseline is not assessed' in (
-                    status.inner_text()
-                )
-                assert result.locator(
-                    '.mu-chart-disposition--capped'
-                ).count() == 0
-                assert result.locator(
-                    '.mu-chart-disposition--review'
-                ).count() == 0
-                assert result.locator('.mu-chart-rule--fail').count() == 0
-                assert result.locator('.mu-chart-rule--unknown').count() == 0
-
-            page.evaluate(
-                """() => {
-                    window.__muhurtaShareOpen = null;
-                    window.open = (url, target) => {
-                        window.__muhurtaShareOpen = { url, target };
-                        return null;
-                    };
-                }"""
-            )
-            result.locator(
-                'button[aria-label="Share on WhatsApp"]'
-            ).click()
-            opened = page.evaluate('window.__muhurtaShareOpen')
-            share_text = parse_qs(urlparse(opened['url']).query)['text'][0]
-            assert 'general election-chart baseline is not assessed' in share_text
-            if result.locator('.mu-chart-status--screened-review').count():
-                assert (
-                    'All disclosed event chart clauses were attempted; '
-                    'unresolved facts still require review.'
-                ) in share_text
-            elif result.locator('.mu-chart-status--screened-capped').count():
-                assert (
-                    'All disclosed event chart clauses were evaluated; '
-                    'one or more qualifications were not met'
-                ) in share_text
-            else:
-                assert (
-                    'All disclosed event chart clauses were evaluated and '
-                    'resolved'
-                ) in share_text
-            assert 'Method: https://panchangam.astrochaganti.com/docs/' in (
-                share_text)
-            assert (
-                'Qualitative chart or ritual checks still require '
-                'practitioner review'
-            ) not in share_text
-        elif scenario in {
-            'annaprasana-pass', 'annaprasana-preference-miss',
-            'annaprasana-hard-fail', 'annaprasana-unknown',
-        }:
-            assert calls
-            if scenario == 'annaprasana-hard-fail':
-                assert 'failed an exact chart requirement' in result.inner_text()
-                assert 'No clear slots found' in result.inner_text()
-                assert result.locator('.mu-slot').count() == 0
-                failed_rules = result.locator('.mu-chart-removals')
-                assert failed_rules.is_visible()
-                failed_rules.locator(':scope > summary').click()
-                assert 'No natural malefic occupies Lagna' in (
-                    failed_rules.inner_text())
-                assert 'Natural malefics in Lagna: Surya.' in (
-                    failed_rules.inner_text())
-            else:
-                assert result.locator('.mu-slot').count() > 0
-                computed = result.locator('.mu-rg-computed').first
-                assert computed.count() == 1
-                assert computed.locator('.mu-chart-rule').count() == 6
-                computed_text = computed.text_content()
-                assert (
-                    'muhurta.annaprasana.raman_transcription_chart'
-                    in computed_text
-                )
-                assert (
-                    'election_chart.annaprasana.'
-                    'raman_transcription_policy_v1'
-                    in computed_text
-                )
-                assert 'printed p. 22' in computed_text
-                assert 'physical PDF p. 25' in computed_text
-                assert 'Annaprasana natural-malefic Lagna convention v1' in (
-                    computed_text)
-                assert result.locator('.mu-rg-validation').count() == 0
-                assert 'general election-chart baseline #284 remains open' in (
-                    status.inner_text())
-                if scenario == 'annaprasana-pass':
-                    assert (
-                        'Annaprasana event-specific chart assessment complete'
-                        in status.inner_text()
-                    )
-                    assert result.locator(
-                        '.mu-chart-rule--pass').count() >= 6
-                    assert result.locator(
-                        '.mu-chart-disposition--review').count() == 0
-                elif scenario == 'annaprasana-preference-miss':
-                    assert (
-                        'Annaprasana event-specific chart assessment complete'
-                        in status.inner_text()
-                    )
-                    assert result.locator(
-                        '.mu-chart-rule--prefer.mu-chart-rule--fail'
-                    ).count() > 0
-                    assert 'Preference not present · no penalty' in computed_text
-                    assert result.locator(
-                        '.mu-chart-disposition--review').count() == 0
-                else:
-                    assert 'unresolved facts' in status.inner_text()
-                    assert result.locator(
-                        '.mu-chart-rule--unknown').count() > 0
-                    assert result.locator(
-                        '.mu-chart-disposition--review').count() > 0
-
-                page.evaluate(
-                    """() => {
-                        window.__muhurtaShareOpen = null;
-                        window.open = (url, target) => {
-                            window.__muhurtaShareOpen = { url, target };
-                            return null;
-                        };
-                    }"""
-                )
-                result.locator(
-                    'button[aria-label="Share on WhatsApp"]'
-                ).click()
-                opened = page.evaluate('window.__muhurtaShareOpen')
-                share_text = parse_qs(urlparse(opened['url']).query)['text'][0]
-                assert 'general election-chart baseline #284 remains open' in (
-                    share_text)
-                if scenario == 'annaprasana-unknown':
-                    assert (
-                        'All six Annaprasana event-specific chart clauses '
-                        'were attempted; unresolved facts still require review.'
-                    ) in share_text
-                else:
-                    assert (
-                        'All six Annaprasana event-specific chart clauses '
-                        'were evaluated and resolved.'
-                    ) in share_text
-                    assert 'practitioner review' not in share_text
-        elif scenario == 'failure':
-            assert 'failed an exact chart requirement' in result.inner_text()
-            assert 'No clear slots found' in result.inner_text()
-            assert result.locator('.mu-slot').count() == 0
-            assert calls
-        elif scenario == 'mixed':
-            assert result.locator('.mu-slot').count() > 0
-            assert result.locator('.mu-chart-rule--unknown').count() > 0
-            assert 'changed within this window' in result.locator(
-                '.mu-chart-boundary'
-            ).first.text_content()
-            assert result.locator('.mu-tier-excellent').count() == 0
-            assert calls
-        elif scenario in {
-            'unsupported', 'annaprasana-unsupported',
-            'karnavedha-unsupported',
-        }:
-            assert 'Selected system kept separate' in status.inner_text()
-            assert 'was not blended into this result' in status.inner_text()
-            assert result.locator('.mu-slot').count() > 0
-            assert calls == []
-            assert 'assessment complete' not in status.inner_text()
-        elif scenario == 'manual-only':
-            assert 'Panchangam shortlist complete' in status.inner_text()
-            assert 'chart review remains manual' not in status.inner_text()
-            assert 'no exact chart request was needed' in status.inner_text()
-            assert result.locator('.mu-slot').count() > 0
-            assert calls == []
-        elif scenario == 'not-run':
-            assert 'Chart screening not run' in status.inner_text()
-            assert 'No clear slots found' in result.inner_text()
-            assert result.locator('.mu-slot').count() == 0
-            assert calls == []
-        else:
-            assert 'Panchangam shortlist shown' in status.inner_text()
-            assert 'no slot is presented as chart-screened' in status.inner_text()
-            assert result.locator('.mu-slot').count() > 0
-            assert result.locator('.mu-tier-excellent').count() == 0
-            assert 'assessment complete' not in status.inner_text()
-            if scenario == 'malformed':
-                assert calls
-
-        if expected_state != 'screened':
-            status_text = status.inner_text()
-            assert 'event-specific clauses were computed' not in status_text
-            assert 'event-specific clauses computed' not in status_text
-
-        details = result.locator('.mu-reason-details')
-        if details.count():
-            details.first.locator(':scope > summary').click()
-        if scenario in {'karnavedha-unsupported', 'karnavedha-offline'}:
-            validation = result.locator('.mu-rg-validation').first
-            assert validation.is_visible()
-            assert 'leave the 8th house unoccupied' in validation.inner_text()
-        _assert_no_horizontal_overflow(
-            page, f'{scenario} chart-aware Muhurtam at {width}px',
+        _assert_muhurta_result_for_scenario(
+            page, result, status, calls, scenario,
+        )
+        _assert_muhurta_result_common(
+            page, result, status, scenario, expected_state, width,
         )
     finally:
         page.close()
