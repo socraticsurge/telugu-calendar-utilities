@@ -180,7 +180,7 @@ function parseSnapshot(value: unknown, expectedInstant: string): ElectionChartSn
   if (
     instant !== expectedInstant || !rashi || !CANONICAL_RASHIS.has(rashi)
     || degree === null || !isContractRoundedDegree(degree)
-    || !rawPlanets || rawPlanets.length !== 9 || planets.length !== rawPlanets.length
+    || rawPlanets?.length !== 9 || planets.length !== rawPlanets?.length
     || new Set(planets.map(planet => planet.name)).size !== 9
     || planets.some((planet, index) => planet.name !== CANONICAL_PLANET_ORDER[index])
     || !wholeSignHousesMatch(rashi, planets)
