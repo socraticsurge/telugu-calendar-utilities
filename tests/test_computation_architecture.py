@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from tools.analyze_computation_architecture import (
+    _layer,
     _summary,
     build_report,
     source_scope_class,
@@ -13,6 +14,37 @@ from tools.benchmark_computation_paths import benchmark
 
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / 'docs' / 'decisions' / '0002-computation-layer-organization.md'
+
+
+@pytest.mark.parametrize(
+    ('path', 'expected'),
+    [
+        ('telugu_panchangam/models/result.py', 'models'),
+        ('telugu_panchangam/engines/drik.py', 'engines'),
+        (
+            'telugu_panchangam/personal/activity_rules.py',
+            'activity-rules',
+        ),
+        ('telugu_panchangam/personal/muhurta.py', 'scoring'),
+        ('telugu_panchangam/personal/slot_scorers.py', 'scoring'),
+        ('telugu_panchangam/personal/homa.py', 'personal'),
+        ('telugu_panchangam/gochara/rules.py', 'gochara'),
+        ('telugu_panchangam/mcp/tools.py', 'mcp'),
+        ('telugu_panchangam/generators/ics.py', 'generators'),
+        ('telugu_panchangam/generate.py', 'build'),
+        ('scripts/build_lagna_json.py', 'build'),
+        ('telugu_panchangam/eclipses.py', 'derived-calendar'),
+        ('src/data/rasis.ts', 'browser-data'),
+        ('src/panels/today.ts', 'browser-panels'),
+        ('src/muhurta-scorer.ts', 'browser-core'),
+        ('docs/reference/computations.json', 'other'),
+    ],
+)
+def test_layer_classification_preserves_ordered_architecture_boundaries(
+    path: str,
+    expected: str,
+) -> None:
+    assert _layer(path) == expected
 
 
 def test_architecture_report_maps_modules_consumers_and_layers():
