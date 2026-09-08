@@ -583,10 +583,10 @@ function screenedMessage<TSlot extends EnrichableMuhurtamSlot>(
   return `${progress.processed} shortlisted slots received exact chart screening across every sampled state.${dispositions}${overlap}`;
 }
 
-export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamSlot>(
+function enrichmentPreflight<TSlot extends EnrichableMuhurtamSlot>(
   baseSlots: readonly TSlot[],
   options: ElectionChartEnrichmentOptions,
-): Promise<ElectionChartEnrichment<TSlot>> {
+): ElectionChartEnrichment<TSlot> | null {
   if (!baseSlots.length) {
     return baseResult(
       'not-run',
@@ -621,6 +621,15 @@ export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamS
       'Panchangam-ranked; exact chart screening is unavailable because the Lagna transition map could not be loaded.',
     );
   }
+  return null;
+}
+
+export async function enrichElectionChartSlots<TSlot extends EnrichableMuhurtamSlot>(
+  baseSlots: readonly TSlot[],
+  options: ElectionChartEnrichmentOptions,
+): Promise<ElectionChartEnrichment<TSlot>> {
+  const preflight = enrichmentPreflight(baseSlots, options);
+  if (preflight) return preflight;
 
   const derive = options.derive || deriveElectionCharts;
   const progress = newEnrichmentProgress<TSlot>();

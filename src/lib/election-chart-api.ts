@@ -193,7 +193,7 @@ export function electionChartApiBase(
   configuredBase: string | undefined = configuredElectionChartApiBase(),
   locationLike: ElectionChartBrowserLocation = globalThis.location,
 ): string {
-  if (locationLike && isLoopbackHostname(locationLike.hostname)) {
+  if (isLoopbackHostname(locationLike.hostname)) {
     return normalizedConfiguredBase(configuredBase, isTrustedLoopbackBase) || LOCAL_API_BASE;
   }
   return normalizedConfiguredBase(configuredBase, isTrustedProductionBase)
@@ -258,19 +258,19 @@ function parseElectionChartDerivation(
   input: ElectionChartRequest,
 ): ElectionChartDerivation {
   const result = record(payload);
-  const engine = result ? record(result.engine) : null;
-  const location = result ? record(result.location) : null;
-  const data = result ? record(result.data) : null;
+  const engine = record(result?.engine);
+  const location = record(result?.location);
+  const data = record(result?.data);
   const rawCharts = Array.isArray(data?.charts) ? data.charts : null;
   const charts = rawCharts?.map((chart, index) => parseSnapshot(chart, input.instants[index])) || [];
-  const engineName = engine ? exactNonEmpty(engine.name, 60) : null;
-  const engineVersion = engine ? exactNonEmpty(engine.version, 40) : null;
-  const ayanamsha = engine ? exactNonEmpty(engine.ayanamsha, 40) : null;
-  const ephemeris = engine ? exactNonEmpty(engine.ephemeris, 20) : null;
-  const nodeConvention = engine ? exactNonEmpty(engine.node_convention, 20) : null;
-  const latitude = location ? finite(location.latitude) : null;
-  const longitude = location ? finite(location.longitude) : null;
-  const timezone = location ? exactNonEmpty(location.timezone, 80) : null;
+  const engineName = exactNonEmpty(engine?.name, 60);
+  const engineVersion = exactNonEmpty(engine?.version, 40);
+  const ayanamsha = exactNonEmpty(engine?.ayanamsha, 40);
+  const ephemeris = exactNonEmpty(engine?.ephemeris, 20);
+  const nodeConvention = exactNonEmpty(engine?.node_convention, 20);
+  const latitude = finite(location?.latitude);
+  const longitude = finite(location?.longitude);
+  const timezone = exactNonEmpty(location?.timezone, 80);
   const validContract = result?.contract_version === ELECTION_CHART_CONTRACT_VERSION
     && result.house_system === 'whole_sign';
   const validLocation = latitude === input.location.latitude

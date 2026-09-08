@@ -64,11 +64,13 @@ export interface BirthProfileEngine {
   ephemeris: 'swiss' | 'moshier' | 'unknown';
 }
 
+export type BirthPada = 1 | 2 | 3 | 4;
+
 export interface BirthProfileDerivation {
   contractVersion: typeof BIRTH_PROFILE_CONTRACT_VERSION;
   engine: BirthProfileEngine;
   nakshatra: string;
-  pada: 1 | 2 | 3 | 4;
+  pada: BirthPada;
   janmaRashi: string;
   lagna: string;
   lagnaDegree: number;
@@ -92,7 +94,7 @@ export function isContractRoundedDegree(degree: number): boolean {
  */
 export function roundedMoonMatchesBirthFacts(
   nakshatra: string,
-  pada: 1 | 2 | 3 | 4,
+  pada: BirthPada,
   janmaRashi: string,
   moon: BirthChartPlanet,
 ): boolean {
@@ -435,7 +437,7 @@ function validBirthProfileChart(
   rawPlanets: unknown[] | null,
   planets: readonly BirthChartPlanet[],
   nakshatra: string,
-  pada: 1 | 2 | 3 | 4,
+  pada: BirthPada,
   janmaRashi: string,
   lagna: string,
 ): boolean {
@@ -455,19 +457,19 @@ export async function deriveBirthProfile(
     longitude: input.longitude,
     timezone: input.timezone,
   }, options));
-  const engineRecord = payload ? record(payload.engine) : null;
-  const data = payload ? record(payload.data) : null;
-  const version = payload ? exactNonEmpty(payload.contract_version, 20) : null;
-  const name = engineRecord ? exactNonEmpty(engineRecord.name, 60) : null;
-  const engineVersion = engineRecord ? exactNonEmpty(engineRecord.version, 40) : null;
-  const ayanamsha = engineRecord ? exactNonEmpty(engineRecord.ayanamsha, 40) : null;
-  const ephemeris = engineRecord ? exactNonEmpty(engineRecord.ephemeris, 20) : null;
-  const nakshatra = data ? exactNonEmpty(data.nakshatra, 60) : null;
-  const pada = data ? finite(data.pada) : null;
-  const janmaRashi = data ? exactNonEmpty(data.janma_rashi, 40) : null;
-  const lagna = data ? exactNonEmpty(data.lagna, 40) : null;
-  const lagnaDegree = data ? finite(data.lagna_degree) : null;
-  const rawPlanets = data && Array.isArray(data.planets) ? data.planets : null;
+  const engineRecord = record(payload?.engine);
+  const data = record(payload?.data);
+  const version = exactNonEmpty(payload?.contract_version, 20);
+  const name = exactNonEmpty(engineRecord?.name, 60);
+  const engineVersion = exactNonEmpty(engineRecord?.version, 40);
+  const ayanamsha = exactNonEmpty(engineRecord?.ayanamsha, 40);
+  const ephemeris = exactNonEmpty(engineRecord?.ephemeris, 20);
+  const nakshatra = exactNonEmpty(data?.nakshatra, 60);
+  const pada = finite(data?.pada);
+  const janmaRashi = exactNonEmpty(data?.janma_rashi, 40);
+  const lagna = exactNonEmpty(data?.lagna, 40);
+  const lagnaDegree = finite(data?.lagna_degree);
+  const rawPlanets = Array.isArray(data?.planets) ? data.planets : null;
   const planets = rawPlanets
     ? rawPlanets
       .map((planet, index) => parsePlanet(planet, BIRTH_CHART_PLANET_NAMES[index] || ''))
@@ -479,7 +481,7 @@ export async function deriveBirthProfile(
     rawPlanets,
     planets,
     nakshatra as string,
-    pada as 1 | 2 | 3 | 4,
+    pada as BirthPada,
     janmaRashi as string,
     lagna as string,
   );
@@ -496,7 +498,7 @@ export async function deriveBirthProfile(
       ephemeris: ephemeris as BirthProfileEngine['ephemeris'],
     },
     nakshatra: nakshatra as string,
-    pada: pada as 1 | 2 | 3 | 4,
+    pada: pada as BirthPada,
     janmaRashi: janmaRashi as string,
     lagna: lagna as string,
     lagnaDegree: lagnaDegree as number,

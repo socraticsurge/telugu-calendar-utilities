@@ -27,9 +27,9 @@ export function parseEvents(text: string): Map<string, { summary: string; descri
           const summary = (current.find(l => l.startsWith('SUMMARY:')) || '').slice('SUMMARY:'.length);
           const descLine = current.find(l => l.startsWith('DESCRIPTION:')) || '';
           const description = descLine.slice('DESCRIPTION:'.length)
-            .replaceAll('\\n', '\n')
-            .replaceAll('\\,', ',')
-            .replaceAll('\\;', ';')
+            .replaceAll(String.raw`\n`, '\n')
+            .replaceAll(String.raw`\,`, ',')
+            .replaceAll(String.raw`\;`, ';')
             .replaceAll('\\\\', '\\');
           events.set(dtstart.slice('DTSTART;VALUE=DATE:'.length), { summary, description });
         }

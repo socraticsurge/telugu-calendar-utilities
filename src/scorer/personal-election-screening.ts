@@ -164,15 +164,15 @@ function ordinal(value: number): string {
   return `${value}${suffix[value % 10] || 'th'}`;
 }
 
-function evaluateTravelRules(
+function evaluateTravelLagnaRule(
   result: PersonalElectionScreening,
+  rule: PersonalRuleDefinition,
   participant: PersonalElectionParticipant,
   facts: PersonalElectionFacts,
 ): void {
-  const [lagnaRule, rashiRule] = PERSONAL_RULES.travel;
   if (!participant.janmaLagna || !facts.lagna) {
     addOutcome(
-      result, lagnaRule, 'unknown',
+      result, rule, 'unknown',
       { janmaLagna: participant.janmaLagna, candidateLagna: facts.lagna },
       `Travel Lagna screening needs ${participant.name}'s Janma Lagna and the candidate Lagna.`,
     );
@@ -189,12 +189,19 @@ function evaluateTravelRules(
       evidence = `${facts.lagna} is ${positionLabel} ${participant.name}'s Janma Lagna; the travel source excludes it.`;
     }
     addOutcome(
-      result, lagnaRule, status,
+      result, rule, status,
       { janmaLagna: participant.janmaLagna, candidateLagna: facts.lagna, position },
       evidence,
     );
   }
+}
 
+function evaluateTravelRashiRule(
+  result: PersonalElectionScreening,
+  rule: PersonalRuleDefinition,
+  participant: PersonalElectionParticipant,
+  facts: PersonalElectionFacts,
+): void {
   const rashiResolved = Boolean(participant.janmaRashi && facts.lagna);
   const rashiMatches = rashiResolved && facts.lagna === participant.janmaRashi;
   let rashiStatus: PersonalRuleStatus = 'unknown';
@@ -206,10 +213,20 @@ function evaluateTravelRules(
       : `${facts.lagna} Lagna does not match ${participant.name}'s Janma Rashi; this is not a rejection.`;
   }
   addOutcome(
-    result, rashiRule, rashiStatus,
+    result, rule, rashiStatus,
     { janmaRashi: participant.janmaRashi, candidateLagna: facts.lagna },
     rashiEvidence,
   );
+}
+
+function evaluateTravelRules(
+  result: PersonalElectionScreening,
+  participant: PersonalElectionParticipant,
+  facts: PersonalElectionFacts,
+): void {
+  const [lagnaRule, rashiRule] = PERSONAL_RULES.travel;
+  evaluateTravelLagnaRule(result, lagnaRule, participant, facts);
+  evaluateTravelRashiRule(result, rashiRule, participant, facts);
 }
 
 function evaluateGruhapraveshaRule(
