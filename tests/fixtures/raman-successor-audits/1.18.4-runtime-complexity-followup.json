@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "release": "1.18.4",
+  "parent_release": "1.18.3",
+  "activity": "runtime-complexity-followup",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [],
+  "semantic_deltas": [],
+  "protected_source_transforms": [
+    {
+      "path": "telugu_panchangam/personal/slot_scorers.py",
+      "scope": "runtime-complexity-followup_slot_scorers_refactor",
+      "transforms": [
+        {
+          "before": "    return bonus, reasons, unfav_names\n\n\ndef score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):\n    \"\"\"Per-person chandrabalam against a specific moon rashi.\n\n    Returns (bonus, reasons, dropped, avoid_names, puja_names).\n    avoid_names feeds doctrinal_notes; puja_names feeds personal_dosha flag.\n    \"\"\"\n    if janma_rasis is None or not any(r is not None for r in janma_rasis):\n        return 0, [], False, [], []\n    bonus = 0\n    good, puja, avoid, avoid_names, puja_names = [], [], [], [], []\n    for i, rasi in enumerate(janma_rasis):\n        if rasi is None:\n            continue\n        janma_label = janma_nakshatras[i] if janma_nakshatras else rasi\n        label = _label(janma_label, i)\n        pos = chandra_position(rasi, lunar_sign)\n        if pos in CHANDRA_GOOD:\n            good.append(label)\n            bonus += 1\n        elif pos in CHANDRA_PUJA:\n            puja.append(f'{label} Moon@{pos}')\n            puja_names.append(label)\n        else:\n            ashtama = ' Ashtama' if pos == 8 else ''\n            avoid.append(f'{label}{ashtama} Moon@{pos}')\n            avoid_names.append(f'{label}{ashtama}')\n            bonus -= 1\n    reasons = []\n    if good:\n        reasons.append(f'chandrabalam favourable for {\", \".join(good)} (+{len(good)})')\n",
+          "after": "    return bonus, reasons, unfav_names\n\n\ndef _chandra_person_result(janma_nakshatras, rasi, lunar_sign, index):\n    if rasi is None:\n        return None\n\n    janma_label = janma_nakshatras[index] if janma_nakshatras else rasi\n    label = _label(janma_label, index)\n    position = chandra_position(rasi, lunar_sign)\n    if position in CHANDRA_GOOD:\n        return 1, 'good', label, label\n    if position in CHANDRA_PUJA:\n        return 0, 'puja', f'{label} Moon@{position}', label\n\n    ashtama = ' Ashtama' if position == 8 else ''\n    return -1, 'avoid', f'{label}{ashtama} Moon@{position}', f'{label}{ashtama}'\n\n\ndef _chandra_reasons(good, puja, avoid):\n    reasons = []\n    if good:\n        reasons.append(f'chandrabalam favourable for {\", \".join(good)} (+{len(good)})')\n"
+        },
+        {
+          "before": "        )\n    if avoid:\n        reasons.append(f'chandrabalam avoid for {\", \".join(avoid)} (-{len(avoid)})')\n    dropped = (chandra_mode == 'strict' and (puja or avoid)) or (\n        chandra_mode == 'puja_ok' and avoid\n    )\n    return bonus, reasons, bool(dropped), avoid_names, puja_names\n\n\ndef slot_lagna_name(lagnas, slot_start):\n",
+          "after": "        )\n    if avoid:\n        reasons.append(f'chandrabalam avoid for {\", \".join(avoid)} (-{len(avoid)})')\n    return reasons\n\n\ndef _chandra_dropped(chandra_mode, puja, avoid):\n    return bool(\n        (chandra_mode == 'strict' and (puja or avoid))\n        or (chandra_mode == 'puja_ok' and avoid)\n    )\n\n\ndef score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):\n    \"\"\"Per-person chandrabalam against a specific moon rashi.\n\n    Returns (bonus, reasons, dropped, avoid_names, puja_names).\n    avoid_names feeds doctrinal_notes; puja_names feeds personal_dosha flag.\n    \"\"\"\n    if janma_rasis is None or not any(r is not None for r in janma_rasis):\n        return 0, [], False, [], []\n    results = [\n        result\n        for index, rasi in enumerate(janma_rasis)\n        if (result := _chandra_person_result(janma_nakshatras, rasi, lunar_sign, index))\n        is not None\n    ]\n    bonus = sum(result[0] for result in results)\n    good = [result[2] for result in results if result[1] == 'good']\n    puja = [result[2] for result in results if result[1] == 'puja']\n    avoid = [result[2] for result in results if result[1] == 'avoid']\n    avoid_names = [result[3] for result in results if result[1] == 'avoid']\n    puja_names = [result[3] for result in results if result[1] == 'puja']\n    reasons = _chandra_reasons(good, puja, avoid)\n    return (\n        bonus,\n        reasons,\n        _chandra_dropped(chandra_mode, puja, avoid),\n        avoid_names,\n        puja_names,\n    )\n\n\ndef slot_lagna_name(lagnas, slot_start):\n"
+        }
+      ]
+    }
+  ]
+}

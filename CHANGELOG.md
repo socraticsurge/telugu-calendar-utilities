@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.4` while completing the merged-main
+  runtime-complexity follow-up behind unchanged calculation, ranking,
+  result-shape, and MCP contracts.
 - Prepare MCP/PyPI patch metadata `1.18.3` while decomposing mutable runtime
   orchestration behind unchanged calculation, ranking, result-shape, and MCP
   contracts.

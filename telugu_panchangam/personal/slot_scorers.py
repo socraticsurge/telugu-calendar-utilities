@@ -141,33 +141,23 @@ def score_tara(janma_nakshatras, day_nakshatra_name):
     return bonus, reasons, unfav_names
 
 
-def score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
-    """Per-person chandrabalam against a specific moon rashi.
+def _chandra_person_result(janma_nakshatras, rasi, lunar_sign, index):
+    if rasi is None:
+        return None
 
-    Returns (bonus, reasons, dropped, avoid_names, puja_names).
-    avoid_names feeds doctrinal_notes; puja_names feeds personal_dosha flag.
-    """
-    if janma_rasis is None or not any(r is not None for r in janma_rasis):
-        return 0, [], False, [], []
-    bonus = 0
-    good, puja, avoid, avoid_names, puja_names = [], [], [], [], []
-    for i, rasi in enumerate(janma_rasis):
-        if rasi is None:
-            continue
-        janma_label = janma_nakshatras[i] if janma_nakshatras else rasi
-        label = _label(janma_label, i)
-        pos = chandra_position(rasi, lunar_sign)
-        if pos in CHANDRA_GOOD:
-            good.append(label)
-            bonus += 1
-        elif pos in CHANDRA_PUJA:
-            puja.append(f'{label} Moon@{pos}')
-            puja_names.append(label)
-        else:
-            ashtama = ' Ashtama' if pos == 8 else ''
-            avoid.append(f'{label}{ashtama} Moon@{pos}')
-            avoid_names.append(f'{label}{ashtama}')
-            bonus -= 1
+    janma_label = janma_nakshatras[index] if janma_nakshatras else rasi
+    label = _label(janma_label, index)
+    position = chandra_position(rasi, lunar_sign)
+    if position in CHANDRA_GOOD:
+        return 1, 'good', label, label
+    if position in CHANDRA_PUJA:
+        return 0, 'puja', f'{label} Moon@{position}', label
+
+    ashtama = ' Ashtama' if position == 8 else ''
+    return -1, 'avoid', f'{label}{ashtama} Moon@{position}', f'{label}{ashtama}'
+
+
+def _chandra_reasons(good, puja, avoid):
     reasons = []
     if good:
         reasons.append(f'chandrabalam favourable for {", ".join(good)} (+{len(good)})')
@@ -177,10 +167,44 @@ def score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
         )
     if avoid:
         reasons.append(f'chandrabalam avoid for {", ".join(avoid)} (-{len(avoid)})')
-    dropped = (chandra_mode == 'strict' and (puja or avoid)) or (
-        chandra_mode == 'puja_ok' and avoid
+    return reasons
+
+
+def _chandra_dropped(chandra_mode, puja, avoid):
+    return bool(
+        (chandra_mode == 'strict' and (puja or avoid))
+        or (chandra_mode == 'puja_ok' and avoid)
     )
-    return bonus, reasons, bool(dropped), avoid_names, puja_names
+
+
+def score_chandra(janma_nakshatras, janma_rasis, lunar_sign, chandra_mode):
+    """Per-person chandrabalam against a specific moon rashi.
+
+    Returns (bonus, reasons, dropped, avoid_names, puja_names).
+    avoid_names feeds doctrinal_notes; puja_names feeds personal_dosha flag.
+    """
+    if janma_rasis is None or not any(r is not None for r in janma_rasis):
+        return 0, [], False, [], []
+    results = [
+        result
+        for index, rasi in enumerate(janma_rasis)
+        if (result := _chandra_person_result(janma_nakshatras, rasi, lunar_sign, index))
+        is not None
+    ]
+    bonus = sum(result[0] for result in results)
+    good = [result[2] for result in results if result[1] == 'good']
+    puja = [result[2] for result in results if result[1] == 'puja']
+    avoid = [result[2] for result in results if result[1] == 'avoid']
+    avoid_names = [result[3] for result in results if result[1] == 'avoid']
+    puja_names = [result[3] for result in results if result[1] == 'puja']
+    reasons = _chandra_reasons(good, puja, avoid)
+    return (
+        bonus,
+        reasons,
+        _chandra_dropped(chandra_mode, puja, avoid),
+        avoid_names,
+        puja_names,
+    )
 
 
 def slot_lagna_name(lagnas, slot_start):
