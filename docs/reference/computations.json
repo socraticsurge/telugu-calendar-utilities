@@ -154,6 +154,21 @@
         "reason": "Election-assessor export surface only."
       },
       {
+        "path": "telugu_panchangam/personal/election_assessors/contracts.py",
+        "kind": "data-model",
+        "reason": "Shared outcome containers define result shapes but perform no calculation."
+      },
+      {
+        "path": "telugu_panchangam/personal/election_assessors/facts.py",
+        "kind": "adapter",
+        "reason": "Compatibility exports delegate to the event-admission owner."
+      },
+      {
+        "path": "telugu_panchangam/personal/election_assessors/primitives.py",
+        "kind": "adapter",
+        "reason": "Compatibility exports delegate to the partitioned domain owners."
+      },
+      {
         "path": "telugu_panchangam/personal/activity_catalog.py",
         "kind": "lookup-data",
         "reason": "User-facing activity labels and catalogue metadata."
@@ -167,6 +182,16 @@
         "path": "src/data/systems.ts",
         "kind": "lookup-data",
         "reason": "Browser calculation-system labels."
+      },
+      {
+        "path": "src/scorer/election-assessors/contracts.ts",
+        "kind": "data-model",
+        "reason": "Shared browser result and rule types perform no calculation."
+      },
+      {
+        "path": "src/scorer/election-assessors/primitives.ts",
+        "kind": "adapter",
+        "reason": "Compatibility exports delegate to the partitioned browser mirrors."
       },
       {
         "path": "src/lib/analytics.ts",
@@ -1833,20 +1858,21 @@
         {"path": "telugu_panchangam/personal/election_chart_rules.py", "symbol": "ELECTION_CHART_COMPLETE_ASSESSORS", "role": "owner"},
         {"path": "telugu_panchangam/personal/election_chart.py", "symbol": "evaluate_election_window", "role": "owner"},
         {"path": "telugu_panchangam/personal/election_assessors/conventions.py", "symbol": "ELECTION_CHART_CONVENTIONS", "role": "owner"},
-        {"path": "telugu_panchangam/personal/election_assessors/facts.py", "symbol": "planet_positions", "role": "owner"},
-        {"path": "telugu_panchangam/personal/election_assessors/primitives.py", "symbol": "evaluate_well_situated", "role": "owner"},
-        {"path": "telugu_panchangam/personal/election_assessors/primitives.py", "symbol": "evaluate_full_aspect", "role": "owner"},
-        {"path": "telugu_panchangam/personal/election_assessors/primitives.py", "symbol": "evaluate_house_free_of_natural_malefics", "role": "owner"},
-        {"path": "telugu_panchangam/personal/election_assessors/primitives.py", "symbol": "evaluate_all_planets_in_houses", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/event_admission.py", "symbol": "planet_positions", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/chart_geometry.py", "symbol": "evaluate_well_situated", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/chart_geometry.py", "symbol": "evaluate_full_aspect", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/graha_nature.py", "symbol": "evaluate_house_free_of_natural_malefics", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/chart_geometry.py", "symbol": "evaluate_all_planets_in_houses", "role": "owner"},
         {"path": "telugu_panchangam/personal/personal_election.py", "symbol": "evaluate_personal_election_window", "role": "owner"},
         {"path": "telugu_panchangam/personal/activity_check_contract.py", "symbol": "build_activity_check_contract", "role": "owner"},
         {"path": "tools/export_election_chart_rules.py", "symbol": "main", "role": "mirror"},
         {"path": "tools/export_activity_rules.py", "symbol": "main", "role": "mirror"},
         {"path": "src/scorer/election-chart-screening.ts", "symbol": "evaluateElectionWindow", "role": "mirror"},
-        {"path": "src/scorer/election-assessors/primitives.ts", "symbol": "evaluateWellSituated", "role": "mirror"},
-        {"path": "src/scorer/election-assessors/primitives.ts", "symbol": "evaluateFullAspect", "role": "mirror"},
-        {"path": "src/scorer/election-assessors/primitives.ts", "symbol": "evaluateHouseFreeOfNaturalMalefics", "role": "mirror"},
-        {"path": "src/scorer/election-assessors/primitives.ts", "symbol": "evaluateAllPlanetsInHouses", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/event-admission.ts", "symbol": "completePlanetPositions", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/chart-geometry.ts", "symbol": "evaluateWellSituated", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/chart-geometry.ts", "symbol": "evaluateFullAspect", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/graha-nature.ts", "symbol": "evaluateHouseFreeOfNaturalMalefics", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/chart-geometry.ts", "symbol": "evaluateAllPlanetsInHouses", "role": "mirror"},
         {"path": "src/scorer/election-assessors/karnavedha-daylight.ts", "symbol": "evaluateKarnavedhaDaylight", "role": "mirror"},
         {"path": "src/scorer/personal-election-screening.ts", "symbol": "evaluatePersonalElectionRules", "role": "mirror"},
         {"path": "src/scorer/election-chart-enrichment.ts", "symbol": "enrichElectionChartSlots", "role": "mirror"},

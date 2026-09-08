@@ -66,10 +66,10 @@ AZ_4lyB64HbJenSxEGN8,python:S1192,CRITICAL,telugu_panchangam/personal/activity_r
 AZ_4lyB64HbJenSxEGOA,python:S1192,CRITICAL,telugu_panchangam/personal/activity_rules.py,302,2026-07-22,46,,,mutable
 AZ_4lyB64HbJenSxEGOJ,python:S1192,CRITICAL,telugu_panchangam/personal/activity_rules.py,303,2026-07-22,46,,,mutable
 AZ_4lyB64HbJenSxEGN-,python:S1192,CRITICAL,telugu_panchangam/personal/activity_rules.py,304,2026-07-22,46,,,mutable
-AaBweDzay_01LXV_JFeY,python:S1192,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,97,2026-09-05,1,,evaluate_well_situated=15;gold_transition_uncertainty=11,mutable
-AaBst6yS9MBxg5veotNC,python:S3776,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,177,2026-09-04,2,,evaluate_well_situated=15;gold_transition_uncertainty=11,mutable
-AaBst6yS9MBxg5veotND,python:S3776,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,251,2026-09-04,2,,evaluate_well_situated=15;gold_transition_uncertainty=11,mutable
-AaBst6yS9MBxg5veotNE,python:S3776,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,376,2026-09-04,2,,evaluate_well_situated=15;gold_transition_uncertainty=11,mutable
+AaBweDzay_01LXV_JFeY,python:S1192,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,97,2026-09-05,1,,,mutable
+AaBst6yS9MBxg5veotNC,python:S3776,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,177,2026-09-04,2,,,mutable
+AaBst6yS9MBxg5veotND,python:S3776,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,251,2026-09-04,2,,,mutable
+AaBst6yS9MBxg5veotNE,python:S3776,CRITICAL,telugu_panchangam/personal/election_assessors/primitives.py,376,2026-09-04,2,,,mutable
 AaBweD3Wy_01LXV_JFea,python:S3776,CRITICAL,telugu_panchangam/personal/election_chart.py,23,2026-09-05,1,,,mutable
 AaBst61s9MBxg5veotNH,python:S3776,CRITICAL,telugu_panchangam/personal/election_chart.py,161,2026-09-04,2,,,mutable
 AaBst61s9MBxg5veotNI,python:S3776,CRITICAL,telugu_panchangam/personal/election_chart.py,222,2026-09-04,2,,,mutable

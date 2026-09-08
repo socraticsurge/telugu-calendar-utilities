@@ -752,7 +752,7 @@
     {
       "id": "election_chart.natural_malefics.bphs_3_11_modern_witness",
       "surface": "muhurtam",
-      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "implementation": "telugu_panchangam/personal/election_assessors/graha_nature.py",
       "evidence_class": "textual",
       "verification_state": "verified",
       "source_ids": ["BPHS-ELS-3.11-MODERN-WITNESS"],
@@ -972,7 +972,7 @@
     {
       "id": "election_chart.well_placed.phaladeepika_2_36",
       "surface": "muhurtam",
-      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "implementation": "telugu_panchangam/personal/election_assessors/chart_geometry.py",
       "evidence_class": "textual",
       "verification_state": "verified",
       "source_ids": ["PD-SASTRI-1950-2E"],
@@ -1005,7 +1005,7 @@
     {
       "id": "election_chart.full_graha_drishti.phaladeepika_2_23",
       "surface": "muhurtam",
-      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "implementation": "telugu_panchangam/personal/election_assessors/chart_geometry.py",
       "evidence_class": "textual",
       "verification_state": "verified",
       "source_ids": ["PD-SASTRI-1950-2E"],
@@ -1016,7 +1016,7 @@
     {
       "id": "election_chart.navamsa.bphs_6_12",
       "surface": "muhurtam",
-      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "implementation": "telugu_panchangam/personal/election_assessors/chart_geometry.py",
       "evidence_class": "textual",
       "verification_state": "verified",
       "source_ids": ["BPHS-ELS-6.12"],
@@ -1027,7 +1027,7 @@
     {
       "id": "election_chart.gold_transition_envelope_v1",
       "surface": "muhurtam",
-      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "implementation": "telugu_panchangam/personal/election_assessors/chart_geometry.py",
       "evidence_class": "project_heuristic",
       "verification_state": "partially_verified",
       "source_ids": ["NASA-MOON-FACTS-2014", "SWISSEPH"],
@@ -1038,7 +1038,7 @@
     {
       "id": "election_chart.chandra_solar_clearance_policy_v1",
       "surface": "muhurtam",
-      "implementation": "telugu_panchangam/personal/election_assessors/primitives.py",
+      "implementation": "telugu_panchangam/personal/election_assessors/chart_geometry.py",
       "evidence_class": "project_heuristic",
       "verification_state": "heuristic",
       "source_ids": ["SS-BURGESS-GANGOOLY-1935"],
