@@ -9,5 +9,5 @@ interface GoatCounterWindow extends Window {
 
 export function gcEvent(name: string): void {
   const gc = (window as GoatCounterWindow).goatcounter;
-  if (gc && gc.count) gc.count({ path: name, title: name, event: true });
+  gc?.count?.({ path: name, title: name, event: true });
 }

@@ -103,7 +103,7 @@ interface ResolvedMuhurtamIds {
 
 const LEGACY_GOCHARA_SELECTION = /^p(\d+)(?:[rl])?$/;
 const PROFILE_GOCHARA_SELECTION = /^profile:(.+)$/;
-const ANY_RASI_SELECTION = /^(?:[0-9]|1[01])$/;
+const ANY_RASI_SELECTION = /^(?:\d|1[01])$/;
 
 export function adaptGuestProfile(profile: GuestProfile): JourneyGuestProfile {
   return {
@@ -168,9 +168,13 @@ export function resolveGocharaSelection(
   rawValue: unknown,
   profiles: ReadonlyArray<Readonly<GuestProfile>>,
 ): GocharaSelectionResolution {
-  const requestedValue = rawValue === null || rawValue === undefined
-    ? null
-    : String(rawValue);
+  if (rawValue !== null && rawValue !== undefined && typeof rawValue !== 'string') {
+    return wholeSky(null, {
+      code: 'invalid-selection',
+      message: 'The saved horoscope view could not be restored. Showing whole-sky transits.',
+    });
+  }
+  const requestedValue = typeof rawValue === 'string' ? rawValue : null;
 
   if (requestedValue === null || requestedValue === '') {
     return wholeSky(requestedValue);
@@ -189,7 +193,7 @@ export function resolveGocharaSelection(
     };
   }
 
-  const stableMatch = requestedValue.match(PROFILE_GOCHARA_SELECTION);
+  const stableMatch = PROFILE_GOCHARA_SELECTION.exec(requestedValue);
   if (stableMatch) {
     const profile = profiles.find(candidate => candidate.id === stableMatch[1]);
     if (!profile) return wholeSky(requestedValue, missingProfileFallback());
@@ -208,7 +212,7 @@ export function resolveGocharaSelection(
     };
   }
 
-  const legacyMatch = requestedValue.match(LEGACY_GOCHARA_SELECTION);
+  const legacyMatch = LEGACY_GOCHARA_SELECTION.exec(requestedValue);
   if (legacyMatch) {
     const legacyReadyProfiles = profiles.filter(
       profile => guestProfileReadiness(profile).horoscope,

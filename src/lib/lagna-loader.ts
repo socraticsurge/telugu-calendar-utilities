@@ -30,7 +30,7 @@ async function loadLagna(city: string): Promise<LagnaData | null> {
 }
 
 function lagnaDayFor(data: LagnaData | null, isoDate: string): LagnaDayData | null {
-  if (!data || !data.days || !data.days.length) return null;
+  if (!data?.days?.length) return null;
   const direct = data.days.find(d => d.date === isoDate);
   if (direct) return direct;
   // Fallback for older formats without 'date': offset from data.start.

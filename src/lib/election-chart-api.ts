@@ -9,7 +9,8 @@ import { RASI_NAMES } from '../data/rasis';
 import {
   electionChartCalculationEnabled,
   isLoopbackHostname,
-  type ElectionChartLocation as ElectionChartBrowserLocation,
+  trimTrailingSlashes,
+  type RemoteCalculationLocation as ElectionChartBrowserLocation,
 } from './remote-calculation-activation';
 
 export const ELECTION_CHART_CONTRACT_VERSION = '1.0' as const;
@@ -98,7 +99,7 @@ function normalizedConfiguredBase(
   try {
     const url = new URL(configuredBase);
     if (!trust(url)) return null;
-    return configuredBase.replace(/\/+$/, '');
+    return trimTrailingSlashes(configuredBase);
   } catch {
     return null;
   }
@@ -118,7 +119,7 @@ function isTrustedProductionBase(url: URL): boolean {
   return url.protocol === 'https:'
     && url.hostname === canonical.hostname
     && url.port === canonical.port
-    && url.pathname.replace(/\/+$/, '') === canonical.pathname
+    && trimTrailingSlashes(url.pathname) === canonical.pathname
     && !url.username
     && !url.password
     && !url.search
@@ -172,7 +173,7 @@ function parseSnapshot(value: unknown, expectedInstant: string): ElectionChartSn
   const instant = item ? exactNonEmpty(item.instant, 40) : null;
   const rashi = lagna ? exactNonEmpty(lagna.rashi, 40) : null;
   const degree = lagna ? finite(lagna.degree) : null;
-  const rawPlanets = item && Array.isArray(item.planets) ? item.planets : null;
+  const rawPlanets = Array.isArray(item?.planets) ? item.planets : null;
   const planets = rawPlanets?.map(parsePlanet).filter(
     (planet): planet is BirthChartPlanet => planet !== null,
   ) || [];
@@ -223,6 +224,80 @@ function apiErrorMessage(value: unknown): string | null {
   if (direct) return direct;
   const nested = record(payload.error);
   return nested ? nonEmpty(nested.message, 240) : null;
+}
+
+function electionChartHttpError(response: Response, payload: unknown): ElectionChartApiError {
+  const rateLimited = response.status === 429;
+  const retryAfter = Number(response.headers.get('Retry-After'));
+  const fallback = rateLimited
+    ? 'Chart screening is busy. Wait a moment and try again.'
+    : 'Chart screening could not complete this request.';
+  return new ElectionChartApiError(
+    rateLimited ? 'rate-limited' : 'request-failed',
+    apiErrorMessage(payload) || fallback,
+    response.status,
+    Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : null,
+  );
+}
+
+function validElectionEngine(
+  name: string | null,
+  version: string | null,
+  ayanamsha: string | null,
+  ephemeris: string | null,
+  nodeConvention: string | null,
+): boolean {
+  if (name !== 'DashaFlow' || !version || ayanamsha !== 'Lahiri') return false;
+  if (nodeConvention !== 'mean') return false;
+  return ephemeris === 'swiss' || ephemeris === 'moshier'
+    || ephemeris === 'unknown' || ephemeris === 'mixed';
+}
+
+function parseElectionChartDerivation(
+  payload: unknown,
+  input: ElectionChartRequest,
+): ElectionChartDerivation {
+  const result = record(payload);
+  const engine = result ? record(result.engine) : null;
+  const location = result ? record(result.location) : null;
+  const data = result ? record(result.data) : null;
+  const rawCharts = Array.isArray(data?.charts) ? data.charts : null;
+  const charts = rawCharts?.map((chart, index) => parseSnapshot(chart, input.instants[index])) || [];
+  const engineName = engine ? exactNonEmpty(engine.name, 60) : null;
+  const engineVersion = engine ? exactNonEmpty(engine.version, 40) : null;
+  const ayanamsha = engine ? exactNonEmpty(engine.ayanamsha, 40) : null;
+  const ephemeris = engine ? exactNonEmpty(engine.ephemeris, 20) : null;
+  const nodeConvention = engine ? exactNonEmpty(engine.node_convention, 20) : null;
+  const latitude = location ? finite(location.latitude) : null;
+  const longitude = location ? finite(location.longitude) : null;
+  const timezone = location ? exactNonEmpty(location.timezone, 80) : null;
+  const validContract = result?.contract_version === ELECTION_CHART_CONTRACT_VERSION
+    && result.house_system === 'whole_sign';
+  const validLocation = latitude === input.location.latitude
+    && longitude === input.location.longitude
+    && timezone === input.location.timezone;
+  const validCharts = rawCharts?.length === input.instants.length && !charts.includes(null);
+  if (!validContract
+    || !validElectionEngine(engineName, engineVersion, ayanamsha, ephemeris, nodeConvention)
+    || !validLocation || !validCharts) {
+    throw new ElectionChartApiError(
+      'invalid-response',
+      'The chart service returned an invalid response.',
+    );
+  }
+  return {
+    contractVersion: ELECTION_CHART_CONTRACT_VERSION,
+    engine: {
+      name: engineName as string,
+      version: engineVersion as string,
+      ayanamsha: ayanamsha as string,
+      ephemeris: ephemeris as ElectionChartEngine['ephemeris'],
+      nodeConvention: 'mean',
+    },
+    houseSystem: 'whole_sign',
+    location: input.location,
+    charts: charts as ElectionChartSnapshot[],
+  };
 }
 
 /** Convert a city-local date/minute pair into an exact UTC ISO instant. */
@@ -343,62 +418,8 @@ export async function deriveElectionCharts(
       },
     );
     const payload: unknown = await response.json().catch(() => null);
-    if (!response.ok) {
-      const retryAfter = Number(response.headers.get('Retry-After'));
-      throw new ElectionChartApiError(
-        response.status === 429 ? 'rate-limited' : 'request-failed',
-        apiErrorMessage(payload) || (response.status === 429
-          ? 'Chart screening is busy. Wait a moment and try again.'
-          : 'Chart screening could not complete this request.'),
-        response.status,
-        Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : null,
-      );
-    }
-
-    const result = record(payload);
-    const engine = result ? record(result.engine) : null;
-    const location = result ? record(result.location) : null;
-    const data = result ? record(result.data) : null;
-    const rawCharts = data && Array.isArray(data.charts) ? data.charts : null;
-    const charts = rawCharts?.map((chart, index) => parseSnapshot(chart, input.instants[index])) || [];
-    const engineName = engine ? exactNonEmpty(engine.name, 60) : null;
-    const engineVersion = engine ? exactNonEmpty(engine.version, 40) : null;
-    const ayanamsha = engine ? exactNonEmpty(engine.ayanamsha, 40) : null;
-    const ephemeris = engine ? exactNonEmpty(engine.ephemeris, 20) : null;
-    const nodeConvention = engine ? exactNonEmpty(engine.node_convention, 20) : null;
-    const latitude = location ? finite(location.latitude) : null;
-    const longitude = location ? finite(location.longitude) : null;
-    const timezone = location ? exactNonEmpty(location.timezone, 80) : null;
-    if (
-      result?.contract_version !== ELECTION_CHART_CONTRACT_VERSION
-      || result.house_system !== 'whole_sign'
-      || engineName !== 'DashaFlow' || !engineVersion || ayanamsha !== 'Lahiri'
-      || nodeConvention !== 'mean'
-      || (ephemeris !== 'swiss' && ephemeris !== 'moshier'
-        && ephemeris !== 'unknown' && ephemeris !== 'mixed')
-      || latitude !== input.location.latitude || longitude !== input.location.longitude
-      || timezone !== input.location.timezone
-      || !rawCharts || rawCharts.length !== input.instants.length
-      || charts.some(chart => chart === null)
-    ) {
-      throw new ElectionChartApiError(
-        'invalid-response',
-        'The chart service returned an invalid response.',
-      );
-    }
-    return {
-      contractVersion: ELECTION_CHART_CONTRACT_VERSION,
-      engine: {
-        name: engineName,
-        version: engineVersion,
-        ayanamsha,
-        ephemeris: ephemeris as ElectionChartEngine['ephemeris'],
-        nodeConvention: 'mean',
-      },
-      houseSystem: 'whole_sign',
-      location: input.location,
-      charts: charts as ElectionChartSnapshot[],
-    };
+    if (!response.ok) throw electionChartHttpError(response, payload);
+    return parseElectionChartDerivation(payload, input);
   } catch (error) {
     if (error instanceof ElectionChartApiError) throw error;
     if (controller.signal.aborted) {

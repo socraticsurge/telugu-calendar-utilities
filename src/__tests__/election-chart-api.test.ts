@@ -43,7 +43,7 @@ function validResponse() {
 
 describe('election-chart gateway client', () => {
   test('allows only a loopback HTTP override for isolated local chart testing', () => {
-    expect(electionChartApiBase('http://127.0.0.1:19014/api/guest/')).toBe(
+    expect(electionChartApiBase('http://127.0.0.1:19014/api/guest////')).toBe(
       'http://127.0.0.1:19014/api/guest',
     );
     expect(electionChartApiBase('https://untrusted.example/api/guest')).not.toContain(

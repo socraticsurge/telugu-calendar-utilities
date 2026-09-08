@@ -47,7 +47,7 @@ export function setSelection(patch: Partial<Selection>): void {
   for (const k of changed) (next[k] as Selection[SelectionKey]) = patch[k]!;
   state = next;
   const snapshot = { ...state };
-  for (const fn of [...listeners]) fn(snapshot, changed);
+  for (const fn of listeners.slice()) fn(snapshot, changed);
 }
 
 /** Subscribe to changes. Returns an unsubscribe function. */

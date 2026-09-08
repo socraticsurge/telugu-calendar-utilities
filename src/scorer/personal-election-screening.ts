@@ -164,6 +164,152 @@ function ordinal(value: number): string {
   return `${value}${suffix[value % 10] || 'th'}`;
 }
 
+function evaluateTravelRules(
+  result: PersonalElectionScreening,
+  participant: PersonalElectionParticipant,
+  facts: PersonalElectionFacts,
+): void {
+  const [lagnaRule, rashiRule] = PERSONAL_RULES.travel;
+  if (!participant.janmaLagna || !facts.lagna) {
+    addOutcome(
+      result, lagnaRule, 'unknown',
+      { janmaLagna: participant.janmaLagna, candidateLagna: facts.lagna },
+      `Travel Lagna screening needs ${participant.name}'s Janma Lagna and the candidate Lagna.`,
+    );
+  } else {
+    const position = inclusivePosition(RASI_NAMES, participant.janmaLagna, facts.lagna);
+    const excluded = position !== null && [1, 5, 7, 9].includes(position);
+    let status: PersonalRuleStatus = excluded ? 'fail' : 'pass';
+    let evidence = `${facts.lagna} avoids the travel source's 1st, 5th, 7th and 9th Lagna exclusions.`;
+    if (position === null) {
+      status = 'unknown';
+      evidence = 'The travel Lagna position could not be resolved.';
+    } else if (excluded) {
+      const positionLabel = position === 1 ? 'the same as' : `the ${ordinal(position)} from`;
+      evidence = `${facts.lagna} is ${positionLabel} ${participant.name}'s Janma Lagna; the travel source excludes it.`;
+    }
+    addOutcome(
+      result, lagnaRule, status,
+      { janmaLagna: participant.janmaLagna, candidateLagna: facts.lagna, position },
+      evidence,
+    );
+  }
+
+  const rashiResolved = Boolean(participant.janmaRashi && facts.lagna);
+  const rashiMatches = rashiResolved && facts.lagna === participant.janmaRashi;
+  let rashiStatus: PersonalRuleStatus = 'unknown';
+  let rashiEvidence = `Travel preference screening needs ${participant.name}'s Janma Rashi and the candidate Lagna.`;
+  if (rashiResolved) {
+    rashiStatus = rashiMatches ? 'pass' : 'fail';
+    rashiEvidence = rashiMatches
+      ? `${facts.lagna} Lagna matches ${participant.name}'s Janma Rashi.`
+      : `${facts.lagna} Lagna does not match ${participant.name}'s Janma Rashi; this is not a rejection.`;
+  }
+  addOutcome(
+    result, rashiRule, rashiStatus,
+    { janmaRashi: participant.janmaRashi, candidateLagna: facts.lagna },
+    rashiEvidence,
+  );
+}
+
+function evaluateGruhapraveshaRule(
+  result: PersonalElectionScreening,
+  participant: PersonalElectionParticipant,
+  facts: PersonalElectionFacts,
+): void {
+  const matches: string[] = [];
+  if (participant.nakshatra && facts.nakshatra === participant.nakshatra) {
+    matches.push('Janma Nakshatra');
+  }
+  if (participant.janmaRashi && facts.lunarRashi === participant.janmaRashi) {
+    matches.push('Janma Rashi');
+  }
+  if (participant.janmaLagna && facts.lagna === participant.janmaLagna) {
+    matches.push('Janma Lagna');
+  }
+  const inputs = {
+    janmaNakshatra: participant.nakshatra,
+    candidateNakshatra: facts.nakshatra,
+    janmaRashi: participant.janmaRashi,
+    candidateChandraRashi: facts.lunarRashi,
+    janmaLagna: participant.janmaLagna,
+    candidateLagna: facts.lagna,
+  };
+  const pairs = [
+    [participant.nakshatra, facts.nakshatra],
+    [participant.janmaRashi, facts.lunarRashi],
+    [participant.janmaLagna, facts.lagna],
+  ];
+  const allPairsResolved = pairs.every(([origin, candidate]) => Boolean(origin && candidate));
+  let status: PersonalRuleStatus = 'unknown';
+  let evidence = 'A home-entry match cannot be ruled out until all three natal and candidate anchors are available.';
+  if (matches.length) {
+    status = 'pass';
+    evidence = `${participant.name}'s ${matches.join(' / ')} supports this Gruhapravesha election.`;
+  } else if (allPairsResolved) {
+    status = 'fail';
+    evidence = 'No owner-specific Janma match is present; this is not a rejection.';
+  }
+  addOutcome(result, PERSONAL_RULES.gruhapravesha[0], status, inputs, evidence);
+}
+
+function evaluateSeemanthaRule(
+  result: PersonalElectionScreening,
+  participant: PersonalElectionParticipant,
+  facts: PersonalElectionFacts,
+): void {
+  const rule = PERSONAL_RULES.seemantha[0];
+  if (!participant.nakshatra) {
+    addOutcome(
+      result, rule, 'unknown',
+      { janmaNakshatra: null, candidateNakshatra: facts.nakshatra, position: null },
+      `Seemantha screening needs ${participant.name}'s Janma Nakshatra.`,
+    );
+    return;
+  }
+  const position = inclusivePosition(NAKSHATRA_NAMES, participant.nakshatra, facts.nakshatra);
+  if (position === null) {
+    addOutcome(
+      result, rule, 'unknown',
+      { janmaNakshatra: participant.nakshatra, candidateNakshatra: facts.nakshatra, position },
+      'The Seemantha birth-star position could not be resolved.',
+    );
+    return;
+  }
+  const excluded = [3, 7, 8, 10, 22].includes(position);
+  addOutcome(
+    result, rule, excluded ? 'fail' : 'pass',
+    { janmaNakshatra: participant.nakshatra, candidateNakshatra: facts.nakshatra, position },
+    excluded
+      ? `${facts.nakshatra} is the ${ordinal(position)} Nakshatra from ${participant.name}'s birth star; the Seemantha source excludes it.`
+      : `The mother's ${ordinal(position)} Nakshatra position is admitted.`,
+  );
+}
+
+function evaluateSurgeryRule(
+  result: PersonalElectionScreening,
+  participant: PersonalElectionParticipant,
+  facts: PersonalElectionFacts,
+): void {
+  const rule = PERSONAL_RULES.surgery[0];
+  if (!participant.janmaRashi || !facts.lunarRashi) {
+    addOutcome(
+      result, rule, 'unknown',
+      { janmaRashi: participant.janmaRashi, candidateChandraRashi: facts.lunarRashi },
+      `Surgery screening needs ${participant.name}'s Janma Rashi and candidate Chandra Rashi.`,
+    );
+    return;
+  }
+  const excluded = facts.lunarRashi === participant.janmaRashi;
+  addOutcome(
+    result, rule, excluded ? 'fail' : 'pass',
+    { janmaRashi: participant.janmaRashi, candidateChandraRashi: facts.lunarRashi },
+    excluded
+      ? `Chandra is in ${participant.name}'s Janma Rashi; the surgery source excludes it.`
+      : `Chandra is outside ${participant.name}'s Janma Rashi.`,
+  );
+}
+
 export function evaluatePersonalElectionRules(
   activity: string,
   participant: PersonalElectionParticipant | null,
@@ -185,136 +331,10 @@ export function evaluatePersonalElectionRules(
     return result;
   }
 
-  if (activity === 'travel') {
-    const [lagnaRule, rashiRule] = PERSONAL_RULES.travel;
-    if (!participant.janmaLagna || !facts.lagna) {
-      addOutcome(
-        result, lagnaRule, 'unknown',
-        { janmaLagna: participant.janmaLagna, candidateLagna: facts.lagna },
-        `Travel Lagna screening needs ${participant.name}'s Janma Lagna and the candidate Lagna.`,
-      );
-    } else {
-      const position = inclusivePosition(RASI_NAMES, participant.janmaLagna, facts.lagna);
-      if (position === null) {
-        addOutcome(
-          result, lagnaRule, 'unknown',
-          { janmaLagna: participant.janmaLagna, candidateLagna: facts.lagna },
-          'The travel Lagna position could not be resolved.',
-        );
-      } else {
-        const excluded = [1, 5, 7, 9].includes(position);
-        addOutcome(
-          result, lagnaRule, excluded ? 'fail' : 'pass',
-          { janmaLagna: participant.janmaLagna, candidateLagna: facts.lagna, position },
-          excluded
-            ? `${facts.lagna} is ${position === 1 ? 'the same as' : `the ${ordinal(position)} from`} ${participant.name}'s Janma Lagna; the travel source excludes it.`
-            : `${facts.lagna} avoids the travel source's 1st, 5th, 7th and 9th Lagna exclusions.`,
-        );
-      }
-    }
-    const rashiResolved = !!participant.janmaRashi && !!facts.lagna;
-    const rashiMatches = rashiResolved && facts.lagna === participant.janmaRashi;
-    addOutcome(
-      result, rashiRule, rashiResolved ? (rashiMatches ? 'pass' : 'fail') : 'unknown',
-      { janmaRashi: participant.janmaRashi, candidateLagna: facts.lagna },
-      rashiMatches
-        ? `${facts.lagna} Lagna matches ${participant.name}'s Janma Rashi.`
-        : rashiResolved
-          ? `${facts.lagna} Lagna does not match ${participant.name}'s Janma Rashi; this is not a rejection.`
-          : `Travel preference screening needs ${participant.name}'s Janma Rashi and the candidate Lagna.`,
-    );
-    return result;
-  }
-
-  if (activity === 'gruhapravesha') {
-    const matches: string[] = [];
-    if (participant.nakshatra && facts.nakshatra === participant.nakshatra) {
-      matches.push('Janma Nakshatra');
-    }
-    if (participant.janmaRashi && facts.lunarRashi === participant.janmaRashi) {
-      matches.push('Janma Rashi');
-    }
-    if (participant.janmaLagna && facts.lagna === participant.janmaLagna) {
-      matches.push('Janma Lagna');
-    }
-    const inputs = {
-      janmaNakshatra: participant.nakshatra,
-      candidateNakshatra: facts.nakshatra,
-      janmaRashi: participant.janmaRashi,
-      candidateChandraRashi: facts.lunarRashi,
-      janmaLagna: participant.janmaLagna,
-      candidateLagna: facts.lagna,
-    };
-    const pairs = [
-      [participant.nakshatra, facts.nakshatra],
-      [participant.janmaRashi, facts.lunarRashi],
-      [participant.janmaLagna, facts.lagna],
-    ];
-    const allPairsResolved = pairs.every(([origin, candidate]) => !!origin && !!candidate);
-    const status: PersonalRuleStatus = matches.length
-      ? 'pass'
-      : allPairsResolved ? 'fail' : 'unknown';
-    addOutcome(
-      result,
-      PERSONAL_RULES.gruhapravesha[0],
-      status,
-      inputs,
-      matches.length
-        ? `${participant.name}'s ${matches.join(' / ')} supports this Gruhapravesha election.`
-        : allPairsResolved
-          ? 'No owner-specific Janma match is present; this is not a rejection.'
-          : 'A home-entry match cannot be ruled out until all three natal and candidate anchors are available.',
-    );
-    return result;
-  }
-
-  if (activity === 'seemantha') {
-    const rule = PERSONAL_RULES.seemantha[0];
-    if (!participant.nakshatra) {
-      addOutcome(
-        result, rule, 'unknown',
-        { janmaNakshatra: null, candidateNakshatra: facts.nakshatra, position: null },
-        `Seemantha screening needs ${participant.name}'s Janma Nakshatra.`,
-      );
-      return result;
-    }
-    const position = inclusivePosition(NAKSHATRA_NAMES, participant.nakshatra, facts.nakshatra);
-    if (position === null) {
-      addOutcome(
-        result, rule, 'unknown',
-        { janmaNakshatra: participant.nakshatra, candidateNakshatra: facts.nakshatra, position },
-        'The Seemantha birth-star position could not be resolved.',
-      );
-      return result;
-    }
-    const excluded = [3, 7, 8, 10, 22].includes(position);
-    addOutcome(
-      result, rule, excluded ? 'fail' : 'pass',
-      { janmaNakshatra: participant.nakshatra, candidateNakshatra: facts.nakshatra, position },
-      excluded
-        ? `${facts.nakshatra} is the ${ordinal(position)} Nakshatra from ${participant.name}'s birth star; the Seemantha source excludes it.`
-        : `The mother's ${ordinal(position)} Nakshatra position is admitted.`,
-    );
-    return result;
-  }
-
-  const rule = PERSONAL_RULES.surgery[0];
-  if (!participant.janmaRashi || !facts.lunarRashi) {
-    addOutcome(
-      result, rule, 'unknown',
-      { janmaRashi: participant.janmaRashi, candidateChandraRashi: facts.lunarRashi },
-      `Surgery screening needs ${participant.name}'s Janma Rashi and candidate Chandra Rashi.`,
-    );
-    return result;
-  }
-  const excluded = facts.lunarRashi === participant.janmaRashi;
-  addOutcome(
-    result, rule, excluded ? 'fail' : 'pass',
-    { janmaRashi: participant.janmaRashi, candidateChandraRashi: facts.lunarRashi },
-    excluded
-      ? `Chandra is in ${participant.name}'s Janma Rashi; the surgery source excludes it.`
-      : `Chandra is outside ${participant.name}'s Janma Rashi.`,
-  );
+  if (activity === 'travel') evaluateTravelRules(result, participant, facts);
+  else if (activity === 'gruhapravesha') evaluateGruhapraveshaRule(result, participant, facts);
+  else if (activity === 'seemantha') evaluateSeemanthaRule(result, participant, facts);
+  else evaluateSurgeryRule(result, participant, facts);
   return result;
 }
 
@@ -340,6 +360,32 @@ export function evaluatePersonalElectionWindow(
   };
 }
 
+function combinedPersonalStatus(
+  effect: PersonalRuleEffect,
+  statuses: readonly PersonalRuleStatus[],
+): PersonalRuleStatus {
+  if (statuses.includes('unknown')) return 'unknown';
+  if (effect === 'reject') return statuses.includes('fail') ? 'fail' : 'pass';
+  if (statuses.every(value => value === 'pass')) return 'pass';
+  if (statuses.every(value => value === 'fail')) return 'fail';
+  return 'unknown';
+}
+
+function personalOutcomeEvidence(
+  status: PersonalRuleStatus,
+  outcome: PersonalElectionOutcome,
+  missingEvidence: readonly string[],
+): string {
+  if (status === 'pass') return `Every sampled window state passes: ${outcome.label}.`;
+  if (status === 'fail' && outcome.effect === 'prefer') {
+    return `The source preference is absent throughout the sampled window: ${outcome.label}.`;
+  }
+  if (status === 'fail') return `At least one sampled window state fails: ${outcome.label}.`;
+  return missingEvidence.length
+    ? missingEvidence.join(' ')
+    : `The sampled window states do not give one stable result: ${outcome.label}.`;
+}
+
 /** Conservatively combine personal outcomes at every sampled chart state. */
 export function evaluatePersonalElectionSnapshots(
   activity: string,
@@ -357,18 +403,7 @@ export function evaluatePersonalElectionSnapshots(
     const boundaryOutcomes = evaluations.map(evaluation =>
       evaluation.outcomes.find(outcome => outcome.ruleId === startOutcome.ruleId));
     const statuses = boundaryOutcomes.map(outcome => outcome?.status || 'unknown');
-    let status: PersonalRuleStatus;
-    if (statuses.includes('unknown')) {
-      status = 'unknown';
-    } else if (startOutcome.effect === 'reject') {
-      status = statuses.includes('fail') ? 'fail' : 'pass';
-    } else if (statuses.every(value => value === 'pass')) {
-      status = 'pass';
-    } else if (statuses.every(value => value === 'fail')) {
-      status = 'fail';
-    } else {
-      status = 'unknown';
-    }
+    const status = combinedPersonalStatus(startOutcome.effect, statuses);
     if (!statuses.every(value => value === statuses[0])) result.stable = false;
     const missingEvidence = [...new Set(evaluations.flatMap((evaluation, index) => {
       const outcome = boundaryOutcomes[index];
@@ -386,18 +421,10 @@ export function evaluatePersonalElectionSnapshots(
       status,
       {
         start: boundaryOutcomes[0]?.inputs || null,
-        end: boundaryOutcomes[boundaryOutcomes.length - 1]?.inputs || null,
+        end: boundaryOutcomes.at(-1)?.inputs || null,
         boundaries: boundaryOutcomes.map(outcome => outcome?.inputs || null),
       },
-      status === 'pass'
-        ? `Every sampled window state passes: ${startOutcome.label}.`
-        : status === 'fail' && startOutcome.effect === 'prefer'
-          ? `The source preference is absent throughout the sampled window: ${startOutcome.label}.`
-          : status === 'fail'
-            ? `At least one sampled window state fails: ${startOutcome.label}.`
-            : missingEvidence.length
-              ? missingEvidence.join(' ')
-              : `The sampled window states do not give one stable result: ${startOutcome.label}.`,
+      personalOutcomeEvidence(status, startOutcome, missingEvidence),
     );
   }
   return result;

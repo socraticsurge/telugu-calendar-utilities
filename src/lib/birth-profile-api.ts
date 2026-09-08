@@ -1,7 +1,8 @@
 import {
   birthProfileCalculationEnabled,
   isLoopbackHostname,
-  type BirthProfileLocation,
+  trimTrailingSlashes,
+  type RemoteCalculationLocation,
 } from './remote-calculation-activation';
 import { NAKSHATRA_NAMES, RASI_NAMES, rasiFromStar } from '../data/rasis';
 
@@ -176,7 +177,7 @@ export interface BirthProfileApiOptions {
   activationFlag?: string;
   baseUrl?: string;
   fetcher?: typeof fetch;
-  locationLike?: BirthProfileLocation;
+  locationLike?: RemoteCalculationLocation;
   timeoutMs?: number;
 }
 
@@ -194,7 +195,7 @@ function normalizedConfiguredBase(
   try {
     const url = new URL(configuredBase);
     if (!trust(url)) return null;
-    return configuredBase.replace(/\/+$/, '');
+    return trimTrailingSlashes(configuredBase);
   } catch {
     return null;
   }
@@ -214,7 +215,7 @@ function isTrustedProductionBase(url: URL): boolean {
   return url.protocol === 'https:'
     && url.hostname === canonical.hostname
     && url.port === canonical.port
-    && url.pathname.replace(/\/+$/, '') === canonical.pathname
+    && trimTrailingSlashes(url.pathname) === canonical.pathname
     && !url.username
     && !url.password
     && !url.search
@@ -222,7 +223,7 @@ function isTrustedProductionBase(url: URL): boolean {
 }
 
 export function birthProfileApiBase(
-  locationLike: BirthProfileLocation = globalThis.location,
+  locationLike: RemoteCalculationLocation = globalThis.location,
   configuredBase: string | undefined = configuredBirthProfileApiBase(),
 ): string {
   if (locationLike && isLoopbackHostname(locationLike.hostname)) {
@@ -374,9 +375,9 @@ export async function searchBirthPlaces(
 ): Promise<BirthPlaceSearchResult> {
   const payload = record(await postJson('/places/search', { query: query.trim() }, options));
   const data = payload ? record(payload.data) : null;
-  const rawResults = data && Array.isArray(data.results) ? data.results : null;
+  const rawResults = Array.isArray(data?.results) ? data.results : null;
   const attribution = data ? nonEmpty(data.attribution, 240) : null;
-  const rawAttributions = data && Array.isArray(data.attributions)
+  const rawAttributions = Array.isArray(data?.attributions)
     ? data.attributions
     : null;
   const attributions = rawAttributions
@@ -400,6 +401,47 @@ export async function searchBirthPlaces(
     throw new BirthProfileApiError('invalid-response', 'Place search returned an invalid response.');
   }
   return { results, attribution, attributions };
+}
+
+function validBirthProfileEngine(
+  version: string | null,
+  name: string | null,
+  engineVersion: string | null,
+  ayanamsha: string | null,
+  ephemeris: string | null,
+): boolean {
+  if (version !== BIRTH_PROFILE_CONTRACT_VERSION) return false;
+  if (name !== BIRTH_PROFILE_ENGINE_NAME || !engineVersion) return false;
+  if (ayanamsha !== BIRTH_PROFILE_AYANAMSHA) return false;
+  return ephemeris === 'swiss' || ephemeris === 'moshier' || ephemeris === 'unknown';
+}
+
+function validBirthProfileFacts(
+  nakshatra: string | null,
+  pada: number | null,
+  janmaRashi: string | null,
+  lagna: string | null,
+  lagnaDegree: number | null,
+): boolean {
+  if (!nakshatra || !NAKSHATRA_NAMES.includes(nakshatra)) return false;
+  if (pada !== 1 && pada !== 2 && pada !== 3 && pada !== 4) return false;
+  if (!janmaRashi || !RASI_NAMES.includes(janmaRashi)) return false;
+  if (rasiFromStar(nakshatra, pada) !== janmaRashi) return false;
+  if (!lagna || !RASI_NAMES.includes(lagna)) return false;
+  return lagnaDegree !== null && isContractRoundedDegree(lagnaDegree);
+}
+
+function validBirthProfileChart(
+  rawPlanets: unknown[] | null,
+  planets: readonly BirthChartPlanet[],
+  nakshatra: string,
+  pada: 1 | 2 | 3 | 4,
+  janmaRashi: string,
+  lagna: string,
+): boolean {
+  if (!rawPlanets || planets.length !== 9 || planets.length !== rawPlanets.length) return false;
+  if (!roundedMoonMatchesBirthFacts(nakshatra, pada, janmaRashi, planets[1])) return false;
+  return wholeSignHousesMatch(lagna, planets) && fixedGrahaFactsMatch(planets);
 }
 
 export async function deriveBirthProfile(
@@ -431,40 +473,33 @@ export async function deriveBirthProfile(
       .map((planet, index) => parsePlanet(planet, BIRTH_CHART_PLANET_NAMES[index] || ''))
       .filter((planet): planet is BirthChartPlanet => planet !== null)
     : [];
-  const canonicalJanmaRashi = nakshatra && (pada === 1 || pada === 2 || pada === 3 || pada === 4)
-    ? rasiFromStar(nakshatra, pada)
-    : null;
-
-  if (
-    version !== BIRTH_PROFILE_CONTRACT_VERSION
-    || name !== BIRTH_PROFILE_ENGINE_NAME || !engineVersion || ayanamsha !== BIRTH_PROFILE_AYANAMSHA
-    || (ephemeris !== 'swiss' && ephemeris !== 'moshier' && ephemeris !== 'unknown')
-    || !nakshatra || !NAKSHATRA_NAMES.includes(nakshatra)
-    || (pada !== 1 && pada !== 2 && pada !== 3 && pada !== 4)
-    || !janmaRashi || !RASI_NAMES.includes(janmaRashi) || janmaRashi !== canonicalJanmaRashi
-    || !lagna || !RASI_NAMES.includes(lagna)
-    || lagnaDegree === null || !isContractRoundedDegree(lagnaDegree)
-    || !rawPlanets || planets.length !== 9 || planets.length !== rawPlanets.length
-    || !roundedMoonMatchesBirthFacts(nakshatra, pada, janmaRashi, planets[1])
-    || !wholeSignHousesMatch(lagna, planets)
-    || !fixedGrahaFactsMatch(planets)
-  ) {
+  const validEngine = validBirthProfileEngine(version, name, engineVersion, ayanamsha, ephemeris);
+  const validFacts = validBirthProfileFacts(nakshatra, pada, janmaRashi, lagna, lagnaDegree);
+  const validChart = validFacts && validBirthProfileChart(
+    rawPlanets,
+    planets,
+    nakshatra as string,
+    pada as 1 | 2 | 3 | 4,
+    janmaRashi as string,
+    lagna as string,
+  );
+  if (!validEngine || !validFacts || !validChart) {
     throw new BirthProfileApiError('invalid-response', 'The calculation service returned an invalid response.');
   }
 
   return {
     contractVersion: BIRTH_PROFILE_CONTRACT_VERSION,
     engine: {
-      name,
-      version: engineVersion,
-      ayanamsha,
-      ephemeris,
+      name: name as string,
+      version: engineVersion as string,
+      ayanamsha: ayanamsha as string,
+      ephemeris: ephemeris as BirthProfileEngine['ephemeris'],
     },
-    nakshatra,
-    pada,
-    janmaRashi,
-    lagna,
-    lagnaDegree,
+    nakshatra: nakshatra as string,
+    pada: pada as 1 | 2 | 3 | 4,
+    janmaRashi: janmaRashi as string,
+    lagna: lagna as string,
+    lagnaDegree: lagnaDegree as number,
     planets,
   };
 }
