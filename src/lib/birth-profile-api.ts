@@ -390,8 +390,7 @@ export async function searchBirthPlaces(
   if (
     !rawResults
     || !attribution
-    || !rawAttributions
-    || attributions.length !== rawAttributions.length
+    || rawAttributions?.length !== attributions.length
     || attributions.length < 1
     || attributions.length > 3
     || new Set(attributions.map(({ url }) => url)).size !== attributions.length
