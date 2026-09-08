@@ -99,6 +99,81 @@ export function chartAssessorCompleteFor(activity: string): boolean {
   return COMPLETE_ASSESSORS.has(activity);
 }
 
+function evaluateHouseEmpty(
+  rule: ElectionChartRule,
+  houses: ReadonlyMap<string, number>,
+): PrimitiveOutcome {
+  const occupants = Array.from(houses.entries())
+    .filter(([, house]) => house === rule.house)
+    .map(([name]) => name);
+  return {
+    status: occupants.length === 0 ? 'pass' : 'fail',
+    evidence: [`House ${rule.house} occupants: ${occupants.length ? occupants.join(', ') : 'none'}.`],
+  };
+}
+
+function evaluatePlanetNotHouse(
+  rule: ElectionChartRule,
+  houses: ReadonlyMap<string, number>,
+): PrimitiveOutcome {
+  const observed = houses.get(rule.planet as string) as number;
+  const passed = observed !== rule.house;
+  return {
+    status: passed ? 'pass' : 'fail',
+    evidence: [`${rule.planet} occupies house ${observed}${passed
+      ? `, outside house ${rule.house}.`
+      : ', which is prohibited.'}`],
+  };
+}
+
+function evaluatePlanetInHouses(
+  rule: ElectionChartRule,
+  houses: ReadonlyMap<string, number>,
+): PrimitiveOutcome {
+  const observed = houses.get(rule.planet as string) as number;
+  return {
+    status: (rule.houses || []).includes(observed) ? 'pass' : 'fail',
+    evidence: [`${rule.planet} occupies house ${observed}; target houses: ${(rule.houses || []).join(', ')}.`],
+  };
+}
+
+function anyPlanetEvidence(rule: ElectionChartRule, matching: readonly string[]): string {
+  if ((rule.houses || []).length === 1 && rule.houses?.[0] === 1) {
+    const planets = rule.planets || [];
+    const named = planets.length > 1
+      ? `${planets.slice(0, -1).join(', ')} and ${planets.at(-1)}`
+      : planets.join('');
+    return `Lagna occupants among ${named}: ${matching.length ? matching.join(', ') : 'none'}.`;
+  }
+  return `Matching grahas: ${matching.length ? matching.join(', ') : 'none'}; target houses: ${(rule.houses || []).join(', ')}.`;
+}
+
+function evaluateAnyPlanetInHouses(
+  rule: ElectionChartRule,
+  houses: ReadonlyMap<string, number>,
+): PrimitiveOutcome {
+  const matching = (rule.planets || []).filter(planet =>
+    (rule.houses || []).includes(houses.get(planet) as number));
+  return {
+    status: matching.length > 0 ? 'pass' : 'fail',
+    evidence: [anyPlanetEvidence(rule, matching)],
+  };
+}
+
+function evaluateHouseRule(
+  rule: ElectionChartRule,
+  houses: ReadonlyMap<string, number>,
+): PrimitiveOutcome {
+  if (rule.kind === 'house_empty') return evaluateHouseEmpty(rule, houses);
+  if (rule.kind === 'planet_not_house') return evaluatePlanetNotHouse(rule, houses);
+  if (rule.kind === 'planet_in_houses') return evaluatePlanetInHouses(rule, houses);
+  if (rule.kind === 'any_planet_in_houses') return evaluateAnyPlanetInHouses(rule, houses);
+  return {
+    status: 'unknown',
+    evidence: [`Unsupported election-chart rule kind: ${String(rule.kind)}.`],
+  };
+}
+
 function evaluateRule(
   rule: ElectionChartRule,
   houses: ReadonlyMap<string, number> | null,
@@ -123,54 +198,7 @@ function evaluateRule(
       evidence: ['Complete Whole Sign house facts are unavailable.'],
     };
   }
-  if (rule.kind === 'house_empty') {
-    const occupants = Array.from(houses.entries())
-      .filter(([, house]) => house === rule.house)
-      .map(([name]) => name);
-    return {
-      status: occupants.length === 0 ? 'pass' : 'fail',
-      evidence: [`House ${rule.house} occupants: ${occupants.length ? occupants.join(', ') : 'none'}.`],
-    };
-  }
-  if (rule.kind === 'planet_not_house') {
-    const observed = houses.get(rule.planet as string) as number;
-    const passed = observed !== rule.house;
-    return {
-      status: passed ? 'pass' : 'fail',
-      evidence: [`${rule.planet} occupies house ${observed}${passed
-        ? `, outside house ${rule.house}.`
-        : ', which is prohibited.'}`],
-    };
-  }
-  if (rule.kind === 'planet_in_houses') {
-    const observed = houses.get(rule.planet as string) as number;
-    return {
-      status: (rule.houses || []).includes(observed) ? 'pass' : 'fail',
-      evidence: [`${rule.planet} occupies house ${observed}; target houses: ${(rule.houses || []).join(', ')}.`],
-    };
-  }
-  if (rule.kind === 'any_planet_in_houses') {
-    const matching = (rule.planets || []).filter(planet =>
-      (rule.houses || []).includes(houses.get(planet) as number));
-    let detail: string;
-    if ((rule.houses || []).length === 1 && rule.houses?.[0] === 1) {
-      const planets = rule.planets || [];
-      const named = planets.length > 1
-        ? `${planets.slice(0, -1).join(', ')} and ${planets.at(-1)}`
-        : planets.join('');
-      detail = `Lagna occupants among ${named}: ${matching.length ? matching.join(', ') : 'none'}.`;
-    } else {
-      detail = `Matching grahas: ${matching.length ? matching.join(', ') : 'none'}; target houses: ${(rule.houses || []).join(', ')}.`;
-    }
-    return {
-      status: matching.length > 0 ? 'pass' : 'fail',
-      evidence: [detail],
-    };
-  }
-  return {
-    status: 'unknown',
-    evidence: [`Unsupported election-chart rule kind: ${String(rule.kind)}.`],
-  };
+  return evaluateHouseRule(rule, houses);
 }
 
 function ruleOutcome(
@@ -210,6 +238,37 @@ function summarize(outcomes: ElectionRuleOutcome[], stable = true): ElectionChar
   };
 }
 
+type PlanetPositions = NonNullable<ReturnType<typeof completePlanetPositions>>;
+
+function recordMissingGoldCoverage(evidence: Map<string, string[]>): void {
+  for (const rule of automatedRulesFor('gold')) {
+    const details = evidence.get(rule.id) || [];
+    details.push('The chart instants do not prove the required ten-minute transition coverage.');
+    evidence.set(rule.id, details);
+  }
+}
+
+function recordGoldTransitionUncertainty(
+  evidence: Map<string, string[]>,
+  startPositions: PlanetPositions,
+  endPositions: PlanetPositions,
+  gapMinutes: number,
+): void {
+  for (const rule of automatedRulesFor('gold')) {
+    const detail = goldTransitionUncertainty(rule, startPositions, endPositions, gapMinutes);
+    if (!detail) continue;
+    const details = evidence.get(rule.id) || [];
+    if (!details.includes(detail)) details.push(detail);
+    evidence.set(rule.id, details);
+  }
+}
+
+function validGoldTransitionGap(gapMinutes: number): boolean {
+  return Number.isFinite(gapMinutes)
+    && gapMinutes > 0
+    && gapMinutes <= GOLD_MAX_SAMPLE_GAP_MINUTES;
+}
+
 function goldTransitionEvidence(
   charts: readonly ElectionChartSnapshot[],
 ): ReadonlyMap<string, string[]> {
@@ -220,31 +279,11 @@ function goldTransitionEvidence(
     const startPositions = completePlanetPositions(startChart, EXPECTED_PLANETS);
     const endPositions = completePlanetPositions(endChart, EXPECTED_PLANETS);
     if (!startPositions || !endPositions) continue;
-    const startInstant = Date.parse(startChart.instant);
-    const endInstant = Date.parse(endChart.instant);
-    const gapMinutes = (endInstant - startInstant) / 60_000;
-    if (
-      !Number.isFinite(gapMinutes)
-      || gapMinutes <= 0
-      || gapMinutes > GOLD_MAX_SAMPLE_GAP_MINUTES
-    ) {
-      for (const rule of automatedRulesFor('gold')) {
-        const details = evidence.get(rule.id) || [];
-        details.push(
-          'The chart instants do not prove the required ten-minute transition coverage.',
-        );
-        evidence.set(rule.id, details);
-      }
-      continue;
-    }
-    for (const rule of automatedRulesFor('gold')) {
-      const detail = goldTransitionUncertainty(
-        rule, startPositions, endPositions, gapMinutes,
-      );
-      if (!detail) continue;
-      const details = evidence.get(rule.id) || [];
-      if (!details.includes(detail)) details.push(detail);
-      evidence.set(rule.id, details);
+    const gapMinutes = (Date.parse(endChart.instant) - Date.parse(startChart.instant)) / 60_000;
+    if (validGoldTransitionGap(gapMinutes)) {
+      recordGoldTransitionUncertainty(evidence, startPositions, endPositions, gapMinutes);
+    } else {
+      recordMissingGoldCoverage(evidence);
     }
   }
   return evidence;
