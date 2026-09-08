@@ -137,4 +137,6 @@ def test_flagged_small_text_meets_wcag_aa_contrast():
         rule = _css_rule(source, selector)
         foreground = _css_property(rule, "color")
         background = _css_property(rule, "background")
+        if selector.startswith(".palette-site"):
+            assert re.fullmatch(r"#[0-9A-Fa-f]{6}", background), selector
         assert _contrast_ratio(foreground, background) >= 4.5, selector
