@@ -98,9 +98,9 @@ AZ_4lyBG4HbJenSxEGNx,python:S3776,CRITICAL,telugu_panchangam/personal/slot_score
 AZ_4lyBG4HbJenSxEGNy,python:S3776,CRITICAL,telugu_panchangam/personal/slot_scorers.py,186,2026-06-22,76,,,mutable
 AZ_4lyCO4HbJenSxEGOM,python:S1192,CRITICAL,telugu_panchangam/special_yogas.py,5,2026-06-17,81,,,mutable
 AZ_4lyCO4HbJenSxEGON,python:S1192,CRITICAL,telugu_panchangam/special_yogas.py,5,2026-06-17,81,,,mutable
-AaBGVEfjI4aEr1GefQjF,python:S3776,CRITICAL,tools/analyze_computation_architecture.py,303,2026-08-28,9,,_layer=14,mutable
-AaBGVEfjI4aEr1GefQjG,python:S3776,CRITICAL,tools/analyze_computation_architecture.py,340,2026-08-28,9,,_layer=14,mutable
-AaBGVEfjI4aEr1GefQjH,python:S3776,CRITICAL,tools/analyze_computation_architecture.py,481,2026-08-28,9,,_layer=14,mutable
+AaBGVEfjI4aEr1GefQjF,python:S3776,CRITICAL,tools/analyze_computation_architecture.py,303,2026-08-28,9,,,mutable
+AaBGVEfjI4aEr1GefQjG,python:S3776,CRITICAL,tools/analyze_computation_architecture.py,340,2026-08-28,9,,,mutable
+AaBGVEfjI4aEr1GefQjH,python:S3776,CRITICAL,tools/analyze_computation_architecture.py,481,2026-08-28,9,,,mutable
 AaBbSRiljK1myYTdWYub,python:S3776,CRITICAL,tools/audit_lagna_boundary_guard.py,169,2026-08-31,6,,,mutable
 AaBbSRi_jK1myYTdWYud,python:S1192,CRITICAL,tools/capture_muhurta_chart_screenshots.py,136,2026-08-31,6,,,mutable
 AaBweEfqy_01LXV_JFeo,python:S1192,CRITICAL,tools/capture_muhurta_chart_screenshots.py,275,2026-09-05,1,,,mutable
@@ -337,7 +337,7 @@ AZ_4lyEZ4HbJenSxEGOf,python:S9073,MAJOR,tests/test_tarabalam.py,59,2026-06-11,87
 AZ_4lyEP4HbJenSxEGOe,python:S9073,MAJOR,tests/test_upanayana_profile.py,59,2026-07-21,47,,,mutable
 AZ_4lyGD4HbJenSxEGOw,python:S9073,MAJOR,tests/test_vishaghati.py,50,2026-06-17,81,,,mutable
 AZ_4lyGD4HbJenSxEGOx,python:S9073,MAJOR,tests/test_vishaghati.py,51,2026-06-17,81,,,mutable
-AaBGVEfjI4aEr1GefQjE,python:S8786,MAJOR,tools/analyze_computation_architecture.py,26,2026-08-28,9,,_layer=14,mutable
+AaBGVEfjI4aEr1GefQjE,python:S8786,MAJOR,tools/analyze_computation_architecture.py,26,2026-08-28,9,,,mutable
 AaBGVVeUScBCsefeJPv4,javascript:S8786,MAJOR,tools/check-docs-source.mjs,38,2026-08-27,10,,,mutable
 AaBbSRiIjK1myYTdWYuY,python:S107,MAJOR,tools/export_muhurtam_rule_crosswalk.py,641,2026-08-31,6,,,mutable
 AaBst7Oj9MBxg5veotNx,python:S3358,MAJOR,tools/export_muhurtam_rule_crosswalk.py,955,2026-09-04,2,,,mutable

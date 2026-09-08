@@ -191,36 +191,35 @@ def _is_test(path: str) -> bool:
     )
 
 
+_LAYERS_BY_EXACT_PATH = {
+    'telugu_panchangam/personal/muhurta.py': 'scoring',
+    'telugu_panchangam/personal/slot_scorers.py': 'scoring',
+    'telugu_panchangam/generate.py': 'build',
+}
+
+_LAYERS_BY_PREFIX = (
+    ('telugu_panchangam/models/', 'models'),
+    ('telugu_panchangam/engines/', 'engines'),
+    ('telugu_panchangam/personal/activity_', 'activity-rules'),
+    ('telugu_panchangam/personal/', 'personal'),
+    ('telugu_panchangam/gochara/', 'gochara'),
+    ('telugu_panchangam/mcp/', 'mcp'),
+    ('telugu_panchangam/generators/', 'generators'),
+    ('scripts/', 'build'),
+    ('telugu_panchangam/', 'derived-calendar'),
+    ('src/data/', 'browser-data'),
+    ('src/panels/', 'browser-panels'),
+    ('src/', 'browser-core'),
+)
+
+
 def _layer(path: str) -> str:
-    if path.startswith('telugu_panchangam/models/'):
-        return 'models'
-    if path.startswith('telugu_panchangam/engines/'):
-        return 'engines'
-    if path.startswith('telugu_panchangam/personal/activity_'):
-        return 'activity-rules'
-    if path in {
-        'telugu_panchangam/personal/muhurta.py',
-        'telugu_panchangam/personal/slot_scorers.py',
-    }:
-        return 'scoring'
-    if path.startswith('telugu_panchangam/personal/'):
-        return 'personal'
-    if path.startswith('telugu_panchangam/gochara/'):
-        return 'gochara'
-    if path.startswith('telugu_panchangam/mcp/'):
-        return 'mcp'
-    if path.startswith('telugu_panchangam/generators/'):
-        return 'generators'
-    if path == 'telugu_panchangam/generate.py' or path.startswith('scripts/'):
-        return 'build'
-    if path.startswith('telugu_panchangam/'):
-        return 'derived-calendar'
-    if path.startswith('src/data/'):
-        return 'browser-data'
-    if path.startswith('src/panels/'):
-        return 'browser-panels'
-    if path.startswith('src/'):
-        return 'browser-core'
+    exact_layer = _LAYERS_BY_EXACT_PATH.get(path)
+    if exact_layer is not None:
+        return exact_layer
+    for prefix, layer in _LAYERS_BY_PREFIX:
+        if path.startswith(prefix):
+            return layer
     return 'other'
 
 

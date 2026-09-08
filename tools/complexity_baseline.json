@@ -6,9 +6,6 @@
     },
     "telugu_panchangam/generators/ics.py": {
       "_description": 24
-    },
-    "tools/analyze_computation_architecture.py": {
-      "_layer": 14
     }
   },
   "max_complexity": 10,
