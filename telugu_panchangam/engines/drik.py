@@ -1,23 +1,42 @@
 # src/engines/drik.py
 from datetime import date
 
-from telugu_panchangam.panchangam_names import (
-    RASHI_NAMES, TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
-    VAARAM_NAMES, KARANA_REPEATING, KARANA_FIXED,
-)
+from telugu_panchangam.eclipses import get_eclipse_for_date
 from telugu_panchangam.engines.base import (
-    PanchangamEngine, rituvu_name, ayanam_name, samvatsara_name, maasam_name,
-    VARJYAM_GHATIS, AMRITA_GHATIS,
-    nakshatra_day_windows, next_nakshatra_span,
+    AMRITA_GHATIS,
+    VARJYAM_GHATIS,
+    PanchangamEngine,
+    ayanam_name,
+    maasam_name,
+    nakshatra_day_windows,
+    next_nakshatra_span,
+    rituvu_name,
+    samvatsara_name,
 )
 from telugu_panchangam.engines.utils import (
-    jd_to_utc, local_midnight_jd, find_crossing,
-    sun_longitude, moon_longitude, moon_sun_elongation,
-    get_sunrise, get_sunset, get_moonrise, get_moonset,
+    find_crossing,
+    get_moonrise,
+    get_moonset,
+    get_sunrise,
+    get_sunset,
+    jd_to_utc,
+    local_midnight_jd,
+    moon_longitude,
+    moon_sun_elongation,
+    sun_longitude,
 )
-from telugu_panchangam.models.panchangam_day import Location, Span, PanchangamDay
-from telugu_panchangam.eclipses import get_eclipse_for_date
+from telugu_panchangam.models.panchangam_day import Location, PanchangamDay, Span
+from telugu_panchangam.panchangam_names import (
+    KARANA_FIXED,
+    KARANA_REPEATING,
+    NAKSHATRA_NAMES,
+    RASHI_NAMES,
+    TITHI_NAMES,
+    VAARAM_NAMES,
+    YOGA_NAMES,
+)
 from telugu_panchangam.special_yogas import get_special_yogas
+
 
 class DrikGanitaEngine(PanchangamEngine):
 
@@ -35,15 +54,17 @@ class DrikGanitaEngine(PanchangamEngine):
     def _moon_lon(self, jd: float) -> float:
         if self.ayanamsa == 'lahiri':
             return moon_longitude(jd)
-        from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
         import swisseph as swe
+
+        from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
         return sidereal_longitude_with_ayanamsa(jd, swe.MOON, self.ayanamsa)
 
     def _sun_lon(self, jd: float) -> float:
         if self.ayanamsa == 'lahiri':
             return sun_longitude(jd)
-        from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
         import swisseph as swe
+
+        from telugu_panchangam.engines.utils import sidereal_longitude_with_ayanamsa
         return sidereal_longitude_with_ayanamsa(jd, swe.SUN, self.ayanamsa)
 
     def _elongation(self, jd: float) -> float:
@@ -293,6 +314,7 @@ class DrikGanitaEngine(PanchangamEngine):
         # longitudes at sunrise. Drik uses Swiss Ephemeris outer planets;
         # SS and Vakya don't model them so those engines leave defaults (False).
         import swisseph as swe
+
         from telugu_panchangam.gochara.simha_stha import is_simha_stha
         if self.ayanamsa == 'lahiri':
             swe.set_sid_mode(swe.SIDM_LAHIRI)

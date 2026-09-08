@@ -1,8 +1,9 @@
-from datetime import datetime, timezone
 from datetime import date as date_type
-import swisseph as swe
-import pytz
+from datetime import datetime, timezone
+from functools import lru_cache
 
+import pytz
+import swisseph as swe
 
 AYANAMSA_MODES = {
     'lahiri':            swe.SIDM_LAHIRI,
@@ -63,8 +64,6 @@ def sidereal_longitude(jd: float, planet: int) -> float:
     result, _ = swe.calc_ut(jd, planet, flags)
     return result[0] % 360.0
 
-
-from functools import lru_cache
 
 @lru_cache(maxsize=1024)
 def sun_longitude(jd: float) -> float:
@@ -140,7 +139,7 @@ def next_new_moon(elongation_func, jd: float) -> float:
 
 def get_sunrise(jd_start: float, geopos: list[float]) -> float:
     """JD of next sunrise after jd_start for geopos=[lon, lat, alt_m]."""
-    ret, tret = swe.rise_trans(
+    _, tret = swe.rise_trans(
         jd_start, swe.SUN, swe.CALC_RISE, geopos, 1013.25, 15.0,
     )
     return tret[0]
@@ -148,7 +147,7 @@ def get_sunrise(jd_start: float, geopos: list[float]) -> float:
 
 def get_sunset(jd_start: float, geopos: list[float]) -> float:
     """JD of next sunset after jd_start."""
-    ret, tret = swe.rise_trans(
+    _, tret = swe.rise_trans(
         jd_start, swe.SUN, swe.CALC_SET, geopos, 1013.25, 15.0,
     )
     return tret[0]
@@ -156,7 +155,7 @@ def get_sunset(jd_start: float, geopos: list[float]) -> float:
 
 def get_moonrise(jd_start: float, geopos: list[float]) -> float:
     """JD of next moonrise after jd_start."""
-    ret, tret = swe.rise_trans(
+    _, tret = swe.rise_trans(
         jd_start, swe.MOON, swe.CALC_RISE, geopos, 1013.25, 15.0,
     )
     return tret[0]
@@ -164,7 +163,7 @@ def get_moonrise(jd_start: float, geopos: list[float]) -> float:
 
 def get_moonset(jd_start: float, geopos: list[float]) -> float:
     """JD of next moonset after jd_start."""
-    ret, tret = swe.rise_trans(
+    _, tret = swe.rise_trans(
         jd_start, swe.MOON, swe.CALC_SET, geopos, 1013.25, 15.0,
     )
     return tret[0]

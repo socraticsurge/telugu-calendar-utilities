@@ -35,9 +35,9 @@ AaBbSRXDjK1myYTdWYss,typescript:S3776,CRITICAL,src/scorer/personal-election-scre
 AaBbSRXDjK1myYTdWYsz,typescript:S3776,CRITICAL,src/scorer/personal-election-screening.ts,344,2026-08-31,6,,,mutable
 AZ_4lyDx4HbJenSxEGOb,python:S1192,CRITICAL,telugu_panchangam/cities.py,5,2026-06-17,81,,,mutable
 AZ_4lyDp4HbJenSxEGOa,python:S3776,CRITICAL,telugu_panchangam/eclipses.py,91,2026-06-10,88,,,mutable
-AZ_4lyCp4HbJenSxEGOP,python:S1192,CRITICAL,telugu_panchangam/engines/base.py,41,2026-06-11,87,I001=4,_festivals=22,frozen-engine
-AZ_4lyCp4HbJenSxEGOQ,python:S3776,CRITICAL,telugu_panchangam/engines/base.py,408,2026-06-16,82,I001=4,_festivals=22,frozen-engine
-AZ_4lyC-4HbJenSxEGOV,python:S3776,CRITICAL,telugu_panchangam/generators/ics.py,128,2026-06-11,87,E701=6;E731=2;F541=1;I001=1,_description=24,frozen-ics
+AZ_4lyCp4HbJenSxEGOP,python:S1192,CRITICAL,telugu_panchangam/engines/base.py,41,2026-06-11,87,,_festivals=22,frozen-engine
+AZ_4lyCp4HbJenSxEGOQ,python:S3776,CRITICAL,telugu_panchangam/engines/base.py,408,2026-06-16,82,,_festivals=22,frozen-engine
+AZ_4lyC-4HbJenSxEGOV,python:S3776,CRITICAL,telugu_panchangam/generators/ics.py,128,2026-06-11,87,,_description=24,frozen-ics
 AZ_4lyCa4HbJenSxEGOO,python:S3776,CRITICAL,telugu_panchangam/gochara/rules.py,50,2026-06-11,87,,,mutable
 AZ_4lyDU4HbJenSxEGOY,python:S3776,CRITICAL,telugu_panchangam/graha_yuddha.py,139,2026-06-17,81,,,mutable
 AZ_4lyDJ4HbJenSxEGOX,python:S3776,CRITICAL,telugu_panchangam/ingress.py,96,2026-06-17,81,,,mutable
@@ -269,7 +269,7 @@ AaBbSRXDjK1myYTdWYsy,typescript:S3358,MAJOR,src/scorer/personal-election-screeni
 AaBbSRXDjK1myYTdWYs4,typescript:S3358,MAJOR,src/scorer/personal-election-screening.ts,394,2026-08-31,6,,,mutable
 AaBbSRXDjK1myYTdWYs5,typescript:S3358,MAJOR,src/scorer/personal-election-screening.ts,396,2026-08-31,6,,,mutable
 AaBbSRXDjK1myYTdWYs6,typescript:S3358,MAJOR,src/scorer/personal-election-screening.ts,398,2026-08-31,6,,,mutable
-AZ_4lyC-4HbJenSxEGOW,python:S3457,MAJOR,telugu_panchangam/generators/ics.py,189,2026-06-10,88,E701=6;E731=2;F541=1;I001=1,_description=24,frozen-ics
+AZ_4lyC-4HbJenSxEGOW,python:S3457,MAJOR,telugu_panchangam/generators/ics.py,189,2026-06-10,88,,_description=24,frozen-ics
 AZ_4lx-B4HbJenSxEGNn,python:S107,MAJOR,telugu_panchangam/mcp/server.py,240,2026-06-21,77,,,mutable
 AZ_4lyAO4HbJenSxEGNu,python:S107,MAJOR,telugu_panchangam/mcp/tools.py,1046,2026-06-21,77,,,mutable
 AZ_4lyBf4HbJenSxEGN2,python:S1172,MAJOR,telugu_panchangam/personal/muhurta.py,291,2026-06-22,76,,,mutable
@@ -445,10 +445,10 @@ AZ_4lyJK4HbJenSxEGRB,typescript:S7778,MINOR,src/panels/today.ts,651,2026-07-18,5
 AZ_4lyJK4HbJenSxEGRC,typescript:S6582,MINOR,src/panels/today.ts,657,2026-07-18,50,,,mutable
 AaBbSRXDjK1myYTdWYs3,typescript:S7755,MINOR,src/scorer/personal-election-screening.ts,389,2026-08-31,6,,,mutable
 AZ_4lyKZ4HbJenSxEGSM,typescript:S7747,MINOR,src/selection-store.ts,50,2026-07-18,50,,,mutable
-AZ_4lyCz4HbJenSxEGOR,python:S1481,MINOR,telugu_panchangam/engines/utils.py,143,2026-06-10,88,E402=1;I001=2,,frozen-engine
-AZ_4lyCz4HbJenSxEGOS,python:S1481,MINOR,telugu_panchangam/engines/utils.py,151,2026-06-10,88,E402=1;I001=2,,frozen-engine
-AZ_4lyCz4HbJenSxEGOT,python:S1481,MINOR,telugu_panchangam/engines/utils.py,159,2026-06-10,88,E402=1;I001=2,,frozen-engine
-AZ_4lyCz4HbJenSxEGOU,python:S1481,MINOR,telugu_panchangam/engines/utils.py,167,2026-06-10,88,E402=1;I001=2,,frozen-engine
+AZ_4lyCz4HbJenSxEGOR,python:S1481,MINOR,telugu_panchangam/engines/utils.py,143,2026-06-10,88,,,frozen-engine
+AZ_4lyCz4HbJenSxEGOS,python:S1481,MINOR,telugu_panchangam/engines/utils.py,151,2026-06-10,88,,,frozen-engine
+AZ_4lyCz4HbJenSxEGOT,python:S1481,MINOR,telugu_panchangam/engines/utils.py,159,2026-06-10,88,,,frozen-engine
+AZ_4lyCz4HbJenSxEGOU,python:S1481,MINOR,telugu_panchangam/engines/utils.py,167,2026-06-10,88,,,frozen-engine
 AaBGUF4rjTP_QyJe4ROg,python:S5713,MINOR,tools/check_computation_inventory.py,170,2026-08-27,10,,,mutable
 AaBGUF4rjTP_QyJe4ROh,python:S5713,MINOR,tools/check_computation_inventory.py,194,2026-08-27,10,,,mutable
 AaB1lYgnX0yOWYZfKFd-,python:S6353,MINOR,tools/verify_release_artifacts.py,42,2026-09-05,1,,,mutable
