@@ -7,10 +7,6 @@
     "telugu_panchangam/generators/ics.py": {
       "_description": 24
     },
-    "telugu_panchangam/personal/election_assessors/primitives.py": {
-      "evaluate_well_situated": 15,
-      "gold_transition_uncertainty": 11
-    },
     "tests/test_browser_smoke.py": {
       "_muhurta_planets": 19,
       "test_chart_aware_muhurta_built_browser_state_matrix": 21

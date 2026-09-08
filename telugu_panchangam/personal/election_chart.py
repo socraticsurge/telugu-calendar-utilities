@@ -7,7 +7,7 @@ from datetime import datetime
 from itertools import pairwise
 from typing import Any
 
-from .election_assessors.facts import planet_houses, planet_positions
+from .election_assessors.event_admission import planet_houses, planet_positions
 from .election_assessors.primitives import (
     GOLD_MAX_SAMPLE_GAP_MINUTES,
     PrimitiveOutcome,
