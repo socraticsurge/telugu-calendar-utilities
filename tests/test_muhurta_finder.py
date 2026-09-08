@@ -797,6 +797,40 @@ def test_mcp_find_muhurta_exposes_janma_rasis_janma_lagnas_chandra_mode():
     assert result.get('chandra_mode') == 'puja_ok'
 
 
+def test_find_muhurta_python_and_mcp_signatures_are_stable():
+    """The complexity refactor must not change either public call contract."""
+    from inspect import signature
+
+    from telugu_panchangam.mcp.server import find_muhurta
+    from telugu_panchangam.mcp.tools import tool_find_muhurta
+
+    tool_parameters = signature(tool_find_muhurta).parameters
+    assert tuple(tool_parameters) == (
+        'start_date',
+        'days',
+        'activity',
+        'city',
+        'system',
+        'janma_nakshatras',
+        'janma_rasis',
+        'janma_lagnas',
+        'chandra_mode',
+        'latitude',
+        'longitude',
+        'timezone',
+        'ayanamsa',
+        'travel_direction',
+        'include_night',
+    )
+    assert tool_parameters['days'].default == 7
+    assert tool_parameters['include_night'].default is False
+
+    mcp_parameters = signature(find_muhurta).parameters
+    assert tuple(mcp_parameters) == tuple(tool_parameters)[:13] + ('include_night',)
+    assert mcp_parameters['days'].default == 7
+    assert mcp_parameters['include_night'].default is False
+
+
 def test_unknown_tithi_name_does_not_explode():
     # Robustness: tithi_family is wrapped in try/except inside day_slots,
     # so an unknown tithi name silently skips tithi-class scoring.

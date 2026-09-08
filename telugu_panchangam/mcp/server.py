@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from inspect import signature
+
 from mcp.server.fastmcp import FastMCP
 
 from telugu_panchangam.mcp.tools import (
@@ -235,25 +238,49 @@ def get_rasi_phalalu(
     return tool_get_rasi_phalalu(date, janma_rasi, city, janma_nakshatra, latitude, longitude, timezone, ayanamsa)
 
 
+@dataclass(frozen=True)
+class _FindMuhurtaMcpRequest:
+    start_date: str
+    days: int = 7
+    activity: str = 'any'
+    city: str = 'Hyderabad'
+    system: str = 'drik'
+    janma_nakshatras: list[str] | None = None
+    janma_rasis: list[str | None] | None = None
+    janma_lagnas: list[str | None] | None = None
+    chandra_mode: str = 'stars'
+    latitude: float | None = None
+    longitude: float | None = None
+    timezone: str | None = None
+    ayanamsa: str = 'lahiri'
+    include_night: bool = False
+
+
+def _with_find_muhurta_signature(function):
+    function.__signature__ = signature(
+        _FindMuhurtaMcpRequest, eval_str=True
+    ).replace(return_annotation=str)
+    return function
+
+
 @mcp.tool()
-def find_muhurta(
-    start_date: str,
-    days: int = 7,
-    activity: str = 'any',
-    city: str = 'Hyderabad',
-    system: str = 'drik',
-    janma_nakshatras: list[str] | None = None,
-    janma_rasis: list[str | None] | None = None,
-    janma_lagnas: list[str | None] | None = None,
-    chandra_mode: str = 'stars',
-    latitude: float | None = None,
-    longitude: float | None = None,
-    timezone: str | None = None,
-    ayanamsa: str = 'lahiri',
-    include_night: bool = False,
-) -> str:
+@_with_find_muhurta_signature
+def find_muhurta(*args, **kwargs) -> str:
     """Find ranked auspicious time slots over the coming days. Slots are good choghadiya blocks (Amrit/Shubh/Labh/Char) with every inauspicious window subtracted (Rahu Kalam, Gulika, Yamagandam, Varjyam, Durmuhurtham), scored with Abhijit Muhurta / Amrita Kalam overlap and special-yoga bonuses. Activity-specific source profiles add their own hard and manual gates; ceremony is narrowly Shantika/Paushtika, and beginning is narrowly Dharma-kriya commencement. New in 1.9.0: Bhadra Mukha is a hard-avoid cut; Simha-Stha Guru/Shukra, Guru/Shukra Maudhya (combustion), Khar-Maasa, Adhika Maasa, and Pitru Paksha are all skipped for samskara activities; Panchaka Rahita (Mrityu/Agni/Raja/Chora/Roga) is checked at both day-level (sunrise lagna) and slot-level; optional travel_direction activates Disha Shoola filtering. The legacy activity name litigation resolves to the verified court filing profile and has no separate Bhadra Puchha bonus. Pass janma_nakshatras (1-4 birth stars) to keep only days whose tarabalam favours everyone. Optionally pass janma_rasis (aligned with janma_nakshatras, null entries allowed) to add Chandrabalam scoring, and janma_lagnas for strict Lagna Shuddhi. include_night=True adds night slots with night-specific scoring. Args: start_date=YYYY-MM-DD, days=1-14, activity=one of the published activity keys, city=city name (or latitude+longitude), system=drik|surya_siddhanta|vakya, chandra_mode=stars|puja_ok|strict, ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha, travel_direction=optional N/S/E/W/NE/NW/SE/SW, include_night=false|true."""
-    return tool_find_muhurta(start_date, days, activity, city, system,
-                             janma_nakshatras, janma_rasis, janma_lagnas,
-                             chandra_mode, latitude, longitude, timezone, ayanamsa,
-                             include_night=include_night)
+    request = _FindMuhurtaMcpRequest(*args, **kwargs)
+    return tool_find_muhurta(
+        request.start_date,
+        request.days,
+        request.activity,
+        request.city,
+        request.system,
+        request.janma_nakshatras,
+        request.janma_rasis,
+        request.janma_lagnas,
+        request.chandra_mode,
+        request.latitude,
+        request.longitude,
+        request.timezone,
+        request.ayanamsa,
+        include_night=request.include_night,
+    )

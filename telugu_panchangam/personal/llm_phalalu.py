@@ -17,6 +17,7 @@ Retry strategy:
 Raises VerificationError if the model cites a position or verdict that
 does not match the engine output.
 """
+
 import json
 import os
 import re
@@ -43,12 +44,20 @@ _VERIFY_RETRIES = 3
 # normalizes the label before the membership check. Position and verdict
 # are still verified exactly against the engine.
 _GRAHA_ALIASES = {
-    'sun': 'Surya', 'moon': 'Chandra',
-    'mars': 'Kuja', 'mangala': 'Kuja',
-    'mercury': 'Budha', 'budh': 'Budha',
-    'jupiter': 'Guru', 'brihaspati': 'Guru', 'bruhaspati': 'Guru',
-    'venus': 'Shukra', 'saturn': 'Shani', 'sani': 'Shani',
-    'north node': 'Rahu', 'south node': 'Ketu',
+    'sun': 'Surya',
+    'moon': 'Chandra',
+    'mars': 'Kuja',
+    'mangala': 'Kuja',
+    'mercury': 'Budha',
+    'budh': 'Budha',
+    'jupiter': 'Guru',
+    'brihaspati': 'Guru',
+    'bruhaspati': 'Guru',
+    'venus': 'Shukra',
+    'saturn': 'Shani',
+    'sani': 'Shani',
+    'north node': 'Rahu',
+    'south node': 'Ketu',
 }
 
 LLM_PHALALU_PROVENANCE = 'daily_horoscope.llm_interpretation'
@@ -58,9 +67,12 @@ LLM_PHALALU_PROVENANCE = 'daily_horoscope.llm_interpretation'
 # and deterministic; they complement, rather than pretend to semantically prove,
 # the prompt's grounding instruction.
 _UNSUPPORTED_GUIDANCE = (
-    re.compile(r'\b(?:morning|afternoon|evening|noon|midnight)\b', re.I),
-    re.compile(r'\b\d+\s*(?:hours?|days?)\b', re.I),
-    re.compile(r'\b(?:contracts?|agreements?|investments?|investing|legal|medical|medication|diagnosis|surgery)\b', re.I),
+    re.compile(r'\b(?:morning|afternoon|evening|noon|midnight)\b', re.IGNORECASE),
+    re.compile(r'\b\d+\s*(?:hours?|days?)\b', re.IGNORECASE),
+    re.compile(
+        r'\b(?:contracts?|agreements?|investments?|investing|legal|medical|medication|diagnosis|surgery)\b',
+        re.IGNORECASE,
+    ),
 )
 
 
@@ -70,44 +82,45 @@ def _canonical_graha(name: str) -> str:
     grahas are still rejected by _verify."""
     return _GRAHA_ALIASES.get(name.strip().lower(), name)
 
+
 _SYSTEM = (
-    "You are a wise Jyotish astrologer writing a daily column for Telugu readers. "
-    "Write ONLY in English — do not use Telugu script. "
-    "\n\n"
-    "For each of the 12 rashis, write ONE flowing paragraph of 10–14 sentences that reads like "
+    'You are a wise Jyotish astrologer writing a daily column for Telugu readers. '
+    'Write ONLY in English — do not use Telugu script. '
+    '\n\n'
+    'For each of the 12 rashis, write ONE flowing paragraph of 10–14 sentences that reads like '
     "a real astrologer's column — practical, warm, personal. Follow this structure:\n"
-    "1. Open with the overall tone of the day for this rasi.\n"
-    "2. Walk through relevant life areas only when they follow from the supplied house placements. "
-    "Describe reflective themes, not promised events or professional advice.\n"
-    "3. Name the most significant transit causing this energy, described in plain human terms "
+    '1. Open with the overall tone of the day for this rasi.\n'
+    '2. Walk through relevant life areas only when they follow from the supplied house placements. '
+    'Describe reflective themes, not promised events or professional advice.\n'
+    '3. Name the most significant transit causing this energy, described in plain human terms '
     "(e.g. 'Saturn moving through your twelfth house pulls your attention inward').\n"
-    "4. If Sade Sati, Ashtama Shani, or vedha applies, mention its practical implication in one sentence.\n"
-    "5. Offer low-stakes reflective guidance only. Never give medical, legal, investment or contract advice.\n"
-    "6. Close with one grounded, encouraging sentence.\n"
-    "\n"
+    '4. If Sade Sati, Ashtama Shani, or vedha applies, mention its practical implication in one sentence.\n'
+    '5. Offer low-stakes reflective guidance only. Never give medical, legal, investment or contract advice.\n'
+    '6. Close with one grounded, encouraging sentence.\n'
+    '\n'
     "Tone: warm, direct — address the reader as 'you'. Like advice from a knowledgeable elder. "
-    "Never a mere list of verdicts. Each rasi must read distinctly from the others.\n"
-    "\n"
+    'Never a mere list of verdicts. Each rasi must read distinctly from the others.\n'
+    '\n'
     "In addition to the paragraph, write a single 'advice' sentence: the ONE most important "
-    "low-stakes action or mindset for this rasi today. Do not invent intraday timing, guaranteed "
-    "outcomes, waiting periods, or medical, legal, investment, negotiation or contract advice. "
-    "This appears separately as a highlighted callout, so it must stand alone and be self-contained.\n"
-    "\n"
-    "You MUST ground every astrological statement in the data provided. Do not invent or change "
+    'low-stakes action or mindset for this rasi today. Do not invent intraday timing, guaranteed '
+    'outcomes, waiting periods, or medical, legal, investment, negotiation or contract advice. '
+    'This appears separately as a highlighted callout, so it must stand alone and be self-contained.\n'
+    '\n'
+    'You MUST ground every astrological statement in the data provided. Do not invent or change '
     "graha positions, precise event timing, promised outcomes, or facts about the reader's health, "
-    "finances, family, relationships or work. Use possibility language and distinguish interpretation.\n"
-    "\n"
-    "Return your response as a JSON array — one object per rasi — with these fields:\n"
+    'finances, family, relationships or work. Use possibility language and distinguish interpretation.\n'
+    '\n'
+    'Return your response as a JSON array — one object per rasi — with these fields:\n'
     "  'rasi': the rasi name\n"
     "  'text': your paragraph (the full astrologer column text)\n"
     "  'advice': one concrete, self-contained sentence — the single most useful thing to do or avoid today\n"
     "  'transits_cited': array of grahas you discussed, each with 'graha', 'position' (house 1–12), "
     "and 'verdict' (exactly one of: favourable, blocked, adverse — copied from the input data)\n"
-    "\n"
+    '\n'
     "CRITICAL: 'transits_cited' and the paragraph must agree. Every graha you list in "
     "'transits_cited' MUST be named explicitly by name in that rasi's 'text' (its Sanskrit or "
     "common English name, e.g. 'Shani' or 'Saturn'). Do not cite a graha you did not name in "
-    "the prose, and do not name a graha in the prose without citing it."
+    'the prose, and do not name a graha in the prose without citing it.'
 )
 
 _SCHEMA = {
@@ -125,7 +138,10 @@ _SCHEMA = {
                     'properties': {
                         'graha': {'type': 'string'},
                         'position': {'type': 'integer'},
-                        'verdict': {'type': 'string', 'enum': ['favourable', 'blocked', 'adverse']},
+                        'verdict': {
+                            'type': 'string',
+                            'enum': ['favourable', 'blocked', 'adverse'],
+                        },
                     },
                     'required': ['graha', 'position', 'verdict'],
                 },
@@ -143,6 +159,7 @@ class VerificationError(Exception):
 def _post(model: str, body: dict) -> str:
     """POST to the Gemini REST API and return the text of the first candidate."""
     import requests  # lazy: only the network path needs the [llm] extra
+
     api_key = os.environ['rasiphalalu']
     url = f'{_API_BASE}/{model}:generateContent'
     resp = requests.post(
@@ -164,13 +181,16 @@ _RETRYABLE = {429, 500, 502, 503, 504}
 def _call_with_retry(model: str, body: dict) -> str:
     """Call _post(), retrying up to _MAX_RETRIES times on transient errors."""
     import requests  # lazy: only the network path needs the [llm] extra
+
     for attempt in range(_MAX_RETRIES):
         try:
             return _post(model, body)
         except requests.HTTPError as e:
             if e.response.status_code in _RETRYABLE and attempt < _MAX_RETRIES - 1:
-                delay = _BASE_DELAY * (2 ** attempt)
-                print(f'429 rate limit, retrying in {delay:.0f}s (attempt {attempt + 1}/{_MAX_RETRIES})')
+                delay = _BASE_DELAY * (2**attempt)
+                print(
+                    f'429 rate limit, retrying in {delay:.0f}s (attempt {attempt + 1}/{_MAX_RETRIES})'
+                )
                 time.sleep(delay)
                 continue
             raise
@@ -193,7 +213,7 @@ def _generate(model: str, user_prompt: str) -> list[dict]:
     end = text.rfind(']')
     if start == -1 or end == -1:
         raise ValueError(f'No JSON array found in model response: {text[:200]!r}')
-    return json.loads(text[start:end + 1])
+    return json.loads(text[start : end + 1])
 
 
 def _generate_verified(model: str, user_prompt: str, all_rashis: dict) -> list[dict]:
@@ -236,10 +256,13 @@ def _format_sky(positions: list[dict]) -> str:
     lines = []
     for p in positions:
         retro = ' (retrograde)' if p.get('retrograde') else ''
-        ingress = (f", moves to {p['next_rasi']} on {p['rasi_until']}"
-                   if p.get('rasi_until') else '')
+        ingress = (
+            f', moves to {p["next_rasi"]} on {p["rasi_until"]}'
+            if p.get('rasi_until')
+            else ''
+        )
         lines.append(
-            f"  {p['graha']}: {p['rasi']}, {p['nakshatra']} pada {p['pada']}{retro}{ingress}"
+            f'  {p["graha"]}: {p["rasi"]}, {p["nakshatra"]} pada {p["pada"]}{retro}{ingress}'
         )
     return '\n'.join(lines)
 
@@ -247,67 +270,91 @@ def _format_sky(positions: list[dict]) -> str:
 def _format_verdicts(all_rashis: dict) -> str:
     lines = []
     for rasi, data in all_rashis.items():
-        lines.append(f"\n{rasi}:")
-        lines.append(f"  Moon: house {data['moon_house']} ({data['moon_verdict']})")
+        lines.append(f'\n{rasi}:')
+        lines.append(f'  Moon: house {data["moon_house"]} ({data["moon_verdict"]})')
         if data['conditions']:
-            lines.append(f"  Special conditions: {', '.join(data['conditions'])}")
+            lines.append(f'  Special conditions: {", ".join(data["conditions"])}')
         for graha, v in data['verdicts'].items():
-            vedha = f" [vedha by {v['vedha_by']}]" if v['vedha_by'] else ''
-            lines.append(f"  {graha}: house {v['position']} → {v['verdict']}{vedha}")
+            vedha = f' [vedha by {v["vedha_by"]}]' if v['vedha_by'] else ''
+            lines.append(f'  {graha}: house {v["position"]} → {v["verdict"]}{vedha}')
     return '\n'.join(lines)
 
 
-def _verify(items: list[dict], all_rashis: dict) -> None:
+def _verify_collection_shape(items: list[dict]) -> None:
     if len(items) != len(RASHI_NAMES):
         raise VerificationError(
-            f'Expected exactly {len(RASHI_NAMES)} rasi entries, got {len(items)}')
+            f'Expected exactly {len(RASHI_NAMES)} rasi entries, got {len(items)}'
+        )
     returned_rashis = {item['rasi'] for item in items}
     if len(returned_rashis) != len(items):
         raise VerificationError('Duplicate rasi entries in LLM response')
     missing = set(RASHI_NAMES) - returned_rashis
     if missing:
-        raise VerificationError(f"Missing rashis in LLM response: {missing}")
+        raise VerificationError(f'Missing rashis in LLM response: {missing}')
 
+
+def _verify_item_fields(item: dict, all_rashis: dict) -> tuple[str, dict]:
+    rasi = item['rasi']
+    if rasi not in all_rashis:
+        raise VerificationError(f'Unknown rasi in response: {rasi!r}')
+    if not item.get('text', '').strip():
+        raise VerificationError(f'{rasi}: empty interpretation text')
+    if not item.get('advice', '').strip():
+        raise VerificationError(f'{rasi}: empty advice')
+    if not item.get('transits_cited'):
+        raise VerificationError(f'{rasi}: no engine-verifiable transit citations')
+    return rasi, all_rashis[rasi]['verdicts']
+
+
+def _verify_guidance(rasi: str, item: dict) -> None:
+    for field in ('text', 'advice'):
+        if any(pattern.search(item[field]) for pattern in _UNSUPPORTED_GUIDANCE):
+            raise VerificationError(
+                f'{rasi}: unsupported precise or high-stakes guidance in {field}'
+            )
+
+
+def _graha_is_named(graha: str, text: str) -> bool:
+    aliases = {graha.lower()}
+    aliases.update(
+        alias for alias, canonical in _GRAHA_ALIASES.items() if canonical == graha
+    )
+    return any(
+        re.search(rf'\b{re.escape(label)}\b', text, re.IGNORECASE) for label in aliases
+    )
+
+
+def _verify_citation(rasi: str, cited: dict, computed: dict, text: str) -> None:
+    graha = _canonical_graha(cited['graha'])
+    if graha not in computed:
+        raise VerificationError(
+            f'{rasi}: unknown graha {cited["graha"]!r} in transits_cited'
+        )
+    expected = computed[graha]
+    if expected['position'] != cited['position']:
+        raise VerificationError(
+            f'{rasi}/{graha}: position mismatch — '
+            f'computed {expected["position"]}, cited {cited["position"]}'
+        )
+    cited_verdict = cited['verdict'].split()[0].rstrip(',')
+    if expected['verdict'] != cited_verdict:
+        raise VerificationError(
+            f'{rasi}/{graha}: verdict mismatch — '
+            f'computed {expected["verdict"]!r}, cited {cited["verdict"]!r}'
+        )
+    if not _graha_is_named(graha, text):
+        raise VerificationError(
+            f'{rasi}: cited graha {cited["graha"]!r} is not named in text'
+        )
+
+
+def _verify(items: list[dict], all_rashis: dict) -> None:
+    _verify_collection_shape(items)
     for item in items:
-        rasi = item['rasi']
-        if rasi not in all_rashis:
-            raise VerificationError(f"Unknown rasi in response: {rasi!r}")
-        computed = all_rashis[rasi]['verdicts']
-        if not item.get('text', '').strip():
-            raise VerificationError(f'{rasi}: empty interpretation text')
-        if not item.get('advice', '').strip():
-            raise VerificationError(f'{rasi}: empty advice')
-        if not item.get('transits_cited'):
-            raise VerificationError(f'{rasi}: no engine-verifiable transit citations')
-        for field in ('text', 'advice'):
-            value = item[field]
-            for pattern in _UNSUPPORTED_GUIDANCE:
-                if pattern.search(value):
-                    raise VerificationError(
-                        f'{rasi}: unsupported precise or high-stakes guidance in {field}')
+        rasi, computed = _verify_item_fields(item, all_rashis)
+        _verify_guidance(rasi, item)
         for cited in item['transits_cited']:
-            graha = _canonical_graha(cited['graha'])
-            if graha not in computed:
-                raise VerificationError(
-                    f"{rasi}: unknown graha {cited['graha']!r} in transits_cited")
-            c = computed[graha]
-            if c['position'] != cited['position']:
-                raise VerificationError(
-                    f"{rasi}/{graha}: position mismatch — "
-                    f"computed {c['position']}, cited {cited['position']}")
-            cited_verdict = cited['verdict'].split()[0].rstrip(',')
-            if c['verdict'] != cited_verdict:
-                raise VerificationError(
-                    f"{rasi}/{graha}: verdict mismatch — "
-                    f"computed {c['verdict']!r}, cited {cited['verdict']!r}")
-
-            aliases = {graha.lower()}
-            aliases.update(alias for alias, canonical in _GRAHA_ALIASES.items()
-                           if canonical == graha)
-            if not any(re.search(rf'\b{re.escape(label)}\b', item['text'], re.I)
-                       for label in aliases):
-                raise VerificationError(
-                    f'{rasi}: cited graha {cited["graha"]!r} is not named in text')
+            _verify_citation(rasi, cited, computed, item['text'])
 
 
 def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
@@ -331,6 +378,7 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
         If any cited transit position or verdict doesn't match the engine output.
     """
     import requests  # lazy: only the network path needs the [llm] extra
+
     sky = {p['graha']: p['rasi'] for p in positions}
     all_rashis = _compute_all_rashis(sky)
 
@@ -338,11 +386,11 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
     verdicts_text = _format_verdicts(all_rashis)
 
     user_prompt = (
-        f"Today is {date_str}.\n\n"
+        f'Today is {date_str}.\n\n'
         f"== Today's sky (sidereal, Lahiri ayanamsa) ==\n{sky_text}\n\n"
-        f"== Computed gochara house positions and verdicts for each rasi ==\n"
-        f"{verdicts_text}\n\n"
-        "Write the daily Rasi Phalalu column for all 12 rashis."
+        f'== Computed gochara house positions and verdicts for each rasi ==\n'
+        f'{verdicts_text}\n\n'
+        'Write the daily Rasi Phalalu column for all 12 rashis.'
     )
 
     model_used = PRIMARY_MODEL
@@ -352,7 +400,9 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
     except requests.HTTPError as e:
         if e.response.status_code != 429:
             raise
-        print(f'Primary model exhausted after retries — falling back to {FALLBACK_MODEL}')
+        print(
+            f'Primary model exhausted after retries — falling back to {FALLBACK_MODEL}'
+        )
         model_used = FALLBACK_MODEL
         items = _generate_verified(FALLBACK_MODEL, user_prompt, all_rashis)
 
@@ -361,12 +411,19 @@ def generate_rasi_phalalu(date_str: str, positions: list[dict]) -> dict:
         'model_used': model_used,
         'provenance': {
             'claim_id': LLM_PHALALU_PROVENANCE,
-            'engine_verified': ['transits_cited.graha', 'transits_cited.position',
-                                'transits_cited.verdict'],
+            'engine_verified': [
+                'transits_cited.graha',
+                'transits_cited.position',
+                'transits_cited.verdict',
+            ],
             'model_interpretation': ['text', 'advice'],
         },
-        'rashis': {item['rasi']: {'text': item['text'],
-                                   'advice': item.get('advice', ''),
-                                   'transits_cited': item['transits_cited']}
-                   for item in items},
+        'rashis': {
+            item['rasi']: {
+                'text': item['text'],
+                'advice': item.get('advice', ''),
+                'transits_cited': item['transits_cited'],
+            }
+            for item in items
+        },
     }

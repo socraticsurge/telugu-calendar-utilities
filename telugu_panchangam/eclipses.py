@@ -33,7 +33,9 @@ def _solar_visible(jd_max: float, geopos: list[float]) -> bool:
     from geopos. sol_eclipse_when_loc finds the next eclipse with any local
     visibility; if its local maximum belongs to this eclipse, it is visible."""
     try:
-        _retflag, tret, _attr = swe.sol_eclipse_when_loc(jd_max - 2.0, geopos, swe.FLG_SWIEPH, False)
+        _retflag, tret, _attr = swe.sol_eclipse_when_loc(
+            jd_max - 2.0, geopos, swe.FLG_SWIEPH, False
+        )
     except Exception:
         return False
     return abs(tret[0] - jd_max) < 0.5
@@ -88,12 +90,8 @@ def _lunar_eclipse(jd_midnight: float, geopos: list[float]) -> dict | None:
     }
 
 
-def list_eclipses_in_range(jd_start: float, jd_end: float) -> list[dict]:
-    """Return all solar and lunar eclipses whose maximum falls within [jd_start, jd_end].
-    Each dict has: kind, subtype, jd_max, jd_start, jd_end.
-    Does NOT compute per-location visibility — that is done in get_eclipse_from_precomputed."""
-    eclipses: list[dict] = []
-
+def _solar_eclipses_in_range(jd_start: float, jd_end: float) -> list[dict]:
+    eclipses = []
     jd = jd_start
     while True:
         try:
@@ -103,15 +101,21 @@ def list_eclipses_in_range(jd_start: float, jd_end: float) -> list[dict]:
         if retflag == 0 or tret[0] > jd_end:
             break
         if tret[0] >= jd_start:
-            eclipses.append({
-                'kind': 'Solar',
-                'subtype': _subtype(retflag, _SOLAR_SUBTYPE_BITS),
-                'jd_max': tret[0],
-                'jd_start': tret[2],
-                'jd_end': tret[3],
-            })
+            eclipses.append(
+                {
+                    'kind': 'Solar',
+                    'subtype': _subtype(retflag, _SOLAR_SUBTYPE_BITS),
+                    'jd_max': tret[0],
+                    'jd_start': tret[2],
+                    'jd_end': tret[3],
+                }
+            )
         jd = tret[0] + 1.0
+    return eclipses
 
+
+def _lunar_eclipses_in_range(jd_start: float, jd_end: float) -> list[dict]:
+    eclipses = []
     jd = jd_start
     while True:
         try:
@@ -122,16 +126,26 @@ def list_eclipses_in_range(jd_start: float, jd_end: float) -> list[dict]:
             break
         jd_s, jd_e = (tret[2], tret[3]) if tret[2] else (tret[6], tret[7])
         if tret[0] >= jd_start:
-            eclipses.append({
-                'kind': 'Lunar',
-                'subtype': _subtype(retflag, _LUNAR_SUBTYPE_BITS),
-                'jd_max': tret[0],
-                'jd_start': jd_s,
-                'jd_end': jd_e,
-            })
+            eclipses.append(
+                {
+                    'kind': 'Lunar',
+                    'subtype': _subtype(retflag, _LUNAR_SUBTYPE_BITS),
+                    'jd_max': tret[0],
+                    'jd_start': jd_s,
+                    'jd_end': jd_e,
+                }
+            )
         jd = tret[0] + 1.0
-
     return eclipses
+
+
+def list_eclipses_in_range(jd_start: float, jd_end: float) -> list[dict]:
+    """Return all solar and lunar eclipses whose maximum falls within [jd_start, jd_end].
+    Each dict has: kind, subtype, jd_max, jd_start, jd_end.
+    Does NOT compute per-location visibility — that is done in get_eclipse_from_precomputed."""
+    return _solar_eclipses_in_range(jd_start, jd_end) + _lunar_eclipses_in_range(
+        jd_start, jd_end
+    )
 
 
 def get_eclipse_from_precomputed(

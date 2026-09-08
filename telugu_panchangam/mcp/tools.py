@@ -1,7 +1,9 @@
 import calendar
 import json
 import logging
+from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from inspect import signature
 from typing import Optional
 
 import pytz
@@ -60,7 +62,7 @@ _END_DATE_ORDER_ERROR = 'end_date must be >= start_date.'
 _TOOL_CALL_FAILED_LOG = 'tool call failed'
 
 _log = logging.getLogger(__name__)
-_MAX_NAME = 80   # max bytes accepted for city/nakshatra/rashi tokens
+_MAX_NAME = 80  # max bytes accepted for city/nakshatra/rashi tokens
 
 _ENGINES = {
     'drik': DrikGanitaEngine(),
@@ -80,6 +82,7 @@ def _get_engine(system: str, ayanamsa: str = 'lahiri'):
     if ayanamsa == 'lahiri':
         return _ENGINES[system]
     return _ENGINE_CLASSES[system](ayanamsa=ayanamsa)
+
 
 _TIMEZONE_COUNTRY = {
     'Asia/Kolkata': 'India',
@@ -153,7 +156,12 @@ def _resolve_city(
             raise ValueError('longitude must be between -180 and 180.')
         if timezone is None:
             timezone = timezone_for_coordinates(float(latitude), float(longitude))
-        return Location(name=city or 'Custom', lat=float(latitude), lon=float(longitude), timezone=timezone)
+        return Location(
+            name=city or 'Custom',
+            lat=float(latitude),
+            lon=float(longitude),
+            timezone=timezone,
+        )
     lat, lon, tz = resolve_location(city)
     return Location(name=city, lat=lat, lon=lon, timezone=tz)
 
@@ -225,7 +233,9 @@ def _eclipse_to_dict(eclipse, tz: str) -> Optional[dict]:
         'sutak': {
             'start': _fmt_time(eclipse.sutak_start, tz),
             'end': _fmt_time(eclipse.sutak_end, tz),
-        } if eclipse.sutak_start is not None else None,
+        }
+        if eclipse.sutak_start is not None
+        else None,
     }
 
 
@@ -245,8 +255,9 @@ def _special_events(day: PanchangamDay) -> list[str]:
         events.append('Soma Pradosham')
     elif day.is_pradosham:
         events.append('Pradosham')
-    if day.sankramanam and not (day.sankramanam == 'Makara'
-                                and 'Makara Sankranti' in day.festivals):
+    if day.sankramanam and not (
+        day.sankramanam == 'Makara' and 'Makara Sankranti' in day.festivals
+    ):
         events.append(f'{day.sankramanam} Sankramanam')
     if day.eclipse:
         events.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
@@ -254,16 +265,18 @@ def _special_events(day: PanchangamDay) -> list[str]:
 
 
 def tool_list_supported_cities() -> str:
-    return json.dumps([
-        {
-            'name': c.name,
-            'latitude': c.lat,
-            'longitude': c.lon,
-            'timezone': c.timezone,
-            'country': _TIMEZONE_COUNTRY.get(c.timezone, 'Unknown'),
-        }
-        for c in CITIES
-    ])
+    return json.dumps(
+        [
+            {
+                'name': c.name,
+                'latitude': c.lat,
+                'longitude': c.lon,
+                'timezone': c.timezone,
+                'country': _TIMEZONE_COUNTRY.get(c.timezone, 'Unknown'),
+            }
+            for c in CITIES
+        ]
+    )
 
 
 def tool_get_panchangam(
@@ -283,79 +296,91 @@ def tool_get_panchangam(
         day = engine.calculate(d, loc)
         tz = loc.timezone
         specials = _special_events(day)
-        return json.dumps({
-            'date': date_str,
-            'city': city,
-            'system': system,
-            'ayanamsa': ayanamsa,
-            'metadata': {
-                'samvatsara': day.samvatsara,
-                'ayanam': day.ayanam,
-                'rituvu': day.rituvu,
-                'maasam': day.maasam,
-                'paksham': day.paksham,
-                'vaaram': day.vaaram,
-                'solar_sign': day.solar_sign,
-                'lunar_sign': day.lunar_sign,
-            },
-            'pancha_anga': {
-                'tithi':          _span_to_dict(day.tithi, tz),
-                'nakshatra':      _span_to_dict(day.nakshatra, tz),
-                'nakshatra_pada': day.nakshatra_pada,
-                'yoga':           _span_to_dict(day.yoga, tz),
-                'karana':         [_span_to_dict(k, tz) for k in day.karana],
-            },
-            'sky': {
-                'sunrise':  _fmt_time(day.sunrise, tz),
-                'sunset':   _fmt_time(day.sunset, tz),
-                'moonrise': _fmt_time(day.moonrise, tz),
-                'moonset':  _fmt_time(day.moonset, tz),
-            },
-            'auspicious': {
-                'brahma_muhurta':  _window_to_dict(day.brahma_muhurta, tz),
-                'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz) if day.abhijit_muhurta else None,
-                'amrita_kalam':    [_window_to_dict(w, tz) for w in day.amrita_kalam],
-            },
-            'inauspicious': {
-                'rahu_kalam':   _window_to_dict(day.rahu_kalam, tz),
-                'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
-                'yamagandam':   _window_to_dict(day.yamagandam, tz),
-                'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
-                'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
-                'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
-            },
-            'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
-            'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
-            'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
-            'choghadiya': [
-                {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
-                for w in day.choghadiya
-            ],
-            'eclipse': _eclipse_to_dict(day.eclipse, tz),
-            'special_yogas': day.special_yogas,
-            'special_days': specials,
-            'is_special': bool(specials),
-            'ghati_clock': (
-                {
-                    'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
-                    'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
-                    'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
-                } if day.ghati_clock else None
-            ),
-            'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
-            'is_khar_maasa': day.is_khar_maasa,
-            'khar_maasa_name': day.khar_maasa_name,
-            'is_pitru_paksha': day.is_pitru_paksha,
-            'simha_stha_guru': day.simha_stha_guru,
-            'simha_stha_shukra': day.simha_stha_shukra,
-            'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
-            'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
-            'anandadi_yoga': day.anandadi_yoga,
-            'disha_shoola_direction': day.disha_shoola_direction,
-            'nakshatra_mukha': day.nakshatra_mukha,
-            'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
-            'provenance': panchangam_provenance(system),
-        })
+        return json.dumps(
+            {
+                'date': date_str,
+                'city': city,
+                'system': system,
+                'ayanamsa': ayanamsa,
+                'metadata': {
+                    'samvatsara': day.samvatsara,
+                    'ayanam': day.ayanam,
+                    'rituvu': day.rituvu,
+                    'maasam': day.maasam,
+                    'paksham': day.paksham,
+                    'vaaram': day.vaaram,
+                    'solar_sign': day.solar_sign,
+                    'lunar_sign': day.lunar_sign,
+                },
+                'pancha_anga': {
+                    'tithi': _span_to_dict(day.tithi, tz),
+                    'nakshatra': _span_to_dict(day.nakshatra, tz),
+                    'nakshatra_pada': day.nakshatra_pada,
+                    'yoga': _span_to_dict(day.yoga, tz),
+                    'karana': [_span_to_dict(k, tz) for k in day.karana],
+                },
+                'sky': {
+                    'sunrise': _fmt_time(day.sunrise, tz),
+                    'sunset': _fmt_time(day.sunset, tz),
+                    'moonrise': _fmt_time(day.moonrise, tz),
+                    'moonset': _fmt_time(day.moonset, tz),
+                },
+                'auspicious': {
+                    'brahma_muhurta': _window_to_dict(day.brahma_muhurta, tz),
+                    'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz)
+                    if day.abhijit_muhurta
+                    else None,
+                    'amrita_kalam': [_window_to_dict(w, tz) for w in day.amrita_kalam],
+                },
+                'inauspicious': {
+                    'rahu_kalam': _window_to_dict(day.rahu_kalam, tz),
+                    'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
+                    'yamagandam': _window_to_dict(day.yamagandam, tz),
+                    'varjyam': [_window_to_dict(w, tz) for w in day.varjyam],
+                    'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+                    'vishaghati': [
+                        _ghati_window_to_dict(w, tz) for w in day.vishaghati
+                    ],
+                },
+                'bhadra_mukha': _ghati_window_to_dict(day.bhadra_mukha, tz),
+                'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
+                'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
+                'choghadiya': [
+                    {
+                        'name': w.name,
+                        'start': _fmt_time(w.start, tz),
+                        'end': _fmt_time(w.end, tz),
+                    }
+                    for w in day.choghadiya
+                ],
+                'eclipse': _eclipse_to_dict(day.eclipse, tz),
+                'special_yogas': day.special_yogas,
+                'special_days': specials,
+                'is_special': bool(specials),
+                'ghati_clock': (
+                    {
+                        'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
+                        'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
+                        'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
+                    }
+                    if day.ghati_clock
+                    else None
+                ),
+                'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
+                'is_khar_maasa': day.is_khar_maasa,
+                'khar_maasa_name': day.khar_maasa_name,
+                'is_pitru_paksha': day.is_pitru_paksha,
+                'simha_stha_guru': day.simha_stha_guru,
+                'simha_stha_shukra': day.simha_stha_shukra,
+                'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
+                'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
+                'anandadi_yoga': day.anandadi_yoga,
+                'disha_shoola_direction': day.disha_shoola_direction,
+                'nakshatra_mukha': day.nakshatra_mukha,
+                'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
+                'provenance': panchangam_provenance(system),
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -377,48 +402,56 @@ def tool_get_muhurta(
         loc = _resolve_city(city, latitude, longitude, timezone)
         day = _ENGINES[system].calculate(d, loc)
         tz = loc.timezone
-        return json.dumps({
-            'date': date_str,
-            'city': city,
-            'system': system,
-            'auspicious': {
-                'brahma_muhurta':  _window_to_dict(day.brahma_muhurta, tz),
-                'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz) if day.abhijit_muhurta else None,
-                'amrita_kalam':    [_window_to_dict(w, tz) for w in day.amrita_kalam],
-            },
-            'inauspicious': {
-                'rahu_kalam':   _window_to_dict(day.rahu_kalam, tz),
-                'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
-                'yamagandam':   _window_to_dict(day.yamagandam, tz),
-                'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
-                'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
-                'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
-            },
-            'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
-            'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
-            'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
-            'nakshatra_pada': day.nakshatra_pada,
-            'ghati_clock': (
-                {
-                    'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
-                    'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
-                    'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
-                } if day.ghati_clock else None
-            ),
-            'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
-            'is_khar_maasa': day.is_khar_maasa,
-            'khar_maasa_name': day.khar_maasa_name,
-            'is_pitru_paksha': day.is_pitru_paksha,
-            'simha_stha_guru': day.simha_stha_guru,
-            'simha_stha_shukra': day.simha_stha_shukra,
-            'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
-            'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
-            'anandadi_yoga': day.anandadi_yoga,
-            'disha_shoola_direction': day.disha_shoola_direction,
-            'nakshatra_mukha': day.nakshatra_mukha,
-            'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
-            'provenance': panchangam_provenance(system),
-        })
+        return json.dumps(
+            {
+                'date': date_str,
+                'city': city,
+                'system': system,
+                'auspicious': {
+                    'brahma_muhurta': _window_to_dict(day.brahma_muhurta, tz),
+                    'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz)
+                    if day.abhijit_muhurta
+                    else None,
+                    'amrita_kalam': [_window_to_dict(w, tz) for w in day.amrita_kalam],
+                },
+                'inauspicious': {
+                    'rahu_kalam': _window_to_dict(day.rahu_kalam, tz),
+                    'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
+                    'yamagandam': _window_to_dict(day.yamagandam, tz),
+                    'varjyam': [_window_to_dict(w, tz) for w in day.varjyam],
+                    'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
+                    'vishaghati': [
+                        _ghati_window_to_dict(w, tz) for w in day.vishaghati
+                    ],
+                },
+                'bhadra_mukha': _ghati_window_to_dict(day.bhadra_mukha, tz),
+                'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
+                'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
+                'nakshatra_pada': day.nakshatra_pada,
+                'ghati_clock': (
+                    {
+                        'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
+                        'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
+                        'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
+                    }
+                    if day.ghati_clock
+                    else None
+                ),
+                'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
+                'is_khar_maasa': day.is_khar_maasa,
+                'khar_maasa_name': day.khar_maasa_name,
+                'is_pitru_paksha': day.is_pitru_paksha,
+                'simha_stha_guru': day.simha_stha_guru,
+                'simha_stha_shukra': day.simha_stha_shukra,
+                'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
+                'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
+                'anandadi_yoga': day.anandadi_yoga,
+                'disha_shoola_direction': day.disha_shoola_direction,
+                'nakshatra_mukha': day.nakshatra_mukha,
+                'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
+                'provenance': panchangam_provenance(system),
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -441,15 +474,21 @@ def tool_get_daily_horas(
         day = _ENGINES[system].calculate(d, loc)
         tz = loc.timezone
         horas = get_horas(day)
-        return json.dumps({
-            'date': date_str,
-            'city': city,
-            'system': system,
-            'horas': [
-                {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
-                for w in horas
-            ]
-        })
+        return json.dumps(
+            {
+                'date': date_str,
+                'city': city,
+                'system': system,
+                'horas': [
+                    {
+                        'name': w.name,
+                        'start': _fmt_time(w.start, tz),
+                        'end': _fmt_time(w.end, tz),
+                    }
+                    for w in horas
+                ],
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -472,15 +511,21 @@ def tool_get_lagna_transitions(
         day = _ENGINES[system].calculate(d, loc)
         tz = loc.timezone
         lagnas = get_lagna_transitions(day)
-        return json.dumps({
-            'date': date_str,
-            'city': city,
-            'system': system,
-            'lagnas': [
-                {'name': w.name, 'start': _fmt_time(w.start, tz), 'end': _fmt_time(w.end, tz)}
-                for w in lagnas
-            ]
-        })
+        return json.dumps(
+            {
+                'date': date_str,
+                'city': city,
+                'system': system,
+                'lagnas': [
+                    {
+                        'name': w.name,
+                        'start': _fmt_time(w.start, tz),
+                        'end': _fmt_time(w.end, tz),
+                    }
+                    for w in lagnas
+                ],
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -505,7 +550,9 @@ def tool_get_panchangam_range(
         if end < start:
             raise ValueError(_END_DATE_ORDER_ERROR)
         if (end - start).days > 30:
-            raise ValueError("Date range exceeds 31-day limit. Use multiple calls for longer spans.")
+            raise ValueError(
+                'Date range exceeds 31-day limit. Use multiple calls for longer spans.'
+            )
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
         engine = _get_engine(system, ayanamsa)
@@ -515,67 +562,85 @@ def tool_get_panchangam_range(
         calculated_days = engine.calculate_bulk(start, days_count, loc)
 
         days = []
-        for d, day in zip([start + timedelta(days=i) for i in range(days_count)], calculated_days):
+        for d, day in zip(
+            [start + timedelta(days=i) for i in range(days_count)], calculated_days
+        ):
             specials = _special_events(day)
-            days.append({
-                'date': d.isoformat(),
-                'vaaram': day.vaaram,
-                'tithi': day.tithi.name,
-                'nakshatra': day.nakshatra.name,
-                'yoga': day.yoga.name,
-                'sunrise': _fmt_time(day.sunrise, tz),
-                'sunset': _fmt_time(day.sunset, tz),
-                'auspicious': {
-                    'brahma_muhurta':  _window_to_dict(day.brahma_muhurta, tz),
-                    'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz) if day.abhijit_muhurta else None,
-                    'amrita_kalam':    [_window_to_dict(w, tz) for w in day.amrita_kalam],
-                },
-                'inauspicious': {
-                    'rahu_kalam':   _window_to_dict(day.rahu_kalam, tz),
-                    'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
-                    'yamagandam':   _window_to_dict(day.yamagandam, tz),
-                    'varjyam':      [_window_to_dict(w, tz) for w in day.varjyam],
-                    'durmuhurtham': [_window_to_dict(w, tz) for w in day.durmuhurtham],
-                    'vishaghati':   [_ghati_window_to_dict(w, tz) for w in day.vishaghati],
-                },
-                'bhadra_mukha':  _ghati_window_to_dict(day.bhadra_mukha, tz),
-                'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
-                'sankramana_avoidance': _window_to_dict(day.sankramana_avoidance, tz),
-                'nakshatra_pada': day.nakshatra_pada,
-                'ghati_clock': (
-                    {
-                        'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
-                        'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
-                        'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
-                    } if day.ghati_clock else None
-                ),
-                'eclipse': _eclipse_to_dict(day.eclipse, tz),
-                'special_yogas': day.special_yogas,
-                'special_days': specials,
-                'is_special': bool(specials),
-                'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
-                'is_khar_maasa': day.is_khar_maasa,
-                'khar_maasa_name': day.khar_maasa_name,
-                'is_pitru_paksha': day.is_pitru_paksha,
-                'simha_stha_guru': day.simha_stha_guru,
-                'simha_stha_shukra': day.simha_stha_shukra,
-                'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
-                'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
-                'anandadi_yoga': day.anandadi_yoga,
-                'disha_shoola_direction': day.disha_shoola_direction,
-                'nakshatra_mukha': day.nakshatra_mukha,
-                'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
-            })
+            days.append(
+                {
+                    'date': d.isoformat(),
+                    'vaaram': day.vaaram,
+                    'tithi': day.tithi.name,
+                    'nakshatra': day.nakshatra.name,
+                    'yoga': day.yoga.name,
+                    'sunrise': _fmt_time(day.sunrise, tz),
+                    'sunset': _fmt_time(day.sunset, tz),
+                    'auspicious': {
+                        'brahma_muhurta': _window_to_dict(day.brahma_muhurta, tz),
+                        'abhijit_muhurta': _window_to_dict(day.abhijit_muhurta, tz)
+                        if day.abhijit_muhurta
+                        else None,
+                        'amrita_kalam': [
+                            _window_to_dict(w, tz) for w in day.amrita_kalam
+                        ],
+                    },
+                    'inauspicious': {
+                        'rahu_kalam': _window_to_dict(day.rahu_kalam, tz),
+                        'gulika_kalam': _window_to_dict(day.gulika_kalam, tz),
+                        'yamagandam': _window_to_dict(day.yamagandam, tz),
+                        'varjyam': [_window_to_dict(w, tz) for w in day.varjyam],
+                        'durmuhurtham': [
+                            _window_to_dict(w, tz) for w in day.durmuhurtham
+                        ],
+                        'vishaghati': [
+                            _ghati_window_to_dict(w, tz) for w in day.vishaghati
+                        ],
+                    },
+                    'bhadra_mukha': _ghati_window_to_dict(day.bhadra_mukha, tz),
+                    'bhadra_puchha': _ghati_window_to_dict(day.bhadra_puchha, tz),
+                    'sankramana_avoidance': _window_to_dict(
+                        day.sankramana_avoidance, tz
+                    ),
+                    'nakshatra_pada': day.nakshatra_pada,
+                    'ghati_clock': (
+                        {
+                            'sunrise': _fmt_time(day.ghati_clock.sunrise, tz),
+                            'next_sunrise': _fmt_time(day.ghati_clock.next_sunrise, tz),
+                            'seconds_per_ghati': day.ghati_clock.seconds_per_ghati,
+                        }
+                        if day.ghati_clock
+                        else None
+                    ),
+                    'eclipse': _eclipse_to_dict(day.eclipse, tz),
+                    'special_yogas': day.special_yogas,
+                    'special_days': specials,
+                    'is_special': bool(specials),
+                    'in_panchaka_nakshatra': day.in_panchaka_nakshatra,
+                    'is_khar_maasa': day.is_khar_maasa,
+                    'khar_maasa_name': day.khar_maasa_name,
+                    'is_pitru_paksha': day.is_pitru_paksha,
+                    'simha_stha_guru': day.simha_stha_guru,
+                    'simha_stha_shukra': day.simha_stha_shukra,
+                    'guru_maudhya': _maudhya_to_dict(day.guru_maudhya),
+                    'shukra_maudhya': _maudhya_to_dict(day.shukra_maudhya),
+                    'anandadi_yoga': day.anandadi_yoga,
+                    'disha_shoola_direction': day.disha_shoola_direction,
+                    'nakshatra_mukha': day.nakshatra_mukha,
+                    'panchaka_rahita': _panchaka_to_dict(day.panchaka_rahita),
+                }
+            )
 
-        return json.dumps({
-            'start_date': start_date,
-            'end_date': end_date,
-            'city': city,
-            'system': system,
-            'ayanamsa': ayanamsa,
-            'days': days,
-            'provenance': panchangam_provenance(system),
-        })
+        return json.dumps(
+            {
+                'start_date': start_date,
+                'end_date': end_date,
+                'city': city,
+                'system': system,
+                'ayanamsa': ayanamsa,
+                'days': days,
+                'provenance': panchangam_provenance(system),
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -594,7 +659,7 @@ def tool_get_special_days(
 ) -> str:
     try:
         if not 1 <= month <= 12:
-            raise ValueError(f"Invalid month {month}. Must be 1–12.")
+            raise ValueError(f'Invalid month {month}. Must be 1–12.')
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
         engine = _ENGINES[system]
@@ -615,29 +680,85 @@ def tool_get_special_days(
             day.eclipse = get_eclipse_from_precomputed(d, precomputed_eclipses, loc)
 
             is_notable = (
-                day.is_ekadashi or day.is_amavasya or day.is_pournami
-                or day.is_pradosham or day.is_sankranti or day.eclipse is not None
+                day.is_ekadashi
+                or day.is_amavasya
+                or day.is_pournami
+                or day.is_pradosham
+                or day.is_sankranti
+                or day.eclipse is not None
             )
             if is_notable:
                 events = _special_events(day)
-                special_days.append({
-                    'date': d.isoformat(),
-                    'tithi': day.tithi.name,
-                    'events': events,
-                    'special_yogas': day.special_yogas,
-                })
-        return json.dumps({
-            'year': year,
-            'month': month,
-            'city': city,
-            'system': system,
-            'special_days': special_days,
-        })
+                special_days.append(
+                    {
+                        'date': d.isoformat(),
+                        'tithi': day.tithi.name,
+                        'events': events,
+                        'special_yogas': day.special_yogas,
+                    }
+                )
+        return json.dumps(
+            {
+                'year': year,
+                'month': month,
+                'city': city,
+                'system': system,
+                'special_days': special_days,
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
         _log.exception(_TOOL_CALL_FAILED_LOG)
         return json.dumps({'error': _CALCULATION_FAILED_ERROR})
+
+
+def _validate_tarabalam_rashis(
+    janma_rasis: Optional[list],
+    janma_nakshatras: list,
+) -> None:
+    if janma_rasis is None:
+        return
+    if len(janma_rasis) != len(janma_nakshatras):
+        raise ValueError(
+            'janma_rasis must align with janma_nakshatras '
+            '(use null for people whose rashi is unknown).'
+        )
+    for rashi in janma_rasis:
+        if rashi:
+            if not isinstance(rashi, str) or len(rashi) > _MAX_NAME:
+                raise ValueError('Invalid rashi name.')
+            _rasi_index(rashi)
+
+
+def _validate_tarabalam_inputs(
+    janma_nakshatras: list,
+    janma_rasis: Optional[list],
+    days: int,
+    chandra_mode: str,
+) -> None:
+    if chandra_mode not in ('stars', 'puja_ok', 'strict'):
+        raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
+    if not 1 <= len(janma_nakshatras) <= 4:
+        raise ValueError('Provide 1 to 4 janma nakshatras.')
+    if not 1 <= days <= 60:
+        raise ValueError('days must be between 1 and 60.')
+    for nakshatra in janma_nakshatras:
+        if not isinstance(nakshatra, str) or len(nakshatra) > _MAX_NAME:
+            raise ValueError('Invalid nakshatra name.')
+        _nak_index(nakshatra)
+    _validate_tarabalam_rashis(janma_rasis, janma_nakshatras)
+
+
+def _tarabalam_is_good(tara: dict, chandra_mode: str) -> bool:
+    if not tara['auspicious']:
+        return False
+    verdict = tara.get('chandra', {}).get('verdict')
+    if verdict is None or chandra_mode == 'stars':
+        return True
+    if chandra_mode == 'puja_ok':
+        return verdict != 'bad'
+    return verdict == 'good'
 
 
 def tool_find_tarabalam_days(
@@ -653,25 +774,7 @@ def tool_find_tarabalam_days(
     chandra_mode: str = 'stars',
 ) -> str:
     try:
-        if chandra_mode not in ('stars', 'puja_ok', 'strict'):
-            raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
-        if not 1 <= len(janma_nakshatras) <= 4:
-            raise ValueError('Provide 1 to 4 janma nakshatras.')
-        if not 1 <= days <= 60:
-            raise ValueError('days must be between 1 and 60.')
-        for nak in janma_nakshatras:
-            if not isinstance(nak, str) or len(nak) > _MAX_NAME:
-                raise ValueError('Invalid nakshatra name.')
-            _nak_index(nak)  # raises with the canonical list on a misspelling
-        if janma_rasis is not None:
-            if len(janma_rasis) != len(janma_nakshatras):
-                raise ValueError('janma_rasis must align with janma_nakshatras '
-                                 '(use null for people whose rashi is unknown).')
-            for r in janma_rasis:
-                if r:
-                    if not isinstance(r, str) or len(r) > _MAX_NAME:
-                        raise ValueError('Invalid rashi name.')
-                    _rasi_index(r)
+        _validate_tarabalam_inputs(janma_nakshatras, janma_rasis, days, chandra_mode)
         start = _parse_date(start_date)
         _validate_system(system)
         loc = _resolve_city(city, latitude, longitude, timezone)
@@ -688,41 +791,40 @@ def tool_find_tarabalam_days(
                 for t, rasi in zip(taras, janma_rasis):
                     if rasi:
                         pos = chandra_position(rasi, day.lunar_sign)
-                        t['chandra'] = {'position': pos, 'verdict': chandra_verdict(pos)}
-            def _ok(t):
-                if not t['auspicious']:
-                    return False
-                v = t.get('chandra', {}).get('verdict')
-                if v is None or chandra_mode == 'stars':
-                    return True
-                if chandra_mode == 'puja_ok':
-                    return v != 'bad'
-                return v == 'good'
-            all_good = all(_ok(t) for t in taras)
+                        t['chandra'] = {
+                            'position': pos,
+                            'verdict': chandra_verdict(pos),
+                        }
+            all_good = all(_tarabalam_is_good(tara, chandra_mode) for tara in taras)
             if all_good:
                 good_dates.append(d.isoformat())
-            out_days.append({
-                'date': d.isoformat(),
-                'vaaram': day.vaaram,
-                'nakshatra': nak,
-                'nakshatra_until': _fmt_time(day.nakshatra.end, loc.timezone),
-                'tithi': day.tithi.name,
-                'taras': taras,
-                'good_for_all': all_good,
-            })
-        return json.dumps({
-            'janma_nakshatras': list(janma_nakshatras),
-            'city': city, 'system': system,
-            'tara_convention': 'auspicious: 2 Sampat, 4 Kshema, 6 Sadhana, 8 Mitra, 9 Parama Mitra; '
-                               'avoid: 1 Janma, 3 Vipat, 5 Pratyak, 7 Naidhana. '
-                               'Day labelled by the sunrise nakshatra; it changes at nakshatra_until.',
-            'chandra_convention': 'when janma_rasis given: positions 1,3,6,7,10,11 good; '
-                                  '2,5,9 workable with remedial puja; 4,8,12 avoid (8 is Ashtama Chandra). '
-                                  f'chandra_mode={chandra_mode}: stars=chandra annotates only, '
-                                  'puja_ok=moon-avoid days dropped, strict=moon must be good.',
-            'days': out_days,
-            'good_for_all_dates': good_dates,
-        })
+            out_days.append(
+                {
+                    'date': d.isoformat(),
+                    'vaaram': day.vaaram,
+                    'nakshatra': nak,
+                    'nakshatra_until': _fmt_time(day.nakshatra.end, loc.timezone),
+                    'tithi': day.tithi.name,
+                    'taras': taras,
+                    'good_for_all': all_good,
+                }
+            )
+        return json.dumps(
+            {
+                'janma_nakshatras': list(janma_nakshatras),
+                'city': city,
+                'system': system,
+                'tara_convention': 'auspicious: 2 Sampat, 4 Kshema, 6 Sadhana, 8 Mitra, 9 Parama Mitra; '
+                'avoid: 1 Janma, 3 Vipat, 5 Pratyak, 7 Naidhana. '
+                'Day labelled by the sunrise nakshatra; it changes at nakshatra_until.',
+                'chandra_convention': 'when janma_rasis given: positions 1,3,6,7,10,11 good; '
+                '2,5,9 workable with remedial puja; 4,8,12 avoid (8 is Ashtama Chandra). '
+                f'chandra_mode={chandra_mode}: stars=chandra annotates only, '
+                'puja_ok=moon-avoid days dropped, strict=moon must be good.',
+                'days': out_days,
+                'good_for_all_dates': good_dates,
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -740,19 +842,22 @@ def tool_get_graha_positions(
 ) -> str:
     try:
         from telugu_panchangam.engines.utils import _validate_ayanamsa
+
         _validate_ayanamsa(ayanamsa)
         d = _parse_date(date_str)
         loc = _resolve_city(city, latitude, longitude, timezone)
         geopos = [loc.lon, loc.lat, 0.0]
         jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), geopos)
-        return json.dumps({
-            'date': date_str,
-            'city': city,
-            'at': 'sunrise',
-            'sunrise': _fmt_time(jd_to_utc(jd_sunrise), loc.timezone),
-            'ayanamsa': ayanamsa,
-            'grahas': graha_positions(jd_sunrise, ayanamsa),
-        })
+        return json.dumps(
+            {
+                'date': date_str,
+                'city': city,
+                'at': 'sunrise',
+                'sunrise': _fmt_time(jd_to_utc(jd_sunrise), loc.timezone),
+                'ayanamsa': ayanamsa,
+                'grahas': graha_positions(jd_sunrise, ayanamsa),
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -771,36 +876,49 @@ def tool_get_gochara(
 ) -> str:
     try:
         from telugu_panchangam.engines.utils import _validate_ayanamsa
+
         _validate_ayanamsa(ayanamsa)
         _rasi_index(janma_rasi)
         d = _parse_date(date_str)
         loc = _resolve_city(city, latitude, longitude, timezone)
-        jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0])
+        jd_sunrise = get_sunrise(
+            local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0]
+        )
         positions = graha_positions(jd_sunrise, ayanamsa)
         sky = {p['graha']: p['rasi'] for p in positions}
         verdicts = {v['graha']: v for v in gochara_for(janma_rasi, sky)}
         merged = []
         for p in positions:
             v = verdicts[p['graha']]
-            merged.append({**p, 'position_from_janma_rasi': v['position'],
-                           'verdict': v['verdict'], 'vedha_by': v['vedha_by']})
-        return json.dumps({
-            'date': date_str, 'city': city, 'janma_rasi': janma_rasi,
-            'convention': 'Transit houses are counted from the natal Moon sign. '
-                          'Brihat Samhita 104.4 supports favourable houses for the '
-                          'seven classical grahas. Phaladeepika 26.3-8 supports '
-                          'the Vedha pairs and classical exemptions. The configured '
-                          'Rahu/Ketu houses (3, 6, 11) conflict with Phaladeepika '
-                          '26.2, which treats both like Surya and therefore includes '
-                          'the 10th; node Vedha remains unverified. Phaladeepika '
-                          '26.1 and 26.22-23 support the Moon-sign reference and '
-                          'underlying Shani-house effects, not the conventional '
-                          'condition names, phase labels or advice. '
-                          'Positions are at sunrise. Gochara is one factor — not a muhurta.',
-            'provenance': GOCHARA_PROVENANCE,
-            'conditions': named_conditions(janma_rasi, sky),
-            'gochara': merged,
-        })
+            merged.append(
+                {
+                    **p,
+                    'position_from_janma_rasi': v['position'],
+                    'verdict': v['verdict'],
+                    'vedha_by': v['vedha_by'],
+                }
+            )
+        return json.dumps(
+            {
+                'date': date_str,
+                'city': city,
+                'janma_rasi': janma_rasi,
+                'convention': 'Transit houses are counted from the natal Moon sign. '
+                'Brihat Samhita 104.4 supports favourable houses for the '
+                'seven classical grahas. Phaladeepika 26.3-8 supports '
+                'the Vedha pairs and classical exemptions. The configured '
+                'Rahu/Ketu houses (3, 6, 11) conflict with Phaladeepika '
+                '26.2, which treats both like Surya and therefore includes '
+                'the 10th; node Vedha remains unverified. Phaladeepika '
+                '26.1 and 26.22-23 support the Moon-sign reference and '
+                'underlying Shani-house effects, not the conventional '
+                'condition names, phase labels or advice. '
+                'Positions are at sunrise. Gochara is one factor — not a muhurta.',
+                'provenance': GOCHARA_PROVENANCE,
+                'conditions': named_conditions(janma_rasi, sky),
+                'gochara': merged,
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -820,25 +938,35 @@ def tool_get_rasi_phalalu(
 ) -> str:
     try:
         from telugu_panchangam.engines.utils import _validate_ayanamsa
+
         _validate_ayanamsa(ayanamsa)
         _rasi_index(janma_rasi)
         if janma_nakshatra:
             _nak_index(janma_nakshatra)
         d = _parse_date(date_str)
         loc = _resolve_city(city, latitude, longitude, timezone)
-        jd_sunrise = get_sunrise(local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0])
+        jd_sunrise = get_sunrise(
+            local_midnight_jd(d, loc.timezone), [loc.lon, loc.lat, 0.0]
+        )
         positions = graha_positions(jd_sunrise, ayanamsa)
         sky = {p['graha']: p['rasi'] for p in positions}
         day_nak = next(p['nakshatra'] for p in positions if p['graha'] == 'Chandra')
-        out = rasi_phalalu(janma_rasi, sky,
-                           janma_nakshatra=janma_nakshatra,
-                           day_nakshatra=day_nak if janma_nakshatra else None)
-        out.update({
-            'date': date_str, 'city': city, 'day_nakshatra': day_nak,
-            'disclaimer': 'Every line is rendered from computed gochara/chandrabalam/'
-                          'tarabalam facts (Brihat Samhita conventions, sunrise positions). '
-                          'This is a daily reading, not a horoscope consultation or a muhurta.',
-        })
+        out = rasi_phalalu(
+            janma_rasi,
+            sky,
+            janma_nakshatra=janma_nakshatra,
+            day_nakshatra=day_nak if janma_nakshatra else None,
+        )
+        out.update(
+            {
+                'date': date_str,
+                'city': city,
+                'day_nakshatra': day_nak,
+                'disclaimer': 'Every line is rendered from computed gochara/chandrabalam/'
+                'tarabalam facts (Brihat Samhita conventions, sunrise positions). '
+                'This is a daily reading, not a horoscope consultation or a muhurta.',
+            }
+        )
         return json.dumps(out)
     except ValueError as e:
         return json.dumps({'error': str(e)})
@@ -863,7 +991,12 @@ def _resolve_city_with_alt(
             raise ValueError('longitude must be between -180 and 180.')
         if timezone is None:
             timezone = timezone_for_coordinates(float(latitude), float(longitude))
-        return Location(name=city or 'Custom', lat=float(latitude), lon=float(longitude), timezone=timezone)
+        return Location(
+            name=city or 'Custom',
+            lat=float(latitude),
+            lon=float(longitude),
+            timezone=timezone,
+        )
     known = next((c for c in CITIES if c.name.lower() == (city or '').lower()), None)
     if known:
         return known
@@ -902,34 +1035,68 @@ def tool_get_combustion_calendar(
                 return None
             return dt.astimezone(pytz.timezone(tz_s)).strftime('%Y-%m-%d %H:%M')
 
-        return json.dumps({
-            'start_date': start_date,
-            'end_date': end_date,
-            'city': city,
-            'timezone': tz_str,
-            'note': (
-                'Heliacal Asta (planet becomes invisible near the Sun) and Udaya '
-                '(re-emergence) computed via Swiss Ephemeris sky-visibility criterion. '
-                'This matches the Drik Panchang Asta/Udaya calendar, not the fixed '
-                'BPHS elongation Maudhya thresholds used in per-day combustion flags. '
-                'Accuracy: within 1-2 days of Drik Panchang for most events; '
-                'Mars ±2 days. ongoing=true means the planet is still combust at end_date.'
-            ),
-            'periods': [
-                {
-                    'planet': p.planet,
-                    'asta': _fmt_dt(p.enters, tz_str),
-                    'udaya': _fmt_dt(p.exits, tz_str) if p.exits else None,
-                    'ongoing': p.exits is None,
-                }
-                for p in periods
-            ],
-        })
+        return json.dumps(
+            {
+                'start_date': start_date,
+                'end_date': end_date,
+                'city': city,
+                'timezone': tz_str,
+                'note': (
+                    'Heliacal Asta (planet becomes invisible near the Sun) and Udaya '
+                    '(re-emergence) computed via Swiss Ephemeris sky-visibility criterion. '
+                    'This matches the Drik Panchang Asta/Udaya calendar, not the fixed '
+                    'BPHS elongation Maudhya thresholds used in per-day combustion flags. '
+                    'Accuracy: within 1-2 days of Drik Panchang for most events; '
+                    'Mars ±2 days. ongoing=true means the planet is still combust at end_date.'
+                ),
+                'periods': [
+                    {
+                        'planet': p.planet,
+                        'asta': _fmt_dt(p.enters, tz_str),
+                        'udaya': _fmt_dt(p.exits, tz_str) if p.exits else None,
+                        'ongoing': p.exits is None,
+                    }
+                    for p in periods
+                ],
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
         _log.exception(_TOOL_CALL_FAILED_LOG)
         return json.dumps({'error': _CALCULATION_FAILED_ERROR})
+
+
+def _validate_nakshatras(values: Optional[list]) -> None:
+    if not values:
+        return
+    if len(values) > 4:
+        raise ValueError('Provide at most 4 janma nakshatras.')
+    for value in values:
+        if not isinstance(value, str) or len(value) > _MAX_NAME:
+            raise ValueError('Invalid nakshatra name.')
+        _nak_index(value)
+
+
+def _validate_aligned_rashis(
+    label: str,
+    values: Optional[list],
+    janma_nakshatras: Optional[list],
+) -> None:
+    if values is None:
+        return
+    unknown_kind = 'lagna' if label == 'janma_lagnas' else 'rashi'
+    if not janma_nakshatras or len(values) != len(janma_nakshatras):
+        raise ValueError(
+            f'{label} must align with janma_nakshatras '
+            f'(use null for people whose {unknown_kind} is unknown).'
+        )
+    for value in values:
+        if value is not None:
+            if not isinstance(value, str) or len(value) > _MAX_NAME:
+                kind = 'lagna rashi' if label == 'janma_lagnas' else 'rashi'
+                raise ValueError(f'Invalid {kind} name.')
+            _rasi_index(value)
 
 
 def _validate_muhurta_inputs(
@@ -946,31 +1113,29 @@ def _validate_muhurta_inputs(
         raise ValueError(f'activity must be one of {ACTIVITIES}.')
     if chandra_mode not in ('stars', 'puja_ok', 'strict'):
         raise ValueError("chandra_mode must be 'stars', 'puja_ok' or 'strict'.")
-    if janma_nakshatras:
-        if len(janma_nakshatras) > 4:
-            raise ValueError('Provide at most 4 janma nakshatras.')
-        for nak in janma_nakshatras:
-            if not isinstance(nak, str) or len(nak) > _MAX_NAME:
-                raise ValueError('Invalid nakshatra name.')
-            _nak_index(nak)
-    if janma_rasis is not None:
-        if not janma_nakshatras or len(janma_rasis) != len(janma_nakshatras):
-            raise ValueError('janma_rasis must align with janma_nakshatras '
-                             '(use null for people whose rashi is unknown).')
-        for r in janma_rasis:
-            if r is not None:
-                if not isinstance(r, str) or len(r) > _MAX_NAME:
-                    raise ValueError('Invalid rashi name.')
-                _rasi_index(r)
-    if janma_lagnas is not None:
-        if not janma_nakshatras or len(janma_lagnas) != len(janma_nakshatras):
-            raise ValueError('janma_lagnas must align with janma_nakshatras '
-                             '(use null for people whose lagna is unknown).')
-        for lagna in janma_lagnas:
-            if lagna is not None:
-                if not isinstance(lagna, str) or len(lagna) > _MAX_NAME:
-                    raise ValueError('Invalid lagna rashi name.')
-                _rasi_index(lagna)
+    _validate_nakshatras(janma_nakshatras)
+    _validate_aligned_rashis('janma_rasis', janma_rasis, janma_nakshatras)
+    _validate_aligned_rashis('janma_lagnas', janma_lagnas, janma_nakshatras)
+
+
+def _precalculate_muhurta_days(
+    start: date,
+    days: int,
+    extra: int,
+    loc: Location,
+    engine: object,
+) -> dict[int, object]:
+    end_date = start + timedelta(days=days - 1)
+    jd_start = local_midnight_jd(start, loc.timezone)
+    jd_end = local_midnight_jd(end_date + timedelta(days=1 + extra), loc.timezone)
+    eclipses = list_eclipses_in_range(jd_start, jd_end)
+    calculated = {}
+    for index in range(days + extra):
+        current = start + timedelta(days=index)
+        day = engine.calculate(current, loc, include_eclipse=False)
+        day.eclipse = get_eclipse_from_precomputed(current, eclipses, loc)
+        calculated[index] = day
+    return calculated
 
 
 def _gather_muhurta_slots(
@@ -993,18 +1158,7 @@ def _gather_muhurta_slots(
     # When include_night=True we need the day after the last requested day
     # to get next_sunrise for the final night's blocks.
     extra = 1 if include_night else 0
-    end_date = start + timedelta(days=days - 1)
-    jd_start_range = local_midnight_jd(start, loc.timezone)
-    jd_end_range = local_midnight_jd(end_date + timedelta(days=1 + extra), loc.timezone)
-    eclipses_in_range = list_eclipses_in_range(jd_start_range, jd_end_range)
-
-    # Pre-calculate all needed days (+ one extra when include_night=True)
-    calculated_days = {}
-    for i in range(days + extra):
-        d = start + timedelta(days=i)
-        pd = engine.calculate(d, loc, include_eclipse=False)
-        pd.eclipse = get_eclipse_from_precomputed(d, eclipses_in_range, loc)
-        calculated_days[i] = pd
+    calculated_days = _precalculate_muhurta_days(start, days, extra, loc, engine)
 
     for i in range(days):
         day = calculated_days[i]
@@ -1013,61 +1167,212 @@ def _gather_muhurta_slots(
             from telugu_panchangam.personal.muhurta import (
                 karnavedha_daylight_assessment,
             )
+
             daylight_assessment = karnavedha_daylight_assessment(
-                day, get_activity_rules(activity), activity)
-        day_results = day_slots(day, activity=activity,
-                                janma_nakshatras=janma_nakshatras,
-                                janma_rasis=janma_rasis,
-                                janma_lagnas=janma_lagnas,
-                                chandra_mode=chandra_mode,
-                                travel_direction=travel_direction,
-                                engine=engine,
-                                _daylight_assessment=daylight_assessment)
+                day, get_activity_rules(activity), activity
+            )
+        day_results = day_slots(
+            day,
+            activity=activity,
+            janma_nakshatras=janma_nakshatras,
+            janma_rasis=janma_rasis,
+            janma_lagnas=janma_lagnas,
+            chandra_mode=chandra_mode,
+            travel_direction=travel_direction,
+            engine=engine,
+            _daylight_assessment=daylight_assessment,
+        )
         night_results = []
         if include_night:
             next_pd = calculated_days[i + 1]
-            night_results = night_slots(day, next_pd, activity=activity,
-                                        janma_nakshatras=janma_nakshatras,
-                                        janma_rasis=janma_rasis,
-                                        janma_lagnas=janma_lagnas,
-                                        chandra_mode=chandra_mode,
-                                        travel_direction=travel_direction,
-                                        engine=engine)
+            night_results = night_slots(
+                day,
+                next_pd,
+                activity=activity,
+                janma_nakshatras=janma_nakshatras,
+                janma_rasis=janma_rasis,
+                janma_lagnas=janma_lagnas,
+                chandra_mode=chandra_mode,
+                travel_direction=travel_direction,
+                engine=engine,
+            )
         if not day_results and not night_results:
-            reason = diagnose_day(day, activity=activity,
-                                  janma_nakshatras=janma_nakshatras,
-                                  janma_rasis=janma_rasis,
-                                  chandra_mode=chandra_mode,
-                                  travel_direction=travel_direction,
-                                  _daylight_assessment=daylight_assessment)
+            reason = diagnose_day(
+                day,
+                activity=activity,
+                janma_nakshatras=janma_nakshatras,
+                janma_rasis=janma_rasis,
+                chandra_mode=chandra_mode,
+                travel_direction=travel_direction,
+                _daylight_assessment=daylight_assessment,
+            )
             if reason:
                 dropped = {'date': day.date.isoformat(), 'reason': reason}
                 if daylight_assessment is not None:
                     dropped['daylight_outcomes'] = daylight_assessment['outcomes']
                 dropped_days.append(dropped)
         for s in day_results + night_results:
-            slots.append({**s, 'start': _fmt_time(s['start'], tz),
-                          'end': _fmt_time(s['end'], tz)})
+            slots.append(
+                {
+                    **s,
+                    'start': _fmt_time(s['start'], tz),
+                    'end': _fmt_time(s['end'], tz),
+                }
+            )
     return slots, dropped_days
 
 
-def tool_find_muhurta(
-    start_date: str,
-    days: int = 7,
-    activity: str = 'any',
-    city: str = 'Hyderabad',
-    system: str = 'drik',
-    janma_nakshatras: Optional[list] = None,
-    janma_rasis: Optional[list] = None,
-    janma_lagnas: Optional[list] = None,
-    chandra_mode: str = 'stars',
-    latitude: Optional[float] = None,
-    longitude: Optional[float] = None,
-    timezone: Optional[str] = None,
-    ayanamsa: str = 'lahiri',
-    travel_direction: Optional[str] = None,
-    include_night: bool = False,
-) -> str:
+@dataclass(frozen=True)
+class _FindMuhurtaRequest:
+    start_date: str
+    days: int = 7
+    activity: str = 'any'
+    city: str = 'Hyderabad'
+    system: str = 'drik'
+    janma_nakshatras: Optional[list] = None
+    janma_rasis: Optional[list] = None
+    janma_lagnas: Optional[list] = None
+    chandra_mode: str = 'stars'
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    timezone: Optional[str] = None
+    ayanamsa: str = 'lahiri'
+    travel_direction: Optional[str] = None
+    include_night: bool = False
+
+
+def _run_find_muhurta(request: _FindMuhurtaRequest) -> str:
+    start_date = request.start_date
+    days = request.days
+    activity = request.activity
+    city = request.city
+    system = request.system
+    janma_nakshatras = request.janma_nakshatras
+    janma_rasis = request.janma_rasis
+    janma_lagnas = request.janma_lagnas
+    chandra_mode = request.chandra_mode
+    latitude = request.latitude
+    longitude = request.longitude
+    timezone = request.timezone
+    ayanamsa = request.ayanamsa
+    travel_direction = request.travel_direction
+    include_night = request.include_night
+
+    try:
+        _validate_muhurta_inputs(
+            days, activity, chandra_mode, janma_nakshatras, janma_rasis, janma_lagnas
+        )
+        start = _parse_date(start_date)
+        _validate_system(system)
+        loc = _resolve_city(city, latitude, longitude, timezone)
+        engine = _get_engine(system, ayanamsa)
+
+        slots, dropped_days = _gather_muhurta_slots(
+            start,
+            days,
+            loc,
+            engine,
+            activity,
+            janma_nakshatras,
+            janma_rasis,
+            chandra_mode,
+            janma_lagnas=janma_lagnas,
+            travel_direction=travel_direction,
+            include_night=include_night,
+        )
+
+        # Re-tier across the whole search, not just one day — "Excellent"
+        # means the best of what turned up over the full date range.
+        assign_tiers(slots)
+        slots.sort(
+            key=lambda x: (
+                -TIER_NAMES.index(x['tier']),
+                -x['score'],
+                x['personal_dosha'] is not None,
+                x['date'],
+                x['start'],
+            )
+        )
+        rules = get_activity_rules(activity)
+        constraint_fields = (
+            'allowed_maasams',
+            'allowed_maasa_solar_pairs',
+            'allowed_varas',
+            'avoid_vara_paksha',
+            'allowed_solar_classes',
+            'allowed_nakshatras',
+            'avoid_nakshatras',
+            'prefer_nakshatras',
+            'allowed_tithi_numbers',
+            'prefer_tithi_numbers',
+            'avoid_tithi_numbers',
+            'required_lagna_class',
+            'allowed_lagnas',
+            'prefer_lagnas',
+            'caution_lagna_solar',
+            'daytime_only',
+            'forenoon_only',
+            'allowed_pakshams',
+            'allowed_solar_signs',
+            'allowed_tithi_names',
+            'skip_on_combust',
+            'avoid_janma_nakshatra',
+            'avoid_vara_tithi_names',
+            'avoid_nitya_yogas',
+            'require_homa_election',
+            'require_single_daylight_tithi',
+            'require_single_daylight_nakshatra',
+        )
+        resolved_activity = ACTIVITY_ALIASES.get(activity, activity)
+        source_scope = None
+        if resolved_activity == 'annaprasana':
+            source_scope = {
+                'panchangam_profile': 'python_and_mcp',
+                'exact_election_chart_assessor': 'drik_browser_only',
+                'event_chart_policy': (
+                    'election_chart.annaprasana.raman_transcription_policy_v1'
+                ),
+                'general_election_chart_baseline': 'open_issue_284',
+            }
+        return json.dumps(
+            {
+                'start_date': start_date,
+                'days': days,
+                'activity': activity,
+                'resolved_activity': resolved_activity,
+                'city': city,
+                'system': system,
+                'chandra_mode': chandra_mode,
+                'ayanamsa': ayanamsa,
+                'slots': slots[:12],
+                'dropped_days': dropped_days,
+                'activity_profile': {
+                    'alias_of': ACTIVITY_ALIASES.get(activity),
+                    'source_claim': rules.get('source_claim'),
+                    'audit_claim': rules.get('audit_claim'),
+                    'heuristic_claim': rules.get('heuristic_claim'),
+                    'related_claims': rules.get('related_claims', []),
+                    'source_scope': rules.get('source_scope'),
+                    'manual_prerequisites': rules.get('manual_prerequisites', False),
+                    **({'source_scope': source_scope} if source_scope else {}),
+                    'automated_constraints': {
+                        field: rules[field]
+                        for field in constraint_fields
+                        if field in rules
+                    },
+                    'manual_checks': rules.get('manual_checks', []),
+                },
+                'disclaimer': _MUHURTA_DISCLAIMER,
+            }
+        )
+    except ValueError as e:
+        return json.dumps({'error': str(e)})
+    except Exception:
+        _log.exception(_TOOL_CALL_FAILED_LOG)
+        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
+
+
+def tool_find_muhurta(*args, **kwargs) -> str:
     """When janma_lagnas[i] is provided, strict Lagna Shuddhi is used
     for that person — kendra/trikona/Ashtama count from the natal
     ascendant. Otherwise we fall back to counting from janma_rasis[i]
@@ -1084,88 +1389,12 @@ def tool_find_muhurta(
     Abhijit Muhurta. Brahma Muhurta (+2) and Nishita Kala (+2) are added
     as night-specific bonuses.
     """
-    try:
-        _validate_muhurta_inputs(days, activity, chandra_mode,
-                                 janma_nakshatras, janma_rasis,
-                                 janma_lagnas)
-        start = _parse_date(start_date)
-        _validate_system(system)
-        loc = _resolve_city(city, latitude, longitude, timezone)
-        engine = _get_engine(system, ayanamsa)
+    return _run_find_muhurta(_FindMuhurtaRequest(*args, **kwargs))
 
-        slots, dropped_days = _gather_muhurta_slots(
-            start, days, loc, engine, activity, janma_nakshatras, janma_rasis, chandra_mode,
-            janma_lagnas=janma_lagnas,
-            travel_direction=travel_direction,
-            include_night=include_night,
-        )
 
-        # Re-tier across the whole search, not just one day — "Excellent"
-        # means the best of what turned up over the full date range.
-        assign_tiers(slots)
-        slots.sort(key=lambda x: (-TIER_NAMES.index(x['tier']), -x['score'],
-                                  x['personal_dosha'] is not None,
-                                  x['date'], x['start']))
-        rules = get_activity_rules(activity)
-        constraint_fields = (
-            'allowed_maasams', 'allowed_maasa_solar_pairs', 'allowed_varas',
-            'avoid_vara_paksha',
-            'allowed_solar_classes', 'allowed_nakshatras', 'avoid_nakshatras',
-            'prefer_nakshatras',
-            'allowed_tithi_numbers', 'prefer_tithi_numbers',
-            'avoid_tithi_numbers',
-            'required_lagna_class',
-            'allowed_lagnas', 'prefer_lagnas', 'caution_lagna_solar',
-            'daytime_only', 'forenoon_only', 'allowed_pakshams',
-            'allowed_solar_signs', 'allowed_tithi_names', 'skip_on_combust',
-            'avoid_janma_nakshatra',
-            'avoid_vara_tithi_names',
-            'avoid_nitya_yogas',
-            'require_homa_election',
-            'require_single_daylight_tithi',
-            'require_single_daylight_nakshatra',
-        )
-        resolved_activity = ACTIVITY_ALIASES.get(activity, activity)
-        source_scope = None
-        if resolved_activity == 'annaprasana':
-            source_scope = {
-                'panchangam_profile': 'python_and_mcp',
-                'exact_election_chart_assessor': 'drik_browser_only',
-                'event_chart_policy': (
-                    'election_chart.annaprasana.'
-                    'raman_transcription_policy_v1'),
-                'general_election_chart_baseline': 'open_issue_284',
-            }
-        return json.dumps({
-            'start_date': start_date, 'days': days, 'activity': activity,
-            'resolved_activity': resolved_activity,
-            'city': city, 'system': system, 'chandra_mode': chandra_mode,
-            'ayanamsa': ayanamsa,
-            'slots': slots[:12],
-            'dropped_days': dropped_days,
-            'activity_profile': {
-                'alias_of': ACTIVITY_ALIASES.get(activity),
-                'source_claim': rules.get('source_claim'),
-                'audit_claim': rules.get('audit_claim'),
-                'heuristic_claim': rules.get('heuristic_claim'),
-                'related_claims': rules.get('related_claims', []),
-                'source_scope': rules.get('source_scope'),
-                'manual_prerequisites': rules.get(
-                    'manual_prerequisites', False),
-                **({'source_scope': source_scope} if source_scope else {}),
-                'automated_constraints': {
-                    field: rules[field]
-                    for field in constraint_fields if field in rules
-                },
-                'manual_checks': rules.get('manual_checks', []),
-            },
-            'disclaimer': _MUHURTA_DISCLAIMER,
-        })
-    except ValueError as e:
-        return json.dumps({'error': str(e)})
-    except Exception:
-        _log.exception(_TOOL_CALL_FAILED_LOG)
-        return json.dumps({'error': _CALCULATION_FAILED_ERROR})
+tool_find_muhurta.__signature__ = signature(_FindMuhurtaRequest, eval_str=True).replace(
+    return_annotation=str
+)
 
 
 def tool_get_graha_yuddha(
@@ -1191,33 +1420,35 @@ def tool_get_graha_yuddha(
         def _fmt(dt):
             return dt.strftime('%Y-%m-%d %H:%M UTC') if dt else None
 
-        return json.dumps({
-            'start_date': start_date,
-            'end_date': end_date,
-            'threshold': '1° ecliptic longitude',
-            'victor_rule': 'higher ecliptic latitude at closest approach',
-            'note': (
-                'Graha Yuddha (planetary war) occurs when two of the five tara '
-                'grahas come within 1° of each other in ecliptic longitude. The '
-                'vanquished planet loses astrological strength for the duration. '
-                'Sun, Moon, Rahu, and Ketu are exempt by classical convention. '
-                'ongoing=true means the war extends beyond the scan horizon.'
-            ),
-            'wars': [
-                {
-                    'planet1': w.planet1,
-                    'planet2': w.planet2,
-                    'winner': w.winner,
-                    'loser': w.loser,
-                    'starts': _fmt(w.starts),
-                    'exact': _fmt(w.exact),
-                    'ends': _fmt(w.ends),
-                    'ongoing': w.ends is None,
-                    'min_separation_arcmin': w.min_separation_arcmin,
-                }
-                for w in wars
-            ],
-        })
+        return json.dumps(
+            {
+                'start_date': start_date,
+                'end_date': end_date,
+                'threshold': '1° ecliptic longitude',
+                'victor_rule': 'higher ecliptic latitude at closest approach',
+                'note': (
+                    'Graha Yuddha (planetary war) occurs when two of the five tara '
+                    'grahas come within 1° of each other in ecliptic longitude. The '
+                    'vanquished planet loses astrological strength for the duration. '
+                    'Sun, Moon, Rahu, and Ketu are exempt by classical convention. '
+                    'ongoing=true means the war extends beyond the scan horizon.'
+                ),
+                'wars': [
+                    {
+                        'planet1': w.planet1,
+                        'planet2': w.planet2,
+                        'winner': w.winner,
+                        'loser': w.loser,
+                        'starts': _fmt(w.starts),
+                        'exact': _fmt(w.exact),
+                        'ends': _fmt(w.ends),
+                        'ongoing': w.ends is None,
+                        'min_separation_arcmin': w.min_separation_arcmin,
+                    }
+                    for w in wars
+                ],
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -1234,6 +1465,7 @@ def tool_get_rashi_ingresses(
     """Return all rashi ingress (sign-change) events in a date range."""
     try:
         from telugu_panchangam.engines.utils import _validate_ayanamsa
+
         _validate_ayanamsa(ayanamsa)
         start = _parse_date(start_date)
         end = _parse_date(end_date)
@@ -1251,27 +1483,29 @@ def tool_get_rashi_ingresses(
         def _fmt(dt):
             return dt.strftime('%Y-%m-%d %H:%M UTC') if dt else None
 
-        return json.dumps({
-            'start_date': start_date,
-            'end_date': end_date,
-            'ayanamsa': ayanamsa,
-            'note': (
-                'Sidereal (Lahiri) rashi ingresses — when each planet crosses a '
-                'sign boundary. Retrograde ingresses (planet re-enters a sign it '
-                'recently left) are included. exits = next sign change for that '
-                'planet, even if it falls outside the requested range; null if '
-                'the planet stays in the same sign for > 3 years.'
-            ),
-            'ingresses': [
-                {
-                    'planet': e.planet,
-                    'rashi': e.rashi,
-                    'enters': _fmt(e.enters),
-                    'exits': _fmt(e.exits),
-                }
-                for e in events
-            ],
-        })
+        return json.dumps(
+            {
+                'start_date': start_date,
+                'end_date': end_date,
+                'ayanamsa': ayanamsa,
+                'note': (
+                    'Sidereal (Lahiri) rashi ingresses — when each planet crosses a '
+                    'sign boundary. Retrograde ingresses (planet re-enters a sign it '
+                    'recently left) are included. exits = next sign change for that '
+                    'planet, even if it falls outside the requested range; null if '
+                    'the planet stays in the same sign for > 3 years.'
+                ),
+                'ingresses': [
+                    {
+                        'planet': e.planet,
+                        'rashi': e.rashi,
+                        'enters': _fmt(e.enters),
+                        'exits': _fmt(e.exits),
+                    }
+                    for e in events
+                ],
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -1290,6 +1524,7 @@ def tool_get_eclipse_calendar(
     """Return all solar and lunar eclipses in a date range with per-city visibility."""
     try:
         import pytz as _pytz
+
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         if end < start:
@@ -1299,7 +1534,7 @@ def tool_get_eclipse_calendar(
         loc = _resolve_city(city, latitude, longitude, timezone)
 
         jd_start = local_midnight_jd(start, loc.timezone)
-        jd_end   = local_midnight_jd(end, loc.timezone) + 1.0
+        jd_end = local_midnight_jd(end, loc.timezone) + 1.0
         precomputed = list_eclipses_in_range(jd_start, jd_end)
 
         tz_obj = _pytz.timezone(loc.timezone)
@@ -1315,7 +1550,7 @@ def tool_get_eclipse_calendar(
                     'subtype': ec['subtype'],
                     'visible': False,
                     'start': _fmt_time(jd_to_utc(ec['jd_start']), loc.timezone),
-                    'end':   _fmt_time(jd_to_utc(ec['jd_end']),   loc.timezone),
+                    'end': _fmt_time(jd_to_utc(ec['jd_end']), loc.timezone),
                     'sutak': None,
                 }
             else:
@@ -1324,25 +1559,29 @@ def tool_get_eclipse_calendar(
                     'subtype': info.subtype,
                     'visible': info.visible,
                     'start': _fmt_time(info.start, loc.timezone),
-                    'end':   _fmt_time(info.end,   loc.timezone),
+                    'end': _fmt_time(info.end, loc.timezone),
                     'sutak': {
                         'start': _fmt_time(info.sutak_start, loc.timezone),
-                        'end':   _fmt_time(info.sutak_end,   loc.timezone),
-                    } if info.sutak_start else None,
+                        'end': _fmt_time(info.sutak_end, loc.timezone),
+                    }
+                    if info.sutak_start
+                    else None,
                 }
             out.append({'date': eclipse_date.isoformat(), **info_dict})
 
-        return json.dumps({
-            'start_date': start_date,
-            'end_date': end_date,
-            'city': city,
-            'note': (
-                'visible=true means the eclipse is observable from the given city. '
-                'sutak (ritual impurity period) is only populated for visible eclipses: '
-                '12 hours before a Solar eclipse, 9 hours before a Lunar eclipse.'
-            ),
-            'eclipses': out,
-        })
+        return json.dumps(
+            {
+                'start_date': start_date,
+                'end_date': end_date,
+                'city': city,
+                'note': (
+                    'visible=true means the eclipse is observable from the given city. '
+                    'sutak (ritual impurity period) is only populated for visible eclipses: '
+                    '12 hours before a Solar eclipse, 9 hours before a Lunar eclipse.'
+                ),
+                'eclipses': out,
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:
@@ -1366,29 +1605,31 @@ def tool_get_panchanga_shuddhi(
         engine = _get_engine(system)
         day = engine.calculate(d, loc)
         result = assess_shuddhi(day)
-        return json.dumps({
-            'date': date_str,
-            'city': city,
-            'system': system,
-            'verdict': result.verdict,
-            'shuddha_count': result.shuddha_count,
-            'note': (
-                'Panchanga Shuddhi measures the purity of each of the five Panchangam '
-                'limbs at sunrise. shuddha_count (0-5) is the number of pure limbs; '
-                'Sarva Shuddha (5) is ideal for auspicious works. '
-                'Values marked "mixed" neither help nor harm; "ashuddha" are to be avoided.'
-            ),
-            'limbs': [
-                {
-                    'limb':    lb.limb,
-                    'value':   lb.value,
-                    'quality': lb.quality,
-                    'shuddha': lb.shuddha,
-                    'reason':  lb.reason,
-                }
-                for lb in result.limbs
-            ],
-        })
+        return json.dumps(
+            {
+                'date': date_str,
+                'city': city,
+                'system': system,
+                'verdict': result.verdict,
+                'shuddha_count': result.shuddha_count,
+                'note': (
+                    'Panchanga Shuddhi measures the purity of each of the five Panchangam '
+                    'limbs at sunrise. shuddha_count (0-5) is the number of pure limbs; '
+                    'Sarva Shuddha (5) is ideal for auspicious works. '
+                    'Values marked "mixed" neither help nor harm; "ashuddha" are to be avoided.'
+                ),
+                'limbs': [
+                    {
+                        'limb': lb.limb,
+                        'value': lb.value,
+                        'quality': lb.quality,
+                        'shuddha': lb.shuddha,
+                        'reason': lb.reason,
+                    }
+                    for lb in result.limbs
+                ],
+            }
+        )
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:

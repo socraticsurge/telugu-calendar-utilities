@@ -21,13 +21,6 @@
       "E731": 2,
       "F541": 1,
       "I001": 1
-    },
-    "telugu_panchangam/personal/muhurta.py": {
-      "I001": 4
-    },
-    "telugu_panchangam/personal/slot_scorers.py": {
-      "E702": 2,
-      "I001": 1
     }
   },
   "description": "Ruff E/F/I debt baseline; counts may only change intentionally.",
