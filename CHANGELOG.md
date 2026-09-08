@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.5` while clearing mechanical lint and
+  simple static-analysis debt in the owner-approved frozen core, with unchanged
+  calculation results and byte-identical ICS output.
 - Prepare MCP/PyPI patch metadata `1.18.4` while completing the merged-main
   runtime-complexity follow-up behind unchanged calculation, ranking,
   result-shape, and MCP contracts.

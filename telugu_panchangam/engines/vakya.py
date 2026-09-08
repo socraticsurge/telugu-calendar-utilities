@@ -1,25 +1,41 @@
 # src/engines/vakya.py
 from datetime import date
 
+from telugu_panchangam.eclipses import get_eclipse_for_date
+from telugu_panchangam.engines.base import (
+    AMRITA_GHATIS,
+    VARJYAM_GHATIS,
+    ayanam_name,
+    maasam_name,
+    nakshatra_day_windows,
+    next_nakshatra_span,
+    rituvu_name,
+)
 from telugu_panchangam.engines.surya_siddhanta import (
-    SuryaSiddhantaEngine,
-    ss_sun_longitude, ss_moon_longitude,
     _KALI_EPOCH_JD,
+    SuryaSiddhantaEngine,
+    ss_moon_longitude,
+    ss_sun_longitude,
 )
 from telugu_panchangam.engines.utils import (
-    jd_to_utc, local_midnight_jd, find_crossing,
-    get_sunrise, get_sunset, get_moonrise, get_moonset,
+    find_crossing,
+    get_moonrise,
+    get_moonset,
+    get_sunrise,
+    get_sunset,
+    jd_to_utc,
+    local_midnight_jd,
 )
+from telugu_panchangam.models.panchangam_day import Location, PanchangamDay, Span
 from telugu_panchangam.panchangam_names import (
-    RASHI_NAMES, VAARAM_NAMES, TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES,
-    KARANA_REPEATING, KARANA_FIXED,
+    KARANA_FIXED,
+    KARANA_REPEATING,
+    NAKSHATRA_NAMES,
+    RASHI_NAMES,
+    TITHI_NAMES,
+    VAARAM_NAMES,
+    YOGA_NAMES,
 )
-from telugu_panchangam.engines.base import (
-    rituvu_name, ayanam_name, maasam_name,
-    VARJYAM_GHATIS, AMRITA_GHATIS, nakshatra_day_windows, next_nakshatra_span,
-)
-from telugu_panchangam.models.panchangam_day import Location, Span, PanchangamDay
-from telugu_panchangam.eclipses import get_eclipse_for_date
 from telugu_panchangam.special_yogas import get_special_yogas
 
 # ---------------------------------------------------------------------------

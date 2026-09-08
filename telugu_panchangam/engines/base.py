@@ -1,13 +1,26 @@
 from abc import ABC, abstractmethod
 from datetime import date, datetime, timezone
+
 from telugu_panchangam.engines.utils import jd_to_utc
 from telugu_panchangam.models.panchangam_day import (
-    Location, PanchangamDay, SlotFacts, Span, Window,
+    Location,
+    PanchangamDay,
+    SlotFacts,
+    Span,
+    Window,
 )
 from telugu_panchangam.panchangam_names import (
-    TITHI_NAMES, NAKSHATRA_NAMES, YOGA_NAMES, RASHI_NAMES,
-    MAASAM_NAMES, SAMVATSARA_NAMES, RITUVU_NAMES, VAARAM_NAMES,
-    KARANA_REPEATING, KARANA_FIXED, EKADASHI_NAMES,
+    EKADASHI_NAMES,
+    KARANA_FIXED,
+    KARANA_REPEATING,
+    MAASAM_NAMES,
+    NAKSHATRA_NAMES,
+    RASHI_NAMES,
+    RITUVU_NAMES,
+    SAMVATSARA_NAMES,
+    TITHI_NAMES,
+    VAARAM_NAMES,
+    YOGA_NAMES,
 )
 
 
@@ -28,6 +41,7 @@ def ayanam_name(sun_sign_idx: int) -> str:
 
 _KALI_EPOCH_JD = 588465.5
 _SIDEREAL_YEAR_DAYS = 365.25636
+_NIJA_PREFIX = 'Nija '
 
 
 def samvatsara_name(jd: float, maasam: str) -> str:
@@ -38,7 +52,7 @@ def samvatsara_name(jd: float, maasam: str) -> str:
     than at the mean solar boundary. Offset +12 anchors the cycle so that
     Kali 5128 (2026-27 CE) is Parabhava.
     """
-    base = maasam.removeprefix('Adhika ').removeprefix('Nija ')
+    base = maasam.removeprefix('Adhika ').removeprefix(_NIJA_PREFIX)
     maasa_num = MAASAM_NAMES.index(base) + 1
     ahargana = jd - _KALI_EPOCH_JD
     kali_elapsed = int((ahargana + (4 - maasa_num) * 30) / _SIDEREAL_YEAR_DAYS)
@@ -64,7 +78,7 @@ def maasam_name(elongation_func, sun_longitude_func, jd_sunrise: float) -> str:
 
     nm_prev = previous_new_moon(elongation_func, nm_start - 1.0)
     if sign_start == int(sun_longitude_func(nm_prev) / 30.0) % 12:
-        return f'Nija {name}'
+        return f'{_NIJA_PREFIX}{name}'
 
     return name
 
@@ -123,7 +137,7 @@ def nakshatra_day_windows(spans: list[Span], ghatis: list[int], label: str,
 def next_nakshatra_span(span: Span, moon_longitude_func) -> Span:
     """The nakshatra span immediately following `span`, using the engine's
     own moon-longitude model."""
-    from telugu_panchangam.engines.utils import datetime_to_jd, jd_to_utc, find_crossing
+    from telugu_panchangam.engines.utils import datetime_to_jd, find_crossing, jd_to_utc
     idx = (NAKSHATRA_NAMES.index(span.name) + 1) % 27
     nak_size = 360.0 / 27.0
     jd_start = datetime_to_jd(span.end)
@@ -140,7 +154,7 @@ def ekadashi_name(maasam: str, paksham: str, solar_sign: str) -> str | None:
     """
     if maasam.startswith('Adhika'):
         return 'Padmini' if paksham == 'Shukla' else 'Parama'
-    name = EKADASHI_NAMES.get(maasam.removeprefix('Nija '), {}).get(paksham)
+    name = EKADASHI_NAMES.get(maasam.removeprefix(_NIJA_PREFIX), {}).get(paksham)
     if name and paksham == 'Shukla' and solar_sign == 'Dhanu':
         return f'{name} (Vaikunta)'
     return name
@@ -294,8 +308,8 @@ class PanchangamEngine(ABC):
         """
         # Local import to avoid circular dependency: special_yogas
         # imports TITHI_NAMES from this module.
-        from telugu_panchangam.special_yogas import get_special_yogas
         from telugu_panchangam.engines.utils import datetime_to_jd
+        from telugu_panchangam.special_yogas import get_special_yogas
 
         # Anchor dt in UTC
         dt_utc = dt.astimezone(timezone.utc) if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
@@ -423,7 +437,7 @@ class PanchangamEngine(ABC):
 
         # --- Lunar festivals (skip the intercalary Adhika month) ---
         if not maasam.startswith('Adhika'):
-            base_m = maasam.removeprefix('Nija ')
+            base_m = maasam.removeprefix(_NIJA_PREFIX)
             for m, idx, name in _SUNRISE_FESTIVALS:
                 if base_m == m and t_sr == idx:
                     fests.append(name)
@@ -554,7 +568,10 @@ class PanchangamEngine(ABC):
         """Apply all engine-neutral post-calculation flags and windows to `day`."""
         day.ghati_clock = self._build_ghati_clock(day.sunrise, jd_to_utc(jd_next_sunrise))
         day.nakshatra_pada = int((moon_lon / (360.0 / 27.0)) * 4) % 4 + 1
-        from telugu_panchangam.karana_windows import compute_vishaghati, compute_bhadra_windows
+        from telugu_panchangam.karana_windows import (
+            compute_bhadra_windows,
+            compute_vishaghati,
+        )
         day.vishaghati = compute_vishaghati(nak_spans, day.ghati_clock)
         day.bhadra_mukha, day.bhadra_puchha = compute_bhadra_windows(
             day.karana, day.ghati_clock,

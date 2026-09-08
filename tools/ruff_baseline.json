@@ -1,28 +1,5 @@
 {
-  "counts": {
-    "telugu_panchangam/engines/base.py": {
-      "I001": 4
-    },
-    "telugu_panchangam/engines/drik.py": {
-      "I001": 4
-    },
-    "telugu_panchangam/engines/surya_siddhanta.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/engines/utils.py": {
-      "E402": 1,
-      "I001": 2
-    },
-    "telugu_panchangam/engines/vakya.py": {
-      "I001": 1
-    },
-    "telugu_panchangam/generators/ics.py": {
-      "E701": 6,
-      "E731": 2,
-      "F541": 1,
-      "I001": 1
-    }
-  },
+  "counts": {},
   "description": "Ruff E/F/I debt baseline; counts may only change intentionally.",
   "ruff_version": "0.16.6"
 }

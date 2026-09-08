@@ -1,12 +1,13 @@
 # src/generators/ics.py
 from datetime import timedelta
+from functools import partial
+
 import pytz
 from icalendar import Calendar, Event, vText
 
+from telugu_panchangam.engines.base import ekadashi_name
 from telugu_panchangam.models.panchangam_day import PanchangamDay, Window
 from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
-from telugu_panchangam.engines.base import ekadashi_name
-
 
 SYSTEM_LABELS = {
     'drik': 'Drik Ganita',
@@ -127,8 +128,8 @@ class ICSGenerator:
 
     def _description(self, day: PanchangamDay, tz, next_day: PanchangamDay | None = None) -> str:
         fmt = self._fmt_time
-        fmtr = lambda dt: self._fmt_time_rel(dt, tz, day.date)
-        fmtw = lambda w: self._fmt_window(w, tz, day.date)
+        fmtr = partial(self._fmt_time_rel, tz=tz, day_date=day.date)
+        fmtw = partial(self._fmt_window, tz=tz, day_date=day.date)
         lines = [
             f'{day.samvatsara} Nama Samvatsara  ·  {day.maasam} Maasam  ·  '
             f'{day.paksham} Paksham  ·  {day.vaaram}',
@@ -186,7 +187,7 @@ class ICSGenerator:
             visibility = 'visible from this location' if e.visible else 'not visible from this location'
             lines += [
                 '',
-                f'─ Eclipse ─',
+                '─ Eclipse ─',
                 f'  {emoji} {e.kind} Eclipse ({e.subtype}) — {visibility}',
                 f'  Window:   {self._fmt_eclipse_time(e.start, tz, day.date)} – {self._fmt_eclipse_time(e.end, tz, day.date)}',
             ]
@@ -203,12 +204,18 @@ class ICSGenerator:
         specials = list(day.festivals)
         if day.nakshatra.name in GANDA_MOOLA_NAKSHATRAS:
             specials.append(f'Ganda Moola ({day.nakshatra.name})')
-        if day.is_ekadashi:        specials.append(f'{self._tithi_display(day)} — fasting day')
-        if day.is_amavasya:        specials.append('Amavasya')
-        if day.is_pournami:        specials.append('Pournami')
-        if day.is_shani_pradosham: specials.append('Shani Pradosham')
-        elif day.is_soma_pradosham: specials.append('Soma Pradosham')
-        elif day.is_pradosham:     specials.append('Pradosham')
+        if day.is_ekadashi:
+            specials.append(f'{self._tithi_display(day)} — fasting day')
+        if day.is_amavasya:
+            specials.append('Amavasya')
+        if day.is_pournami:
+            specials.append('Pournami')
+        if day.is_shani_pradosham:
+            specials.append('Shani Pradosham')
+        elif day.is_soma_pradosham:
+            specials.append('Soma Pradosham')
+        elif day.is_pradosham:
+            specials.append('Pradosham')
         if day.sankramanam and not (day.sankramanam == 'Makara'
                                     and 'Makara Sankranti' in day.festivals):
             specials.append(f'{day.sankramanam} Sankramanam')
