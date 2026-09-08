@@ -2504,7 +2504,6 @@ async function findMuhurta() {
       ? await loadLagna(city) : null;
     const slots = [];
     let droppedEclipseDays = 0;
-    let droppedModeDays = 0;
     let droppedModeSlots = 0;
     const droppedDays = [];
     const slotsPerDay = new Map();   // YYYY-MM-DD → count
@@ -2759,7 +2758,6 @@ async function findMuhurta() {
       const ev = events.get(stampOf(d));
       if (ev) processDay(d, ev);
     }
-    droppedModeDays = droppedModeSlots;
     // "Excellent" means the best result across the full requested range.
     muRankCandidateSlots(slots);
     if (muSearchIsStale(searchSequence, searchFingerprint, box)) return;
@@ -2773,7 +2771,7 @@ async function findMuhurta() {
       top: chartEnrichment.slots,
       chartEnrichment,
       droppedEclipseDays,
-      droppedModeDays,
+      droppedModeDays: droppedModeSlots,
       droppedDays,
       droppedPersonalRules: chartEnrichment.personalRemovedRules,
       activity,
