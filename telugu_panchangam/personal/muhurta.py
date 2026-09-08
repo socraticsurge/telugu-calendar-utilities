@@ -923,6 +923,148 @@ def _day_bad_windows(day, rules, avoid_karana_names):
     return bad
 
 
+def _slot_context(
+    day,
+    rules,
+    janma_nakshatras,
+    janma_rasis,
+    janma_lagnas,
+    chandra_mode,
+    *,
+    abhijit,
+    amrita,
+    horas,
+    lagnas,
+) -> _DayContext:
+    prefer_varas = frozenset(rules.get('prefer_vara', ()))
+    vara_bonus = 1 if day.vaaram in prefer_varas else 0
+    label = rules['label']
+    vara_reason = f'{day.vaaram} favoured for {label} (+1)' if vara_bonus else None
+    shukra_penalty = (
+        rules.get('penalty_on_simha_stha_shukra', 0) if day.simha_stha_shukra else 0
+    )
+    return _DayContext(
+        day=day,
+        skip_yogas=frozenset(rules.get('skip_on_yoga', ())),
+        janma_nakshatras=janma_nakshatras,
+        janma_rasis=janma_rasis,
+        janma_lagnas=janma_lagnas,
+        chandra_mode=chandra_mode,
+        prefer_tithi_class=rules.get('prefer_tithi_class'),
+        avoid_tithi_class=list(rules.get('avoid_tithi_class', [])),
+        label=label,
+        vara_bonus=vara_bonus,
+        vara_reason=vara_reason,
+        abhijit=abhijit,
+        amrita=amrita,
+        prefer_chog=rules.get('prefer_choghadiya'),
+        avoid_karana_names=frozenset(rules.get('avoid_karana', ())),
+        horas=horas,
+        prefer_varas=prefer_varas,
+        lagnas=lagnas,
+        prefer_lagna_class=rules.get('prefer_lagna_class'),
+        required_lagna_class=rules.get('required_lagna_class'),
+        prefer_bhadra_puchha=rules.get('prefer_bhadra_puchha', 0),
+        simha_stha_shukra_penalty=shukra_penalty,
+        prefer_nakshatra_mukha=rules.get('prefer_nakshatra_mukha'),
+        allowed_nakshatras=canonical_activity_nakshatras(
+            rules.get('allowed_nakshatras', ())
+        ),
+        avoid_nakshatras=canonical_activity_nakshatras(
+            rules.get('avoid_nakshatras', ())
+        ),
+        prefer_nakshatras=canonical_activity_nakshatras(
+            rules.get('prefer_nakshatras', ())
+        ),
+        allowed_tithi_numbers=frozenset(rules.get('allowed_tithi_numbers', ())),
+        prefer_tithi_numbers=frozenset(rules.get('prefer_tithi_numbers', ())),
+        allowed_tithi_names=frozenset(rules.get('allowed_tithi_names', ())),
+        avoid_tithi_numbers=frozenset(rules.get('avoid_tithi_numbers', ())),
+        avoid_vara_tithi_names=frozenset(
+            tuple(pair) for pair in rules.get('avoid_vara_tithi_names', ())
+        ),
+        avoid_nitya_yogas=frozenset(rules.get('avoid_nitya_yogas', ())),
+        allowed_lagnas=frozenset(rules.get('allowed_lagnas', ())),
+        prefer_lagnas=frozenset(rules.get('prefer_lagnas', ())),
+        caution_lagna_solar=bool(rules.get('caution_lagna_solar')),
+        manual_checks=tuple(rules.get('manual_checks', ())),
+        manual_prerequisites=bool(rules.get('manual_prerequisites')),
+        avoid_janma_nakshatra=bool(rules.get('avoid_janma_nakshatra')),
+    )
+
+
+def _slot_facts(day, engine, use_engine, snapshot, start):
+    if use_engine:
+        return engine.facts_at(start, day.location, vaaram=day.vaaram)
+    return snapshot
+
+
+def _homa_election_result(rules, facts, start, engine):
+    if not rules.get('require_homa_election'):
+        return True, ()
+    from telugu_panchangam.personal.homa import homa_election, solar_nakshatra_at
+
+    return homa_election(
+        facts.tithi,
+        facts.vaaram,
+        facts.nakshatra,
+        solar_nakshatra_at(start, engine),
+    )
+
+
+def _evaluated_day_slot(
+    mu,
+    day,
+    rules,
+    bad,
+    solar_noon,
+    engine,
+    use_engine,
+    snapshot,
+    ctx,
+    daylight_assessment,
+):
+    start, end = mu['start'], mu['end']
+    if rules.get('forenoon_only') and end > solar_noon:
+        return None
+    if any(_overlaps(start, end, bad_start, bad_end) for bad_start, bad_end in bad):
+        return None
+    block, straddle = _dominant_choghadiya(start, end, day.choghadiya)
+    if block is None:
+        return None
+    mu = {**mu, 'chog_straddle': straddle}
+    facts = _slot_facts(day, engine, use_engine, snapshot, start)
+    admitted, election_reasons = _homa_election_result(rules, facts, start, engine)
+    if not admitted:
+        return None
+    slot = _evaluate_slot(
+        start,
+        end,
+        block,
+        GOOD_CHOGHADIYA.get(block.name, 0),
+        facts,
+        ctx,
+        mu,
+        election_reasons,
+    )
+    if slot is not None and daylight_assessment is not None:
+        slot['reason_groups']['day_source_outcomes'] = daylight_assessment['outcomes']
+    return slot
+
+
+def _rank_slots(slots):
+    assign_tiers(slots)
+    slots.sort(
+        key=lambda item: (
+            -TIER_NAMES.index(item['tier']),
+            -item['score'],
+            item['personal_dosha'] is not None,
+            item['start'],
+        )
+    )
+    return slots
+
+
 def day_slots(
     day: PanchangamDay,
     activity: str = 'any',
@@ -969,87 +1111,19 @@ def day_slots(
     if reason is not None:
         return []
 
-    skip_yogas = frozenset(rules.get('skip_on_yoga', ()))
-    prefer_chog = rules.get('prefer_choghadiya')
-    avoid_karana_names = frozenset(rules.get('avoid_karana', ()))
-    prefer_tithi_class = rules.get('prefer_tithi_class')
-    avoid_tithi_class = list(rules.get('avoid_tithi_class', []))
-    prefer_varas = frozenset(rules.get('prefer_vara', ()))
-    prefer_lagna_class = rules.get('prefer_lagna_class')
-    required_lagna_class = rules.get('required_lagna_class')
-    prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
-    prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
-    allowed_nakshatras = canonical_activity_nakshatras(
-        rules.get('allowed_nakshatras', ())
-    )
-    avoid_nakshatras = canonical_activity_nakshatras(rules.get('avoid_nakshatras', ()))
-    prefer_nakshatras = canonical_activity_nakshatras(
-        rules.get('prefer_nakshatras', ())
-    )
-    allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
-    prefer_tithi_numbers = frozenset(rules.get('prefer_tithi_numbers', ()))
-    allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
-    avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
-    avoid_vara_tithi_names = frozenset(
-        tuple(pair) for pair in rules.get('avoid_vara_tithi_names', ())
-    )
-    avoid_nitya_yogas = frozenset(rules.get('avoid_nitya_yogas', ()))
-    allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
-    prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
-    caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
-    manual_checks = tuple(rules.get('manual_checks', ()))
-    label = rules['label']
-
-    _shukra_penalty = (
-        rules.get('penalty_on_simha_stha_shukra', 0) if day.simha_stha_shukra else 0
-    )
-
-    vara_bonus = 1 if day.vaaram in prefer_varas else 0
-    vara_reason = f'{day.vaaram} favoured for {label} (+1)' if vara_bonus else None
-
-    bad = _day_bad_windows(day, rules, avoid_karana_names)
-
-    ctx = _DayContext(
-        day=day,
-        skip_yogas=skip_yogas,
-        janma_nakshatras=janma_nakshatras,
-        janma_rasis=janma_rasis,
-        janma_lagnas=janma_lagnas,
-        chandra_mode=chandra_mode,
-        prefer_tithi_class=prefer_tithi_class,
-        avoid_tithi_class=avoid_tithi_class,
-        label=label,
-        vara_bonus=vara_bonus,
-        vara_reason=vara_reason,
+    ctx = _slot_context(
+        day,
+        rules,
+        janma_nakshatras,
+        janma_rasis,
+        janma_lagnas,
+        chandra_mode,
         abhijit=day.abhijit_muhurta,
         amrita=list(day.amrita_kalam),
-        prefer_chog=prefer_chog,
-        avoid_karana_names=avoid_karana_names,
         horas=get_horas(day),
-        prefer_varas=prefer_varas,
         lagnas=get_lagna_transitions(day),
-        prefer_lagna_class=prefer_lagna_class,
-        required_lagna_class=required_lagna_class,
-        prefer_bhadra_puchha=prefer_bhadra_puchha,
-        simha_stha_shukra_penalty=_shukra_penalty,
-        prefer_nakshatra_mukha=prefer_nakshatra_mukha,
-        allowed_nakshatras=allowed_nakshatras,
-        avoid_nakshatras=avoid_nakshatras,
-        prefer_nakshatras=prefer_nakshatras,
-        allowed_tithi_numbers=allowed_tithi_numbers,
-        prefer_tithi_numbers=prefer_tithi_numbers,
-        allowed_tithi_names=allowed_tithi_names,
-        avoid_tithi_numbers=avoid_tithi_numbers,
-        avoid_vara_tithi_names=avoid_vara_tithi_names,
-        avoid_nitya_yogas=avoid_nitya_yogas,
-        allowed_lagnas=allowed_lagnas,
-        prefer_lagnas=prefer_lagnas,
-        caution_lagna_solar=caution_lagna_solar,
-        manual_checks=manual_checks,
-        manual_prerequisites=bool(rules.get('manual_prerequisites')),
-        avoid_janma_nakshatra=bool(rules.get('avoid_janma_nakshatra')),
     )
-
+    bad = _day_bad_windows(day, rules, ctx.avoid_karana_names)
     engine, use_engine = _slot_engine(day, rules, engine)
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
@@ -1062,54 +1136,21 @@ def day_slots(
     slots = []
     solar_noon = day.sunrise + (day.sunset - day.sunrise) / 2
     for mu in named_muhurtas(day):
-        s, e = mu['start'], mu['end']
-        if rules.get('forenoon_only') and e > solar_noon:
-            continue
-        if any(_overlaps(s, e, b0, b1) for b0, b1 in bad):
-            continue  # decision 1: hard-window exclude
-        block, straddle = _dominant_choghadiya(s, e, day.choghadiya)
-        if block is None:
-            continue
-        mu = {**mu, 'chog_straddle': straddle}
-        base = GOOD_CHOGHADIYA.get(block.name, 0)  # bad choghadiya scores 0, not gated
-        facts = (
-            engine.facts_at(s, day.location, vaaram=day.vaaram)
-            if use_engine
-            else snapshot
+        slot_dict = _evaluated_day_slot(
+            mu,
+            day,
+            rules,
+            bad,
+            solar_noon,
+            engine,
+            use_engine,
+            snapshot,
+            ctx,
+            _daylight_assessment,
         )
-        election_reasons = ()
-        if rules.get('require_homa_election'):
-            from telugu_panchangam.personal.homa import (
-                homa_election,
-                solar_nakshatra_at,
-            )
-
-            admitted, election_reasons = homa_election(
-                facts.tithi,
-                facts.vaaram,
-                facts.nakshatra,
-                solar_nakshatra_at(s, engine),
-            )
-            if not admitted:
-                continue
-        slot_dict = _evaluate_slot(s, e, block, base, facts, ctx, mu, election_reasons)
         if slot_dict is not None:
-            if _daylight_assessment is not None:
-                slot_dict['reason_groups']['day_source_outcomes'] = (
-                    _daylight_assessment['outcomes']
-                )
             slots.append(slot_dict)
-
-    assign_tiers(slots)
-    slots.sort(
-        key=lambda x: (
-            -TIER_NAMES.index(x['tier']),
-            -x['score'],
-            x['personal_dosha'] is not None,
-            x['start'],
-        )
-    )
-    return slots
+    return _rank_slots(slots)
 
 
 def _night_traditional_skip(day, rules) -> bool:
@@ -1140,6 +1181,74 @@ def _night_unavailable(day, rules, activity, travel_direction) -> bool:
     return _night_traditional_skip(day, rules)
 
 
+def _night_bad_windows(day, rules, avoid_karana_names):
+    bad = _get_bad_windows_night(day, avoid_karana_names)
+    if rules.get('skip_on_sankramana') and day.sankramana_avoidance is not None:
+        bad.append((day.sankramana_avoidance.start, day.sankramana_avoidance.end))
+    return bad
+
+
+def _night_choghadiya_blocks(day, next_day):
+    weekday = (day.date.weekday() + 1) % 7
+    block_duration = (next_day.sunrise - day.sunset) / 8
+    return [
+        Window(
+            name=_NIGHT_CHOGHADIYA[weekday][index],
+            start=day.sunset + index * block_duration,
+            end=day.sunset + (index + 1) * block_duration,
+        )
+        for index in range(8)
+    ]
+
+
+def _nishita_window(day, next_day):
+    one_ghati = timedelta(minutes=24)
+    midpoint = day.sunset + (next_day.sunrise - day.sunset) / 2
+    return midpoint - one_ghati, midpoint + one_ghati
+
+
+def _evaluated_night_slot(
+    mu,
+    day,
+    rules,
+    bad,
+    night_blocks,
+    nishita,
+    engine,
+    use_engine,
+    snapshot,
+    ctx,
+):
+    start, end = mu['start'], mu['end']
+    if any(_overlaps(start, end, bad_start, bad_end) for bad_start, bad_end in bad):
+        return None
+    block, straddle = _dominant_choghadiya(start, end, night_blocks)
+    if block is None:
+        return None
+    mu = {**mu, 'chog_straddle': straddle}
+    facts = _slot_facts(day, engine, use_engine, snapshot, start)
+    admitted, election_reasons = _homa_election_result(rules, facts, start, engine)
+    if not admitted:
+        return None
+    slot = _evaluate_slot(
+        start,
+        end,
+        block,
+        GOOD_CHOGHADIYA.get(block.name, 0),
+        facts,
+        ctx,
+        mu,
+        election_reasons,
+    )
+    if slot is None:
+        return None
+    if _overlaps(start, end, *nishita):
+        slot['score'] += 2
+        slot['reason_groups']['slot_quality'].append('overlaps Nishita Kala (+2)')
+        slot['reasons'].append('overlaps Nishita Kala (+2)')
+    return slot
+
+
 def night_slots(
     day: PanchangamDay,
     next_day: PanchangamDay,
@@ -1168,116 +1277,21 @@ def night_slots(
     if _night_unavailable(day, rules, activity, travel_direction):
         return []
 
-    skip_yogas = set(rules.get('skip_on_yoga', ()))
-    prefer_chog = rules.get('prefer_choghadiya')
-    avoid_karana_names = set(rules.get('avoid_karana', ()))
-    prefer_tithi_class = rules.get('prefer_tithi_class')
-    avoid_tithi_class = list(rules.get('avoid_tithi_class', []))
-    prefer_varas = set(rules.get('prefer_vara', ()))
-    prefer_lagna_class = rules.get('prefer_lagna_class')
-    required_lagna_class = rules.get('required_lagna_class')
-    prefer_bhadra_puchha = rules.get('prefer_bhadra_puchha', 0)
-    prefer_nakshatra_mukha = rules.get('prefer_nakshatra_mukha')
-    allowed_nakshatras = canonical_activity_nakshatras(
-        rules.get('allowed_nakshatras', ())
-    )
-    avoid_nakshatras = canonical_activity_nakshatras(rules.get('avoid_nakshatras', ()))
-    prefer_nakshatras = canonical_activity_nakshatras(
-        rules.get('prefer_nakshatras', ())
-    )
-    allowed_tithi_numbers = frozenset(rules.get('allowed_tithi_numbers', ()))
-    prefer_tithi_numbers = frozenset(rules.get('prefer_tithi_numbers', ()))
-    allowed_tithi_names = frozenset(rules.get('allowed_tithi_names', ()))
-    avoid_tithi_numbers = frozenset(rules.get('avoid_tithi_numbers', ()))
-    avoid_vara_tithi_names = frozenset(
-        tuple(pair) for pair in rules.get('avoid_vara_tithi_names', ())
-    )
-    avoid_nitya_yogas = frozenset(rules.get('avoid_nitya_yogas', ()))
-    allowed_lagnas = frozenset(rules.get('allowed_lagnas', ()))
-    prefer_lagnas = frozenset(rules.get('prefer_lagnas', ()))
-    caution_lagna_solar = bool(rules.get('caution_lagna_solar'))
-    manual_checks = tuple(rules.get('manual_checks', ()))
-    label = rules['label']
-
-    _shukra_penalty = (
-        rules.get('penalty_on_simha_stha_shukra', 0) if day.simha_stha_shukra else 0
-    )
-
-    # Vara is sunrise-anchored — carries through the night following that sunrise.
-    vara_bonus = 1 if day.vaaram in prefer_varas else 0
-    vara_reason = f'{day.vaaram} favoured for {label} (+1)' if vara_bonus else None
-
-    bad = _get_bad_windows_night(day, avoid_karana_names)
-    if rules.get('skip_on_sankramana') and day.sankramana_avoidance is not None:
-        bad.append((day.sankramana_avoidance.start, day.sankramana_avoidance.end))
-
-    amrita = list(day.amrita_kalam)  # absolute datetimes; night-spanning ones included
-
-    # Nishita Kala: midpoint of night ± 1 ghati (24 min).
-    _ONE_GHATI = timedelta(minutes=24)
-    nishita_mid = day.sunset + (next_day.sunrise - day.sunset) / 2
-    nishita_start = nishita_mid - _ONE_GHATI
-    nishita_end = nishita_mid + _ONE_GHATI
-
-    # Night choghadiya blocks (engine convention: Sunday=0).
-    weekday = (day.date.weekday() + 1) % 7
-    _block_dur = (next_day.sunrise - day.sunset) / 8
-    night_blocks = [
-        Window(
-            name=_NIGHT_CHOGHADIYA[weekday][i],
-            start=day.sunset + i * _block_dur,
-            end=day.sunset + (i + 1) * _block_dur,
-        )
-        for i in range(8)
-    ]
-
-    # get_horas() returns 24 horas covering the full day+night from today's sunrise.
-    # get_lagna_transitions() covers sunrise to next sunrise.
-    # Both are already night-aware — no special handling needed.
-    horas = get_horas(day)
-    lagnas = get_lagna_transitions(day)
-
-    ctx = _DayContext(
-        day=day,
-        skip_yogas=frozenset(skip_yogas),
-        janma_nakshatras=janma_nakshatras,
-        janma_rasis=janma_rasis,
-        janma_lagnas=janma_lagnas,
-        chandra_mode=chandra_mode,
-        prefer_tithi_class=prefer_tithi_class,
-        label=label,
-        vara_bonus=vara_bonus,
-        vara_reason=vara_reason,
+    ctx = _slot_context(
+        day,
+        rules,
+        janma_nakshatras,
+        janma_rasis,
+        janma_lagnas,
+        chandra_mode,
         abhijit=None,  # no Abhijit at night
-        amrita=amrita,
-        prefer_chog=prefer_chog,
-        avoid_karana_names=frozenset(avoid_karana_names),
-        horas=horas,
-        prefer_varas=frozenset(prefer_varas),
-        lagnas=lagnas,
-        prefer_lagna_class=prefer_lagna_class,
-        required_lagna_class=required_lagna_class,
-        prefer_bhadra_puchha=prefer_bhadra_puchha,
-        simha_stha_shukra_penalty=_shukra_penalty,
-        prefer_nakshatra_mukha=prefer_nakshatra_mukha,
-        allowed_nakshatras=allowed_nakshatras,
-        avoid_nakshatras=avoid_nakshatras,
-        prefer_nakshatras=prefer_nakshatras,
-        allowed_tithi_numbers=allowed_tithi_numbers,
-        prefer_tithi_numbers=prefer_tithi_numbers,
-        allowed_tithi_names=allowed_tithi_names,
-        avoid_tithi_numbers=avoid_tithi_numbers,
-        avoid_vara_tithi_names=avoid_vara_tithi_names,
-        avoid_nitya_yogas=avoid_nitya_yogas,
-        allowed_lagnas=allowed_lagnas,
-        prefer_lagnas=prefer_lagnas,
-        caution_lagna_solar=caution_lagna_solar,
-        manual_checks=manual_checks,
-        manual_prerequisites=bool(rules.get('manual_prerequisites')),
-        avoid_janma_nakshatra=bool(rules.get('avoid_janma_nakshatra')),
-        avoid_tithi_class=avoid_tithi_class,
+        amrita=list(day.amrita_kalam),
+        horas=get_horas(day),
+        lagnas=get_lagna_transitions(day),
     )
-
+    bad = _night_bad_windows(day, rules, ctx.avoid_karana_names)
+    night_blocks = _night_choghadiya_blocks(day, next_day)
+    nishita = _nishita_window(day, next_day)
     engine, use_engine = _slot_engine(day, rules, engine)
     snapshot = _day_snapshot_facts(day) if not use_engine else None
 
@@ -1287,52 +1301,18 @@ def night_slots(
     # the Nishita Kala overlap remains a night-specific bonus.
     slots = []
     for mu in (m for m in named_muhurtas(day, next_day) if m['period'] == 'night'):
-        s, e = mu['start'], mu['end']
-        if any(_overlaps(s, e, b0, b1) for b0, b1 in bad):
-            continue
-        block, straddle = _dominant_choghadiya(s, e, night_blocks)
-        if block is None:
-            continue
-        mu = {**mu, 'chog_straddle': straddle}
-        base = GOOD_CHOGHADIYA.get(block.name, 0)
-        facts = (
-            engine.facts_at(s, day.location, vaaram=day.vaaram)
-            if use_engine
-            else snapshot
+        slot_dict = _evaluated_night_slot(
+            mu,
+            day,
+            rules,
+            bad,
+            night_blocks,
+            nishita,
+            engine,
+            use_engine,
+            snapshot,
+            ctx,
         )
-        election_reasons = ()
-        if rules.get('require_homa_election'):
-            from telugu_panchangam.personal.homa import (
-                homa_election,
-                solar_nakshatra_at,
-            )
-
-            admitted, election_reasons = homa_election(
-                facts.tithi,
-                facts.vaaram,
-                facts.nakshatra,
-                solar_nakshatra_at(s, engine),
-            )
-            if not admitted:
-                continue
-        slot_dict = _evaluate_slot(s, e, block, base, facts, ctx, mu, election_reasons)
-        if slot_dict is None:
-            continue
-        if _overlaps(s, e, nishita_start, nishita_end):
-            slot_dict['score'] += 2
-            slot_dict['reason_groups']['slot_quality'].append(
-                'overlaps Nishita Kala (+2)'
-            )
-            slot_dict['reasons'].append('overlaps Nishita Kala (+2)')
-        slots.append(slot_dict)
-
-    assign_tiers(slots)
-    slots.sort(
-        key=lambda x: (
-            -TIER_NAMES.index(x['tier']),
-            -x['score'],
-            x['personal_dosha'] is not None,
-            x['start'],
-        )
-    )
-    return slots
+        if slot_dict is not None:
+            slots.append(slot_dict)
+    return _rank_slots(slots)

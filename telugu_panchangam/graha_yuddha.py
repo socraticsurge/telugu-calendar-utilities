@@ -194,7 +194,7 @@ def _pair_periods(
         prev_in = in_war
         jd = jd_next
     if prev_in and jd_entry is not None and jd_entry < jd_req_end:
-        results.append(_record(*pair, jd_entry, None, jd_scan_to))
+        results.append(_record(p1, p2, b1, b2, jd_entry, None, jd_scan_to))
     return results
 
 
