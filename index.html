@@ -149,6 +149,7 @@
 
     .selector-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.6rem 0 1rem; }
     .selector { display: flex; flex-direction: column; gap: 0.2rem; }
+    fieldset.selector { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
     .selector label { font-size: 0.7rem; color: #746B5E; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
     .selector select { font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--indigo-border); background: var(--indigo-bg); color: var(--indigo); font-weight: 600; min-width: 160px; }
 
@@ -176,9 +177,9 @@
 
     .preview-card { border: 1px solid #DDD2BC; border-radius: 8px; overflow: hidden; box-shadow: 2px 2px 0 rgba(31,26,23,0.05); }
     .preview-head { background: var(--indigo); color: #fff; padding: 0.6rem 0.9rem; position: relative; padding-right: 3rem; }
-    .preview-head .date { font-weight: 700; font-size: 0.95rem; }
+    .preview-head .date { font-weight: 700; font-size: 0.95rem; cursor: pointer; }
     .preview-head .meta { font-size: 0.78rem; opacity: 0.85; margin-top: 0.1rem; }
-    .preview-head .badge { display: inline-block; background: #C98A3A; color: #5C3D10; font-size: 0.75rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
+    .preview-head .badge { display: inline-block; background: #C98A3A; color: #3B2408; font-size: 0.75rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 5px; margin-left: 0.4rem; }
 
     .flag-strip { background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); padding: 0.45rem 0.9rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
     .special-chip { display: inline-block; background: #fff; color: var(--amber); border: 1px solid var(--amber-border); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700; }
@@ -246,11 +247,11 @@
 
     .preview-note { font-size: 0.75rem; color: #746B5E; margin: 0.6rem 0 0; }
     .tool-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 2px solid #E7DECC; }
-    .tool-tab { font-family: inherit; font-size: 0.95rem; font-weight: 700; color: #746B5E;
+    .tool-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; flex: 1 1 0;
+                font-family: inherit; font-size: 0.95rem; font-weight: 700; color: #746B5E;
                 background: none; border: none; cursor: pointer; padding: 0.4rem 0.65rem 0.55rem;
                 border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .tool-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
-    .tool-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; flex: 1 1 0; }
     .tool-tab .ts { font-size: 0.72rem; font-weight: 500; color: #746B5E; }
     .tool-tab.active .ts { color: #b83a2a; }
     @media (max-width: 620px) {
@@ -461,7 +462,7 @@
                      display: flex; align-items: center; justify-content: center;
                      box-shadow: 0 1px 3px rgba(31,26,23,0.04); }
     .wa-share-mini:hover { background: #FBF6EB; border-color: #15803d; }
-    .preview-error { font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
+    .preview-error { display: block; font-size: 0.85rem; color: #b91c1c; padding: 0.75rem; margin: 0; }
 
     .fmt-toggle { display: inline-flex; border: 1px solid var(--indigo-border); border-radius: 8px; overflow: hidden; }
     .fmt-toggle button { border: none; background: #fff; color: #6B6357; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.7rem; cursor: pointer; font-family: inherit; }
@@ -481,7 +482,6 @@
       border-bottom: 1px solid #E7DECC;
     }
     body[data-mode="mobile"] #global-controls-bar select { max-width: 42vw; }
-    .preview-head .date { cursor: pointer; }
     .preview-head .date:hover { opacity: 0.85; }
 
     .upcoming-month { margin-bottom: 0.5rem; border: 1px solid #E7DECC; border-radius: 8px; overflow: hidden; }
@@ -635,8 +635,7 @@
     /* Special days row: weekday + date stay together (no space-between split),
        chips on a second line. The "in N days" hint folds into the same line as
        the date so the row reads as one sentence. */
-    body[data-mode="mobile"] .upcoming-date { justify-content: flex-start; }
-    body[data-mode="mobile"] .upcoming-date { gap: 0.35rem; align-items: baseline; }
+    body[data-mode="mobile"] .upcoming-date { justify-content: flex-start; gap: 0.35rem; align-items: baseline; }
     body[data-mode="mobile"] .upcoming-in { display: inline; color: #DDD2BC; font-weight: 500; }
 
     /* ---------- Mobile Gochara screen ---------- */
@@ -671,7 +670,7 @@
       border: 1px solid #D9A85C; border-radius: 8px; padding: 0.65rem 0.8rem; margin: 0.6rem 0 0.4rem;
     }
     body[data-mode="mobile"] #go-conditions .chip {
-      background: #f59e0b; color: #fff; border: 0; font-weight: 700;
+      background: #f59e0b; color: #5C3D10; border: 0; font-weight: 700;
       padding: 0.3rem 0.65rem; border-radius: 999px;
     }
     /* Chart full-bleed: extend just past the card padding, tighten cells */
@@ -709,7 +708,6 @@
       margin: 0 0 0.3rem; color: #746B5E !important;
     }
     /* tighter profile + date controls */
-    body[data-mode="mobile"] #panel-tarabalam .tb-controls { padding: 0.5rem 0; }
     body[data-mode="mobile"] #panel-tarabalam .tb-controls-title { font-size: 0.85rem; }
     body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector { flex: 1 1 48%; }
     body[data-mode="mobile"] #panel-tarabalam .tb-controls .selector:last-child { flex: 1 1 100%; }
@@ -1084,7 +1082,7 @@
   <div class="sidebar-nav-groups">
     <section class="sidebar-group" aria-labelledby="sidebar-tools-label">
       <h2 class="sidebar-group-label" id="sidebar-tools-label">Tools</h2>
-      <ul class="sidebar-nav" role="list">
+      <ul class="sidebar-nav">
         <li>
           <button class="sidebar-item active" id="sidebar-today" aria-current="page" onclick="switchTool('today')">
             <span class="sidebar-icon">🔆</span>
@@ -1119,7 +1117,7 @@
     </section>
     <section class="sidebar-group" aria-labelledby="sidebar-resources-label">
       <h2 class="sidebar-group-label" id="sidebar-resources-label">Resources</h2>
-      <ul class="sidebar-nav" role="list">
+      <ul class="sidebar-nav">
         <li>
           <button class="sidebar-item" id="sidebar-subscribe" onclick="switchTool('subscribe')">
             <span class="sidebar-icon">📅</span>
@@ -1145,7 +1143,7 @@
     <div class="sidebar-shloka-gist">Be truthful. Be kind.</div>
   </div>
   <section class="sidebar-footer" aria-label="More">
-    <ul class="sidebar-footer-list" role="list">
+    <ul class="sidebar-footer-list">
       <li><button class="sidebar-item sidebar-secondary" id="sidebar-useinai" onclick="switchTool('useinai')">Use in AI</button></li>
       <li><button class="sidebar-item sidebar-secondary" id="sidebar-about" onclick="switchTool('about')">About</button></li>
     </ul>
@@ -1201,13 +1199,13 @@
         <select id="tp-system"></select>
       </div>
     </div>
-    <div class="selector" id="sel-fmt-toggle">
-      <label id="fmt-label">Time format</label>
-      <div class="fmt-toggle" role="group" aria-labelledby="fmt-label">
+    <fieldset class="selector" id="sel-fmt-toggle">
+      <legend class="sr-only">Time format</legend>
+      <div class="fmt-toggle">
         <button id="fmt-12" type="button" aria-pressed="true" onclick="setTimeFmt('12')">12h</button>
         <button id="fmt-24" type="button" aria-pressed="false" onclick="setTimeFmt('24')">24h</button>
       </div>
-    </div>
+    </fieldset>
   </div>
   <div class="card" id="card-tools">
     <div class="tool-tabs" role="tablist">
@@ -1221,7 +1219,7 @@
     <h1 class="m-page-title" id="m-page-title" tabindex="-1"><span class="m-page-title-main" id="m-page-title-main">Today's Panchangam</span><span class="m-page-title-sub" id="m-page-title-sub">What is the day?</span></h1>
     <div id="panel-today" role="tabpanel" aria-labelledby="tab-today" aria-hidden="false">
     <h2 class="panel-heading">Today's Panchangam</h2>
-    <div id="tp-result" aria-busy="true"><p class="preview-error" role="status">Loading…</p></div>
+    <div id="tp-result" aria-busy="true"><output class="preview-error">Loading…</output></div>
     </div><!-- /panel-today -->
 
     <div id="panel-tarabalam" role="tabpanel" aria-labelledby="tab-tarabalam" aria-hidden="true" style="display:none;">
@@ -1307,11 +1305,7 @@
         <p class="preview-note" style="margin-top:0.5rem;" id="mu-context"></p>
       </div><!-- /tb-controls -->
 
-      <!-- TARABALAM HIDDEN: tb-summary, tb-result
-      <div id="tb-summary"></div>
-      <div id="tb-result"></div>
-      END TARABALAM HIDDEN -->
-      <p id="mu-result-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+      <output id="mu-result-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></output>
       <div id="mu-result" aria-busy="false"></div>
       <p class="surface-boundary">
         <strong>Use the ranking comparatively.</strong> Read any named cautions on a slot; for weddings,
@@ -1411,7 +1405,7 @@
     <h3 class="sub">2 · Your subscription URL</h3>
     <div class="url-box" id="sub-url">—</div>
     <button class="btn" onclick="copyUrl()">Copy URL</button>
-    <span class="copy-confirm" id="copy-confirm" role="status" aria-live="polite"></span>
+    <output class="copy-confirm" id="copy-confirm" aria-live="polite"></output>
 
     <h3 class="sub" style="margin-top:1.25rem;">3 · Add it to your calendar</h3>
     <div class="app-tabs" role="tablist" aria-label="Calendar application">

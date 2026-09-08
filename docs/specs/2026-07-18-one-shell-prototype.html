@@ -195,7 +195,9 @@
     grid-template-columns: 1fr 1fr;
   }
   .mu-form .field { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
-  .mu-form label { font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); }
+  .mu-form fieldset.field { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
+  .mu-form label, .mu-form legend { font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); }
+  .mu-form legend { padding: 0; }
   .mu-form select, .mu-form input {
     font: 500 0.92rem var(--sans); color: var(--ink);
     border: 1px solid var(--line); border-radius: 8px; background: #fff;
@@ -401,14 +403,14 @@
             <label for="mu-range">Search window</label>
             <select id="mu-range"><option>Next 14 days</option><option>Next 30 days</option><option>Custom range…</option></select>
           </div>
-          <div class="field people">
-            <label>For whom <small>(birth star · rasi)</small></label>
+          <fieldset class="field people">
+            <legend>For whom <small>(birth star · rasi)</small></legend>
             <div class="chips">
               <span class="chip">Sarath <small>Bharani · Mesha</small></span>
               <span class="chip">Meghana <small>Vishakha · Tula</small></span>
               <button class="chip add" type="button">+ Add person</button>
             </div>
-          </div>
+          </fieldset>
           <div class="mu-actions">
             <button class="btn-primary" type="submit">Find slots</button>
             <span class="mu-note">Scores Tarabalam, Chandrabalam, lagna, choghadiya &amp; doshas for everyone listed.</span>
