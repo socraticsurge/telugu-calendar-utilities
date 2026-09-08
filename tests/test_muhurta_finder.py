@@ -831,6 +831,47 @@ def test_find_muhurta_python_and_mcp_signatures_are_stable():
     assert mcp_parameters['include_night'].default is False
 
 
+@pytest.mark.parametrize(
+    ("chandra_mode", "expected_dropped"),
+    (("stars", False), ("puja_ok", True), ("strict", True)),
+)
+def test_score_chandra_preserves_per_person_results(
+    chandra_mode, expected_dropped
+):
+    from telugu_panchangam.personal.slot_scorers import score_chandra
+
+    result = score_chandra(
+        ["Ashvini", "Bharani", "Krittika", "Rohini"],
+        ["Mesha", "Meena", "Kanya", None],
+        "Mesha",
+        chandra_mode,
+    )
+
+    assert result == (
+        0,
+        [
+            "chandrabalam favourable for #1 (Ashvini) (+1)",
+            "chandrabalam remedial for #2 (Bharani) Moon@2 (puja recommended)",
+            "chandrabalam avoid for #3 (Krittika) Ashtama Moon@8 (-1)",
+        ],
+        expected_dropped,
+        ["#3 (Krittika) Ashtama"],
+        ["#2 (Bharani)"],
+    )
+
+
+def test_score_chandra_ignores_unknown_rashis():
+    from telugu_panchangam.personal.slot_scorers import score_chandra
+
+    assert score_chandra(["Ashvini"], [None], "Mesha", "strict") == (
+        0,
+        [],
+        False,
+        [],
+        [],
+    )
+
+
 def test_unknown_tithi_name_does_not_explode():
     # Robustness: tithi_family is wrapped in try/except inside day_slots,
     # so an unknown tithi name silently skips tithi-class scoring.

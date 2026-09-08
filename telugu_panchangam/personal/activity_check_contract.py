@@ -643,6 +643,58 @@ def _validate_manual_count(
         )
 
 
+def _manual_spec_metadata(activity: str, manual_spec: Any) -> tuple:
+    if isinstance(manual_spec, str):
+        return (manual_spec,), (), None
+    if not isinstance(manual_spec, Mapping):
+        return tuple(item[0] for item in manual_spec), (), None
+
+    allowed_keys = {'display_section', 'applicable_varas', 'purpose'}
+    unknown_keys = set(manual_spec) - allowed_keys
+    if unknown_keys:
+        raise ValueError(f'{activity}: unknown manual metadata {unknown_keys!r}')
+    return (
+        (manual_spec.get('display_section'),),
+        tuple(manual_spec.get('applicable_varas', ())),
+        manual_spec.get('purpose'),
+    )
+
+
+def _validate_manual_spec(
+    activity: str,
+    manual_spec: Any,
+    allowed_sections: set[str],
+) -> None:
+    sections, applicable_varas, purpose = _manual_spec_metadata(activity, manual_spec)
+    if not sections or set(sections) - allowed_sections:
+        raise ValueError(f'{activity}: invalid manual display sections {sections!r}')
+
+    unknown_varas = set(applicable_varas) - set(CANONICAL_VARAS)
+    if unknown_varas:
+        raise ValueError(f'{activity}: unknown applicable Varas {unknown_varas!r}')
+    if purpose is not None and purpose not in MANUAL_CHECK_PURPOSES:
+        raise ValueError(f'{activity}: unknown manual purpose {purpose!r}')
+
+
+def _validate_activity_spec(
+    activity: str,
+    specification: Mapping[str, Any],
+    allowed_fields: set[str],
+    allowed_sections: set[str],
+) -> None:
+    source_rule = ACTIVITY_RULES[activity]
+    _validate_deterministic_inventory(
+        activity, specification, source_rule, allowed_fields
+    )
+    _validate_rule_ids(activity, specification)
+
+    source_checks = tuple(source_rule.get('manual_checks', ()))
+    manual_specs = specification['manual_sections']
+    _validate_manual_count(activity, source_checks, manual_specs)
+    for manual_spec in manual_specs:
+        _validate_manual_spec(activity, manual_spec, allowed_sections)
+
+
 def _validate_specs() -> None:
     if tuple(ACTIVITY_CHECK_SPECS) != BROWSER_ACTIVITIES:
         raise ValueError(
@@ -652,49 +704,9 @@ def _validate_specs() -> None:
     allowed_fields = set(DETERMINISTIC_PANCHANGAM_FIELDS)
     allowed_sections = set(MANUAL_CHECK_DISPLAY_SECTIONS)
     for activity, specification in ACTIVITY_CHECK_SPECS.items():
-        source_rule = ACTIVITY_RULES[activity]
-        _validate_deterministic_inventory(
-            activity, specification, source_rule, allowed_fields
+        _validate_activity_spec(
+            activity, specification, allowed_fields, allowed_sections
         )
-
-        _validate_rule_ids(activity, specification)
-
-        source_checks = tuple(source_rule.get('manual_checks', ()))
-        manual_specs = specification['manual_sections']
-        _validate_manual_count(activity, source_checks, manual_specs)
-        for manual_spec in manual_specs:
-            if isinstance(manual_spec, str):
-                sections = (manual_spec,)
-                applicable_varas = ()
-                purpose = None
-            elif isinstance(manual_spec, Mapping):
-                unknown_keys = set(manual_spec) - {
-                    'display_section',
-                    'applicable_varas',
-                    'purpose',
-                }
-                if unknown_keys:
-                    raise ValueError(
-                        f'{activity}: unknown manual metadata {unknown_keys!r}'
-                    )
-                sections = (manual_spec.get('display_section'),)
-                applicable_varas = tuple(manual_spec.get('applicable_varas', ()))
-                purpose = manual_spec.get('purpose')
-            else:
-                sections = tuple(item[0] for item in manual_spec)
-                applicable_varas = ()
-                purpose = None
-            if not sections or set(sections) - allowed_sections:
-                raise ValueError(
-                    f'{activity}: invalid manual display sections {sections!r}'
-                )
-            unknown_varas = set(applicable_varas) - set(CANONICAL_VARAS)
-            if unknown_varas:
-                raise ValueError(
-                    f'{activity}: unknown applicable Varas {unknown_varas!r}'
-                )
-            if purpose is not None and purpose not in MANUAL_CHECK_PURPOSES:
-                raise ValueError(f'{activity}: unknown manual purpose {purpose!r}')
 
 
 def build_activity_check_contract() -> dict[str, Any]:

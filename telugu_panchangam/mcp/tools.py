@@ -1138,6 +1138,92 @@ def _precalculate_muhurta_days(
     return calculated
 
 
+def _muhurta_day_results(
+    index,
+    calculated_days,
+    activity,
+    janma_nakshatras,
+    janma_rasis,
+    janma_lagnas,
+    chandra_mode,
+    travel_direction,
+    include_night,
+    engine,
+):
+    day = calculated_days[index]
+    daylight_assessment = None
+    if activity == 'karnavedha':
+        from telugu_panchangam.personal.muhurta import (
+            karnavedha_daylight_assessment,
+        )
+
+        daylight_assessment = karnavedha_daylight_assessment(
+            day, get_activity_rules(activity), activity
+        )
+    day_results = day_slots(
+        day,
+        activity=activity,
+        janma_nakshatras=janma_nakshatras,
+        janma_rasis=janma_rasis,
+        janma_lagnas=janma_lagnas,
+        chandra_mode=chandra_mode,
+        travel_direction=travel_direction,
+        engine=engine,
+        _daylight_assessment=daylight_assessment,
+    )
+    night_results = []
+    if include_night:
+        night_results = night_slots(
+            day,
+            calculated_days[index + 1],
+            activity=activity,
+            janma_nakshatras=janma_nakshatras,
+            janma_rasis=janma_rasis,
+            janma_lagnas=janma_lagnas,
+            chandra_mode=chandra_mode,
+            travel_direction=travel_direction,
+            engine=engine,
+        )
+    return day, daylight_assessment, day_results, night_results
+
+
+def _dropped_muhurta_day(
+    day,
+    activity,
+    janma_nakshatras,
+    janma_rasis,
+    chandra_mode,
+    travel_direction,
+    daylight_assessment,
+):
+    reason = diagnose_day(
+        day,
+        activity=activity,
+        janma_nakshatras=janma_nakshatras,
+        janma_rasis=janma_rasis,
+        chandra_mode=chandra_mode,
+        travel_direction=travel_direction,
+        _daylight_assessment=daylight_assessment,
+    )
+    if not reason:
+        return None
+    dropped = {'date': day.date.isoformat(), 'reason': reason}
+    if daylight_assessment is not None:
+        dropped['daylight_outcomes'] = daylight_assessment['outcomes']
+    return dropped
+
+
+def _formatted_muhurta_slots(results, timezone):
+    return [
+        {
+            **slot,
+            'start': _fmt_time(slot['start'], timezone),
+            'end': _fmt_time(slot['end'], timezone),
+        }
+        for slot in results
+    ]
+
+
 def _gather_muhurta_slots(
     start: date,
     days: int,
@@ -1153,72 +1239,39 @@ def _gather_muhurta_slots(
 ) -> tuple[list, list]:
     slots = []
     dropped_days = []
-    tz = loc.timezone
-
     # When include_night=True we need the day after the last requested day
     # to get next_sunrise for the final night's blocks.
     extra = 1 if include_night else 0
     calculated_days = _precalculate_muhurta_days(start, days, extra, loc, engine)
 
-    for i in range(days):
-        day = calculated_days[i]
-        daylight_assessment = None
-        if activity == 'karnavedha':
-            from telugu_panchangam.personal.muhurta import (
-                karnavedha_daylight_assessment,
-            )
-
-            daylight_assessment = karnavedha_daylight_assessment(
-                day, get_activity_rules(activity), activity
-            )
-        day_results = day_slots(
-            day,
-            activity=activity,
-            janma_nakshatras=janma_nakshatras,
-            janma_rasis=janma_rasis,
-            janma_lagnas=janma_lagnas,
-            chandra_mode=chandra_mode,
-            travel_direction=travel_direction,
-            engine=engine,
-            _daylight_assessment=daylight_assessment,
+    for index in range(days):
+        day, daylight_assessment, day_results, night_results = _muhurta_day_results(
+            index,
+            calculated_days,
+            activity,
+            janma_nakshatras,
+            janma_rasis,
+            janma_lagnas,
+            chandra_mode,
+            travel_direction,
+            include_night,
+            engine,
         )
-        night_results = []
-        if include_night:
-            next_pd = calculated_days[i + 1]
-            night_results = night_slots(
-                day,
-                next_pd,
-                activity=activity,
-                janma_nakshatras=janma_nakshatras,
-                janma_rasis=janma_rasis,
-                janma_lagnas=janma_lagnas,
-                chandra_mode=chandra_mode,
-                travel_direction=travel_direction,
-                engine=engine,
-            )
         if not day_results and not night_results:
-            reason = diagnose_day(
+            dropped = _dropped_muhurta_day(
                 day,
-                activity=activity,
-                janma_nakshatras=janma_nakshatras,
-                janma_rasis=janma_rasis,
-                chandra_mode=chandra_mode,
-                travel_direction=travel_direction,
-                _daylight_assessment=daylight_assessment,
+                activity,
+                janma_nakshatras,
+                janma_rasis,
+                chandra_mode,
+                travel_direction,
+                daylight_assessment,
             )
-            if reason:
-                dropped = {'date': day.date.isoformat(), 'reason': reason}
-                if daylight_assessment is not None:
-                    dropped['daylight_outcomes'] = daylight_assessment['outcomes']
+            if dropped is not None:
                 dropped_days.append(dropped)
-        for s in day_results + night_results:
-            slots.append(
-                {
-                    **s,
-                    'start': _fmt_time(s['start'], tz),
-                    'end': _fmt_time(s['end'], tz),
-                }
-            )
+        slots.extend(
+            _formatted_muhurta_slots(day_results + night_results, loc.timezone)
+        )
     return slots, dropped_days
 
 
