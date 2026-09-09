@@ -35,8 +35,8 @@ AaBbSRXDjK1myYTdWYss,typescript:S3776,CRITICAL,src/scorer/personal-election-scre
 AaBbSRXDjK1myYTdWYsz,typescript:S3776,CRITICAL,src/scorer/personal-election-screening.ts,344,2026-08-31,6,,,mutable
 AZ_4lyDx4HbJenSxEGOb,python:S1192,CRITICAL,telugu_panchangam/cities.py,5,2026-06-17,81,,,mutable
 AZ_4lyDp4HbJenSxEGOa,python:S3776,CRITICAL,telugu_panchangam/eclipses.py,91,2026-06-10,88,,,mutable
-AZ_4lyCp4HbJenSxEGOP,python:S1192,CRITICAL,telugu_panchangam/engines/base.py,41,2026-06-11,87,,_festivals=22,frozen-engine
-AZ_4lyCp4HbJenSxEGOQ,python:S3776,CRITICAL,telugu_panchangam/engines/base.py,408,2026-06-16,82,,_festivals=22,frozen-engine
+AZ_4lyCp4HbJenSxEGOP,python:S1192,CRITICAL,telugu_panchangam/engines/base.py,41,2026-06-11,87,,,frozen-engine
+AZ_4lyCp4HbJenSxEGOQ,python:S3776,CRITICAL,telugu_panchangam/engines/base.py,408,2026-06-16,82,,,frozen-engine
 AZ_4lyC-4HbJenSxEGOV,python:S3776,CRITICAL,telugu_panchangam/generators/ics.py,128,2026-06-11,87,,_description=24,frozen-ics
 AZ_4lyCa4HbJenSxEGOO,python:S3776,CRITICAL,telugu_panchangam/gochara/rules.py,50,2026-06-11,87,,,mutable
 AZ_4lyDU4HbJenSxEGOY,python:S3776,CRITICAL,telugu_panchangam/graha_yuddha.py,139,2026-06-17,81,,,mutable

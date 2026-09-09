@@ -419,86 +419,150 @@ class PanchangamEngine(ABC):
             return RASHI_NAMES[sr], jd_cross
         return None, None
 
-    def _festivals(self, maasam: str, weekday: int,
-                   jd_sr: float, jd_ss: float, jd_next_sr: float,
-                   jd_moonrise: float) -> list[str]:
-        fests: list[str] = []
+    def _solar_festivals(
+        self, jd_sr: float, jd_ss: float, jd_next_sr: float
+    ) -> list[str]:
+        candidates = (
+            (self._is_makara_day(jd_sr, jd_ss), 'Makara Sankranti'),
+            (self._is_makara_day(jd_next_sr, jd_ss + 1.0), 'Bhogi'),
+            (self._is_makara_day(jd_sr - 1.0, jd_ss - 1.0), 'Kanuma'),
+        )
+        return [name for occurs, name in candidates if occurs]
 
-        # --- Solar: Sankranti cluster ---
-        if self._is_makara_day(jd_sr, jd_ss):
-            fests.append('Makara Sankranti')
-        if self._is_makara_day(jd_next_sr, jd_ss + 1.0):
-            fests.append('Bhogi')
-        if self._is_makara_day(jd_sr - 1.0, jd_ss - 1.0):
-            fests.append('Kanuma')
+    def _festival_month_at_moment(
+        self, base_m: str, t_sr: int, t_now: int
+    ) -> str:
+        # When sunrise was Amavasya and pratipada has begun, the amanta
+        # month has rolled over by this deciding moment.
+        if t_sr == 29 and t_now == 0:
+            return MAASAM_NAMES[(MAASAM_NAMES.index(base_m) + 1) % 12]
+        return base_m
 
+    def _moment_festivals(
+        self,
+        base_m: str,
+        t_sr: int,
+        jd_sr: float,
+        jd_ss: float,
+        nishita: float,
+    ) -> list[str]:
+        moments = (
+            (_MADHYAHNA_FESTIVALS, jd_sr + 0.5 * (jd_ss - jd_sr)),
+            (_APARAHNA_FESTIVALS, jd_sr + 0.7 * (jd_ss - jd_sr)),
+            (_PRADOSHA_FESTIVALS, jd_ss + 0.05),
+            (_NISHITA_FESTIVALS, nishita),
+        )
+        festivals: list[str] = []
+        for rules, jd_moment in moments:
+            t_now = self._tithi_index_at(jd_moment)
+            # The same tithi can prevail at this moment two days running;
+            # the festival belongs to the first.
+            t_prev = self._tithi_index_at(jd_moment - 1.0)
+            m_moment = self._festival_month_at_moment(base_m, t_sr, t_now)
+            festivals.extend(
+                name
+                for month, tithi_idx, name in rules
+                if m_moment == month and t_now == tithi_idx and t_prev != tithi_idx
+            )
+        return festivals
+
+    def _last_weekday_festivals(
+        self, base_m: str, weekday: int, t_sr: int, jd_sr: float
+    ) -> list[str]:
+        festivals: list[str] = []
+        for month, rule_weekday, paksha, name in _LAST_WEEKDAY_IN_PAKSHAM_FESTIVALS:
+            if base_m != month or weekday != rule_weekday:
+                continue
+            today_shukla = t_sr <= 14
+            next_week_shukla = self._tithi_index_at(jd_sr + 7.0) <= 14
+            target_shukla = paksha == 'Shukla'
+            if today_shukla == target_shukla and next_week_shukla != target_shukla:
+                festivals.append(name)
+        return festivals
+
+    def _annual_lunar_festivals(
+        self,
+        base_m: str,
+        weekday: int,
+        t_sr: int,
+        jd_sr: float,
+        jd_ss: float,
+        nishita: float,
+    ) -> list[str]:
+        festivals = [
+            name
+            for month, tithi_idx, name in _SUNRISE_FESTIVALS
+            if base_m == month and t_sr == tithi_idx
+        ]
+        festivals.extend(self._moment_festivals(base_m, t_sr, jd_sr, jd_ss, nishita))
+        festivals.extend(
+            name
+            for month, rule_weekday, name in _WEEKDAY_IN_MAASAM_FESTIVALS
+            if base_m == month and weekday == rule_weekday
+        )
+        festivals.extend(self._last_weekday_festivals(base_m, weekday, t_sr, jd_sr))
+        return festivals
+
+    def _is_first_tithi_day(self, jd_moment: float, tithi_idx: int) -> bool:
+        return (
+            self._tithi_index_at(jd_moment) == tithi_idx
+            and self._tithi_index_at(jd_moment - 1.0) != tithi_idx
+        )
+
+    def _monthly_festivals(
+        self,
+        existing_festivals: list[str],
+        jd_ss: float,
+        jd_next_sr: float,
+        jd_moonrise: float,
+        nishita: float,
+    ) -> list[str]:
+        jd_moonrise_eff = (
+            jd_moonrise if jd_ss < jd_moonrise < jd_next_sr else jd_ss + 0.1
+        )
+        existing_count = len(existing_festivals)
+        festivals = list(existing_festivals)
+        festivals.extend(
+            name
+            for tithi_idx, name in _MOONRISE_MONTHLY_FESTIVALS
+            if self._is_first_tithi_day(jd_moonrise_eff, tithi_idx)
+        )
+        for tithi_idx, name, suppress_if in _NISHITA_MONTHLY_FESTIVALS:
+            if suppress_if and suppress_if in festivals:
+                continue
+            if self._is_first_tithi_day(nishita, tithi_idx):
+                festivals.append(name)
+        return festivals[existing_count:]
+
+    def _festivals(
+        self,
+        maasam: str,
+        weekday: int,
+        jd_sr: float,
+        jd_ss: float,
+        jd_next_sr: float,
+        jd_moonrise: float,
+    ) -> list[str]:
+        festivals = self._solar_festivals(jd_sr, jd_ss, jd_next_sr)
         t_sr = self._tithi_index_at(jd_sr)
         nishita = (jd_ss + jd_next_sr) / 2.0
 
-        # --- Lunar festivals (skip the intercalary Adhika month) ---
+        # Annual lunar festivals skip the intercalary Adhika month.
         if not maasam.startswith('Adhika'):
             base_m = maasam.removeprefix(_NIJA_PREFIX)
-            for m, idx, name in _SUNRISE_FESTIVALS:
-                if base_m == m and t_sr == idx:
-                    fests.append(name)
-            moments = [
-                (_MADHYAHNA_FESTIVALS, jd_sr + 0.5 * (jd_ss - jd_sr)),
-                (_APARAHNA_FESTIVALS,  jd_sr + 0.7 * (jd_ss - jd_sr)),
-                (_PRADOSHA_FESTIVALS,  jd_ss + 0.05),
-                (_NISHITA_FESTIVALS,   nishita),
-            ]
-            for rules, jd_moment in moments:
-                t_now = self._tithi_index_at(jd_moment)
-                # the same tithi can prevail at this moment two days running;
-                # the festival belongs to the first
-                t_prev = self._tithi_index_at(jd_moment - 1.0)
-                # when sunrise was Amavasya and pratipada has begun, the
-                # amanta month has rolled over by this moment
-                if t_sr == 29 and t_now == 0:
-                    m_moment = MAASAM_NAMES[(MAASAM_NAMES.index(base_m) + 1) % 12]
-                else:
-                    m_moment = base_m
-                for m, idx, name in rules:
-                    if m_moment == m and t_now == idx and t_prev != idx:
-                        fests.append(name)
-            # Weekday-in-maasam: e.g. Karthika Somavaram (every Monday in Kartika)
-            for m, wd, name in _WEEKDAY_IN_MAASAM_FESTIVALS:
-                if base_m == m and weekday == wd:
-                    fests.append(name)
-            # Last-weekday-in-paksham: e.g. Varalakshmi Vratam (last Shukla
-            # Friday in Shravana, identified by "today is in this paksham
-            # AND the same weekday a week from now has crossed into the
-            # other paksham")
-            for m, wd, paksha, name in _LAST_WEEKDAY_IN_PAKSHAM_FESTIVALS:
-                if base_m != m or weekday != wd:
-                    continue
-                today_shukla = t_sr <= 14
-                next_week_shukla = self._tithi_index_at(jd_sr + 7.0) <= 14
-                this_paksha_now = today_shukla if paksha == 'Shukla' else (not today_shukla)
-                crosses_paksha_in_week = (this_paksha_now != (next_week_shukla if paksha == 'Shukla' else (not next_week_shukla)))
-                if this_paksha_now and crosses_paksha_in_week:
-                    fests.append(name)
+            festivals.extend(
+                self._annual_lunar_festivals(
+                    base_m, weekday, t_sr, jd_sr, jd_ss, nishita
+                )
+            )
 
-        # --- Monthly vrats (observed in Adhika months too) ---
-        if jd_ss < jd_moonrise < jd_next_sr:
-            jd_moonrise_eff = jd_moonrise
-        else:
-            jd_moonrise_eff = jd_ss + 0.1
-        # Moonrise-monthly: e.g. Sankashti Chaturthi
-        for tithi_idx, name in _MOONRISE_MONTHLY_FESTIVALS:
-            if self._tithi_index_at(jd_moonrise_eff) == tithi_idx \
-                    and self._tithi_index_at(jd_moonrise_eff - 1.0) != tithi_idx:
-                fests.append(name)
-        # Nishita-monthly with annual-variant suppression: e.g. Masa Shivaratri
-        # (suppressed when Maha Shivaratri already fired today)
-        for tithi_idx, name, suppress_if in _NISHITA_MONTHLY_FESTIVALS:
-            if suppress_if and suppress_if in fests:
-                continue
-            if self._tithi_index_at(nishita) == tithi_idx \
-                    and self._tithi_index_at(nishita - 1.0) != tithi_idx:
-                fests.append(name)
-
-        return fests
+        # Monthly vrats are observed in Adhika months too.
+        festivals.extend(
+            self._monthly_festivals(
+                festivals, jd_ss, jd_next_sr, jd_moonrise, nishita
+            )
+        )
+        return festivals
 
     def _build_ghati_clock(self, sunrise_dt, next_sunrise_dt):
         from telugu_panchangam.ghati import make_clock
