@@ -31,8 +31,9 @@ advances into the *next* rashi for a short sliver before next
 sunrise). Intentional and accurate; the ribbon shows the cycle as
 it actually unfolds. ``cycleEnd`` is the minute-offset to next
 sunrise — used as the end time of the last visible cell.
-When a sub-minute final window's start and end independently round to
-the same minute, that zero-width serialized cell is omitted.
+When a sub-minute first or final window's start and end independently round to
+the same minute, that zero-width serialized cell is omitted; for a collapsed
+first window, ``lagna0`` advances to the first representable Lagna.
 
 Hora is NOT precomputed — the static site derives it client-side from
 sunrise / sunset / next-sunrise (already in the ICS feed) since the
@@ -94,6 +95,13 @@ def build_for_city(loc, start: date, days: int) -> dict:
         for index, w in enumerate(transitions[1:], start=1):
             new_idx = RASHI_NAMES.index(w.name.replace(' Lagna', ''))
             offset = _minute_of_day(w.start, day.sunrise)
+            if offset == 0:
+                # A sub-minute leading window can independently round its end
+                # to sunrise.  It has no representable JSON interval, so begin
+                # the minute-resolution feed with the following Lagna instead
+                # of emitting a zero-width transition at minute zero.
+                lagna0 = new_idx
+                continue
             if offset >= cycle_end:
                 # The continuous final window can be shorter than half a
                 # minute. Independent minute rounding then collapses its start
