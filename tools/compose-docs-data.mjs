@@ -9,6 +9,7 @@ const outputRoot = join(root, 'dist', 'docs', 'reference')
 const publicData = [
   'computations.json',
   'computations.schema.json',
+  'election-chart-interpretations.json',
   'muhurta-activity-backlog.json',
   'muhurtam-rule-crosswalk.json',
   'project-facts.json',

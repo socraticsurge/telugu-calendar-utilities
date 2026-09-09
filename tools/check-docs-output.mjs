@@ -100,6 +100,7 @@ for (const path of await filesUnder(publicRoot)) {
 for (const file of [
   'computations.json',
   'computations.schema.json',
+  'election-chart-interpretations.json',
   'muhurta-activity-backlog.json',
   'muhurtam-rule-crosswalk.json',
   'project-facts.json',

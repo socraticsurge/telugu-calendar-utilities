@@ -6,6 +6,7 @@ new code imports the domain owner directly.
 
 | Domain | Python owner | TypeScript mirror | Admission rule |
 | --- | --- | --- | --- |
+| interpretation policy | `docs/reference/election-chart-interpretations.json` | `election-chart-interpretations.generated.json` | Source wording, selected computation, alternatives and unresolved states only; it does not evaluate or apply event effects |
 | chart geometry | `chart_geometry.py` | `chart-geometry.ts` | Rasi/Navamsa geometry, house predicates, classical full aspects, and transition envelopes only |
 | graha nature | `graha_nature.py` | `graha-nature.ts` | Natural benefic/malefic classification and lunar-phase policy only |
 | combustion | `combustion.py` | `combustion.ts` | Reserved for the accepted combustion foundation; do not place it in geometry |
@@ -17,6 +18,10 @@ new code imports the domain owner directly.
 Reserved paths are boundaries, not empty modules. They are created only when
 their accepted issue lands. Source- or event-specific policy belongs in its
 domain module or event assessor, never in chart geometry. Every future mirrored
-module must preserve JSON fixture parity and remain dependency-acyclic:
-contracts and facts feed domains, domains feed event assessors, and event
-assessors feed the public election-chart evaluator.
+module must preserve JSON fixture parity and remain dependency-acyclic: the
+interpretation registry constrains domain meanings; contracts and facts feed
+domains; domains feed event assessors; and event assessors feed the public
+election-chart evaluator. A selected registry entry with an empty
+`implementation` list and `specified_unwired` status is approved policy
+metadata, not delivered computation; `partial` identifies an existing bounded
+consumer without claiming the generic primitive complete.

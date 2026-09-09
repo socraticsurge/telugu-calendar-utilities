@@ -36,6 +36,19 @@
       "authority_type": "primary_text_translation"
     },
     {
+      "id": "PD-KAPOOR-DIGITAL-2008",
+      "title": "Phala Deepika",
+      "author": "Mantreswara; English translation, commentary and annotation by G. S. Kapoor",
+      "edition": "Digital artifact produced with OpenOffice.org 2.2, 265 physical PDF pages",
+      "url": "https://starlore.info/pdf/Mantreswaras_Phaladeeplka.pdf",
+      "authority_type": "primary_text_translation_with_commentary",
+      "inspected_directly": true,
+      "accessed_on": "2026-09-09",
+      "sha256": "34259edac6787a32f33742616733ac9f1e059992ddb5c063d4c64bb9106c454a",
+      "byte_size": 1006072,
+      "physical_pdf_page_count": 265
+    },
+    {
       "id": "BPHS-ELS-6.12",
       "title": "Brihat Parashara Hora Shastra, chapter 6 verse 12",
       "author": "Attributed to Parashara",
@@ -761,6 +774,28 @@
       "last_reviewed": "2026-09-04"
     },
     {
+      "id": "election_chart.natural_graha_nature.phaladeepika_2_27",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/election-chart-interpretations.json",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["PD-SASTRI-1950-2E"],
+      "locator": "Chapter II, sloka 27, book pp. 19-20 (scan pp. 56-57)",
+      "scope": "Enumerates waning Chandra, Surya, Kuja, Shani, Rahu and Ketu as malefic; Guru and Shukra as benefic; waxing Chandra as benefic; and Budha as malefic when joined to a malefic. It does not define a conjunction orb, a numerical phase boundary guard or functional lordship.",
+      "last_reviewed": "2026-09-09"
+    },
+    {
+      "id": "election_chart.same_rasi_distributive_conjunction_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/election-chart-interpretations.json",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "same-rasi-distributive-conjunction-v1; source wording remains independently registered as muhurta.borrowing_money",
+      "scope": "Represents the borrowing passage's Chandra conjunction with Mangala and Shani as the distributive formula R(Chandra)=R(Kuja) OR R(Chandra)=R(Shani), with same sidereal Rasi as the only association test and no numerical degree orb. This is an event-bounded selected mode, not a universal conjunction default, and remains unwired pending issue 402.",
+      "last_reviewed": "2026-09-09"
+    },
+    {
       "id": "muhurta.raman_transcription.paksha_definition",
       "surface": "muhurtam",
       "implementation": "docs/reference/18-annaprasana-profile.md",
@@ -1045,6 +1080,28 @@
       "locator": "Surya-Siddhanta Chapter X, verse 1, printed p. 262 (scan p. 315); gold-phaladeepika-placement-full-drishti-v1",
       "scope": "Operationalizes Phaladeepika 2.36's mudha or solar-ray-overpowering condition for Chandra as more than 12 degrees of shortest ecliptic elongation, with a 0.02-degree rounding guard. Surya-Siddhanta X.1 supplies historical rationale for a 12-degree lunar visibility boundary, but its measure is kalamsa or time-degrees in oblique ascension rather than this implementation's ecliptic-longitude distance. The conversion and precision guard therefore remain explicit v1 product approximations, not a direct textual formula.",
       "last_reviewed": "2026-08-30"
+    },
+    {
+      "id": "election_chart.combustion.kapoor_2_36_note",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/election-chart-interpretations.json",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["PD-KAPOOR-DIGITAL-2008"],
+      "locator": "Chapter II, verse 36 commentary note, physical/printed pp. 26-27",
+      "scope": "Kapoor's commentary note, not the Sanskrit verse, gives solar-distance values of 11 degrees for Guru, 10 degrees for direct Shukra and 8 degrees for retrograde Shukra. The shortest-arc formula, strict inequalities, candidate-instant use and precision guard are separate project conventions.",
+      "last_reviewed": "2026-09-09"
+    },
+    {
+      "id": "election_chart.fixed_elongation_combustion_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/election-chart-interpretations.json",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["PD-KAPOOR-DIGITAL-2008"],
+      "locator": "Phaladeepika Chapter II, verse 36 commentary note, physical/printed pp. 26-27; phaladeepika-kapoor-fixed-elongation-combustion-v1",
+      "scope": "Uses shortest ecliptic-longitude separation at the candidate instant, the Kapoor thresholds for Guru and Shukra, strict threshold comparisons, and a plus-or-minus 0.02-degree guard matching the rounded exact-chart contract. Missing Shukra retrograde state, malformed facts or guard overlap returns unknown. The location-dependent heliacal calendar is explicitly not substituted. The mode is selected but remains unwired pending issue 251 and event-specific delivery.",
+      "last_reviewed": "2026-09-09"
     },
     {
       "id": "election_chart.gold_qualification_policy_v1",
