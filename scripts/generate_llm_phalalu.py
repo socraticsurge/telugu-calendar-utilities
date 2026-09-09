@@ -4,7 +4,7 @@ Positions are taken at Hyderabad sunrise (rasi-level data is uniform
 across Indian cities at this resolution).
 
 Usage:
-    rasiphalalu=<key> python scripts/generate_llm_phalalu.py
+    rasiphalalu=<key> python -m scripts.generate_llm_phalalu
 
 Output:
     data/llm_phalalu/YYYY-MM-DD.json   (override with PHALALU_OUT env var)
