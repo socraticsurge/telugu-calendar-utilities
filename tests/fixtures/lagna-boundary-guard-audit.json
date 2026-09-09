@@ -49,8 +49,8 @@
   "results": {
     "transition_count": 25344,
     "first_new_minute_offsets": {
-      "0": 3334,
-      "1": 18865,
+      "0": 3338,
+      "1": 18861,
       "2": 3145
     },
     "transitions_after_t_plus_2": 0,

@@ -1,10 +1,15 @@
 """Smoke tests for the lagna.json generator. Verifies shape, in-range
 indices, monotonic minute offsets, and timezone-aware sunrise."""
-from datetime import date
+from datetime import date, timedelta
+from itertools import pairwise
+
+import pytest
 
 from scripts.build_lagna_json import build_for_city
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.panchangam_names import RASHI_NAMES
+
+ANNUAL_CYCLE_CITIES = ('Hyderabad', 'London', 'New York', 'Sydney')
 
 
 def _hyderabad():
@@ -77,6 +82,14 @@ def test_rounded_zero_duration_terminal_transition_is_omitted():
         assert row['cycleEnd'] not in offsets
 
 
+def test_rounded_zero_duration_initial_transition_is_omitted():
+    """A sub-minute sunrise cell must not become a zero-width JSON cell."""
+    row = build_for_city(_hyderabad(), date(2026, 5, 16), 1)['days'][0]
+
+    assert row['lagna0'] == 1
+    assert row['transitions'][0][0] > 0
+
+
 def test_cell_count_is_13_or_14_per_day():
     """The 24h panchangam slice captures 13 OR 14 engine windows
     depending on how far past the leading rashi the cycle has wrapped
@@ -89,3 +102,38 @@ def test_cell_count_is_13_or_14_per_day():
     counts = [1 + len(d['transitions']) for d in data['days']]
     assert all(c in (13, 14) for c in counts), \
         f'expected 13 or 14 cells per day, got {counts}'
+
+
+@pytest.mark.parametrize('city_name', ANNUAL_CYCLE_CITIES)
+def test_annual_multi_city_feed_covers_one_sunrise_cycle(city_name):
+    """Protect the repaired generator across a full year and both hemispheres.
+
+    The former ``sunrise + 1 Julian day`` seed could land after the immediately
+    following sunrise and make Swiss Ephemeris return the *second* following
+    sunrise.  That produced 24/25-transition, roughly 2880-minute artifacts on
+    127 Hyderabad dates in the original #244 audit.  The sunset-seeded boundary
+    must instead produce exactly one ordered zodiac cycle on every 2026 date,
+    including the London, New York, and Sydney DST transitions.
+    """
+    city = next(candidate for candidate in CITIES if candidate.name == city_name)
+    start = date(2026, 1, 1)
+    rows = build_for_city(city, start, 365)['days']
+
+    assert [row['date'] for row in rows] == [
+        (start + timedelta(days=offset)).isoformat()
+        for offset in range(365)
+    ]
+
+    for row in rows:
+        offsets = [offset for offset, _ in row['transitions']]
+        rashis = [row['lagna0'], *(index for _, index in row['transitions'])]
+
+        assert offsets == sorted(set(offsets))
+        assert all(0 < offset < row['cycleEnd'] for offset in offsets)
+        assert 1430 <= row['cycleEnd'] <= 1450
+        assert len(rashis) in (13, 14)
+        assert set(rashis) == set(range(12))
+        assert all(
+            following == (current + 1) % 12
+            for current, following in pairwise(rashis)
+        )
