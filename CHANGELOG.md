@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.6` while decomposing frozen festival
+  dispatch into rule-group helpers, with unchanged rule tables, deciding
+  moments, festival ordering, calculation results, and ICS bytes.
 - Prepare MCP/PyPI patch metadata `1.18.5` while clearing mechanical lint and
   simple static-analysis debt in the owner-approved frozen core, with unchanged
   calculation results and byte-identical ICS output.
