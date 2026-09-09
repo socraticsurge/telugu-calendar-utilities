@@ -1,10 +1,6 @@
 {
   "description": "Exact C901 hotspot scores; every change requires intentional review.",
-  "hotspots": {
-    "telugu_panchangam/generators/ics.py": {
-      "_description": 24
-    }
-  },
+  "hotspots": {},
   "max_complexity": 10,
   "ruff_version": "0.16.6",
   "schema_version": 1,

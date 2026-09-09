@@ -126,16 +126,21 @@ class ICSGenerator:
         prefix = 'Previous day ' if local.date() < day_date else ''
         return f'{prefix}{local.strftime("%H:%M")}'
 
-    def _description(self, day: PanchangamDay, tz, next_day: PanchangamDay | None = None) -> str:
+    def _description_header(self, day: PanchangamDay, tz) -> list[str]:
         fmt = self._fmt_time
         fmtr = partial(self._fmt_time_rel, tz=tz, day_date=day.date)
-        fmtw = partial(self._fmt_window, tz=tz, day_date=day.date)
         lines = [
-            f'{day.samvatsara} Nama Samvatsara  ·  {day.maasam} Maasam  ·  '
-            f'{day.paksham} Paksham  ·  {day.vaaram}',
+            (
+                f'{day.samvatsara} Nama Samvatsara  ·  {day.maasam} Maasam  ·  '
+                f'{day.paksham} Paksham  ·  {day.vaaram}'
+            ),
             f'Ayanam: {day.ayanam}  ·  Rituvu: {day.rituvu}',
-            f'Sunrise {fmt(day.sunrise, tz)}  ·  Sunset {fmt(day.sunset, tz)}  ·  '
-            f'Moonrise {fmt(day.moonrise, tz)}  ·  Moonset {fmt(day.moonset, tz)}',
+            (
+                f'Sunrise {fmt(day.sunrise, tz)}  ·  '
+                f'Sunset {fmt(day.sunset, tz)}  ·  '
+                f'Moonrise {fmt(day.moonrise, tz)}  ·  '
+                f'Moonset {fmt(day.moonset, tz)}'
+            ),
             f'Solar sign: {day.solar_sign}  ·  Lunar sign: {day.lunar_sign}',
             '',
             f'Tithi:     {self._tithi_display(day):<18} {fmtr(day.tithi.start)} – {fmtr(day.tithi.end)}',
@@ -146,7 +151,10 @@ class ICSGenerator:
             karana_str = '  /  '.join(f'{k.name} {fmtr(k.start)}–{fmtr(k.end)}'
                                       for k in day.karana)
             lines.append(f'Karana:    {karana_str}')
-        lines += [
+        return lines
+
+    def _auspicious_lines(self, day: PanchangamDay, fmtw) -> list[str]:
+        lines = [
             '',
             '─ Auspicious ─',
             f'  Brahma Muhurta   {fmtw(day.brahma_muhurta)}',
@@ -155,7 +163,10 @@ class ICSGenerator:
             lines.append(f'  Abhijit Muhurta  {fmtw(day.abhijit_muhurta)}')
         for w in day.amrita_kalam:
             lines.append(f'  Amrita Kalam     {fmtw(w)}')
-        lines += [
+        return lines
+
+    def _inauspicious_lines(self, day: PanchangamDay, fmtw) -> list[str]:
+        lines = [
             '',
             '─ Inauspicious ─',
             f'  Rahu Kalam       {fmtw(day.rahu_kalam)}',
@@ -166,61 +177,124 @@ class ICSGenerator:
             lines.append(f'  Varjyam          {fmtw(w)}')
         for w in day.durmuhurtham:
             lines.append(f'  Durmuhurtham     {fmtw(w)}')
-        if day.choghadiya:
-            lines.append('')
-            lines.append('─ Choghadiya ─')
-            for w in day.choghadiya:
-                lines.append(f'  {fmt(w.start, tz)} – {fmt(w.end, tz)}  {w.name}')
-        if next_day is not None:
-            weekday = (day.date.weekday() + 1) % 7  # 0=Sunday, engine convention
-            names = _NIGHT_CHOGHADIYA[weekday]
-            block = (next_day.sunrise - day.sunset) / 8
-            lines.append('')
-            lines.append('─ Night Choghadiya ─')
-            for i in range(8):
-                start = day.sunset + i * block
-                end = day.sunset + (i + 1) * block
-                lines.append(f'  {fmtr(start)} – {fmtr(end)}  {names[i]}')
-        if day.eclipse:
-            e = day.eclipse
-            emoji = '🌒' if e.kind == 'Solar' else '🌕'
-            visibility = 'visible from this location' if e.visible else 'not visible from this location'
-            lines += [
-                '',
-                '─ Eclipse ─',
-                f'  {emoji} {e.kind} Eclipse ({e.subtype}) — {visibility}',
-                f'  Window:   {self._fmt_eclipse_time(e.start, tz, day.date)} – {self._fmt_eclipse_time(e.end, tz, day.date)}',
-            ]
-            if e.visible:
-                lines.append(
-                    f'  Sutak:    {self._fmt_eclipse_time(e.sutak_start, tz, day.date)} – {self._fmt_eclipse_time(e.sutak_end, tz, day.date)}'
-                )
+        return lines
 
-        if day.special_yogas:
-            lines += ['', '─ Special Yogas ─']
-            for yoga in day.special_yogas:
-                lines.append(f'  {yoga}')
+    def _day_choghadiya_lines(self, day: PanchangamDay, tz) -> list[str]:
+        if not day.choghadiya:
+            return []
+        lines = ['', '─ Choghadiya ─']
+        for w in day.choghadiya:
+            lines.append(
+                f'  {self._fmt_time(w.start, tz)} – '
+                f'{self._fmt_time(w.end, tz)}  {w.name}'
+            )
+        return lines
 
-        specials = list(day.festivals)
-        if day.nakshatra.name in GANDA_MOOLA_NAKSHATRAS:
-            specials.append(f'Ganda Moola ({day.nakshatra.name})')
-        if day.is_ekadashi:
-            specials.append(f'{self._tithi_display(day)} — fasting day')
-        if day.is_amavasya:
-            specials.append('Amavasya')
-        if day.is_pournami:
-            specials.append('Pournami')
+    def _night_choghadiya_lines(
+        self, day: PanchangamDay, next_day: PanchangamDay | None, fmtr
+    ) -> list[str]:
+        if next_day is None:
+            return []
+        weekday = (day.date.weekday() + 1) % 7  # 0=Sunday, engine convention
+        names = _NIGHT_CHOGHADIYA[weekday]
+        block = (next_day.sunrise - day.sunset) / 8
+        lines = ['', '─ Night Choghadiya ─']
+        for i in range(8):
+            start = day.sunset + i * block
+            end = day.sunset + (i + 1) * block
+            lines.append(f'  {fmtr(start)} – {fmtr(end)}  {names[i]}')
+        return lines
+
+    def _eclipse_lines(self, day: PanchangamDay, tz) -> list[str]:
+        if not day.eclipse:
+            return []
+        eclipse = day.eclipse
+        emoji = '🌒' if eclipse.kind == 'Solar' else '🌕'
+        visibility = (
+            'visible from this location'
+            if eclipse.visible
+            else 'not visible from this location'
+        )
+        lines = [
+            '',
+            '─ Eclipse ─',
+            f'  {emoji} {eclipse.kind} Eclipse ({eclipse.subtype}) — {visibility}',
+            (
+                f'  Window:   '
+                f'{self._fmt_eclipse_time(eclipse.start, tz, day.date)} – '
+                f'{self._fmt_eclipse_time(eclipse.end, tz, day.date)}'
+            ),
+        ]
+        if eclipse.visible:
+            lines.append(
+                f'  Sutak:    '
+                f'{self._fmt_eclipse_time(eclipse.sutak_start, tz, day.date)} – '
+                f'{self._fmt_eclipse_time(eclipse.sutak_end, tz, day.date)}'
+            )
+        return lines
+
+    def _special_yoga_lines(self, day: PanchangamDay) -> list[str]:
+        if not day.special_yogas:
+            return []
+        return ['', '─ Special Yogas ─', *(f'  {yoga}' for yoga in day.special_yogas)]
+
+    def _pradosham_special(self, day: PanchangamDay) -> str | None:
         if day.is_shani_pradosham:
-            specials.append('Shani Pradosham')
-        elif day.is_soma_pradosham:
-            specials.append('Soma Pradosham')
-        elif day.is_pradosham:
-            specials.append('Pradosham')
-        if day.sankramanam and not (day.sankramanam == 'Makara'
-                                    and 'Makara Sankranti' in day.festivals):
-            specials.append(f'{day.sankramanam} Sankramanam')
+            return 'Shani Pradosham'
+        if day.is_soma_pradosham:
+            return 'Soma Pradosham'
+        if day.is_pradosham:
+            return 'Pradosham'
+        return None
+
+    def _sankramanam_special(self, day: PanchangamDay) -> str | None:
+        if not day.sankramanam:
+            return None
+        if day.sankramanam == 'Makara' and 'Makara Sankranti' in day.festivals:
+            return None
+        return f'{day.sankramanam} Sankramanam'
+
+    def _description_specials(self, day: PanchangamDay) -> list[str]:
+        specials = list(day.festivals)
+        conditional_specials = (
+            (
+                day.nakshatra.name in GANDA_MOOLA_NAKSHATRAS,
+                f'Ganda Moola ({day.nakshatra.name})',
+            ),
+            (day.is_ekadashi, f'{self._tithi_display(day)} — fasting day'),
+            (day.is_amavasya, 'Amavasya'),
+            (day.is_pournami, 'Pournami'),
+        )
+        specials.extend(
+            label for enabled, label in conditional_specials if enabled
+        )
+        pradosham = self._pradosham_special(day)
+        if pradosham:
+            specials.append(pradosham)
+        sankramanam = self._sankramanam_special(day)
+        if sankramanam:
+            specials.append(sankramanam)
         if day.eclipse:
             specials.append(f'{day.eclipse.kind} Eclipse ({day.eclipse.subtype})')
-        if specials:
-            lines += ['', '⚡ ' + '  ·  '.join(specials)]
+        return specials
+
+    def _special_lines(self, day: PanchangamDay) -> list[str]:
+        specials = self._description_specials(day)
+        if not specials:
+            return []
+        return ['', '⚡ ' + '  ·  '.join(specials)]
+
+    def _description(
+        self, day: PanchangamDay, tz, next_day: PanchangamDay | None = None
+    ) -> str:
+        fmtr = partial(self._fmt_time_rel, tz=tz, day_date=day.date)
+        fmtw = partial(self._fmt_window, tz=tz, day_date=day.date)
+        lines = self._description_header(day, tz)
+        lines.extend(self._auspicious_lines(day, fmtw))
+        lines.extend(self._inauspicious_lines(day, fmtw))
+        lines.extend(self._day_choghadiya_lines(day, tz))
+        lines.extend(self._night_choghadiya_lines(day, next_day, fmtr))
+        lines.extend(self._eclipse_lines(day, tz))
+        lines.extend(self._special_yoga_lines(day))
+        lines.extend(self._special_lines(day))
         return '\n'.join(lines)
