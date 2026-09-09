@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.7` while decomposing the frozen ICS
+  description builder into section-formatting helpers, with byte-identical
+  subscriber feeds and no remaining governed complexity hotspots.
 - Prepare MCP/PyPI patch metadata `1.18.6` while decomposing frozen festival
   dispatch into rule-group helpers, with unchanged rule tables, deciding
   moments, festival ordering, calculation results, and ICS bytes.

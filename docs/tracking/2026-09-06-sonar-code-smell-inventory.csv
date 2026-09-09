@@ -37,7 +37,7 @@ AZ_4lyDx4HbJenSxEGOb,python:S1192,CRITICAL,telugu_panchangam/cities.py,5,2026-06
 AZ_4lyDp4HbJenSxEGOa,python:S3776,CRITICAL,telugu_panchangam/eclipses.py,91,2026-06-10,88,,,mutable
 AZ_4lyCp4HbJenSxEGOP,python:S1192,CRITICAL,telugu_panchangam/engines/base.py,41,2026-06-11,87,,,frozen-engine
 AZ_4lyCp4HbJenSxEGOQ,python:S3776,CRITICAL,telugu_panchangam/engines/base.py,408,2026-06-16,82,,,frozen-engine
-AZ_4lyC-4HbJenSxEGOV,python:S3776,CRITICAL,telugu_panchangam/generators/ics.py,128,2026-06-11,87,,_description=24,frozen-ics
+AZ_4lyC-4HbJenSxEGOV,python:S3776,CRITICAL,telugu_panchangam/generators/ics.py,128,2026-06-11,87,,,frozen-ics
 AZ_4lyCa4HbJenSxEGOO,python:S3776,CRITICAL,telugu_panchangam/gochara/rules.py,50,2026-06-11,87,,,mutable
 AZ_4lyDU4HbJenSxEGOY,python:S3776,CRITICAL,telugu_panchangam/graha_yuddha.py,139,2026-06-17,81,,,mutable
 AZ_4lyDJ4HbJenSxEGOX,python:S3776,CRITICAL,telugu_panchangam/ingress.py,96,2026-06-17,81,,,mutable
@@ -269,7 +269,7 @@ AaBbSRXDjK1myYTdWYsy,typescript:S3358,MAJOR,src/scorer/personal-election-screeni
 AaBbSRXDjK1myYTdWYs4,typescript:S3358,MAJOR,src/scorer/personal-election-screening.ts,394,2026-08-31,6,,,mutable
 AaBbSRXDjK1myYTdWYs5,typescript:S3358,MAJOR,src/scorer/personal-election-screening.ts,396,2026-08-31,6,,,mutable
 AaBbSRXDjK1myYTdWYs6,typescript:S3358,MAJOR,src/scorer/personal-election-screening.ts,398,2026-08-31,6,,,mutable
-AZ_4lyC-4HbJenSxEGOW,python:S3457,MAJOR,telugu_panchangam/generators/ics.py,189,2026-06-10,88,,_description=24,frozen-ics
+AZ_4lyC-4HbJenSxEGOW,python:S3457,MAJOR,telugu_panchangam/generators/ics.py,189,2026-06-10,88,,,frozen-ics
 AZ_4lx-B4HbJenSxEGNn,python:S107,MAJOR,telugu_panchangam/mcp/server.py,240,2026-06-21,77,,,mutable
 AZ_4lyAO4HbJenSxEGNu,python:S107,MAJOR,telugu_panchangam/mcp/tools.py,1046,2026-06-21,77,,,mutable
 AZ_4lyBf4HbJenSxEGN2,python:S1172,MAJOR,telugu_panchangam/personal/muhurta.py,291,2026-06-22,76,,,mutable

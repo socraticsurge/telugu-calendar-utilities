@@ -151,10 +151,7 @@ def test_baseline_serialization_is_deterministic(monkeypatch, tmp_path):
     assert destination.read_text().endswith("\n")
 
 
-def test_remaining_frozen_core_hotspot_stays_governed():
+def test_repository_has_no_governed_complexity_hotspots():
     payload = json.loads(complexity.BASELINE.read_text())
 
-    assert "telugu_panchangam/engines/base.py" not in payload["hotspots"]
-    assert payload["hotspots"]["telugu_panchangam/generators/ics.py"] == {
-        "_description": 24
-    }
+    assert payload["hotspots"] == {}
