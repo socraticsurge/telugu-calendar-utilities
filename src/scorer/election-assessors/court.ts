@@ -2,6 +2,7 @@ import { RASI_NAMES } from '../../data/rasis';
 import type { ElectionChartSnapshot } from '../../lib/election-chart-api';
 import { navamsaRashi } from './chart-geometry';
 import type { PlanetPosition, PrimitiveOutcome } from './contracts';
+import { evaluateForbiddenMaleficHouseSet } from './graha-nature';
 
 const NAVAMSA_ROUNDING_GUARD_DEGREES = 0.01;
 
@@ -39,6 +40,36 @@ export const COURT_MESHA_D1_D9_METADATA = {
   },
 } as const;
 
+export const COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA = {
+  source_statement: {
+    claim_id: 'muhurta.court.filing_lawsuit',
+    text: 'Place no malefic in the 6th.',
+    locator: "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+  },
+  convention: {
+    classifier_id: 'phaladeepika-natural-graha-nature-whole-sign-v1',
+    house_occupation_id: 'whole-sign-physical-occupation-v1',
+    method_claim_ids: [
+      'election_chart.natural_graha_nature.phaladeepika_2_27',
+      'election_chart.budha_same_sign_association_policy_v1',
+      'election_chart.raman_180_degree_paksha_policy_v1',
+      'election_chart.lunar_phase_boundary_guard_policy_v1',
+      'election_chart.whole_sign_house_policy_v1',
+    ],
+    formula: 'no graha p has H(p) = 6 and natural_nature(p) = malefic',
+    house_system: 'whole_sign',
+    frame: 'validated_local_lagna',
+  },
+  event_policy: {
+    id: 'court.house-6-without-natural-malefic',
+    activity: 'court',
+    effect: 'reject',
+    effect_claim_id: 'muhurta.court.effect_policy_v1',
+    status: 'specified_unwired',
+    delivery_issue: 397,
+  },
+} as const;
+
 export interface CourtMeshaD1D9Options {
   authoritativeD1Rashi?: string | null;
   lagnaAuthorityUncertain?: boolean;
@@ -48,6 +79,14 @@ export interface CourtMeshaD1D9Options {
 export interface CourtMeshaD1D9Coverage {
   localLagnaTransitionsComplete: boolean;
   lagnaNavamsaTransitionsComplete: boolean;
+  budgetExhausted: boolean;
+}
+
+export interface CourtSixthHouseNaturalMaleficCoverage {
+  localLagnaTransitionsComplete: boolean;
+  grahaRasiTransitionsComplete: boolean;
+  chandraPhaseTransitionsComplete: boolean;
+  budhaAssociationTransitionsComplete: boolean;
   budgetExhausted: boolean;
 }
 
@@ -243,6 +282,121 @@ export function aggregateCourtMeshaD1D9Window(
     status: 'pass',
     evidence: [
       'Every represented state resolves the Court Mesha D1-or-D9 condition as satisfied.',
+    ],
+  };
+}
+
+export function evaluateCourtSixthHouseNaturalMalefic(
+  chart: ElectionChartSnapshot,
+  options: { houseFrameUncertain?: boolean } = {},
+): PrimitiveOutcome {
+  if (
+    options.houseFrameUncertain !== undefined
+    && typeof options.houseFrameUncertain !== 'boolean'
+  ) {
+    return {
+      status: 'unknown',
+      evidence: ['The Court sixth-house evaluator configuration is malformed.'],
+    };
+  }
+  if (
+    !chart || typeof chart !== 'object' || Array.isArray(chart)
+    || !Array.isArray(chart.planets)
+    || Array.from({ length: chart.planets.length }, (_, index) => chart.planets[index])
+      .some(planet => !planet)
+  ) {
+    return {
+      status: 'unknown',
+      evidence: ['Complete canonical nine-graha facts are unavailable or invalid.'],
+    };
+  }
+  if (options.houseFrameUncertain) {
+    return {
+      status: 'unknown',
+      evidence: [
+        'The validated local-Lagna house frame is unavailable or disagrees with sidecar facts.',
+      ],
+    };
+  }
+  return evaluateForbiddenMaleficHouseSet(chart, [6]);
+}
+
+export function courtSixthHouseCandidateDisposition(
+  outcome: PrimitiveOutcome,
+): 'reject' | 'retain' | 'review' {
+  if (!outcome || typeof outcome !== 'object' || Array.isArray(outcome)) return 'review';
+  if (outcome.status === 'fail') return 'reject';
+  if (outcome.status === 'pass') return 'retain';
+  return 'review';
+}
+
+function validCourtSixthHouseCoverage(
+  coverage: CourtSixthHouseNaturalMaleficCoverage | null | undefined,
+): coverage is CourtSixthHouseNaturalMaleficCoverage {
+  return Boolean(
+    coverage && typeof coverage === 'object' && !Array.isArray(coverage)
+    && typeof coverage.localLagnaTransitionsComplete === 'boolean'
+    && typeof coverage.grahaRasiTransitionsComplete === 'boolean'
+    && typeof coverage.chandraPhaseTransitionsComplete === 'boolean'
+    && typeof coverage.budhaAssociationTransitionsComplete === 'boolean'
+    && typeof coverage.budgetExhausted === 'boolean',
+  );
+}
+
+export function aggregateCourtSixthHouseNaturalMaleficWindow(
+  samples: readonly PrimitiveOutcome[],
+  coverage: CourtSixthHouseNaturalMaleficCoverage,
+): PrimitiveOutcome {
+  const failed = Array.isArray(samples)
+    ? samples.find(sample => sample?.status === 'fail')
+    : undefined;
+  if (failed) return failed;
+  if (
+    !Array.isArray(samples)
+    || Array.from({ length: samples.length }, (_, index) => samples[index])
+      .some(sample => !validOutcome(sample))
+  ) {
+    return {
+      status: 'unknown',
+      evidence: ['Represented chart states are malformed or incomplete.'],
+    };
+  }
+  const unknown = samples.find(sample => sample.status === 'unknown');
+  if (unknown) return unknown;
+  if (!samples.length) {
+    return { status: 'unknown', evidence: ['No represented chart states are available.'] };
+  }
+  if (!validCourtSixthHouseCoverage(coverage)) {
+    return {
+      status: 'unknown',
+      evidence: ['Window transition metadata is malformed or incomplete.'],
+    };
+  }
+  if (coverage.budgetExhausted) {
+    return {
+      status: 'unknown',
+      evidence: [
+        "The chart-request budget was exhausted before this window's coverage was complete.",
+      ],
+    };
+  }
+  const missing = [];
+  if (!coverage.localLagnaTransitionsComplete) missing.push('local-Lagna');
+  if (!coverage.grahaRasiTransitionsComplete) missing.push('graha-Rasi');
+  if (!coverage.chandraPhaseTransitionsComplete) missing.push('Chandra-phase');
+  if (!coverage.budhaAssociationTransitionsComplete) missing.push('Budha-association');
+  if (missing.length) {
+    return {
+      status: 'unknown',
+      evidence: [
+        `All represented states pass, but ${missing.join(', ')} transition coverage is incomplete.`,
+      ],
+    };
+  }
+  return {
+    status: 'pass',
+    evidence: [
+      'Every represented state keeps Whole Sign house 6 free of resolved natural malefics.',
     ],
   };
 }

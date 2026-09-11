@@ -1,0 +1,74 @@
+{
+  "fixture_kind": "synthetic_contract_fixture",
+  "source_golden": false,
+  "metadata": {
+    "source_statement": {
+      "claim_id": "muhurta.court.filing_lawsuit",
+      "text": "Place no malefic in the 6th.",
+      "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+    },
+    "convention": {
+      "classifier_id": "phaladeepika-natural-graha-nature-whole-sign-v1",
+      "house_occupation_id": "whole-sign-physical-occupation-v1",
+      "method_claim_ids": [
+        "election_chart.natural_graha_nature.phaladeepika_2_27",
+        "election_chart.budha_same_sign_association_policy_v1",
+        "election_chart.raman_180_degree_paksha_policy_v1",
+        "election_chart.lunar_phase_boundary_guard_policy_v1",
+        "election_chart.whole_sign_house_policy_v1"
+      ],
+      "formula": "no graha p has H(p) = 6 and natural_nature(p) = malefic",
+      "house_system": "whole_sign",
+      "frame": "validated_local_lagna"
+    },
+    "event_policy": {
+      "id": "court.house-6-without-natural-malefic",
+      "activity": "court",
+      "effect": "reject",
+      "effect_claim_id": "muhurta.court.effect_policy_v1",
+      "status": "specified_unwired",
+      "delivery_issue": 397
+    }
+  },
+  "base_planets": [
+    {"name": "Surya", "rashi": "Mesha", "degree": 0.0, "house": 1, "retrograde": false},
+    {"name": "Chandra", "rashi": "Karka", "degree": 10.0, "house": 4, "retrograde": false},
+    {"name": "Kuja", "rashi": "Mithuna", "degree": 12.0, "house": 3, "retrograde": false},
+    {"name": "Budha", "rashi": "Simha", "degree": 13.0, "house": 5, "retrograde": false},
+    {"name": "Guru", "rashi": "Kanya", "degree": 14.0, "house": 6, "retrograde": false},
+    {"name": "Shukra", "rashi": "Tula", "degree": 15.0, "house": 7, "retrograde": false},
+    {"name": "Shani", "rashi": "Vrischika", "degree": 16.0, "house": 8, "retrograde": true},
+    {"name": "Rahu", "rashi": "Dhanu", "degree": 17.0, "house": 9, "retrograde": true},
+    {"name": "Ketu", "rashi": "Mithuna", "degree": 17.0, "house": 3, "retrograde": true}
+  ],
+  "snapshot_cases": [
+    {"id": "fixed-benefic-guru-in-house6-pass", "expected": {"status": "pass", "evidence": ["No resolved natural malefic occupies the forbidden house set."]}},
+    {"id": "no-occupant-in-house6-pass", "overrides": {"Guru": {"rashi": "Kumbha", "house": 11}}, "expected": {"status": "pass", "evidence": ["No resolved natural malefic occupies the forbidden house set."]}},
+    {"id": "surya-in-house6-fail", "overrides": {"Surya": {"rashi": "Kanya", "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Surya (house 6)."]}},
+    {"id": "kuja-in-house6-fail", "overrides": {"Kuja": {"rashi": "Kanya", "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Kuja (house 6)."]}},
+    {"id": "shani-in-house6-fail", "overrides": {"Shani": {"rashi": "Kanya", "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Shani (house 6)."]}},
+    {"id": "rahu-in-house6-fail", "overrides": {"Rahu": {"rashi": "Kanya", "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Rahu (house 6)."]}},
+    {"id": "ketu-in-house6-fail", "overrides": {"Ketu": {"rashi": "Kanya", "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Ketu (house 6)."]}},
+    {"id": "multiple-occupants-one-malefic-fail", "overrides": {"Kuja": {"rashi": "Kanya", "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Kuja (house 6)."]}},
+    {"id": "waxing-chandra-in-house6-pass", "overrides": {"Chandra": {"rashi": "Kanya", "degree": 10.0, "house": 6}}, "expected": {"status": "pass", "evidence": ["No resolved natural malefic occupies the forbidden house set."]}},
+    {"id": "waning-chandra-in-house6-fail", "overrides": {"Surya": {"rashi": "Tula", "degree": 0.0, "house": 7}, "Chandra": {"rashi": "Kanya", "degree": 0.0, "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Chandra (house 6)."]}},
+    {"id": "phase-boundary-chandra-and-budha-unknown", "overrides": {"Surya": {"rashi": "Meena", "degree": 0.0, "house": 12}, "Chandra": {"rashi": "Kanya", "degree": 0.0, "house": 6}, "Budha": {"rashi": "Kanya", "degree": 10.0, "house": 6}}, "expected": {"status": "unknown", "evidence": ["Forbidden-malefic check remains unresolved: Chandra (house 6), Budha (house 6)."]}},
+    {"id": "known-malefic-dominates-phase-unknown", "overrides": {"Surya": {"rashi": "Meena", "degree": 0.0, "house": 12}, "Chandra": {"rashi": "Kanya", "degree": 0.0, "house": 6}, "Budha": {"rashi": "Kanya", "degree": 10.0, "house": 6}, "Kuja": {"rashi": "Kanya", "degree": 15.0, "house": 6}}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Kuja (house 6), Budha (house 6)."]}},
+    {"id": "missing-graha-unknown", "remove": ["Ketu"], "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha facts are unavailable or invalid."]}},
+    {"id": "duplicate-graha-unknown", "duplicate": "Guru", "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha facts are unavailable or invalid."]}},
+    {"id": "malformed-house-unknown", "overrides": {"Guru": {"house": 13}}, "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha facts are unavailable or invalid."]}},
+    {"id": "lagna-frame-unknown", "house_frame_uncertain": true, "expected": {"status": "unknown", "evidence": ["The validated local-Lagna house frame is unavailable or disagrees with sidecar facts."]}}
+  ],
+  "window_cases": [
+    {"id": "known-fail-dominates-unrelated-unknown", "sample_case_ids": ["kuja-in-house6-fail", "missing-graha-unknown"], "coverage": {"local_lagna_transitions_complete": false, "graha_rasi_transitions_complete": false, "chandra_phase_transitions_complete": false, "budha_association_transitions_complete": false, "budget_exhausted": true}, "expected": {"status": "fail", "evidence": ["Forbidden natural-malefic witness: Kuja (house 6)."]}},
+    {"id": "unknown-dominates-pass", "sample_case_ids": ["fixed-benefic-guru-in-house6-pass", "phase-boundary-chandra-and-budha-unknown"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["Forbidden-malefic check remains unresolved: Chandra (house 6), Budha (house 6)."]}},
+    {"id": "all-represented-states-pass", "sample_case_ids": ["fixed-benefic-guru-in-house6-pass", "waxing-chandra-in-house6-pass", "no-occupant-in-house6-pass"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "pass", "evidence": ["Every represented state keeps Whole Sign house 6 free of resolved natural malefics."]}},
+    {"id": "local-lagna-transition-incomplete", "sample_case_ids": ["fixed-benefic-guru-in-house6-pass"], "coverage": {"local_lagna_transitions_complete": false, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but local-Lagna transition coverage is incomplete."]}},
+    {"id": "graha-rasi-transition-incomplete", "sample_case_ids": ["fixed-benefic-guru-in-house6-pass"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": false, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but graha-Rasi transition coverage is incomplete."]}},
+    {"id": "chandra-phase-transition-incomplete", "sample_case_ids": ["waxing-chandra-in-house6-pass"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": false, "budha_association_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but Chandra-phase transition coverage is incomplete."]}},
+    {"id": "budha-association-transition-incomplete", "sample_case_ids": ["fixed-benefic-guru-in-house6-pass"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": false, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but Budha-association transition coverage is incomplete."]}},
+    {"id": "multiple-transition-sets-incomplete", "sample_case_ids": ["fixed-benefic-guru-in-house6-pass"], "coverage": {"local_lagna_transitions_complete": false, "graha_rasi_transitions_complete": false, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but local-Lagna, graha-Rasi transition coverage is incomplete."]}},
+    {"id": "request-budget-exhausted", "sample_case_ids": ["fixed-benefic-guru-in-house6-pass"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "budget_exhausted": true}, "expected": {"status": "unknown", "evidence": ["The chart-request budget was exhausted before this window's coverage was complete."]}},
+    {"id": "no-represented-states", "sample_case_ids": [], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["No represented chart states are available."]}}
+  ]
+}
