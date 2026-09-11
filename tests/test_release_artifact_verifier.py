@@ -17,7 +17,7 @@ from tools.verify_release_artifacts import (
 
 NAME = "mcp-server-panchangam"
 NORMALIZED_NAME = "mcp_server_panchangam"
-VERSION = "1.18.10"
+VERSION = "1.18.11"
 DEPENDENCY = "pyswisseph==2.10.3.2"
 
 

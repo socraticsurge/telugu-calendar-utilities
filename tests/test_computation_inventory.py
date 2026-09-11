@@ -105,11 +105,11 @@ def test_personal_gochara_and_interpretation_method_family_is_complete():
         if record['id'].startswith(prefixes)
     ]
 
-    assert len(records) == 20
+    assert len(records) == 21
     assert all(record.get('method') for record in records)
     assert all(record['method']['steps'] for record in records)
     assert all(record['method']['worked_examples'] for record in records)
-    assert len(_registry()['computations']) == 67
+    assert len(_registry()['computations']) == 68
 
 
 def test_method_validation_rejects_an_unreproducible_example(tmp_path):

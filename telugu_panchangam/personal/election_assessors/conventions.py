@@ -5,6 +5,22 @@ from __future__ import annotations
 ELECTION_CHART_CONVENTION_SCHEMA_VERSION = 3
 
 ELECTION_CHART_CONVENTIONS: dict[str, dict] = {
+    'court-peace-benefic-subject-continuity-v1': {
+        'label': 'Court peace benefic subject-continuity convention v1',
+        'formula': (
+            'Pass when a resolved natural benefic occupies Whole Sign house '
+            '1, 4, 7 or 10, or when a resolved natural benefic occupies an '
+            'odd Rasi and receives a full classical aspect from another '
+            'resolved natural benefic. The result is non-ranking information.'
+        ),
+        'male_rasis': [
+            'Mesha', 'Mithuna', 'Simha', 'Tula', 'Dhanu', 'Kumbha',
+        ],
+        'aspect_direction': 'benefic_receiver_from_benefic_source',
+        'method_claims': [
+            'election_chart.court_peace_pattern_policy_v1',
+        ],
+    },
     'court-lagna-sixth-lord-whole-sign-opposition-v1': {
         'label': 'Court Lagna-sixth-lord Whole Sign opposition convention v1',
         'formula': (

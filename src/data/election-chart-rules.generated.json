@@ -16,6 +16,22 @@
   ],
   "convention_schema_version": 3,
   "conventions": {
+    "court-peace-benefic-subject-continuity-v1": {
+      "label": "Court peace benefic subject-continuity convention v1",
+      "formula": "Pass when a resolved natural benefic occupies Whole Sign house 1, 4, 7 or 10, or when a resolved natural benefic occupies an odd Rasi and receives a full classical aspect from another resolved natural benefic. The result is non-ranking information.",
+      "male_rasis": [
+        "Mesha",
+        "Mithuna",
+        "Simha",
+        "Tula",
+        "Dhanu",
+        "Kumbha"
+      ],
+      "aspect_direction": "benefic_receiver_from_benefic_source",
+      "method_claims": [
+        "election_chart.court_peace_pattern_policy_v1"
+      ]
+    },
     "court-lagna-sixth-lord-whole-sign-opposition-v1": {
       "label": "Court Lagna-sixth-lord Whole Sign opposition convention v1",
       "formula": "Derive the Lagna Rasi and sixth-house Rasi lords from the classical seven-graha ownership table, then require min(abs(R1 - R2), 12 - abs(R1 - R2)) = 6. Rahu and Ketu are never sign lords. This is a binary, score-neutral Court preference rather than a source-supplied numeric formula.",

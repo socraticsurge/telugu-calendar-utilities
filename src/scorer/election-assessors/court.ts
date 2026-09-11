@@ -1,5 +1,6 @@
 import { RASI_NAMES } from '../../data/rasis';
 import type { ElectionChartSnapshot } from '../../lib/election-chart-api';
+import { evaluateBeneficKendraOrMaleRasiAspect } from './benefic-patterns';
 import { navamsaRashi } from './chart-geometry';
 import type { PlanetPosition, PrimitiveOutcome } from './contracts';
 import { evaluateForbiddenMaleficHouseSet } from './graha-nature';
@@ -100,6 +101,32 @@ export const COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA = {
   },
 } as const;
 
+export const COURT_PEACE_PATTERN_METADATA = {
+  source_statement: {
+    claim_id: 'muhurta.court.filing_lawsuit',
+    text: 'If benefics occupy Kendras or occupying the male Rasis have beneficial aspects, there will be peace between the parties.',
+    locator: "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+  },
+  convention: {
+    id: 'court-peace-benefic-subject-continuity-v1',
+    nature_id: 'phaladeepika-natural-graha-nature-whole-sign-v1',
+    aspect_id: 'phaladeepika-full-graha-drishti-v1',
+    house_occupation_id: 'whole-sign-physical-occupation-v1',
+    interpretation_claim_id: 'election_chart.court_peace_pattern_policy_v1',
+    formula: 'exists natural_benefic in H{1,4,7,10} OR exists natural_benefic in odd_Rasi receiving full_aspect from another natural_benefic',
+    male_rasis: ['Mesha', 'Mithuna', 'Simha', 'Tula', 'Dhanu', 'Kumbha'],
+    aspect_direction: 'benefic_receiver_from_benefic_source',
+  },
+  event_policy: {
+    id: 'court.peace-benefic-pattern',
+    activity: 'court',
+    effect: 'inform',
+    effect_claim_id: 'muhurta.court.effect_policy_v1',
+    status: 'specified_unwired',
+    delivery_issue: 399,
+  },
+} as const;
+
 export interface CourtMeshaD1D9Options {
   authoritativeD1Rashi?: string | null;
   lagnaAuthorityUncertain?: boolean;
@@ -124,6 +151,15 @@ export interface CourtLagnaSixthLordSeparationCoverage {
   localLagnaTransitionsComplete: boolean;
   lagnaLordRasiTransitionsComplete: boolean;
   sixthLordRasiTransitionsComplete: boolean;
+  budgetExhausted: boolean;
+}
+
+export interface CourtPeacePatternCoverage {
+  localLagnaTransitionsComplete: boolean;
+  grahaRasiTransitionsComplete: boolean;
+  chandraPhaseTransitionsComplete: boolean;
+  budhaAssociationTransitionsComplete: boolean;
+  fullAspectTransitionsComplete: boolean;
   budgetExhausted: boolean;
 }
 
@@ -494,4 +530,87 @@ export function aggregateCourtLagnaSixthLordSeparationWindow(
     normalized,
     'Every represented state keeps the Lagna and sixth-house lords at the maximum Whole Sign shortest distance of 6.',
   );
+}
+
+export function evaluateCourtPeacePattern(
+  chart: ElectionChartSnapshot,
+  options: { houseFrameUncertain?: boolean } = {},
+): PrimitiveOutcome {
+  return evaluateBeneficKendraOrMaleRasiAspect(chart, options);
+}
+
+function validCourtPeacePatternCoverage(
+  coverage: CourtPeacePatternCoverage | null | undefined,
+): coverage is CourtPeacePatternCoverage {
+  return Boolean(
+    coverage && typeof coverage === 'object' && !Array.isArray(coverage)
+    && typeof coverage.localLagnaTransitionsComplete === 'boolean'
+    && typeof coverage.grahaRasiTransitionsComplete === 'boolean'
+    && typeof coverage.chandraPhaseTransitionsComplete === 'boolean'
+    && typeof coverage.budhaAssociationTransitionsComplete === 'boolean'
+    && typeof coverage.fullAspectTransitionsComplete === 'boolean'
+    && typeof coverage.budgetExhausted === 'boolean',
+  );
+}
+
+export function aggregateCourtPeacePatternWindow(
+  samples: readonly PrimitiveOutcome[],
+  coverage: CourtPeacePatternCoverage,
+): PrimitiveOutcome {
+  if (
+    !Array.isArray(samples)
+    || Array.from({ length: samples.length }, (_, index) => samples[index])
+      .some(sample => !validOutcome(sample))
+  ) {
+    return {
+      status: 'unknown',
+      evidence: ['Represented chart states are malformed or incomplete.'],
+    };
+  }
+  if (!samples.length) {
+    return { status: 'unknown', evidence: ['No represented chart states are available.'] };
+  }
+  const unknown = samples.find(sample => sample.status === 'unknown');
+  if (unknown) return unknown;
+  if (!validCourtPeacePatternCoverage(coverage)) {
+    return {
+      status: 'unknown',
+      evidence: ['Window transition metadata is malformed or incomplete.'],
+    };
+  }
+  if (coverage.budgetExhausted) {
+    return {
+      status: 'unknown',
+      evidence: [
+        "The chart-request budget was exhausted before this window's informational coverage was complete.",
+      ],
+    };
+  }
+  const missing = [
+    ['local-Lagna', coverage.localLagnaTransitionsComplete],
+    ['graha-Rasi', coverage.grahaRasiTransitionsComplete],
+    ['Chandra-phase', coverage.chandraPhaseTransitionsComplete],
+    ['Budha-association', coverage.budhaAssociationTransitionsComplete],
+    ['full-aspect', coverage.fullAspectTransitionsComplete],
+  ].filter(([, complete]) => !complete).map(([name]) => name as string);
+  if (missing.length) {
+    return {
+      status: 'unknown',
+      evidence: [`Peace-pattern coverage is incomplete for ${humanJoin(missing)} transitions.`],
+    };
+  }
+  if (samples.some(sample => sample.status === 'fail')) {
+    return {
+      status: 'fail',
+      evidence: [
+        'The registered benefic pattern is not continuous across every represented state; no adverse inference is made.',
+      ],
+    };
+  }
+  return {
+    status: 'pass',
+    evidence: [
+      'Every represented state satisfies at least one registered non-ranking benefic-pattern arm.',
+    ],
+  };
 }

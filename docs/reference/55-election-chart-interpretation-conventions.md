@@ -32,6 +32,7 @@ owner-accepted, versioned and tested.
 | Combustion | `phaladeepika-kapoor-fixed-elongation-combustion-v1` | Kapoor commentary on *Phaladeepika* II.36, physical/printed pp. 26–27 | Selected for Guru and Shukra exact-chart use; not yet implemented or wired |
 | Waxing/waning Chandra | `raman-180-degree-paksha-v1` | Raman, Chapter II “On certain special yogas,” internal p. 4 / physical PDF p. 7 | Selected with a separately disclosed 0.02° precision guard |
 | Rasi lordship | `classical-seven-graha-rasi-lordship-v1` | *Phaladeepika* I.6, book pp. 3–4 / scan pp. 40–41 | Selected and implemented for seven classical grahas; nodes and co-lordship are excluded |
+| Court peace pattern | `court-peace-benefic-subject-continuity-v1` | Raman, Chapter XVII “Filing law-suits,” internal p. 67 / physical PDF p. 71; *Phaladeepika* II.23 and II.27 | Selected and implemented as non-ranking information; event wiring remains parked for issue 400 |
 | Lord relationships | `phaladeepika-natural-relationships-v1` | *Phaladeepika* II.21–22, book p. 17 / scan p. 54 | Selected, partially implemented for Gold; temporary and compound modes unresolved |
 | Navamsa | `bphs-modality-navamsa-v1` | BPHS 6.12 | Selected with a separately disclosed 0.01° internal-boundary guard |
 | Hemming | `lagna-hemming-unresolved-v1` | Raman, Chapter IX marriage, internal pp. 41–42 / physical PDF pp. 45–46 | Unresolved; no hidden node, nature, aspect or orb semantics |
@@ -123,6 +124,23 @@ not this numerical formula. Exact angular opposition is not selected because
 the passage gives no orb or precision threshold; candidate-pool-relative
 maximization is rejected because it would make one chart depend on unrelated
 search results. A shared Lagna/sixth lord necessarily has distance zero.
+
+### Court peace benefic pattern
+
+Version 1 preserves “benefics” as the subject of both OR arms:
+
+`exists p: benefic(p) AND H(p) in {1,4,7,10}`
+
+or
+
+`exists distinct p,q: benefic(p) AND R(p) in {1,3,5,7,9,11} AND benefic(q) AND full_aspect(q,p)`
+
+The second arm therefore treats the natural benefic in the odd/male Rasi as
+the aspect receiver. Reversing it into an aspector, allowing any planet as the
+odd-Rasi subject, or admitting partial/node aspects is unselected. Either arm
+can establish the informational pattern. A fully resolved miss is neutral;
+unknown evidence changes completion disclosure only, and no status predicts a
+legal outcome or relationship between the parties.
 
 ## Precedence and conflicts
 
