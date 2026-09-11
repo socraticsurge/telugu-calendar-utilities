@@ -230,9 +230,20 @@ function validCoverage(
   );
 }
 
-export function aggregateCourtMeshaD1D9Window(
+interface CourtRejectWindowCoverage {
+  budgetExhausted: boolean;
+  transitions: ReadonlyArray<readonly [string, boolean]>;
+}
+
+function humanJoin(items: readonly string[]): string {
+  if (items.length < 3) return items.join(' and ');
+  return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`;
+}
+
+function aggregateCourtRejectWindow(
   samples: readonly PrimitiveOutcome[],
-  coverage: CourtMeshaD1D9Coverage,
+  coverage: CourtRejectWindowCoverage | null,
+  successEvidence: string,
 ): PrimitiveOutcome {
   const failed = Array.isArray(samples)
     ? samples.find(sample => sample?.status === 'fail')
@@ -253,7 +264,7 @@ export function aggregateCourtMeshaD1D9Window(
   if (!samples.length) {
     return { status: 'unknown', evidence: ['No represented chart states are available.'] };
   }
-  if (!validCoverage(coverage)) {
+  if (!coverage) {
     return {
       status: 'unknown',
       evidence: ['Window transition metadata is malformed or incomplete.'],
@@ -267,23 +278,36 @@ export function aggregateCourtMeshaD1D9Window(
       ],
     };
   }
-  const missing = [];
-  if (!coverage.localLagnaTransitionsComplete) missing.push('local-Lagna');
-  if (!coverage.lagnaNavamsaTransitionsComplete) missing.push('Lagna-Navamsa');
+  const missing = coverage.transitions
+    .filter(([, complete]) => !complete)
+    .map(([name]) => name);
   if (missing.length) {
     return {
       status: 'unknown',
       evidence: [
-        `All represented states pass, but ${missing.join(' and ')} transition coverage is incomplete.`,
+        `All represented states pass, but ${humanJoin(missing)} transition coverage is incomplete.`,
       ],
     };
   }
-  return {
-    status: 'pass',
-    evidence: [
-      'Every represented state resolves the Court Mesha D1-or-D9 condition as satisfied.',
-    ],
-  };
+  return { status: 'pass', evidence: [successEvidence] };
+}
+
+export function aggregateCourtMeshaD1D9Window(
+  samples: readonly PrimitiveOutcome[],
+  coverage: CourtMeshaD1D9Coverage,
+): PrimitiveOutcome {
+  const normalized = validCoverage(coverage) ? {
+    budgetExhausted: coverage.budgetExhausted,
+    transitions: [
+      ['local-Lagna', coverage.localLagnaTransitionsComplete],
+      ['Lagna-Navamsa', coverage.lagnaNavamsaTransitionsComplete],
+    ] as const,
+  } : null;
+  return aggregateCourtRejectWindow(
+    samples,
+    normalized,
+    'Every represented state resolves the Court Mesha D1-or-D9 condition as satisfied.',
+  );
 }
 
 export function evaluateCourtSixthHouseNaturalMalefic(
@@ -347,56 +371,18 @@ export function aggregateCourtSixthHouseNaturalMaleficWindow(
   samples: readonly PrimitiveOutcome[],
   coverage: CourtSixthHouseNaturalMaleficCoverage,
 ): PrimitiveOutcome {
-  const failed = Array.isArray(samples)
-    ? samples.find(sample => sample?.status === 'fail')
-    : undefined;
-  if (failed) return failed;
-  if (
-    !Array.isArray(samples)
-    || Array.from({ length: samples.length }, (_, index) => samples[index])
-      .some(sample => !validOutcome(sample))
-  ) {
-    return {
-      status: 'unknown',
-      evidence: ['Represented chart states are malformed or incomplete.'],
-    };
-  }
-  const unknown = samples.find(sample => sample.status === 'unknown');
-  if (unknown) return unknown;
-  if (!samples.length) {
-    return { status: 'unknown', evidence: ['No represented chart states are available.'] };
-  }
-  if (!validCourtSixthHouseCoverage(coverage)) {
-    return {
-      status: 'unknown',
-      evidence: ['Window transition metadata is malformed or incomplete.'],
-    };
-  }
-  if (coverage.budgetExhausted) {
-    return {
-      status: 'unknown',
-      evidence: [
-        "The chart-request budget was exhausted before this window's coverage was complete.",
-      ],
-    };
-  }
-  const missing = [];
-  if (!coverage.localLagnaTransitionsComplete) missing.push('local-Lagna');
-  if (!coverage.grahaRasiTransitionsComplete) missing.push('graha-Rasi');
-  if (!coverage.chandraPhaseTransitionsComplete) missing.push('Chandra-phase');
-  if (!coverage.budhaAssociationTransitionsComplete) missing.push('Budha-association');
-  if (missing.length) {
-    return {
-      status: 'unknown',
-      evidence: [
-        `All represented states pass, but ${missing.join(', ')} transition coverage is incomplete.`,
-      ],
-    };
-  }
-  return {
-    status: 'pass',
-    evidence: [
-      'Every represented state keeps Whole Sign house 6 free of resolved natural malefics.',
-    ],
-  };
+  const normalized = validCourtSixthHouseCoverage(coverage) ? {
+    budgetExhausted: coverage.budgetExhausted,
+    transitions: [
+      ['local-Lagna', coverage.localLagnaTransitionsComplete],
+      ['graha-Rasi', coverage.grahaRasiTransitionsComplete],
+      ['Chandra-phase', coverage.chandraPhaseTransitionsComplete],
+      ['Budha-association', coverage.budhaAssociationTransitionsComplete],
+    ] as const,
+  } : null;
+  return aggregateCourtRejectWindow(
+    samples,
+    normalized,
+    'Every represented state keeps Whole Sign house 6 free of resolved natural malefics.',
+  );
 }
