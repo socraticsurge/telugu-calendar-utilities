@@ -11,6 +11,7 @@ new code imports the domain owner directly.
 | graha nature | `graha_nature.py` | `graha-nature.ts` | Natural benefic/malefic classification and lunar-phase policy only |
 | combustion | `combustion.py` | `combustion.ts` | Reserved for the accepted combustion foundation; do not place it in geometry |
 | conjunction | `conjunction.py` | `conjunction.ts` | Reserved for the accepted conjunction foundation; do not place it in geometry |
+| Court event rules | `court.py` | `court.ts` | Source-scoped Court predicates and their event effects; reusable Rasi/Navamsa, house, nature, lordship and aspect facts stay in their domain owners |
 | Vedha | `vedha.py` | `vedha.ts` | Reserved for the accepted Vedha foundation and its source-specific facts |
 | event admission | `event_admission.py` | `event-admission.ts` | Validate and normalize complete chart facts before predicate evaluation |
 | non-scoring event context | `event_context.py` | `event-context.ts` | Reserved for disclosed context that cannot affect score or admission |
