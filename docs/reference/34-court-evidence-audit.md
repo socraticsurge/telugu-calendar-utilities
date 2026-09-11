@@ -115,3 +115,27 @@ The shared Python/TypeScript oracle is labelled
 wired into the Court scorer, does not change completion counts and does not
 remove any practitioner-review language. Those changes remain owned by the
 Court effect-policy and completion children under the parent assessor issue.
+
+## Sixth-house natural-malefic computation foundation
+
+Issue 397 adds the source clause “place no malefic in the 6th” as a mirrored,
+three-valued predicate. It consumes the shared
+`phaladeepika-natural-graha-nature-whole-sign-v1` classifier delivered by issue
+354; Court does not define another benefic/malefic list. A resolved fixed
+malefic, waning Chandra, or malefic-associated Budha physically occupying
+Whole Sign house 6 fails. Fixed benefics and a sixth house without a resolved
+natural malefic pass. A phase-guarded Chandra or conditionally unresolved
+Budha remains `unknown` only when no known malefic already controls.
+
+The accepted `muhurta.court.effect_policy_v1` maps a known failure to `reject`.
+Across a candidate window, a known failure defeats unrelated unknown evidence;
+otherwise unknown defeats pass. An all-pass result still requires complete
+local-Lagna, graha-Rasi, Chandra-phase and Budha-association transition
+coverage within the request budget.
+
+This foundation remains `specified_unwired`: it changes neither candidate
+admission nor score, rank, tier or completion counts until issue 400 integrates
+the accepted Court predicates. It also preserves
+`general_baseline_mode = none`; a future general election baseline must not
+double-count this Court-specific exclusion. The shared oracle is a
+`synthetic_contract_fixture`, not a source golden or outcome prediction.

@@ -2013,6 +2013,40 @@
       }
     },
     {
+      "id": "personal.court-sixth-house-natural-malefic-foundation",
+      "title": "Court sixth-house natural-malefic exclusion foundation",
+      "summary": "A Court-scoped reject predicate consumes the shared natural-graha classifier and requires every represented Whole Sign sixth-house state to remain free of resolved natural malefics.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "evaluate_court_sixth_house_natural_malefic", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "court_sixth_house_candidate_disposition", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "aggregate_court_sixth_house_natural_malefic_window", "role": "owner"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "evaluateCourtSixthHouseNaturalMalefic", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "courtSixthHouseCandidateDisposition", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "aggregateCourtSixthHouseNaturalMaleficWindow", "role": "mirror"}
+      ],
+      "inputs": ["complete canonical nine-graha Drik/Lahiri Whole Sign chart", "validated local-Lagna house-frame state", "represented window samples", "local-Lagna, graha-Rasi, Chandra-phase and Budha-association transition coverage", "chart-request budget state"],
+      "outputs": ["per-state pass, fail or unknown with decisive witness evidence", "whole-window pass, fail or unknown", "unwired reject, retain or review disposition under the accepted Court effect policy"],
+      "time_basis": "Each exact chart sample in the candidate's half-open civil-minute window; all house, Rasi, Chandra-phase and Budha-association transitions must be represented before an all-pass window resolves.",
+      "surfaces": ["python-library", "website"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["verified", "heuristic"], "claim_ids": ["muhurta.court.filing_lawsuit", "muhurta.court.effect_policy_v1", "election_chart.natural_graha_nature.phaladeepika_2_27", "election_chart.budha_same_sign_association_policy_v1", "election_chart.raman_180_degree_paksha_policy_v1", "election_chart.lunar_phase_boundary_guard_policy_v1", "election_chart.whole_sign_house_policy_v1"], "note": "Raman supplies the no-malefic-in-the-sixth clause. Natural-graha classification, guarded conditional states, Whole Sign projection, reject effect and three-valued window precedence remain separately disclosed conventions."},
+      "tests": ["tests/test_court_sixth_house_natural_malefic.py", "src/scorer/__tests__/court-sixth-house-natural-malefic.test.ts"],
+      "limitations": ["This issue delivers an additive Python and TypeScript predicate foundation only. It remains specified_unwired until Court integration issue 400; the current finder, completion counts, score, rank and tier are unchanged.", "Incomplete or malformed nine-graha facts, an uncertain local-Lagna frame, phase-guarded Chandra, conditionally unresolved Budha, missing transitions and chart-request budget exhaustion remain unknown.", "The rule checks natural malefic physical occupation of Whole Sign house 6 only. It does not infer functional maleficence, aspects, strength, dignity, success in litigation or a general election baseline."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Delegate natural-graha classification to the canonical shared decision table, inspect only Whole Sign house 6, and aggregate all represented states with reject-first precedence.",
+        "steps": ["Reject an unavailable or conflicting local-Lagna house frame to unknown.", "Validate the complete canonical nine-graha chart through the shared natural-graha classifier.", "Fail when any resolved natural malefic occupies house 6, including fixed malefics, waning Chandra, or malefic-associated Budha.", "Return unknown when an occupant's Chandra or Budha nature remains conditionally unresolved and no resolved malefic already controls; otherwise pass.", "Project a known failure to reject, a pass to retain, and an unknown to review without yet wiring candidate generation.", "Across a window, any known failure controls; otherwise unknown controls; an all-pass result still becomes unknown when relevant transitions are incomplete or the request budget is exhausted."],
+        "formulae": [
+          {"name": "Court sixth-house exclusion", "expression": "pass iff not exists p: H(p) = 6 and natural_nature(p) = malefic", "variables": ["H(p): canonical Whole Sign house from the validated local Drik/Lahiri Lagna", "natural_nature(p): shared fixed, guarded-Chandra and conditional-Budha classification", "unknown: used when a potentially decisive conditional nature or transition is unresolved"]}
+        ],
+        "worked_examples": [
+          {"label": "Kuja in the sixth with an unrelated phase-unknown occupant", "inputs": ["Kuja occupies Whole Sign house 6", "Chandra is inside the disclosed phase-boundary guard", "All nine canonical graha facts are otherwise available"], "calculation": ["The shared classifier resolves Kuja as a fixed natural malefic.", "Kuja supplies a decisive forbidden house-6 witness.", "Reject-first precedence prevents the unrelated unknown state from hiding the known violation."], "result": ["Status: fail", "Accepted Court effect: reject", "No score or tier adjustment can override the exclusion"]}
+        ],
+        "notes": ["The shared JSON oracle is synthetic contract evidence, not a source golden or external ephemeris validation.", "The rule consumes personal.natural-graha-nature and does not create a second event-specific benefic or malefic taxonomy.", "general_baseline_mode remains none, so the predicate is not double-counted as a future general election baseline check."]
+      }
+    },
+    {
       "id": "personal.natural-graha-nature",
       "title": "Natural graha nature and house-set witnesses",
       "summary": "A source-bounded, versioned decision table classifies each canonical graha as a natural benefic, natural malefic, or unknown and derives decisive three-valued house-set witness predicates.",

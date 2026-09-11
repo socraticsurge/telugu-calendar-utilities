@@ -10,6 +10,7 @@ from ...panchangam_names import RASHI_NAMES
 from .chart_geometry import NAVAMSA_ROUNDING_GUARD_DEGREES, navamsa_rashi
 from .contracts import PrimitiveOutcome
 from .event_admission import PlanetPosition
+from .graha_nature import evaluate_forbidden_malefic_house_set
 
 COURT_MESHA_D1_D9_METADATA: dict[str, Any] = {
     'source_statement': {
@@ -57,6 +58,40 @@ COURT_MESHA_D1_D9_METADATA: dict[str, Any] = {
             'Only a valid non-Mesha D1 candidate whose D9 alternative is not '
             + 'yet resolved may be provisionally retained.'
         ),
+    },
+}
+
+COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA: dict[str, Any] = {
+    'source_statement': {
+        'claim_id': 'muhurta.court.filing_lawsuit',
+        'text': 'Place no malefic in the 6th.',
+        'locator': (
+            "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section "
+            + "'Filing law-suits,' inspected in the 2020 Chistabo derivative "
+            + 'at internal printed p. 67 (physical PDF p. 71)'
+        ),
+    },
+    'convention': {
+        'classifier_id': 'phaladeepika-natural-graha-nature-whole-sign-v1',
+        'house_occupation_id': 'whole-sign-physical-occupation-v1',
+        'method_claim_ids': [
+            'election_chart.natural_graha_nature.phaladeepika_2_27',
+            'election_chart.budha_same_sign_association_policy_v1',
+            'election_chart.raman_180_degree_paksha_policy_v1',
+            'election_chart.lunar_phase_boundary_guard_policy_v1',
+            'election_chart.whole_sign_house_policy_v1',
+        ],
+        'formula': 'no graha p has H(p) = 6 and natural_nature(p) = malefic',
+        'house_system': 'whole_sign',
+        'frame': 'validated_local_lagna',
+    },
+    'event_policy': {
+        'id': 'court.house-6-without-natural-malefic',
+        'activity': 'court',
+        'effect': 'reject',
+        'effect_claim_id': 'muhurta.court.effect_policy_v1',
+        'status': 'specified_unwired',
+        'delivery_issue': 397,
     },
 }
 
@@ -292,5 +327,129 @@ def aggregate_court_mesha_d1_d9_window(
             'Every represented state resolves the Court Mesha D1-or-D9 '
             +
             'condition as satisfied.',
+        ),
+    )
+
+
+def evaluate_court_sixth_house_natural_malefic(
+    chart: Mapping[str, Any],
+    *,
+    house_frame_uncertain: bool = False,
+) -> PrimitiveOutcome:
+    """Apply the Court H6 exclusion through the shared nature classifier."""
+    if type(house_frame_uncertain) is not bool:
+        return PrimitiveOutcome(
+            'unknown', ('The Court sixth-house evaluator configuration is malformed.',)
+        )
+    if house_frame_uncertain:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                'The validated local-Lagna house frame is unavailable or '
+                + 'disagrees with sidecar facts.',
+            ),
+        )
+    return evaluate_forbidden_malefic_house_set(chart, [6])
+
+
+def court_sixth_house_candidate_disposition(outcome: PrimitiveOutcome) -> str:
+    """Project the accepted reject policy without wiring candidate generation."""
+    if not isinstance(outcome, PrimitiveOutcome):
+        return 'review'
+    if outcome.status == 'fail':
+        return 'reject'
+    if outcome.status == 'pass':
+        return 'retain'
+    return 'review'
+
+
+def _court_house6_missing_coverage(
+    *,
+    local_lagna_transitions_complete: bool,
+    graha_rasi_transitions_complete: bool,
+    chandra_phase_transitions_complete: bool,
+    budha_association_transitions_complete: bool,
+) -> list[str]:
+    coverage = (
+        ('local-Lagna', local_lagna_transitions_complete),
+        ('graha-Rasi', graha_rasi_transitions_complete),
+        ('Chandra-phase', chandra_phase_transitions_complete),
+        ('Budha-association', budha_association_transitions_complete),
+    )
+    return [name for name, complete in coverage if not complete]
+
+
+def aggregate_court_sixth_house_natural_malefic_window(
+    samples: Sequence[PrimitiveOutcome],
+    *,
+    local_lagna_transitions_complete: bool,
+    graha_rasi_transitions_complete: bool,
+    chandra_phase_transitions_complete: bool,
+    budha_association_transitions_complete: bool,
+    budget_exhausted: bool,
+) -> PrimitiveOutcome:
+    """Aggregate the Court reject predicate across represented chart states."""
+    if isinstance(samples, Sequence):
+        failure = next(
+            (
+                sample
+                for sample in samples
+                if isinstance(sample, PrimitiveOutcome) and sample.status == 'fail'
+            ),
+            None,
+        )
+        if failure is not None:
+            return failure
+    if not _samples_are_well_formed(samples):
+        return PrimitiveOutcome(
+            'unknown', ('Represented chart states are malformed or incomplete.',)
+        )
+    unknown = _first_sample_with_status(samples, 'unknown')
+    if unknown is not None:
+        return unknown
+    if not samples:
+        return PrimitiveOutcome(
+            'unknown', ('No represented chart states are available.',)
+        )
+    coverage = (
+        local_lagna_transitions_complete,
+        graha_rasi_transitions_complete,
+        chandra_phase_transitions_complete,
+        budha_association_transitions_complete,
+        budget_exhausted,
+    )
+    if any(type(value) is not bool for value in coverage):
+        return PrimitiveOutcome(
+            'unknown', ('Window transition metadata is malformed or incomplete.',)
+        )
+    if budget_exhausted:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                "The chart-request budget was exhausted before this window's "
+                + 'coverage was complete.',
+            ),
+        )
+    missing = _court_house6_missing_coverage(
+        local_lagna_transitions_complete=local_lagna_transitions_complete,
+        graha_rasi_transitions_complete=graha_rasi_transitions_complete,
+        chandra_phase_transitions_complete=chandra_phase_transitions_complete,
+        budha_association_transitions_complete=(
+            budha_association_transitions_complete
+        ),
+    )
+    if missing:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                f'All represented states pass, but {", ".join(missing)} '
+                + 'transition coverage is incomplete.',
+            ),
+        )
+    return PrimitiveOutcome(
+        'pass',
+        (
+            'Every represented state keeps Whole Sign house 6 free of '
+            + 'resolved natural malefics.',
         ),
     )

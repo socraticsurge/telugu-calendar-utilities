@@ -60,9 +60,9 @@ def test_architecture_report_maps_modules_consumers_and_layers():
         report['scope']['established_source_files']
         + report['scope']['additive_feature_source_files']
     )
-    assert report['scope']['computation_records'] == 65
-    assert len(report['output_consumer_map']) == 65
-    assert len({item['id'] for item in report['output_consumer_map']}) == 65
+    assert report['scope']['computation_records'] == 66
+    assert len(report['output_consumer_map']) == 66
+    assert len({item['id'] for item in report['output_consumer_map']}) == 66
     assert {'engines', 'derived-calendar', 'scoring', 'mcp', 'browser-panels'} \
         <= set(report['layers'])
 
