@@ -12,17 +12,18 @@ import {
 type SnapshotCase = (typeof oracle.snapshot_cases)[number];
 
 function chart(caseData: SnapshotCase): ElectionChartSnapshot {
-  const planets = structuredClone(oracle.base_planets);
-  const overrides = 'overrides' in caseData ? caseData.overrides : undefined;
-  for (const planet of planets) {
-    Object.assign(planet, overrides?.[planet.name as keyof typeof overrides]);
-  }
-  const removed = new Set('remove' in caseData ? caseData.remove : []);
-  const remaining = planets.filter(item => !removed.has(item.name));
-  if ('duplicate' in caseData && caseData.duplicate) {
-    remaining.push(structuredClone(
-      remaining.find(item => item.name === caseData.duplicate)!,
-    ));
+  const changes = ('overrides' in caseData ? caseData.overrides : {}) as Record<
+    string,
+    Partial<(typeof oracle.base_planets)[number]>
+  >;
+  const omissions = new Set<string>('remove' in caseData ? caseData.remove : []);
+  const remaining = oracle.base_planets
+    .filter(planet => !omissions.has(planet.name))
+    .map(planet => ({ ...structuredClone(planet), ...changes[planet.name] }));
+  const duplicateName = 'duplicate' in caseData ? caseData.duplicate : undefined;
+  if (duplicateName) {
+    const source = remaining.find(planet => planet.name === duplicateName);
+    if (source) remaining.push(structuredClone(source));
   }
   return { planets: remaining } as ElectionChartSnapshot;
 }

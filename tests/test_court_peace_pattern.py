@@ -21,14 +21,20 @@ ORACLE = json.loads(
 
 
 def _chart(case):
-    planets = copy.deepcopy(ORACLE['base_planets'])
-    for planet in planets:
-        planet.update(case.get('overrides', {}).get(planet['name'], {}))
-    removed = set(case.get('remove', []))
-    planets = [item for item in planets if item['name'] not in removed]
+    overrides = case.get('overrides', {})
+    removed = frozenset(case.get('remove', []))
+    planets = [
+        {
+            **copy.deepcopy(planet),
+            **overrides.get(planet['name'], {}),
+        }
+        for planet in ORACLE['base_planets']
+        if planet['name'] not in removed
+    ]
     duplicate = case.get('duplicate')
     if duplicate:
-        planets.append(copy.deepcopy(next(p for p in planets if p['name'] == duplicate)))
+        source = next(planet for planet in planets if planet['name'] == duplicate)
+        planets.append(copy.deepcopy(source))
     return {'planets': planets}
 
 
