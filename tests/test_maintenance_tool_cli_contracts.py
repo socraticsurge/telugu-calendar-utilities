@@ -17,14 +17,14 @@ ROOT = Path(__file__).resolve().parents[1]
         (
             ('tools/check_computation_inventory.py',),
             (
-                    'Computation inventory valid: 62 records, 167 implementations, '
-                    '106 audited source files, 62/62 methods documented.\n'
+                    'Computation inventory valid: 63 records, 171 implementations, '
+                    '108 audited source files, 63/63 methods documented.\n'
             ),
         ),
         (
             ('tools/check_documentation_freshness.py',),
             (
-                'Documentation facts current: 62 computations, 17 MCP tools, '
+                'Documentation facts current: 63 computations, 17 MCP tools, '
                 '22 cities, 35 Muhurtam profiles.\n'
             ),
         ),

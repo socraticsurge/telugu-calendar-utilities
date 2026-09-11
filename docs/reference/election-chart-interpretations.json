@@ -88,6 +88,9 @@
       "method_claims": [
         "election_chart.same_rasi_distributive_conjunction_policy_v1"
       ],
+      "event_policy_claims": [
+        "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1"
+      ],
       "inputs": [
         "Chandra Rasi",
         "Kuja Rasi",
@@ -98,7 +101,7 @@
         "degree_orb": "none; equality of sidereal Rasi only"
       },
       "precedence": "Either known equality controls a prohibition; pass requires both inequalities to resolve.",
-      "conflict_resolution": "This event-bounded mode is not a global conjunction default. Missing/conflicting facts return unknown; angular-orb traditions remain unresolved.",
+      "conflict_resolution": "This event-bounded mode is not a global conjunction default. Missing/conflicting facts return unknown; angular-orb traditions remain unresolved. The reusable primitive is implemented, while the borrowing event effect remains unwired.",
       "alternatives": [
         {
           "id": "degree-orb-conjunction-unresolved",
@@ -111,8 +114,12 @@
           "reason": "The grammar is represented as a distributive OR."
         }
       ],
-      "implementation": [],
-      "implementation_status": "specified_unwired",
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/conjunction.py",
+        "src/scorer/election-assessors/conjunction.ts"
+      ],
+      "implementation_status": "implemented",
+      "event_wiring_status": "specified_unwired",
       "delivery_issues": [
         250,
         402

@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "source_statement": {
+      "claim_id": "muhurta.borrowing_money",
+      "text": "Avoid Chandra conjoined with Mangala or Shani.",
+      "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)"
+    },
+    "convention": {
+      "id": "same-rasi-distributive-conjunction-v1",
+      "method_claim_id": "election_chart.same_rasi_distributive_conjunction_policy_v1",
+      "formula": "R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani)",
+      "degree_orb": null
+    },
+    "event_policy": {
+      "id": "borrowing-money.same-rasi-conjunction-reject-v1",
+      "decision_claim_id": "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1",
+      "activity": "borrowing_money",
+      "effect": "reject",
+      "status": "specified_unwired",
+      "delivery_issue": 271
+    }
+  },
+  "base_planets": [
+    {"name": "Surya", "rashi": "Mesha", "degree": 10.0, "house": 1, "retrograde": false},
+    {"name": "Chandra", "rashi": "Vrishabha", "degree": 5.0, "house": 2, "retrograde": false},
+    {"name": "Kuja", "rashi": "Mithuna", "degree": 12.0, "house": 3, "retrograde": false},
+    {"name": "Budha", "rashi": "Karka", "degree": 8.0, "house": 4, "retrograde": false},
+    {"name": "Guru", "rashi": "Simha", "degree": 15.0, "house": 5, "retrograde": true},
+    {"name": "Shukra", "rashi": "Kanya", "degree": 18.0, "house": 6, "retrograde": false},
+    {"name": "Shani", "rashi": "Tula", "degree": 22.0, "house": 7, "retrograde": true},
+    {"name": "Rahu", "rashi": "Vrischika", "degree": 25.0, "house": 8, "retrograde": true},
+    {"name": "Ketu", "rashi": "Dhanu", "degree": 25.0, "house": 9, "retrograde": true}
+  ],
+  "snapshot_cases": [
+    {
+      "id": "distinct-rashis-pass",
+      "expected": {"status": "pass", "evidence": ["Chandra: Vrishabha; Kuja: Mithuna; Shani: Tula; no same-Rasi conjunction."]}
+    },
+    {
+      "id": "kuja-conjunction-fail",
+      "overrides": {"Kuja": {"rashi": "Vrishabha"}},
+      "expected": {"status": "fail", "evidence": ["Same-Rasi conjunction: Chandra and Kuja in Vrishabha."]}
+    },
+    {
+      "id": "shani-conjunction-fail",
+      "overrides": {"Shani": {"rashi": "Vrishabha"}},
+      "expected": {"status": "fail", "evidence": ["Same-Rasi conjunction: Chandra and Shani in Vrishabha."]}
+    },
+    {
+      "id": "triple-conjunction-fail",
+      "overrides": {"Kuja": {"rashi": "Vrishabha"}, "Shani": {"rashi": "Vrishabha"}},
+      "expected": {"status": "fail", "evidence": ["Same-Rasi conjunction: Chandra, Kuja and Shani in Vrishabha."]}
+    },
+    {
+      "id": "zero-degree-ingress-fail",
+      "overrides": {
+        "Chandra": {"rashi": "Mesha", "degree": 0.0},
+        "Kuja": {"rashi": "Mesha", "degree": 29.99},
+        "Shani": {"rashi": "Meena", "degree": 29.99}
+      },
+      "expected": {"status": "fail", "evidence": ["Same-Rasi conjunction: Chandra and Kuja in Mesha."]}
+    },
+    {
+      "id": "wrap-before-pass",
+      "overrides": {
+        "Chandra": {"rashi": "Meena", "degree": 29.99},
+        "Kuja": {"rashi": "Mesha", "degree": 0.0},
+        "Shani": {"rashi": "Kumbha", "degree": 29.99}
+      },
+      "expected": {"status": "pass", "evidence": ["Chandra: Meena; Kuja: Mesha; Shani: Kumbha; no same-Rasi conjunction."]}
+    },
+    {
+      "id": "wrap-after-pass",
+      "overrides": {
+        "Chandra": {"rashi": "Mesha", "degree": 0.0},
+        "Kuja": {"rashi": "Vrishabha", "degree": 0.01},
+        "Shani": {"rashi": "Kumbha", "degree": 29.99}
+      },
+      "expected": {"status": "pass", "evidence": ["Chandra: Mesha; Kuja: Vrishabha; Shani: Kumbha; no same-Rasi conjunction."]}
+    },
+    {
+      "id": "missing-chandra-unknown",
+      "remove": ["Chandra"],
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "missing-kuja-unknown",
+      "remove": ["Kuja"],
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "missing-shani-unknown",
+      "remove": ["Shani"],
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "malformed-chandra-unknown",
+      "overrides": {"Chandra": {"rashi": "Meshaa"}},
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "malformed-kuja-unknown",
+      "overrides": {"Kuja": {"degree": 30.0}},
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "malformed-shani-unknown",
+      "overrides": {"Shani": {"house": 13}},
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "duplicate-facts-unknown",
+      "duplicate": "Chandra",
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "conflicting-facts-unknown",
+      "conflict": {"name": "Chandra", "rashi": "Dhanu", "replace": "Ketu"},
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    }
+  ],
+  "window_cases": [
+    {
+      "id": "known-fail-dominates-unknown",
+      "sample_case_ids": ["kuja-conjunction-fail", "missing-shani-unknown"],
+      "transition_complete": false,
+      "budget_exhausted": true,
+      "expected": {"status": "fail", "evidence": ["Same-Rasi conjunction: Chandra and Kuja in Vrishabha."]}
+    },
+    {
+      "id": "unknown-dominates-pass",
+      "sample_case_ids": ["distinct-rashis-pass", "missing-kuja-unknown"],
+      "transition_complete": true,
+      "budget_exhausted": false,
+      "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Rasi facts are unavailable."]}
+    },
+    {
+      "id": "all-pass-complete",
+      "sample_case_ids": ["distinct-rashis-pass", "wrap-before-pass"],
+      "transition_complete": true,
+      "budget_exhausted": false,
+      "expected": {"status": "pass", "evidence": ["Every sampled state resolves Chandra in a different Rasi from Kuja and Shani."]}
+    },
+    {
+      "id": "wrap-ingress-transition-incomplete",
+      "sample_case_ids": ["wrap-before-pass", "wrap-after-pass"],
+      "transition_complete": false,
+      "budget_exhausted": false,
+      "expected": {"status": "unknown", "evidence": ["All sampled states pass, but Rasi-transition coverage is incomplete."]}
+    },
+    {
+      "id": "empty-samples",
+      "sample_case_ids": [],
+      "transition_complete": true,
+      "budget_exhausted": false,
+      "expected": {"status": "unknown", "evidence": ["No sampled chart states are available."]}
+    },
+    {
+      "id": "budget-exhausted-all-pass",
+      "sample_case_ids": ["distinct-rashis-pass"],
+      "transition_complete": true,
+      "budget_exhausted": true,
+      "expected": {"status": "unknown", "evidence": ["The chart-request budget was exhausted before this window's coverage was complete."]}
+    },
+    {
+      "id": "budget-exhausted-known-fail",
+      "sample_case_ids": ["shani-conjunction-fail"],
+      "transition_complete": true,
+      "budget_exhausted": true,
+      "expected": {"status": "fail", "evidence": ["Same-Rasi conjunction: Chandra and Shani in Vrishabha."]}
+    }
+  ]
+}

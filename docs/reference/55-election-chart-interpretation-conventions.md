@@ -23,7 +23,7 @@ owner-accepted, versioned and tested.
 | Concept | Canonical entry | Exact source locator | State |
 |---|---|---|---|
 | Aspect | `phaladeepika-full-graha-drishti-v1` | *Phaladeepika* II.23, Sastri 1950, book p. 18 / scan p. 55 | Selected and implemented for full classical aspects; partial and node aspects stay separate |
-| Conjunction | `same-rasi-distributive-conjunction-v1` | Raman, Chapter X “Borrowing Money,” internal p. 45 / physical PDF p. 49 | Selected for the Chandra–Kuja/Shani clause, no degree orb; not yet implemented or wired |
+| Conjunction | `same-rasi-distributive-conjunction-v1` | Raman, Chapter X “Borrowing Money,” internal p. 45 / physical PDF p. 49 | Reusable Python/TypeScript primitive implemented with no degree orb; borrowing event effect remains unwired |
 | Benefic/malefic | `phaladeepika-natural-graha-nature-whole-sign-v1` | *Phaladeepika* II.27, book pp. 19–20 / scan pp. 56–57; corroborating modern BPHS 3.11 witness | Selected, partially implemented for Annaprasana; generic Budha and benefic predicates remain #251 work |
 | Dignity | `phaladeepika-rasi-dignity-v1` | *Phaladeepika* I.6, book pp. 3–4 / scan pp. 40–41 | Selected, partially implemented for Gold; not a strength score |
 | Strength | `bounded-graha-strength-unresolved-v1` | Raman, Chapter XV “Surgical Operations,” internal pp. 64–65 / physical PDF pp. 68–69 | Unresolved; neither dignity alone nor an incomplete Shadbala may be relabelled strength |
@@ -55,6 +55,26 @@ The Borrowing mode is
 `R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani)`. Either equality controls the
 prohibition. Pass requires both inequalities to resolve. There is no angular
 orb and this mode is not a global default.
+
+The Python owner is
+`telugu_panchangam/personal/election_assessors/conjunction.py`; the browser
+mirror is `src/scorer/election-assessors/conjunction.ts`. Both consume only a
+strictly admitted, complete nine-graha chart. Missing, malformed, duplicate or
+conflicting facts return `unknown`. At one sampled state, either known equality
+returns `fail`; both known inequalities return `pass`.
+
+The window combiner is also three-valued: a known failure dominates unknown,
+unknown dominates pass, and an all-pass set is still `unknown` when an interior
+Rasi transition is not covered or the chart-request budget is exhausted. The
+shared synthetic oracle covers both sides of the 360°/0° ingress, empty
+samples, malformed input and every precedence branch.
+
+The separately named event policy
+`borrowing-money.same-rasi-conjunction-reject-v1` records that a future
+Borrowing assessor will map a known failure to `reject`. Its status is
+`specified_unwired`: the primitive is not imported by an event evaluator, the
+existing manual check remains visible, and no score, ordering, completion
+count or user-facing result changes in this delivery.
 
 ### Natural graha nature
 
