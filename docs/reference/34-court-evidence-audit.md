@@ -41,3 +41,25 @@ a legal outcome.
 
 The legacy internal `litigation` key is now an explicit compatibility alias for
 this narrow filing profile. It does not represent a broader election.
+
+## Guru-Trikona computation foundation
+
+Issue 396 adds an explicitly unwired computation foundation for the source
+clause “strengthen Lagna with Guru in a Trikona.” Under the registered
+`whole-sign-physical-occupation-v1` convention, the predicate passes exactly
+when Guru occupies house 1, 5 or 9 from the validated local Drik/Lahiri Lagna.
+It fails in every other house and returns `unknown` when the complete canonical
+nine-graha chart or local-Lagna house frame is unavailable or contradictory.
+
+The predicate is a preference only. It never rejects a candidate, changes raw
+score, predicts a legal outcome or treats Guru's occupation as proof that
+Lagna is otherwise strong. A preference is earned only when every represented
+chart state passes and both local-Lagna and Guru-Rasi transition coverage are
+complete within the chart-request budget. A known non-Trikona state defeats an
+unrelated unknown; incomplete coverage never earns the preference.
+
+The shared Python/TypeScript oracle is labelled
+`synthetic_contract_fixture`, not a source golden. This foundation is not yet
+wired into the Court scorer, does not change completion counts and does not
+remove any practitioner-review language. Those changes remain owned by the
+Court effect-policy and completion children under the parent assessor issue.

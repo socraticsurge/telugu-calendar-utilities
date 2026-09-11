@@ -1,10 +1,46 @@
 import { RASI_NAMES } from '../../data/rasis';
+import type { ElectionChartSnapshot } from '../../lib/election-chart-api';
 import {
   COMPLETE_GRAHA_FACTS_UNAVAILABLE,
   type ElectionPrimitiveRule,
   type PlanetPosition,
   type PrimitiveOutcome,
 } from './contracts';
+import { completePlanetPositions } from './event-admission';
+
+export const COURT_GURU_TRIKONA_FACTS_UNAVAILABLE =
+  'Complete canonical nine-graha Whole Sign facts are unavailable.';
+const CANONICAL_GRAHAS = new Set([
+  'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru', 'Shukra', 'Shani', 'Rahu', 'Ketu',
+]);
+
+export const COURT_GURU_TRIKONA_METADATA = {
+  source_statement: {
+    claim_id: 'muhurta.court.filing_lawsuit',
+    text: 'Strengthen Lagna with Guru in a Trikona.',
+    locator: "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+  },
+  convention: {
+    id: 'whole-sign-physical-occupation-v1',
+    method_claim_id: 'election_chart.whole_sign_house_policy_v1',
+    formula: 'H(Guru) in {1, 5, 9}',
+    house_system: 'whole_sign',
+    frame: 'validated_local_lagna',
+  },
+  event_policy: {
+    id: 'court.guru-trikona',
+    activity: 'court',
+    effect: 'prefer',
+    status: 'specified_unwired',
+    delivery_issue: 396,
+  },
+} as const;
+
+export interface CourtGuruTrikonaCoverage {
+  localLagnaTransitionsComplete: boolean;
+  guruRasiTransitionsComplete: boolean;
+  budgetExhausted: boolean;
+}
 
 const NAVAMSA_WIDTH_DEGREES = 30 / 9;
 const NAVAMSA_ROUNDING_GUARD_DEGREES = 0.01;
@@ -27,6 +63,137 @@ const FULL_ASPECT_OFFSETS: Readonly<Record<string, ReadonlySet<number>>> = {
 
 function longitude(position: PlanetPosition): number {
   return RASI_NAMES.indexOf(position.rashi) * 30 + position.degree;
+}
+
+export function evaluateCourtGuruTrikona(
+  chart: ElectionChartSnapshot,
+  options: { houseFrameUncertain?: boolean } = {},
+): PrimitiveOutcome {
+  if (options?.houseFrameUncertain) {
+    return {
+      status: 'unknown',
+      evidence: [
+        'The validated local-Lagna house frame is unavailable or disagrees with sidecar facts.',
+      ],
+    };
+  }
+  if (
+    !chart || typeof chart !== 'object' || !Array.isArray(chart.planets)
+    || Array.from({ length: chart.planets.length }, (_, index) => chart.planets[index])
+      .some(planet => !planet)
+  ) {
+    return { status: 'unknown', evidence: [COURT_GURU_TRIKONA_FACTS_UNAVAILABLE] };
+  }
+  const positions = completePlanetPositions(chart, CANONICAL_GRAHAS);
+  if (!positions) {
+    return { status: 'unknown', evidence: [COURT_GURU_TRIKONA_FACTS_UNAVAILABLE] };
+  }
+
+  const guruHouse = positions.get('Guru')!.house;
+  if ([1, 5, 9].includes(guruHouse)) {
+    return {
+      status: 'pass',
+      evidence: [
+        `Guru occupies house ${guruHouse}, a Trikona from the validated local Lagna.`,
+      ],
+    };
+  }
+  return {
+    status: 'fail',
+    evidence: [`Guru occupies house ${guruHouse}; target Trikona houses: 1, 5, 9.`],
+  };
+}
+
+function completePrimitiveOutcome(sample: PrimitiveOutcome | undefined): boolean {
+  return Boolean(
+    sample
+    && ['pass', 'fail', 'unknown'].includes(sample.status)
+    && Array.isArray(sample.evidence)
+    && sample.evidence.every(item => typeof item === 'string'),
+  );
+}
+
+function completeCourtCoverage(
+  coverage: CourtGuruTrikonaCoverage | null | undefined,
+): coverage is CourtGuruTrikonaCoverage {
+  return Boolean(
+    coverage && typeof coverage === 'object' && !Array.isArray(coverage)
+    && typeof coverage.localLagnaTransitionsComplete === 'boolean'
+    && typeof coverage.guruRasiTransitionsComplete === 'boolean'
+    && typeof coverage.budgetExhausted === 'boolean',
+  );
+}
+
+export function aggregateCourtGuruTrikonaWindow(
+  samples: readonly PrimitiveOutcome[],
+  coverage: CourtGuruTrikonaCoverage,
+): PrimitiveOutcome {
+  const failed = Array.isArray(samples)
+    ? samples.find(sample => sample?.status === 'fail')
+    : undefined;
+  if (failed) return failed;
+  if (
+    !Array.isArray(samples)
+    || Array.from({ length: samples.length }, (_, index) => samples[index])
+      .some(sample => !completePrimitiveOutcome(sample))
+  ) {
+    return {
+      status: 'unknown',
+      evidence: ['Represented chart states are malformed or incomplete.'],
+    };
+  }
+  const unknown = samples.find(sample => sample.status === 'unknown');
+  if (unknown) return unknown;
+  if (!samples.length) {
+    return { status: 'unknown', evidence: ['No represented chart states are available.'] };
+  }
+  if (!completeCourtCoverage(coverage)) {
+    return {
+      status: 'unknown',
+      evidence: ['Window transition metadata is malformed or incomplete.'],
+    };
+  }
+  if (coverage.budgetExhausted) {
+    return {
+      status: 'unknown',
+      evidence: [
+        "The chart-request budget was exhausted before this window's coverage was complete.",
+      ],
+    };
+  }
+  if (
+    !coverage.localLagnaTransitionsComplete
+    && !coverage.guruRasiTransitionsComplete
+  ) {
+    return {
+      status: 'unknown',
+      evidence: [
+        'All represented states pass, but local-Lagna and Guru-Rasi transition coverage is incomplete.',
+      ],
+    };
+  }
+  if (!coverage.localLagnaTransitionsComplete) {
+    return {
+      status: 'unknown',
+      evidence: [
+        'All represented states pass, but local-Lagna transition coverage is incomplete.',
+      ],
+    };
+  }
+  if (!coverage.guruRasiTransitionsComplete) {
+    return {
+      status: 'unknown',
+      evidence: [
+        'All represented states pass, but Guru-Rasi transition coverage is incomplete.',
+      ],
+    };
+  }
+  return {
+    status: 'pass',
+    evidence: [
+      'Every represented state places Guru in Whole Sign house 1, 5 or 9.',
+    ],
+  };
 }
 
 export function evaluateAllPlanetsInHouses(
