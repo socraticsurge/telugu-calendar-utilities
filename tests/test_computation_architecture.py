@@ -51,24 +51,24 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     report = build_report('HEAD', commit_limit=20)
 
     assert report['schema_version'] == 1
-    assert report['scope']['source_files'] == 108
-    assert report['scope']['established_source_files'] == 78
+    assert report['scope']['source_files'] == 110
+    assert report['scope']['established_source_files'] == 80
     assert report['scope']['additive_feature_source_files'] == 30
-    assert report['scope']['total_source_files'] == 108
+    assert report['scope']['total_source_files'] == 110
     assert report['scope']['source_files'] == report['scope']['total_source_files']
     assert report['scope']['source_files'] == (
         report['scope']['established_source_files']
         + report['scope']['additive_feature_source_files']
     )
-    assert report['scope']['computation_records'] == 63
-    assert len(report['output_consumer_map']) == 63
-    assert len({item['id'] for item in report['output_consumer_map']}) == 63
+    assert report['scope']['computation_records'] == 64
+    assert len(report['output_consumer_map']) == 64
+    assert len({item['id'] for item in report['output_consumer_map']}) == 64
     assert {'engines', 'derived-calendar', 'scoring', 'mcp', 'browser-panels'} \
         <= set(report['layers'])
 
     summary = _summary(report)
-    assert 'Production modules: 108' in summary
-    assert 'Established production modules: 78' in summary
+    assert 'Production modules: 110' in summary
+    assert 'Established production modules: 80' in summary
     assert 'Additive feature modules: 30' in summary
 
 

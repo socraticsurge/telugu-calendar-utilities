@@ -197,6 +197,34 @@ def court_mesha_admission_kind(
     return 'unavailable'
 
 
+def _samples_are_well_formed(samples: object) -> bool:
+    return isinstance(samples, Sequence) and all(
+        isinstance(sample, PrimitiveOutcome)
+        and sample.status in {'pass', 'fail', 'unknown'}
+        and all(isinstance(item, str) for item in sample.evidence)
+        for sample in samples
+    )
+
+
+def _first_sample_with_status(
+    samples: Sequence[PrimitiveOutcome], status: str
+) -> PrimitiveOutcome | None:
+    return next((sample for sample in samples if sample.status == status), None)
+
+
+def _missing_transition_names(
+    *,
+    local_lagna_transitions_complete: bool,
+    lagna_navamsa_transitions_complete: bool,
+) -> list[str]:
+    missing = []
+    if not local_lagna_transitions_complete:
+        missing.append('local-Lagna')
+    if not lagna_navamsa_transitions_complete:
+        missing.append('Lagna-Navamsa')
+    return missing
+
+
 def aggregate_court_mesha_d1_d9_window(
     samples: Sequence[PrimitiveOutcome],
     *,
@@ -206,24 +234,23 @@ def aggregate_court_mesha_d1_d9_window(
 ) -> PrimitiveOutcome:
     """Combine sampled reject outcomes without hiding an interior failure."""
     if isinstance(samples, Sequence):
-        for sample in samples:
-            if isinstance(sample, PrimitiveOutcome) and sample.status == 'fail':
-                return sample
-    if (
-        not isinstance(samples, Sequence)
-        or any(
-            not isinstance(sample, PrimitiveOutcome)
-            or sample.status not in {'pass', 'fail', 'unknown'}
-            or any(not isinstance(item, str) for item in sample.evidence)
-            for sample in samples
+        failure = next(
+            (
+                sample
+                for sample in samples
+                if isinstance(sample, PrimitiveOutcome) and sample.status == 'fail'
+            ),
+            None,
         )
-    ):
+        if failure is not None:
+            return failure
+    if not _samples_are_well_formed(samples):
         return PrimitiveOutcome(
             'unknown', ('Represented chart states are malformed or incomplete.',)
         )
-    for sample in samples:
-        if sample.status == 'unknown':
-            return sample
+    unknown = _first_sample_with_status(samples, 'unknown')
+    if unknown is not None:
+        return unknown
     if not samples:
         return PrimitiveOutcome(
             'unknown', ('No represented chart states are available.',)
@@ -246,11 +273,10 @@ def aggregate_court_mesha_d1_d9_window(
                 'coverage was complete.',
             ),
         )
-    missing = []
-    if not local_lagna_transitions_complete:
-        missing.append('local-Lagna')
-    if not lagna_navamsa_transitions_complete:
-        missing.append('Lagna-Navamsa')
+    missing = _missing_transition_names(
+        local_lagna_transitions_complete=local_lagna_transitions_complete,
+        lagna_navamsa_transitions_complete=lagna_navamsa_transitions_complete,
+    )
     if missing:
         return PrimitiveOutcome(
             'unknown',
