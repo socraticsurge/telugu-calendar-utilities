@@ -42,6 +42,7 @@ ACTIVITY_METADATA_FIELDS = frozenset({
     'related_claims',
     'manual_checks',
     'manual_prerequisites',
+    'court_policy',
 })
 
 PROJECT_PREDICATE_CLAIM = 'muhurta.shared.project_predicates'

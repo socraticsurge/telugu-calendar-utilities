@@ -521,6 +521,50 @@
       "last_reviewed": "2026-07-22"
     },
     {
+      "id": "muhurta.court.tithi_shorthand_sources",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "B. V. Raman, inspected in the 2020 Chistabo derivative: Chapter II 'General hints,' internal printed p. 6 (physical PDF p. 9); Chapter V 'Panchang Suddhi,' internal printed p. 12 (physical PDF p. 15); Chapter VIII 'Naming the child (Namakarana),' internal printed p. 22 (physical PDF p. 25); and Chapter XVII 'Filing law-suits,' internal printed p. 67 (physical PDF p. 71)",
+      "scope": "The lawsuit passage says only 'the usual unfavorable Tithis.' Three nearby reusable lists are materially different: General hints names 4, 8, 12 and 14; Panchang Suddhi adds 6 plus Full and New Moon; Namakarana additionally names 9. None of those passages states that its complete list is the intended Chapter XVII cross-reference, so they remain alternatives rather than blended source wording.",
+      "last_reviewed": "2026-09-11"
+    },
+    {
+      "id": "muhurta.court.tithi_operational_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "Project decision for B. V. Raman's ambiguous Chapter XVII Tithi shorthand, inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71); source alternatives are registered under muhurta.court.tithi_shorthand_sources",
+      "scope": "Preserves the existing 4, 6, 8, 9, 12, 14 and 15 rejection set without behavioral change. Navami remains an explicit conservative project interpretation based on the Namakarana list, not a word attributed to the lawsuit passage. Both Full Moon and New Moon map to the Paksha-local ordinal 15.",
+      "last_reviewed": "2026-09-11"
+    },
+    {
+      "id": "muhurta.court.effect_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "Project decision over the five atomic B. V. Raman Chapter XVII filing-law-suits clauses, inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "scope": "Mesha Lagna-or-Navamsa and a natural-malefic-free sixth house are reject effects; Guru in a Trikona and maximum Lagna-sixth-lord separation are non-scoring preferences; the peace configuration is non-ranking information. Source wording does not itself define these product effects.",
+      "last_reviewed": "2026-09-11"
+    },
+    {
+      "id": "muhurta.court.general_baseline_none_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/activity_rules.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
+      "locator": "Project decision scoped to B. V. Raman Chapter XVII 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "scope": "Sets general_baseline_mode to none because the filing-law-suits paragraph does not explicitly incorporate a general election baseline. Tarabalam, Chandrabalam, Muhurta nature, Choghadiya, Nitya Yoga, Anandadi, personal Lagna fit and Panchaka remain disclosed upstream product-ranking policy and do not become Chapter XVII Court-source rules.",
+      "last_reviewed": "2026-09-11"
+    },
+    {
       "id": "muhurta.court.filing_lawsuit",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
@@ -528,8 +572,8 @@
       "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
       "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
-      "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or the manual alternative of Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; and separation of the Lagna and 6th lords. The passage says to avoid the usual unfavorable lunar days without repeating them; automation transparently resolves that phrase to Raman's recurring explicit list in the same inspected derivative: Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The legacy litigation API key resolves explicitly to this profile and is not a separate election.",
-      "last_reviewed": "2026-09-04"
+      "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; separation of the Lagna and 6th lords; and the non-predictive peace configuration. The passage does not expand 'the usual unfavorable Tithis'; registered alternatives and the unchanged operational choice are separate claims. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The legacy litigation API key resolves explicitly to this profile and is not a separate election.",
+      "last_reviewed": "2026-09-11"
     },
     {
       "id": "muhurta.litigation.profile_conflict",

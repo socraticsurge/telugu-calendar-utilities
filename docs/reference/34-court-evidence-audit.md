@@ -20,24 +20,58 @@ passage, not that every lineage treats them as universal.
 | Source criterion | Implementation | Boundary |
 |---|---|---|
 | Avoid Tuesday and Saturday | `allowed_varas` admits the other five weekdays | Hard day gate |
-| Avoid the usual unfavorable lunar days | `avoid_tithi_numbers` = 4, 6, 8, 9, 12, 14, 15 | “Usual” is resolved to Raman's recurring explicit list in the same inspected derivative; 15 covers both Pournami and Amavasya |
+| Avoid the usual unfavorable lunar days | `avoid_tithi_numbers` = 4, 6, 8, 9, 12, 14, 15 | The passage does not define “usual.” The unchanged list is a conservative project policy recorded below; 15 covers both Pournami and Amavasya. |
 | Ten named Nakshatras are good | Exact `allowed_nakshatras` list | Hard day gate |
 | Lagna, or at least Navamsa, should be Mesha | `allowed_lagnas = ['Mesha']` | Conservative hard slot gate; the Navamsa alternative remains manual because it is unavailable on every surface |
 | Strengthen Lagna with Guru in a Trikona; no malefic in the 6th; keep Lagna and 6th lords apart | `manual_checks`; `manual_prerequisites = true` | Results cannot be rated Excellent until a practitioner checks the chart |
 | Benefics in Kendras, or benefic aspects from male Rasis, indicate peace | Manual interpretive note | Never presented as a guarantee of settlement or success |
 
-The recurring unfavorable-Tithi list is stated explicitly earlier in the same
-inspected derivative in the Namakarana passage (Chapter VIII, internal printed
-page 22, physical PDF page 25):
-Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and
-Amavasya. This cross-reference is disclosed because the lawsuit passage itself
-uses shorthand rather than restating the numbers.
+## Tithi shorthand decision
+
+The Chapter XVII paragraph says only “Avoid the usual unfavorable Tithis.” It
+does not identify a cross-reference. Direct inspection found three materially
+different reusable lists in the same artifact:
+
+| Candidate | Exact locator | Avoided Paksha-local ordinals |
+|---|---|---|
+| General hints | Chapter II, internal printed p. 6 / physical PDF p. 9 | 4, 8, 12, 14 |
+| General Panchang Suddhi | Chapter V, internal printed p. 12 / physical PDF p. 15 | 4, 6, 8, 12, 14, 15 |
+| Namakarana | Chapter VIII, internal printed p. 22 / physical PDF p. 25 | 4, 6, 8, 9, 12, 14, 15 |
+
+The first list is on the Chapter II “General hints” page immediately before
+Chapter III; it is not a Chapter III rule despite an earlier ticket shorthand.
+The Namakarana locator is therefore ratified as printed p. 22 / physical PDF
+p. 25, but the Court paragraph never says to inherit Namakarana. Version 1
+keeps the existing 4, 6, 8, 9, 12, 14 and 15 behavior as the explicit
+`court-tithi-operational-policy-v1`. In particular, Navami rejection is a
+conservative project interpretation, not quoted Chapter XVII wording. No
+candidate behavior changes in this policy record.
+
+## Effect and baseline policy
+
+The five atomic chart clauses have separate product effects:
+
+| Rule | Effect | Consequence |
+|---|---|---|
+| Mesha Lagna or Mesha Navamsa | `reject` | A resolved miss removes the candidate. |
+| Guru in a Trikona | `prefer` | Tie-break evidence only; no raw-score change. |
+| No natural malefic in the sixth | `reject` | A resolved natural-malefic occupant removes the candidate. |
+| Lagna and sixth lords maximally separated | `prefer` | Binary tie-break evidence; no graduated score. |
+| Peace benefic pattern | `inform` | Explanation only; never affects score, rank, tier, admission or outcome prediction. |
+
+`general_baseline_mode` is `none`: the p. 67 paragraph does not explicitly
+incorporate a general election baseline. Tarabalam, Chandrabalam, Muhurta
+nature, Choghadiya, Nitya Yoga, Anandadi, personal Lagna fit and Panchaka can
+still affect the upstream product shortlist, but they are disclosed product
+policy rather than Court-source rules. This Court-specific decision does not
+claim that the broader baseline registry in issue 292 is complete.
 
 ## Safety and alias boundary
 
 Legal deadlines, court rules, counsel, evidence and personal safety always
 take precedence over electional timing. A Muhurtam cannot predict or guarantee
-a legal outcome.
+a legal outcome. Scope and legal-safety disclosures are `inform` rows: neither
+can make a chart result unknown, incomplete or practitioner-reviewed.
 
 The legacy internal `litigation` key is now an explicit compatibility alias for
 this narrow filing profile. It does not represent a broader election.

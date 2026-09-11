@@ -54,6 +54,85 @@
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
 
+COURT_SOURCE_EFFECT_POLICY = {
+    'schema_version': 1,
+    'source_claim': 'muhurta.court.filing_lawsuit',
+    'tithi_shorthand': {
+        'source_wording': 'Avoid the usual unfavorable Tithis.',
+        'source_candidates': [
+            {
+                'id': 'raman-general-hints-p6',
+                'locator': (
+                    'Chapter II, General hints, internal printed p. 6 '
+                    + '(physical PDF p. 9)'
+                ),
+                'avoid_tithi_numbers': [4, 8, 12, 14],
+            },
+            {
+                'id': 'raman-panchanga-suddhi-p12',
+                'locator': (
+                    'Chapter V, Panchang Suddhi, internal printed p. 12 '
+                    + '(physical PDF p. 15)'
+                ),
+                'avoid_tithi_numbers': [4, 6, 8, 12, 14, 15],
+            },
+            {
+                'id': 'raman-namakarana-p22',
+                'locator': (
+                    'Chapter VIII, Naming the child (Namakarana), internal '
+                    + 'printed p. 22 (physical PDF p. 25)'
+                ),
+                'avoid_tithi_numbers': [4, 6, 8, 9, 12, 14, 15],
+            },
+        ],
+        'selection': {
+            'id': 'court-tithi-operational-policy-v1',
+            'status': 'selected_project_policy',
+            'avoid_tithi_numbers': [4, 6, 8, 9, 12, 14, 15],
+            'behavior_change': False,
+            'claim_id': 'muhurta.court.tithi_operational_policy_v1',
+        },
+    },
+    'general_baseline': {
+        'mode': 'none',
+        'claim_id': 'muhurta.court.general_baseline_none_v1',
+    },
+    'atomic_rule_effects': {
+        'court.mesha-lagna-or-navamsa': 'reject',
+        'court.guru-trikona': 'prefer',
+        'court.house-6-without-natural-malefic': 'reject',
+        'court.lagna-sixth-lords-max-separated': 'prefer',
+        'court.peace-benefic-pattern': 'inform',
+    },
+    'effect_policy_claim': 'muhurta.court.effect_policy_v1',
+    'upstream_product_policy': [
+        'Tarabalam',
+        'Chandrabalam',
+        'Muhurta nature',
+        'Choghadiya',
+        'Nitya Yoga',
+        'Anandadi',
+        'personal Lagna fit',
+        'Panchaka',
+    ],
+    'scope': {
+        'text': (
+            'Filing or initiating a lawsuit; not a hearing, response, '
+            + 'settlement, appeal, or prediction of the case outcome.'
+        ),
+        'effect': 'inform',
+        'affects_chart_completion': False,
+    },
+    'legal_safety': {
+        'text': (
+            'Legal deadlines, court rules, counsel, evidence, procedure, '
+            + 'and personal safety always take precedence over electional timing.'
+        ),
+        'effect': 'inform',
+        'affects_chart_completion': False,
+    },
+}
+
 _CLAIM_PURCHASE_GENERAL = 'muhurta.purchase.general'
 _NAKSHATRA_UTTARA_ASHADHA = 'Uttara Ashadha'
 _NAKSHATRA_UTTARA_BHADRAPADA = 'Uttara Bhadrapada'
@@ -973,6 +1052,13 @@ ACTIVITY_RULES: dict[str, dict] = {
     # — Civil & Medical —
     'court':         {'label': 'Filing a lawsuit / court action',
                       'source_claim': 'muhurta.court.filing_lawsuit',
+                      'related_claims': [
+                          'muhurta.court.tithi_shorthand_sources',
+                          'muhurta.court.tithi_operational_policy_v1',
+                          'muhurta.court.effect_policy_v1',
+                          'muhurta.court.general_baseline_none_v1',
+                      ],
+                      'court_policy': COURT_SOURCE_EFFECT_POLICY,
                       'manual_prerequisites': True,
                       'allowed_varas': [
                           'Adivaram', 'Somavaram', 'Budhavaram',
