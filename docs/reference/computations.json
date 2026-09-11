@@ -993,6 +993,71 @@
       }
     },
     {
+      "id": "interpretation.same-rasi-conjunction",
+      "title": "Same-Rasi Chandra conjunction primitive",
+      "summary": "A complete canonical chart is classified for Chandra sharing a Rasi with Kuja or Shani, then sampled states are combined with fail-closed window precedence.",
+      "owning_layer": "interpretation",
+      "claim_kind": "project-heuristic",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/election_assessors/conjunction.py", "symbol": "evaluate_same_rasi_chandra_conjunction", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/conjunction.py", "symbol": "aggregate_same_rasi_conjunction_window", "role": "owner"},
+        {"path": "src/scorer/election-assessors/conjunction.ts", "symbol": "evaluateSameRasiChandraConjunction", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/conjunction.ts", "symbol": "aggregateSameRasiConjunctionWindow", "role": "mirror"}
+      ],
+      "inputs": ["complete canonical nine-graha Rasi facts", "sampled primitive outcomes", "Rasi-transition coverage state", "chart-request budget state"],
+      "outputs": ["pass, fail, or unknown outcome with evidence", "sampled-window outcome"],
+      "time_basis": "An exact chart snapshot or a sampled half-open candidate window; no Borrowing Money event wiring is active.",
+      "surfaces": ["python-library"],
+      "provenance": {
+        "evidence_classes": ["textual", "project_heuristic"],
+        "verification_states": ["verified", "heuristic"],
+        "claim_ids": [
+          "muhurta.borrowing_money",
+          "election_chart.same_rasi_distributive_conjunction_policy_v1",
+          "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1"
+        ],
+        "note": "The cited source statement, selected same-Rasi computation convention, and future event-level reject effect are separately registered. The primitive is implemented with a TypeScript parity mirror; the event policy remains specified but unwired."
+      },
+      "tests": [
+        "tests/test_same_rasi_conjunction.py",
+        "src/scorer/__tests__/same-rasi-conjunction.test.ts",
+        "tests/fixtures/election_chart_same_rasi_conjunction_oracle.json"
+      ],
+      "limitations": [
+        "Conjunction means same Rasi only; it does not imply a degree orb or a global conjunction default.",
+        "Missing, malformed, duplicate, or conflicting chart facts resolve to unknown.",
+        "A sampled window passes only when every sample passes and transition coverage completes within the request budget.",
+        "The primitive is not wired into Borrowing Money ranking or completion counts until issue 271."
+      ],
+      "method": {
+        "kind": "decision-table",
+        "summary": "Admit only a complete canonical nine-graha Rasi map, fail when Chandra shares a Rasi with Kuja or Shani, pass when both are different, and otherwise return unknown; across a window, fail outranks unknown, which outranks pass.",
+        "steps": [
+          "Validate that all nine canonical Grahas occur exactly once with canonical names and Rasis; otherwise return unknown.",
+          "Compare Chandra's Rasi independently with Kuja's and Shani's Rasis.",
+          "Return fail when either equality holds and pass only when both comparisons are unequal.",
+          "Across sampled states, return the first fail; otherwise the first unknown; otherwise return unknown for empty samples, budget exhaustion, or incomplete transition coverage; return pass only after complete all-pass coverage.",
+          "Keep the Borrowing Money reject effect as metadata only; do not change event scoring, ranking, or completion counts."
+        ],
+        "formulae": [
+          {
+            "name": "Distributive same-Rasi conjunction",
+            "expression": "C = (R(Chandra) = R(Kuja)) OR (R(Chandra) = R(Shani))",
+            "variables": ["R(g): canonical Rasi occupied by Graha g", "C: event-bounded same-Rasi conjunction fact"]
+          }
+        ],
+        "worked_examples": [
+          {
+            "label": "Chandra and Kuja in Mesha, Shani in Kumbha",
+            "inputs": ["Chandra Rasi: Mesha", "Kuja Rasi: Mesha", "Shani Rasi: Kumbha", "complete canonical chart: yes"],
+            "calculation": ["R(Chandra) equals R(Kuja).", "The disjunction is true even though R(Chandra) differs from R(Shani)."],
+            "result": ["Primitive outcome: fail", "Future Borrowing Money effect: reject, still unwired"]
+          }
+        ],
+        "notes": ["Window aggregation preserves fail over unknown so an already-observed prohibited state is not hidden by incomplete later coverage."]
+      }
+    },
+    {
       "id": "panchangam.abhijit-muhurta",
       "title": "Abhijit Muhurta window",
       "summary": "The midday auspicious interval is derived proportionally from daytime length, except on Wednesday.",

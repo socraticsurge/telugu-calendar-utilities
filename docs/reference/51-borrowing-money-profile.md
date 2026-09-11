@@ -31,8 +31,13 @@ paragraph supplies none.
 - For quick domestic or personal use, Chandra should favour Lagna.
 - For business use, Chandra should favour Budha and the Lagna lord.
 
-These unresolved chart conditions, and an omitted Janma star, require
-practitioner review; automated results cannot receive `Excellent`.
+The first clause now has an unwired reusable computation primitive:
+`same-rasi-distributive-conjunction-v1` evaluates
+`R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani)` with no degree orb. It is not
+yet an event result: issue #271 must wire the separately recorded reject policy
+alongside the remaining purpose-specific clauses and prove complete sampled-
+window coverage. Until then, all three conditions remain visible for
+practitioner review and automated results cannot receive `Excellent`.
 
 ## Financial safety
 

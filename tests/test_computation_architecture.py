@@ -51,25 +51,25 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     report = build_report('HEAD', commit_limit=20)
 
     assert report['schema_version'] == 1
-    assert report['scope']['source_files'] == 106
+    assert report['scope']['source_files'] == 108
     assert report['scope']['established_source_files'] == 78
-    assert report['scope']['additive_feature_source_files'] == 28
-    assert report['scope']['total_source_files'] == 106
+    assert report['scope']['additive_feature_source_files'] == 30
+    assert report['scope']['total_source_files'] == 108
     assert report['scope']['source_files'] == report['scope']['total_source_files']
     assert report['scope']['source_files'] == (
         report['scope']['established_source_files']
         + report['scope']['additive_feature_source_files']
     )
-    assert report['scope']['computation_records'] == 62
-    assert len(report['output_consumer_map']) == 62
-    assert len({item['id'] for item in report['output_consumer_map']}) == 62
+    assert report['scope']['computation_records'] == 63
+    assert len(report['output_consumer_map']) == 63
+    assert len({item['id'] for item in report['output_consumer_map']}) == 63
     assert {'engines', 'derived-calendar', 'scoring', 'mcp', 'browser-panels'} \
         <= set(report['layers'])
 
     summary = _summary(report)
-    assert 'Production modules: 106' in summary
+    assert 'Production modules: 108' in summary
     assert 'Established production modules: 78' in summary
-    assert 'Additive feature modules: 28' in summary
+    assert 'Additive feature modules: 30' in summary
 
 
 def test_karnavedha_assessors_extend_architecture_additively():
@@ -78,6 +78,15 @@ def test_karnavedha_assessors_extend_architecture_additively():
     ) == 'additive-feature'
     assert source_scope_class(
         'telugu_panchangam/personal/election_assessors/karnavedha.py'
+    ) == 'additive-feature'
+
+
+def test_same_rasi_conjunction_assessors_extend_architecture_additively():
+    assert source_scope_class(
+        'src/scorer/election-assessors/conjunction.ts'
+    ) == 'additive-feature'
+    assert source_scope_class(
+        'telugu_panchangam/personal/election_assessors/conjunction.py'
     ) == 'additive-feature'
 
 
