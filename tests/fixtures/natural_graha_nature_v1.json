@@ -1,0 +1,222 @@
+{
+  "convention_id": "phaladeepika-natural-graha-nature-whole-sign-v1",
+  "base_chart": {
+    "instant": "2026-09-08T05:30:00.000Z",
+    "lagna": {"rashi": "Mesha", "degree": 12.5},
+    "planets": [
+      {"name": "Surya", "rashi": "Mesha", "degree": 10.0, "house": 1, "retrograde": false},
+      {"name": "Chandra", "rashi": "Karka", "degree": 10.0, "house": 4, "retrograde": false},
+      {"name": "Kuja", "rashi": "Mithuna", "degree": 12.0, "house": 3, "retrograde": false},
+      {"name": "Budha", "rashi": "Kanya", "degree": 5.0, "house": 6, "retrograde": false},
+      {"name": "Guru", "rashi": "Dhanu", "degree": 12.0, "house": 9, "retrograde": false},
+      {"name": "Shukra", "rashi": "Vrishabha", "degree": 21.0, "house": 2, "retrograde": false},
+      {"name": "Shani", "rashi": "Tula", "degree": 17.0, "house": 7, "retrograde": false},
+      {"name": "Rahu", "rashi": "Makara", "degree": 8.0, "house": 10, "retrograde": true},
+      {"name": "Ketu", "rashi": "Kumbha", "degree": 8.0, "house": 11, "retrograde": true}
+    ]
+  },
+  "classifier_cases": [
+    {
+      "id": "all-fixed-waxing-and-budha-alone",
+      "overrides": {},
+      "expected": {
+        "Surya": "malefic",
+        "Chandra": "benefic",
+        "Kuja": "malefic",
+        "Budha": "benefic",
+        "Guru": "benefic",
+        "Shukra": "benefic",
+        "Shani": "malefic",
+        "Rahu": "malefic",
+        "Ketu": "malefic"
+      }
+    },
+    {
+      "id": "waning-chandra",
+      "overrides": {"Chandra": {"rashi": "Makara", "degree": 10.0, "house": 10}},
+      "expected": {"Chandra": "malefic"}
+    },
+    {
+      "id": "new-chandra-zero-guard",
+      "overrides": {"Chandra": {"rashi": "Mesha", "degree": 10.0, "house": 1}},
+      "expected": {"Chandra": "unknown"}
+    },
+    {
+      "id": "waxing-lower-guard-edge",
+      "overrides": {"Chandra": {"rashi": "Mesha", "degree": 10.02, "house": 1}},
+      "expected": {"Chandra": "unknown"}
+    },
+    {
+      "id": "waxing-just-outside-lower-guard",
+      "overrides": {"Chandra": {"rashi": "Mesha", "degree": 10.0201, "house": 1}},
+      "expected": {"Chandra": "benefic"}
+    },
+    {
+      "id": "full-chandra-lower-guard-edge",
+      "overrides": {"Chandra": {"rashi": "Tula", "degree": 9.98, "house": 7}},
+      "expected": {"Chandra": "unknown"}
+    },
+    {
+      "id": "waxing-just-outside-full-guard",
+      "overrides": {"Chandra": {"rashi": "Tula", "degree": 9.9799, "house": 7}},
+      "expected": {"Chandra": "benefic"}
+    },
+    {
+      "id": "full-guard-half-quantum-rounds-up",
+      "overrides": {"Chandra": {"rashi": "Tula", "degree": 9.97999999995, "house": 7}},
+      "expected": {"Chandra": "unknown"}
+    },
+    {
+      "id": "full-guard-below-half-quantum-stays-outside",
+      "overrides": {"Chandra": {"rashi": "Tula", "degree": 9.97999999994, "house": 7}},
+      "expected": {"Chandra": "benefic"}
+    },
+    {
+      "id": "full-chandra-upper-guard-edge",
+      "overrides": {"Chandra": {"rashi": "Tula", "degree": 10.02, "house": 7}},
+      "expected": {"Chandra": "unknown"}
+    },
+    {
+      "id": "waning-just-outside-full-guard",
+      "overrides": {"Chandra": {"rashi": "Tula", "degree": 10.0201, "house": 7}},
+      "expected": {"Chandra": "malefic"}
+    },
+    {
+      "id": "new-chandra-360-guard-edge",
+      "overrides": {"Chandra": {"rashi": "Mesha", "degree": 9.98, "house": 1}},
+      "expected": {"Chandra": "unknown"}
+    },
+    {
+      "id": "waning-just-outside-360-guard",
+      "overrides": {"Chandra": {"rashi": "Mesha", "degree": 9.9799, "house": 1}},
+      "expected": {"Chandra": "malefic"}
+    },
+    {
+      "id": "budha-with-fixed-malefic",
+      "overrides": {"Budha": {"rashi": "Mesha", "degree": 5.0, "house": 1}},
+      "expected": {"Budha": "malefic"}
+    },
+    {
+      "id": "budha-with-waning-chandra",
+      "overrides": {
+        "Chandra": {"rashi": "Makara", "degree": 10.0, "house": 10},
+        "Budha": {"rashi": "Makara", "degree": 5.0, "house": 10}
+      },
+      "expected": {"Chandra": "malefic", "Budha": "malefic"}
+    },
+    {
+      "id": "budha-with-waxing-chandra",
+      "overrides": {"Budha": {"rashi": "Karka", "degree": 5.0, "house": 4}},
+      "expected": {"Chandra": "benefic", "Budha": "benefic"}
+    },
+    {
+      "id": "budha-with-only-phase-unknown-chandra",
+      "overrides": {
+        "Chandra": {"rashi": "Tula", "degree": 10.0, "house": 7},
+        "Budha": {"rashi": "Tula", "degree": 5.0, "house": 7},
+        "Shani": {"rashi": "Vrischika", "degree": 17.0, "house": 8}
+      },
+      "expected": {"Chandra": "unknown", "Budha": "unknown"}
+    },
+    {
+      "id": "budha-resolved-malefic-dominates-unknown-chandra",
+      "overrides": {
+        "Chandra": {"rashi": "Tula", "degree": 10.0, "house": 7},
+        "Budha": {"rashi": "Tula", "degree": 5.0, "house": 7}
+      },
+      "expected": {"Chandra": "unknown", "Budha": "malefic"}
+    }
+  ],
+  "invalid_cases": [
+    {"id": "missing-graha", "mutation": {"kind": "remove", "planet": "Ketu"}},
+    {"id": "duplicate-graha", "mutation": {"kind": "rename", "planet": "Ketu", "value": "Rahu"}},
+    {"id": "invalid-rashi", "mutation": {"kind": "set", "planet": "Guru", "field": "rashi", "value": "NotARashi"}},
+    {"id": "invalid-degree", "mutation": {"kind": "set", "planet": "Guru", "field": "degree", "value": 30}},
+    {"id": "invalid-house", "mutation": {"kind": "set", "planet": "Guru", "field": "house", "value": 0}},
+    {"id": "invalid-retrograde", "mutation": {"kind": "set", "planet": "Guru", "field": "retrograde", "value": "false"}}
+  ],
+  "predicate_cases": [
+    {
+      "id": "benefic-pass",
+      "predicate": "existential_benefic",
+      "houses": [2],
+      "overrides": {},
+      "expected_status": "pass",
+      "evidence_contains": "Shukra"
+    },
+    {
+      "id": "benefic-fail",
+      "predicate": "existential_benefic",
+      "houses": [1, 3],
+      "overrides": {},
+      "expected_status": "fail",
+      "evidence_contains": "No resolved natural benefic"
+    },
+    {
+      "id": "benefic-unknown",
+      "predicate": "existential_benefic",
+      "houses": [7],
+      "overrides": {
+        "Chandra": {"rashi": "Tula", "degree": 10.0, "house": 7},
+        "Budha": {"rashi": "Tula", "degree": 5.0, "house": 7},
+        "Shani": {"rashi": "Vrischika", "degree": 17.0, "house": 8}
+      },
+      "expected_status": "unknown",
+      "evidence_contains": "Chandra"
+    },
+    {
+      "id": "benefic-decisive-witness-conflict",
+      "predicate": "existential_benefic",
+      "houses": [7],
+      "overrides": {
+        "Chandra": {"rashi": "Tula", "degree": 10.0, "house": 7},
+        "Budha": {"rashi": "Tula", "degree": 5.0, "house": 7},
+        "Guru": {"rashi": "Tula", "degree": 12.0, "house": 7},
+        "Shani": {"rashi": "Vrischika", "degree": 17.0, "house": 8}
+      },
+      "expected_status": "pass",
+      "evidence_contains": "Guru"
+    },
+    {
+      "id": "forbidden-pass",
+      "predicate": "forbidden_malefic",
+      "houses": [2, 9],
+      "overrides": {},
+      "expected_status": "pass",
+      "evidence_contains": "No resolved natural malefic"
+    },
+    {
+      "id": "forbidden-fail",
+      "predicate": "forbidden_malefic",
+      "houses": [1],
+      "overrides": {},
+      "expected_status": "fail",
+      "evidence_contains": "Surya"
+    },
+    {
+      "id": "forbidden-unknown",
+      "predicate": "forbidden_malefic",
+      "houses": [7],
+      "overrides": {
+        "Chandra": {"rashi": "Tula", "degree": 10.0, "house": 7},
+        "Budha": {"rashi": "Tula", "degree": 5.0, "house": 7},
+        "Shani": {"rashi": "Vrischika", "degree": 17.0, "house": 8}
+      },
+      "expected_status": "unknown",
+      "evidence_contains": "Chandra"
+    },
+    {
+      "id": "forbidden-decisive-witness-conflict",
+      "predicate": "forbidden_malefic",
+      "houses": [1, 7],
+      "overrides": {
+        "Chandra": {"rashi": "Tula", "degree": 10.0, "house": 7},
+        "Budha": {"rashi": "Tula", "degree": 5.0, "house": 7},
+        "Shani": {"rashi": "Vrischika", "degree": 17.0, "house": 8}
+      },
+      "expected_status": "fail",
+      "evidence_contains": "Surya"
+    }
+  ]
+}
+
