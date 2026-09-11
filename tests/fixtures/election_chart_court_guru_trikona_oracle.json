@@ -1,0 +1,64 @@
+{
+  "fixture_kind": "synthetic_contract_fixture",
+  "source_golden": false,
+  "metadata": {
+    "source_statement": {
+      "claim_id": "muhurta.court.filing_lawsuit",
+      "text": "Strengthen Lagna with Guru in a Trikona.",
+      "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+    },
+    "convention": {
+      "id": "whole-sign-physical-occupation-v1",
+      "method_claim_id": "election_chart.whole_sign_house_policy_v1",
+      "formula": "H(Guru) in {1, 5, 9}",
+      "house_system": "whole_sign",
+      "frame": "validated_local_lagna"
+    },
+    "event_policy": {
+      "id": "court.guru-trikona",
+      "activity": "court",
+      "effect": "prefer",
+      "status": "specified_unwired",
+      "delivery_issue": 396
+    }
+  },
+  "base_planets": [
+    {"name": "Surya", "rashi": "Mesha", "degree": 10.0, "house": 1, "retrograde": false},
+    {"name": "Chandra", "rashi": "Vrishabha", "degree": 11.0, "house": 2, "retrograde": false},
+    {"name": "Kuja", "rashi": "Mithuna", "degree": 12.0, "house": 3, "retrograde": false},
+    {"name": "Budha", "rashi": "Karka", "degree": 13.0, "house": 4, "retrograde": false},
+    {"name": "Guru", "rashi": "Simha", "degree": 14.0, "house": 5, "retrograde": false},
+    {"name": "Shukra", "rashi": "Kanya", "degree": 15.0, "house": 6, "retrograde": false},
+    {"name": "Shani", "rashi": "Tula", "degree": 16.0, "house": 7, "retrograde": true},
+    {"name": "Rahu", "rashi": "Vrischika", "degree": 17.0, "house": 8, "retrograde": true},
+    {"name": "Ketu", "rashi": "Vrishabha", "degree": 17.0, "house": 2, "retrograde": true}
+  ],
+  "snapshot_cases": [
+    {"id": "guru-house-1-pass", "guru": {"rashi": "Mesha", "house": 1}, "expected": {"status": "pass", "evidence": ["Guru occupies house 1, a Trikona from the validated local Lagna."]}},
+    {"id": "guru-house-5-pass", "expected": {"status": "pass", "evidence": ["Guru occupies house 5, a Trikona from the validated local Lagna."]}},
+    {"id": "guru-house-9-pass", "guru": {"rashi": "Dhanu", "house": 9}, "expected": {"status": "pass", "evidence": ["Guru occupies house 9, a Trikona from the validated local Lagna."]}},
+    {"id": "guru-house-2-fail", "guru": {"rashi": "Vrishabha", "house": 2}, "expected": {"status": "fail", "evidence": ["Guru occupies house 2; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-3-fail", "guru": {"rashi": "Mithuna", "house": 3}, "expected": {"status": "fail", "evidence": ["Guru occupies house 3; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-4-fail", "guru": {"rashi": "Karka", "house": 4}, "expected": {"status": "fail", "evidence": ["Guru occupies house 4; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-6-fail", "guru": {"rashi": "Kanya", "house": 6}, "expected": {"status": "fail", "evidence": ["Guru occupies house 6; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-7-fail", "guru": {"rashi": "Tula", "house": 7}, "expected": {"status": "fail", "evidence": ["Guru occupies house 7; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-8-fail", "guru": {"rashi": "Vrischika", "house": 8}, "expected": {"status": "fail", "evidence": ["Guru occupies house 8; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-10-fail", "guru": {"rashi": "Makara", "house": 10}, "expected": {"status": "fail", "evidence": ["Guru occupies house 10; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-11-fail", "guru": {"rashi": "Kumbha", "house": 11}, "expected": {"status": "fail", "evidence": ["Guru occupies house 11; target Trikona houses: 1, 5, 9."]}},
+    {"id": "guru-house-12-fail", "guru": {"rashi": "Meena", "house": 12}, "expected": {"status": "fail", "evidence": ["Guru occupies house 12; target Trikona houses: 1, 5, 9."]}},
+    {"id": "missing-guru-unknown", "remove": ["Guru"], "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Whole Sign facts are unavailable."]}},
+    {"id": "duplicate-guru-unknown", "duplicate": "Guru", "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Whole Sign facts are unavailable."]}},
+    {"id": "malformed-guru-unknown", "guru": {"rashi": "NotARasi", "house": 5}, "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Whole Sign facts are unavailable."]}},
+    {"id": "lagna-frame-disagreement-unknown", "house_frame_uncertain": true, "expected": {"status": "unknown", "evidence": ["The validated local-Lagna house frame is unavailable or disagrees with sidecar facts."]}}
+  ],
+  "window_cases": [
+    {"id": "known-fail-dominates-unrelated-unknown", "sample_case_ids": ["guru-house-4-fail", "missing-guru-unknown"], "coverage": {"local_lagna_transitions_complete": false, "guru_rasi_transitions_complete": false, "budget_exhausted": true}, "expected": {"status": "fail", "evidence": ["Guru occupies house 4; target Trikona houses: 1, 5, 9."]}},
+    {"id": "unknown-dominates-pass", "sample_case_ids": ["guru-house-1-pass", "missing-guru-unknown"], "coverage": {"local_lagna_transitions_complete": true, "guru_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha Whole Sign facts are unavailable."]}},
+    {"id": "all-represented-states-pass", "sample_case_ids": ["guru-house-1-pass", "guru-house-5-pass", "guru-house-9-pass"], "coverage": {"local_lagna_transitions_complete": true, "guru_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "pass", "evidence": ["Every represented state places Guru in Whole Sign house 1, 5 or 9."]}},
+    {"id": "local-lagna-transition-incomplete", "sample_case_ids": ["guru-house-1-pass", "guru-house-5-pass"], "coverage": {"local_lagna_transitions_complete": false, "guru_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but local-Lagna transition coverage is incomplete."]}},
+    {"id": "guru-rasi-transition-incomplete", "sample_case_ids": ["guru-house-5-pass", "guru-house-9-pass"], "coverage": {"local_lagna_transitions_complete": true, "guru_rasi_transitions_complete": false, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but Guru-Rasi transition coverage is incomplete."]}},
+    {"id": "both-transition-sets-incomplete", "sample_case_ids": ["guru-house-5-pass"], "coverage": {"local_lagna_transitions_complete": false, "guru_rasi_transitions_complete": false, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but local-Lagna and Guru-Rasi transition coverage is incomplete."]}},
+    {"id": "request-budget-exhausted", "sample_case_ids": ["guru-house-1-pass"], "coverage": {"local_lagna_transitions_complete": true, "guru_rasi_transitions_complete": true, "budget_exhausted": true}, "expected": {"status": "unknown", "evidence": ["The chart-request budget was exhausted before this window's coverage was complete."]}},
+    {"id": "no-represented-states", "sample_case_ids": [], "coverage": {"local_lagna_transitions_complete": true, "guru_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["No represented chart states are available."]}}
+  ]
+}

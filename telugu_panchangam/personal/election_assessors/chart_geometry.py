@@ -2,12 +2,41 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from ...panchangam_names import RASHI_NAMES
 from .contracts import COMPLETE_GRAHA_FACTS_UNAVAILABLE, PrimitiveOutcome
-from .event_admission import PlanetPosition
+from .event_admission import PlanetPosition, planet_positions
+
+COURT_GURU_TRIKONA_FACTS_UNAVAILABLE = (
+    'Complete canonical nine-graha Whole Sign facts are unavailable.'
+)
+COURT_GURU_TRIKONA_METADATA: dict[str, Any] = {
+    'source_statement': {
+        'claim_id': 'muhurta.court.filing_lawsuit',
+        'text': 'Strengthen Lagna with Guru in a Trikona.',
+        'locator': (
+            "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section "
+            "'Filing law-suits,' inspected in the 2020 Chistabo derivative "
+            'at internal printed p. 67 (physical PDF p. 71)'
+        ),
+    },
+    'convention': {
+        'id': 'whole-sign-physical-occupation-v1',
+        'method_claim_id': 'election_chart.whole_sign_house_policy_v1',
+        'formula': 'H(Guru) in {1, 5, 9}',
+        'house_system': 'whole_sign',
+        'frame': 'validated_local_lagna',
+    },
+    'event_policy': {
+        'id': 'court.guru-trikona',
+        'activity': 'court',
+        'effect': 'prefer',
+        'status': 'specified_unwired',
+        'delivery_issue': 396,
+    },
+}
 
 NAVAMSA_WIDTH_DEGREES = 30 / 9
 NAVAMSA_ROUNDING_GUARD_DEGREES = 0.01
@@ -30,6 +59,141 @@ FULL_ASPECT_OFFSETS: Mapping[str, frozenset[int]] = {
 
 def _longitude(position: PlanetPosition) -> float:
     return RASHI_NAMES.index(position.rashi) * 30 + position.degree
+
+
+def evaluate_court_guru_trikona(
+    chart: Mapping[str, Any],
+    *,
+    house_frame_uncertain: bool = False,
+) -> PrimitiveOutcome:
+    """Evaluate the unwired Court Guru-in-Trikona preference foundation."""
+    if house_frame_uncertain:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                (
+                    'The validated local-Lagna house frame is unavailable or '
+                    'disagrees with sidecar facts.'
+                ),
+            ),
+        )
+    if not isinstance(chart, Mapping):
+        return PrimitiveOutcome(
+            'unknown', (COURT_GURU_TRIKONA_FACTS_UNAVAILABLE,)
+        )
+    positions = planet_positions(chart)
+    if positions is None:
+        return PrimitiveOutcome(
+            'unknown', (COURT_GURU_TRIKONA_FACTS_UNAVAILABLE,)
+        )
+
+    guru_house = positions['Guru'].house
+    if guru_house in {1, 5, 9}:
+        return PrimitiveOutcome(
+            'pass',
+            (
+                (
+                    f'Guru occupies house {guru_house}, a Trikona from the '
+                    'validated local Lagna.'
+                ),
+            ),
+        )
+    return PrimitiveOutcome(
+        'fail',
+        (
+            (
+                f'Guru occupies house {guru_house}; target Trikona houses: '
+                '1, 5, 9.'
+            ),
+        ),
+    )
+
+
+def _court_sample_precedence(
+    samples: Sequence[PrimitiveOutcome],
+) -> PrimitiveOutcome | None:
+    for sample in samples:
+        if isinstance(sample, PrimitiveOutcome) and sample.status == 'fail':
+            return sample
+    if any(
+        not isinstance(sample, PrimitiveOutcome)
+        or sample.status not in {'pass', 'fail', 'unknown'}
+        for sample in samples
+    ):
+        return PrimitiveOutcome(
+            'unknown', ('Represented chart states are malformed or incomplete.',)
+        )
+    for sample in samples:
+        if sample.status == 'unknown':
+            return sample
+    if not samples:
+        return PrimitiveOutcome(
+            'unknown', ('No represented chart states are available.',)
+        )
+    return None
+
+
+def _court_transition_coverage_result(
+    local_lagna_transitions_complete: bool,
+    guru_rasi_transitions_complete: bool,
+) -> PrimitiveOutcome | None:
+    if local_lagna_transitions_complete and guru_rasi_transitions_complete:
+        return None
+    missing = []
+    if not local_lagna_transitions_complete:
+        missing.append('local-Lagna')
+    if not guru_rasi_transitions_complete:
+        missing.append('Guru-Rasi')
+    return PrimitiveOutcome(
+        'unknown',
+        (
+            (
+                f'All represented states pass, but {" and ".join(missing)} '
+                'transition coverage is incomplete.'
+            ),
+        ),
+    )
+
+
+def aggregate_court_guru_trikona_window(
+    samples: Sequence[PrimitiveOutcome],
+    *,
+    local_lagna_transitions_complete: bool,
+    guru_rasi_transitions_complete: bool,
+    budget_exhausted: bool,
+) -> PrimitiveOutcome:
+    """Combine represented Court states with preference-only precedence."""
+    if sample_result := _court_sample_precedence(samples):
+        return sample_result
+    coverage_values = (
+        local_lagna_transitions_complete,
+        guru_rasi_transitions_complete,
+        budget_exhausted,
+    )
+    if any(type(value) is not bool for value in coverage_values):
+        return PrimitiveOutcome(
+            'unknown', ('Window transition metadata is malformed or incomplete.',)
+        )
+    if budget_exhausted:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                (
+                    'The chart-request budget was exhausted before this '
+                    "window's coverage was complete."
+                ),
+            ),
+        )
+    if coverage_result := _court_transition_coverage_result(
+        local_lagna_transitions_complete, guru_rasi_transitions_complete
+    ):
+        return coverage_result
+    return PrimitiveOutcome(
+        'pass',
+        (
+            'Every represented state places Guru in Whole Sign house 1, 5 or 9.',
+        ),
+    )
 
 
 def evaluate_all_planets_in_houses(
@@ -182,15 +346,19 @@ def evaluate_well_situated(
         return PrimitiveOutcome(
             'unknown',
             (
-                f'{planet_name}: {position.rashi} {position.degree:.2f}° '
-                f'is within the rounded {" and ".join(reasons)} guard.',
+                (
+                    f'{planet_name}: {position.rashi} {position.degree:.2f}° '
+                    f'is within the rounded {" and ".join(reasons)} guard.'
+                ),
             ),
         )
     return PrimitiveOutcome(
         'pass',
         (
-            f'{planet_name}: {position.rashi}, house {position.house}, '
-            f'{navamsa} Navamsa; no v1 adverse placement factor.',
+            (
+                f'{planet_name}: {position.rashi}, house {position.house}, '
+                f'{navamsa} Navamsa; no v1 adverse placement factor.'
+            ),
         ),
     )
 
