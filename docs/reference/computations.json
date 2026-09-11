@@ -2013,6 +2013,168 @@
       }
     },
     {
+      "id": "personal.natural-graha-nature",
+      "title": "Natural graha nature and house-set witnesses",
+      "summary": "A source-bounded, versioned decision table classifies each canonical graha as a natural benefic, natural malefic, or unknown and derives decisive three-valued house-set witness predicates.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {
+          "path": "telugu_panchangam/personal/election_assessors/graha_nature.py",
+          "symbol": "classify_natural_graha_natures",
+          "role": "owner"
+        },
+        {
+          "path": "telugu_panchangam/personal/election_assessors/graha_nature.py",
+          "symbol": "evaluate_existential_benefic_house_set",
+          "role": "owner"
+        },
+        {
+          "path": "telugu_panchangam/personal/election_assessors/graha_nature.py",
+          "symbol": "evaluate_forbidden_malefic_house_set",
+          "role": "owner"
+        },
+        {
+          "path": "src/scorer/election-assessors/graha-nature.ts",
+          "symbol": "classifyNaturalGrahaNatures",
+          "role": "mirror"
+        },
+        {
+          "path": "src/scorer/election-assessors/graha-nature.ts",
+          "symbol": "evaluateExistentialBeneficHouseSet",
+          "role": "mirror"
+        },
+        {
+          "path": "src/scorer/election-assessors/graha-nature.ts",
+          "symbol": "evaluateForbiddenMaleficHouseSet",
+          "role": "mirror"
+        }
+      ],
+      "inputs": [
+        "complete canonical Surya-through-Ketu sidereal Rasi, degree, Whole Sign house and retrograde facts",
+        "non-empty required or forbidden house set with integer houses 1-12"
+      ],
+      "outputs": [
+        "complete flag and benefic, malefic or unknown nature for all nine grahas",
+        "existential natural-benefic house witness as pass, fail or unknown",
+        "forbidden natural-malefic house witness as pass, fail or unknown",
+        "human-readable decisive or unresolved evidence"
+      ],
+      "time_basis": "One instantaneous Drik/Lahiri, mean-node, Whole Sign election-chart snapshot. This primitive does not sample a time window or call an ephemeris.",
+      "surfaces": [
+        "python-library",
+        "website",
+        "generated-data"
+      ],
+      "provenance": {
+        "evidence_classes": [
+          "textual",
+          "project_heuristic"
+        ],
+        "verification_states": [
+          "verified",
+          "heuristic"
+        ],
+        "claim_ids": [
+          "election_chart.natural_graha_nature.phaladeepika_2_27",
+          "election_chart.natural_malefics.bphs_3_11_modern_witness",
+          "election_chart.budha_same_sign_association_policy_v1",
+          "election_chart.raman_180_degree_paksha_policy_v1",
+          "election_chart.lunar_phase_boundary_guard_policy_v1",
+          "election_chart.mean_node_policy_v1"
+        ],
+        "note": "Phaladeepika II.27 and BPHS 3.11 support the natural-nature categories. The numerical lunar guard, ten-decimal half-up quantization, same-Rasi Budha association and decisive unknown precedence are disclosed reproducibility conventions."
+      },
+      "tests": [
+        "tests/test_natural_graha_nature.py",
+        "src/scorer/__tests__/natural-graha-nature.test.ts"
+      ],
+      "limitations": [
+        "No event scorer consumes this primitive at this snapshot, so it changes no ranking by itself.",
+        "Natural nature is not functional lordship, dignity, strength, combustion, aspect, degree conjunction or event suitability.",
+        "A complete nine-graha set is mandatory; malformed or incomplete data makes every nature unknown.",
+        "The predicates evaluate one chart state and do not prove every transition inside a Muhurtam window."
+      ],
+      "method": {
+        "kind": "decision-table",
+        "summary": "Validate a complete canonical chart, classify fixed grahas, resolve Chandra from quantized Surya-Chandra elongation, resolve Budha from same-Rasi companions, then use decisive known witnesses before unknown occupants for house-set predicates.",
+        "steps": [
+          "Require exactly one valid canonical record for Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu and Ketu; otherwise return unknown for all natures.",
+          "Reconstruct absolute longitude from Rasi index and in-Rasi degree, normalize Chandra minus Surya to 0-360 degrees, and quantize to ten decimal places using non-negative round-half-up integer units.",
+          "Mark Chandra unknown inside the inclusive 0.02-degree guards around 0, 180 and 360 degrees, benefic between the new and full-Moon guards, and malefic between the full- and new-Moon guards.",
+          "Assign Surya, Kuja, Shani, Rahu and Ketu as fixed malefics and Guru and Shukra as fixed benefics.",
+          "Make Budha malefic when any resolved malefic shares its sidereal Rasi; if only phase-unknown Chandra could decide, return unknown; otherwise make Budha benefic.",
+          "For an existential benefic rule, pass on any known benefic, otherwise return unknown for an unknown-nature occupant, otherwise fail.",
+          "For a forbidden malefic rule, fail on any known malefic, otherwise return unknown for an unknown-nature occupant, otherwise pass."
+        ],
+        "formulae": [
+          {
+            "name": "Quantized Chandra elongation",
+            "expression": "Q = floor((((L(Chandra) - L(Surya)) mod 360) * 10^10) + 0.5)",
+            "variables": [
+              "L(graha): sidereal absolute longitude reconstructed from Rasi and degree",
+              "Q: non-negative integer quantum at ten decimal places",
+              "floor(x + 0.5): shared non-negative round-half-up tie rule"
+            ]
+          },
+          {
+            "name": "Chandra nature",
+            "expression": "unknown when min(Q, |Q-180*10^10|, |360*10^10-Q|) <= 0.02*10^10; benefic when Q < 180*10^10 outside the guard; otherwise malefic",
+            "variables": [
+              "0.02 degrees: disclosed inclusive project precision guard",
+              "0, 180 and 360 degrees: new-Moon and full-Moon phase boundaries"
+            ]
+          },
+          {
+            "name": "Decisive witness aggregation",
+            "expression": "existential benefic: known benefic > unknown > fail; forbidden malefic: known malefic > unknown > pass",
+            "variables": [
+              "known witness: an occupant whose natural nature resolves benefic or malefic",
+              "unknown: an occupant whose unresolved nature could change the predicate"
+            ]
+          }
+        ],
+        "worked_examples": [
+          {
+            "label": "Half-quantum full-Moon boundary",
+            "inputs": [
+              "Surya: Mesha 10.0 degrees",
+              "Chandra: Tula 9.97999999995 degrees",
+              "Guard: 0.02 degrees"
+            ],
+            "calculation": [
+              "Raw elongation is 179.97999999995 degrees.",
+              "Non-negative half-up quantization produces Q = 179.98 * 10^10.",
+              "The distance to 180 degrees equals the inclusive guard."
+            ],
+            "result": [
+              "Chandra nature: unknown",
+              "Python and TypeScript return the same boundary result"
+            ]
+          },
+          {
+            "label": "Decisive benefic beside an unresolved occupant",
+            "inputs": [
+              "Target house 7 contains Guru and phase-unknown Chandra",
+              "Predicate: existential natural benefic"
+            ],
+            "calculation": [
+              "Guru is a resolved natural benefic.",
+              "Chandra remains unknown, but cannot undo the known existential witness."
+            ],
+            "result": [
+              "Predicate: pass",
+              "Evidence names Guru as the decisive witness"
+            ]
+          }
+        ],
+        "notes": [
+          "The two textual authorities agree on the operative natural-nature categories but do not supply the numerical guard or a conjunction orb.",
+          "Whole-window certification additionally requires phase-boundary and every relevant Rasi-ingress transition from issue #254."
+        ]
+      }
+    },
+    {
       "id": "personal.nitya-yoga-disposition",
       "title": "Nitya Yoga disposition",
       "summary": "Each of the 27 Nitya Yogas is classified for slot scoring and partial-window cautions.",

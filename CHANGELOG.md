@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.9` while adding the source-backed
+  natural-graha nature v1 classifier and reusable three-valued house-set
+  witnesses with Python/TypeScript parity and no event wiring.
 - Prepare MCP/PyPI patch metadata `1.18.8` while separating Court Tithi
   shorthand, operational interpretation, chart effects, baseline choice,
   scope, and legal-safety disclosures without changing candidate behavior.

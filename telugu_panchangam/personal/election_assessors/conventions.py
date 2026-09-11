@@ -2,9 +2,37 @@
 
 from __future__ import annotations
 
-ELECTION_CHART_CONVENTION_SCHEMA_VERSION = 2
+ELECTION_CHART_CONVENTION_SCHEMA_VERSION = 3
 
 ELECTION_CHART_CONVENTIONS: dict[str, dict] = {
+    'phaladeepika-natural-graha-nature-whole-sign-v1': {
+        'label': 'Phaladeepika natural-graha nature Whole Sign convention v1',
+        'formula': (
+            'Surya, Kuja, Shani, Rahu and Ketu are fixed malefics; Guru and '
+            'Shukra are fixed benefics. Chandra is benefic for normalized '
+            'Surya-Chandra elongation 0.02° < E < 179.98°, malefic for '
+            '180.02° < E < 359.98°, and unknown inside the inclusive '
+            '0.02° guards around 0°/180°/360° after ten-decimal, '
+            'non-negative round-half-up quantization. Budha is malefic when '
+            'a resolved malefic shares its sidereal Rasi, unknown when only '
+            'phase-unknown Chandra can decide, and otherwise benefic.'
+        ),
+        'fixed_malefics': ['Surya', 'Kuja', 'Shani', 'Rahu', 'Ketu'],
+        'fixed_benefics': ['Guru', 'Shukra'],
+        'chandra_phase_guard_degrees': 0.02,
+        'phase_quantization_decimal_places': 10,
+        'phase_quantization_rounding': 'half_up_nonnegative',
+        'budha_association': 'same_sidereal_rashi',
+        'house_system': 'whole_sign',
+        'method_claims': [
+            'election_chart.natural_graha_nature.phaladeepika_2_27',
+            'election_chart.natural_malefics.bphs_3_11_modern_witness',
+            'election_chart.budha_same_sign_association_policy_v1',
+            'election_chart.raman_180_degree_paksha_policy_v1',
+            'election_chart.lunar_phase_boundary_guard_policy_v1',
+            'election_chart.mean_node_policy_v1',
+        ],
+    },
     'whole-sign-physical-occupation-v1': {
         'label': 'Whole Sign physical-occupation convention v1',
         'formula': (

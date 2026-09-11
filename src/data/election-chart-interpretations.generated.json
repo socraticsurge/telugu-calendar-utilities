@@ -147,7 +147,8 @@
       ],
       "formula": "Fixed malefics are Surya, Kuja, Shani, Rahu and Ketu; fixed benefics are Guru and Shukra. Chandra nature follows the selected Paksha convention. Budha is malefic when it shares a Rasi with a resolved natural malefic and benefic otherwise.",
       "thresholds": {
-        "lunar_phase_guard_degrees": "0.02 around 0 and 180"
+        "lunar_phase_guard_degrees": "inclusive 0.02 around 0, 180 and 360",
+        "phase_quantization": "10 decimal places, non-negative round-half-up"
       },
       "precedence": "A known prohibited malefic controls over another occupant whose nature is unknown; functional lordship is outside this classifier.",
       "conflict_resolution": "Phase-unknown Chandra can make associated Budha unknown. Aspect, dispositor and degree-orb association are not inferred.",
@@ -167,9 +168,10 @@
         "telugu_panchangam/personal/election_assessors/graha_nature.py",
         "src/scorer/election-assessors/graha-nature.ts"
       ],
-      "implementation_status": "partial",
+      "implementation_status": "implemented",
       "delivery_issues": [
-        251
+        251,
+        354
       ]
     },
     "phaladeepika-rasi-dignity-v1": {
@@ -538,6 +540,9 @@
     }
   },
   "applied_convention_interpretations": {
+    "phaladeepika-natural-graha-nature-whole-sign-v1": [
+      "phaladeepika-natural-graha-nature-whole-sign-v1"
+    ],
     "whole-sign-physical-occupation-v1": [
       "whole-sign-physical-occupation-v1"
     ],
