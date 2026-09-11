@@ -164,3 +164,28 @@ local-Lagna, Lagna-lord-Rasi and sixth-lord-Rasi transition coverage within the
 chart-request budget. This remains `specified_unwired`: issue 400 owns its
 event integration, so this foundation changes no score, tier, candidate order,
 completion count or user-facing review text.
+
+## Peace-pattern information foundation
+
+Issue 399 resolves the final sentence's ambiguous grammar under the
+owner-accepted `court-peace-benefic-subject-continuity-v1` convention. The
+subject “benefics” continues across both OR arms: either a resolved natural
+benefic physically occupies Whole Sign house 1, 4, 7 or 10, or a resolved
+natural benefic in an odd/male Rasi receives a full classical aspect from a
+different resolved natural benefic. The six odd Rasis are Mesha, Mithuna,
+Simha, Tula, Dhanu and Kumbha.
+
+The implementation consumes the existing natural-nature, Whole Sign
+occupation and directed full-Graha-Drishti conventions. It does not reverse
+the aspect direction, expand the second arm to any planet, or admit partial,
+node, self, functional-benefic or conjunction semantics. Either resolved arm
+passes; without a pass, a potentially satisfying unresolved nature or aspect
+returns `unknown`, while only a fully resolved miss returns `fail`.
+
+That status is informational, not evaluative. A miss never predicts conflict,
+failed settlement, victory or loss. Missing facts affect chart-completion
+disclosure only. Across a window, a positive statement requires every
+represented state plus complete local-Lagna, graha-Rasi, Chandra-phase,
+Budha-association and full-aspect transition coverage. This foundation remains
+`specified_unwired` until issue 400 and changes no score, rank, tier,
+admission, qualification or completion count.

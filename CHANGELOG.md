@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.11` while implementing the Court
+  benefic peace-pattern grammar as non-ranking, non-predictive information
+  with explicit subject continuity and aspect direction.
 - Prepare MCP/PyPI patch metadata `1.18.10` while defining the Court
   Lagna-to-sixth-lord preference as exact Whole Sign opposition, with
   source-traceable policy and Python/TypeScript parity but no event wiring.

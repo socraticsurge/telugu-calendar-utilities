@@ -1,0 +1,62 @@
+{
+  "fixture_kind": "synthetic_contract_fixture",
+  "source_golden": false,
+  "metadata": {
+    "source_statement": {
+      "claim_id": "muhurta.court.filing_lawsuit",
+      "text": "If benefics occupy Kendras or occupying the male Rasis have beneficial aspects, there will be peace between the parties.",
+      "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+    },
+    "convention": {
+      "id": "court-peace-benefic-subject-continuity-v1",
+      "nature_id": "phaladeepika-natural-graha-nature-whole-sign-v1",
+      "aspect_id": "phaladeepika-full-graha-drishti-v1",
+      "house_occupation_id": "whole-sign-physical-occupation-v1",
+      "interpretation_claim_id": "election_chart.court_peace_pattern_policy_v1",
+      "formula": "exists natural_benefic in H{1,4,7,10} OR exists natural_benefic in odd_Rasi receiving full_aspect from another natural_benefic",
+      "male_rasis": ["Mesha", "Mithuna", "Simha", "Tula", "Dhanu", "Kumbha"],
+      "aspect_direction": "benefic_receiver_from_benefic_source"
+    },
+    "event_policy": {
+      "id": "court.peace-benefic-pattern",
+      "activity": "court",
+      "effect": "inform",
+      "effect_claim_id": "muhurta.court.effect_policy_v1",
+      "status": "specified_unwired",
+      "delivery_issue": 399
+    }
+  },
+  "base_planets": [
+    {"name": "Surya", "rashi": "Mesha", "degree": 10.0, "house": 1, "retrograde": false},
+    {"name": "Chandra", "rashi": "Meena", "degree": 10.0, "house": 12, "retrograde": false},
+    {"name": "Kuja", "rashi": "Mithuna", "degree": 10.0, "house": 3, "retrograde": false},
+    {"name": "Budha", "rashi": "Mesha", "degree": 15.0, "house": 1, "retrograde": false},
+    {"name": "Guru", "rashi": "Vrishabha", "degree": 10.0, "house": 2, "retrograde": false},
+    {"name": "Shukra", "rashi": "Kanya", "degree": 10.0, "house": 6, "retrograde": false},
+    {"name": "Shani", "rashi": "Simha", "degree": 10.0, "house": 5, "retrograde": true},
+    {"name": "Rahu", "rashi": "Vrischika", "degree": 10.0, "house": 8, "retrograde": true},
+    {"name": "Ketu", "rashi": "Dhanu", "degree": 10.0, "house": 9, "retrograde": true}
+  ],
+  "snapshot_cases": [
+    {"id": "neither-arm-resolved", "expected_status": "fail"},
+    {"id": "kendra-arm-only", "overrides": {"Guru": {"rashi": "Karka", "house": 4}}, "expected_status": "pass"},
+    {"id": "male-rasi-aspect-arm-only", "overrides": {"Guru": {"rashi": "Mithuna", "house": 3}, "Shukra": {"rashi": "Dhanu", "house": 9}}, "expected_status": "pass"},
+    {"id": "both-arms", "overrides": {"Chandra": {"rashi": "Mithuna", "house": 3}, "Kuja": {"rashi": "Simha", "house": 5}, "Guru": {"rashi": "Karka", "house": 4}, "Shukra": {"rashi": "Dhanu", "house": 9}}, "expected_status": "pass"},
+    {"id": "kendra-pass-overrides-aspect-unknown", "overrides": {"Chandra": {"rashi": "Mithuna", "degree": 0.0, "house": 3}, "Kuja": {"rashi": "Simha", "house": 5}, "Guru": {"rashi": "Karka", "house": 4}, "Shukra": {"rashi": "Dhanu", "house": 9}}, "expected_status": "pass"},
+    {"id": "phase-unknown-kendra-witness", "overrides": {"Surya": {"rashi": "Tula", "degree": 0.0, "house": 7}, "Chandra": {"rashi": "Mesha", "degree": 0.0, "house": 1}}, "expected_status": "unknown"},
+    {"id": "unknown-benefic-aspector", "overrides": {"Surya": {"rashi": "Mithuna", "degree": 0.0, "house": 3}, "Chandra": {"rashi": "Dhanu", "degree": 0.0, "house": 9}, "Budha": {"rashi": "Dhanu", "degree": 10.0, "house": 9}, "Guru": {"rashi": "Mithuna", "degree": 10.0, "house": 3}}, "expected_status": "unknown"},
+    {"id": "aspect-boundary-unknown", "overrides": {"Guru": {"rashi": "Mithuna", "degree": 0.0, "house": 3}, "Shukra": {"rashi": "Dhanu", "house": 9}}, "expected_status": "unknown"},
+    {"id": "missing-graha-unknown", "remove": ["Ketu"], "expected_status": "unknown"},
+    {"id": "duplicate-graha-unknown", "duplicate": "Guru", "expected_status": "unknown"},
+    {"id": "house-frame-unknown", "house_frame_uncertain": true, "expected_status": "unknown"}
+  ],
+  "window_cases": [
+    {"id": "all-states-pass", "sample_case_ids": ["kendra-arm-only", "male-rasi-aspect-arm-only", "both-arms"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "full_aspect_transitions_complete": true, "budget_exhausted": false}, "expected_status": "pass"},
+    {"id": "resolved-neutral-miss", "sample_case_ids": ["kendra-arm-only", "neither-arm-resolved"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "full_aspect_transitions_complete": true, "budget_exhausted": false}, "expected_status": "fail"},
+    {"id": "unknown-controls-disclosure", "sample_case_ids": ["neither-arm-resolved", "phase-unknown-kendra-witness"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "full_aspect_transitions_complete": true, "budget_exhausted": false}, "expected_status": "unknown"},
+    {"id": "aspect-transition-incomplete", "sample_case_ids": ["neither-arm-resolved"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "full_aspect_transitions_complete": false, "budget_exhausted": false}, "expected_status": "unknown"},
+    {"id": "multiple-transitions-incomplete", "sample_case_ids": ["kendra-arm-only"], "coverage": {"local_lagna_transitions_complete": false, "graha_rasi_transitions_complete": false, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "full_aspect_transitions_complete": true, "budget_exhausted": false}, "expected_status": "unknown"},
+    {"id": "request-budget-exhausted", "sample_case_ids": ["kendra-arm-only"], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "full_aspect_transitions_complete": true, "budget_exhausted": true}, "expected_status": "unknown"},
+    {"id": "no-represented-states", "sample_case_ids": [], "coverage": {"local_lagna_transitions_complete": true, "graha_rasi_transitions_complete": true, "chandra_phase_transitions_complete": true, "budha_association_transitions_complete": true, "full_aspect_transitions_complete": true, "budget_exhausted": false}, "expected_status": "unknown"}
+  ]
+}

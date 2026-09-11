@@ -576,6 +576,17 @@
       "last_reviewed": "2026-09-11"
     },
     {
+      "id": "election_chart.court_peace_pattern_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/benefic_patterns.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020", "PD-SASTRI-1950-2E"],
+      "locator": "Project decision for B. V. Raman Chapter XVII 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71), using Phaladeepika Chapter II, slokas 23 and 27, book pp. 18-20 (scan pp. 55-57) for full classical aspects and natural graha nature",
+      "scope": "Reads 'benefics' as the continuing subject of both grammatical arms. A resolved natural benefic either physically occupies a Whole Sign Kendra or occupies an odd/male Rasi and receives a full classical aspect from another resolved natural benefic. The odd signs are Mesha, Mithuna, Simha, Tula, Dhanu and Kumbha. Reversed aspect direction, any-planet subject expansion, partial or node aspects, functional beneficence and self-aspect are excluded. The result is non-ranking information only; a miss makes no inference about conflict, settlement, victory or loss.",
+      "last_reviewed": "2026-09-11"
+    },
+    {
       "id": "muhurta.court.filing_lawsuit",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "release": "1.18.11",
+  "parent_release": "1.18.10",
+  "activity": "court-peace-pattern",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [
+    {
+      "claim_id": "election_chart.court_peace_pattern_policy_v1",
+      "relationship": "successor_addition",
+      "verification_state": "heuristic",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020",
+        "PD-SASTRI-1950-2E"
+      ],
+      "locator": "Project decision for B. V. Raman Chapter XVII 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71), using Phaladeepika Chapter II, slokas 23 and 27, book pp. 18-20 (scan pp. 55-57) for full classical aspects and natural graha nature",
+      "after_sha256": "13e29084c239c6f4d60330191f443c84dba79d34503de20e4dcca1f9fd613863"
+    }
+  ],
+  "semantic_deltas": [
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/conventions/court-peace-benefic-subject-continuity-v1",
+      "operation": "add",
+      "scope": "court-peace-pattern_convention",
+      "after_sha256": "bc24a81b69b76e2b2f6aa4e07bb648f2cababfc93c147f5b934677519c21420e"
+    }
+  ],
+  "protected_source_transforms": []
+}

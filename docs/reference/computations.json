@@ -2087,6 +2087,41 @@
       }
     },
     {
+      "id": "personal.court-peace-pattern-foundation",
+      "title": "Court non-ranking peace-pattern information foundation",
+      "summary": "A source-bounded OR predicate reports natural-benefic Kendra occupation or a natural benefic in an odd Rasi receiving a full classical aspect from another natural benefic, without affecting candidate evaluation.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/election_assessors/benefic_patterns.py", "symbol": "evaluate_benefic_kendra_or_male_rasi_aspect", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "evaluate_court_peace_pattern", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "aggregate_court_peace_pattern_window", "role": "owner"},
+        {"path": "src/scorer/election-assessors/benefic-patterns.ts", "symbol": "evaluateBeneficKendraOrMaleRasiAspect", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "evaluateCourtPeacePattern", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "aggregateCourtPeacePatternWindow", "role": "mirror"}
+      ],
+      "inputs": ["complete canonical nine-graha Rasi, degree and Whole Sign house facts", "natural benefic, lunar-phase and Budha-association states", "directed full classical aspect geometry", "represented window samples and local-Lagna, graha-Rasi, phase, association and aspect transition coverage", "chart-request budget state"],
+      "outputs": ["Kendra-arm and male-Rasi-aspect-arm evidence", "per-state and whole-window pass, fail or unknown", "unwired non-ranking Court information"],
+      "time_basis": "Each exact chart sample in the candidate's half-open civil-minute window; every controlling nature, Rasi, house and full-aspect transition must be represented before a continuous informational statement resolves.",
+      "surfaces": ["python-library", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["verified", "heuristic"], "claim_ids": ["muhurta.court.filing_lawsuit", "election_chart.court_peace_pattern_policy_v1", "election_chart.natural_graha_nature.phaladeepika_2_27", "election_chart.full_graha_drishti.phaladeepika_2_23", "muhurta.court.effect_policy_v1"], "note": "Raman supplies the ambiguous sentence. Subject continuity, odd-Rasi enumeration, receiver direction, full-aspect and natural-benefic modes, fail-closed completeness and the inform-only effect are separately disclosed."},
+      "tests": ["tests/test_court_peace_pattern.py", "src/scorer/__tests__/court-peace-pattern.test.ts"],
+      "limitations": ["This additive foundation remains specified_unwired until Court integration issue 400 and changes no score, rank, tier, rejection, qualification, admission, completion count or user-facing review text.", "A resolved miss is neutral evidence only and does not predict conflict, settlement, victory, loss or any legal outcome.", "Partial aspects, node aspects, self-aspect, functional beneficence, strength and a reversed aspector reading are excluded.", "Missing or conflicting chart facts and incomplete relevant transition coverage remain unknown and affect chart-completion disclosure only."],
+      "method": {
+        "kind": "decision-table",
+        "summary": "Classify natural benefics, test the two registered OR arms independently, preserve uncertainty only when neither arm passes, then require continuous complete-window coverage without applying a ranking effect.",
+        "steps": ["Validate a complete canonical chart and the local Whole Sign house frame.", "Classify each graha with the registered natural-nature convention, including guarded Chandra and conditional Budha.", "Pass the Kendra arm when any resolved natural benefic physically occupies house 1, 4, 7 or 10.", "For each resolved natural benefic in Mesha, Mithuna, Simha, Tula, Dhanu or Kumbha, test whether a different resolved natural benefic casts a registered directed full classical aspect to it.", "Pass when either arm passes; otherwise return unknown for a potentially satisfying unresolved nature or aspect and fail only when both arms are fully resolved misses.", "Across a window, require every represented state and all local-Lagna, graha-Rasi, Chandra-phase, Budha-association and full-aspect transitions within budget before reporting a continuous pass or neutral miss.", "Expose the result only as inform metadata; never alter score, rank, tier, admission or qualification."],
+        "formulae": [
+          {"name": "Court benefic-pattern OR", "expression": "exists p: B(p) and H(p) in {1,4,7,10} OR exists distinct p,q: B(p) and R(p) in {1,3,5,7,9,11} and B(q) and full_aspect(q,p)", "variables": ["B: registered natural-benefic classifier", "H: canonical Whole Sign house", "R: zero-based Rasi index, with even human ordinals treated as female and odd human ordinals as male", "full_aspect: directed Phaladeepika full Graha Drishti"]}
+        ],
+        "worked_examples": [
+          {"label": "Kendra arm only", "inputs": ["Guru is a resolved natural benefic in Whole Sign house 4", "No resolved odd-Rasi benefic receives another benefic's full aspect"], "calculation": ["The Kendra arm passes from Guru's physical occupation.", "The second arm misses, but the OR is already satisfied."], "result": ["Status: pass", "Effect: non-ranking information only"]},
+          {"label": "Odd-Rasi receiver arm only", "inputs": ["Guru in Mithuna and Shukra in Dhanu", "Both resolve as natural benefics"], "calculation": ["Mithuna and Dhanu are registered odd/male Rasis.", "Shukra's seventh full aspect reaches Guru in Mithuna; Guru's seventh full aspect also reaches Shukra in Dhanu.", "No benefic occupies a Kendra."], "result": ["Status: pass from the second OR arm", "No score or legal-outcome inference"]}
+        ],
+        "notes": ["The JSON oracle is synthetic parity evidence, not a source golden or outcome validation.", "The printed sentence is preserved verbatim in metadata while the selected grammar is separately named.", "Unknown status changes disclosure only; fail is a neutral pattern miss rather than an adverse prediction."]
+      }
+    },
+    {
       "id": "personal.natural-graha-nature",
       "title": "Natural graha nature and house-set witnesses",
       "summary": "A source-bounded, versioned decision table classifies each canonical graha as a natural benefic, natural malefic, or unknown and derives decisive three-valued house-set witness predicates.",

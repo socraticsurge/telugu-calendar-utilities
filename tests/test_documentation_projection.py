@@ -151,7 +151,7 @@ def test_generated_pages_show_real_methods_for_every_family():
 
     generated_pages = list(
         (ROOT / 'docs' / '_generated' / 'computations').glob('*.md'))
-    assert len(generated_pages) == 67
+    assert len(generated_pages) == 68
     assert all(
         'Method documentation incomplete' not in page.read_text(encoding='utf-8')
         for page in generated_pages

@@ -12,6 +12,7 @@ new code imports the domain owner directly.
 | combustion | `combustion.py` | `combustion.ts` | Reserved for the accepted combustion foundation; do not place it in geometry |
 | conjunction | `conjunction.py` | `conjunction.ts` | Reserved for the accepted conjunction foundation; do not place it in geometry |
 | classical Rasi lordship and separation | `lordship.py` | `lordship.ts` | Seven-graha sign ownership and undirected Whole Sign distance only; nodes and event effects stay outside |
+| benefic placement and aspect patterns | `benefic_patterns.py` | `benefic-patterns.ts` | Natural-benefic Kendra/odd-Rasi full-aspect OR facts only; event effects stay outside |
 | Court event rules | `court.py` | `court.ts` | Source-scoped Court predicates and their event effects; reusable Rasi/Navamsa, house, nature, lordship and aspect facts stay in their domain owners |
 | Vedha | `vedha.py` | `vedha.ts` | Reserved for the accepted Vedha foundation and its source-specific facts |
 | event admission | `event_admission.py` | `event-admission.ts` | Validate and normalize complete chart facts before predicate evaluation |

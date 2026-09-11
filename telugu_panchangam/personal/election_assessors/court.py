@@ -7,6 +7,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from ...panchangam_names import RASHI_NAMES
+from .benefic_patterns import evaluate_benefic_kendra_or_male_rasi_aspect
 from .chart_geometry import NAVAMSA_ROUNDING_GUARD_DEGREES, navamsa_rashi
 from .contracts import PrimitiveOutcome
 from .event_admission import PlanetPosition
@@ -130,6 +131,42 @@ COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA: dict[str, Any] = {
         'effect_claim_id': 'muhurta.court.effect_policy_v1',
         'status': 'specified_unwired',
         'delivery_issue': 398,
+    },
+}
+
+COURT_PEACE_PATTERN_METADATA: dict[str, Any] = {
+    'source_statement': {
+        'claim_id': 'muhurta.court.filing_lawsuit',
+        'text': (
+            'If benefics occupy Kendras or occupying the male Rasis have '
+            'beneficial aspects, there will be peace between the parties.'
+        ),
+        'locator': (
+            "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section "
+            + "'Filing law-suits,' inspected in the 2020 Chistabo derivative "
+            + 'at internal printed p. 67 (physical PDF p. 71)'
+        ),
+    },
+    'convention': {
+        'id': 'court-peace-benefic-subject-continuity-v1',
+        'nature_id': 'phaladeepika-natural-graha-nature-whole-sign-v1',
+        'aspect_id': 'phaladeepika-full-graha-drishti-v1',
+        'house_occupation_id': 'whole-sign-physical-occupation-v1',
+        'interpretation_claim_id': 'election_chart.court_peace_pattern_policy_v1',
+        'formula': (
+            'exists natural_benefic in H{1,4,7,10} OR exists natural_benefic '
+            'in odd_Rasi receiving full_aspect from another natural_benefic'
+        ),
+        'male_rasis': ['Mesha', 'Mithuna', 'Simha', 'Tula', 'Dhanu', 'Kumbha'],
+        'aspect_direction': 'benefic_receiver_from_benefic_source',
+    },
+    'event_policy': {
+        'id': 'court.peace-benefic-pattern',
+        'activity': 'court',
+        'effect': 'inform',
+        'effect_claim_id': 'muhurta.court.effect_policy_v1',
+        'status': 'specified_unwired',
+        'delivery_issue': 399,
     },
 }
 
@@ -485,5 +522,86 @@ def aggregate_court_lagna_sixth_lord_separation_window(
         success_evidence=(
             'Every represented state keeps the Lagna and sixth-house lords '
             + 'at the maximum Whole Sign shortest distance of 6.'
+        ),
+    )
+
+
+def evaluate_court_peace_pattern(
+    chart: Mapping[str, Any],
+    *,
+    house_frame_uncertain: bool = False,
+) -> PrimitiveOutcome:
+    """Evaluate non-ranking Court peace-pattern evidence."""
+    return evaluate_benefic_kendra_or_male_rasi_aspect(
+        chart,
+        house_frame_uncertain=house_frame_uncertain,
+    )
+
+
+def aggregate_court_peace_pattern_window(
+    samples: Sequence[PrimitiveOutcome],
+    *,
+    local_lagna_transitions_complete: bool,
+    graha_rasi_transitions_complete: bool,
+    chandra_phase_transitions_complete: bool,
+    budha_association_transitions_complete: bool,
+    full_aspect_transitions_complete: bool,
+    budget_exhausted: bool,
+) -> PrimitiveOutcome:
+    """Resolve continuous informational evidence without adverse inference."""
+    if not _samples_are_well_formed(samples):
+        return PrimitiveOutcome(
+            'unknown', ('Represented chart states are malformed or incomplete.',)
+        )
+    if not samples:
+        return PrimitiveOutcome(
+            'unknown', ('No represented chart states are available.',)
+        )
+    unknown = _first_sample_with_status(samples, 'unknown')
+    if unknown is not None:
+        return unknown
+    coverage = (
+        ('local-Lagna', local_lagna_transitions_complete),
+        ('graha-Rasi', graha_rasi_transitions_complete),
+        ('Chandra-phase', chandra_phase_transitions_complete),
+        ('Budha-association', budha_association_transitions_complete),
+        ('full-aspect', full_aspect_transitions_complete),
+    )
+    if any(type(value) is not bool for _, value in coverage) or (
+        type(budget_exhausted) is not bool
+    ):
+        return PrimitiveOutcome(
+            'unknown', ('Window transition metadata is malformed or incomplete.',)
+        )
+    if budget_exhausted:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                "The chart-request budget was exhausted before this window's "
+                + 'informational coverage was complete.',
+            ),
+        )
+    missing = [name for name, complete in coverage if not complete]
+    if missing:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                f'Peace-pattern coverage is incomplete for {_human_join(missing)} '
+                + 'transitions.',
+            ),
+        )
+    if any(sample.status == 'fail' for sample in samples):
+        return PrimitiveOutcome(
+            'fail',
+            (
+                'The registered benefic pattern is not continuous across every '
+                + 'represented state; no adverse inference is made.',
+            ),
+        )
+    return PrimitiveOutcome(
+        'pass',
+        (
+            'Every represented state satisfies at least one registered '
+            + 'non-ranking benefic-pattern arm.',
         ),
     )
