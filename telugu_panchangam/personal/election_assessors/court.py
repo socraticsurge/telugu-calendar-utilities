@@ -247,27 +247,20 @@ def _first_sample_with_status(
     return next((sample for sample in samples if sample.status == status), None)
 
 
-def _missing_transition_names(
-    *,
-    local_lagna_transitions_complete: bool,
-    lagna_navamsa_transitions_complete: bool,
-) -> list[str]:
-    missing = []
-    if not local_lagna_transitions_complete:
-        missing.append('local-Lagna')
-    if not lagna_navamsa_transitions_complete:
-        missing.append('Lagna-Navamsa')
-    return missing
+def _human_join(items: Sequence[str]) -> str:
+    if len(items) < 3:
+        return ' and '.join(items)
+    return f'{", ".join(items[:-1])}, and {items[-1]}'
 
 
-def aggregate_court_mesha_d1_d9_window(
+def _aggregate_court_reject_window(
     samples: Sequence[PrimitiveOutcome],
     *,
-    local_lagna_transitions_complete: bool,
-    lagna_navamsa_transitions_complete: bool,
+    transition_coverage: Sequence[tuple[str, bool]],
     budget_exhausted: bool,
+    success_evidence: str,
 ) -> PrimitiveOutcome:
-    """Combine sampled reject outcomes without hiding an interior failure."""
+    """Apply shared reject-first and completeness precedence."""
     if isinstance(samples, Sequence):
         failure = next(
             (
@@ -290,12 +283,11 @@ def aggregate_court_mesha_d1_d9_window(
         return PrimitiveOutcome(
             'unknown', ('No represented chart states are available.',)
         )
-    coverage = (
-        local_lagna_transitions_complete,
-        lagna_navamsa_transitions_complete,
-        budget_exhausted,
-    )
-    if any(type(value) is not bool for value in coverage):
+    coverage_values = [complete for _, complete in transition_coverage]
+    if any(
+        type(value) is not bool
+        for value in [*coverage_values, budget_exhausted]
+    ):
         return PrimitiveOutcome(
             'unknown', ('Window transition metadata is malformed or incomplete.',)
         )
@@ -304,29 +296,41 @@ def aggregate_court_mesha_d1_d9_window(
             'unknown',
             (
                 "The chart-request budget was exhausted before this window's "
-                +
-                'coverage was complete.',
+                + 'coverage was complete.',
             ),
         )
-    missing = _missing_transition_names(
-        local_lagna_transitions_complete=local_lagna_transitions_complete,
-        lagna_navamsa_transitions_complete=lagna_navamsa_transitions_complete,
-    )
+    missing = [
+        name for name, complete in transition_coverage if not complete
+    ]
     if missing:
         return PrimitiveOutcome(
             'unknown',
             (
-                f'All represented states pass, but {" and ".join(missing)} '
-                +
-                'transition coverage is incomplete.',
+                f'All represented states pass, but {_human_join(missing)} '
+                + 'transition coverage is incomplete.',
             ),
         )
-    return PrimitiveOutcome(
-        'pass',
-        (
+    return PrimitiveOutcome('pass', (success_evidence,))
+
+
+def aggregate_court_mesha_d1_d9_window(
+    samples: Sequence[PrimitiveOutcome],
+    *,
+    local_lagna_transitions_complete: bool,
+    lagna_navamsa_transitions_complete: bool,
+    budget_exhausted: bool,
+) -> PrimitiveOutcome:
+    """Combine sampled reject outcomes without hiding an interior failure."""
+    return _aggregate_court_reject_window(
+        samples,
+        transition_coverage=(
+            ('local-Lagna', local_lagna_transitions_complete),
+            ('Lagna-Navamsa', lagna_navamsa_transitions_complete),
+        ),
+        budget_exhausted=budget_exhausted,
+        success_evidence=(
             'Every represented state resolves the Court Mesha D1-or-D9 '
-            +
-            'condition as satisfied.',
+            + 'condition as satisfied.'
         ),
     )
 
@@ -363,22 +367,6 @@ def court_sixth_house_candidate_disposition(outcome: PrimitiveOutcome) -> str:
     return 'review'
 
 
-def _court_house6_missing_coverage(
-    *,
-    local_lagna_transitions_complete: bool,
-    graha_rasi_transitions_complete: bool,
-    chandra_phase_transitions_complete: bool,
-    budha_association_transitions_complete: bool,
-) -> list[str]:
-    coverage = (
-        ('local-Lagna', local_lagna_transitions_complete),
-        ('graha-Rasi', graha_rasi_transitions_complete),
-        ('Chandra-phase', chandra_phase_transitions_complete),
-        ('Budha-association', budha_association_transitions_complete),
-    )
-    return [name for name, complete in coverage if not complete]
-
-
 def aggregate_court_sixth_house_natural_malefic_window(
     samples: Sequence[PrimitiveOutcome],
     *,
@@ -389,67 +377,17 @@ def aggregate_court_sixth_house_natural_malefic_window(
     budget_exhausted: bool,
 ) -> PrimitiveOutcome:
     """Aggregate the Court reject predicate across represented chart states."""
-    if isinstance(samples, Sequence):
-        failure = next(
-            (
-                sample
-                for sample in samples
-                if isinstance(sample, PrimitiveOutcome) and sample.status == 'fail'
-            ),
-            None,
-        )
-        if failure is not None:
-            return failure
-    if not _samples_are_well_formed(samples):
-        return PrimitiveOutcome(
-            'unknown', ('Represented chart states are malformed or incomplete.',)
-        )
-    unknown = _first_sample_with_status(samples, 'unknown')
-    if unknown is not None:
-        return unknown
-    if not samples:
-        return PrimitiveOutcome(
-            'unknown', ('No represented chart states are available.',)
-        )
-    coverage = (
-        local_lagna_transitions_complete,
-        graha_rasi_transitions_complete,
-        chandra_phase_transitions_complete,
-        budha_association_transitions_complete,
-        budget_exhausted,
-    )
-    if any(type(value) is not bool for value in coverage):
-        return PrimitiveOutcome(
-            'unknown', ('Window transition metadata is malformed or incomplete.',)
-        )
-    if budget_exhausted:
-        return PrimitiveOutcome(
-            'unknown',
-            (
-                "The chart-request budget was exhausted before this window's "
-                + 'coverage was complete.',
-            ),
-        )
-    missing = _court_house6_missing_coverage(
-        local_lagna_transitions_complete=local_lagna_transitions_complete,
-        graha_rasi_transitions_complete=graha_rasi_transitions_complete,
-        chandra_phase_transitions_complete=chandra_phase_transitions_complete,
-        budha_association_transitions_complete=(
-            budha_association_transitions_complete
+    return _aggregate_court_reject_window(
+        samples,
+        transition_coverage=(
+            ('local-Lagna', local_lagna_transitions_complete),
+            ('graha-Rasi', graha_rasi_transitions_complete),
+            ('Chandra-phase', chandra_phase_transitions_complete),
+            ('Budha-association', budha_association_transitions_complete),
         ),
-    )
-    if missing:
-        return PrimitiveOutcome(
-            'unknown',
-            (
-                f'All represented states pass, but {", ".join(missing)} '
-                + 'transition coverage is incomplete.',
-            ),
-        )
-    return PrimitiveOutcome(
-        'pass',
-        (
+        budget_exhausted=budget_exhausted,
+        success_evidence=(
             'Every represented state keeps Whole Sign house 6 free of '
-            + 'resolved natural malefics.',
+            + 'resolved natural malefics.'
         ),
     )
