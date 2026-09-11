@@ -12,8 +12,9 @@ from .chart_geometry import (
     evaluate_full_aspect,
 )
 from .contracts import PrimitiveOutcome
-from .event_admission import planet_positions
+from .event_admission import PlanetPosition, planet_positions
 from .graha_nature import (
+    NaturalGrahaNature,
     classify_natural_graha_natures,
     evaluate_existential_benefic_house_set,
 )
@@ -27,6 +28,55 @@ def _prefixed(label: str, outcome: PrimitiveOutcome) -> tuple[str, ...]:
     return tuple(f'{label}: {item}' for item in outcome.evidence)
 
 
+def _male_rasi_target_state(
+    target_name: str,
+    positions: Mapping[str, PlanetPosition],
+    natures: Mapping[str, NaturalGrahaNature],
+) -> tuple[str | None, bool]:
+    """Return one resolved witness and whether this target remains possible."""
+    target = positions[target_name]
+    target_nature = natures[target_name]
+    near_boundary = min(target.degree, 30 - target.degree) <= (
+        RASHI_ROUNDING_GUARD_DEGREES
+    )
+    if target.rashi not in MALE_RASIS:
+        return None, near_boundary and target_nature in {'benefic', 'unknown'}
+
+    benefic_sources = [
+        name
+        for name in _CLASSICAL_GRAHAS
+        if name != target_name and natures[name] == 'benefic'
+    ]
+    unresolved_sources = [
+        name
+        for name in _CLASSICAL_GRAHAS
+        if name != target_name and natures[name] == 'unknown'
+    ]
+    benefic_aspect = evaluate_full_aspect(
+        {'planet': target_name, 'aspectors': benefic_sources}, positions
+    )
+    unresolved_aspect = evaluate_full_aspect(
+        {'planet': target_name, 'aspectors': unresolved_sources}, positions
+    )
+    if target_nature == 'benefic' and benefic_aspect.status == 'pass':
+        aspectors = benefic_aspect.evidence[0].split(': ', 1)[1].removesuffix('.')
+        return (
+            (
+                f'{target_name} in {target.rashi} receives full Graha Drishti '
+                f'from {aspectors}'
+            ),
+            False,
+        )
+
+    possible_unknown_target = target_nature == 'unknown' and (
+        benefic_aspect.status != 'fail' or unresolved_aspect.status != 'fail'
+    )
+    possible_unknown_aspector = target_nature == 'benefic' and (
+        benefic_aspect.status == 'unknown' or unresolved_aspect.status != 'fail'
+    )
+    return None, possible_unknown_target or possible_unknown_aspector
+
+
 def _male_rasi_benefic_aspect(
     chart: Mapping[str, Any],
 ) -> PrimitiveOutcome:
@@ -38,54 +88,12 @@ def _male_rasi_benefic_aspect(
     witnesses: list[str] = []
     unresolved = False
     for target_name in _CLASSICAL_GRAHAS:
-        target = positions[target_name]
-        target_nature = nature.natures[target_name]
-        near_boundary = min(target.degree, 30 - target.degree) <= (
-            RASHI_ROUNDING_GUARD_DEGREES
+        witness, target_unresolved = _male_rasi_target_state(
+            target_name, positions, nature.natures
         )
-        if target.rashi not in MALE_RASIS:
-            unresolved = unresolved or (
-                near_boundary and target_nature in {'benefic', 'unknown'}
-            )
-            continue
-
-        benefic_sources = [
-            name
-            for name in _CLASSICAL_GRAHAS
-            if name != target_name
-            and nature.natures[name] == 'benefic'
-        ]
-        unresolved_sources = [
-            name
-            for name in _CLASSICAL_GRAHAS
-            if name != target_name and nature.natures[name] == 'unknown'
-        ]
-        benefic_aspect = evaluate_full_aspect(
-            {'planet': target_name, 'aspectors': benefic_sources}, positions
-        )
-        unresolved_aspect = evaluate_full_aspect(
-            {'planet': target_name, 'aspectors': unresolved_sources}, positions
-        )
-        if target_nature == 'benefic' and benefic_aspect.status == 'pass':
-            aspectors = benefic_aspect.evidence[0].split(': ', 1)[1].removesuffix('.')
-            witnesses.append(
-                f'{target_name} in {target.rashi} receives full Graha Drishti '
-                f'from {aspectors}'
-            )
-        elif (
-            target_nature == 'unknown'
-            and (
-                benefic_aspect.status != 'fail'
-                or unresolved_aspect.status != 'fail'
-            )
-        ) or (
-            target_nature == 'benefic'
-            and (
-                benefic_aspect.status == 'unknown'
-                or unresolved_aspect.status != 'fail'
-            )
-        ):
-            unresolved = True
+        if witness is not None:
+            witnesses.append(witness)
+        unresolved = unresolved or target_unresolved
 
     if witnesses:
         return PrimitiveOutcome(
