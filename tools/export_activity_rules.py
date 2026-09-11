@@ -30,6 +30,7 @@ CONSUMED_FIELDS = (
     'caution_lagna_solar',
     'source_claim', 'audit_claim', 'heuristic_claim', 'related_claims',
     'source_scope',
+    'court_policy',
     'daytime_only',
     'require_single_daylight_tithi',
     'require_single_daylight_nakshatra',

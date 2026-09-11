@@ -58,7 +58,8 @@ def test_claim_has_exact_locator_scope_and_tithi_disclosure():
     ]
     assert "section 'Filing law-suits,'" in claim['locator']
     assert 'internal printed p. 67 (physical PDF p. 71)' in claim['locator']
-    assert 'recurring explicit list in the same inspected derivative' in claim['scope']
+    assert "does not expand 'the usual unfavorable Tithis'" in claim['scope']
+    assert 'registered alternatives' in claim['scope']
     assert 'filing or initiating a lawsuit' in claim['scope']
     assert 'legacy litigation API key resolves explicitly' in claim['scope']
 

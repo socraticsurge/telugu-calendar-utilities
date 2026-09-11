@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.8` while separating Court Tithi
+  shorthand, operational interpretation, chart effects, baseline choice,
+  scope, and legal-safety disclosures without changing candidate behavior.
 - Prepare MCP/PyPI patch metadata `1.18.7` while decomposing the frozen ICS
   description builder into section-formatting helpers, with byte-identical
   subscriber feeds and no remaining governed complexity hotspots.
