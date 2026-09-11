@@ -139,3 +139,28 @@ the accepted Court predicates. It also preserves
 `general_baseline_mode = none`; a future general election baseline must not
 double-count this Court-specific exclusion. The shared oracle is a
 `synthetic_contract_fixture`, not a source golden or outcome prediction.
+
+## Lagna–sixth-lord separation computation foundation
+
+Issue 398 resolves Raman's qualitative “as far apart as possible” phrase with
+the owner-accepted `court-lagna-sixth-lord-whole-sign-opposition-v1` policy.
+The reusable lordship layer derives both lords from the classical seven-graha
+table supported by *Phaladeepika* I.6; Rahu and Ketu never become lords. It then
+computes the undirected shortest distance between their observed Rasis on the
+twelve-sign circle. The Court preference passes only at the maximum distance
+of 6. A same-owner Lagna/sixth pair has distance 0 and therefore does not earn
+the preference.
+
+This numerical formula is project policy, not wording supplied by Raman. Exact
+angular opposition was not selected because the passage gives no orb or
+precision threshold. “Best among the returned candidates” was also rejected
+because it would make the same chart change status when unrelated candidates
+are added or removed. The result is therefore a stable binary
+`pass | fail | unknown`, never a graduated score.
+
+Across a candidate window, any represented miss prevents the preference;
+otherwise unknown defeats pass. An all-pass result still requires complete
+local-Lagna, Lagna-lord-Rasi and sixth-lord-Rasi transition coverage within the
+chart-request budget. This remains `specified_unwired`: issue 400 owns its
+event integration, so this foundation changes no score, tier, candidate order,
+completion count or user-facing review text.

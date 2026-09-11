@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "release": "1.18.10",
+  "parent_release": "1.18.9",
+  "activity": "court-lord-separation",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [
+    {
+      "claim_id": "election_chart.court_lagna_sixth_lord_separation_policy_v1",
+      "relationship": "successor_addition",
+      "verification_state": "heuristic",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020",
+        "PD-SASTRI-1950-2E"
+      ],
+      "locator": "Project decision for B. V. Raman Chapter XVII 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71), with the classical seven-graha ownership table from Phaladeepika Chapter I, sloka 6, book pp. 3-4 (scan pp. 40-41)",
+      "after_sha256": "93bf8df7ab6ee67718002694c2db369d0be9bff02169952f7d0a23fc47f46c0b"
+    }
+  ],
+  "semantic_deltas": [
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/conventions/court-lagna-sixth-lord-whole-sign-opposition-v1",
+      "operation": "add",
+      "scope": "court-lord-separation_convention",
+      "after_sha256": "302428d447d7a0d87bd3d243198ea15db1a4fa2c013ec6aa675ab8257f96ae57"
+    }
+  ],
+  "protected_source_transforms": []
+}

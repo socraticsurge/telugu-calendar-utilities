@@ -3,6 +3,10 @@ import type { ElectionChartSnapshot } from '../../lib/election-chart-api';
 import { navamsaRashi } from './chart-geometry';
 import type { PlanetPosition, PrimitiveOutcome } from './contracts';
 import { evaluateForbiddenMaleficHouseSet } from './graha-nature';
+import {
+  deriveLagnaSixthLords,
+  evaluateRasiLordSeparation,
+} from './lordship';
 
 const NAVAMSA_ROUNDING_GUARD_DEGREES = 0.01;
 
@@ -70,6 +74,32 @@ export const COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA = {
   },
 } as const;
 
+export const COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA = {
+  source_statement: {
+    claim_id: 'muhurta.court.filing_lawsuit',
+    text: 'Lords of Lagna and 6th should be as far apart as possible.',
+    locator: "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+  },
+  convention: {
+    id: 'court-lagna-sixth-lord-whole-sign-opposition-v1',
+    ownership_id: 'classical-seven-graha-rasi-lordship-v1',
+    ownership_claim_id: 'election_chart.dignity.phaladeepika_1_6',
+    separation_claim_id: 'election_chart.court_lagna_sixth_lord_separation_policy_v1',
+    formula: 'shortest_distance(R(lord(Lagna)), R(lord(house 6))) == 6',
+    house_system: 'whole_sign',
+    maximum_shortest_distance: 6,
+    nodes_are_lords: false,
+  },
+  event_policy: {
+    id: 'court.lagna-sixth-lords-max-separated',
+    activity: 'court',
+    effect: 'prefer',
+    effect_claim_id: 'muhurta.court.effect_policy_v1',
+    status: 'specified_unwired',
+    delivery_issue: 398,
+  },
+} as const;
+
 export interface CourtMeshaD1D9Options {
   authoritativeD1Rashi?: string | null;
   lagnaAuthorityUncertain?: boolean;
@@ -87,6 +117,13 @@ export interface CourtSixthHouseNaturalMaleficCoverage {
   grahaRasiTransitionsComplete: boolean;
   chandraPhaseTransitionsComplete: boolean;
   budhaAssociationTransitionsComplete: boolean;
+  budgetExhausted: boolean;
+}
+
+export interface CourtLagnaSixthLordSeparationCoverage {
+  localLagnaTransitionsComplete: boolean;
+  lagnaLordRasiTransitionsComplete: boolean;
+  sixthLordRasiTransitionsComplete: boolean;
   budgetExhausted: boolean;
 }
 
@@ -240,7 +277,7 @@ function humanJoin(items: readonly string[]): string {
   return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`;
 }
 
-function aggregateCourtRejectWindow(
+function aggregateCourtWindow(
   samples: readonly PrimitiveOutcome[],
   coverage: CourtRejectWindowCoverage | null,
   successEvidence: string,
@@ -303,7 +340,7 @@ export function aggregateCourtMeshaD1D9Window(
       ['Lagna-Navamsa', coverage.lagnaNavamsaTransitionsComplete],
     ] as const,
   } : null;
-  return aggregateCourtRejectWindow(
+  return aggregateCourtWindow(
     samples,
     normalized,
     'Every represented state resolves the Court Mesha D1-or-D9 condition as satisfied.',
@@ -380,9 +417,81 @@ export function aggregateCourtSixthHouseNaturalMaleficWindow(
       ['Budha-association', coverage.budhaAssociationTransitionsComplete],
     ] as const,
   } : null;
-  return aggregateCourtRejectWindow(
+  return aggregateCourtWindow(
     samples,
     normalized,
     'Every represented state keeps Whole Sign house 6 free of resolved natural malefics.',
+  );
+}
+
+export function evaluateCourtLagnaSixthLordSeparation(
+  chart: ElectionChartSnapshot,
+  options: {
+    authoritativeLagnaRashi?: string | null;
+    lagnaAuthorityUncertain?: boolean;
+  } = {},
+): PrimitiveOutcome {
+  if (
+    !options || typeof options !== 'object' || Array.isArray(options)
+    || (options.lagnaAuthorityUncertain !== undefined
+    && typeof options.lagnaAuthorityUncertain !== 'boolean'
+    )
+  ) {
+    return {
+      status: 'unknown',
+      evidence: ['The Court lord-separation evaluator configuration is malformed.'],
+    };
+  }
+  if (options.lagnaAuthorityUncertain) {
+    return {
+      status: 'unknown',
+      evidence: [
+        'The local Lagna authority is missing, conflicting, or inside its transition guard.',
+      ],
+    };
+  }
+  const lagnaRashi = options.authoritativeLagnaRashi;
+  const derived = lagnaRashi ? deriveLagnaSixthLords(lagnaRashi) : null;
+  if (!lagnaRashi || !derived) {
+    return {
+      status: 'unknown',
+      evidence: ['The authoritative local Drik/Lahiri Lagna Rasi is unavailable.'],
+    };
+  }
+  return evaluateRasiLordSeparation(chart, {
+    firstRashi: lagnaRashi,
+    secondRashi: derived.sixthRashi,
+    requiredShortestDistance: 6,
+  });
+}
+
+function validCourtLagnaSixthLordCoverage(
+  coverage: CourtLagnaSixthLordSeparationCoverage | null | undefined,
+): coverage is CourtLagnaSixthLordSeparationCoverage {
+  return Boolean(
+    coverage && typeof coverage === 'object' && !Array.isArray(coverage)
+    && typeof coverage.localLagnaTransitionsComplete === 'boolean'
+    && typeof coverage.lagnaLordRasiTransitionsComplete === 'boolean'
+    && typeof coverage.sixthLordRasiTransitionsComplete === 'boolean'
+    && typeof coverage.budgetExhausted === 'boolean',
+  );
+}
+
+export function aggregateCourtLagnaSixthLordSeparationWindow(
+  samples: readonly PrimitiveOutcome[],
+  coverage: CourtLagnaSixthLordSeparationCoverage,
+): PrimitiveOutcome {
+  const normalized = validCourtLagnaSixthLordCoverage(coverage) ? {
+    budgetExhausted: coverage.budgetExhausted,
+    transitions: [
+      ['local-Lagna', coverage.localLagnaTransitionsComplete],
+      ['Lagna-lord-Rasi', coverage.lagnaLordRasiTransitionsComplete],
+      ['sixth-lord-Rasi', coverage.sixthLordRasiTransitionsComplete],
+    ] as const,
+  } : null;
+  return aggregateCourtWindow(
+    samples,
+    normalized,
+    'Every represented state keeps the Lagna and sixth-house lords at the maximum Whole Sign shortest distance of 6.',
   );
 }

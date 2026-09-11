@@ -5,6 +5,22 @@ from __future__ import annotations
 ELECTION_CHART_CONVENTION_SCHEMA_VERSION = 3
 
 ELECTION_CHART_CONVENTIONS: dict[str, dict] = {
+    'court-lagna-sixth-lord-whole-sign-opposition-v1': {
+        'label': 'Court Lagna-sixth-lord Whole Sign opposition convention v1',
+        'formula': (
+            'Derive the Lagna Rasi and sixth-house Rasi lords from the '
+            'classical seven-graha ownership table, then require '
+            'min(abs(R1 - R2), 12 - abs(R1 - R2)) = 6. Rahu and Ketu are '
+            'never sign lords. This is a binary, score-neutral Court '
+            'preference rather than a source-supplied numeric formula.'
+        ),
+        'maximum_shortest_distance': 6,
+        'house_system': 'whole_sign',
+        'nodes_are_lords': False,
+        'method_claims': [
+            'election_chart.court_lagna_sixth_lord_separation_policy_v1',
+        ],
+    },
     'phaladeepika-natural-graha-nature-whole-sign-v1': {
         'label': 'Phaladeepika natural-graha nature Whole Sign convention v1',
         'formula': (

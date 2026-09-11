@@ -11,6 +11,10 @@ from .chart_geometry import NAVAMSA_ROUNDING_GUARD_DEGREES, navamsa_rashi
 from .contracts import PrimitiveOutcome
 from .event_admission import PlanetPosition
 from .graha_nature import evaluate_forbidden_malefic_house_set
+from .lordship import (
+    derive_lagna_sixth_lords,
+    evaluate_rasi_lord_separation,
+)
 
 COURT_MESHA_D1_D9_METADATA: dict[str, Any] = {
     'source_statement': {
@@ -92,6 +96,40 @@ COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA: dict[str, Any] = {
         'effect_claim_id': 'muhurta.court.effect_policy_v1',
         'status': 'specified_unwired',
         'delivery_issue': 397,
+    },
+}
+
+COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA: dict[str, Any] = {
+    'source_statement': {
+        'claim_id': 'muhurta.court.filing_lawsuit',
+        'text': 'Lords of Lagna and 6th should be as far apart as possible.',
+        'locator': (
+            "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section "
+            + "'Filing law-suits,' inspected in the 2020 Chistabo derivative "
+            + 'at internal printed p. 67 (physical PDF p. 71)'
+        ),
+    },
+    'convention': {
+        'id': 'court-lagna-sixth-lord-whole-sign-opposition-v1',
+        'ownership_id': 'classical-seven-graha-rasi-lordship-v1',
+        'ownership_claim_id': 'election_chart.dignity.phaladeepika_1_6',
+        'separation_claim_id': (
+            'election_chart.court_lagna_sixth_lord_separation_policy_v1'
+        ),
+        'formula': (
+            'shortest_distance(R(lord(Lagna)), R(lord(house 6))) == 6'
+        ),
+        'house_system': 'whole_sign',
+        'maximum_shortest_distance': 6,
+        'nodes_are_lords': False,
+    },
+    'event_policy': {
+        'id': 'court.lagna-sixth-lords-max-separated',
+        'activity': 'court',
+        'effect': 'prefer',
+        'effect_claim_id': 'muhurta.court.effect_policy_v1',
+        'status': 'specified_unwired',
+        'delivery_issue': 398,
     },
 }
 
@@ -253,14 +291,14 @@ def _human_join(items: Sequence[str]) -> str:
     return f'{", ".join(items[:-1])}, and {items[-1]}'
 
 
-def _aggregate_court_reject_window(
+def _aggregate_court_window(
     samples: Sequence[PrimitiveOutcome],
     *,
     transition_coverage: Sequence[tuple[str, bool]],
     budget_exhausted: bool,
     success_evidence: str,
 ) -> PrimitiveOutcome:
-    """Apply shared reject-first and completeness precedence."""
+    """Apply shared decisive-fail and completeness precedence."""
     if isinstance(samples, Sequence):
         failure = next(
             (
@@ -321,7 +359,7 @@ def aggregate_court_mesha_d1_d9_window(
     budget_exhausted: bool,
 ) -> PrimitiveOutcome:
     """Combine sampled reject outcomes without hiding an interior failure."""
-    return _aggregate_court_reject_window(
+    return _aggregate_court_window(
         samples,
         transition_coverage=(
             ('local-Lagna', local_lagna_transitions_complete),
@@ -377,7 +415,7 @@ def aggregate_court_sixth_house_natural_malefic_window(
     budget_exhausted: bool,
 ) -> PrimitiveOutcome:
     """Aggregate the Court reject predicate across represented chart states."""
-    return _aggregate_court_reject_window(
+    return _aggregate_court_window(
         samples,
         transition_coverage=(
             ('local-Lagna', local_lagna_transitions_complete),
@@ -389,5 +427,63 @@ def aggregate_court_sixth_house_natural_malefic_window(
         success_evidence=(
             'Every represented state keeps Whole Sign house 6 free of '
             + 'resolved natural malefics.'
+        ),
+    )
+
+
+def evaluate_court_lagna_sixth_lord_separation(
+    chart: Mapping[str, Any],
+    *,
+    authoritative_lagna_rashi: str,
+    lagna_authority_uncertain: bool = False,
+) -> PrimitiveOutcome:
+    """Apply the disclosed Court opposition policy to reusable lordship facts."""
+    if type(lagna_authority_uncertain) is not bool:
+        return PrimitiveOutcome(
+            'unknown', ('The Court lord-separation evaluator configuration is malformed.',)
+        )
+    if lagna_authority_uncertain:
+        return PrimitiveOutcome(
+            'unknown',
+            (
+                'The local Lagna authority is missing, conflicting, or inside '
+                + 'its transition guard.',
+            ),
+        )
+    derived = derive_lagna_sixth_lords(authoritative_lagna_rashi)
+    if derived is None:
+        return PrimitiveOutcome(
+            'unknown',
+            ('The authoritative local Drik/Lahiri Lagna Rasi is unavailable.',),
+        )
+    _, sixth_rashi, _ = derived
+    return evaluate_rasi_lord_separation(
+        chart,
+        first_rashi=authoritative_lagna_rashi,
+        second_rashi=sixth_rashi,
+        required_shortest_distance=6,
+    )
+
+
+def aggregate_court_lagna_sixth_lord_separation_window(
+    samples: Sequence[PrimitiveOutcome],
+    *,
+    local_lagna_transitions_complete: bool,
+    lagna_lord_rasi_transitions_complete: bool,
+    sixth_lord_rasi_transitions_complete: bool,
+    budget_exhausted: bool,
+) -> PrimitiveOutcome:
+    """Earn the binary preference only across complete represented states."""
+    return _aggregate_court_window(
+        samples,
+        transition_coverage=(
+            ('local-Lagna', local_lagna_transitions_complete),
+            ('Lagna-lord-Rasi', lagna_lord_rasi_transitions_complete),
+            ('sixth-lord-Rasi', sixth_lord_rasi_transitions_complete),
+        ),
+        budget_exhausted=budget_exhausted,
+        success_evidence=(
+            'Every represented state keeps the Lagna and sixth-house lords '
+            + 'at the maximum Whole Sign shortest distance of 6.'
         ),
     )

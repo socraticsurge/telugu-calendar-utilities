@@ -1,0 +1,74 @@
+{
+  "fixture_kind": "synthetic_contract_fixture",
+  "source_golden": false,
+  "metadata": {
+    "source_statement": {
+      "claim_id": "muhurta.court.filing_lawsuit",
+      "text": "Lords of Lagna and 6th should be as far apart as possible.",
+      "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+    },
+    "convention": {
+      "id": "court-lagna-sixth-lord-whole-sign-opposition-v1",
+      "ownership_id": "classical-seven-graha-rasi-lordship-v1",
+      "ownership_claim_id": "election_chart.dignity.phaladeepika_1_6",
+      "separation_claim_id": "election_chart.court_lagna_sixth_lord_separation_policy_v1",
+      "formula": "shortest_distance(R(lord(Lagna)), R(lord(house 6))) == 6",
+      "house_system": "whole_sign",
+      "maximum_shortest_distance": 6,
+      "nodes_are_lords": false
+    },
+    "event_policy": {
+      "id": "court.lagna-sixth-lords-max-separated",
+      "activity": "court",
+      "effect": "prefer",
+      "effect_claim_id": "muhurta.court.effect_policy_v1",
+      "status": "specified_unwired",
+      "delivery_issue": 398
+    }
+  },
+  "lagna_cases": [
+    {"lagna": "Mesha", "lagna_lord": "Kuja", "sixth_rashi": "Kanya", "sixth_lord": "Budha"},
+    {"lagna": "Vrishabha", "lagna_lord": "Shukra", "sixth_rashi": "Tula", "sixth_lord": "Shukra"},
+    {"lagna": "Mithuna", "lagna_lord": "Budha", "sixth_rashi": "Vrischika", "sixth_lord": "Kuja"},
+    {"lagna": "Karka", "lagna_lord": "Chandra", "sixth_rashi": "Dhanu", "sixth_lord": "Guru"},
+    {"lagna": "Simha", "lagna_lord": "Surya", "sixth_rashi": "Makara", "sixth_lord": "Shani"},
+    {"lagna": "Kanya", "lagna_lord": "Budha", "sixth_rashi": "Kumbha", "sixth_lord": "Shani"},
+    {"lagna": "Tula", "lagna_lord": "Shukra", "sixth_rashi": "Meena", "sixth_lord": "Guru"},
+    {"lagna": "Vrischika", "lagna_lord": "Kuja", "sixth_rashi": "Mesha", "sixth_lord": "Kuja"},
+    {"lagna": "Dhanu", "lagna_lord": "Guru", "sixth_rashi": "Vrishabha", "sixth_lord": "Shukra"},
+    {"lagna": "Makara", "lagna_lord": "Shani", "sixth_rashi": "Mithuna", "sixth_lord": "Budha"},
+    {"lagna": "Kumbha", "lagna_lord": "Shani", "sixth_rashi": "Karka", "sixth_lord": "Chandra"},
+    {"lagna": "Meena", "lagna_lord": "Guru", "sixth_rashi": "Simha", "sixth_lord": "Surya"}
+  ],
+  "base_planets": [
+    {"name": "Surya", "rashi": "Mithuna", "degree": 1.0, "house": 3, "retrograde": false},
+    {"name": "Chandra", "rashi": "Mesha", "degree": 2.0, "house": 1, "retrograde": false},
+    {"name": "Kuja", "rashi": "Simha", "degree": 3.0, "house": 5, "retrograde": false},
+    {"name": "Budha", "rashi": "Kumbha", "degree": 4.0, "house": 11, "retrograde": false},
+    {"name": "Guru", "rashi": "Tula", "degree": 5.0, "house": 7, "retrograde": false},
+    {"name": "Shukra", "rashi": "Karka", "degree": 6.0, "house": 4, "retrograde": false},
+    {"name": "Shani", "rashi": "Dhanu", "degree": 7.0, "house": 9, "retrograde": true},
+    {"name": "Rahu", "rashi": "Makara", "degree": 8.0, "house": 10, "retrograde": true},
+    {"name": "Ketu", "rashi": "Karka", "degree": 8.0, "house": 4, "retrograde": true}
+  ],
+  "snapshot_cases": [
+    {"id": "mesha-opposition-pass", "lagna": "Mesha", "expected": {"status": "pass", "evidence": ["Mesha lord Kuja is in Simha; Kanya lord Budha is in Kumbha; shortest Whole Sign distance is 6 (required 6)."]}},
+    {"id": "mesha-asymmetric-distance-five-fail", "lagna": "Mesha", "overrides": {"Budha": {"rashi": "Makara", "house": 10}}, "expected": {"status": "fail", "evidence": ["Mesha lord Kuja is in Simha; Kanya lord Budha is in Makara; shortest Whole Sign distance is 5 (required 6)."]}},
+    {"id": "vrishabha-same-owner-fail", "lagna": "Vrishabha", "expected": {"status": "fail", "evidence": ["Vrishabha and Tula share lord Shukra in Karka; shortest Whole Sign distance is 0 (required 6)."]}},
+    {"id": "karka-opposition-pass", "lagna": "Karka", "expected": {"status": "pass", "evidence": ["Karka lord Chandra is in Mesha; Dhanu lord Guru is in Tula; shortest Whole Sign distance is 6 (required 6)."]}},
+    {"id": "karka-asymmetric-distance-five-fail", "lagna": "Karka", "overrides": {"Guru": {"rashi": "Kanya", "house": 6}}, "expected": {"status": "fail", "evidence": ["Karka lord Chandra is in Mesha; Dhanu lord Guru is in Kanya; shortest Whole Sign distance is 5 (required 6)."]}},
+    {"id": "missing-relevant-lord-unknown", "lagna": "Karka", "remove": ["Chandra"], "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha position facts are unavailable or conflicting."]}},
+    {"id": "duplicate-relevant-lord-unknown", "lagna": "Karka", "duplicate": "Guru", "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha position facts are unavailable or conflicting."]}},
+    {"id": "malformed-relevant-lord-rashi-unknown", "lagna": "Karka", "overrides": {"Guru": {"rashi": "invalid"}}, "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha position facts are unavailable or conflicting."]}},
+    {"id": "lagna-authority-conflict-unknown", "lagna": "Karka", "lagna_authority_uncertain": true, "expected": {"status": "unknown", "evidence": ["The local Lagna authority is missing, conflicting, or inside its transition guard."]}}
+  ],
+  "window_cases": [
+    {"id": "known-fail-dominates-unrelated-unknown", "sample_case_ids": ["mesha-asymmetric-distance-five-fail", "missing-relevant-lord-unknown"], "coverage": {"local_lagna_transitions_complete": false, "lagna_lord_rasi_transitions_complete": false, "sixth_lord_rasi_transitions_complete": false, "budget_exhausted": true}, "expected": {"status": "fail", "evidence": ["Mesha lord Kuja is in Simha; Kanya lord Budha is in Makara; shortest Whole Sign distance is 5 (required 6)."]}},
+    {"id": "unknown-dominates-pass", "sample_case_ids": ["mesha-opposition-pass", "missing-relevant-lord-unknown"], "coverage": {"local_lagna_transitions_complete": true, "lagna_lord_rasi_transitions_complete": true, "sixth_lord_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["Complete canonical nine-graha position facts are unavailable or conflicting."]}},
+    {"id": "all-represented-states-pass", "sample_case_ids": ["mesha-opposition-pass", "karka-opposition-pass"], "coverage": {"local_lagna_transitions_complete": true, "lagna_lord_rasi_transitions_complete": true, "sixth_lord_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "pass", "evidence": ["Every represented state keeps the Lagna and sixth-house lords at the maximum Whole Sign shortest distance of 6."]}},
+    {"id": "lagna-transition-incomplete", "sample_case_ids": ["mesha-opposition-pass"], "coverage": {"local_lagna_transitions_complete": false, "lagna_lord_rasi_transitions_complete": true, "sixth_lord_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but local-Lagna transition coverage is incomplete."]}},
+    {"id": "both-lord-ingresses-incomplete", "sample_case_ids": ["mesha-opposition-pass"], "coverage": {"local_lagna_transitions_complete": true, "lagna_lord_rasi_transitions_complete": false, "sixth_lord_rasi_transitions_complete": false, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["All represented states pass, but Lagna-lord-Rasi and sixth-lord-Rasi transition coverage is incomplete."]}},
+    {"id": "request-budget-exhausted", "sample_case_ids": ["mesha-opposition-pass"], "coverage": {"local_lagna_transitions_complete": true, "lagna_lord_rasi_transitions_complete": true, "sixth_lord_rasi_transitions_complete": true, "budget_exhausted": true}, "expected": {"status": "unknown", "evidence": ["The chart-request budget was exhausted before this window's coverage was complete."]}},
+    {"id": "no-represented-states", "sample_case_ids": [], "coverage": {"local_lagna_transitions_complete": true, "lagna_lord_rasi_transitions_complete": true, "sixth_lord_rasi_transitions_complete": true, "budget_exhausted": false}, "expected": {"status": "unknown", "evidence": ["No represented chart states are available."]}}
+  ]
+}

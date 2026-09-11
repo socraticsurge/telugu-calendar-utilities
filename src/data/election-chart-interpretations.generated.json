@@ -401,6 +401,56 @@
         251
       ]
     },
+    "classical-seven-graha-rasi-lordship-v1": {
+      "schema_version": 1,
+      "concept": "sign_lordship",
+      "label": "Classical seven-graha Rasi lordship",
+      "status": "selected",
+      "source_claims": [
+        "election_chart.dignity.phaladeepika_1_6"
+      ],
+      "method_claims": [
+        "election_chart.court_lagna_sixth_lord_separation_policy_v1"
+      ],
+      "inputs": [
+        "canonical Rasi name",
+        "complete canonical nine-graha Rasi position facts",
+        "optional target Whole Sign shortest distance"
+      ],
+      "formula": "Mesha/Vrischika -> Kuja; Vrishabha/Tula -> Shukra; Mithuna/Kanya -> Budha; Karka -> Chandra; Simha -> Surya; Dhanu/Meena -> Guru; Makara/Kumbha -> Shani. For two lord positions, distance = min(abs(R1-R2), 12-abs(R1-R2)).",
+      "thresholds": {
+        "whole_sign_shortest_distance_range": "integer 0 through 6",
+        "court_maximum": "exactly 6 under the separate Court project policy"
+      },
+      "precedence": "Classical lord identity and observed Rasi separation are reusable facts; event effects remain outside this primitive. Rahu and Ketu never become sign lords.",
+      "conflict_resolution": "Missing, malformed, duplicate or conflicting canonical position facts return unknown. Co-lordship traditions and node lordship are not blended. A shared owner has distance zero.",
+      "alternatives": [
+        {
+          "id": "node-or-co-lordship-unselected",
+          "status": "unselected",
+          "reason": "Version 1 uses only the seven classical grahas attested by the selected source table."
+        },
+        {
+          "id": "exact-angular-lord-separation-unselected",
+          "status": "unselected",
+          "reason": "The Court source supplies no degree orb, angular threshold or precision rule."
+        },
+        {
+          "id": "candidate-pool-relative-separation-unselected",
+          "status": "unselected",
+          "reason": "A query-relative maximum would make the same chart change status when unrelated candidates are added."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/lordship.py",
+        "src/scorer/election-assessors/lordship.ts"
+      ],
+      "implementation_status": "implemented",
+      "delivery_issues": [
+        252,
+        398
+      ]
+    },
     "phaladeepika-natural-relationships-v1": {
       "schema_version": 1,
       "concept": "lord_relationships",
@@ -540,6 +590,9 @@
     }
   },
   "applied_convention_interpretations": {
+    "court-lagna-sixth-lord-whole-sign-opposition-v1": [
+      "classical-seven-graha-rasi-lordship-v1"
+    ],
     "phaladeepika-natural-graha-nature-whole-sign-v1": [
       "phaladeepika-natural-graha-nature-whole-sign-v1"
     ],
