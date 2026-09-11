@@ -66,6 +66,24 @@ still affect the upstream product shortlist, but they are disclosed product
 policy rather than Court-source rules. This Court-specific decision does not
 claim that the broader baseline registry in issue 292 is complete.
 
+### Mesha D1-or-D9 predicate foundation
+
+Issue 395 adds a mirrored, three-valued predicate for the first chart clause:
+
+- authoritative local Drik/Lahiri Mesha D1 passes immediately;
+- otherwise the sidecar's exact Lagna degree can derive D9 only when its Rasi
+  agrees with the canonical local D1;
+- guarded Mesha D9 passes, while two resolved non-Mesha values fail;
+- missing or conflicting authority, a value within 0.01 degrees of a 3 degrees
+  20 minutes Navamsa boundary, incomplete transitions, non-Drik input, and
+  chart unavailability remain `unknown`.
+
+This is a `specified_unwired` predicate foundation. It does not broaden the
+current D1-only shortlist or change ranking. Conditional-admission issue 285
+may later retain only a valid non-Mesha D1 candidate whose D9 alternative is
+still unresolved; a resolved D1/D9 miss is never eligible. Court integration
+issue 400 owns the eventual reject wiring and user-visible completion claim.
+
 ## Safety and alias boundary
 
 Legal deadlines, court rules, counsel, evidence and personal safety always

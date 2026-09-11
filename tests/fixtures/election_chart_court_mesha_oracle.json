@@ -1,0 +1,179 @@
+{
+  "fixture_kind": "synthetic_contract_fixture",
+  "source_golden": false,
+  "metadata": {
+    "source_statement": {
+      "claim_id": "muhurta.court.filing_lawsuit",
+      "text": "The Lagna should be Mesha, or at least the Navamsa must be Mesha.",
+      "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+    },
+    "convention": {
+      "id": "court-canonical-local-d1-sidecar-d9-v1",
+      "method_claim_ids": [
+        "election_chart.whole_sign_house_policy_v1",
+        "election_chart.navamsa.bphs_6_12"
+      ],
+      "formula": "canonical local D1 Lagna Rasi = Mesha OR BPHS-modality Navamsa(sidecar Lagna Rasi, degree) = Mesha",
+      "d1_authority": "canonical local Drik/Lahiri Lagna Rasi",
+      "d9_authority": "sidecar Lagna degree only when its Rasi agrees with canonical local D1",
+      "navamsa_boundary_guard_degrees": 0.01,
+      "unsupported_system": "unknown"
+    },
+    "event_policy": {
+      "id": "court.mesha-lagna-or-navamsa",
+      "activity": "court",
+      "effect": "reject",
+      "effect_claim_id": "muhurta.court.effect_policy_v1",
+      "status": "specified_unwired",
+      "delivery_issue": 395
+    },
+    "conditional_admission": {
+      "id": "court.mesha-navamsa-unresolved",
+      "status": "specified_unwired",
+      "delivery_issue": 285,
+      "rule": "Only a valid non-Mesha D1 candidate whose D9 alternative is not yet resolved may be provisionally retained."
+    }
+  },
+  "snapshot_cases": [
+    {
+      "id": "authoritative-d1-mesha-passes-without-sidecar",
+      "authoritative_d1_rashi": "Mesha",
+      "chart": null,
+      "expected": {
+        "status": "pass",
+        "evidence": ["The authoritative local D1 Lagna is Mesha; D9 is not needed."]
+      }
+    },
+    {
+      "id": "non-mesha-d1-mesha-d9-passes",
+      "authoritative_d1_rashi": "Vrishabha",
+      "chart": {"lagna": {"rashi": "Vrishabha", "degree": 11.0}},
+      "expected": {
+        "status": "pass",
+        "evidence": ["The authoritative local D1 Lagna is Vrishabha and its guarded BPHS-modality D9 is Mesha."]
+      }
+    },
+    {
+      "id": "resolved-non-mesha-d1-and-d9-fail",
+      "authoritative_d1_rashi": "Vrishabha",
+      "chart": {"lagna": {"rashi": "Vrishabha", "degree": 1.0}},
+      "expected": {
+        "status": "fail",
+        "evidence": ["The authoritative local D1 Lagna is Vrishabha and its guarded BPHS-modality D9 is Makara; neither is Mesha."]
+      }
+    },
+    {
+      "id": "internal-navamsa-boundary-is-unknown",
+      "authoritative_d1_rashi": "Vrishabha",
+      "chart": {"lagna": {"rashi": "Vrishabha", "degree": 3.33}},
+      "expected": {
+        "status": "unknown",
+        "evidence": ["The exact Lagna degree is inside the 0.01-degree Navamsa boundary guard."]
+      }
+    },
+    {
+      "id": "missing-local-d1-authority-is-unknown",
+      "authoritative_d1_rashi": null,
+      "chart": {"lagna": {"rashi": "Vrishabha", "degree": 11.0}},
+      "expected": {
+        "status": "unknown",
+        "evidence": ["The authoritative local Drik/Lahiri D1 Lagna Rasi is unavailable."]
+      }
+    },
+    {
+      "id": "explicit-local-authority-conflict-is-unknown",
+      "authoritative_d1_rashi": "Vrishabha",
+      "lagna_authority_uncertain": true,
+      "chart": {"lagna": {"rashi": "Vrishabha", "degree": 10.0}},
+      "expected": {
+        "status": "unknown",
+        "evidence": ["The local Lagna authority is missing, conflicting, or inside its transition guard."]
+      }
+    },
+    {
+      "id": "sidecar-rashi-disagrees-with-local-d1",
+      "authoritative_d1_rashi": "Vrishabha",
+      "chart": {"lagna": {"rashi": "Mithuna", "degree": 20.0}},
+      "expected": {
+        "status": "unknown",
+        "evidence": ["The sidecar Lagna Rasi Mithuna disagrees with authoritative local D1 Vrishabha, so its degree cannot determine D9."]
+      }
+    },
+    {
+      "id": "chart-unavailable-for-d9-alternative",
+      "authoritative_d1_rashi": "Vrishabha",
+      "chart": null,
+      "expected": {
+        "status": "unknown",
+        "evidence": ["Authoritative exact Lagna facts for the D9 alternative are unavailable."]
+      }
+    },
+    {
+      "id": "non-drik-path-is-unknown",
+      "authoritative_d1_rashi": "Vrishabha",
+      "supported_system": false,
+      "chart": {"lagna": {"rashi": "Vrishabha", "degree": 10.0}},
+      "expected": {
+        "status": "unknown",
+        "evidence": ["The Court D1/D9 predicate is supported only on the authoritative Drik chart path."]
+      }
+    }
+  ],
+  "window_cases": [
+    {
+      "id": "all-pass-complete-window",
+      "sample_case_ids": [
+        "authoritative-d1-mesha-passes-without-sidecar",
+        "non-mesha-d1-mesha-d9-passes"
+      ],
+      "coverage": {
+        "local_lagna_transitions_complete": true,
+        "lagna_navamsa_transitions_complete": true,
+        "budget_exhausted": false
+      },
+      "expected": {
+        "status": "pass",
+        "evidence": ["Every represented state resolves the Court Mesha D1-or-D9 condition as satisfied."]
+      }
+    },
+    {
+      "id": "resolved-failure-dominates-unknown",
+      "sample_case_ids": [
+        "internal-navamsa-boundary-is-unknown",
+        "resolved-non-mesha-d1-and-d9-fail"
+      ],
+      "coverage": {
+        "local_lagna_transitions_complete": false,
+        "lagna_navamsa_transitions_complete": false,
+        "budget_exhausted": true
+      },
+      "expected_case_id": "resolved-non-mesha-d1-and-d9-fail"
+    },
+    {
+      "id": "unknown-dominates-passes",
+      "sample_case_ids": [
+        "authoritative-d1-mesha-passes-without-sidecar",
+        "internal-navamsa-boundary-is-unknown"
+      ],
+      "coverage": {
+        "local_lagna_transitions_complete": true,
+        "lagna_navamsa_transitions_complete": true,
+        "budget_exhausted": false
+      },
+      "expected_case_id": "internal-navamsa-boundary-is-unknown"
+    },
+    {
+      "id": "missing-d9-transition-coverage-is-unknown",
+      "sample_case_ids": ["non-mesha-d1-mesha-d9-passes"],
+      "coverage": {
+        "local_lagna_transitions_complete": true,
+        "lagna_navamsa_transitions_complete": false,
+        "budget_exhausted": false
+      },
+      "expected": {
+        "status": "unknown",
+        "evidence": ["All represented states pass, but Lagna-Navamsa transition coverage is incomplete."]
+      }
+    }
+  ]
+}

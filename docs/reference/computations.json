@@ -1979,6 +1979,40 @@
       }
     },
     {
+      "id": "personal.court-mesha-d1-d9-foundation",
+      "title": "Court Mesha D1-or-D9 predicate foundation",
+      "summary": "A three-valued, source-scoped Court predicate accepts authoritative Mesha D1 immediately or guarded Mesha Lagna Navamsa when the exact sidecar Lagna agrees with the local Drik frame.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "evaluate_court_mesha_d1_d9", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "court_mesha_admission_kind", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "aggregate_court_mesha_d1_d9_window", "role": "owner"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "evaluateCourtMeshaD1D9", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "courtMeshaAdmissionKind", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "aggregateCourtMeshaD1D9Window", "role": "mirror"}
+      ],
+      "inputs": ["canonical local Drik/Lahiri D1 Lagna Rasi", "sidecar Lagna Rasi and exact degree", "Lagna authority/transition state", "window transition coverage", "chart-request budget state"],
+      "outputs": ["per-state pass, fail, or unknown with evidence", "whole-window pass, fail, or unknown", "unwired conditional-admission contract for issue 285"],
+      "time_basis": "Each exact chart sample in the candidate's half-open civil-minute window; D1 and Lagna-Navamsa transitions must both be completely represented before an all-pass window resolves.",
+      "surfaces": ["python-library", "website"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["verified", "heuristic"], "claim_ids": ["muhurta.court.filing_lawsuit", "muhurta.court.effect_policy_v1", "election_chart.navamsa.bphs_6_12", "election_chart.whole_sign_house_policy_v1"], "note": "Raman supplies the Mesha D1-or-Navamsa clause. Local-D1 precedence, the exact-degree agreement gate, the 0.01-degree guard, reject effect, and three-valued window precedence are explicit product conventions."},
+      "tests": ["tests/test_court_mesha_d1_d9.py", "src/scorer/__tests__/court-mesha-d1-d9.test.ts"],
+      "limitations": ["This issue delivers an additive Python/TypeScript predicate foundation only. It remains specified_unwired: the current D1-only base shortlist is unchanged until conditional admission issue 285 and Court integration issue 400 land.", "Only the Drik/Lahiri path can resolve the predicate. Missing local Lagna authority, sidecar/local Rasi disagreement, malformed facts, guarded Navamsa boundaries, incomplete transitions, and request-budget exhaustion remain unknown.", "The formula uses Lagna Navamsa only; it does not implement a general election baseline, strength, fortification, Shadvarga, or outcome prediction."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Evaluate the source's D1-or-D9 Boolean only after preserving local Lagna authority and the selected guarded BPHS Navamsa convention, then aggregate every represented state with reject-first precedence.",
+        "steps": ["Reject unsupported systems and missing, conflicting, or transition-guarded local Lagna authority to unknown.", "If the authoritative local D1 Lagna is Mesha, pass without requiring sidecar D9 facts.", "Otherwise require a valid exact sidecar Lagna whose Rasi equals the authoritative local D1; disagreement or absence is unknown.", "Derive D9 with the selected modality-based Navamsa sequence and return unknown inside 0.01 degrees of each 3 degrees 20 minutes division boundary.", "Pass when D9 is Mesha and fail when both resolved D1 and D9 are non-Mesha.", "Across a window, any resolved failure controls; otherwise unknown controls; an all-pass result still becomes unknown when D1 or D9 transitions are incomplete or the chart-request budget is exhausted."],
+        "formulae": [
+          {"name": "Court Mesha D1 or D9", "expression": "pass = (D1 = Mesha) OR (D9(local-agreed exact Lagna) = Mesha)", "variables": ["D1: authoritative local Drik/Lahiri Lagna Rasi", "D9: guarded BPHS-modality Lagna Navamsa", "guard: plus or minus 0.01 degrees at every 3 degrees 20 minutes Navamsa division boundary"]}
+        ],
+        "worked_examples": [
+          {"label": "Vrishabha D1 with Mesha D9", "inputs": ["Authoritative local D1: Vrishabha", "Sidecar Lagna: Vrishabha 11.00 degrees", "No boundary or authority conflict"], "calculation": ["The local and sidecar Rasis agree, so the exact degree may be used for D9.", "Vrishabha is fixed, so Navamsa starts from its ninth sign Makara; 11.00 degrees is the fourth division, which advances to Mesha.", "D1 is not Mesha but D9 is Mesha."], "result": ["Status: pass", "The reject predicate does not fire"]}
+        ],
+        "notes": ["The shared JSON oracle is synthetic contract evidence, not a source golden or external ephemeris validation.", "The specified-unwired conditional-admission record allows only a valid non-Mesha D1 candidate with an unresolved D9 alternative to be provisionally retained when issue 285 is implemented; a resolved D1/D9 miss must not survive."]
+      }
+    },
+    {
       "id": "personal.nitya-yoga-disposition",
       "title": "Nitya Yoga disposition",
       "summary": "Each of the 27 Nitya Yogas is classified for slot scoring and partial-window cautions.",
