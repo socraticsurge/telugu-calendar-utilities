@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "source": "docs/reference/election-chart-interpretations.json",
+  "interpretations": {
+    "whole-sign-physical-occupation-v1": {
+      "schema_version": 1,
+      "concept": "house_occupation",
+      "label": "Whole Sign physical occupation",
+      "status": "selected",
+      "source_claims": [],
+      "method_claims": [
+        "election_chart.whole_sign_house_policy_v1"
+      ],
+      "inputs": [
+        "canonical local Lagna Rasi",
+        "graha sidereal Rasi"
+      ],
+      "formula": "house = 1 + ((graha Rasi index - Lagna Rasi index + 12) mod 12)",
+      "thresholds": {},
+      "precedence": "Canonical local Drik/Lahiri Lagna overrides sidecar house and Lagna fields; physical occupation does not imply aspect or lordship.",
+      "conflict_resolution": "Missing, conflicting or transition-guarded Lagna/Rasi facts return unknown; other house systems are not blended.",
+      "alternatives": [
+        {
+          "id": "degree-cusp-house-occupation-unselected",
+          "status": "unselected",
+          "reason": "No cusp-based house convention is registered."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/primitives.py",
+        "src/scorer/election-assessors/primitives.ts"
+      ],
+      "implementation_status": "implemented",
+      "delivery_issues": [
+        237
+      ]
+    },
+    "phaladeepika-full-graha-drishti-v1": {
+      "schema_version": 1,
+      "concept": "aspect",
+      "label": "Phaladeepika full Graha Drishti",
+      "status": "selected",
+      "source_claims": [
+        "election_chart.full_graha_drishti.phaladeepika_2_23"
+      ],
+      "method_claims": [
+        "election_chart.gold_transition_envelope_v1"
+      ],
+      "inputs": [
+        "source graha sidereal Rasi",
+        "target sidereal Rasi"
+      ],
+      "formula": "delta = (target Rasi - source Rasi + 12) mod 12; all seven classical grahas use {6}, Kuja also {3,7}, Guru also {4,8}, and Shani also {2,9}.",
+      "thresholds": {
+        "degree_orb": "none; sign-based full aspects only"
+      },
+      "precedence": "A directed registered full aspect is evidence; conjunction, self, partial and node aspects do not satisfy this convention.",
+      "conflict_resolution": "Partial-aspect traditions and node-aspect traditions remain named alternatives and are not blended into a full-aspect result.",
+      "alternatives": [
+        {
+          "id": "phaladeepika-partial-graha-drishti-unselected",
+          "status": "unselected",
+          "reason": "The current event rules request full aspects only."
+        },
+        {
+          "id": "node-graha-drishti-unresolved",
+          "status": "unresolved",
+          "reason": "No node-aspect authority or geometry is selected."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/chart_geometry.py",
+        "src/scorer/election-assessors/chart-geometry.ts"
+      ],
+      "implementation_status": "implemented",
+      "delivery_issues": [
+        250
+      ]
+    },
+    "same-rasi-distributive-conjunction-v1": {
+      "schema_version": 1,
+      "concept": "conjunction",
+      "label": "Same-Rasi distributive Chandra conjunction",
+      "status": "selected",
+      "source_claims": [
+        "muhurta.borrowing_money"
+      ],
+      "method_claims": [
+        "election_chart.same_rasi_distributive_conjunction_policy_v1"
+      ],
+      "inputs": [
+        "Chandra Rasi",
+        "Kuja Rasi",
+        "Shani Rasi"
+      ],
+      "formula": "R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani)",
+      "thresholds": {
+        "degree_orb": "none; equality of sidereal Rasi only"
+      },
+      "precedence": "Either known equality controls a prohibition; pass requires both inequalities to resolve.",
+      "conflict_resolution": "This event-bounded mode is not a global conjunction default. Missing/conflicting facts return unknown; angular-orb traditions remain unresolved.",
+      "alternatives": [
+        {
+          "id": "degree-orb-conjunction-unresolved",
+          "status": "unresolved",
+          "reason": "The source supplies no numerical angular orb."
+        },
+        {
+          "id": "group-only-conjunction-unselected",
+          "status": "unselected",
+          "reason": "The grammar is represented as a distributive OR."
+        }
+      ],
+      "implementation": [],
+      "implementation_status": "specified_unwired",
+      "delivery_issues": [
+        250,
+        402
+      ]
+    },
+    "phaladeepika-natural-graha-nature-whole-sign-v1": {
+      "schema_version": 1,
+      "concept": "benefic_malefic",
+      "label": "Phaladeepika natural graha nature with Whole Sign association",
+      "status": "selected",
+      "source_claims": [
+        "election_chart.natural_graha_nature.phaladeepika_2_27",
+        "election_chart.natural_malefics.bphs_3_11_modern_witness"
+      ],
+      "method_claims": [
+        "election_chart.budha_same_sign_association_policy_v1",
+        "election_chart.raman_180_degree_paksha_policy_v1",
+        "election_chart.lunar_phase_boundary_guard_policy_v1",
+        "election_chart.mean_node_policy_v1"
+      ],
+      "inputs": [
+        "complete nine-graha sidereal Rasis",
+        "Surya and Chandra sidereal longitudes",
+        "mean-node convention"
+      ],
+      "formula": "Fixed malefics are Surya, Kuja, Shani, Rahu and Ketu; fixed benefics are Guru and Shukra. Chandra nature follows the selected Paksha convention. Budha is malefic when it shares a Rasi with a resolved natural malefic and benefic otherwise.",
+      "thresholds": {
+        "lunar_phase_guard_degrees": "0.02 around 0 and 180"
+      },
+      "precedence": "A known prohibited malefic controls over another occupant whose nature is unknown; functional lordship is outside this classifier.",
+      "conflict_resolution": "Phase-unknown Chandra can make associated Budha unknown. Aspect, dispositor and degree-orb association are not inferred.",
+      "alternatives": [
+        {
+          "id": "functional-graha-nature-unresolved",
+          "status": "unresolved",
+          "reason": "Functional nature depends on Lagna and is separate."
+        },
+        {
+          "id": "degree-orb-budha-association-unresolved",
+          "status": "unresolved",
+          "reason": "Neither cited source supplies a numerical orb."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/graha_nature.py",
+        "src/scorer/election-assessors/graha-nature.ts"
+      ],
+      "implementation_status": "partial",
+      "delivery_issues": [
+        251
+      ]
+    },
+    "phaladeepika-rasi-dignity-v1": {
+      "schema_version": 1,
+      "concept": "dignity",
+      "label": "Phaladeepika Rasi dignity",
+      "status": "selected",
+      "source_claims": [
+        "election_chart.dignity.phaladeepika_1_6"
+      ],
+      "method_claims": [],
+      "inputs": [
+        "graha",
+        "graha sidereal Rasi"
+      ],
+      "formula": "Classify own, exalted or fallen Rasi from the registered lord and exaltation table; fall is the seventh Rasi from exaltation.",
+      "thresholds": {
+        "degree_dignity": "not represented"
+      },
+      "precedence": "Emit constituent dignity evidence only; dignity does not become an opaque strength score.",
+      "conflict_resolution": "Navamsa dignity, friendly signs and degree-based exaltation remain separate facts and are not blended.",
+      "alternatives": [
+        {
+          "id": "degree-exaltation-strength-unresolved",
+          "status": "unresolved",
+          "reason": "No degree-strength convention is selected."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/chart_geometry.py"
+      ],
+      "implementation_status": "partial",
+      "delivery_issues": [
+        251
+      ]
+    },
+    "bounded-graha-strength-unresolved-v1": {
+      "schema_version": 1,
+      "concept": "strength",
+      "label": "Bounded graha strength",
+      "status": "unresolved",
+      "source_claims": [
+        "muhurta.surgery"
+      ],
+      "method_claims": [],
+      "inputs": [
+        "graha placement",
+        "requested event clause"
+      ],
+      "formula": null,
+      "thresholds": {},
+      "precedence": "No automated result or ranking effect is permitted.",
+      "conflict_resolution": "Preserve the source clause as manual review until one named mode is source-audited, owner-accepted and versioned.",
+      "alternatives": [
+        {
+          "id": "dignity-only-strength-candidate",
+          "status": "unresolved",
+          "reason": "Dignity alone is narrower than generic strength."
+        },
+        {
+          "id": "full-shadbala-candidate",
+          "status": "unresolved",
+          "reason": "Inputs, formula and applicable authority are absent."
+        }
+      ],
+      "implementation": [],
+      "implementation_status": "unresolved",
+      "delivery_issues": [
+        251
+      ],
+      "unresolved_reason": "The inspected event passage asks for Mangala strength but does not define components. No partial calculation may be called Shadbala."
+    },
+    "election-lagna-fortification-unresolved-v1": {
+      "schema_version": 1,
+      "concept": "fortification",
+      "label": "Election Lagna fortification",
+      "status": "unresolved",
+      "source_claims": [
+        "muhurta.wedding",
+        "muhurta.travel"
+      ],
+      "method_claims": [],
+      "inputs": [
+        "Lagna",
+        "graha positions",
+        "event-specific source clause"
+      ],
+      "formula": null,
+      "thresholds": {},
+      "precedence": "No automated result or ranking effect is permitted.",
+      "conflict_resolution": "Preserve the source clause as manual review until one named mode is source-audited, owner-accepted and versioned.",
+      "alternatives": [
+        {
+          "id": "named-yoga-fortification-candidate",
+          "status": "unresolved",
+          "reason": "Each named Yoga requires its own pattern authority."
+        },
+        {
+          "id": "benefic-occupation-fortification-candidate",
+          "status": "unresolved",
+          "reason": "Occupation is not equivalent to general fortification."
+        }
+      ],
+      "implementation": [],
+      "implementation_status": "unresolved",
+      "delivery_issues": [
+        251,
+        252
+      ],
+      "unresolved_reason": "The registered passages require qualitative fortification but do not define one reusable complete formula."
+    },
+    "constituent-affliction-unresolved-v1": {
+      "schema_version": 1,
+      "concept": "affliction",
+      "label": "Constituent chart affliction",
+      "status": "unresolved",
+      "source_claims": [
+        "muhurta.surgery"
+      ],
+      "method_claims": [],
+      "inputs": [
+        "target graha or house",
+        "candidate affliction predicates"
+      ],
+      "formula": null,
+      "thresholds": {},
+      "precedence": "No automated result or ranking effect is permitted.",
+      "conflict_resolution": "Preserve the source clause as manual review until one named mode is source-audited, owner-accepted and versioned.",
+      "alternatives": [
+        {
+          "id": "malefic-occupation-affliction-candidate",
+          "status": "unresolved",
+          "reason": "Occupation alone is not a complete affliction model."
+        },
+        {
+          "id": "malefic-aspect-affliction-candidate",
+          "status": "unresolved",
+          "reason": "Aspect nature and target precedence need event review."
+        }
+      ],
+      "implementation": [],
+      "implementation_status": "unresolved",
+      "delivery_issues": [
+        251
+      ],
+      "unresolved_reason": "The source uses qualitative affliction wording without enumerating a complete reusable constituent set or conflict precedence."
+    },
+    "phaladeepika-kapoor-fixed-elongation-combustion-v1": {
+      "schema_version": 1,
+      "concept": "combustion",
+      "label": "Kapoor fixed-elongation combustion",
+      "status": "selected",
+      "source_claims": [
+        "election_chart.combustion.kapoor_2_36_note"
+      ],
+      "method_claims": [
+        "election_chart.fixed_elongation_combustion_policy_v1"
+      ],
+      "inputs": [
+        "Surya and target graha sidereal longitudes",
+        "Shukra retrograde state"
+      ],
+      "formula": "delta = abs(((longitude(graha) - longitude(Surya) + 180) mod 360) - 180); combust below T-0.02, clear above T+0.02, otherwise unknown.",
+      "thresholds": {
+        "Guru": "11 degrees",
+        "Shukra_direct": "10 degrees",
+        "Shukra_retrograde": "8 degrees",
+        "precision_guard": "0.02 degrees"
+      },
+      "precedence": "Use candidate-instant angular facts. Do not substitute the observer-dependent heliacal combustion calendar.",
+      "conflict_resolution": "Missing retrograde state for Shukra, invalid positions or threshold-guard overlap returns unknown.",
+      "alternatives": [
+        {
+          "id": "heliacal-visibility-combustion-unselected",
+          "status": "unselected",
+          "reason": "It answers a different observer/atmosphere question."
+        },
+        {
+          "id": "single-shukra-threshold-unselected",
+          "status": "unselected",
+          "reason": "The selected note distinguishes retrograde Shukra."
+        }
+      ],
+      "implementation": [],
+      "implementation_status": "specified_unwired",
+      "delivery_issues": [
+        251,
+        264
+      ]
+    },
+    "raman-180-degree-paksha-v1": {
+      "schema_version": 1,
+      "concept": "waxing_waning_chandra",
+      "label": "Raman 180-degree Paksha split",
+      "status": "selected",
+      "source_claims": [
+        "muhurta.raman_transcription.paksha_definition"
+      ],
+      "method_claims": [
+        "election_chart.raman_180_degree_paksha_policy_v1",
+        "election_chart.lunar_phase_boundary_guard_policy_v1"
+      ],
+      "inputs": [
+        "Surya sidereal longitude",
+        "Chandra sidereal longitude"
+      ],
+      "formula": "E = (longitude(Chandra) - longitude(Surya)) mod 360; waxing for 0.02 < E < 179.98; waning for 180.02 < E < 359.98.",
+      "thresholds": {
+        "boundary_guard_degrees": "0.02 around 0 and 180"
+      },
+      "precedence": "The phase classification affects only rules that explicitly consume natural Chandra nature or waxing/waning state.",
+      "conflict_resolution": "Exact conjunction/opposition and guarded cells return unknown. Other lunar-phase lineages are not blended.",
+      "alternatives": [
+        {
+          "id": "tithi-paksha-classification-unselected",
+          "status": "unselected",
+          "reason": "This registry fixes the cited longitude wording."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/primitives.py",
+        "src/scorer/election-assessors/primitives.ts"
+      ],
+      "implementation_status": "implemented",
+      "delivery_issues": [
+        250,
+        251
+      ]
+    },
+    "phaladeepika-natural-relationships-v1": {
+      "schema_version": 1,
+      "concept": "lord_relationships",
+      "label": "Phaladeepika natural graha relationships",
+      "status": "selected",
+      "source_claims": [
+        "election_chart.relationships.phaladeepika_2_21_22"
+      ],
+      "method_claims": [],
+      "inputs": [
+        "subject graha",
+        "Rasi lord"
+      ],
+      "formula": "Look up the subject-to-lord natural relationship as friend, neutral or enemy using the registered directed table.",
+      "thresholds": {},
+      "precedence": "Natural relationship is a directed constituent fact; it does not include temporary relationship or house-lord placement.",
+      "conflict_resolution": "Missing lordship or relationship data returns unknown. Temporary and compound relationships remain separate unresolved modes.",
+      "alternatives": [
+        {
+          "id": "temporary-graha-relationships-unresolved",
+          "status": "unresolved",
+          "reason": "No temporary-relationship formula is selected."
+        },
+        {
+          "id": "compound-graha-relationships-unresolved",
+          "status": "unresolved",
+          "reason": "No combination precedence is selected."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/chart_geometry.py"
+      ],
+      "implementation_status": "partial",
+      "delivery_issues": [
+        252
+      ]
+    },
+    "bphs-modality-navamsa-v1": {
+      "schema_version": 1,
+      "concept": "navamsa",
+      "label": "BPHS modality-based Navamsa",
+      "status": "selected",
+      "source_claims": [
+        "election_chart.navamsa.bphs_6_12"
+      ],
+      "method_claims": [
+        "election_chart.gold_transition_envelope_v1"
+      ],
+      "inputs": [
+        "graha sidereal Rasi",
+        "degree within Rasi"
+      ],
+      "formula": "division = floor(degree / (30/9)); start from the Rasi for movable, the ninth for fixed, and the fifth for dual signs; advance by division.",
+      "thresholds": {
+        "internal_boundary_guard_degrees": "0.01"
+      },
+      "precedence": "A guarded division boundary returns unknown before dignity or event policy is evaluated.",
+      "conflict_resolution": "Malformed degrees and unresolved boundaries return unknown; no alternative Varga computation is blended.",
+      "alternatives": [],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/chart_geometry.py",
+        "src/scorer/election-assessors/chart-geometry.ts"
+      ],
+      "implementation_status": "implemented",
+      "delivery_issues": [
+        252
+      ]
+    },
+    "lagna-hemming-unresolved-v1": {
+      "schema_version": 1,
+      "concept": "hemming",
+      "label": "Lagna hemming by malefics",
+      "status": "unresolved",
+      "source_claims": [
+        "muhurta.wedding"
+      ],
+      "method_claims": [],
+      "inputs": [
+        "Lagna",
+        "adjacent houses",
+        "resolved graha natures"
+      ],
+      "formula": null,
+      "thresholds": {},
+      "precedence": "No automated result or ranking effect is permitted.",
+      "conflict_resolution": "Preserve the source clause as manual review until one named mode is source-audited, owner-accepted and versioned.",
+      "alternatives": [
+        {
+          "id": "adjacent-house-occupation-hemming-candidate",
+          "status": "unresolved",
+          "reason": "Nature and occupancy rules require explicit selection."
+        },
+        {
+          "id": "aspect-inclusive-hemming-candidate",
+          "status": "unresolved",
+          "reason": "The source does not define an aspect-inclusive mode."
+        }
+      ],
+      "implementation": [],
+      "implementation_status": "unresolved",
+      "delivery_issues": [
+        252
+      ],
+      "unresolved_reason": "The event source names hemming but the repository has not selected node, Chandra, Budha, occupancy, aspect or boundary semantics."
+    },
+    "named-election-yoga-patterns-unresolved-v1": {
+      "schema_version": 1,
+      "concept": "named_yoga",
+      "label": "Named election-chart Yoga patterns",
+      "status": "unresolved",
+      "source_claims": [
+        "muhurta.wedding"
+      ],
+      "method_claims": [],
+      "inputs": [
+        "named Yoga",
+        "its own exact source pattern",
+        "chart facts"
+      ],
+      "formula": null,
+      "thresholds": {},
+      "precedence": "No automated result or ranking effect is permitted.",
+      "conflict_resolution": "Preserve the source clause as manual review until one named mode is source-audited, owner-accepted and versioned.",
+      "alternatives": [
+        {
+          "id": "event-yoga-one-pattern-per-source",
+          "status": "required",
+          "reason": "Each Yoga must register its own exact locator, Boolean pattern, boundary behavior and event effect."
+        }
+      ],
+      "implementation": [],
+      "implementation_status": "unresolved",
+      "delivery_issues": [
+        252
+      ],
+      "unresolved_reason": "The wedding passage names fortification Yogas, but no umbrella definition can authorize all named patterns."
+    }
+  },
+  "applied_convention_interpretations": {
+    "whole-sign-physical-occupation-v1": [
+      "whole-sign-physical-occupation-v1"
+    ],
+    "annaprasana-natural-malefic-lagna-v1": [
+      "whole-sign-physical-occupation-v1",
+      "phaladeepika-natural-graha-nature-whole-sign-v1",
+      "raman-180-degree-paksha-v1"
+    ],
+    "phaladeepika-well-placed-v1": [
+      "whole-sign-physical-occupation-v1",
+      "phaladeepika-rasi-dignity-v1",
+      "phaladeepika-natural-relationships-v1",
+      "bphs-modality-navamsa-v1"
+    ],
+    "phaladeepika-full-graha-drishti-v1": [
+      "phaladeepika-full-graha-drishti-v1"
+    ],
+    "vidyarambha-benefic-trio-co-location-v1": [
+      "whole-sign-physical-occupation-v1"
+    ]
+  }
+}

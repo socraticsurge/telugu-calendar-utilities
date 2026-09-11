@@ -282,6 +282,13 @@ The canonical table is
 JSON is not an independent authority. There are 32 deterministic predicates
 across 15 activity profiles.
 
+The reusable source-to-computation meanings are separately owned by
+`docs/reference/election-chart-interpretations.json` and exported to
+`src/data/election-chart-interpretations.generated.json`. This additive
+registry maps the already released composite conventions to stable primitive
+meanings without changing this protected rule artifact. See
+[Election-chart interpretation conventions](55-election-chart-interpretation-conventions.md).
+
 `Reject` means a failed predicate removes the window. `Prefer` means a passing
 predicate is tie-break evidence only; it adds no raw score and its absence does
 not reject the window. `Qualify` means a positive event condition must pass
