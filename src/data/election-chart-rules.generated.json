@@ -16,6 +16,16 @@
   ],
   "convention_schema_version": 3,
   "conventions": {
+    "court-lagna-sixth-lord-whole-sign-opposition-v1": {
+      "label": "Court Lagna-sixth-lord Whole Sign opposition convention v1",
+      "formula": "Derive the Lagna Rasi and sixth-house Rasi lords from the classical seven-graha ownership table, then require min(abs(R1 - R2), 12 - abs(R1 - R2)) = 6. Rahu and Ketu are never sign lords. This is a binary, score-neutral Court preference rather than a source-supplied numeric formula.",
+      "maximum_shortest_distance": 6,
+      "house_system": "whole_sign",
+      "nodes_are_lords": false,
+      "method_claims": [
+        "election_chart.court_lagna_sixth_lord_separation_policy_v1"
+      ]
+    },
     "phaladeepika-natural-graha-nature-whole-sign-v1": {
       "label": "Phaladeepika natural-graha nature Whole Sign convention v1",
       "formula": "Surya, Kuja, Shani, Rahu and Ketu are fixed malefics; Guru and Shukra are fixed benefics. Chandra is benefic for normalized Surya-Chandra elongation 0.02° < E < 179.98°, malefic for 180.02° < E < 359.98°, and unknown inside the inclusive 0.02° guards around 0°/180°/360° after ten-decimal, non-negative round-half-up quantization. Budha is malefic when a resolved malefic shares its sidereal Rasi, unknown when only phase-unknown Chandra can decide, and otherwise benefic.",

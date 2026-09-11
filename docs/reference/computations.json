@@ -2047,6 +2047,46 @@
       }
     },
     {
+      "id": "personal.court-lagna-sixth-lord-separation-foundation",
+      "title": "Court Lagna-sixth-lord separation foundation",
+      "summary": "A reusable classical seven-graha lordship layer derives the Court Lagna and sixth-house lords, measures their Whole Sign shortest distance, and earns the binary preference only at exact opposition.",
+      "owning_layer": "personal",
+      "claim_kind": "textual-rule",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/election_assessors/lordship.py", "symbol": "derive_lagna_sixth_lords", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/lordship.py", "symbol": "whole_sign_shortest_distance", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/lordship.py", "symbol": "evaluate_rasi_lord_separation", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "evaluate_court_lagna_sixth_lord_separation", "role": "owner"},
+        {"path": "telugu_panchangam/personal/election_assessors/court.py", "symbol": "aggregate_court_lagna_sixth_lord_separation_window", "role": "owner"},
+        {"path": "src/scorer/election-assessors/lordship.ts", "symbol": "deriveLagnaSixthLords", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/lordship.ts", "symbol": "wholeSignShortestDistance", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/lordship.ts", "symbol": "evaluateRasiLordSeparation", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "evaluateCourtLagnaSixthLordSeparation", "role": "mirror"},
+        {"path": "src/scorer/election-assessors/court.ts", "symbol": "aggregateCourtLagnaSixthLordSeparationWindow", "role": "mirror"}
+      ],
+      "inputs": ["authoritative canonical local Drik/Lahiri Lagna Rasi", "complete canonical nine-graha Rasi position facts", "represented window samples", "local-Lagna, Lagna-lord-Rasi and sixth-lord-Rasi transition coverage", "chart-request budget state"],
+      "outputs": ["derived Lagna lord, sixth-house Rasi and sixth-house lord", "Whole Sign shortest distance 0 through 6", "per-state and whole-window pass, fail or unknown with inspectable evidence", "unwired binary Court preference"],
+      "time_basis": "Each exact chart sample in the candidate's half-open civil-minute window; local Lagna and both derived lord-Rasi transitions must be completely represented before an all-pass window resolves.",
+      "surfaces": ["python-library", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["verified", "heuristic"], "claim_ids": ["muhurta.court.filing_lawsuit", "election_chart.dignity.phaladeepika_1_6", "election_chart.court_lagna_sixth_lord_separation_policy_v1", "muhurta.court.effect_policy_v1"], "note": "Raman supplies only the qualitative separation preference. Phaladeepika I.6 supplies the classical seven-graha ownership table. Exact Whole Sign opposition, exclusion of query-relative and angular-orb alternatives, fail-closed aggregation and the score-neutral prefer effect are separately disclosed project policy."},
+      "tests": ["tests/test_court_lord_separation.py", "src/scorer/__tests__/court-lord-separation.test.ts"],
+      "limitations": ["This additive Python and TypeScript foundation remains specified_unwired until Court integration issue 400; it changes no score, rank, tier, admission, completion count or user-facing review text.", "The source gives no degree orb, angular threshold or graduated scale. Version 1 therefore uses exact Whole Sign opposition as a binary project policy and does not choose a best candidate relative to a search batch.", "Missing, malformed, duplicate or conflicting canonical position facts, uncertain Lagna authority, incomplete relevant transitions and chart-request budget exhaustion remain unknown.", "The classical table uses Surya through Shani only. Rahu/Ketu and co-lordship traditions are not blended; same-owner Lagna/sixth pairs have distance zero."],
+      "method": {
+        "kind": "algorithm",
+        "summary": "Derive both relevant lords from the classical table, measure their observed Whole Sign Rasi separation, compare it with the disclosed maximum of six, and aggregate every represented state without applying the future Court tie-break.",
+        "steps": ["Validate the authoritative local Lagna Rasi and derive the sixth-house Rasi by advancing five signs.", "Map both Rasis through the classical seven-graha ownership table; never derive Rahu or Ketu as a lord.", "Require one complete, non-conflicting canonical position record for every graha and read the observed Rasis of the two derived lords.", "Compute the undirected shortest distance on the twelve-Rasi circle and pass only when it equals six; a shared owner has distance zero.", "Return inspectable fail for every resolved non-six distance and unknown for invalid authority or position facts; never produce a graduated score.", "Across a window, a resolved miss prevents the preference, otherwise unknown controls; an all-pass set still requires complete local-Lagna and both lord-ingress transition coverage within budget."],
+        "formulae": [
+          {"name": "Classical Lagna and sixth-house lords", "expression": "sixth_rasi = Rasi[(index(Lagna)+5) mod 12]; L1 = lord(Lagna); L6 = lord(sixth_rasi)", "variables": ["lord: classical seven-graha table from Phaladeepika I.6", "Rahu and Ketu: excluded from lord derivation"]},
+          {"name": "Court maximum Whole Sign separation", "expression": "d = min(abs(index(Rasi(L1))-index(Rasi(L6))), 12-abs(index(Rasi(L1))-index(Rasi(L6)))); pass iff d = 6", "variables": ["d: undirected shortest Rasi distance 0 through 6", "d = 6: disclosed project policy, not Raman's numeric wording"]}
+        ],
+        "worked_examples": [
+          {"label": "Mesha Lagna with opposite lord positions", "inputs": ["Lagna: Mesha, whose lord is Kuja", "Sixth Rasi: Kanya, whose lord is Budha", "Kuja in Simha; Budha in Kumbha"], "calculation": ["Simha index is 4 and Kumbha index is 10.", "The raw difference is 6, so the undirected shortest distance is min(6, 6) = 6.", "The distance equals the selected Whole Sign maximum."], "result": ["Status: pass", "Future Court effect: one score-neutral tie-break preference"]},
+          {"label": "Vrishabha Lagna with a shared lord", "inputs": ["Lagna: Vrishabha, whose lord is Shukra", "Sixth Rasi: Tula, also ruled by Shukra"], "calculation": ["Both sides refer to the same observed Shukra position.", "The shortest distance from one position to itself is 0."], "result": ["Status: fail", "The binary preference is not earned"]}
+        ],
+        "notes": ["The JSON oracle is a synthetic parity fixture, not source golden or ephemeris validation.", "Exact angular opposition was rejected because the source supplies no orb or precision rule.", "Candidate-pool-relative maximization was rejected because it would make one chart's result depend on unrelated search candidates."]
+      }
+    },
+    {
       "id": "personal.natural-graha-nature",
       "title": "Natural graha nature and house-set witnesses",
       "summary": "A source-bounded, versioned decision table classifies each canonical graha as a natural benefic, natural malefic, or unknown and derives decisive three-valued house-set witness predicates.",

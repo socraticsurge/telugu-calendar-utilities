@@ -31,6 +31,7 @@ owner-accepted, versioned and tested.
 | Affliction | `constituent-affliction-unresolved-v1` | Raman, Chapter XV “Surgical Operations,” internal pp. 64–65 / physical PDF pp. 68–69 | Unresolved; eventual output must expose constituent evidence |
 | Combustion | `phaladeepika-kapoor-fixed-elongation-combustion-v1` | Kapoor commentary on *Phaladeepika* II.36, physical/printed pp. 26–27 | Selected for Guru and Shukra exact-chart use; not yet implemented or wired |
 | Waxing/waning Chandra | `raman-180-degree-paksha-v1` | Raman, Chapter II “On certain special yogas,” internal p. 4 / physical PDF p. 7 | Selected with a separately disclosed 0.02° precision guard |
+| Rasi lordship | `classical-seven-graha-rasi-lordship-v1` | *Phaladeepika* I.6, book pp. 3–4 / scan pp. 40–41 | Selected and implemented for seven classical grahas; nodes and co-lordship are excluded |
 | Lord relationships | `phaladeepika-natural-relationships-v1` | *Phaladeepika* II.21–22, book p. 17 / scan p. 54 | Selected, partially implemented for Gold; temporary and compound modes unresolved |
 | Navamsa | `bphs-modality-navamsa-v1` | BPHS 6.12 | Selected with a separately disclosed 0.01° internal-boundary guard |
 | Hemming | `lagna-hemming-unresolved-v1` | Raman, Chapter IX marriage, internal pp. 41–42 / physical PDF pp. 45–46 | Unresolved; no hidden node, nature, aspect or orb semantics |
@@ -107,6 +108,21 @@ Divide a Rasi into nine parts. Start from that Rasi for movable signs, its ninth
 for fixed signs, and its fifth for dual signs, then advance by the zero-based
 division index. A value within `0.01°` of an internal division boundary is
 unknown.
+
+### Classical Rasi lordship and separation
+
+The ownership table is Mesha/Vrischika—Kuja, Vrishabha/Tula—Shukra,
+Mithuna/Kanya—Budha, Karka—Chandra, Simha—Surya, Dhanu/Meena—Guru and
+Makara/Kumbha—Shani. Rahu and Ketu are not sign lords in this mode.
+
+For two observed lord Rasis with zero-based indices `R1` and `R2`, the reusable
+fact is `min(abs(R1-R2), 12-abs(R1-R2))`, an integer from 0 through 6. The
+Court-specific `court-lagna-sixth-lord-whole-sign-opposition-v1` policy selects
+exactly 6 as “as far apart as possible.” Raman supplies that qualitative phrase,
+not this numerical formula. Exact angular opposition is not selected because
+the passage gives no orb or precision threshold; candidate-pool-relative
+maximization is rejected because it would make one chart depend on unrelated
+search results. A shared Lagna/sixth lord necessarily has distance zero.
 
 ## Precedence and conflicts
 

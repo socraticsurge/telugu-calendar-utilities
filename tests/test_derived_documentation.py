@@ -32,7 +32,7 @@ def test_every_non_engine_computation_has_a_human_readable_contract():
     ]
     documentation = _text(DOC03)
 
-    assert len(records) == 39
+    assert len(records) == 40
     for record in records:
         assert f"`{record['id']}`" in documentation, record['id']
 

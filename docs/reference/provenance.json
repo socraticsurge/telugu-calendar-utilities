@@ -565,6 +565,17 @@
       "last_reviewed": "2026-09-11"
     },
     {
+      "id": "election_chart.court_lagna_sixth_lord_separation_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/lordship.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020", "PD-SASTRI-1950-2E"],
+      "locator": "Project decision for B. V. Raman Chapter XVII 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71), with the classical seven-graha ownership table from Phaladeepika Chapter I, sloka 6, book pp. 3-4 (scan pp. 40-41)",
+      "scope": "Operationalizes 'Lords of Lagna and 6th should be as far apart as possible' as exact Whole Sign opposition: shortest_distance(R(lord(Lagna)), R(lord(house 6))) equals 6. The distance formula and binary threshold are project policy, not source wording. Exact-degree opposition is unselected because Raman gives no orb or precision threshold; candidate-pool-relative maximization is unselected because it is query-dependent. The classical seven-graha table excludes Rahu/Ketu and co-lordship. The event effect is the separately registered non-scoring prefer policy.",
+      "last_reviewed": "2026-09-11"
+    },
+    {
       "id": "muhurta.court.filing_lawsuit",
       "surface": "muhurtam",
       "implementation": "telugu_panchangam/personal/activity_rules.py",
