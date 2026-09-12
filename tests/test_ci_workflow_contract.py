@@ -20,6 +20,10 @@ def test_ci_normalizes_push_and_pull_request_concurrency_keys():
         "github.repository }}-${{ github.head_ref || github.ref_name }}" in workflow
     )
     assert "group: ci-${{ github.ref }}" not in workflow
+    assert "format('branch test ({0})', matrix.python-version)" in workflow
+    assert "format('test ({0})', matrix.python-version)" in workflow
+    assert "'branch frontend-and-browser'" in workflow
+    assert "|| 'frontend-and-browser'" in workflow
 
 
 def test_ci_retains_supported_runtimes_and_browser_coverage():

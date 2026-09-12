@@ -10,14 +10,15 @@ permissions:
 
 # Push validates a branch before it has a PR. After a PR opens, GitHub emits
 # both push and pull_request events for the same commit; normalize both to the
-# source branch so only one matrix completes. Job names stay unchanged for
-# branch-protection compatibility.
+# source branch so only one matrix completes. Push jobs use distinct check
+# names so their expected cancellation cannot poison the required PR contexts.
 concurrency:
   group: ci-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   test:
+    name: ${{ github.event_name == 'push' && format('branch test ({0})', matrix.python-version) || format('test ({0})', matrix.python-version) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -57,6 +58,7 @@ jobs:
         run: uv run --no-sync --no-build python -m pytest tests/ -v --ignore=tests/test_browser_smoke.py
 
   frontend-and-browser:
+    name: ${{ github.event_name == 'push' && 'branch frontend-and-browser' || 'frontend-and-browser' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

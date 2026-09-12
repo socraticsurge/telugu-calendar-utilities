@@ -127,6 +127,11 @@ validated again on `master`. Once a PR is open, GitHub can emit both push and
 pull-request events for the same commit. The concurrency key combines the head
 repository with `github.head_ref || github.ref_name`, so local duplicate events
 cancel while identically named branches from different forks stay isolated.
+Branch-push jobs are deliberately named `branch test (3.10)` through
+`branch test (3.13)` and `branch frontend-and-browser`. Pull-request jobs retain
+the protected names below. This separation matters: GitHub records the canceled
+push jobs on the same commit, and reusing a protected name there can make a
+successful PR check appear unsuccessful.
 
 The matrix job names remain `test (3.10)` through `test (3.13)`, so the four
 backend compatibility contexts are unchanged. Node, the production Vite build,
