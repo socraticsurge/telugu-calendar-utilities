@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 # Push validates a branch before it has a PR. Push and pull-request events use
 # separate concurrency groups so neither can leave canceled checks on the
@@ -21,6 +20,9 @@ jobs:
   scope:
     name: CI scope
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       run-suite: ${{ steps.scope.outputs.run-suite }}
     steps:

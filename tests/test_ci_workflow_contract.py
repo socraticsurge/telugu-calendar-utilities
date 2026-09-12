@@ -15,7 +15,7 @@ def test_ci_normalizes_push_and_pull_request_concurrency_keys():
     assert "branches-ignore: [gh-pages]" in workflow
     assert "branches-ignore: [master" not in workflow
     assert "permissions:\n  contents: read" in workflow
-    assert "pull-requests: read" in workflow
+    assert "    permissions:\n      contents: read\n      pull-requests: read" in workflow
     assert (
         "group: ci-${{ github.event_name }}-${{ "
         "github.event.pull_request.head.repo.full_name || "
