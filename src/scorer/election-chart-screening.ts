@@ -10,9 +10,23 @@ import {
   goldTransitionUncertainty,
   type PrimitiveOutcome,
 } from './election-assessors/primitives';
+import {
+  aggregateCourtGuruTrikonaWindow,
+  evaluateCourtGuruTrikona,
+} from './election-assessors/chart-geometry';
+import {
+  aggregateCourtLagnaSixthLordSeparationWindow,
+  aggregateCourtMeshaD1D9Window,
+  aggregateCourtPeacePatternWindow,
+  aggregateCourtSixthHouseNaturalMaleficWindow,
+  evaluateCourtLagnaSixthLordSeparation,
+  evaluateCourtMeshaD1D9,
+  evaluateCourtPeacePattern,
+  evaluateCourtSixthHouseNaturalMalefic,
+} from './election-assessors/court';
 
 export type ElectionRuleStatus = 'pass' | 'fail' | 'unknown';
-export type ElectionRuleEffect = 'reject' | 'qualify' | 'prefer';
+export type ElectionRuleEffect = 'reject' | 'qualify' | 'prefer' | 'inform';
 
 export interface ElectionChartRule {
   id: string;
@@ -25,7 +39,12 @@ export interface ElectionChartRule {
     | 'all_planets_in_houses'
     | 'planet_well_situated'
     | 'planet_receives_full_aspect'
-    | 'house_free_of_natural_malefics';
+    | 'house_free_of_natural_malefics'
+    | 'court_mesha_d1_d9'
+    | 'court_guru_trikona'
+    | 'court_no_natural_malefic_h6'
+    | 'court_lagna_sixth_lord_separation'
+    | 'court_peace_pattern';
   effect: ElectionRuleEffect;
   source_claim: string;
   source_locator: string;
@@ -76,6 +95,24 @@ export interface ElectionChartScreening {
 
 export interface ElectionChartEvaluationOptions {
   houseFrameUncertain?: boolean;
+  authoritativeLagnaRashi?: string | null;
+  authoritativeLagnaRashis?: Array<string | null>;
+  lagnaAuthorityUncertain?: boolean;
+  supportedSystem?: boolean;
+  courtTransitionCoverage?: CourtTransitionCoverage;
+}
+
+export interface CourtTransitionCoverage {
+  localLagnaTransitionsComplete: boolean;
+  lagnaNavamsaTransitionsComplete: boolean;
+  guruRasiTransitionsComplete: boolean;
+  grahaRasiTransitionsComplete: boolean;
+  chandraPhaseTransitionsComplete: boolean;
+  budhaAssociationTransitionsComplete: boolean;
+  lagnaLordRasiTransitionsComplete: boolean;
+  sixthLordRasiTransitionsComplete: boolean;
+  fullAspectTransitionsComplete: boolean;
+  budgetExhausted: boolean;
 }
 
 const EXPECTED_PLANETS = new Set(rulesContract.vacancy_includes);
@@ -86,17 +123,18 @@ const COMPLETE_ASSESSORS = new Set(
 );
 
 export function automatedRulesFor(activity: string): readonly ElectionChartRule[] {
-  return RULES[activity] || [];
+  return RULES[activity === 'litigation' ? 'court' : activity] || [];
 }
 
 export function chartManualRemaindersFor(activity: string): readonly string[] | null {
+  activity = activity === 'litigation' ? 'court' : activity;
   return Object.hasOwn(MANUAL_REMAINDERS, activity)
     ? MANUAL_REMAINDERS[activity]
     : null;
 }
 
 export function chartAssessorCompleteFor(activity: string): boolean {
-  return COMPLETE_ASSESSORS.has(activity);
+  return COMPLETE_ASSESSORS.has(activity === 'litigation' ? 'court' : activity);
 }
 
 function evaluateHouseEmpty(
@@ -176,10 +214,33 @@ function evaluateHouseRule(
 
 function evaluateRule(
   rule: ElectionChartRule,
+  chart: ElectionChartSnapshot,
   houses: ReadonlyMap<string, number> | null,
   positions: ReturnType<typeof completePlanetPositions>,
   options: ElectionChartEvaluationOptions,
 ): PrimitiveOutcome {
+  if (rule.kind === 'court_mesha_d1_d9') {
+    return evaluateCourtMeshaD1D9(chart, {
+      authoritativeD1Rashi: options.authoritativeLagnaRashi,
+      lagnaAuthorityUncertain: options.lagnaAuthorityUncertain,
+      supportedSystem: options.supportedSystem,
+    });
+  }
+  if (rule.kind === 'court_guru_trikona') {
+    return evaluateCourtGuruTrikona(chart, options);
+  }
+  if (rule.kind === 'court_no_natural_malefic_h6') {
+    return evaluateCourtSixthHouseNaturalMalefic(chart, options);
+  }
+  if (rule.kind === 'court_lagna_sixth_lord_separation') {
+    return evaluateCourtLagnaSixthLordSeparation(chart, {
+      authoritativeLagnaRashi: options.authoritativeLagnaRashi,
+      lagnaAuthorityUncertain: options.lagnaAuthorityUncertain,
+    });
+  }
+  if (rule.kind === 'court_peace_pattern') {
+    return evaluateCourtPeacePattern(chart, options);
+  }
   if (rule.kind === 'planet_well_situated') {
     return evaluateWellSituated(rule, positions, options);
   }
@@ -301,6 +362,91 @@ function combinedRuleStatus(
   return 'unknown';
 }
 
+const INCOMPLETE_COURT_COVERAGE: CourtTransitionCoverage = {
+  localLagnaTransitionsComplete: false,
+  lagnaNavamsaTransitionsComplete: false,
+  guruRasiTransitionsComplete: false,
+  grahaRasiTransitionsComplete: false,
+  chandraPhaseTransitionsComplete: false,
+  budhaAssociationTransitionsComplete: false,
+  lagnaLordRasiTransitionsComplete: false,
+  sixthLordRasiTransitionsComplete: false,
+  fullAspectTransitionsComplete: false,
+  budgetExhausted: false,
+};
+
+function aggregateCourtRule(
+  ruleId: string,
+  samples: readonly PrimitiveOutcome[],
+  coverage: CourtTransitionCoverage,
+): PrimitiveOutcome {
+  const shared = {
+    localLagnaTransitionsComplete: coverage.localLagnaTransitionsComplete,
+    budgetExhausted: coverage.budgetExhausted,
+  };
+  if (ruleId === 'court.mesha-lagna-or-navamsa') {
+    return aggregateCourtMeshaD1D9Window(samples, {
+      ...shared,
+      lagnaNavamsaTransitionsComplete: coverage.lagnaNavamsaTransitionsComplete,
+    });
+  }
+  if (ruleId === 'court.guru-trikona') {
+    return aggregateCourtGuruTrikonaWindow(samples, {
+      ...shared,
+      guruRasiTransitionsComplete: coverage.guruRasiTransitionsComplete,
+    });
+  }
+  if (ruleId === 'court.house-6-without-natural-malefic') {
+    return aggregateCourtSixthHouseNaturalMaleficWindow(samples, {
+      ...shared,
+      grahaRasiTransitionsComplete: coverage.grahaRasiTransitionsComplete,
+      chandraPhaseTransitionsComplete: coverage.chandraPhaseTransitionsComplete,
+      budhaAssociationTransitionsComplete:
+        coverage.budhaAssociationTransitionsComplete,
+    });
+  }
+  if (ruleId === 'court.lagna-sixth-lords-max-separated') {
+    return aggregateCourtLagnaSixthLordSeparationWindow(samples, {
+      ...shared,
+      lagnaLordRasiTransitionsComplete:
+        coverage.lagnaLordRasiTransitionsComplete,
+      sixthLordRasiTransitionsComplete:
+        coverage.sixthLordRasiTransitionsComplete,
+    });
+  }
+  return aggregateCourtPeacePatternWindow(samples, {
+    ...shared,
+    grahaRasiTransitionsComplete: coverage.grahaRasiTransitionsComplete,
+    chandraPhaseTransitionsComplete: coverage.chandraPhaseTransitionsComplete,
+    budhaAssociationTransitionsComplete:
+      coverage.budhaAssociationTransitionsComplete,
+    fullAspectTransitionsComplete: coverage.fullAspectTransitionsComplete,
+  });
+}
+
+function evaluateCourtWindowOutcomes(
+  evaluations: readonly ElectionChartScreening[],
+  suppliedCoverage: CourtTransitionCoverage | undefined,
+): ElectionChartScreening {
+  const coverage = suppliedCoverage || INCOMPLETE_COURT_COVERAGE;
+  const first = evaluations[0];
+  let stable = true;
+  const outcomes = first.outcomes.map(firstOutcome => {
+    const matching = evaluations.map(result => result.outcomes.find(
+      outcome => outcome.ruleId === firstOutcome.ruleId,
+    ));
+    const samples = matching.map(item => ({
+      status: item?.status || 'unknown',
+      evidence: item?.evidence || [],
+    }) as PrimitiveOutcome);
+    const result = aggregateCourtRule(firstOutcome.ruleId, samples, coverage);
+    stable &&= result.status !== 'unknown'
+      && samples.every(sample => sample.status === samples[0].status);
+    return { ...firstOutcome, status: result.status, evidence: result.evidence };
+  });
+  return summarize(outcomes, stable);
+}
+
 export function evaluateElectionChart(
   activity: string,
   chart: ElectionChartSnapshot,
@@ -311,7 +457,7 @@ export function evaluateElectionChart(
     ? new Map(Array.from(positions, ([name, position]) => [name, position.house]))
     : null;
   return summarize(automatedRulesFor(activity).map(rule =>
-    ruleOutcome(rule, evaluateRule(rule, houses, positions, options))));
+    ruleOutcome(rule, evaluateRule(rule, chart, houses, positions, options))));
 }
 
 export function evaluateElectionWindow(
@@ -328,11 +474,25 @@ export function evaluateElectionSnapshots(
   charts: readonly ElectionChartSnapshot[],
   options: ElectionChartEvaluationOptions = {},
 ): ElectionChartScreening {
+  activity = activity === 'litigation' ? 'court' : activity;
   if (!charts.length) {
     return summarize(automatedRulesFor(activity).map(rule =>
       ruleOutcome(rule, { status: 'unknown', evidence: [] })), false);
   }
-  const evaluations = charts.map(chart => evaluateElectionChart(activity, chart, options));
+  const lagnaRashis = options.authoritativeLagnaRashis;
+  const evaluations = charts.map((chart, index) => evaluateElectionChart(
+    activity,
+    chart,
+    {
+      ...options,
+      authoritativeLagnaRashi: lagnaRashis?.length === charts.length
+        ? lagnaRashis[index]
+        : options.authoritativeLagnaRashi,
+    },
+  ));
+  if (activity === 'court') {
+    return evaluateCourtWindowOutcomes(evaluations, options.courtTransitionCoverage);
+  }
   const first = evaluations[0];
   const transitionEvidence = activity === 'gold'
     ? goldTransitionEvidence(charts)

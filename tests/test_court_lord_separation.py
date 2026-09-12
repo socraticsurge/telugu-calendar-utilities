@@ -53,7 +53,7 @@ def test_metadata_separates_source_ownership_distance_and_event_effect():
         metadata['convention']['separation_claim_id']
     )
     assert metadata['event_policy']['effect'] == 'prefer'
-    assert metadata['event_policy']['status'] == 'specified_unwired'
+    assert metadata['event_policy']['status'] == 'implemented'
     assert COURT_SOURCE_EFFECT_POLICY['atomic_rule_effects'][
         metadata['event_policy']['id']
     ] == 'prefer'

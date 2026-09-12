@@ -181,6 +181,7 @@ interface TarabalamPanelModule {
     preferLagnaClass: string | null,
     lagnaCityData: unknown,
     activityLabel: string,
+    allowConditionalAdmission?: boolean,
   ): { score: number; reasons: string[] } | null;
 }
 
@@ -528,6 +529,15 @@ describe('Muhurtam saved-profile participants', () => {
     expect(panel.muScoreActivityLagna(
       'Mesha', 'Sthira', new Set(), new Set(), null, {}, 'Wedding',
     )).toBeNull();
+    expect(panel.muScoreActivityLagna(
+      'Vrishabha', null, new Set(['Mesha']), new Set(), null, {},
+      'Filing a lawsuit / court action', true,
+    )).toEqual({
+      score: 0,
+      reasons: [
+        'Vrishabha lagna retained provisionally for exact Navamsa assessment',
+      ],
+    });
   });
 
   test('claims partial event clauses only after actual chart screening', () => {
@@ -656,6 +666,9 @@ describe('Muhurtam saved-profile participants', () => {
       ['prefer', 'pass', 'Preference met · tie-break only'],
       ['prefer', 'unknown', 'Preference could not be verified'],
       ['prefer', 'fail', 'Preference not present · no penalty'],
+      ['inform', 'pass', 'Information pattern present · no ranking effect'],
+      ['inform', 'unknown', 'Information pattern could not be verified'],
+      ['inform', 'fail', 'Information pattern not continuous · no adverse inference'],
     ];
     for (const [effect, status, label] of cases) {
       expect(panel.muChartOutcomeLabel({ effect, status })).toBe(label);
@@ -826,6 +839,8 @@ describe('Muhurtam saved-profile participants', () => {
       .toBe('Gold event-specific chart clauses resolved');
     expect(panel.muChartAssessmentTitle('karnavedha', dispositionBase))
       .toBe('Karnavedha event checks resolved');
+    expect(panel.muChartAssessmentTitle('court', dispositionBase))
+      .toBe('Court filing chart assessment complete');
     expect(panel.muChartAssessmentTitle('purchase', dispositionBase))
       .toBe('Exact chart screening applied');
   });

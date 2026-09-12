@@ -39,14 +39,14 @@ function outcome(caseData: SnapshotCase) {
 }
 
 describe('Court Lagna-sixth-lord separation', () => {
-  test('separates source wording, computation convention, and unwired preference', () => {
+  test('separates source wording, computation convention, and integrated preference', () => {
     expect(oracle.fixture_kind).toBe('synthetic_contract_fixture');
     expect(oracle.source_golden).toBe(false);
     expect(COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA).toEqual(oracle.metadata);
     expect(COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA.event_policy.effect)
       .toBe('prefer');
     expect(COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA.event_policy.status)
-      .toBe('specified_unwired');
+      .toBe('implemented');
   });
 
   test('covers all twelve Lagnas and never derives a node as lord', () => {

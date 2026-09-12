@@ -7,6 +7,21 @@ from datetime import datetime
 from itertools import pairwise
 from typing import Any
 
+from .activity_rules import resolve_activity
+from .election_assessors.chart_geometry import (
+    aggregate_court_guru_trikona_window,
+    evaluate_court_guru_trikona,
+)
+from .election_assessors.court import (
+    aggregate_court_lagna_sixth_lord_separation_window,
+    aggregate_court_mesha_d1_d9_window,
+    aggregate_court_peace_pattern_window,
+    aggregate_court_sixth_house_natural_malefic_window,
+    evaluate_court_lagna_sixth_lord_separation,
+    evaluate_court_mesha_d1_d9,
+    evaluate_court_peace_pattern,
+    evaluate_court_sixth_house_natural_malefic,
+)
 from .election_assessors.event_admission import planet_houses, planet_positions
 from .election_assessors.primitives import (
     GOLD_MAX_SAMPLE_GAP_MINUTES,
@@ -135,8 +150,41 @@ def _evaluate_rule(
     houses: Mapping[str, int] | None,
     positions: Mapping[str, Any] | None,
     *,
+    chart: Mapping[str, Any] | None = None,
     house_frame_uncertain: bool = False,
+    authoritative_lagna_rashi: str | None = None,
+    lagna_authority_uncertain: bool = False,
+    supported_system: bool = True,
 ) -> PrimitiveOutcome:
+    chart = chart or {}
+    court_evaluators = {
+        'court_mesha_d1_d9': lambda: evaluate_court_mesha_d1_d9(
+            chart,
+            authoritative_d1_rashi=authoritative_lagna_rashi,
+            lagna_authority_uncertain=lagna_authority_uncertain,
+            supported_system=supported_system,
+        ),
+        'court_guru_trikona': lambda: evaluate_court_guru_trikona(
+            chart, house_frame_uncertain=house_frame_uncertain
+        ),
+        'court_no_natural_malefic_h6': lambda: (
+            evaluate_court_sixth_house_natural_malefic(
+                chart, house_frame_uncertain=house_frame_uncertain
+            )
+        ),
+        'court_lagna_sixth_lord_separation': lambda: (
+            evaluate_court_lagna_sixth_lord_separation(
+                chart,
+                authoritative_lagna_rashi=authoritative_lagna_rashi or '',
+                lagna_authority_uncertain=lagna_authority_uncertain,
+            )
+        ),
+        'court_peace_pattern': lambda: evaluate_court_peace_pattern(
+            chart, house_frame_uncertain=house_frame_uncertain
+        ),
+    }
+    if evaluator := court_evaluators.get(rule['kind']):
+        return evaluator()
     primitive = _primitive_result(
         rule,
         houses,
@@ -265,8 +313,12 @@ def evaluate_election_chart(
     chart: Mapping[str, Any],
     *,
     house_frame_uncertain: bool = False,
+    authoritative_lagna_rashi: str | None = None,
+    lagna_authority_uncertain: bool = False,
+    supported_system: bool = True,
 ) -> dict:
     """Evaluate all deterministic rules for one exact chart snapshot."""
+    activity = resolve_activity(activity)
     houses = planet_houses(chart)
     positions = planet_positions(chart)
     outcomes = [
@@ -276,7 +328,11 @@ def evaluate_election_chart(
                 rule,
                 houses,
                 positions,
+                chart=chart,
                 house_frame_uncertain=house_frame_uncertain,
+                authoritative_lagna_rashi=authoritative_lagna_rashi,
+                lagna_authority_uncertain=lagna_authority_uncertain,
+                supported_system=supported_system,
             ),
         )
         for rule in ELECTION_CHART_RULES.get(activity, ())
@@ -294,6 +350,7 @@ def evaluate_election_window(
 
 
 def _unknown_summary(activity: str) -> dict:
+    activity = resolve_activity(activity)
     outcomes = []
     for rule in ELECTION_CHART_RULES.get(activity, ()):
         outcome = {
@@ -394,21 +451,166 @@ def _combined_chart_outcome(
     return {**start_item, 'status': status, 'evidence': evidence}, stable
 
 
+def _court_sample_outcomes(
+    first_item: dict,
+    evaluations: list[dict],
+) -> list[PrimitiveOutcome]:
+    return [
+        PrimitiveOutcome(
+            item['status'] if item is not None else 'unknown',
+            tuple(item.get('evidence', ())) if item is not None else (),
+        )
+        for item in _matching_outcomes(first_item, evaluations)
+    ]
+
+
+def _coverage_value(coverage: Mapping[str, Any], key: str) -> Any:
+    return coverage.get(key, False)
+
+
+def _aggregate_court_rule(
+    rule_id: str,
+    samples: list[PrimitiveOutcome],
+    coverage: Mapping[str, Any],
+) -> PrimitiveOutcome:
+    budget_exhausted = _coverage_value(coverage, 'budget_exhausted')
+    local_lagna = _coverage_value(
+        coverage, 'local_lagna_transitions_complete'
+    )
+    if rule_id == 'court.mesha-lagna-or-navamsa':
+        return aggregate_court_mesha_d1_d9_window(
+            samples,
+            local_lagna_transitions_complete=local_lagna,
+            lagna_navamsa_transitions_complete=_coverage_value(
+                coverage, 'lagna_navamsa_transitions_complete'
+            ),
+            budget_exhausted=budget_exhausted,
+        )
+    if rule_id == 'court.guru-trikona':
+        return aggregate_court_guru_trikona_window(
+            samples,
+            local_lagna_transitions_complete=local_lagna,
+            guru_rasi_transitions_complete=_coverage_value(
+                coverage, 'guru_rasi_transitions_complete'
+            ),
+            budget_exhausted=budget_exhausted,
+        )
+    if rule_id == 'court.house-6-without-natural-malefic':
+        return aggregate_court_sixth_house_natural_malefic_window(
+            samples,
+            local_lagna_transitions_complete=local_lagna,
+            graha_rasi_transitions_complete=_coverage_value(
+                coverage, 'graha_rasi_transitions_complete'
+            ),
+            chandra_phase_transitions_complete=_coverage_value(
+                coverage, 'chandra_phase_transitions_complete'
+            ),
+            budha_association_transitions_complete=_coverage_value(
+                coverage, 'budha_association_transitions_complete'
+            ),
+            budget_exhausted=budget_exhausted,
+        )
+    if rule_id == 'court.lagna-sixth-lords-max-separated':
+        return aggregate_court_lagna_sixth_lord_separation_window(
+            samples,
+            local_lagna_transitions_complete=local_lagna,
+            lagna_lord_rasi_transitions_complete=_coverage_value(
+                coverage, 'lagna_lord_rasi_transitions_complete'
+            ),
+            sixth_lord_rasi_transitions_complete=_coverage_value(
+                coverage, 'sixth_lord_rasi_transitions_complete'
+            ),
+            budget_exhausted=budget_exhausted,
+        )
+    return aggregate_court_peace_pattern_window(
+        samples,
+        local_lagna_transitions_complete=local_lagna,
+        graha_rasi_transitions_complete=_coverage_value(
+            coverage, 'graha_rasi_transitions_complete'
+        ),
+        chandra_phase_transitions_complete=_coverage_value(
+            coverage, 'chandra_phase_transitions_complete'
+        ),
+        budha_association_transitions_complete=_coverage_value(
+            coverage, 'budha_association_transitions_complete'
+        ),
+        full_aspect_transitions_complete=_coverage_value(
+            coverage, 'full_aspect_transitions_complete'
+        ),
+        budget_exhausted=budget_exhausted,
+    )
+
+
+def _court_window_summary(
+    evaluations: list[dict],
+    coverage: Mapping[str, Any],
+) -> dict:
+    first = evaluations[0]
+    outcomes = []
+    stable = True
+    for first_item in first['outcomes']:
+        samples = _court_sample_outcomes(first_item, evaluations)
+        result = _aggregate_court_rule(first_item['rule_id'], samples, coverage)
+        observed_statuses = [sample.status for sample in samples]
+        stable = stable and result.status != 'unknown' and all(
+            status == observed_statuses[0] for status in observed_statuses
+        )
+        outcomes.append(_outcome(
+            {
+                'id': first_item['rule_id'],
+                'label': first_item['label'],
+                'effect': first_item['effect'],
+                'source_claim': first_item['source_claim'],
+                'source_locator': first_item['source_locator'],
+                **{
+                    key: first_item[key]
+                    for key in (
+                        'convention_id', 'convention_label', 'formula',
+                        'method_claims', 'decision_policy_claim',
+                    )
+                    if key in first_item
+                },
+            },
+            result,
+        ))
+    return _summary(outcomes, stable=stable)
+
+
 def evaluate_election_snapshots(
     activity: str,
     charts: list[Mapping[str, Any]],
     *,
     house_frame_uncertain: bool = False,
+    authoritative_lagna_rashis: list[str | None] | None = None,
+    lagna_authority_uncertain: bool = False,
+    supported_system: bool = True,
+    court_transition_coverage: Mapping[str, Any] | None = None,
 ) -> dict:
     """Conservatively combine all sampled states inside an offered window."""
+    activity = resolve_activity(activity)
     if not charts:
         return _unknown_summary(activity)
+    lagna_rashis = authoritative_lagna_rashis or [None] * len(charts)
+    if len(lagna_rashis) != len(charts):
+        lagna_rashis = [None] * len(charts)
     evaluations = [
         evaluate_election_chart(
-            activity, chart, house_frame_uncertain=house_frame_uncertain
+            activity,
+            chart,
+            house_frame_uncertain=house_frame_uncertain,
+            authoritative_lagna_rashi=lagna_rashis[index],
+            lagna_authority_uncertain=lagna_authority_uncertain,
+            supported_system=supported_system,
         )
-        for chart in charts
+        for index, chart in enumerate(charts)
     ]
+    if activity == 'court':
+        return _court_window_summary(
+            evaluations,
+            court_transition_coverage
+            if isinstance(court_transition_coverage, Mapping)
+            else {},
+        )
     transition_evidence = (
         _gold_transition_evidence(charts) if activity == 'gold' else {}
     )

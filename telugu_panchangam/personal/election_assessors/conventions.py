@@ -2,9 +2,21 @@
 
 from __future__ import annotations
 
-ELECTION_CHART_CONVENTION_SCHEMA_VERSION = 3
+ELECTION_CHART_CONVENTION_SCHEMA_VERSION = 4
 
 ELECTION_CHART_CONVENTIONS: dict[str, dict] = {
+    'court-canonical-local-d1-sidecar-d9-v1': {
+        'label': 'Court canonical D1-or-guarded-D9 convention v1',
+        'formula': (
+            'Pass when the canonical local Drik/Lahiri D1 Lagna Rasi is '
+            'Mesha, or when the sidecar Lagna Rasi agrees with that canonical '
+            'D1 and its guarded BPHS-modality Navamsa is Mesha.'
+        ),
+        'method_claims': [
+            'election_chart.whole_sign_house_policy_v1',
+            'election_chart.navamsa.bphs_6_12',
+        ],
+    },
     'court-peace-benefic-subject-continuity-v1': {
         'label': 'Court peace benefic subject-continuity convention v1',
         'formula': (

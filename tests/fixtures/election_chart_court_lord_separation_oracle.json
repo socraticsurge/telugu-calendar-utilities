@@ -22,8 +22,9 @@
       "activity": "court",
       "effect": "prefer",
       "effect_claim_id": "muhurta.court.effect_policy_v1",
-      "status": "specified_unwired",
-      "delivery_issue": 398
+      "status": "implemented",
+      "delivery_issue": 398,
+      "integration_issue": 400
     }
   },
   "lagna_cases": [

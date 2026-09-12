@@ -49,7 +49,7 @@ def test_fixture_is_synthetic_and_metadata_keeps_source_policy_separate():
     assert metadata['source_statement']['claim_id'] != (
         metadata['event_policy']['effect_claim_id']
     )
-    assert metadata['event_policy']['status'] == 'specified_unwired'
+    assert metadata['event_policy']['status'] == 'implemented'
     registry = json.loads(
         (ROOT / 'docs/reference/election-chart-interpretations.json')
         .read_text(encoding='utf-8')

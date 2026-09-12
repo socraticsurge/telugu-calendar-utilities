@@ -51,10 +51,10 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     report = build_report('HEAD', commit_limit=20)
 
     assert report['schema_version'] == 1
-    assert report['scope']['source_files'] == 114
-    assert report['scope']['established_source_files'] == 80
+    assert report['scope']['source_files'] == 115
+    assert report['scope']['established_source_files'] == 81
     assert report['scope']['additive_feature_source_files'] == 34
-    assert report['scope']['total_source_files'] == 114
+    assert report['scope']['total_source_files'] == 115
     assert report['scope']['source_files'] == report['scope']['total_source_files']
     assert report['scope']['source_files'] == (
         report['scope']['established_source_files']
@@ -67,8 +67,8 @@ def test_architecture_report_maps_modules_consumers_and_layers():
         <= set(report['layers'])
 
     summary = _summary(report)
-    assert 'Production modules: 114' in summary
-    assert 'Established production modules: 80' in summary
+    assert 'Production modules: 115' in summary
+    assert 'Established production modules: 81' in summary
     assert 'Additive feature modules: 34' in summary
 
 

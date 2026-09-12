@@ -33,8 +33,9 @@ COURT_GURU_TRIKONA_METADATA: dict[str, Any] = {
         'id': 'court.guru-trikona',
         'activity': 'court',
         'effect': 'prefer',
-        'status': 'specified_unwired',
+        'status': 'implemented',
         'delivery_issue': 396,
+        'integration_issue': 400,
     },
 }
 
@@ -66,7 +67,7 @@ def evaluate_court_guru_trikona(
     *,
     house_frame_uncertain: bool = False,
 ) -> PrimitiveOutcome:
-    """Evaluate the unwired Court Guru-in-Trikona preference foundation."""
+    """Evaluate the integrated Court Guru-in-Trikona preference."""
     if house_frame_uncertain:
         return PrimitiveOutcome(
             'unknown',

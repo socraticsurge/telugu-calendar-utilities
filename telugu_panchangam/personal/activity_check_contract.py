@@ -506,6 +506,13 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
             'avoid_tithi_numbers',
             'allowed_lagnas',
         ),
+        election_chart_rule_ids=(
+            'court.mesha-lagna-or-navamsa',
+            'court.guru-trikona',
+            'court.house-6-without-natural-malefic',
+            'court.lagna-sixth-lords-max-separated',
+            'court.peace-benefic-pattern',
+        ),
         manual_sections=(
             'information',
             'information',

@@ -45,7 +45,7 @@ describe('Court peace-pattern information', () => {
       'Mesha', 'Mithuna', 'Simha', 'Tula', 'Dhanu', 'Kumbha',
     ]);
     expect(COURT_PEACE_PATTERN_METADATA.event_policy.effect).toBe('inform');
-    expect(COURT_PEACE_PATTERN_METADATA.event_policy.status).toBe('specified_unwired');
+    expect(COURT_PEACE_PATTERN_METADATA.event_policy.status).toBe('implemented');
   });
 
   test.each(oracle.snapshot_cases)('$id', (caseData) => {

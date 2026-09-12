@@ -9,6 +9,9 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.12` while completing the five-clause
+  Court filing assessor, `litigation` alias parity, conservative transition
+  coverage, non-ranking peace information, responsive UI and review evidence.
 - Prepare MCP/PyPI patch metadata `1.18.11` while implementing the Court
   benefic peace-pattern grammar as non-ranking, non-predictive information
   with explicit subject continuity and aspect direction.

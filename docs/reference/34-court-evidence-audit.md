@@ -22,9 +22,11 @@ passage, not that every lineage treats them as universal.
 | Avoid Tuesday and Saturday | `allowed_varas` admits the other five weekdays | Hard day gate |
 | Avoid the usual unfavorable lunar days | `avoid_tithi_numbers` = 4, 6, 8, 9, 12, 14, 15 | The passage does not define “usual.” The unchanged list is a conservative project policy recorded below; 15 covers both Pournami and Amavasya. |
 | Ten named Nakshatras are good | Exact `allowed_nakshatras` list | Hard day gate |
-| Lagna, or at least Navamsa, should be Mesha | `allowed_lagnas = ['Mesha']` | Conservative hard slot gate; the Navamsa alternative remains manual because it is unavailable on every surface |
-| Strengthen Lagna with Guru in a Trikona; no malefic in the 6th; keep Lagna and 6th lords apart | `manual_checks`; `manual_prerequisites = true` | Results cannot be rated Excellent until a practitioner checks the chart |
-| Benefics in Kendras, or benefic aspects from male Rasis, indicate peace | Manual interpretive note | Never presented as a guarantee of settlement or success |
+| Lagna, or at least Navamsa, should be Mesha | `court.mesha-lagna-or-navamsa` | A resolved miss rejects. The Python/MCP finder retains its conservative Mesha-D1 gate because it has no exact-chart sidecar; the Drik browser may retain a non-Mesha D1 candidate provisionally until guarded D9 resolves. |
+| Strengthen Lagna with Guru in a Trikona | `court.guru-trikona` | Score-neutral tie-break preference. |
+| Place no malefic in the 6th | `court.house-6-without-natural-malefic` | A resolved natural-malefic occupant rejects. |
+| Keep Lagna and 6th lords as far apart as possible | `court.lagna-sixth-lords-max-separated` | Binary, score-neutral tie-break preference under the registered maximum-distance convention. |
+| Benefics in Kendras, or benefic aspects from male Rasis, indicate peace | `court.peace-benefic-pattern` | Non-ranking information only; never a guarantee of settlement, victory or success. |
 
 ## Tithi shorthand decision
 
@@ -78,11 +80,12 @@ Issue 395 adds a mirrored, three-valued predicate for the first chart clause:
   20 minutes Navamsa boundary, incomplete transitions, non-Drik input, and
   chart unavailability remain `unknown`.
 
-This is a `specified_unwired` predicate foundation. It does not broaden the
-current D1-only shortlist or change ranking. Conditional-admission issue 285
-may later retain only a valid non-Mesha D1 candidate whose D9 alternative is
-still unresolved; a resolved D1/D9 miss is never eligible. Court integration
-issue 400 owns the eventual reject wiring and user-visible completion claim.
+Issue 400 wires this predicate into the integrated five-rule assessor. In the
+Drik browser, a valid non-Mesha D1 candidate can survive the initial activity
+gate only provisionally; it is shown as resolved only when the guarded D9 arm
+passes. A resolved D1/D9 miss is removed, while a missing, conflicting or
+boundary-guarded fact stays visibly review-gated. The Python/MCP finder keeps
+its earlier D1-only gate because that surface has no exact-chart sidecar.
 
 ## Safety and alias boundary
 
@@ -96,7 +99,7 @@ this narrow filing profile. It does not represent a broader election.
 
 ## Guru-Trikona computation foundation
 
-Issue 396 adds an explicitly unwired computation foundation for the source
+Issue 396 added the computation foundation for the source
 clause “strengthen Lagna with Guru in a Trikona.” Under the registered
 `whole-sign-physical-occupation-v1` convention, the predicate passes exactly
 when Guru occupies house 1, 5 or 9 from the validated local Drik/Lahiri Lagna.
@@ -111,10 +114,9 @@ complete within the chart-request budget. A known non-Trikona state defeats an
 unrelated unknown; incomplete coverage never earns the preference.
 
 The shared Python/TypeScript oracle is labelled
-`synthetic_contract_fixture`, not a source golden. This foundation is not yet
-wired into the Court scorer, does not change completion counts and does not
-remove any practitioner-review language. Those changes remain owned by the
-Court effect-policy and completion children under the parent assessor issue.
+`synthetic_contract_fixture`, not a source golden. Issue 400 now wires the
+result as a score-neutral preference. It can break a tie only after every
+represented state and transition is resolved; a miss adds no penalty.
 
 ## Sixth-house natural-malefic computation foundation
 
@@ -133,9 +135,8 @@ otherwise unknown defeats pass. An all-pass result still requires complete
 local-Lagna, graha-Rasi, Chandra-phase and Budha-association transition
 coverage within the request budget.
 
-This foundation remains `specified_unwired`: it changes neither candidate
-admission nor score, rank, tier or completion counts until issue 400 integrates
-the accepted Court predicates. It also preserves
+Issue 400 wires this result as a hard Court gate: a known failure removes the
+candidate, while an unknown keeps it visible with a review cap. It preserves
 `general_baseline_mode = none`; a future general election baseline must not
 double-count this Court-specific exclusion. The shared oracle is a
 `synthetic_contract_fixture`, not a source golden or outcome prediction.
@@ -161,9 +162,8 @@ are added or removed. The result is therefore a stable binary
 Across a candidate window, any represented miss prevents the preference;
 otherwise unknown defeats pass. An all-pass result still requires complete
 local-Lagna, Lagna-lord-Rasi and sixth-lord-Rasi transition coverage within the
-chart-request budget. This remains `specified_unwired`: issue 400 owns its
-event integration, so this foundation changes no score, tier, candidate order,
-completion count or user-facing review text.
+chart-request budget. Issue 400 wires the result as a score-neutral tie-break
+preference; a miss or unknown never reduces the raw Panchangam score.
 
 ## Peace-pattern information foundation
 
@@ -187,5 +187,33 @@ failed settlement, victory or loss. Missing facts affect chart-completion
 disclosure only. Across a window, a positive statement requires every
 represented state plus complete local-Lagna, graha-Rasi, Chandra-phase,
 Budha-association and full-aspect transition coverage. This foundation remains
-`specified_unwired` until issue 400 and changes no score, rank, tier,
-admission, qualification or completion count.
+non-ranking after issue 400 integration: it changes no score, rank, tier,
+admission or qualification.
+
+## Integrated assessor and completion boundary
+
+Issue 400 delivers one integrated five-rule assessor for `court`; the legacy
+`litigation` alias canonicalizes to the same rules and produces the same
+result. The default mode contains only the five Raman clauses above. The
+optional Chintamani/Ghata-Chandra proposal in issue 300 is not selected or
+silently blended into this mode.
+
+The browser samples the first and final represented minute, each ten-minute
+cadence point, and both sides of every known canonical Drik/Lahiri Lagna
+transition. A positive completion claim additionally requires:
+
+- canonical Lagna coverage without an edge-overlapping five-minute convention
+  guard;
+- sidecar Lagna agreement at every sample, guarded Navamsa endpoints, and less
+  than one Navamsa of forward Lagna motion between adjacent samples;
+- complete nine-graha facts whose sampled motion stays within the documented
+  24 degrees/day body envelope, with no unrepresented Rasi boundary;
+- Chandra-Surya relative motion within 48 degrees/day and no unrepresented
+  waxing/waning boundary; and
+- no exhausted chart-request or candidate budget.
+
+A represented hard-gate failure wins even if some unrelated evidence is
+unknown. Otherwise, malformed facts, a cadence gap above ten minutes, an
+unrepresented transition, a non-Drik system, unavailable calculation or an
+exhausted budget remains visibly incomplete. Scope and legal-safety rows stay
+informational/practical disclosures and do not themselves trigger review.

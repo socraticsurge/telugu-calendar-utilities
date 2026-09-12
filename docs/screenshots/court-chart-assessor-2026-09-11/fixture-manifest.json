@@ -1,0 +1,111 @@
+{
+  "capturedAt": "2026-09-11T16:54:39+00:00",
+  "source": "tools/capture_muhurta_chart_screenshots.py",
+  "liveServicesUsed": false,
+  "captures": [
+    {
+      "file": "fixture-court-pass-desktop-1440x900.png",
+      "scenario": "court-pass",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Court filing chart assessment complete",
+      "sha256": "fecc3505c45e13b20458b715b29e57cc37afacf3bf031d04fdcbf378ddc28329"
+    },
+    {
+      "file": "fixture-court-pass-mobile-390x844.png",
+      "scenario": "court-pass",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Court filing chart assessment complete",
+      "sha256": "64cc3bdb8e2091cb6fc1a6b1a5cc8940f05593d5d5281a2ce63daeb9503bb590"
+    },
+    {
+      "file": "fixture-court-preference-miss-desktop-1440x900.png",
+      "scenario": "court-preference-miss",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference not present \u00b7 no penalty",
+      "sha256": "c940b11a8811e21aecf6006484348acdddd0382728ac6d37f09af4ffc6444af5"
+    },
+    {
+      "file": "fixture-court-preference-miss-mobile-390x844.png",
+      "scenario": "court-preference-miss",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "Preference not present \u00b7 no penalty",
+      "sha256": "61177d8387f8eba5504b68b3fc93f1e005e556e5d0cfa3fcc8ec947a54ba2730"
+    },
+    {
+      "file": "fixture-court-hard-fail-desktop-1440x900.png",
+      "scenario": "court-hard-fail",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened",
+      "expectedCopy": "failed an exact chart requirement",
+      "sha256": "a4cf0d2122694cdeb442110359f2ef0a4102881b0bcccfc62c080a31db56d86c"
+    },
+    {
+      "file": "fixture-court-hard-fail-mobile-390x844.png",
+      "scenario": "court-hard-fail",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened",
+      "expectedCopy": "failed an exact chart requirement",
+      "sha256": "5e708f1fed74fc963beb397f49169423be814004f7feccd9a8f9b5be9903e7b1"
+    },
+    {
+      "file": "fixture-court-unknown-desktop-1440x900.png",
+      "scenario": "court-unknown",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "expectedState": "screened-review",
+      "expectedCopy": "Required check could not be verified",
+      "sha256": "3a52ce66df38ae5823bb944aa5b669ee3076abe47c52e5faaffcc8d1bde1f2a7"
+    },
+    {
+      "file": "fixture-court-unknown-mobile-390x844.png",
+      "scenario": "court-unknown",
+      "activity": "court",
+      "system": "drik",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "expectedState": "screened-review",
+      "expectedCopy": "Required check could not be verified",
+      "sha256": "384339affc24d86cc38c46a65115cc2515208383355b2e165dcb4328d29647a1"
+    }
+  ]
+}

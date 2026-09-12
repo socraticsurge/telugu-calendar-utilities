@@ -339,6 +339,27 @@ def _muhurta_lagna_fixture():
     }
 
 
+def _court_lagna_fixture():
+    """Keep all pinned Court candidate windows inside one stable Mesha span."""
+    return {
+        'start': MUHURTA_FIXTURE_DATE,
+        'days': [
+            {
+                'date': date,
+                'sunrise': '05:41',
+                'lagna0': 11,
+                'transitions': [
+                    [50, 0], [900, 1], [901, 2], [902, 3],
+                    [903, 4], [904, 5], [905, 6], [906, 7],
+                    [907, 8], [908, 9], [909, 10], [910, 11],
+                ],
+                'cycleEnd': 1440,
+            }
+            for date in ('2026-06-11', '2026-06-12', '2026-06-13')
+        ],
+    }
+
+
 def _terminal_boundary_lagna_fixture():
     """Use the exact public boundary shape with the pinned browser feed dates.
 
@@ -578,6 +599,9 @@ _VIDYARAMBHA_CHART_SCENARIOS = {
     'vidyarambha-hard-fail',
     'vidyarambha-unknown',
 }
+_COURT_CHART_SCENARIOS = {
+    'court-pass', 'court-preference-miss', 'court-hard-fail', 'court-unknown',
+}
 
 
 def _gold_muhurta_planets(scenario, canonical_lagna, gold_template):
@@ -628,6 +652,17 @@ def _vidyarambha_house_overrides(scenario, chart_index):
     return overrides
 
 
+def _court_house_overrides(scenario):
+    houses = {'Guru': 1, 'Kuja': 1, 'Budha': 7, 'Rahu': 2}
+    if scenario == 'court-preference-miss':
+        houses.update({'Guru': 2, 'Kuja': 2, 'Budha': 2})
+    elif scenario == 'court-hard-fail':
+        houses['Shani'] = 6
+    elif scenario == 'court-unknown':
+        houses.update({'Surya': 12, 'Chandra': 6})
+    return houses
+
+
 def _muhurta_house_overrides(scenario, chart_index):
     if scenario in _ANNAPRASANA_CHART_SCENARIOS:
         return _annaprasana_house_overrides(scenario)
@@ -646,6 +681,8 @@ def _muhurta_house_overrides(scenario, chart_index):
         return {'Chandra': 1 if chart_index % 2 == 0 else 2, 'Shukra': 1}
     if scenario in _VIDYARAMBHA_CHART_SCENARIOS:
         return _vidyarambha_house_overrides(scenario, chart_index)
+    if scenario in _COURT_CHART_SCENARIOS:
+        return _court_house_overrides(scenario)
     return {}
 
 
@@ -681,6 +718,9 @@ def _muhurta_planets(
             'degree'] = 10.0
         next(item for item in planets if item['name'] == 'Chandra')[
             'degree'] = 10.0
+    if scenario == 'court-unknown':
+        next(item for item in planets if item['name'] == 'Surya')['degree'] = 10.0
+        next(item for item in planets if item['name'] == 'Chandra')['degree'] = 10.0
     return planets
 
 
@@ -832,6 +872,8 @@ def _install_muhurta_routes(
     page, docs_server, scenario, lagna_fixture=None,
 ):
     """Intercept every mutable Muhurtam dependency for a built-site test."""
+    if scenario in _COURT_CHART_SCENARIOS and lagna_fixture is None:
+        lagna_fixture = _court_lagna_fixture()
     calls = []
     feed_text = (
         _karnavedha_bounded_feed_fixture()
@@ -2243,7 +2285,7 @@ def _muhurta_share_text(page, result):
 
 def _assert_positive_muhurta_result(_page, result, status, calls, _scenario):
     assert 'Exact chart screening applied' in status.inner_text()
-    assert result.locator('.mu-slot').count() > 0
+    assert result.locator('.mu-slot').count() > 0, result.inner_text()
     assert result.locator('.mu-rg-computed').count() > 0
     assert result.locator('.mu-chart-rule--pass').count() > 0
     assert calls
@@ -2307,7 +2349,7 @@ def _assert_gold_share_text(share_text, result):
 
 def _assert_gold_muhurta_result(page, result, status, calls, scenario):
     assert 'chart review remains manual' not in status.inner_text()
-    assert result.locator('.mu-slot').count() > 0
+    assert result.locator('.mu-slot').count() > 0, result.inner_text()
     computed = result.locator('.mu-rg-computed').first
     assert computed.count() == 1
     computed_text = computed.text_content()
@@ -2388,6 +2430,43 @@ def _assert_annaprasana_muhurta_result(page, result, status, calls, scenario):
         assert 'practitioner review' not in share_text
 
 
+def _assert_court_muhurta_result(page, result, status, calls, scenario):
+    assert calls
+    if scenario == 'court-hard-fail':
+        assert 'failed an exact chart requirement' in result.inner_text()
+        assert result.locator('.mu-slot').count() == 0
+        assert 'No clear slots found' in result.inner_text()
+        return
+
+    assert result.locator('.mu-slot').count() > 0, result.inner_text()
+    computed = result.locator('.mu-rg-computed').first
+    assert computed.count() == 1
+    assert computed.locator('.mu-chart-rule').count() == 5
+    computed_text = computed.text_content()
+    assert 'physical PDF p. 71' in computed_text
+    assert 'Product ranking policy' in computed_text
+    assert result.locator('.mu-rg-validation').count() == 0
+    if scenario == 'court-pass':
+        assert 'Court filing chart assessment complete' in status.inner_text()
+        assert 'Information pattern present · no ranking effect' in computed_text
+        assert result.locator('.mu-chart-disposition--review').count() == 0
+    elif scenario == 'court-preference-miss':
+        assert 'Preference not present · no penalty' in computed_text
+        assert 'Information pattern not continuous · no adverse inference' in (
+            computed_text
+        )
+        assert result.locator('.mu-chart-disposition--review').count() == 0
+    else:
+        assert 'unresolved' in status.inner_text()
+        assert 'Required check could not be verified' in computed_text
+        assert result.locator('.mu-chart-disposition--review').count() > 0
+
+    share_text = _muhurta_share_text(page, result)
+    assert 'Court filing v1 assesses five Raman clauses' in share_text
+    assert 'It does not predict a legal outcome.' in share_text
+    assert 'Private' not in share_text
+
+
 def _assert_failure_muhurta_result(_page, result, _status, calls, _scenario):
     assert 'failed an exact chart requirement' in result.inner_text()
     assert 'No clear slots found' in result.inner_text()
@@ -2455,6 +2534,10 @@ _MUHURTA_SCENARIO_ASSERTIONS = {
     'annaprasana-unknown': _assert_annaprasana_muhurta_result,
     'annaprasana-unsupported': _assert_unsupported_muhurta_result,
     'annaprasana-offline': _assert_unavailable_muhurta_result,
+    'court-pass': _assert_court_muhurta_result,
+    'court-preference-miss': _assert_court_muhurta_result,
+    'court-hard-fail': _assert_court_muhurta_result,
+    'court-unknown': _assert_court_muhurta_result,
     'karnavedha-unsupported': _assert_unsupported_muhurta_result,
     'karnavedha-offline': _assert_unavailable_muhurta_result,
     'failure': _assert_failure_muhurta_result,
@@ -2509,6 +2592,10 @@ def _assert_muhurta_result_common(
             'surya-siddhanta', 'unsupported-system',
         ),
         ('annaprasana-offline', 'annaprasana', 'drik', 'unavailable'),
+        ('court-pass', 'court', 'drik', 'screened'),
+        ('court-preference-miss', 'court', 'drik', 'screened'),
+        ('court-hard-fail', 'court', 'drik', 'screened'),
+        ('court-unknown', 'court', 'drik', 'screened'),
         (
             'karnavedha-unsupported', 'karnavedha',
             'surya-siddhanta', 'unsupported-system',

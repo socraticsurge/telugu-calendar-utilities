@@ -26,8 +26,9 @@
       "activity": "court",
       "effect": "reject",
       "effect_claim_id": "muhurta.court.effect_policy_v1",
-      "status": "specified_unwired",
-      "delivery_issue": 397
+      "status": "implemented",
+      "delivery_issue": 397,
+      "integration_issue": 400
     }
   },
   "base_planets": [

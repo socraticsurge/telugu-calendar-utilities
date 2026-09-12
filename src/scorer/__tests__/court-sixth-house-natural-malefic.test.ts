@@ -40,7 +40,7 @@ describe('Court sixth-house natural-malefic exclusion', () => {
     expect(oracle.source_golden).toBe(false);
     expect(COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA).toEqual(oracle.metadata);
     expect(COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA.event_policy.status)
-      .toBe('specified_unwired');
+      .toBe('implemented');
   });
 
   test.each(oracle.snapshot_cases)('$id', (caseData) => {

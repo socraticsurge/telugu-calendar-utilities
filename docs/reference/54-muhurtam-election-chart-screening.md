@@ -7,8 +7,8 @@ questions without collapsing them into one opaque score:
 1. Which candidate windows survive the existing day, slot and personal gates?
 2. Which source statements can be expressed as deterministic predicates,
    either directly or through a named, versioned interpretation convention?
-3. Does each predicate reject a window, qualify its displayed tier, or supply
-   tie-break evidence?
+3. Does each predicate reject a window, qualify its displayed tier, supply
+   tie-break evidence, or report non-ranking information?
 4. Which source statements or chart facts remain genuinely unresolved after
    that computation?
 
@@ -48,7 +48,7 @@ flowchart LR
     LAGNA["Validated local Lagna map<br/>selected city and minute"]
     PROJECT["Local Whole Sign projection<br/>planet Rashi relative to Lagna"]
     RULES["Generated deterministic rules<br/>evaluated in browser"]
-    OUT["Reject failures<br/>cap unmet qualifications<br/>tie-break preferences<br/>show unknowns"]
+    OUT["Reject failures<br/>cap unmet qualifications<br/>tie-break preferences<br/>show information and unknowns"]
 
     ROLE --> BASE
     BASE --> BATCH --> GATE --> SIDE --> GATE --> PROJECT --> RULES --> OUT
@@ -279,8 +279,8 @@ separate artifact-shape behavior.
 The canonical table is
 `telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES`.
 `tools/export_election_chart_rules.py` projects it to the browser; the generated
-JSON is not an independent authority. There are 32 deterministic predicates
-across 15 activity profiles.
+JSON is not an independent authority. There are 37 deterministic predicates
+across 16 activity profiles.
 
 The reusable source-to-computation meanings are separately owned by
 `docs/reference/election-chart-interpretations.json` and exported to
@@ -291,7 +291,9 @@ meanings without changing this protected rule artifact. See
 
 `Reject` means a failed predicate removes the window. `Prefer` means a passing
 predicate is tie-break evidence only; it adds no raw score and its absence does
-not reject the window. `Qualify` means a positive event condition must pass
+not reject the window. `Inform` means the outcome is displayed but never
+changes score, rank, tier, admission or a real-world prediction. `Qualify`
+means a positive event condition must pass
 across the sampled window for an `Excellent` label. A known failure retains the
 window, leaves its raw score unchanged and makes `Good` the maximum displayed
 tier; it is a conclusive event-specific condition miss, not a
@@ -316,7 +318,7 @@ appearing in the same result.
 
 The same Python module owns `ELECTION_CHART_MANUAL_REMAINDERS` and the
 versioned `ELECTION_CHART_COMPLETE_ASSESSORS` declaration. Gold, Annaprasana,
-and Karnavedha are the currently declared complete event-specific assessors.
+Karnavedha and Court are the currently declared complete event-specific assessors.
 Aksharabhyasa has no Chapter VIII event-clause remainder, but it is
 intentionally not declared complete because the shared general election-chart
 baseline remains provisional. The browser may name an assessor complete only
@@ -332,7 +334,8 @@ Python/MCP results retain their original full `manual_checks` disclosure.
 Let `H(p)` be the locally recomputed Whole Sign house of graha `p` using the
 validated selected-city Lagna frame, `R(p)` its Rasi, `N(p)` its derived
 Navamsa, `G` the complete nine-graha set, and `S` a listed set of houses. The
-eight supported predicate kinds are exactly:
+shared evaluator supports the eight reusable predicate kinds below plus five
+Court-scoped compositions:
 
 ```text
 house_empty(h)                = every p in G has H(p) != h
@@ -344,6 +347,11 @@ planet_well_situated(p, C)     = no adverse factor selected by convention C
 planet_receives_full_aspect(p) = at least one listed classical graha casts a
                                   full whole-sign Graha Drishti to R(p)
 house_free_of_natural_malefics = no configured natural malefic occupies house 1
+court_mesha_d1_d9              = canonical Mesha D1 or guarded Mesha D9
+court_guru_trikona             = Guru in Whole Sign house 1, 5 or 9
+court_no_natural_malefic_h6    = no resolved natural malefic in house 6
+court_lagna_sixth_lord_separation = derived lords are six Rasis apart
+court_peace_pattern            = registered benefic Kendra-or-aspect pattern
 ```
 
 The first five predicates are direct configured occupancy tests. The sixth
@@ -357,6 +365,11 @@ these predicates.
 
 | Activity | Rule ID | Deterministic predicate | Effect | Source claim |
 |---|---|---|---|---|
+| Court filing | `court.mesha-lagna-or-navamsa` | Canonical local D1 is Mesha, or an agreeing sidecar Lagna has guarded Mesha D9 | Reject | `muhurta.court.filing_lawsuit` |
+| Court filing | `court.guru-trikona` | Guru is in house 1, 5 or 9 | Prefer | `muhurta.court.filing_lawsuit` |
+| Court filing | `court.house-6-without-natural-malefic` | No resolved natural malefic occupies house 6 | Reject | `muhurta.court.filing_lawsuit` |
+| Court filing | `court.lagna-sixth-lords-max-separated` | The Lagna and sixth-house lords are six Rasis apart | Prefer | `muhurta.court.filing_lawsuit` |
+| Court filing | `court.peace-benefic-pattern` | The registered benefic Kendra-or-odd-Rasi full-aspect pattern is continuous | Inform | `muhurta.court.filing_lawsuit` |
 | Wedding | `wedding.house-7-vacant` | None of the nine grahas occupies house 7 | Reject | `muhurta.wedding` |
 | Wedding | `wedding.kuja-not-8` | Kuja is not in house 8 | Reject | `muhurta.wedding` |
 | Wedding | `wedding.shukra-not-6` | Shukra is not in house 6 | Reject | `muhurta.wedding` |
@@ -554,12 +567,12 @@ future.
 
 The table below defines the **chart-predicate** window combiner:
 
-| Condition across every sampled state | Reject predicate | Qualify predicate | Prefer predicate |
-|---|---|---|---|
-| Pass at every sample | `pass`; retain | `pass`; retain without a qualification cap | `pass`; one tie-break pass |
-| At least one known failure | `fail`; remove; mark unstable if statuses differ | `fail`; retain and cap below Excellent; mark unstable if statuses differ | `fail` only when every sample fails; retain with no preference |
-| No failure, but at least one `unknown` | `unknown`; retain for review | `unknown`; retain for review and cap below Excellent | `unknown`; retain for review with no preference |
-| Known preference statuses differ | Not applicable | Not applicable | `unknown`; retain for review with no preference |
+| Condition across every sampled state | Reject predicate | Qualify predicate | Prefer predicate | Inform predicate |
+|---|---|---|---|---|
+| Pass at every sample | `pass`; retain | `pass`; retain without a qualification cap | `pass`; one tie-break pass | `pass`; display only |
+| At least one known failure | `fail`; remove; mark unstable if statuses differ | `fail`; retain and cap below Excellent; mark unstable if statuses differ | `fail` only when every sample fails; retain with no preference | `fail`; display absence without adverse inference |
+| No failure, but at least one `unknown` | `unknown`; retain for review | `unknown`; retain for review and cap below Excellent | `unknown`; retain for review with no preference | `unknown`; retain for review |
+| Known non-reject statuses differ | Not applicable | Not applicable | `unknown`; retain for review with no preference | Resolved `fail`; the positive information pattern was not continuous |
 
 A complete, valid batch is a precondition for this table. A malformed or
 incomplete network response does not become a retained `unknown`; that batch is
@@ -663,6 +676,7 @@ Python/MCP slot orchestrator applies no other candidate-time chart evaluator.
 
 | Activity | Automated here | Still requires practitioner or real-world review |
 |---|---|---|
+| Court filing | Mesha D1-or-guarded-D9 gate; Guru-Trikona preference; natural-malefic-free sixth-house gate; maximum Lagna/sixth-lord separation preference; non-ranking peace-pattern information | No residual p. 67 chart clause after a complete valid Drik screen. Filing scope, legal deadlines, procedure, counsel, evidence and safety remain real-world responsibilities; no legal outcome is predicted. |
 | Wedding | Vacant 7th; Kuja outside 8th; Shukra outside 6th | Nakshatra Pada, lineage-specific Mrityu Yoga, malefics around Lagna, Chandra association, fortification Yogas, both partners' compatibility/Tarabala/Chandrabala/Panchaka, consent |
 | Annaprasana | Vacant 10th; Budha/Kuja/Shukra exclusions; Budha/Guru/Shukra-in-Lagna preference; natural-malefic-free Lagna under the named v1 convention | No residual event-chart clause after a complete, valid Drik screen; the age-month remains an information input outside this chart assessor, and baseline #284 remains open |
 | Karnavedha | One Tithi and one Nakshatra throughout `[local sunrise, local sunset)`; vacant 8th in the candidate chart | Child-age guidance, consent, sterile technique and aftercare; Python/MCP apply the day rules but do not call the candidate-chart service |
@@ -707,8 +721,8 @@ choice.
 
 The complete machine-readable crosswalk is published as
 [Muhurtam rule crosswalk JSON](muhurtam-rule-crosswalk.json). It contains all
-328 configured prerequisite rows across the 30 browser activities: 177
-Panchangam predicates, five personal predicates, 32 election-chart predicates
+333 configured prerequisite rows across the 30 browser activities: 177
+Panchangam predicates, five personal predicates, 37 election-chart predicates
 and 114 manual display rows. The original Gold row, three Annaprasana rows and
 the Karnavedha vacant-eighth row remain in this exhaustive source inventory
 because non-Drik, unavailable and Python/MCP fallbacks still disclose them;
@@ -737,6 +751,7 @@ the readable criterion-by-criterion audit.
 
 | Claim(s) used by chart or personal screening | Registered locator | Detailed audit |
 |---|---|---|
+| `muhurta.court.filing_lawsuit`; `muhurta.court.effect_policy_v1` | B. V. Raman, *Muhurtha*, Chapter XVII, “Filing law-suits,” Chistabo derivative internal printed p. 67 (physical PDF p. 71); separate registered product-effects policy | [Court filing](34-court-evidence-audit.md) |
 | `muhurta.wedding` | B. V. Raman, *Muhurtha*, Chapter IX, Chistabo derivative internal printed pp. 41–42 (physical PDF pp. 45–46) | [Wedding](31-wedding-evidence-audit.md) |
 | `muhurta.annaprasana`; `muhurta.annaprasana.raman_transcription_chart` | B. V. Raman, *Muhurtha*, Chapter VIII, inspected in the 2020 Chistabo derivative: profile on internal printed pp. 22–23 (physical PDF pp. 25–26), with all six chart clauses on internal printed p. 22 (physical PDF p. 25) | [Annaprasana](18-annaprasana-profile.md) |
 | `muhurta.annaprasana.source_divergence` | *Kalaprakasika* Chapter III, printed p. 34; *Muhurta Chintamani* verse 18, printed p. 178 with commentary printed p. 180 | [Annaprasana](18-annaprasana-profile.md) |
@@ -806,7 +821,7 @@ HTTP 200. Producer story
 is closed and Done. The browser validator remains strict; release of the
 producer fix is evidence for keeping, not relaxing, those invariants.
 
-The Python table is the source of truth for the 32 chart predicates. The
+The Python table is the source of truth for the 37 chart predicates. The
 Python personal module and TypeScript mirror carry the same five personal rule
 IDs, effects, locators, input evidence and all-sampled-state result semantics, with
 fixture parity tests. The TypeScript chart evaluator is a browser mirror and
@@ -869,6 +884,15 @@ mandatory removal with observed evidence, and phase-boundary unknown at both
 1440×900 and 390×844. Its own manifest and evidence test bind every image to
 the named scenario, viewport, expected copy, and checksum.
 
+The Court review-evidence directory at
+`docs/screenshots/court-chart-assessor-2026-09-11/` contains eight captures:
+complete pass, resolved preference miss, mandatory removal, and a visibly
+incomplete calculation-boundary result at both 1440×900 and 390×844. The
+fixture uses one stable Mesha interval so the UI states isolate Court rule
+semantics rather than synthetic Lagna transitions. Its manifest binds every
+image to the scenario, viewport, expected state/copy, and SHA-256; no live
+service is called.
+
 The earlier `muhurtam-chart-screening-2026-08-29/` directory remains as an
 immutable historical record. Its Gold manual-only image predates this
 assessor and is not evidence for the current runtime state.
@@ -880,6 +904,9 @@ python tools/capture_muhurta_chart_screenshots.py --dist dist
 
 python tools/capture_muhurta_chart_screenshots.py \
   --dist dist --annaprasana-only
+
+python tools/capture_muhurta_chart_screenshots.py \
+  --dist dist --court-only
 ```
 
 ## Reproduce and verify

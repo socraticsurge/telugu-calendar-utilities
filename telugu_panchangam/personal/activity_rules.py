@@ -1070,9 +1070,10 @@ ACTIVITY_RULES: dict[str, dict] = {
                           _NAKSHATRA_UTTARA_PHALGUNI, 'Hasta', 'Chitra', 'Anuradha',
                           'Dhanishtha', 'Revati',
                       ],
-                      # Raman also admits a non-Mesha Lagna when its Navamsa
-                      # is Mesha. Navamsa is not available on every surface,
-                      # so automation conservatively admits Mesha Lagna only.
+                      # The Python/MCP finder has no exact-chart sidecar, so it
+                      # keeps the conservative D1 gate. The browser can retain
+                      # non-Mesha D1 provisionally and resolve the D9 arm before
+                      # showing the result.
                       'allowed_lagnas': ['Mesha'],
                       'manual_checks': [
                           'Scope: this election is for filing or initiating '
@@ -1084,15 +1085,17 @@ ACTIVITY_RULES: dict[str, dict] = {
                           + 'Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, '
                           + 'Pournami and Amavasya from the same inspected '
                           + 'derivative.',
-                          'Lagna/Navamsa: automation admits Mesha Lagna. A '
-                          + 'practitioner may evaluate the source\'s alternative '
-                          + 'of a non-Mesha Lagna with Mesha Navamsa.',
+                          'Lagna/Navamsa: a complete Drik browser screen '
+                          + 'requires Mesha in the canonical D1 or guarded '
+                          + 'Lagna Navamsa. Other surfaces retain the '
+                          + 'conservative Mesha-D1 gate.',
                           'Election chart: strengthen Lagna with Guru in a '
-                          + 'Trikona; place no malefic in the 6th; keep the '
-                          + 'Lagna and 6th lords well separated.',
-                          'Raman says benefics in Kendras, or benefic aspects '
-                          + 'from male Rasis, indicate peace between the '
-                          + 'parties; this is not a promise of legal success.',
+                          + 'Trikona; place no natural malefic in the 6th; '
+                          + 'keep the Lagna and 6th lords maximally separated.',
+                          'Raman says benefics in Kendras, or a benefic in a '
+                          + 'male Rasi receiving a benefic full aspect, '
+                          + 'indicate peace between the parties; this is '
+                          + 'non-ranking information, not a legal prediction.',
                           'Legal deadlines, court rules, counsel, evidence '
                           + 'and personal safety always take precedence over '
                           + 'electional timing.',

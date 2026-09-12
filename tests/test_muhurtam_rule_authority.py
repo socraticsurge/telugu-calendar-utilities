@@ -108,11 +108,14 @@ def test_numeric_and_tier_policy_is_separate_from_predicate_authority():
     policy_effects = ('score_bonus', 'score_penalty', 'tie_break', 'tier_cap')
     for row in rows:
         expects_policy = any(
-            token in row['ranking_effect'] for token in policy_effects)
+            token in row['ranking_effect'] for token in policy_effects
+        ) or row['predicate_class'].startswith('election-chart.court_')
         assert ('decision_policy_claim' in row) is expects_policy
         if expects_policy:
             expected_policy = (
-                'election_chart.gold_qualification_policy_v1'
+                'muhurta.court.effect_policy_v1'
+                if row['predicate_class'].startswith('election-chart.court_')
+                else 'election_chart.gold_qualification_policy_v1'
                 if row['ranking_effect'] == 'post_screen_tier_cap'
                 else (
                     'election_chart.annaprasana.'

@@ -1298,9 +1298,9 @@
       "manual_checks": [
         "Scope: this election is for filing or initiating a lawsuit, not a hearing, response, settlement, appeal or prediction of the case outcome.",
         "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same inspected derivative.",
-        "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
-        "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
-        "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+        "Lagna/Navamsa: a complete Drik browser screen requires Mesha in the canonical D1 or guarded Lagna Navamsa. Other surfaces retain the conservative Mesha-D1 gate.",
+        "Election chart: strengthen Lagna with Guru in a Trikona; place no natural malefic in the 6th; keep the Lagna and 6th lords maximally separated.",
+        "Raman says benefics in Kendras, or a benefic in a male Rasi receiving a benefic full aspect, indicate peace between the parties; this is non-ranking information, not a legal prediction.",
         "Legal deadlines, court rules, counsel, evidence and personal safety always take precedence over electional timing."
       ],
       "manual_prerequisites": true,
@@ -2718,7 +2718,13 @@
           "allowed_lagnas"
         ],
         "personal_rule_ids": [],
-        "election_chart_rule_ids": [],
+        "election_chart_rule_ids": [
+          "court.mesha-lagna-or-navamsa",
+          "court.guru-trikona",
+          "court.house-6-without-natural-malefic",
+          "court.lagna-sixth-lords-max-separated",
+          "court.peace-benefic-pattern"
+        ],
         "manual_checks": [
           {
             "id": "court.manual-1",
@@ -2739,24 +2745,24 @@
           {
             "id": "court.manual-3",
             "source_index": 2,
-            "source_text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
-            "text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
+            "source_text": "Lagna/Navamsa: a complete Drik browser screen requires Mesha in the canonical D1 or guarded Lagna Navamsa. Other surfaces retain the conservative Mesha-D1 gate.",
+            "text": "Lagna/Navamsa: a complete Drik browser screen requires Mesha in the canonical D1 or guarded Lagna Navamsa. Other surfaces retain the conservative Mesha-D1 gate.",
             "class": "manual-only",
             "display_section": "chart"
           },
           {
             "id": "court.manual-4",
             "source_index": 3,
-            "source_text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
-            "text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
+            "source_text": "Election chart: strengthen Lagna with Guru in a Trikona; place no natural malefic in the 6th; keep the Lagna and 6th lords maximally separated.",
+            "text": "Election chart: strengthen Lagna with Guru in a Trikona; place no natural malefic in the 6th; keep the Lagna and 6th lords maximally separated.",
             "class": "manual-only",
             "display_section": "chart"
           },
           {
             "id": "court.manual-5",
             "source_index": 4,
-            "source_text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
-            "text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+            "source_text": "Raman says benefics in Kendras, or a benefic in a male Rasi receiving a benefic full aspect, indicate peace between the parties; this is non-ranking information, not a legal prediction.",
+            "text": "Raman says benefics in Kendras, or a benefic in a male Rasi receiving a benefic full aspect, indicate peace between the parties; this is non-ranking information, not a legal prediction.",
             "class": "manual-only",
             "display_section": "chart"
           },

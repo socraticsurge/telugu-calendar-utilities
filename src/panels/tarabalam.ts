@@ -2086,6 +2086,7 @@ export function muScoreActivityLagna(
   preferLagnaClass,
   lagnaCityData,
   activityLabel: string,
+  allowConditionalAdmission = false,
 ) {
   const reasons = [];
   let score = 0;
@@ -2095,8 +2096,15 @@ export function muScoreActivityLagna(
     reasons.push(`${slotLagna} lagna satisfies required ${requiredLagnaClass} class`);
   }
   if (allowedLagnas.size) {
-    if (!slotLagna || !allowedLagnas.has(slotLagna)) return null;
-    reasons.push(`${slotLagna} lagna is admitted for ${activityLabel}`);
+    if (!slotLagna) return null;
+    if (!allowedLagnas.has(slotLagna)) {
+      if (!allowConditionalAdmission) return null;
+      reasons.push(
+        `${slotLagna} lagna retained provisionally for exact Navamsa assessment`,
+      );
+    } else {
+      reasons.push(`${slotLagna} lagna is admitted for ${activityLabel}`);
+    }
   }
   if (slotLagna && preferLagnas.has(slotLagna)) {
     score += 1;
@@ -2656,6 +2664,7 @@ async function findMuhurta() {
           const activityLagna = muScoreActivityLagna(
             slotLagna, requiredLagnaClass, allowedLagnas, preferLagnas,
             preferLagnaClass, lagnaCityData, activityLabel,
+            activity === 'court' && system === 'drik',
           );
           if (!activityLagna) return;
           score += activityLagna.score;
@@ -2874,6 +2883,11 @@ export function muChartOutcomeLabel(outcome: MuChartOutcomeState): string {
       return 'Indeterminate at calculation boundary · review needed';
     }
     return 'Condition not met · slot retained · raw score unchanged · maximum rating Good';
+  }
+  if (outcome.effect === 'inform') {
+    if (outcome.status === 'pass') return 'Information pattern present · no ranking effect';
+    if (outcome.status === 'unknown') return 'Information pattern could not be verified';
+    return 'Information pattern not continuous · no adverse inference';
   }
   if (outcome.status === 'pass') return 'Preference met · tie-break only';
   if (outcome.status === 'unknown') return 'Preference could not be verified';
@@ -3128,6 +3142,7 @@ export function muChartAssessmentTitle(
       return 'Annaprasana event-specific chart assessment complete';
     }
     if (activity === 'gold') return 'Gold event-specific chart clauses resolved';
+    if (activity === 'court') return 'Court filing chart assessment complete';
   }
   if (activity === 'karnavedha') return 'Karnavedha event checks resolved';
   return 'Exact chart screening applied';
@@ -3159,6 +3174,11 @@ function muResultScopeDetail(activity, chartEnrichment, partialAssessor: boolean
     return muChartAssessorCanClaimComplete(activity, chartEnrichment)
       ? ' · all six Annaprasana event-specific clauses resolved; the general election-chart baseline #284 remains open'
       : ' · all six Annaprasana event-specific clauses attempted; unresolved or bounded outcomes remain review-gated; the general election-chart baseline #284 remains open';
+  }
+  if (activity === 'court') {
+    return muChartAssessorCanClaimComplete(activity, chartEnrichment)
+      ? ' · all five Court filing clauses resolved; two mandatory gates, two score-neutral preferences, and one non-ranking information pattern were evaluated'
+      : ' · all five Court filing clauses attempted; unresolved, boundary-adjacent, or bounded outcomes remain visibly incomplete';
   }
   if (activity === 'karnavedha') {
     if (hasScreeningReview) {
@@ -3547,7 +3567,7 @@ function renderMuhurta() {
     + personalRoleHtml
     + chartRemovalHtml
     + personalRemovalHtml
-    + `<p class="mu-ranking-note">Excellent slots appear before Good ones. Mandatory chart failures remove a slot. A conclusive event-specific qualification miss retains the slot, leaves its raw score unchanged, and sets Good as its maximum rating. A calculation-boundary unknown also retains the slot and sets the same maximum pending review. Source preferences only break ties; they do not inflate the Panchangam score.</p>`
+    + `<p class="mu-ranking-note">Excellent slots appear before Good ones. Mandatory chart failures remove a slot. A conclusive event-specific qualification miss retains the slot, leaves its raw score unchanged, and sets Good as its maximum rating. A calculation-boundary unknown also retains the slot and sets the same maximum pending review. Source preferences only break ties; they do not inflate the Panchangam score. Informational patterns do not change ranking and do not support an adverse prediction when absent.</p>`
     + top.map(renderSlot).join('')
     + droppedHtml
     + `<p class="preview-note" style="margin-top:0.5rem;">Each slot's score is the sum of the (+n)/(-n) bonuses across
@@ -3606,7 +3626,10 @@ function muEventShareScopeLine(activity: string): string | null {
     return 'Annaprasana v1 assesses six event-specific chart clauses; the general election-chart baseline #284 remains open.';
   }
   if (activity === 'karnavedha') {
-    return 'Karnavedha v1 assesses two daylight-limb gates and the vacant-eighth chart clause; the general election-chart baseline is not assessed.';
+      return 'Karnavedha v1 assesses two daylight-limb gates and the vacant-eighth chart clause; the general election-chart baseline is not assessed.';
+  }
+  if (activity === 'court') {
+    return 'Court filing v1 assesses five Raman clauses: two mandatory gates, two score-neutral preferences, and one non-ranking information pattern. It does not predict a legal outcome.';
   }
   return null;
 }

@@ -31,8 +31,9 @@ export const COURT_GURU_TRIKONA_METADATA = {
     id: 'court.guru-trikona',
     activity: 'court',
     effect: 'prefer',
-    status: 'specified_unwired',
+    status: 'implemented',
     delivery_issue: 396,
+    integration_issue: 400,
   },
 } as const;
 
