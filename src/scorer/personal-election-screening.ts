@@ -1,6 +1,7 @@
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../data/rasis';
 
-export type MuhurtamParticipantRole = 'traveller' | 'homeowner' | 'mother' | 'patient';
+export type MuhurtamParticipantRole =
+  | 'traveller' | 'homeowner' | 'mother' | 'patient' | 'primary_borrower';
 export type PersonalRuleStatus = 'pass' | 'fail' | 'unknown';
 export type PersonalRuleEffect = 'reject' | 'prefer';
 
@@ -59,6 +60,7 @@ const LOCATORS = {
   gruhapravesha: "B. V. Raman, Chapter XII, 'House building,' section 'Entering a new house,' inspected in the 2020 Chistabo derivative at internal printed pp. 52-54 (physical PDF pp. 56-58)",
   seemantha: "B. V. Raman, Chapter VII-VIII transition, 'Seemantha,' inspected in the 2020 Chistabo derivative at internal printed pp. 21-22 (physical PDF pp. 24-25)",
   surgery: "B. V. Raman, Chapter XV, 'Surgical Operations,' inspected in the 2020 Chistabo derivative at internal printed pp. 64-65 (physical PDF pp. 68-69)",
+  borrowing_money: "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
 } as const;
 
 const PERSONAL_RULES: Record<string, PersonalRuleDefinition[]> = {
@@ -88,6 +90,12 @@ const PERSONAL_RULES: Record<string, PersonalRuleDefinition[]> = {
     ruleId: 'personal.surgery.chandra-outside-janma-rashi',
     label: "Chandra is outside the patient's Janma Rashi",
     effect: 'reject', sourceClaim: 'muhurta.surgery', sourceLocator: LOCATORS.surgery,
+  }],
+  borrowing_money: [{
+    ruleId: 'personal.borrowing.primary-borrower-janma-nakshatra',
+    label: "Candidate Nakshatra avoids the primary borrower's Janma Nakshatra",
+    effect: 'reject', sourceClaim: 'muhurta.borrowing_money',
+    sourceLocator: LOCATORS.borrowing_money,
   }],
 };
 
@@ -119,6 +127,13 @@ const ROLE_BY_ACTIVITY: Record<string, MuhurtamRoleRequirement> = {
     prompt: 'Whose birth chart should govern the surgery checks?',
     cardinality: 1, required: true,
     ruleIds: PERSONAL_RULES.surgery.map(rule => rule.ruleId),
+  },
+  borrowing_money: {
+    role: 'primary_borrower',
+    label: 'Primary borrower',
+    prompt: 'Whose Janma Nakshatra should govern this borrowing search?',
+    cardinality: 1, required: true,
+    ruleIds: PERSONAL_RULES.borrowing_money.map(rule => rule.ruleId),
   },
 };
 
@@ -327,6 +342,38 @@ function evaluateSurgeryRule(
   );
 }
 
+function evaluateBorrowingRule(
+  result: PersonalElectionScreening,
+  participant: PersonalElectionParticipant,
+  facts: PersonalElectionFacts,
+): void {
+  const rule = PERSONAL_RULES.borrowing_money[0];
+  const janmaNakshatra = participant.nakshatra;
+  const candidateNakshatra = facts.nakshatra;
+  const resolved = Boolean(
+    janmaNakshatra
+    && NAKSHATRA_NAMES.includes(janmaNakshatra)
+    && NAKSHATRA_NAMES.includes(candidateNakshatra),
+  );
+  const excluded = resolved && janmaNakshatra === candidateNakshatra;
+  const status: PersonalRuleStatus = !resolved
+    ? 'unknown'
+    : excluded ? 'fail' : 'pass';
+  addOutcome(
+    result, rule, status,
+    {
+      primaryBorrowerId: participant.id,
+      janmaNakshatra,
+      candidateNakshatra,
+    },
+    !resolved
+      ? `Borrowing screening needs the primary borrower's valid Janma Nakshatra and the candidate Nakshatra.`
+      : excluded
+        ? `${candidateNakshatra} is ${participant.name}'s Janma Nakshatra; Raman excludes it for borrowing.`
+        : `${candidateNakshatra} is outside ${participant.name}'s Janma Nakshatra.`,
+  );
+}
+
 export function evaluatePersonalElectionRules(
   activity: string,
   participant: PersonalElectionParticipant | null,
@@ -351,7 +398,8 @@ export function evaluatePersonalElectionRules(
   if (activity === 'travel') evaluateTravelRules(result, participant, facts);
   else if (activity === 'gruhapravesha') evaluateGruhapraveshaRule(result, participant, facts);
   else if (activity === 'seemantha') evaluateSeemanthaRule(result, participant, facts);
-  else evaluateSurgeryRule(result, participant, facts);
+  else if (activity === 'surgery') evaluateSurgeryRule(result, participant, facts);
+  else evaluateBorrowingRule(result, participant, facts);
   return result;
 }
 

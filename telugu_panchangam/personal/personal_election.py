@@ -34,6 +34,10 @@ LOCATORS = {
         '2020 Chistabo derivative at internal printed pp. 64-65 '
         '(physical PDF pp. 68-69)'
     ),
+    'borrowing_money': (
+        "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 "
+        'Chistabo derivative at internal printed p. 45 (physical PDF p. 49)'
+    ),
 }
 
 PERSONAL_ELECTION_RULES = {
@@ -73,6 +77,14 @@ PERSONAL_ELECTION_RULES = {
             'reject',
             'muhurta.surgery',
             LOCATORS['surgery'],
+        ),
+    ),
+    'borrowing_money': (
+        (
+            'personal.borrowing.primary-borrower-janma-nakshatra',
+            'reject',
+            'muhurta.borrowing_money',
+            LOCATORS['borrowing_money'],
         ),
     ),
 }
@@ -234,11 +246,41 @@ def _surgery_result(participant: Mapping[str, Any], facts: Mapping[str, Any]) ->
     )
 
 
+def _borrowing_result(
+    participant: Mapping[str, Any], facts: Mapping[str, Any]
+) -> dict:
+    janma_nakshatra = participant.get('nakshatra')
+    candidate_nakshatra = facts.get('nakshatra')
+    status = 'unknown'
+    if (
+        janma_nakshatra in NAKSHATRA_NAMES
+        and candidate_nakshatra in NAKSHATRA_NAMES
+    ):
+        status = (
+            'fail' if janma_nakshatra == candidate_nakshatra else 'pass'
+        )
+    return _result(
+        [
+            _outcome(
+                'borrowing_money',
+                0,
+                status,
+                {
+                    'primary_borrower_id': participant.get('id'),
+                    'janma_nakshatra': janma_nakshatra,
+                    'candidate_nakshatra': candidate_nakshatra,
+                },
+            )
+        ],
+    )
+
+
 _ACTIVITY_EVALUATORS = {
     'travel': _travel_result,
     'gruhapravesha': _gruhapravesha_result,
     'seemantha': _seemantha_result,
     'surgery': _surgery_result,
+    'borrowing_money': _borrowing_result,
 }
 
 

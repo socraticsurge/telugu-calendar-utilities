@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "source": "telugu_panchangam.personal.election_chart_rules.ELECTION_CHART_RULES",
   "house_system": "whole_sign",
   "node_convention": "mean",
@@ -23,6 +23,13 @@
         "election_chart.benefic_rasi_lord_nature_policy_v1",
         "election_chart.natural_graha_nature.phaladeepika_2_27",
         "election_chart.dignity.phaladeepika_1_6"
+      ]
+    },
+    "same-rasi-distributive-conjunction-v1": {
+      "label": "Same-Rasi distributive Chandra conjunction v1",
+      "formula": "R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani); either equality fails, both resolved inequalities pass, and no degree orb is used.",
+      "method_claims": [
+        "election_chart.same_rasi_distributive_conjunction_policy_v1"
       ]
     },
     "court-canonical-local-d1-sidecar-d9-v1": {
@@ -140,9 +147,27 @@
     "gold",
     "annaprasana",
     "karnavedha",
-    "court"
+    "court",
+    "borrowing_money"
   ],
   "rules": {
+    "borrowing_money": [
+      {
+        "id": "borrowing.same-rasi-chandra-kuja-shani",
+        "label": "Chandra is not in the same Rasi as Kuja or Shani",
+        "kind": "same_rasi_chandra_conjunction",
+        "effect": "reject",
+        "source_claim": "muhurta.borrowing_money",
+        "source_locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
+        "convention_id": "same-rasi-distributive-conjunction-v1",
+        "convention_label": "Same-Rasi distributive Chandra conjunction v1",
+        "formula": "R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani); either equality fails, both resolved inequalities pass, and no degree orb is used.",
+        "method_claims": [
+          "election_chart.same_rasi_distributive_conjunction_policy_v1"
+        ],
+        "decision_policy_claim": "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1"
+      }
+    ],
     "court": [
       {
         "id": "court.mesha-lagna-or-navamsa",
@@ -744,6 +769,7 @@
     ]
   },
   "manual_remainders": {
+    "borrowing_money": [],
     "court": [],
     "wedding": [
       "Assess malefic occupancy or hemming around Lagna and any Chandra-Graha association.",

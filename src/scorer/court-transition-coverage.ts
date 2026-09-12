@@ -1,6 +1,9 @@
 import type { ElectionChartSnapshot } from '../lib/election-chart-api';
 import { RASI_NAMES } from '../data/rasis';
-import type { CourtTransitionCoverage } from './election-chart-screening';
+import type {
+  BorrowingTransitionCoverage,
+  CourtTransitionCoverage,
+} from './election-chart-screening';
 
 const MAX_SAMPLE_GAP_MINUTES = 10;
 const MAX_GRAHA_MOTION_DEGREES_PER_DAY = 24;
@@ -132,6 +135,19 @@ export function inferCourtTransitionCoverage(
     lagnaLordRasiTransitionsComplete: grahaRasiTransitionsComplete,
     sixthLordRasiTransitionsComplete: grahaRasiTransitionsComplete,
     fullAspectTransitionsComplete: grahaRasiTransitionsComplete,
+    budgetExhausted: false,
+  };
+}
+
+/** Infer fail-closed Rasi continuity for the Borrowing conjunction rule. */
+export function inferBorrowingTransitionCoverage(
+  charts: readonly ElectionChartSnapshot[],
+): BorrowingTransitionCoverage {
+  return {
+    rasiTransitionsComplete: rasiCoverage(
+      charts,
+      new Set(['Chandra', 'Kuja', 'Shani']),
+    ),
     budgetExhausted: false,
   };
 }

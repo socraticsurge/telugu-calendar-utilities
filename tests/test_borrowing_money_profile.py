@@ -10,7 +10,11 @@ from telugu_panchangam.personal.muhurta import day_slots
 
 ROOT = Path(__file__).parents[1]
 CLAIM_ID = 'muhurta.borrowing_money'
-DIVERGENCE_ID = 'muhurta.borrowing.chintamani_divergence'
+RELATED_CLAIM_IDS = [
+    'muhurta.borrowing.chintamani_lineage',
+    'muhurta.borrowing.drik_published_practice_2026_09',
+    'muhurta.borrowing.purpose_interpretation_v1',
+]
 HYDERABAD = next(city for city in CITIES if city.name == 'Hyderabad')
 ENGINE = DrikGanitaEngine()
 
@@ -22,7 +26,7 @@ def _day(year: int, month: int, day: int):
 def test_borrowing_profile_matches_raman_nakshatra_prohibitions():
     rules = ACTIVITY_RULES['borrowing_money']
     assert rules['source_claim'] == CLAIM_ID
-    assert rules['related_claims'] == [DIVERGENCE_ID]
+    assert rules['related_claims'] == RELATED_CLAIM_IDS
     assert rules['manual_prerequisites'] is True
     assert rules['avoid_nakshatras'] == [
         'Krittika', 'Moola', 'Punarvasu', 'Dhanishtha']
@@ -65,16 +69,23 @@ def test_claims_and_product_surfaces_publish_the_same_profile():
         'BVR-MUHURTHA-1993',
         'BVR-MUHURTHA-CHISTABO-2020',
     ]
-    divergence = next(
-        item for item in ledger['claims'] if item['id'] == DIVERGENCE_ID)
-    assert divergence['verification_state'] == 'contradicted'
-    assert divergence['source_ids'] == ['MC-HINDI-IA']
+    claims = {item['id']: item for item in ledger['claims']}
+    assert claims['muhurta.borrowing.chintamani_divergence'][
+        'verification_state'] == 'verified'
+    assert claims['muhurta.borrowing.chintamani_lineage'][
+        'verification_state'] == 'verified'
+    assert claims['muhurta.borrowing.chintamani_lineage'][
+        'source_ids'] == ['MC-HINDI-IA']
+    assert claims['muhurta.borrowing.drik_published_practice_2026_09'][
+        'verification_state'] == 'verified'
+    assert claims['muhurta.borrowing.purpose_interpretation_v1'][
+        'verification_state'] == 'heuristic'
 
     result = json.loads(tool_find_muhurta(
         '2026-01-01', days=1, activity='borrowing_money', city='Hyderabad'))
     profile = result['activity_profile']
     assert profile['source_claim'] == CLAIM_ID
-    assert profile['related_claims'] == [DIVERGENCE_ID]
+    assert profile['related_claims'] == RELATED_CLAIM_IDS
     assert profile['automated_constraints']['avoid_janma_nakshatra'] is True
 
     browser = json.loads(

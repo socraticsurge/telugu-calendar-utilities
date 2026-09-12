@@ -41,18 +41,18 @@ def _actual(outcome):
     return {"status": outcome.status, "evidence": list(outcome.evidence)}
 
 
-def test_source_convention_and_unwired_event_policy_metadata_match_oracle():
+def test_source_convention_and_implemented_event_policy_metadata_match_oracle():
     assert SAME_RASI_CONJUNCTION_METADATA == ORACLE["metadata"]
     assert (
         SAME_RASI_CONJUNCTION_METADATA["source_statement"]["claim_id"]
         != (SAME_RASI_CONJUNCTION_METADATA["convention"]["method_claim_id"])
     )
     assert SAME_RASI_CONJUNCTION_METADATA["event_policy"]["status"] == (
-        "specified_unwired"
+        "implemented"
     )
 
 
-def test_registry_and_provenance_record_implemented_but_unwired_boundary():
+def test_registry_and_provenance_record_implemented_event_boundary():
     registry = json.loads(
         (ROOT / "docs/reference/election-chart-interpretations.json").read_text(
             encoding="utf-8"
@@ -71,7 +71,7 @@ def test_registry_and_provenance_record_implemented_but_unwired_boundary():
         SAME_RASI_CONJUNCTION_METADATA["event_policy"]["decision_claim_id"]
     ]
     assert entry["implementation_status"] == "implemented"
-    assert entry["event_wiring_status"] == "specified_unwired"
+    assert entry["event_wiring_status"] == "implemented"
     assert set(entry["implementation"]) == {
         "telugu_panchangam/personal/election_assessors/conjunction.py",
         "src/scorer/election-assessors/conjunction.ts",

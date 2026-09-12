@@ -22,6 +22,10 @@ from .election_assessors.court import (
     evaluate_court_peace_pattern,
     evaluate_court_sixth_house_natural_malefic,
 )
+from .election_assessors.conjunction import (
+    aggregate_same_rasi_conjunction_window,
+    evaluate_same_rasi_chandra_conjunction,
+)
 from .election_assessors.event_admission import planet_houses, planet_positions
 from .election_assessors.primitives import (
     GOLD_MAX_SAMPLE_GAP_MINUTES,
@@ -57,6 +61,8 @@ def _primitive_result(
         return evaluate_all_planets_in_houses(
             rule, houses, house_frame_uncertain=house_frame_uncertain
         )
+    if kind == 'same_rasi_chandra_conjunction':
+        return evaluate_same_rasi_chandra_conjunction(positions)
     return None
 
 
@@ -157,6 +163,11 @@ def _evaluate_rule(
     supported_system: bool = True,
 ) -> PrimitiveOutcome:
     chart = chart or {}
+    if not supported_system and rule.get('kind') == 'same_rasi_chandra_conjunction':
+        return PrimitiveOutcome(
+            'unknown',
+            ('Borrowing chart screening is available only for Drik/Lahiri; systems are not blended.',),
+        )
     court_evaluators = {
         'court_mesha_d1_d9': lambda: evaluate_court_mesha_d1_d9(
             chart,
@@ -576,6 +587,41 @@ def _court_window_summary(
     return _summary(outcomes, stable=stable)
 
 
+def _borrowing_window_summary(
+    evaluations: list[dict],
+    coverage: Mapping[str, Any],
+) -> dict:
+    first_item = evaluations[0]['outcomes'][0]
+    samples = _court_sample_outcomes(first_item, evaluations)
+    result = aggregate_same_rasi_conjunction_window(
+        samples,
+        transition_complete=bool(coverage.get('rasi_transitions_complete')),
+        budget_exhausted=bool(coverage.get('budget_exhausted')),
+    )
+    outcome = _outcome(
+        {
+            'id': first_item['rule_id'],
+            'label': first_item['label'],
+            'effect': first_item['effect'],
+            'source_claim': first_item['source_claim'],
+            'source_locator': first_item['source_locator'],
+            **{
+                key: first_item[key]
+                for key in (
+                    'convention_id', 'convention_label', 'formula',
+                    'method_claims', 'decision_policy_claim',
+                )
+                if key in first_item
+            },
+        },
+        result,
+    )
+    stable = result.status != 'unknown' and all(
+        sample.status == samples[0].status for sample in samples
+    )
+    return _summary([outcome], stable=stable)
+
+
 def evaluate_election_snapshots(
     activity: str,
     charts: list[Mapping[str, Any]],
@@ -585,6 +631,7 @@ def evaluate_election_snapshots(
     lagna_authority_uncertain: bool = False,
     supported_system: bool = True,
     court_transition_coverage: Mapping[str, Any] | None = None,
+    borrowing_transition_coverage: Mapping[str, Any] | None = None,
 ) -> dict:
     """Conservatively combine all sampled states inside an offered window."""
     activity = resolve_activity(activity)
@@ -609,6 +656,13 @@ def evaluate_election_snapshots(
             evaluations,
             court_transition_coverage
             if isinstance(court_transition_coverage, Mapping)
+            else {},
+        )
+    if activity == 'borrowing_money':
+        return _borrowing_window_summary(
+            evaluations,
+            borrowing_transition_coverage
+            if isinstance(borrowing_transition_coverage, Mapping)
             else {},
         )
     transition_evidence = (

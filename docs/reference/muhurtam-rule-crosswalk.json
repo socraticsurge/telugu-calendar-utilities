@@ -11,11 +11,11 @@
     "activities": 30,
     "browser_activities": 30,
     "python_mcp_only_activities": 5,
-    "rows": 333,
+    "rows": 336,
     "deterministic_panchangam_rows": 177,
-    "personal_rule_rows": 5,
-    "election_chart_rule_rows": 37,
-    "manual_display_rows": 114,
+    "personal_rule_rows": 6,
+    "election_chart_rule_rows": 38,
+    "manual_display_rows": 115,
     "by_predicate_class": {
       "panchangam.slot-exclusion": 16,
       "panchangam.day-exclusion": 33,
@@ -27,17 +27,18 @@
       "panchangam.ranking-penalty": 7,
       "election-chart.house_empty": 7,
       "election-chart.planet_not_house": 9,
-      "manual.display-row": 114,
+      "manual.display-row": 115,
       "election-chart.any_planet_in_houses": 2,
       "election-chart.house_free_of_natural_malefics": 1,
       "panchangam.time-admission": 3,
       "panchangam.daylight-single-limb": 2,
       "election-chart.all_planets_in_houses": 1,
-      "personal.exact-election-fact": 5,
+      "personal.exact-election-fact": 6,
       "election-chart.planet_in_houses": 8,
       "election-chart.planet_well_situated": 2,
       "election-chart.planet_receives_full_aspect": 2,
       "panchangam.personal-slot-exclusion": 2,
+      "election-chart.same_rasi_chandra_conjunction": 1,
       "panchangam.disclosure": 1,
       "panchangam.specialized-admission": 1,
       "election-chart.court_mesha_d1_d9": 1,
@@ -49,11 +50,11 @@
     "by_implementation_status": {
       "automated_browser_and_python": 154,
       "automated_python_only_not_browser": 23,
-      "automated_exact_chart_browser_with_python_parity": 42,
-      "manual_displayed_not_computed": 114
+      "automated_exact_chart_browser_with_python_parity": 44,
+      "manual_displayed_not_computed": 115
     },
     "by_authority_status": {
-      "source_backed": 254,
+      "source_backed": 257,
       "explicit_project_heuristic": 76,
       "documented_conflict": 3
     },
@@ -1168,15 +1169,15 @@
           }
         ],
         "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
-        "scope": "Supports hard exclusion of Krittika, Moola, Punarvasu, Dhanishtha and each borrower's Janma Nakshatra. Chandra-Mangala/Shani conjunction and purpose-specific Chandra relationships remain manual checks. It supplies no weekday, Tithi, Lagna-class or Choghadiya preference. This is debtor-side election guidance only; repayment capacity, borrowing cost, collateral, lender terms and professional advice take precedence."
+        "scope": "Supports hard exclusion of Krittika, Moola, Punarvasu, Dhanishtha and the explicit primary borrower's Janma Nakshatra. The Drik website post-screen automates the same-Rasi Chandra-Kuja/Shani reject predicate under separately registered project conventions and does not blend that result into Surya Siddhanta or Vakya. The quick domestic/personal and business relationship phrases remain purpose-specific manual checks because the complete registered work supplies no operational formula. The passage supplies no event-specific weekday or Tithi list, but explicitly inherits general Tithi, Vara, Nakshatra and Tarabala purity; reusable baseline coverage remains incomplete under issue 284. This is debtor-side election guidance only; repayment capacity, borrowing cost, collateral, lender terms and professional advice take precedence."
       },
       "related_claims": [
         {
-          "id": "muhurta.borrowing.chintamani_divergence",
+          "id": "muhurta.borrowing.chintamani_lineage",
           "surface": "muhurtam",
-          "authority_status": "documented_conflict",
+          "authority_status": "source_backed",
           "evidence_class": "textual",
-          "verification_state": "contradicted",
+          "verification_state": "verified",
           "source_ids": [
             "MC-HINDI-IA"
           ],
@@ -1188,8 +1189,39 @@
               "url": "https://archive.org/details/muhurta-chintamani-hindi"
             }
           ],
-          "locator": "Nakshatra-prakarana, 'Dravyaprayoga and taking a loan,' verse 27, printed pp. 38-39 (OCR lines 2578-2599)",
-          "scope": "The inspected commentary joins debt-taking to a broader Dravyaprayoga/capital-deployment election with twelve named Nakshatras, Chara Lagna, benefics in the 5th/9th and an empty 8th. It does not reproduce Raman's Krittika/Moola/Punarvasu/Dhanishtha/Janma exclusion set. This is a disclosed lineage/scope divergence, not authority to merge the formulas."
+          "locator": "Nakshatra-prakarana, 'Dravyaprayoga and taking a loan,' verse 27, printed pp. 38-39 (physical PDF pp. 47-48; OCR lines 2578-2599)",
+          "scope": "Registers an alternate, non-default borrower/debt-taking lineage with twelve named Nakshatras, Chara Lagna, benefics in houses 5 and 9, an empty 8th house, and commentary prohibitions for Tuesday, Sankranti, Vriddhi Yoga, Hasta and Sunday. Its Wednesday statement belongs separately to lending. It does not falsify or define Raman's different formula, is not blended into the Raman default, and remains unimplemented as a runtime assessor."
+        },
+        {
+          "id": "muhurta.borrowing.drik_published_practice_2026_09",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "published_panchangam",
+          "verification_state": "verified",
+          "source_ids": [
+            "DP-DAY-PAGE"
+          ],
+          "sources": [
+            {
+              "id": "DP-DAY-PAGE",
+              "title": "Drik Panchang day and festival pages",
+              "authority_type": "published_panchangam",
+              "url": "https://www.drikpanchang.com/"
+            }
+          ],
+          "locator": "Drik Panchang, Loan Taking Muhurat methodology and dated New Delhi page for 11 September 2026; reviewed 12 September 2026",
+          "scope": "Registers a dated alternate published-practice mode: avoid Tuesday, Vriddhi Yoga, Sankranti and the Sunday-plus-Hasta Amrit Siddhi combination; prefer Wednesday; admit the published monetary Nakshatras and movable Lagna; and prefer houses 5, 8 and 9 vacant. Similarities and differences are descriptive only, not a claim that Drik derives from or validates Raman or Chintamani. The mode is not blended into the Raman default and remains unimplemented."
+        },
+        {
+          "id": "muhurta.borrowing.purpose_interpretation_v1",
+          "surface": "muhurtam",
+          "authority_status": "explicit_project_heuristic",
+          "evidence_class": "project_heuristic",
+          "verification_state": "heuristic",
+          "source_ids": [],
+          "sources": [],
+          "locator": "borrowing-purpose-context-v1 and borrowing-purpose-qualitative-relation-manual-v1; source wording remains registered as muhurta.borrowing_money",
+          "scope": "Selects exactly one primary borrower and the ephemeral enum quick_domestic_or_personal, business or other_or_unknown. Complete-source review found no attributable formula for 'good aspect to Lagna' or 'favorable situation with regard to Budha and Lord of Lagna'; the literal full-aspect, Kendra/Trikona, conjunction-plus-aspect, friendship, dignity and strength candidates therefore remain unselected. Exactly one applicable purpose row is displayed for manual review; inactive rows do not fail, pass, score or appear as unknown. Unknown purpose fails completion closed. No financial detail is stored or transmitted."
         }
       ],
       "source_scope": null,
@@ -1198,13 +1230,16 @@
       "row_ids": [
         "borrowing_money.panchangam.avoid_nakshatras",
         "borrowing_money.panchangam.avoid_janma_nakshatra",
+        "personal.borrowing.primary-borrower-janma-nakshatra",
+        "borrowing.same-rasi-chandra-kuja-shani",
         "borrowing_money.manual-1",
         "borrowing_money.manual-2",
         "borrowing_money.manual-3",
         "borrowing_money.manual-4",
-        "borrowing_money.manual-5"
+        "borrowing_money.manual-5",
+        "borrowing_money.manual-6"
       ],
-      "row_count": 7
+      "row_count": 10
     },
     {
       "activity": "lending_money",
@@ -10669,6 +10704,101 @@
     },
     {
       "activity": "borrowing_money",
+      "rule_id": "personal.borrowing.primary-borrower-janma-nakshatra",
+      "predicate_class": "personal.exact-election-fact",
+      "configured_inputs": {
+        "role": "primary_borrower",
+        "participant_inputs": [
+          "nakshatra"
+        ],
+        "candidate_inputs": [
+          "nakshatra"
+        ],
+        "operator": "not_equals",
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
+      },
+      "source_claim_id": "muhurta.borrowing_money",
+      "source_claim": {
+        "id": "muhurta.borrowing_money",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/personal_election.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "The named natal and exact candidate facts support a bounded equality or cyclic-position predicate.",
+      "predicate_source_locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)"
+    },
+    {
+      "activity": "borrowing_money",
+      "rule_id": "borrowing.same-rasi-chandra-kuja-shani",
+      "predicate_class": "election-chart.same_rasi_chandra_conjunction",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "same_rasi_chandra_conjunction",
+        "predicate_inputs": {
+          "convention_id": "same-rasi-distributive-conjunction-v1",
+          "convention_label": "Same-Rasi distributive Chandra conjunction v1",
+          "formula": "R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani); either equality fails, both resolved inequalities pass, and no degree orb is used.",
+          "method_claims": [
+            "election_chart.same_rasi_distributive_conjunction_policy_v1"
+          ],
+          "decision_policy_claim": "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1"
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
+      },
+      "source_claim_id": "muhurta.borrowing_money",
+      "source_claim": {
+        "id": "muhurta.borrowing_money",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
+      "decision_policy_claim_id": "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1",
+      "decision_policy_claim": {
+        "id": "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "borrowing-money.same-rasi-conjunction-reject-v1; source wording and same-Rasi computation remain separately registered"
+      }
+    },
+    {
+      "activity": "borrowing_money",
       "rule_id": "borrowing_money.manual-1",
       "predicate_class": "manual.display-row",
       "configured_inputs": {
@@ -10714,8 +10844,8 @@
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 1,
-        "source_text": "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
-        "text": "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+        "source_text": "General election baseline: Raman explicitly requires Tithi, Vara, Nakshatra and Tarabala purity; the reusable baseline remains incomplete under issue #284.",
+        "text": "General election baseline: Raman explicitly requires Tithi, Vara, Nakshatra and Tarabala purity; the reusable baseline remains incomplete under issue #284.",
         "class": "manual-only",
         "display_section": "chart"
       },
@@ -10755,10 +10885,11 @@
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 2,
-        "source_text": "Election chart: avoid Chandra conjoined with Mangala or Shani.",
-        "text": "Election chart: avoid Chandra conjoined with Mangala or Shani.",
+        "source_text": "Quick domestic or personal purpose: have a practitioner assess whether Chandra is in good aspect to Lagna; the source does not define an operational formula.",
+        "text": "Quick domestic or personal purpose: have a practitioner assess whether Chandra is in good aspect to Lagna; the source does not define an operational formula.",
         "class": "manual-only",
-        "display_section": "chart"
+        "display_section": "chart",
+        "purpose": "quick_domestic_or_personal"
       },
       "source_claim_id": "muhurta.borrowing_money",
       "source_claim": {
@@ -10796,10 +10927,11 @@
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 3,
-        "source_text": "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
-        "text": "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
+        "source_text": "Business purpose: have a practitioner assess Chandra’s favorable situation with Budha and the Lagna lord; the source does not define an operational formula.",
+        "text": "Business purpose: have a practitioner assess Chandra’s favorable situation with Budha and the Lagna lord; the source does not define an operational formula.",
         "class": "manual-only",
-        "display_section": "chart"
+        "display_section": "chart",
+        "purpose": "business"
       },
       "source_claim_id": "muhurta.borrowing_money",
       "source_claim": {
@@ -10837,6 +10969,48 @@
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 4,
+        "source_text": "Other or unknown purpose: the cited passage gives no purpose-specific formula, so chart review remains unresolved.",
+        "text": "Other or unknown purpose: the cited passage gives no purpose-specific formula, so chart review remains unresolved.",
+        "class": "manual-only",
+        "display_section": "chart",
+        "purpose": "other_or_unknown"
+      },
+      "source_claim_id": "muhurta.borrowing_money",
+      "source_claim": {
+        "id": "muhurta.borrowing_money",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)"
+      },
+      "implementation_status": "manual_displayed_not_computed",
+      "implementation_owner": "telugu_panchangam/personal/activity_check_contract.py",
+      "ranking_effect": "practitioner_review_tier_cap",
+      "automation_mode": "manual",
+      "automation_rationale": "This source-authored chart row contains qualitative or uncomputed judgement; separately automated clauses have their own rule rows.",
+      "decision_policy_claim_id": "muhurta.scoring_policy",
+      "decision_policy_claim": {
+        "id": "muhurta.scoring_policy",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [],
+        "locator": "score bonuses and penalties in personal/muhurta.py; post-screen tie-breaks, unresolved-review caps and result-tier caps in src/scorer/election-chart-enrichment.ts"
+      },
+      "authority_role": "activity_source_claim"
+    },
+    {
+      "activity": "borrowing_money",
+      "rule_id": "borrowing_money.manual-6",
+      "predicate_class": "manual.display-row",
+      "configured_inputs": {
+        "source_index": 5,
         "source_text": "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing.",
         "text": "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing.",
         "class": "manual-only",

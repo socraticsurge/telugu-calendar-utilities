@@ -13,6 +13,10 @@ PyPI version tracks this file's most recent release entry.
   event-unwired Benefic-Rasi-by-resolved-natural-lord convention with guarded
   Python/TypeScript parity, explicit alternative interpretations, and no
   change to ranking, rejection, qualification, or completion behavior.
+- Prepare MCP/PyPI patch metadata `1.18.14` while completing the Raman
+  Borrowing event layer: an explicit primary borrower, ephemeral broad-purpose
+  guidance, same-Rasi Chandra–Kuja/Shani rejection, non-blended alternate
+  lineages, privacy guards, and honest shared-baseline incompleteness.
 - Prepare MCP/PyPI patch metadata `1.18.12` while completing the five-clause
   Court filing assessor, `litigation` alias parity, conservative transition
   coverage, non-ranking peace information, responsive UI and review evidence.

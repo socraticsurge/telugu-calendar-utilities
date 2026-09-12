@@ -51,7 +51,7 @@ SAME_RASI_CONJUNCTION_METADATA: dict[str, Any] = {
         ),
         "activity": "borrowing_money",
         "effect": "reject",
-        "status": "specified_unwired",
+        "status": "implemented",
         "delivery_issue": 271,
     },
 }

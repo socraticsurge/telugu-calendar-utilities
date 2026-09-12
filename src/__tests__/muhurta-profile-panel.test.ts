@@ -15,6 +15,7 @@ import type {
   ElectionChartRequest,
   ElectionChartSnapshot,
 } from '../lib/election-chart-api';
+import type { BorrowingPurpose } from '../scorer/borrowing-context';
 import {
   enrichElectionChartSlots,
   type EnrichableMuhurtamSlot,
@@ -41,6 +42,7 @@ interface ProfilesController {
   getParticipants(): Participant[];
   getSelectedIds(): string[];
   getRoleParticipant(activity: string): Participant | null;
+  getBorrowingPurpose(): BorrowingPurpose;
   selectProfile(id: string): boolean;
 }
 
@@ -60,7 +62,9 @@ interface TarabalamPanelModule {
   tbRemoveRow(index: number): void;
   tbSaveProfiles(): void;
   tbResetProfiles(): void;
-  muRelevantManualChecks(activity: string, vaaram: string): ManualCheckRow[];
+  muRelevantManualChecks(
+    activity: string, vaaram: string, borrowingPurpose?: BorrowingPurpose,
+  ): ManualCheckRow[];
   muClassifyManualChecks(activity: string, rows?: ManualCheckRow[] | null): {
     chart: string[];
     information: string[];
@@ -250,6 +254,7 @@ function renderPanelFixture(): void {
       <option value="gruhapravesha">Gruhapravesha</option>
       <option value="seemantha">Seemantha</option>
       <option value="surgery">Surgery</option>
+      <option value="borrowing_money">Borrowing money</option>
     </select>
   `;
 }
@@ -841,8 +846,17 @@ describe('Muhurtam saved-profile participants', () => {
       .toBe('Karnavedha event checks resolved');
     expect(panel.muChartAssessmentTitle('court', dispositionBase))
       .toBe('Court filing chart assessment complete');
+    expect(panel.muChartAssessmentTitle('borrowing_money', dispositionBase))
+      .toBe('Borrowing event-specific chart clause resolved');
     expect(panel.muChartAssessmentTitle('purchase', dispositionBase))
       .toBe('Exact chart screening applied');
+    const borrowingScopeDetail = panel.muComplexityContracts
+      .muResultScopeDetail as unknown as (
+        activity: string, enrichment: unknown, partial: boolean,
+      ) => string;
+    expect(borrowingScopeDetail(
+      'borrowing_money', dispositionBase, false,
+    )).toContain('shared election baseline remain manual');
   });
 
   test('samples both sides of every Lagna transition inside a slot', () => {
@@ -1330,6 +1344,67 @@ describe('Muhurtam saved-profile participants', () => {
     activityAfterReload.value = 'gold';
     activityAfterReload.dispatchEvent(new Event('change', { bubbles: true }));
     expect(document.querySelector('[data-muhurta-role]')).toBeNull();
+  });
+
+  test('keeps the Borrowing purpose ephemeral and shows only active guidance', () => {
+    store = createGuestProfileStore(profileStorage, {
+      idFactory: ids('guest_alpha', 'guest_bravo'),
+    });
+    store.create({ name: 'Alpha', nakshatra: 'Rohini' });
+    store.create({ name: 'Bravo', nakshatra: 'Hasta' });
+    localStorage.setItem(
+      MUHURTAM_PROFILE_IDS_STORAGE_KEY,
+      '["guest_alpha","guest_bravo"]',
+    );
+    const active = initialize();
+    const activity = document.querySelector<HTMLSelectElement>('#mu-activity')!;
+    activity.value = 'borrowing_money';
+    activity.dispatchEvent(new Event('change', { bubbles: true }));
+
+    const borrower = document.querySelector<HTMLSelectElement>(
+      '[data-muhurta-role="primary_borrower"]',
+    )!;
+    const purpose = document.querySelector<HTMLSelectElement>(
+      '[data-borrowing-purpose]',
+    )!;
+    expect(borrower).toBeTruthy();
+    expect(active.getRoleParticipant('borrowing_money')?.id).toBe('guest_alpha');
+    expect(active.getBorrowingPurpose()).toBe('other_or_unknown');
+
+    purpose.value = 'business';
+    purpose.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(active.getBorrowingPurpose()).toBe('business');
+    const business = panel.muClassifyManualChecks(
+      'borrowing_money',
+      panel.muRelevantManualChecks('borrowing_money', 'Budhavaram', 'business'),
+    );
+    expect(business.chart.join(' ')).toContain('Business purpose');
+    expect(business.chart.join(' ')).not.toContain('Quick domestic');
+    expect(localStorage.getItem('borrowing-purpose')).toBeNull();
+    expect(localStorage.getItem(MUHURTAM_ROLE_SELECTIONS_STORAGE_KEY))
+      .not.toContain('business');
+
+    controller?.destroy();
+    controller = null;
+    renderPanelFixture();
+    const activityAfterReload = document.querySelector<HTMLSelectElement>('#mu-activity')!;
+    activityAfterReload.value = 'borrowing_money';
+    const restored = initialize();
+    expect(restored.getBorrowingPurpose()).toBe('other_or_unknown');
+  });
+
+  test('labels a missing required Borrowing participant as unresolved', () => {
+    localStorage.setItem(MUHURTAM_PROFILE_IDS_STORAGE_KEY, '[]');
+    const activity = document.querySelector<HTMLSelectElement>('#mu-activity')!;
+    activity.value = 'borrowing_money';
+    initialize();
+
+    expect(document.querySelector('#tb-profiles')?.textContent).toContain(
+      'No primary borrower is selected',
+    );
+    expect(document.querySelector('#tb-profiles')?.textContent).toContain(
+      'required primary borrower check otherwise remains unresolved',
+    );
   });
 
   test('refuses missing and incomplete contextual profiles without persisting a choice', () => {

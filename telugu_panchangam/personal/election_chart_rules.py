@@ -23,11 +23,12 @@ _CLAIM_SEEMANTHA = 'muhurta.seemantha'
 _CLAIM_SHANTIKA_PAUSHTIKA = 'muhurta.shantika_paushtika'
 _CLAIM_WEDDING = 'muhurta.wedding'
 _CLAIM_COURT = 'muhurta.court.filing_lawsuit'
+_CLAIM_BORROWING = 'muhurta.borrowing_money'
 _EIGHTH_HOUSE_VACANT = '8th house is vacant'
 _GOLD_QUALIFICATION_POLICY = 'election_chart.gold_qualification_policy_v1'
 _KUJA_OUTSIDE_EIGHTH = 'Mangala (Kuja) is outside the 8th house'
 
-ELECTION_CHART_RULE_SCHEMA_VERSION = 4
+ELECTION_CHART_RULE_SCHEMA_VERSION = 5
 ELECTION_CHART_HOUSE_SYSTEM = 'whole_sign'
 ELECTION_CHART_NODE_CONVENTION = 'mean'
 ELECTION_CHART_PLANETS = (
@@ -35,7 +36,7 @@ ELECTION_CHART_PLANETS = (
     'Shukra', 'Shani', 'Rahu', 'Ketu',
 )
 ELECTION_CHART_COMPLETE_ASSESSORS = (
-    'gold', 'annaprasana', 'karnavedha', 'court',
+    'gold', 'annaprasana', 'karnavedha', 'court', 'borrowing_money',
 )
 VIDYARAMBHA_SOURCE_CLAIM = 'muhurta.vidyarambha'
 
@@ -101,6 +102,9 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section "
         "'Filing law-suits,' inspected in the 2020 Chistabo derivative at "
         'internal printed p. 67 (physical PDF p. 71)'),
+    _CLAIM_BORROWING: (
+        "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 "
+        'Chistabo derivative at internal printed p. 45 (physical PDF p. 49)'),
 }
 
 
@@ -137,6 +141,17 @@ def _rule(
 
 
 ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
+    'borrowing_money': (
+        _rule(
+            'borrowing.same-rasi-chandra-kuja-shani',
+            'Chandra is not in the same Rasi as Kuja or Shani',
+            'same_rasi_chandra_conjunction', 'reject', _CLAIM_BORROWING,
+            convention_id='same-rasi-distributive-conjunction-v1',
+            decision_policy_claim=(
+                'election_chart.borrowing_same_rasi_conjunction_reject_policy_v1'
+            ),
+        ),
+    ),
     'court': (
         _rule(
             'court.mesha-lagna-or-navamsa',
@@ -376,6 +391,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
 # These sentences intentionally exclude the clauses represented above so the
 # UI never asks a practitioner to re-check a condition it just computed.
 ELECTION_CHART_MANUAL_REMAINDERS: dict[str, tuple[str, ...]] = {
+    'borrowing_money': (),
     'court': (),
     'wedding': (
         'Assess malefic occupancy or hemming around Lagna and any Chandra-Graha association.',

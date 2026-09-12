@@ -85,6 +85,15 @@ def test_same_rasi_conjunction_assessors_extend_architecture_additively():
     assert source_scope_class(
         'src/scorer/election-assessors/conjunction.ts'
     ) == 'additive-feature'
+
+
+def test_borrowing_context_extends_architecture_additively():
+    assert source_scope_class(
+        'src/scorer/borrowing-context.ts'
+    ) == 'additive-feature'
+    assert source_scope_class(
+        'telugu_panchangam/personal/borrowing.py'
+    ) == 'additive-feature'
     assert source_scope_class(
         'telugu_panchangam/personal/election_assessors/conjunction.py'
     ) == 'additive-feature'

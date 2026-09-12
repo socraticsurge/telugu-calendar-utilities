@@ -671,19 +671,52 @@
       "verification_state": "verified",
       "source_ids": ["BVR-MUHURTHA-1993", "BVR-MUHURTHA-CHISTABO-2020"],
       "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
-      "scope": "Supports hard exclusion of Krittika, Moola, Punarvasu, Dhanishtha and each borrower's Janma Nakshatra. Chandra-Mangala/Shani conjunction and purpose-specific Chandra relationships remain manual checks. It supplies no weekday, Tithi, Lagna-class or Choghadiya preference. This is debtor-side election guidance only; repayment capacity, borrowing cost, collateral, lender terms and professional advice take precedence.",
-      "last_reviewed": "2026-09-04"
+      "scope": "Supports hard exclusion of Krittika, Moola, Punarvasu, Dhanishtha and the explicit primary borrower's Janma Nakshatra. The Drik website post-screen automates the same-Rasi Chandra-Kuja/Shani reject predicate under separately registered project conventions and does not blend that result into Surya Siddhanta or Vakya. The quick domestic/personal and business relationship phrases remain purpose-specific manual checks because the complete registered work supplies no operational formula. The passage supplies no event-specific weekday or Tithi list, but explicitly inherits general Tithi, Vara, Nakshatra and Tarabala purity; reusable baseline coverage remains incomplete under issue 284. This is debtor-side election guidance only; repayment capacity, borrowing cost, collateral, lender terms and professional advice take precedence.",
+      "last_reviewed": "2026-09-12"
     },
     {
       "id": "muhurta.borrowing.chintamani_divergence",
       "surface": "muhurtam",
       "implementation": "docs/reference/51-borrowing-money-profile.md",
       "evidence_class": "textual",
-      "verification_state": "contradicted",
+      "verification_state": "verified",
       "source_ids": ["MC-HINDI-IA"],
       "locator": "Nakshatra-prakarana, 'Dravyaprayoga and taking a loan,' verse 27, printed pp. 38-39 (OCR lines 2578-2599)",
-      "scope": "The inspected commentary joins debt-taking to a broader Dravyaprayoga/capital-deployment election with twelve named Nakshatras, Chara Lagna, benefics in the 5th/9th and an empty 8th. It does not reproduce Raman's Krittika/Moola/Punarvasu/Dhanishtha/Janma exclusion set. This is a disclosed lineage/scope divergence, not authority to merge the formulas.",
-      "last_reviewed": "2026-07-22"
+      "scope": "Legacy compatibility identifier for the separately registered muhurta.borrowing.chintamani_lineage record. The inspected commentary describes a broader Dravyaprayoga/capital-deployment and debt-taking election that differs from Raman; this is a verified alternate lineage, not a contradiction and not authority to merge the formulas.",
+      "last_reviewed": "2026-09-12"
+    },
+    {
+      "id": "muhurta.borrowing.chintamani_lineage",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/borrowing.py",
+      "evidence_class": "textual",
+      "verification_state": "verified",
+      "source_ids": ["MC-HINDI-IA"],
+      "locator": "Nakshatra-prakarana, 'Dravyaprayoga and taking a loan,' verse 27, printed pp. 38-39 (physical PDF pp. 47-48; OCR lines 2578-2599)",
+      "scope": "Registers an alternate, non-default borrower/debt-taking lineage with twelve named Nakshatras, Chara Lagna, benefics in houses 5 and 9, an empty 8th house, and commentary prohibitions for Tuesday, Sankranti, Vriddhi Yoga, Hasta and Sunday. Its Wednesday statement belongs separately to lending. It does not falsify or define Raman's different formula, is not blended into the Raman default, and remains unimplemented as a runtime assessor.",
+      "last_reviewed": "2026-09-12"
+    },
+    {
+      "id": "muhurta.borrowing.drik_published_practice_2026_09",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/borrowing.py",
+      "evidence_class": "published_panchangam",
+      "verification_state": "verified",
+      "source_ids": ["DP-DAY-PAGE"],
+      "locator": "Drik Panchang, Loan Taking Muhurat methodology and dated New Delhi page for 11 September 2026; reviewed 12 September 2026",
+      "scope": "Registers a dated alternate published-practice mode: avoid Tuesday, Vriddhi Yoga, Sankranti and the Sunday-plus-Hasta Amrit Siddhi combination; prefer Wednesday; admit the published monetary Nakshatras and movable Lagna; and prefer houses 5, 8 and 9 vacant. Similarities and differences are descriptive only, not a claim that Drik derives from or validates Raman or Chintamani. The mode is not blended into the Raman default and remains unimplemented.",
+      "last_reviewed": "2026-09-12"
+    },
+    {
+      "id": "muhurta.borrowing.purpose_interpretation_v1",
+      "surface": "muhurtam",
+      "implementation": "docs/reference/51-borrowing-money-profile.md",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "borrowing-purpose-context-v1 and borrowing-purpose-qualitative-relation-manual-v1; source wording remains registered as muhurta.borrowing_money",
+      "scope": "Selects exactly one primary borrower and the ephemeral enum quick_domestic_or_personal, business or other_or_unknown. Complete-source review found no attributable formula for 'good aspect to Lagna' or 'favorable situation with regard to Budha and Lord of Lagna'; the literal full-aspect, Kendra/Trikona, conjunction-plus-aspect, friendship, dignity and strength candidates therefore remain unselected. Exactly one applicable purpose row is displayed for manual review; inactive rows do not fail, pass, score or appear as unknown. Unknown purpose fails completion closed. No financial detail is stored or transmitted.",
+      "last_reviewed": "2026-09-12"
     },
     {
       "id": "muhurta.trade_inventory.purchase",
@@ -869,8 +902,8 @@
       "verification_state": "heuristic",
       "source_ids": [],
       "locator": "same-rasi-distributive-conjunction-v1; source wording remains independently registered as muhurta.borrowing_money",
-      "scope": "Represents the borrowing passage's Chandra conjunction with Mangala and Shani as the distributive formula R(Chandra)=R(Kuja) OR R(Chandra)=R(Shani), with same sidereal Rasi as the only association test and no numerical degree orb. The Python owner and TypeScript mirror implement the reusable three-valued primitive with shared fixture parity. This is an event-bounded selected mode, not a universal conjunction default; the borrowing event remains unwired pending issue 271.",
-      "last_reviewed": "2026-09-11"
+      "scope": "Represents the borrowing passage's Chandra conjunction with Mangala and Shani as the distributive formula R(Chandra)=R(Kuja) OR R(Chandra)=R(Shani), with same sidereal Rasi as the only association test and no numerical degree orb. The Python owner and TypeScript mirror implement the reusable three-valued primitive with shared fixture parity. This is an event-bounded selected mode, not a universal conjunction default; issue 271 wires it only into the Borrowing Drik post-screen.",
+      "last_reviewed": "2026-09-12"
     },
     {
       "id": "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1",
@@ -880,8 +913,8 @@
       "verification_state": "heuristic",
       "source_ids": [],
       "locator": "borrowing-money.same-rasi-conjunction-reject-v1; source wording and same-Rasi computation remain separately registered",
-      "scope": "Records that a future borrowing-money assessor will map a known same-Rasi Chandra-Kuja or Chandra-Shani conjunction failure to the reject effect. The policy is metadata only in issue 402: it is not imported by the event evaluator, does not alter score, order, completion counts or manual-review copy, and remains specified_unwired until issue 271.",
-      "last_reviewed": "2026-09-11"
+      "scope": "Maps a known same-Rasi Chandra-Kuja or Chandra-Shani conjunction failure to the reject effect in the Borrowing Drik post-screen. Fail outranks unknown and pass across the sampled window; incomplete transition coverage fails closed to unknown. Surya Siddhanta and Vakya do not consume the Drik chart rule.",
+      "last_reviewed": "2026-09-12"
     },
     {
       "id": "muhurta.raman_transcription.paksha_definition",

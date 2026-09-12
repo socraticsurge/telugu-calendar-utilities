@@ -45,6 +45,7 @@
 #                           relevant to the profile but not its implementation authority
 #   source_scope            concise lineage and automation boundary exposed to clients
 #   source_claim            stable verified claim ID in provenance.json
+#   borrowing_policy        explicit Borrowing role/purpose/mode contract
 #   daytime_only            night_slots returns no candidates for the activity
 #   forenoon_only           candidate must end by local solar noon
 #   allowed_pakshams        day omitted unless its Paksha is listed
@@ -53,6 +54,9 @@
 #   prefer_bhadra_puchha    bonus when slot overlaps Bhadra Puchha
 #   prefer_nakshatra_mukha  ([classes], bonus) — bonus when day nakshatra mukha matches
 #   avoid_karana            karana names — slots overlapping these are cut
+
+from .borrowing import BORROWING_MODE_REGISTRY
+
 
 COURT_SOURCE_EFFECT_POLICY = {
     'schema_version': 1,
@@ -244,7 +248,11 @@ ACTIVITY_RULES: dict[str, dict] = {
                       'label': 'Borrowing money / taking a loan',
                       'source_claim': 'muhurta.borrowing_money',
                       'related_claims': [
-                          'muhurta.borrowing.chintamani_divergence'],
+                          'muhurta.borrowing.chintamani_lineage',
+                          'muhurta.borrowing.drik_published_practice_2026_09',
+                          'muhurta.borrowing.purpose_interpretation_v1',
+                      ],
+                      'borrowing_policy': BORROWING_MODE_REGISTRY,
                       'manual_prerequisites': True,
                       'avoid_nakshatras': [
                           'Krittika', 'Moola', 'Punarvasu', 'Dhanishtha',
@@ -254,15 +262,21 @@ ACTIVITY_RULES: dict[str, dict] = {
                           'Transaction role: this is the borrower/debtor '
                           + 'side only; do not reuse it for lending, receiving '
                           + 'repayment or deploying capital.',
-                          'Personal-star gate: supply every borrower’s Janma '
-                          + 'Nakshatra so the source prohibition can be '
-                          + 'enforced; without it, review remains incomplete.',
-                          'Election chart: avoid Chandra conjoined with '
-                          + 'Mangala or Shani.',
-                          'Purpose-specific chart: for quick domestic or '
-                          + 'personal use, Chandra should favour Lagna; for '
-                          + 'business use, Chandra should favour Budha and the '
-                          + 'Lagna lord.',
+                          'General election baseline: Raman explicitly '
+                          + 'requires Tithi, Vara, Nakshatra and Tarabala '
+                          + 'purity; the reusable baseline remains incomplete '
+                          + 'under issue #284.',
+                          'Quick domestic or personal purpose: have a '
+                          + 'practitioner assess whether Chandra is in good '
+                          + 'aspect to Lagna; the source does not define an '
+                          + 'operational formula.',
+                          'Business purpose: have a practitioner assess '
+                          + 'Chandra’s favorable situation with Budha and the '
+                          + 'Lagna lord; the source does not define an '
+                          + 'operational formula.',
+                          'Other or unknown purpose: the cited passage gives '
+                          + 'no purpose-specific formula, so chart review '
+                          + 'remains unresolved.',
                           'Repayment capacity, total borrowing cost, lender '
                           + 'terms, collateral risk and qualified financial or '
                           + 'legal advice take precedence over timing.',

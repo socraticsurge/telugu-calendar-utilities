@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "release": "1.18.14",
+  "parent_release": "1.18.13",
+  "activity": "borrowing_money",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [
+    {
+      "claim_id": "muhurta.borrowing_money",
+      "relationship": "successor_revision",
+      "verification_state": "verified",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
+      "before_sha256": "34a7e1620ecbfdb8ac7449e160862ba7dea9864fcb6ae904feeac8f79ae5f191",
+      "after_sha256": "d3a766922989bc2f014bccaf8649f0652bb0b9632c2944f68bc7108b9b812fe4",
+      "before": {
+        "id": "muhurta.borrowing_money",
+        "surface": "muhurtam",
+        "implementation": "telugu_panchangam/personal/activity_rules.py",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter X, 'Borrowing Money,' inspected in the 2020 Chistabo derivative at internal printed p. 45 (physical PDF p. 49)",
+        "scope": "Supports hard exclusion of Krittika, Moola, Punarvasu, Dhanishtha and each borrower's Janma Nakshatra. Chandra-Mangala/Shani conjunction and purpose-specific Chandra relationships remain manual checks. It supplies no weekday, Tithi, Lagna-class or Choghadiya preference. This is debtor-side election guidance only; repayment capacity, borrowing cost, collateral, lender terms and professional advice take precedence.",
+        "last_reviewed": "2026-09-04"
+      }
+    }
+  ],
+  "semantic_deltas": [
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/check_contract/schema_version",
+      "operation": "replace",
+      "scope": "activity_contract_schema",
+      "after_sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "before_sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+      "before": 2
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/check_contract/purposes",
+      "operation": "replace",
+      "scope": "activity_contract_purposes",
+      "after_sha256": "de89188a79be305102f4ca37b24d3ae68f5359de3381e9a31cd209c577055a56",
+      "before_sha256": "70dcca346e1b1d07604ee53c15bf54e51c6ee6c75cf7289eaecfab3d57e94f32",
+      "before": [
+        "safety_override"
+      ]
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/check_contract/activities/borrowing_money",
+      "operation": "replace",
+      "scope": "borrowing_money_contract",
+      "after_sha256": "74a1e60b7606965fb4903783ce3f4d7a9e122d37eedfb9c3e6aadf77bbea71d5",
+      "before_sha256": "9fb80d37d29835ed501d356d338234c99ab71553dc9ee6c93bd6c83656e1a357",
+      "before": {
+        "deterministic_panchangam_fields": [
+          "avoid_nakshatras",
+          "avoid_janma_nakshatra"
+        ],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "borrowing_money.manual-1",
+            "source_index": 0,
+            "source_text": "Transaction role: this is the borrower/debtor side only; do not reuse it for lending, receiving repayment or deploying capital.",
+            "text": "Transaction role: this is the borrower/debtor side only; do not reuse it for lending, receiving repayment or deploying capital.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "borrowing_money.manual-2",
+            "source_index": 1,
+            "source_text": "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+            "text": "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "borrowing_money.manual-3",
+            "source_index": 2,
+            "source_text": "Election chart: avoid Chandra conjoined with Mangala or Shani.",
+            "text": "Election chart: avoid Chandra conjoined with Mangala or Shani.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "borrowing_money.manual-4",
+            "source_index": 3,
+            "source_text": "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
+            "text": "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "borrowing_money.manual-5",
+            "source_index": 4,
+            "source_text": "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing.",
+            "text": "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing.",
+            "class": "manual-only",
+            "display_section": "practical"
+          }
+        ]
+      }
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/rules/borrowing_money",
+      "operation": "replace",
+      "scope": "borrowing_money_activity_rules",
+      "after_sha256": "f8f13cec24245e9263c51a42cd1d589999286f9db60a011c6325fa02138ac532",
+      "before_sha256": "a8a918a9e4f1a6aed8173d18aa7cf4e6307bf3bb2fdfe9c7234b37f77c8e5459",
+      "before": {
+        "label": "Borrowing money / taking a loan",
+        "avoid_nakshatras": [
+          "Krittika",
+          "Moola",
+          "Punarvasu",
+          "Dhanishtha"
+        ],
+        "manual_checks": [
+          "Transaction role: this is the borrower/debtor side only; do not reuse it for lending, receiving repayment or deploying capital.",
+          "Personal-star gate: supply every borrower’s Janma Nakshatra so the source prohibition can be enforced; without it, review remains incomplete.",
+          "Election chart: avoid Chandra conjoined with Mangala or Shani.",
+          "Purpose-specific chart: for quick domestic or personal use, Chandra should favour Lagna; for business use, Chandra should favour Budha and the Lagna lord.",
+          "Repayment capacity, total borrowing cost, lender terms, collateral risk and qualified financial or legal advice take precedence over timing."
+        ],
+        "manual_prerequisites": true,
+        "avoid_janma_nakshatra": true,
+        "source_claim": "muhurta.borrowing_money",
+        "related_claims": [
+          "muhurta.borrowing.chintamani_divergence"
+        ]
+      }
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/consumed_fields",
+      "operation": "replace",
+      "scope": "borrowing_money_consumed_fields",
+      "after_sha256": "8b3f448d850c72413a2df3e6ff5252443727b3327b372637b6d1cf57e2211e47",
+      "before_sha256": "f5ac9d4ff3c0a2ab0e89b83c1632b293150c4b5b0bada524cfadb01492b459f5",
+      "before": [
+        "label",
+        "avoid_karana",
+        "prefer_lagna_class",
+        "prefer_choghadiya",
+        "skip_on_yoga",
+        "skip_on_sankramana",
+        "prefer_vara",
+        "prefer_tithi_class",
+        "avoid_tithi_class",
+        "required_lagna_class",
+        "allowed_maasams",
+        "allowed_maasa_solar_pairs",
+        "allowed_varas",
+        "avoid_vara_paksha",
+        "allowed_solar_classes",
+        "allowed_nakshatras",
+        "avoid_nakshatras",
+        "prefer_nakshatras",
+        "allowed_tithi_numbers",
+        "prefer_tithi_numbers",
+        "avoid_tithi_numbers",
+        "manual_checks",
+        "manual_prerequisites",
+        "avoid_janma_nakshatra",
+        "avoid_vara_tithi_names",
+        "avoid_nitya_yogas",
+        "allowed_lagnas",
+        "prefer_lagnas",
+        "caution_lagna_solar",
+        "source_claim",
+        "audit_claim",
+        "heuristic_claim",
+        "related_claims",
+        "source_scope",
+        "court_policy",
+        "daytime_only",
+        "require_single_daylight_tithi",
+        "require_single_daylight_nakshatra",
+        "forenoon_only",
+        "allowed_pakshams",
+        "require_homa_election",
+        "allowed_solar_signs",
+        "allowed_tithi_names",
+        "skip_on_combust"
+      ]
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/schema_version",
+      "operation": "replace",
+      "scope": "shared_schema",
+      "after_sha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "before_sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+      "before": 4
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/conventions/same-rasi-distributive-conjunction-v1",
+      "operation": "add",
+      "scope": "borrowing_money_convention",
+      "after_sha256": "75f0eee84b7c2c1f91855398287c8629f2157e7996dab549cb9c778d93e61cc2"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/rules/borrowing_money",
+      "operation": "add",
+      "scope": "borrowing_money_rules",
+      "after_sha256": "e259e67764f7e71e353ca6e3b121226bcceda3fc057b7cd7e894a6baca81b02c"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/manual_remainders/borrowing_money",
+      "operation": "add",
+      "scope": "borrowing_money_remainder",
+      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/complete_assessors",
+      "operation": "replace",
+      "scope": "completion_registry",
+      "after_sha256": "7ebc5cd6a6f6180adbfcbf24448cbba9aba5f01d0ea7022c02aaad4920f620ff",
+      "before_sha256": "ef124e7d9542058d3107856246e2ad88a2d1b36915cc44a76853cb4d866c0539",
+      "before": [
+        "gold",
+        "annaprasana",
+        "karnavedha",
+        "court"
+      ]
+    }
+  ],
+  "protected_source_transforms": [
+    {
+      "path": "src/scorer/election-chart-enrichment.ts",
+      "scope": "borrowing_money_transition_coverage",
+      "transforms": [
+        {
+          "before": "import { inferCourtTransitionCoverage } from './court-transition-coverage';",
+          "after": "import {\n  inferBorrowingTransitionCoverage,\n  inferCourtTransitionCoverage,\n} from './court-transition-coverage';"
+        },
+        {
+          "before": "        ...(options.activity === 'court' || options.activity === 'litigation'\n          ? {\n            courtTransitionCoverage: inferCourtTransitionCoverage(\n              canonicalCharts,\n              chunk.canonicalLagnaPlans[index],\n              !boundaryAffectsGeneric,\n            ),\n          }\n          : {}),\n      }),",
+          "after": "        ...(options.activity === 'court' || options.activity === 'litigation'\n          ? {\n            courtTransitionCoverage: inferCourtTransitionCoverage(\n              canonicalCharts,\n              chunk.canonicalLagnaPlans[index],\n              !boundaryAffectsGeneric,\n            ),\n          }\n          : {}),\n        ...(options.activity === 'borrowing_money'\n          ? {\n            borrowingTransitionCoverage:\n              inferBorrowingTransitionCoverage(canonicalCharts),\n          }\n          : {}),\n      }),"
+        }
+      ]
+    }
+  ]
+}

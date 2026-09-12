@@ -36,7 +36,7 @@ STRICT_SEMVER = re.compile(
 )
 MANIFEST_FILENAME = re.compile(
     rf"(?P<release>{STRICT_SEMVER.pattern})-"
-    r"(?P<activity>[a-z0-9]+(?:-[a-z0-9]+)*)\.json"
+    r"(?P<activity>[a-z0-9]+(?:[-_][a-z0-9]+)*)\.json"
 )
 
 
@@ -189,6 +189,12 @@ def _validated_semantic_delta_pointer(
 
     if expected is not None:
         assert (artifact, pointer) == expected
+    elif scope == "activity_contract_schema":
+        assert artifact == "src/data/activity-rules.generated.json"
+        assert pointer == "/check_contract/schema_version"
+    elif scope == "activity_contract_purposes":
+        assert artifact == "src/data/activity-rules.generated.json"
+        assert pointer == "/check_contract/purposes"
     elif scope == f"{activity}_convention":
         assert artifact == "src/data/election-chart-rules.generated.json"
         assert len(parts) == 2
@@ -260,6 +266,16 @@ def _assert_non_overlapping_pointers(manifest: dict) -> None:
             "example_convention",
             "src/data/election-chart-rules.generated.json",
             "/conventions/example-rule-v1",
+        ),
+        (
+            "activity_contract_schema",
+            "src/data/activity-rules.generated.json",
+            "/check_contract/schema_version",
+        ),
+        (
+            "activity_contract_purposes",
+            "src/data/activity-rules.generated.json",
+            "/check_contract/purposes",
         ),
         (
             "shared_schema",

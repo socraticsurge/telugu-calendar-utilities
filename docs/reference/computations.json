@@ -1006,7 +1006,7 @@
       ],
       "inputs": ["complete canonical nine-graha Rasi facts", "sampled primitive outcomes", "Rasi-transition coverage state", "chart-request budget state"],
       "outputs": ["pass, fail, or unknown outcome with evidence", "sampled-window outcome"],
-      "time_basis": "An exact chart snapshot or a sampled half-open candidate window; no Borrowing Money event wiring is active.",
+      "time_basis": "An exact chart snapshot or a sampled half-open candidate window; the Borrowing Drik post-screen consumes the sampled outcome.",
       "surfaces": ["python-library"],
       "provenance": {
         "evidence_classes": ["textual", "project_heuristic"],
@@ -1016,7 +1016,7 @@
           "election_chart.same_rasi_distributive_conjunction_policy_v1",
           "election_chart.borrowing_same_rasi_conjunction_reject_policy_v1"
         ],
-        "note": "The cited source statement, selected same-Rasi computation convention, and future event-level reject effect are separately registered. The primitive is implemented with a TypeScript parity mirror; the event policy remains specified but unwired."
+        "note": "The cited source statement, selected same-Rasi computation convention and event-level reject effect are separately registered. The primitive is implemented with a TypeScript parity mirror and consumed only by the Borrowing Drik post-screen."
       },
       "tests": [
         "tests/test_same_rasi_conjunction.py",
@@ -1027,7 +1027,7 @@
         "Conjunction means same Rasi only; it does not imply a degree orb or a global conjunction default.",
         "Missing, malformed, duplicate, or conflicting chart facts resolve to unknown.",
         "A sampled window passes only when every sample passes and transition coverage completes within the request budget.",
-        "The primitive is not wired into Borrowing Money ranking or completion counts until issue 271."
+        "The Borrowing event-specific assessor maps a fail to rejection, but its overall completion remains provisional while the reusable baseline under issue 284 is incomplete."
       ],
       "method": {
         "kind": "decision-table",
@@ -1037,7 +1037,7 @@
           "Compare Chandra's Rasi independently with Kuja's and Shani's Rasis.",
           "Return fail when either equality holds and pass only when both comparisons are unequal.",
           "Across sampled states, return the first fail; otherwise the first unknown; otherwise return unknown for empty samples, budget exhaustion, or incomplete transition coverage; return pass only after complete all-pass coverage.",
-          "Keep the Borrowing Money reject effect as metadata only; do not change event scoring, ranking, or completion counts."
+          "Map a known fail to rejection only in the Borrowing Drik post-screen; keep non-Drik engines unknown and preserve the separate baseline-completeness boundary."
         ],
         "formulae": [
           {
@@ -1051,7 +1051,7 @@
             "label": "Chandra and Kuja in Mesha, Shani in Kumbha",
             "inputs": ["Chandra Rasi: Mesha", "Kuja Rasi: Mesha", "Shani Rasi: Kumbha", "complete canonical chart: yes"],
             "calculation": ["R(Chandra) equals R(Kuja).", "The disjunction is true even though R(Chandra) differs from R(Shani)."],
-            "result": ["Primitive outcome: fail", "Future Borrowing Money effect: reject, still unwired"]
+            "result": ["Primitive outcome: fail", "Borrowing Drik post-screen effect: reject"]
           }
         ],
         "notes": ["Window aggregation preserves fail over unknown so an already-observed prohibited state is not hidden by incomplete later coverage."]
@@ -1881,6 +1881,7 @@
       "implementations": [
         {"path": "telugu_panchangam/personal/activity_rules.py", "symbol": "ACTIVITY_RULES", "role": "owner"},
         {"path": "telugu_panchangam/personal/activity_rules.py", "symbol": "get_activity_rules", "role": "owner"},
+        {"path": "telugu_panchangam/personal/borrowing.py", "symbol": "resolve_borrowing_mode", "role": "owner"},
         {"path": "telugu_panchangam/personal/activity_check_contract.py", "symbol": "build_activity_check_contract", "role": "owner"},
         {"path": "tools/export_activity_rules.py", "symbol": "main", "role": "mirror"},
         {"path": "src/panels/tarabalam.ts", "symbol": "MU_ACTIVITY", "role": "mirror"}
@@ -1915,6 +1916,7 @@
         {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_tara", "role": "owner"},
         {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_chandra", "role": "owner"},
         {"path": "src/panels/tarabalam.ts", "symbol": "findMuhurta", "role": "mirror"},
+        {"path": "src/scorer/borrowing-context.ts", "symbol": "borrowingPurposeContext", "role": "mirror"},
         {"path": "src/panels/tarabalam.ts", "symbol": "muAssignTiers", "role": "mirror"},
         {"path": "src/muhurta-scorer.ts", "symbol": "computePersonalDosha", "role": "mirror"},
         {"path": "src/muhurta-scorer.ts", "symbol": "computeDayDosha", "role": "mirror"},

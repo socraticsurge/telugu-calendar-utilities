@@ -18,6 +18,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from telugu_panchangam.personal.activity_catalog import BROWSER_ACTIVITIES
+from telugu_panchangam.personal.borrowing import BORROWING_PURPOSES
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.election_chart_rules import (
     ELECTION_CHART_RULES,
@@ -26,10 +27,10 @@ from telugu_panchangam.personal.personal_election import (
     PERSONAL_ELECTION_RULES,
 )
 
-ACTIVITY_CHECK_CONTRACT_SCHEMA_VERSION = 2
+ACTIVITY_CHECK_CONTRACT_SCHEMA_VERSION = 3
 MANUAL_CHECK_CLASS = 'manual-only'
 MANUAL_CHECK_DISPLAY_SECTIONS = ('chart', 'information', 'practical')
-MANUAL_CHECK_PURPOSES = ('safety_override',)
+MANUAL_CHECK_PURPOSES = ('safety_override', *BORROWING_PURPOSES)
 CANONICAL_VARAS = (
     'Adivaram',
     'Somavaram',
@@ -401,11 +402,18 @@ ACTIVITY_CHECK_SPECS: Mapping[str, dict[str, tuple]] = {
     ),
     'borrowing_money': _activity(
         panchangam_fields=('avoid_nakshatras', 'avoid_janma_nakshatra'),
+        personal_rule_ids=(
+            'personal.borrowing.primary-borrower-janma-nakshatra',
+        ),
+        election_chart_rule_ids=(
+            'borrowing.same-rasi-chandra-kuja-shani',
+        ),
         manual_sections=(
             'information',
             'chart',
-            'chart',
-            'chart',
+            _manual('chart', purpose='quick_domestic_or_personal'),
+            _manual('chart', purpose='business'),
+            _manual('chart', purpose='other_or_unknown'),
             'practical',
         ),
     ),

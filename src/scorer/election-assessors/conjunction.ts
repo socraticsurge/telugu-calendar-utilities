@@ -24,7 +24,7 @@ export const SAME_RASI_CONJUNCTION_METADATA = {
     decision_claim_id: 'election_chart.borrowing_same_rasi_conjunction_reject_policy_v1',
     activity: 'borrowing_money',
     effect: 'reject',
-    status: 'specified_unwired',
+    status: 'implemented',
     delivery_issue: 271,
   },
 } as const;

@@ -86,7 +86,7 @@ def test_vidyarambha_declares_scoped_two_rule_partial_assessor():
     remainders = ELECTION_CHART_MANUAL_REMAINDERS['vidyarambha']
     assert remainders == ()
     assert ELECTION_CHART_COMPLETE_ASSESSORS == (
-        'gold', 'annaprasana', 'karnavedha', 'court')
+        'gold', 'annaprasana', 'karnavedha', 'court', 'borrowing_money')
 
 
 @pytest.mark.parametrize('case', FIXTURE['cases'], ids=lambda item: item['id'])
