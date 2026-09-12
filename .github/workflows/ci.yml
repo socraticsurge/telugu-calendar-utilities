@@ -8,16 +8,47 @@ on:
 permissions:
   contents: read
 
-# Push validates a branch before it has a PR. After a PR opens, GitHub emits
-# both push and pull_request events for the same commit; normalize both to the
-# source branch so only one matrix completes. Job names stay unchanged for
-# branch-protection compatibility.
+# Push validates a branch before it has a PR. Push and pull-request events use
+# separate concurrency groups so neither can leave canceled checks on the
+# other's commit. The scope job suppresses the push suite once that commit is
+# associated with an open PR; the PR suite then owns the protected contexts.
 concurrency:
-  group: ci-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
+  scope:
+    name: CI scope
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      run-suite: ${{ steps.scope.outputs.run-suite }}
+    steps:
+      - id: scope
+        name: Decide whether this event owns the suite
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" != "push" ]]; then
+            echo "run-suite=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          open_pr_count="$(gh api \
+            "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            --jq '[.[] | select(.state == "open")] | length')"
+          if (( open_pr_count > 0 )); then
+            echo "run-suite=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run-suite=true" >> "$GITHUB_OUTPUT"
+          fi
+
   test:
+    name: ${{ github.event_name == 'push' && format('branch test ({0})', matrix.python-version) || format('test ({0})', matrix.python-version) }}
+    needs: scope
+    if: needs.scope.outputs.run-suite == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -57,6 +88,9 @@ jobs:
         run: uv run --no-sync --no-build python -m pytest tests/ -v --ignore=tests/test_browser_smoke.py
 
   frontend-and-browser:
+    name: ${{ github.event_name == 'push' && 'branch frontend-and-browser' || 'frontend-and-browser' }}
+    needs: scope
+    if: needs.scope.outputs.run-suite == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

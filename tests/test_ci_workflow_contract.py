@@ -15,11 +15,19 @@ def test_ci_normalizes_push_and_pull_request_concurrency_keys():
     assert "branches-ignore: [gh-pages]" in workflow
     assert "branches-ignore: [master" not in workflow
     assert "permissions:\n  contents: read" in workflow
+    assert "    permissions:\n      contents: read\n      pull-requests: read" in workflow
     assert (
-        "group: ci-${{ github.event.pull_request.head.repo.full_name || "
+        "group: ci-${{ github.event_name }}-${{ "
+        "github.event.pull_request.head.repo.full_name || "
         "github.repository }}-${{ github.head_ref || github.ref_name }}" in workflow
     )
     assert "group: ci-${{ github.ref }}" not in workflow
+    assert "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" in workflow
+    assert workflow.count("if: needs.scope.outputs.run-suite == 'true'") == 2
+    assert "format('branch test ({0})', matrix.python-version)" in workflow
+    assert "format('test ({0})', matrix.python-version)" in workflow
+    assert "'branch frontend-and-browser'" in workflow
+    assert "|| 'frontend-and-browser'" in workflow
 
 
 def test_ci_retains_supported_runtimes_and_browser_coverage():

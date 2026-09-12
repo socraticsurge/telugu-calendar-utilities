@@ -124,9 +124,14 @@ before the deploy step runs.
 CI listens to feature-branch and `master` pushes plus pull requests. A push
 therefore validates a new branch before a PR exists, and the merge commit is
 validated again on `master`. Once a PR is open, GitHub can emit both push and
-pull-request events for the same commit. The concurrency key combines the head
-repository with `github.head_ref || github.ref_name`, so local duplicate events
-cancel while identically named branches from different forks stay isolated.
+pull-request events for the same commit. Push and pull-request events use
+separate concurrency groups. A successful `CI scope` job checks whether a
+pushed commit is already associated with an open PR. If so, the branch suite is
+skipped and the pull-request suite owns that commit. This avoids both duplicated
+matrices and canceled checks on active PRs. Branch-push jobs are additionally
+named `branch test (3.10)` through `branch test (3.13)` and
+`branch frontend-and-browser`; pull-request jobs retain the protected names
+below.
 
 The matrix job names remain `test (3.10)` through `test (3.13)`, so the four
 backend compatibility contexts are unchanged. Node, the production Vite build,
@@ -138,10 +143,10 @@ When introducing or renaming a job, push the branch and wait for the new check
 to pass before adding its exact name to branch protection. Do not merge while a
 new coverage-bearing job is not yet required.
 
-If duplicate matrices both complete, inspect the two runs' event types and
-concurrency groups. A `push` run and a `pull_request` run for the same head
-commit in this repository must resolve to the same
-`ci-<head-repository>-<source-branch>` group.
+If duplicate matrices both complete for a commit that was pushed after its PR
+opened, inspect the `CI scope` output and the commit-to-pulls API response. The
+push event should complete only the scope job, with its branch jobs skipped;
+the pull-request event should complete the protected suite.
 
 ---
 
