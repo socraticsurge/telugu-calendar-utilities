@@ -1,0 +1,618 @@
+{
+  "date": "2026-07-17",
+  "model_used": "gemini-3.1-flash-lite",
+  "rashis": {
+    "Mesha": {
+      "text": "Today brings a sense of heaviness as the cosmic currents push you to confront some internal friction. Your career trajectory is currently under strain, making it difficult to find steady ground in professional discussions. Financially, remain cautious with sudden expenditures as the energy patterns suggest a drain on resources. At home, family dynamics may feel tense, requiring a calm demeanor to prevent minor disagreements from escalating. Your physical well-being needs extra attention today; prioritize rest and avoid overexertion. Relationships may feel distant or misunderstood during this transit phase. Saturn moving through your twelfth house pulls your attention inward, reminding you that solitude is often more healing than constant action. Please be mindful that you are navigating the rising phase of Sade Sati, which calls for deep patience and resilience. Avoid making any impulsive investments or major financial commitments today to protect your long-term stability. Dedicate some time to silent reflection or a short meditative practice to center yourself. Keep your focus on small, manageable tasks rather than grand schemes. Remember that every challenging transit eventually leads to a season of growth and strength.",
+      "advice": "Postpone any significant financial investments or impulsive shopping trips until you have had time to review your budget carefully.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 3,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 5,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Ketu",
+          "position": 5,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Vrishabha": {
+      "text": "The day carries a mix of external opportunities and a slight feeling of personal restlessness. Your professional life looks promising with good potential for growth, provided you stay focused on your long-term objectives. Finances are in a stable place, and you might see some relief from previous pressures. However, family interactions might feel slightly burdened by the current planetary alignment, so try to lead with compassion. Health-wise, stay hydrated and maintain a regular routine to keep your energy levels consistent. Your relationships will flourish if you express appreciation to those closest to you today. Surya moving through your third house grants you a boost in courage, helping you overcome small hurdles with grace. Remember that staying grounded is your biggest asset today. Avoid getting dragged into unnecessary arguments with colleagues that do not concern your core responsibilities. Spend time connecting with close friends to rejuvenate your spirit. Trust your intuition when making quick decisions about your daily schedule. You are capable of handling today's demands with poise and clarity.",
+      "advice": "Focus your energy on clearing pending work tasks early in the day rather than starting new, complex projects.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 2,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 3,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 4,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Rahu",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 4,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Mithuna": {
+      "text": "You are greeted with a positive spark today as the Moon illuminates your path, offering a fresh perspective on ongoing projects. Career matters require a steady hand as you navigate through a period of adjustment. Financial decisions should be weighed carefully, avoiding any impulsive spending or speculative risks. Family life is currently in a harmonious phase, making it a great time to reconnect with loved ones over a simple meal. Pay attention to your health by keeping a balanced diet and avoiding excessive mental stress. Relationships will benefit from your clear communication today, provided you listen as much as you speak. The current positioning of Ketu in your third house strengthens your resolve, helping you cut through confusion with ease. Although you face some blockage in your career progress, maintain a steady pace and do not force results. Avoid signing any legally binding contracts until the late afternoon when the energy feels more settled. Practice gratitude for the small wins you have achieved recently. Your intellectual clarity is your greatest strength right now, so use it to solve lingering problems.",
+      "advice": "Do not sign any important contracts or start new negotiations before the late afternoon.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 2,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shukra",
+          "position": 3,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shani",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 3,
+          "verdict": "favourable"
+        }
+      ]
+    },
+    "Karka": {
+      "text": "Today demands that you step back and observe the shifting currents of your personal life with patience. Career efforts may feel like an uphill climb, so avoid overextending yourself with new, high-stakes tasks today. Finances are looking up thanks to favorable influences, allowing you to manage your resources with more confidence. Family life may feel a bit overwhelming, so create some physical space to process your thoughts and emotions. Focus on your health by incorporating gentle movement into your day to release stagnant energy. Relationships require sensitivity; try to be an anchor for others rather than seeking validation from them. The presence of Kuja in your eleventh house provides a much-needed boost in your networking capabilities, helping you gain support from unexpected sources. Be mindful that current planetary placements call for a conservative approach to decision-making. Avoid engaging in heated debates regarding family finances or long-term investments. Prioritize your inner peace over winning an argument or proving a point. You possess the emotional depth to navigate this day successfully by staying grounded and authentic.",
+      "advice": "Focus on clearing existing professional debts or pending administrative work rather than initiating new major collaborations.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Budha",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 2,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 2,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Simha": {
+      "text": "You stand at a threshold today, feeling a mix of internal drive and external challenges that test your resolve. Your career situation is delicate, requiring you to act with extreme caution and diplomatic tact. Financially, there are potential pitfalls, so keep a tight grip on your savings and avoid unnecessary risks. Family members may look to you for guidance, but ensure you are not draining your own reserves in the process. Health requires vigilance; watch for signs of fatigue and ensure you get adequate rest. Relationships might feel strained due to miscommunications, so choose your words carefully. The influence of Ashtama Shani makes this a time for deep introspection and caution in all dealings. Be aware that your current planetary setup calls for humility and patience above all else. Avoid starting any new ventures today that require long-term commitment. Instead, focus on completing legacy tasks that have been hanging over your head. Keep your communication clear and avoid gossiping, as it may come back to haunt you. You have the inner strength to emerge from this day stronger and wiser.",
+      "advice": "Avoid making any major changes in your professional role or personal life until the evening hours have passed.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 1,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 11,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Guru",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 1,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shani",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 1,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Kanya": {
+      "text": "The day brings a sense of expansive possibility, even if the logistics feel a little overwhelming right now. Your career is supported by favorable alignments, making this a good time to showcase your efficiency and attention to detail. Financial prospects are bright, and you may find yourself in a position to settle some long-standing accounts. Family dynamics are supportive, providing you with a comfortable base from which to operate. Health is generally good, provided you don't skip your exercise routine due to a busy schedule. Relationships are blossoming, and you might find deep connection in shared quiet moments. The transit of Budha in your tenth house sharpens your communication skills, making it easier to convince others of your vision. Remember that your current successes are built on your consistency; keep that momentum going without burning out. Avoid letting minor worries about the future disturb your current productivity. Spend time documenting your ideas today as they will prove valuable in the coming weeks. You are in a strong position to advance your goals if you remain focused and diligent.",
+      "advice": "Use the favorable professional energy to finalize important reports or present your ideas to leadership before the day ends.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 10,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shukra",
+          "position": 12,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Ketu",
+          "position": 12,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Tula": {
+      "text": "You are experiencing a day of balance and movement, where social connections play a vital role in your success. Your career is showing signs of positive development, especially if you leverage your network and collaborate with trusted peers. Finances are manageable, but it is wise to avoid impulsive luxury purchases that might affect your stability. Family life is a source of joy today; spend time engaging in meaningful conversations with your household. Health is stable, but remember to take breaks from the screen to avoid eye strain. Relationships are deeply rewarding, provided you remain authentic about your needs. Ketu in your eleventh house brings a unique opportunity to detach from superficial goals and focus on what truly matters to your long-term success. Be mindful that even good days require careful navigation of minor obstacles. Avoid being too rigid in your plans, as flexibility will be your greatest ally today. Spend a little time in nature or near water to recharge your creative faculties. You are well-positioned to make progress if you maintain your focus on your core priorities.",
+      "advice": "Prioritize networking and social engagement over isolated administrative work today to make the most of your current placements.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 10,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 11,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Kuja",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 11,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shani",
+          "position": 6,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Rahu",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 11,
+          "verdict": "favourable"
+        }
+      ]
+    },
+    "Vrischika": {
+      "text": "Today brings a sense of quiet authority, helping you manage your responsibilities with a calm and collected demeanor. Your career is progressing well, and you may find that previous efforts are finally yielding recognition. Financially, you are in a safe spot, but keep a cautious eye on shared accounts or joint ventures. Family life is generally stable, though a brief moment of misunderstanding could arise if you aren't attentive. Focus on your health by maintaining your exercise routine, even if you feel tempted to skip it. Relationships are grounded, and today is a good time to demonstrate loyalty and support to those who rely on you. Budha in your eighth house encourages deeper insight and research, making this an ideal time to solve complex puzzles or hidden issues. Remember to balance your intensity with occasional levity to keep the atmosphere light. Avoid making hasty promises or commitments that you cannot realistically fulfill later. Spend time in reflection to align your actions with your deepest values. You have the stability required to handle the day's challenges with grace.",
+      "advice": "Engage in research or analytical tasks that require deep focus rather than social or public-facing work.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 10,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 8,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 9,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shukra",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shani",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 10,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Dhanu": {
+      "text": "The energy today suggests a time of spiritual consolidation, where you are invited to look at your broader purpose. Your career might feel like it is in a transition phase, so prioritize maintaining your current standards rather than pushing for radical change. Finances are steady, provided you avoid unnecessary indulgence or large impulse buys. Family interactions are warm and supportive, offering you a necessary refuge from any outside stress. Health requires gentle care; listen to your body and avoid pushing yourself beyond your limits today. Relationships are a source of great comfort and clarity for you. With Rahu in your third house, your communication style is bold and effective, helping you get your points across with impact. Be mindful that you are under the influence of Ardhastama Shani, which suggests exercising caution in all property or home-related matters. Avoid conflicts involving siblings or neighbors by choosing silence over confrontation today. Dedicate time to your personal interests to keep your spirits high. You are navigating this time with integrity, and that will reflect in your outcomes.",
+      "advice": "Avoid property-related decisions or home renovations today, focusing instead on internal goals.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 6,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Budha",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 9,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Ketu",
+          "position": 9,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Makara": {
+      "text": "Today asks for patience as you navigate through a slightly bumpy landscape. Career matters might feel stalled, but this is a temporary state, so avoid forcing a resolution today. Financially, keep your wallet closed to speculative risks and focus on consolidating what you already have. Family life may require extra patience, as emotions could run a bit high in the household. Pay special attention to your health by sticking to a routine that promotes digestion and relaxation. Relationships are best handled with a gentle approach; sometimes the best way to support someone is just to be present. The placement of Shani in your third house grants you the inner stamina to weather any minor setbacks that come your way. Please be aware that your current planetary conditions suggest a day for observation rather than aggressive expansion. Avoid starting new partnerships or signing contracts until you have more clarity. Spend time organizing your physical space to create a sense of order. Trust that your methodical nature is your best protection against current volatility. You are steady and ready for whatever comes next.",
+      "advice": "Avoid engaging in risky financial speculations or starting new professional collaborations today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 7,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shukra",
+          "position": 8,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shani",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Rahu",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 8,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Kumbha": {
+      "text": "The day brings a focus on your partnerships and your ability to connect with others on a deeper level. Career progress is steady, provided you don't let current transit challenges discourage your natural ambition. Finances are manageable, though you should keep a watchful eye on shared expenses. Family life is a pillar of strength today, so lean on your loved ones if you feel the weight of the day. Health needs some attention; maintain your routine and ensure you get enough rest to stay sharp. Relationships are under scrutiny, but this is a chance to clear away any lingering misunderstandings. You are currently in the setting phase of Sade Sati, which calls for humility and grace in all your interactions. Be mindful that despite some blockages in your transit path, you remain resilient. Avoid making impulsive decisions in legal or partnership matters today, as clarity might be limited. Spend time in creative pursuits that allow you to express your inner world. You are finding your way through a complex time, and your patience is truly commendable.",
+      "advice": "Postpone important discussions with partners or legal advisors until tomorrow when your communication will be clearer.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 7,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Kuja",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 6,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shani",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 7,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Meena": {
+      "text": "Today brings a sense of steady progress, even as you navigate your internal and external tasks with care. Career efforts are met with some initial resistance, but your consistency will eventually break through any barriers. Finances are stable, though avoiding unnecessary luxury spending will help you feel more secure. Family members are supportive, providing you with a grounding energy that you can rely on today. Focus on your health by drinking plenty of water and getting enough quiet, restorative sleep. Relationships are in a good place, so prioritize spending quality time with your partner or close friends. You are experiencing the peak phase of Sade Sati, which emphasizes the need for spiritual grounding and emotional control. Be mindful that even with some transit challenges, your capacity for growth remains immense. Avoid overcommitting your time to projects that don't align with your core values. Spend a little time in meditation or gentle exercise to keep your energy balanced. You are capable of navigating today with wisdom and kindness towards yourself.",
+      "advice": "Prioritize personal health and quiet tasks over high-energy social obligations today to maintain your internal balance.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Budha",
+          "position": 4,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Guru",
+          "position": 5,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shukra",
+          "position": 6,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shani",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 6,
+          "verdict": "favourable"
+        }
+      ]
+    }
+  }
+}
