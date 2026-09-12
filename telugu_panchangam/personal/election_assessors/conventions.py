@@ -5,6 +5,21 @@ from __future__ import annotations
 ELECTION_CHART_CONVENTION_SCHEMA_VERSION = 4
 
 ELECTION_CHART_CONVENTIONS: dict[str, dict] = {
+    'benefic-rasi-by-resolved-natural-lord-v1': {
+        'label': 'Benefic Rasi by resolved natural lord v1',
+        'formula': (
+            'Derive the Rasi lord from the classical seven-graha ownership '
+            'table, then pass when that lord resolves natural benefic, fail '
+            'when it resolves natural malefic, and return unknown when the '
+            'lord nature or canonical chart is unresolved. Occupancy, '
+            'dignity and functional lordship are not included.'
+        ),
+        'method_claims': [
+            'election_chart.benefic_rasi_lord_nature_policy_v1',
+            'election_chart.natural_graha_nature.phaladeepika_2_27',
+            'election_chart.dignity.phaladeepika_1_6',
+        ],
+    },
     'court-canonical-local-d1-sidecar-d9-v1': {
         'label': 'Court canonical D1-or-guarded-D9 convention v1',
         'formula': (

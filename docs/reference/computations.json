@@ -2123,6 +2123,32 @@
       }
     },
     {
+      "id": "personal.benefic-rasi-foundation",
+      "title": "Benefic Rasi by resolved natural lord foundation",
+      "summary": "A reusable primitive classifies a target Rasi through the resolved natural nature of its classical lord while keeping occupancy, dignity and event effects separate.",
+      "owning_layer": "personal",
+      "claim_kind": "project-heuristic",
+      "implementations": [
+        {"path": "telugu_panchangam/personal/election_assessors/benefic_rasi.py", "symbol": "evaluate_benefic_rasi", "role": "owner"},
+        {"path": "src/scorer/election-assessors/benefic-rasi.ts", "symbol": "evaluateBeneficRasi", "role": "mirror"}
+      ],
+      "inputs": ["target canonical Rasi", "complete canonical nine-graha chart", "classical seven-graha Rasi-lord table", "resolved natural-graha natures"],
+      "outputs": ["pass, fail or unknown with the derived lord and resolved nature as evidence"],
+      "time_basis": "One exact chart snapshot; the primitive neither samples a window nor applies an event effect.",
+      "surfaces": ["python-library", "website", "generated-data"],
+      "provenance": {"evidence_classes": ["textual", "project_heuristic"], "verification_states": ["verified", "heuristic"], "claim_ids": ["muhurta.namakarana", "election_chart.dignity.phaladeepika_1_6", "election_chart.natural_graha_nature.phaladeepika_2_27", "election_chart.benefic_rasi_lord_nature_policy_v1"], "note": "Raman supplies the Naming phrase; registered ownership and natural-nature authorities supply the two facts; their composition is explicit project policy."},
+      "tests": ["tests/test_benefic_rasi.py", "src/scorer/__tests__/benefic-rasi.test.ts", "tests/fixtures/election_chart_benefic_rasi_oracle.json"],
+      "limitations": ["This issue-408 foundation is specified_unwired and changes no score, rank, tier, rejection, qualification, admission, completion count or user-facing result.", "Benefic occupancy, dignity, own-sign status, nodes and functional nature are not alternative names for this result.", "Conditional Chandra or Budha nature and missing or conflicting canonical facts return unknown.", "A consumer must separately select and document any reject, qualify or prefer effect."],
+      "method": {
+        "kind": "decision-table",
+        "summary": "Map the target Rasi to its classical lord, reuse the registered natural-nature classifier, then pass for a resolved natural benefic, fail for a resolved natural malefic and otherwise return unknown.",
+        "steps": ["Validate the target against the twelve canonical Rasis.", "Validate and classify the complete nine-graha chart through the shared natural-nature owner.", "Derive the target's lord from the classical seven-graha ownership table.", "Return pass for a benefic lord, fail for a malefic lord and unknown for an unresolved conditional lord or invalid evidence.", "Expose the derived lord and nature but do not assign an event effect."],
+        "formulae": [{"name": "Benefic Rasi by resolved natural lord", "expression": "L = classical_lord(S); result = pass if nature(L)=benefic, fail if nature(L)=malefic, else unknown", "variables": ["S: target canonical Rasi", "L: classical Surya-through-Shani Rasi lord", "nature: registered natural-graha-nature classifier"]}],
+        "worked_examples": [{"label": "Mithuna with resolved benefic Budha", "inputs": ["Target Rasi: Mithuna", "Classical lord: Budha", "No resolved natural malefic shares Budha's Rasi"], "calculation": ["The ownership table derives Budha.", "The natural-nature classifier resolves Budha as benefic."], "result": ["Status: pass", "No event effect"]}],
+        "notes": ["The twelve-Rasi and nature-edge oracle is synthetic parity evidence, not an external-source golden.", "A fixed list that ignores current Chandra and Budha conditions is deliberately unselected."]
+      }
+    },
+    {
       "id": "personal.natural-graha-nature",
       "title": "Natural graha nature and house-set witnesses",
       "summary": "A source-bounded, versioned decision table classifies each canonical graha as a natural benefic, natural malefic, or unknown and derives decisive three-valued house-set witness predicates.",

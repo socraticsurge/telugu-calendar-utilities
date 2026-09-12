@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "convention_id": "benefic-rasi-by-resolved-natural-lord-v1",
+  "base_chart": {
+    "instant": "2026-09-12T06:00:00Z",
+    "lagna": {"rashi": "Mesha", "degree": 12.0},
+    "planets": [
+      {"name": "Surya", "rashi": "Mesha", "degree": 10.0, "house": 1, "retrograde": false},
+      {"name": "Chandra", "rashi": "Vrishabha", "degree": 5.0, "house": 2, "retrograde": false},
+      {"name": "Kuja", "rashi": "Karka", "degree": 12.0, "house": 4, "retrograde": false},
+      {"name": "Budha", "rashi": "Mithuna", "degree": 8.0, "house": 3, "retrograde": false},
+      {"name": "Guru", "rashi": "Simha", "degree": 15.0, "house": 5, "retrograde": true},
+      {"name": "Shukra", "rashi": "Kanya", "degree": 18.0, "house": 6, "retrograde": false},
+      {"name": "Shani", "rashi": "Tula", "degree": 22.0, "house": 7, "retrograde": true},
+      {"name": "Rahu", "rashi": "Vrischika", "degree": 25.0, "house": 8, "retrograde": true},
+      {"name": "Ketu", "rashi": "Dhanu", "degree": 25.0, "house": 9, "retrograde": true}
+    ]
+  },
+  "rasi_cases": [
+    {"rashi": "Mesha", "lord": "Kuja", "status": "fail"},
+    {"rashi": "Vrishabha", "lord": "Shukra", "status": "pass"},
+    {"rashi": "Mithuna", "lord": "Budha", "status": "pass"},
+    {"rashi": "Karka", "lord": "Chandra", "status": "pass"},
+    {"rashi": "Simha", "lord": "Surya", "status": "fail"},
+    {"rashi": "Kanya", "lord": "Budha", "status": "pass"},
+    {"rashi": "Tula", "lord": "Shukra", "status": "pass"},
+    {"rashi": "Vrischika", "lord": "Kuja", "status": "fail"},
+    {"rashi": "Dhanu", "lord": "Guru", "status": "pass"},
+    {"rashi": "Makara", "lord": "Shani", "status": "fail"},
+    {"rashi": "Kumbha", "lord": "Shani", "status": "fail"},
+    {"rashi": "Meena", "lord": "Guru", "status": "pass"}
+  ],
+  "nature_cases": [
+    {
+      "id": "waning-chandra-lord",
+      "rashi": "Karka",
+      "overrides": {"Chandra": {"rashi": "Kumbha", "degree": 10.0}},
+      "status": "fail"
+    },
+    {
+      "id": "phase-guard-chandra-lord",
+      "rashi": "Karka",
+      "overrides": {"Chandra": {"rashi": "Tula", "degree": 10.0}},
+      "status": "unknown"
+    },
+    {
+      "id": "malefic-associated-budha-lord",
+      "rashi": "Mithuna",
+      "overrides": {"Kuja": {"rashi": "Mithuna"}},
+      "status": "fail"
+    },
+    {
+      "id": "phase-unknown-associated-budha-lord",
+      "rashi": "Kanya",
+      "overrides": {
+        "Chandra": {"rashi": "Tula", "degree": 10.0},
+        "Budha": {"rashi": "Tula", "degree": 8.0},
+        "Shani": {"rashi": "Makara"}
+      },
+      "status": "unknown"
+    },
+    {"id": "missing-chart-fact", "rashi": "Dhanu", "remove": "Guru", "status": "unknown"},
+    {"id": "invalid-rasi", "rashi": "Not-a-Rasi", "status": "unknown"}
+  ]
+}

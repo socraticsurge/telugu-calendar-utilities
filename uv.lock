@@ -841,7 +841,7 @@ wheels = [
 
 [[package]]
 name = "mcp-server-panchangam"
-version = "1.18.12"
+version = "1.18.13"
 source = { editable = "." }
 dependencies = [
     { name = "geopy" },

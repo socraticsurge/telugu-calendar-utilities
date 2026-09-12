@@ -125,6 +125,65 @@
         402
       ]
     },
+    "benefic-rasi-by-resolved-natural-lord-v1": {
+      "schema_version": 1,
+      "concept": "benefic_rasi",
+      "label": "Benefic Rasi by resolved natural lord",
+      "status": "selected",
+      "source_claims": [
+        "muhurta.namakarana",
+        "election_chart.natural_graha_nature.phaladeepika_2_27",
+        "election_chart.dignity.phaladeepika_1_6"
+      ],
+      "method_claims": [
+        "election_chart.benefic_rasi_lord_nature_policy_v1"
+      ],
+      "inputs": [
+        "target Rasi",
+        "classical seven-graha Rasi lordship",
+        "resolved natural nature of that lord"
+      ],
+      "formula": "lord = classical_lord(target Rasi); pass when natural_nature(lord) is benefic, fail when it is malefic, and otherwise unknown",
+      "thresholds": {},
+      "precedence": "The target Rasi is classified only through its classical lord's resolved natural nature; the current chart still controls conditional Chandra and Budha nature.",
+      "conflict_resolution": "Occupancy, dignity, functional lordship, nodes and event-specific effects remain separate facts. Missing or conflicting chart facts, and unresolved Chandra or Budha nature, return unknown.",
+      "alternatives": [
+        {
+          "id": "fixed-benefic-lord-list-unselected",
+          "status": "unselected",
+          "reason": "It would erase the registered conditional nature of Chandra and Budha."
+        },
+        {
+          "id": "benefic-occupant-unselected",
+          "status": "unselected",
+          "reason": "A benefic occupying a Rasi is an occupancy fact, not a classification of the Rasi itself."
+        },
+        {
+          "id": "dignity-or-own-sign-unselected",
+          "status": "unselected",
+          "reason": "Dignity and ownership are separate registered facts and the source phrase does not select this blend."
+        },
+        {
+          "id": "functional-benefic-rasi-unresolved",
+          "status": "unresolved",
+          "reason": "Functional nature depends on Lagna and has no selected source or formula here."
+        },
+        {
+          "id": "independent-auspicious-rasi-classification-unselected",
+          "status": "unselected",
+          "reason": "The complete registered source does not name a separate twelve-Rasi benefic taxonomy."
+        }
+      ],
+      "implementation": [
+        "telugu_panchangam/personal/election_assessors/benefic_rasi.py",
+        "src/scorer/election-assessors/benefic-rasi.ts"
+      ],
+      "implementation_status": "implemented",
+      "event_wiring_status": "specified_unwired",
+      "delivery_issues": [
+        408
+      ]
+    },
     "court-peace-benefic-subject-continuity-v1": {
       "schema_version": 1,
       "concept": "benefic_pattern",
@@ -642,6 +701,10 @@
     }
   },
   "applied_convention_interpretations": {
+    "benefic-rasi-by-resolved-natural-lord-v1": [
+      "classical-seven-graha-rasi-lordship-v1",
+      "phaladeepika-natural-graha-nature-whole-sign-v1"
+    ],
     "court-canonical-local-d1-sidecar-d9-v1": [
       "bphs-modality-navamsa-v1"
     ],

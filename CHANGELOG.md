@@ -9,6 +9,10 @@ PyPI version tracks this file's most recent release entry.
 
 ### Fixed
 
+- Prepare MCP/PyPI patch metadata `1.18.13` while adding the reusable,
+  event-unwired Benefic-Rasi-by-resolved-natural-lord convention with guarded
+  Python/TypeScript parity, explicit alternative interpretations, and no
+  change to ranking, rejection, qualification, or completion behavior.
 - Prepare MCP/PyPI patch metadata `1.18.12` while completing the five-clause
   Court filing assessor, `litigation` alias parity, conservative transition
   coverage, non-ranking peace information, responsive UI and review evidence.
