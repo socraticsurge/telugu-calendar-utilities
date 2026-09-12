@@ -18,8 +18,8 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from telugu_panchangam.personal.activity_catalog import BROWSER_ACTIVITIES
-from telugu_panchangam.personal.borrowing import BORROWING_PURPOSES
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
+from telugu_panchangam.personal.borrowing import BORROWING_PURPOSES
 from telugu_panchangam.personal.election_chart_rules import (
     ELECTION_CHART_RULES,
 )

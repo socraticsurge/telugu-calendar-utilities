@@ -57,7 +57,6 @@
 
 from .borrowing import BORROWING_MODE_REGISTRY
 
-
 COURT_SOURCE_EFFECT_POLICY = {
     'schema_version': 1,
     'source_claim': 'muhurta.court.filing_lawsuit',

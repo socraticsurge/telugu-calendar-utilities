@@ -1,18 +1,18 @@
 """Integrated, source-bounded Borrowing event checks."""
 
-from copy import deepcopy
 import json
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
+from telugu_panchangam.personal.activity_check_contract import (
+    build_activity_check_contract,
+)
 from telugu_panchangam.personal.borrowing import (
     BORROWING_MODE_REGISTRY,
     BORROWING_PURPOSES,
     resolve_borrowing_mode,
-)
-from telugu_panchangam.personal.activity_check_contract import (
-    build_activity_check_contract,
 )
 from telugu_panchangam.personal.election_chart import (
     evaluate_election_chart,
