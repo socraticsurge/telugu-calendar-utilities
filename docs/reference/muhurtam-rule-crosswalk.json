@@ -11,10 +11,10 @@
     "activities": 30,
     "browser_activities": 30,
     "python_mcp_only_activities": 5,
-    "rows": 328,
+    "rows": 333,
     "deterministic_panchangam_rows": 177,
     "personal_rule_rows": 5,
-    "election_chart_rule_rows": 32,
+    "election_chart_rule_rows": 37,
     "manual_display_rows": 114,
     "by_predicate_class": {
       "panchangam.slot-exclusion": 16,
@@ -39,16 +39,21 @@
       "election-chart.planet_receives_full_aspect": 2,
       "panchangam.personal-slot-exclusion": 2,
       "panchangam.disclosure": 1,
-      "panchangam.specialized-admission": 1
+      "panchangam.specialized-admission": 1,
+      "election-chart.court_mesha_d1_d9": 1,
+      "election-chart.court_guru_trikona": 1,
+      "election-chart.court_no_natural_malefic_h6": 1,
+      "election-chart.court_lagna_sixth_lord_separation": 1,
+      "election-chart.court_peace_pattern": 1
     },
     "by_implementation_status": {
       "automated_browser_and_python": 154,
       "automated_python_only_not_browser": 23,
-      "automated_exact_chart_browser_with_python_parity": 37,
+      "automated_exact_chart_browser_with_python_parity": 42,
       "manual_displayed_not_computed": 114
     },
     "by_authority_status": {
-      "source_backed": 249,
+      "source_backed": 254,
       "explicit_project_heuristic": 76,
       "documented_conflict": 3
     },
@@ -1652,7 +1657,7 @@
           }
         ],
         "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
-        "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; separation of the Lagna and 6th lords; and the non-predictive peace configuration. The passage does not expand 'the usual unfavorable Tithis'; registered alternatives and the unchanged operational choice are separate claims. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The legacy litigation API key resolves explicitly to this profile and is not a separate election."
+        "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; separation of the Lagna and 6th lords; and the non-predictive peace configuration. The Drik website post-screen now evaluates all five clauses across every sampled, Lagna-stable state: two exact rejection gates, two score-neutral preferences and one non-ranking information pattern. Unknown or boundary-adjacent facts retain the slot with visible review; mandatory failures remove it. The passage does not expand 'the usual unfavorable Tithis'; registered alternatives and the unchanged operational choice are separate claims. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The legacy litigation API key resolves explicitly to this profile and is not a separate election."
       },
       "related_claims": [
         {
@@ -1772,6 +1777,11 @@
         "court.panchangam.allowed_nakshatras",
         "court.panchangam.avoid_tithi_numbers",
         "court.panchangam.allowed_lagnas",
+        "court.mesha-lagna-or-navamsa",
+        "court.guru-trikona",
+        "court.house-6-without-natural-malefic",
+        "court.lagna-sixth-lords-max-separated",
+        "court.peace-benefic-pattern",
         "court.manual-1",
         "court.manual-2",
         "court.manual-3",
@@ -1779,7 +1789,7 @@
         "court.manual-5",
         "court.manual-6"
       ],
-      "row_count": 10
+      "row_count": 15
     },
     {
       "activity": "surgery",
@@ -13618,6 +13628,364 @@
     },
     {
       "activity": "court",
+      "rule_id": "court.mesha-lagna-or-navamsa",
+      "predicate_class": "election-chart.court_mesha_d1_d9",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "court_mesha_d1_d9",
+        "predicate_inputs": {
+          "convention_id": "court-canonical-local-d1-sidecar-d9-v1",
+          "convention_label": "Court canonical D1-or-guarded-D9 convention v1",
+          "formula": "Pass when the canonical local Drik/Lahiri D1 Lagna Rasi is Mesha, or when the sidecar Lagna Rasi agrees with that canonical D1 and its guarded BPHS-modality Navamsa is Mesha.",
+          "method_claims": [
+            "election_chart.whole_sign_house_policy_v1",
+            "election_chart.navamsa.bphs_6_12"
+          ],
+          "decision_policy_claim": "muhurta.court.effect_policy_v1"
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
+      },
+      "source_claim_id": "muhurta.court.filing_lawsuit",
+      "source_claim": {
+        "id": "muhurta.court.filing_lawsuit",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "decision_policy_claim_id": "muhurta.court.effect_policy_v1",
+      "decision_policy_claim": {
+        "id": "muhurta.court.effect_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "Project decision over the five atomic B. V. Raman Chapter XVII filing-law-suits clauses, inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      },
+      "supporting_claims": [
+        {
+          "id": "election_chart.navamsa.bphs_6_12",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "BPHS-ELS-6.12"
+          ],
+          "locator": "Chapter 6, verse 12"
+        }
+      ]
+    },
+    {
+      "activity": "court",
+      "rule_id": "court.guru-trikona",
+      "predicate_class": "election-chart.court_guru_trikona",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "court_guru_trikona",
+        "predicate_inputs": {
+          "convention_id": "whole-sign-physical-occupation-v1",
+          "convention_label": "Whole Sign physical-occupation convention v1",
+          "formula": "house = 1 + ((graha Rasi index - local Lagna Rasi index + 12) mod 12). “Occupies Lagna” means physical occupation of house 1; it does not mean aspect, lordship, Shadbala or Lagna strength.",
+          "method_claims": [
+            "election_chart.whole_sign_house_policy_v1"
+          ],
+          "decision_policy_claim": "muhurta.court.effect_policy_v1"
+        },
+        "sample_aggregation": "pass only if every sampled state passes; fail only if every sampled state fails; otherwise unknown"
+      },
+      "source_claim_id": "muhurta.court.filing_lawsuit",
+      "source_claim": {
+        "id": "muhurta.court.filing_lawsuit",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tie_break_preference",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "decision_policy_claim_id": "muhurta.court.effect_policy_v1",
+      "decision_policy_claim": {
+        "id": "muhurta.court.effect_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "Project decision over the five atomic B. V. Raman Chapter XVII filing-law-suits clauses, inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      }
+    },
+    {
+      "activity": "court",
+      "rule_id": "court.house-6-without-natural-malefic",
+      "predicate_class": "election-chart.court_no_natural_malefic_h6",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "court_no_natural_malefic_h6",
+        "predicate_inputs": {
+          "convention_id": "phaladeepika-natural-graha-nature-whole-sign-v1",
+          "convention_label": "Phaladeepika natural-graha nature Whole Sign convention v1",
+          "formula": "Surya, Kuja, Shani, Rahu and Ketu are fixed malefics; Guru and Shukra are fixed benefics. Chandra is benefic for normalized Surya-Chandra elongation 0.02° < E < 179.98°, malefic for 180.02° < E < 359.98°, and unknown inside the inclusive 0.02° guards around 0°/180°/360° after ten-decimal, non-negative round-half-up quantization. Budha is malefic when a resolved malefic shares its sidereal Rasi, unknown when only phase-unknown Chandra can decide, and otherwise benefic.",
+          "method_claims": [
+            "election_chart.natural_graha_nature.phaladeepika_2_27",
+            "election_chart.natural_malefics.bphs_3_11_modern_witness",
+            "election_chart.budha_same_sign_association_policy_v1",
+            "election_chart.raman_180_degree_paksha_policy_v1",
+            "election_chart.lunar_phase_boundary_guard_policy_v1",
+            "election_chart.mean_node_policy_v1"
+          ],
+          "decision_policy_claim": "muhurta.court.effect_policy_v1"
+        },
+        "sample_aggregation": "fail if any sampled state fails; unknown if any sampled state is unresolved; otherwise pass"
+      },
+      "source_claim_id": "muhurta.court.filing_lawsuit",
+      "source_claim": {
+        "id": "muhurta.court.filing_lawsuit",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "candidate_exclusion",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "decision_policy_claim_id": "muhurta.court.effect_policy_v1",
+      "decision_policy_claim": {
+        "id": "muhurta.court.effect_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "Project decision over the five atomic B. V. Raman Chapter XVII filing-law-suits clauses, inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      },
+      "supporting_claims": [
+        {
+          "id": "election_chart.natural_graha_nature.phaladeepika_2_27",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "PD-SASTRI-1950-2E"
+          ],
+          "locator": "Chapter II, sloka 27, book pp. 19-20 (scan pp. 56-57)"
+        },
+        {
+          "id": "election_chart.natural_malefics.bphs_3_11_modern_witness",
+          "surface": "muhurtam",
+          "authority_status": "source_backed",
+          "evidence_class": "textual",
+          "verification_state": "verified",
+          "source_ids": [
+            "BPHS-ELS-3.11-MODERN-WITNESS"
+          ],
+          "locator": "Chapter 3, verse 11, Sanskrit compound analysis and English rendering"
+        }
+      ]
+    },
+    {
+      "activity": "court",
+      "rule_id": "court.lagna-sixth-lords-max-separated",
+      "predicate_class": "election-chart.court_lagna_sixth_lord_separation",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "court_lagna_sixth_lord_separation",
+        "predicate_inputs": {
+          "convention_id": "court-lagna-sixth-lord-whole-sign-opposition-v1",
+          "convention_label": "Court Lagna-sixth-lord Whole Sign opposition convention v1",
+          "formula": "Derive the Lagna Rasi and sixth-house Rasi lords from the classical seven-graha ownership table, then require min(abs(R1 - R2), 12 - abs(R1 - R2)) = 6. Rahu and Ketu are never sign lords. This is a binary, score-neutral Court preference rather than a source-supplied numeric formula.",
+          "method_claims": [
+            "election_chart.court_lagna_sixth_lord_separation_policy_v1"
+          ],
+          "decision_policy_claim": "muhurta.court.effect_policy_v1"
+        },
+        "sample_aggregation": "pass only if every sampled state passes; fail only if every sampled state fails; otherwise unknown"
+      },
+      "source_claim_id": "muhurta.court.filing_lawsuit",
+      "source_claim": {
+        "id": "muhurta.court.filing_lawsuit",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tie_break_preference",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "decision_policy_claim_id": "muhurta.court.effect_policy_v1",
+      "decision_policy_claim": {
+        "id": "muhurta.court.effect_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "Project decision over the five atomic B. V. Raman Chapter XVII filing-law-suits clauses, inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      }
+    },
+    {
+      "activity": "court",
+      "rule_id": "court.peace-benefic-pattern",
+      "predicate_class": "election-chart.court_peace_pattern",
+      "configured_inputs": {
+        "house_system": "whole_sign",
+        "node_convention": "mean",
+        "planet_set": [
+          "Surya",
+          "Chandra",
+          "Kuja",
+          "Budha",
+          "Guru",
+          "Shukra",
+          "Shani",
+          "Rahu",
+          "Ketu"
+        ],
+        "predicate": "court_peace_pattern",
+        "predicate_inputs": {
+          "convention_id": "court-peace-benefic-subject-continuity-v1",
+          "convention_label": "Court peace benefic subject-continuity convention v1",
+          "formula": "Pass when a resolved natural benefic occupies Whole Sign house 1, 4, 7 or 10, or when a resolved natural benefic occupies an odd Rasi and receives a full classical aspect from another resolved natural benefic. The result is non-ranking information.",
+          "method_claims": [
+            "election_chart.court_peace_pattern_policy_v1"
+          ],
+          "decision_policy_claim": "muhurta.court.effect_policy_v1"
+        },
+        "sample_aggregation": "pass only if every sampled state passes; fail only if every sampled state fails; otherwise unknown"
+      },
+      "source_claim_id": "muhurta.court.filing_lawsuit",
+      "source_claim": {
+        "id": "muhurta.court.filing_lawsuit",
+        "surface": "muhurtam",
+        "authority_status": "source_backed",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      },
+      "implementation_status": "automated_exact_chart_browser_with_python_parity",
+      "implementation_owner": "telugu_panchangam/personal/election_chart_rules.py",
+      "ranking_effect": "post_screen_tie_break_preference",
+      "automation_mode": "automated",
+      "automation_rationale": "The named, versioned interpretation convention is a bounded predicate over the exact nine-Graha election chart.",
+      "predicate_source_locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "decision_policy_claim_id": "muhurta.court.effect_policy_v1",
+      "decision_policy_claim": {
+        "id": "muhurta.court.effect_policy_v1",
+        "surface": "muhurtam",
+        "authority_status": "explicit_project_heuristic",
+        "evidence_class": "project_heuristic",
+        "verification_state": "heuristic",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "Project decision over the five atomic B. V. Raman Chapter XVII filing-law-suits clauses, inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)"
+      }
+    },
+    {
+      "activity": "court",
       "rule_id": "court.manual-1",
       "predicate_class": "manual.display-row",
       "configured_inputs": {
@@ -13704,8 +14072,8 @@
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 2,
-        "source_text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
-        "text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
+        "source_text": "Lagna/Navamsa: a complete Drik browser screen requires Mesha in the canonical D1 or guarded Lagna Navamsa. Other surfaces retain the conservative Mesha-D1 gate.",
+        "text": "Lagna/Navamsa: a complete Drik browser screen requires Mesha in the canonical D1 or guarded Lagna Navamsa. Other surfaces retain the conservative Mesha-D1 gate.",
         "class": "manual-only",
         "display_section": "chart"
       },
@@ -13745,8 +14113,8 @@
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 3,
-        "source_text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
-        "text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
+        "source_text": "Election chart: strengthen Lagna with Guru in a Trikona; place no natural malefic in the 6th; keep the Lagna and 6th lords maximally separated.",
+        "text": "Election chart: strengthen Lagna with Guru in a Trikona; place no natural malefic in the 6th; keep the Lagna and 6th lords maximally separated.",
         "class": "manual-only",
         "display_section": "chart"
       },
@@ -13786,8 +14154,8 @@
       "predicate_class": "manual.display-row",
       "configured_inputs": {
         "source_index": 4,
-        "source_text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
-        "text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+        "source_text": "Raman says benefics in Kendras, or a benefic in a male Rasi receiving a benefic full aspect, indicate peace between the parties; this is non-ranking information, not a legal prediction.",
+        "text": "Raman says benefics in Kendras, or a benefic in a male Rasi receiving a benefic full aspect, indicate peace between the parties; this is non-ranking information, not a legal prediction.",
         "class": "manual-only",
         "display_section": "chart"
       },

@@ -34,13 +34,15 @@ export const COURT_MESHA_D1_D9_METADATA = {
     activity: 'court',
     effect: 'reject',
     effect_claim_id: 'muhurta.court.effect_policy_v1',
-    status: 'specified_unwired',
+    status: 'implemented',
     delivery_issue: 395,
+    integration_issue: 400,
   },
   conditional_admission: {
     id: 'court.mesha-navamsa-unresolved',
-    status: 'specified_unwired',
+    status: 'implemented',
     delivery_issue: 285,
+    integration_issue: 400,
     rule: 'Only a valid non-Mesha D1 candidate whose D9 alternative is not yet resolved may be provisionally retained.',
   },
 } as const;
@@ -70,8 +72,9 @@ export const COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA = {
     activity: 'court',
     effect: 'reject',
     effect_claim_id: 'muhurta.court.effect_policy_v1',
-    status: 'specified_unwired',
+    status: 'implemented',
     delivery_issue: 397,
+    integration_issue: 400,
   },
 } as const;
 
@@ -96,8 +99,9 @@ export const COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA = {
     activity: 'court',
     effect: 'prefer',
     effect_claim_id: 'muhurta.court.effect_policy_v1',
-    status: 'specified_unwired',
+    status: 'implemented',
     delivery_issue: 398,
+    integration_issue: 400,
   },
 } as const;
 
@@ -122,8 +126,9 @@ export const COURT_PEACE_PATTERN_METADATA = {
     activity: 'court',
     effect: 'inform',
     effect_claim_id: 'muhurta.court.effect_policy_v1',
-    status: 'specified_unwired',
+    status: 'implemented',
     delivery_issue: 399,
+    integration_issue: 400,
   },
 } as const;
 

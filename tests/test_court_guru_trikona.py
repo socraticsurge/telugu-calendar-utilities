@@ -39,13 +39,13 @@ def test_fixture_is_explicitly_synthetic_not_a_source_golden():
     assert ORACLE["source_golden"] is False
 
 
-def test_source_convention_and_unwired_preference_metadata_match_oracle():
+def test_source_convention_and_integrated_preference_metadata_match_oracle():
     assert COURT_GURU_TRIKONA_METADATA == ORACLE["metadata"]
     assert COURT_GURU_TRIKONA_METADATA["source_statement"]["claim_id"] != (
         COURT_GURU_TRIKONA_METADATA["convention"]["method_claim_id"]
     )
     assert COURT_GURU_TRIKONA_METADATA["event_policy"]["status"] == (
-        "specified_unwired"
+        "implemented"
     )
 
 

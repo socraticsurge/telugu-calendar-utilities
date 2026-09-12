@@ -38,12 +38,12 @@ describe('Court Guru-Trikona foundation', () => {
     expect(oracle.source_golden).toBe(false);
   });
 
-  test('separates source wording, computation convention, and unwired effect', () => {
+  test('separates source wording, computation convention, and integrated effect', () => {
     expect(COURT_GURU_TRIKONA_METADATA).toEqual(oracle.metadata);
     expect(COURT_GURU_TRIKONA_METADATA.source_statement.claim_id).not.toBe(
       COURT_GURU_TRIKONA_METADATA.convention.method_claim_id,
     );
-    expect(COURT_GURU_TRIKONA_METADATA.event_policy.status).toBe('specified_unwired');
+    expect(COURT_GURU_TRIKONA_METADATA.event_policy.status).toBe('implemented');
   });
 
   test.each(oracle.snapshot_cases)('$id', (caseData) => {

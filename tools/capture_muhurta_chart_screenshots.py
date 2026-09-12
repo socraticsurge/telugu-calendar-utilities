@@ -8,6 +8,7 @@ Usage:
     python tools/capture_muhurta_chart_screenshots.py --dist dist
     python tools/capture_muhurta_chart_screenshots.py --dist dist \
         --aksharabhyasa-only
+    python tools/capture_muhurta_chart_screenshots.py --dist dist --court-only
 """
 
 from __future__ import annotations
@@ -35,6 +36,9 @@ OUTPUT_DIR = (
 ANNAPRASANA_OUTPUT_DIR = (
     REPO_ROOT / 'docs' / 'screenshots' /
     'annaprasana-chart-assessor-2026-09-04'
+)
+COURT_OUTPUT_DIR = (
+    REPO_ROOT / 'docs' / 'screenshots' / 'court-chart-assessor-2026-09-11'
 )
 PREFERENCE_MET_COPY = 'Preference met · tie-break only'
 PREFERENCE_NOT_PRESENT_COPY = 'Preference not present · no penalty'
@@ -178,6 +182,36 @@ ANNAPRASANA_CAPTURES = tuple(
         PREFERENCE_MET_COPY,
         'Natural malefics in Lagna: none; Chandra is outside Lagna.',
     ),
+)
+
+
+COURT_CAPTURES = tuple(
+    Capture(filename, scenario, 'court', 'drik', width, height, state, copy)
+    for scenario, state, copy in (
+        (
+            'court-pass', 'screened',
+            'Court filing chart assessment complete',
+        ),
+        (
+            'court-preference-miss', 'screened',
+            'Preference not present · no penalty',
+        ),
+        (
+            'court-hard-fail', 'screened',
+            'failed an exact chart requirement',
+        ),
+        (
+            'court-unknown', 'screened-review',
+            'Required check could not be verified',
+        ),
+    )
+    for width, height, viewport in (
+        (1440, 900, 'desktop'),
+        (390, 844, 'mobile'),
+    )
+    for filename in (
+        f'fixture-{scenario}-{viewport}-{width}x{height}.png',
+    )
 )
 
 
@@ -327,11 +361,12 @@ def _capture_regular(
             'gold-pass', 'gold-cap', 'gold-unknown',
             'annaprasana-pass', 'annaprasana-preference-miss',
             'annaprasana-unknown',
+            'court-pass', 'court-preference-miss', 'court-unknown',
         }:
             detail_selector = '.mu-reason-details:has(.mu-rg-computed)'
         elif capture.scenario == 'mixed':
             detail_selector = '.mu-reason-details:has(.mu-chart-rule--unknown)'
-        elif capture.scenario == 'vidyarambha-hard-fail':
+        elif capture.scenario in {'vidyarambha-hard-fail', 'court-hard-fail'}:
             detail_selector = '.mu-chart-removals'
         if detail_selector and result.locator(detail_selector).count():
             result.locator(detail_selector).first.locator('summary').first.click()
@@ -355,6 +390,11 @@ def _capture_regular(
                     '.mu-chart-rule--prefer.mu-chart-rule--fail'),
                 'annaprasana-hard-fail': '.mu-chart-removals',
                 'annaprasana-unknown': '.mu-chart-rule--unknown',
+                'court-pass': '.mu-chart-status--screened strong',
+                'court-preference-miss': (
+                    '.mu-chart-rule--prefer.mu-chart-rule--fail'),
+                'court-hard-fail': '.mu-chart-removals',
+                'court-unknown': '.mu-chart-rule--unknown',
             }.get(capture.scenario, MUHURTA_RESULT_SELECTOR)
         top_margin = 300 if capture.filename == (
             'fixture-annaprasana-pass-mobile-390x844.png'
@@ -444,14 +484,24 @@ def main() -> int:
         '--annaprasana-only', action='store_true',
         help='Capture only the nine Annaprasana release-review frames.',
     )
+    parser.add_argument(
+        '--court-only', action='store_true',
+        help='Capture only the eight Court-assessor release-review frames.',
+    )
     args = parser.parse_args()
+    if args.annaprasana_only and args.court_only:
+        parser.error('choose only one feature-specific capture option')
     dist = args.dist.resolve()
     if not (dist / 'index.html').is_file():
         parser.error(f'{dist} does not contain index.html; build the site first')
 
     smoke = _load_smoke_module()
-    output_dir = ANNAPRASANA_OUTPUT_DIR if args.annaprasana_only else OUTPUT_DIR
-    captures = ANNAPRASANA_CAPTURES if args.annaprasana_only else CAPTURES
+    if args.annaprasana_only:
+        output_dir, captures = ANNAPRASANA_OUTPUT_DIR, ANNAPRASANA_CAPTURES
+    elif args.court_only:
+        output_dir, captures = COURT_OUTPUT_DIR, COURT_CAPTURES
+    else:
+        output_dir, captures = OUTPUT_DIR, CAPTURES
     output_dir.mkdir(parents=True, exist_ok=True)
     port = _free_port()
     def handler(*handler_args, **handler_kwargs):
@@ -476,7 +526,7 @@ def main() -> int:
                     )
                     for capture in captures
                 ]
-                if not args.annaprasana_only:
+                if not args.annaprasana_only and not args.court_only:
                     rows.extend(
                         _capture_loading_and_timeout(
                             browser, smoke, base_url,

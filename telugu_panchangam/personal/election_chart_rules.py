@@ -22,6 +22,7 @@ _CLAIM_PURCHASE_GENERAL = 'muhurta.purchase.general'
 _CLAIM_SEEMANTHA = 'muhurta.seemantha'
 _CLAIM_SHANTIKA_PAUSHTIKA = 'muhurta.shantika_paushtika'
 _CLAIM_WEDDING = 'muhurta.wedding'
+_CLAIM_COURT = 'muhurta.court.filing_lawsuit'
 _EIGHTH_HOUSE_VACANT = '8th house is vacant'
 _GOLD_QUALIFICATION_POLICY = 'election_chart.gold_qualification_policy_v1'
 _KUJA_OUTSIDE_EIGHTH = 'Mangala (Kuja) is outside the 8th house'
@@ -33,7 +34,9 @@ ELECTION_CHART_PLANETS = (
     'Surya', 'Chandra', 'Kuja', 'Budha', 'Guru',
     'Shukra', 'Shani', 'Rahu', 'Ketu',
 )
-ELECTION_CHART_COMPLETE_ASSESSORS = ('gold', 'annaprasana', 'karnavedha')
+ELECTION_CHART_COMPLETE_ASSESSORS = (
+    'gold', 'annaprasana', 'karnavedha', 'court',
+)
 VIDYARAMBHA_SOURCE_CLAIM = 'muhurta.vidyarambha'
 
 ELECTION_CHART_SOURCE_LOCATORS = {
@@ -94,6 +97,10 @@ ELECTION_CHART_SOURCE_LOCATORS = {
         "B. V. Raman, Chapter XV, 'Surgical Operations,' inspected in the "
         '2020 Chistabo derivative at internal printed pp. 64-65 '
         '(physical PDF pp. 68-69)'),
+    _CLAIM_COURT: (
+        "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section "
+        "'Filing law-suits,' inspected in the 2020 Chistabo derivative at "
+        'internal printed p. 67 (physical PDF p. 71)'),
 }
 
 
@@ -130,6 +137,43 @@ def _rule(
 
 
 ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
+    'court': (
+        _rule(
+            'court.mesha-lagna-or-navamsa',
+            'Mesha in the canonical D1 or guarded Lagna Navamsa',
+            'court_mesha_d1_d9', 'reject', _CLAIM_COURT,
+            convention_id='court-canonical-local-d1-sidecar-d9-v1',
+            decision_policy_claim='muhurta.court.effect_policy_v1',
+        ),
+        _rule(
+            'court.guru-trikona',
+            'Guru occupies a Trikona from the validated local Lagna',
+            'court_guru_trikona', 'prefer', _CLAIM_COURT,
+            convention_id='whole-sign-physical-occupation-v1',
+            decision_policy_claim='muhurta.court.effect_policy_v1',
+        ),
+        _rule(
+            'court.house-6-without-natural-malefic',
+            'No resolved natural malefic occupies the 6th house',
+            'court_no_natural_malefic_h6', 'reject', _CLAIM_COURT,
+            convention_id='phaladeepika-natural-graha-nature-whole-sign-v1',
+            decision_policy_claim='muhurta.court.effect_policy_v1',
+        ),
+        _rule(
+            'court.lagna-sixth-lords-max-separated',
+            'Lagna and sixth-house lords are maximally separated',
+            'court_lagna_sixth_lord_separation', 'prefer', _CLAIM_COURT,
+            convention_id='court-lagna-sixth-lord-whole-sign-opposition-v1',
+            decision_policy_claim='muhurta.court.effect_policy_v1',
+        ),
+        _rule(
+            'court.peace-benefic-pattern',
+            'Registered benefic peace pattern is present',
+            'court_peace_pattern', 'inform', _CLAIM_COURT,
+            convention_id='court-peace-benefic-subject-continuity-v1',
+            decision_policy_claim='muhurta.court.effect_policy_v1',
+        ),
+    ),
     'wedding': (
         _rule('wedding.house-7-vacant', '7th house is vacant',
               'house_empty', 'reject', _CLAIM_WEDDING, house=7),
@@ -332,6 +376,7 @@ ELECTION_CHART_RULES: dict[str, tuple[dict, ...]] = {
 # These sentences intentionally exclude the clauses represented above so the
 # UI never asks a practitioner to re-check a condition it just computed.
 ELECTION_CHART_MANUAL_REMAINDERS: dict[str, tuple[str, ...]] = {
+    'court': (),
     'wedding': (
         'Assess malefic occupancy or hemming around Lagna and any Chandra-Graha association.',
         'Review the optional fortification combinations and both partners’ compatibility, Tarabala, Chandrabala and Panchaka.',

@@ -171,9 +171,10 @@
         "src/scorer/election-assessors/court.ts"
       ],
       "implementation_status": "implemented",
-      "event_wiring_status": "specified_unwired",
+      "event_wiring_status": "implemented",
       "delivery_issues": [
-        399
+        399,
+        400
       ]
     },
     "phaladeepika-natural-graha-nature-whole-sign-v1": {
@@ -641,6 +642,9 @@
     }
   },
   "applied_convention_interpretations": {
+    "court-canonical-local-d1-sidecar-d9-v1": [
+      "bphs-modality-navamsa-v1"
+    ],
     "court-peace-benefic-subject-continuity-v1": [
       "whole-sign-physical-occupation-v1",
       "phaladeepika-natural-graha-nature-whole-sign-v1",

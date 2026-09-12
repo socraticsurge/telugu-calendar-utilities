@@ -18,8 +18,9 @@
       "id": "court.guru-trikona",
       "activity": "court",
       "effect": "prefer",
-      "status": "specified_unwired",
-      "delivery_issue": 396
+      "status": "implemented",
+      "delivery_issue": 396,
+      "integration_issue": 400
     }
   },
   "base_planets": [

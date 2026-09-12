@@ -52,13 +52,15 @@ COURT_MESHA_D1_D9_METADATA: dict[str, Any] = {
         'activity': 'court',
         'effect': 'reject',
         'effect_claim_id': 'muhurta.court.effect_policy_v1',
-        'status': 'specified_unwired',
+        'status': 'implemented',
         'delivery_issue': 395,
+        'integration_issue': 400,
     },
     'conditional_admission': {
         'id': 'court.mesha-navamsa-unresolved',
-        'status': 'specified_unwired',
+        'status': 'implemented',
         'delivery_issue': 285,
+        'integration_issue': 400,
         'rule': (
             'Only a valid non-Mesha D1 candidate whose D9 alternative is not '
             + 'yet resolved may be provisionally retained.'
@@ -95,8 +97,9 @@ COURT_SIXTH_HOUSE_NATURAL_MALEFIC_METADATA: dict[str, Any] = {
         'activity': 'court',
         'effect': 'reject',
         'effect_claim_id': 'muhurta.court.effect_policy_v1',
-        'status': 'specified_unwired',
+        'status': 'implemented',
         'delivery_issue': 397,
+        'integration_issue': 400,
     },
 }
 
@@ -129,8 +132,9 @@ COURT_LAGNA_SIXTH_LORD_SEPARATION_METADATA: dict[str, Any] = {
         'activity': 'court',
         'effect': 'prefer',
         'effect_claim_id': 'muhurta.court.effect_policy_v1',
-        'status': 'specified_unwired',
+        'status': 'implemented',
         'delivery_issue': 398,
+        'integration_issue': 400,
     },
 }
 
@@ -165,8 +169,9 @@ COURT_PEACE_PATTERN_METADATA: dict[str, Any] = {
         'activity': 'court',
         'effect': 'inform',
         'effect_claim_id': 'muhurta.court.effect_policy_v1',
-        'status': 'specified_unwired',
+        'status': 'implemented',
         'delivery_issue': 399,
+        'integration_issue': 400,
     },
 }
 

@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "release": "1.18.12",
+  "parent_release": "1.18.11",
+  "activity": "court",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [
+    {
+      "claim_id": "muhurta.court.filing_lawsuit",
+      "relationship": "successor_revision",
+      "verification_state": "verified",
+      "source_ids": [
+        "BVR-MUHURTHA-1993",
+        "BVR-MUHURTHA-CHISTABO-2020"
+      ],
+      "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+      "before_sha256": "3cdcbee3c3bcadc782a3dcb880bfdcb9858b6668b621df24a7f592d13d46d837",
+      "after_sha256": "8d83e4293cb016e155ec1a0d3683ce1cfd19a637b90d665480131e2c0ca02e19",
+      "before": {
+        "id": "muhurta.court.filing_lawsuit",
+        "surface": "muhurtam",
+        "implementation": "telugu_panchangam/personal/activity_rules.py",
+        "evidence_class": "textual",
+        "verification_state": "verified",
+        "source_ids": [
+          "BVR-MUHURTHA-1993",
+          "BVR-MUHURTHA-CHISTABO-2020"
+        ],
+        "locator": "B. V. Raman, Chapter XVII, 'Miscellaneous elections,' section 'Filing law-suits,' inspected in the 2020 Chistabo derivative at internal printed p. 67 (physical PDF p. 71)",
+        "scope": "Supports rejection of Tuesday and Saturday; admission of Ashwini, Rohini, Mrigashira, Pushya, Uttara Phalguni, Hasta, Chitra, Anuradha, Dhanishtha and Revati; Mesha Lagna or Mesha Navamsa; Guru in a Trikona from a strengthened Lagna; no malefic in the 6th; separation of the Lagna and 6th lords; and the non-predictive peace configuration. The passage does not expand 'the usual unfavorable Tithis'; registered alternatives and the unchanged operational choice are separate claims. The profile is limited to filing or initiating a lawsuit and does not cover hearings, responses, settlement, appeals or outcome prediction. Legal obligations always take precedence. The legacy litigation API key resolves explicitly to this profile and is not a separate election.",
+        "last_reviewed": "2026-09-11"
+      }
+    }
+  ],
+  "semantic_deltas": [
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/rules/court",
+      "operation": "replace",
+      "scope": "court_activity_rules",
+      "before_sha256": "3f9ccf766bfbff1d85e4ccdf7c0630f35b722e4bc2ffb1332abd7fa1360ad728",
+      "after_sha256": "9a75ce2a265ee2c7bdccd9203a08b3fdb26dca17318d0c988d1a9550df992ad0",
+      "before": {
+        "label": "Filing a lawsuit / court action",
+        "allowed_varas": ["Adivaram", "Somavaram", "Budhavaram", "Guruvaram", "Shukravaram"],
+        "allowed_nakshatras": ["Ashwini", "Rohini", "Mrigashira", "Pushya", "Uttara Phalguni", "Hasta", "Chitra", "Anuradha", "Dhanishtha", "Revati"],
+        "avoid_tithi_numbers": [4, 6, 8, 9, 12, 14, 15],
+        "manual_checks": [
+          "Scope: this election is for filing or initiating a lawsuit, not a hearing, response, settlement, appeal or prediction of the case outcome.",
+          "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same inspected derivative.",
+          "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
+          "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
+          "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+          "Legal deadlines, court rules, counsel, evidence and personal safety always take precedence over electional timing."
+        ],
+        "manual_prerequisites": true,
+        "allowed_lagnas": ["Mesha"],
+        "source_claim": "muhurta.court.filing_lawsuit",
+        "related_claims": [
+          "muhurta.court.tithi_shorthand_sources",
+          "muhurta.court.tithi_operational_policy_v1",
+          "muhurta.court.effect_policy_v1",
+          "muhurta.court.general_baseline_none_v1"
+        ],
+        "court_policy": {
+          "schema_version": 1,
+          "source_claim": "muhurta.court.filing_lawsuit",
+          "tithi_shorthand": {
+            "source_wording": "Avoid the usual unfavorable Tithis.",
+            "source_candidates": [
+              {
+                "id": "raman-general-hints-p6",
+                "locator": "Chapter II, General hints, internal printed p. 6 (physical PDF p. 9)",
+                "avoid_tithi_numbers": [4, 8, 12, 14]
+              },
+              {
+                "id": "raman-panchanga-suddhi-p12",
+                "locator": "Chapter V, Panchang Suddhi, internal printed p. 12 (physical PDF p. 15)",
+                "avoid_tithi_numbers": [4, 6, 8, 12, 14, 15]
+              },
+              {
+                "id": "raman-namakarana-p22",
+                "locator": "Chapter VIII, Naming the child (Namakarana), internal printed p. 22 (physical PDF p. 25)",
+                "avoid_tithi_numbers": [4, 6, 8, 9, 12, 14, 15]
+              }
+            ],
+            "selection": {
+              "id": "court-tithi-operational-policy-v1",
+              "status": "selected_project_policy",
+              "avoid_tithi_numbers": [4, 6, 8, 9, 12, 14, 15],
+              "behavior_change": false,
+              "claim_id": "muhurta.court.tithi_operational_policy_v1"
+            }
+          },
+          "general_baseline": {
+            "mode": "none",
+            "claim_id": "muhurta.court.general_baseline_none_v1"
+          },
+          "atomic_rule_effects": {
+            "court.mesha-lagna-or-navamsa": "reject",
+            "court.guru-trikona": "prefer",
+            "court.house-6-without-natural-malefic": "reject",
+            "court.lagna-sixth-lords-max-separated": "prefer",
+            "court.peace-benefic-pattern": "inform"
+          },
+          "effect_policy_claim": "muhurta.court.effect_policy_v1",
+          "upstream_product_policy": [
+            "Tarabalam", "Chandrabalam", "Muhurta nature", "Choghadiya",
+            "Nitya Yoga", "Anandadi", "personal Lagna fit", "Panchaka"
+          ],
+          "scope": {
+            "text": "Filing or initiating a lawsuit; not a hearing, response, settlement, appeal, or prediction of the case outcome.",
+            "effect": "inform",
+            "affects_chart_completion": false
+          },
+          "legal_safety": {
+            "text": "Legal deadlines, court rules, counsel, evidence, procedure, and personal safety always take precedence over electional timing.",
+            "effect": "inform",
+            "affects_chart_completion": false
+          }
+        }
+      }
+    },
+    {
+      "artifact": "src/data/activity-rules.generated.json",
+      "json_pointer": "/check_contract/activities/court",
+      "operation": "replace",
+      "scope": "court_contract",
+      "before_sha256": "5a10145d7a76c9dae741d8d7362d5f2657719dcfa8426f52036556469249e662",
+      "after_sha256": "0df6ddabdee5843ea362297051cd05ad1d55290538ea7e9c9bee97fa97591654",
+      "before": {
+        "deterministic_panchangam_fields": ["allowed_varas", "allowed_nakshatras", "avoid_tithi_numbers", "allowed_lagnas"],
+        "personal_rule_ids": [],
+        "election_chart_rule_ids": [],
+        "manual_checks": [
+          {
+            "id": "court.manual-1",
+            "source_index": 0,
+            "source_text": "Scope: this election is for filing or initiating a lawsuit, not a hearing, response, settlement, appeal or prediction of the case outcome.",
+            "text": "Scope: this election is for filing or initiating a lawsuit, not a hearing, response, settlement, appeal or prediction of the case outcome.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "court.manual-2",
+            "source_index": 1,
+            "source_text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same inspected derivative.",
+            "text": "Tithi cross-reference: Raman says to avoid the usual unfavorable lunar days; the automated list uses his explicit recurring list of Chaturthi, Shashthi, Ashtami, Navami, Dwadashi, Chaturdashi, Pournami and Amavasya from the same inspected derivative.",
+            "class": "manual-only",
+            "display_section": "information"
+          },
+          {
+            "id": "court.manual-3",
+            "source_index": 2,
+            "source_text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
+            "text": "Lagna/Navamsa: automation admits Mesha Lagna. A practitioner may evaluate the source's alternative of a non-Mesha Lagna with Mesha Navamsa.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "court.manual-4",
+            "source_index": 3,
+            "source_text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
+            "text": "Election chart: strengthen Lagna with Guru in a Trikona; place no malefic in the 6th; keep the Lagna and 6th lords well separated.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "court.manual-5",
+            "source_index": 4,
+            "source_text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+            "text": "Raman says benefics in Kendras, or benefic aspects from male Rasis, indicate peace between the parties; this is not a promise of legal success.",
+            "class": "manual-only",
+            "display_section": "chart"
+          },
+          {
+            "id": "court.manual-6",
+            "source_index": 5,
+            "source_text": "Legal deadlines, court rules, counsel, evidence and personal safety always take precedence over electional timing.",
+            "text": "Legal deadlines, court rules, counsel, evidence and personal safety always take precedence over electional timing.",
+            "class": "manual-only",
+            "display_section": "practical",
+            "purpose": "safety_override"
+          }
+        ]
+      }
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/convention_schema_version",
+      "operation": "replace",
+      "scope": "shared_schema",
+      "before_sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "after_sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+      "before": 3
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/conventions/court-canonical-local-d1-sidecar-d9-v1",
+      "operation": "add",
+      "scope": "court_convention",
+      "after_sha256": "69161827c60b94e52e21e031786fb5dbff046d0b751ed8ecd7ee57dd0f4a78a6"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/rules/court",
+      "operation": "add",
+      "scope": "court_rules",
+      "after_sha256": "7773b5234dc76d094603669f09330328bb8bbb91be7d88d9ffd87167bf627699"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/manual_remainders/court",
+      "operation": "add",
+      "scope": "court_remainder",
+      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "artifact": "src/data/election-chart-rules.generated.json",
+      "json_pointer": "/complete_assessors",
+      "operation": "replace",
+      "scope": "completion_registry",
+      "before_sha256": "f043a637aad83a0dcae492c161948bf902dea609c26a5dcc4fdf8616c670c600",
+      "after_sha256": "ef124e7d9542058d3107856246e2ad88a2d1b36915cc44a76853cb4d866c0539",
+      "before": ["gold", "annaprasana", "karnavedha"]
+    }
+  ],
+  "protected_source_transforms": [
+    {
+      "path": "src/scorer/election-chart-enrichment.ts",
+      "scope": "court_transition_coverage",
+      "transforms": [
+        {
+          "before": "} from './election-chart-screening';\nimport {",
+          "after": "} from './election-chart-screening';\nimport { inferCourtTransitionCoverage } from './court-transition-coverage';\nimport {"
+        },
+        {
+          "before": "      ...evaluateElectionSnapshots(options.activity, canonicalCharts, {\n        houseFrameUncertain: boundaryAffectsGeneric,\n      }),",
+          "after": "      ...evaluateElectionSnapshots(options.activity, canonicalCharts, {\n        houseFrameUncertain: boundaryAffectsGeneric,\n        authoritativeLagnaRashis: chunk.canonicalLagnaPlans[index],\n        lagnaAuthorityUncertain: boundaryAffectsGeneric,\n        supportedSystem: options.system === 'drik',\n        ...(options.activity === 'court' || options.activity === 'litigation'\n          ? {\n            courtTransitionCoverage: inferCourtTransitionCoverage(\n              canonicalCharts,\n              chunk.canonicalLagnaPlans[index],\n              !boundaryAffectsGeneric,\n            ),\n          }\n          : {}),\n      }),"
+        }
+      ]
+    }
+  ]
+}

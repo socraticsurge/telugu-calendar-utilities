@@ -33,7 +33,7 @@ describe('Court Mesha D1/D9 foundation', () => {
     expect(COURT_MESHA_D1_D9_METADATA.source_statement.claim_id).not.toBe(
       COURT_MESHA_D1_D9_METADATA.event_policy.effect_claim_id,
     );
-    expect(COURT_MESHA_D1_D9_METADATA.event_policy.status).toBe('specified_unwired');
+    expect(COURT_MESHA_D1_D9_METADATA.event_policy.status).toBe('implemented');
     expect(COURT_MESHA_D1_D9_METADATA.conditional_admission.delivery_issue).toBe(285);
   });
 

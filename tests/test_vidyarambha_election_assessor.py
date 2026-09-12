@@ -86,7 +86,7 @@ def test_vidyarambha_declares_scoped_two_rule_partial_assessor():
     remainders = ELECTION_CHART_MANUAL_REMAINDERS['vidyarambha']
     assert remainders == ()
     assert ELECTION_CHART_COMPLETE_ASSESSORS == (
-        'gold', 'annaprasana', 'karnavedha')
+        'gold', 'annaprasana', 'karnavedha', 'court')
 
 
 @pytest.mark.parametrize('case', FIXTURE['cases'], ids=lambda item: item['id'])
@@ -224,9 +224,9 @@ def test_vidyarambha_lineages_and_copy_variance_are_explicit():
     assert 'not blended into this Chapter' in profile
     assert 'physical scan p. 213' in profile
     assert 'physical scan p. 214' in profile
-    assert '32 deterministic predicates' in method
+    assert '37 deterministic predicates' in method
     assert (
-        'Gold, Annaprasana, and Karnavedha are the currently declared '
+            'Gold, Annaprasana, Karnavedha and Court are the currently declared '
         'complete event-specific assessors.'
     ) in ' '.join(method.split())
     assert 'partial/provisional' in method

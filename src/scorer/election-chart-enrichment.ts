@@ -17,6 +17,7 @@ import {
   evaluateElectionSnapshots,
   type ElectionChartScreening,
 } from './election-chart-screening';
+import { inferCourtTransitionCoverage } from './court-transition-coverage';
 import {
   evaluatePersonalElectionSnapshots,
   roleForActivity,
@@ -474,6 +475,18 @@ async function screenChartChunk<TSlot extends EnrichableMuhurtamSlot>(
     const screening: ElectionChartScreening = {
       ...evaluateElectionSnapshots(options.activity, canonicalCharts, {
         houseFrameUncertain: boundaryAffectsGeneric,
+        authoritativeLagnaRashis: chunk.canonicalLagnaPlans[index],
+        lagnaAuthorityUncertain: boundaryAffectsGeneric,
+        supportedSystem: options.system === 'drik',
+        ...(options.activity === 'court' || options.activity === 'litigation'
+          ? {
+            courtTransitionCoverage: inferCourtTransitionCoverage(
+              canonicalCharts,
+              chunk.canonicalLagnaPlans[index],
+              !boundaryAffectsGeneric,
+            ),
+          }
+          : {}),
       }),
       ...(boundaryAffectsGeneric ? { boundaryConventionUncertain: true } : {}),
     };

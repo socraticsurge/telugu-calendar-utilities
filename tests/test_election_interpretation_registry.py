@@ -120,7 +120,7 @@ def test_method_claims_are_separate_registered_project_conventions():
 
 def test_applied_conventions_reference_canonical_interpretations():
     registered = set(ELECTION_CHART_INTERPRETATIONS)
-    assert ELECTION_CHART_CONVENTION_SCHEMA_VERSION == 3
+    assert ELECTION_CHART_CONVENTION_SCHEMA_VERSION == 4
     assert set(ELECTION_CHART_APPLIED_CONVENTION_INTERPRETATIONS) == set(
         ELECTION_CHART_CONVENTIONS
     )

@@ -55,7 +55,7 @@ def test_metadata_records_selected_grammar_direction_and_inform_effect():
     }
     policy = COURT_PEACE_PATTERN_METADATA['event_policy']
     assert policy['effect'] == 'inform'
-    assert policy['status'] == 'specified_unwired'
+    assert policy['status'] == 'implemented'
     assert COURT_SOURCE_EFFECT_POLICY['atomic_rule_effects'][policy['id']] == 'inform'
 
 

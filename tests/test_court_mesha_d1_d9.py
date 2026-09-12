@@ -41,13 +41,12 @@ def test_fixture_is_synthetic_and_policy_layers_are_separate():
     assert COURT_MESHA_D1_D9_METADATA['source_statement']['claim_id'] != (
         COURT_MESHA_D1_D9_METADATA['event_policy']['effect_claim_id']
     )
-    assert COURT_MESHA_D1_D9_METADATA['event_policy']['status'] == (
-        'specified_unwired'
-    )
+    assert COURT_MESHA_D1_D9_METADATA['event_policy']['status'] == 'implemented'
     assert COURT_MESHA_D1_D9_METADATA['conditional_admission'] == {
         'id': 'court.mesha-navamsa-unresolved',
-        'status': 'specified_unwired',
+        'status': 'implemented',
         'delivery_issue': 285,
+        'integration_issue': 400,
         'rule': (
             'Only a valid non-Mesha D1 candidate whose D9 alternative is not '
             'yet resolved may be provisionally retained.'
@@ -73,7 +72,7 @@ def test_registered_authority_and_documentation_match_the_foundation():
         encoding='utf-8'
     )
     assert 'Mesha D1-or-D9 predicate foundation' in report
-    assert '`specified_unwired` predicate foundation' in report
+    assert 'integrated five-rule assessor' in report
 
 
 def test_snapshot_oracle_covers_d1_d9_authority_and_unavailable_states():
