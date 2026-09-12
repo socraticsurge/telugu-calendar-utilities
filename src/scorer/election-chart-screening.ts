@@ -24,6 +24,10 @@ import {
   evaluateCourtPeacePattern,
   evaluateCourtSixthHouseNaturalMalefic,
 } from './election-assessors/court';
+import {
+  aggregateSameRasiConjunctionWindow,
+  evaluateSameRasiChandraConjunction,
+} from './election-assessors/conjunction';
 
 export type ElectionRuleStatus = 'pass' | 'fail' | 'unknown';
 export type ElectionRuleEffect = 'reject' | 'qualify' | 'prefer' | 'inform';
@@ -44,7 +48,8 @@ export interface ElectionChartRule {
     | 'court_guru_trikona'
     | 'court_no_natural_malefic_h6'
     | 'court_lagna_sixth_lord_separation'
-    | 'court_peace_pattern';
+    | 'court_peace_pattern'
+    | 'same_rasi_chandra_conjunction';
   effect: ElectionRuleEffect;
   source_claim: string;
   source_locator: string;
@@ -100,6 +105,12 @@ export interface ElectionChartEvaluationOptions {
   lagnaAuthorityUncertain?: boolean;
   supportedSystem?: boolean;
   courtTransitionCoverage?: CourtTransitionCoverage;
+  borrowingTransitionCoverage?: BorrowingTransitionCoverage;
+}
+
+export interface BorrowingTransitionCoverage {
+  rasiTransitionsComplete: boolean;
+  budgetExhausted: boolean;
 }
 
 export interface CourtTransitionCoverage {
@@ -240,6 +251,17 @@ function evaluateRule(
   }
   if (rule.kind === 'court_peace_pattern') {
     return evaluateCourtPeacePattern(chart, options);
+  }
+  if (rule.kind === 'same_rasi_chandra_conjunction') {
+    if (options.supportedSystem === false) {
+      return {
+        status: 'unknown',
+        evidence: [
+          'Borrowing chart screening is available only for Drik/Lahiri; systems are not blended.',
+        ],
+      };
+    }
+    return evaluateSameRasiChandraConjunction(positions);
   }
   if (rule.kind === 'planet_well_situated') {
     return evaluateWellSituated(rule, positions, options);
@@ -447,6 +469,30 @@ function evaluateCourtWindowOutcomes(
   return summarize(outcomes, stable);
 }
 
+function evaluateBorrowingWindowOutcomes(
+  evaluations: readonly ElectionChartScreening[],
+  coverage: BorrowingTransitionCoverage | undefined,
+): ElectionChartScreening {
+  const firstOutcome = evaluations[0].outcomes[0];
+  const samples = evaluations.map(result => {
+    const item = result.outcomes.find(
+      outcome => outcome.ruleId === firstOutcome.ruleId,
+    );
+    return {
+      status: item?.status || 'unknown',
+      evidence: item?.evidence || [],
+    } as PrimitiveOutcome;
+  });
+  const result = aggregateSameRasiConjunctionWindow(samples, {
+    transitionComplete: coverage?.rasiTransitionsComplete || false,
+    budgetExhausted: coverage?.budgetExhausted || false,
+  });
+  return summarize([
+    { ...firstOutcome, status: result.status, evidence: result.evidence },
+  ], result.status !== 'unknown'
+    && samples.every(sample => sample.status === samples[0].status));
+}
+
 export function evaluateElectionChart(
   activity: string,
   chart: ElectionChartSnapshot,
@@ -492,6 +538,12 @@ export function evaluateElectionSnapshots(
   ));
   if (activity === 'court') {
     return evaluateCourtWindowOutcomes(evaluations, options.courtTransitionCoverage);
+  }
+  if (activity === 'borrowing_money') {
+    return evaluateBorrowingWindowOutcomes(
+      evaluations,
+      options.borrowingTransitionCoverage,
+    );
   }
   const first = evaluations[0];
   const transitionEvidence = activity === 'gold'

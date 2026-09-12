@@ -43,6 +43,7 @@ ACTIVITY_METADATA_FIELDS = frozenset({
     'manual_checks',
     'manual_prerequisites',
     'court_policy',
+    'borrowing_policy',
 })
 
 PROJECT_PREDICATE_CLAIM = 'muhurta.shared.project_predicates'
@@ -296,7 +297,7 @@ AUTOMATED_CHART_FALLBACK_MANUAL_IDS = frozenset(
 PRODUCT_POLICY_MANUAL_IDS = frozenset({
     'wedding.manual-5', 'engagement.manual-3', 'seemantha.manual-7',
     'gruhapravesha.manual-5', 'house_purchase.manual-4',
-    'business_inventory_purchase.manual-5', 'borrowing_money.manual-5',
+    'business_inventory_purchase.manual-5', 'borrowing_money.manual-6',
     'lending_money.manual-6', 'home_repair.manual-5',
     'business.manual-3', 'job.manual-4', 'yajna.manual-2',
     'court.manual-6', 'surgery.manual-1', 'purchase.manual-3',
@@ -518,6 +519,12 @@ PERSONAL_PREDICATE_CONFIG: Mapping[str, dict[str, Any]] = {
         'role': 'patient',
         'participant_inputs': ['janma_rashi'],
         'candidate_inputs': ['lunar_rashi'],
+        'operator': 'not_equals',
+    },
+    'personal.borrowing.primary-borrower-janma-nakshatra': {
+        'role': 'primary_borrower',
+        'participant_inputs': ['nakshatra'],
+        'candidate_inputs': ['nakshatra'],
         'operator': 'not_equals',
     },
 }

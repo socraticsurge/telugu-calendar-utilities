@@ -30,10 +30,15 @@ const electionRules = electionArtifact.rules as Record<string, Array<{ id: strin
 describe('generated activity-check contract', () => {
   test('covers every browser activity and every canonical manual check', () => {
     expect(Object.keys(activities)).toEqual(Object.keys(rules));
-    expect(contract.schema_version).toBe(2);
+    expect(contract.schema_version).toBe(3);
     expect(contract.manual_check_class).toBe('manual-only');
     expect(contract.display_sections).toEqual(['chart', 'information', 'practical']);
-    expect(contract.purposes).toEqual(['safety_override']);
+    expect(contract.purposes).toEqual([
+      'safety_override',
+      'quick_domestic_or_personal',
+      'business',
+      'other_or_unknown',
+    ]);
 
     const ids = new Set<string>();
     for (const [activity, rule] of Object.entries(rules)) {

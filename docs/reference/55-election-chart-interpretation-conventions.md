@@ -23,7 +23,7 @@ owner-accepted, versioned and tested.
 | Concept | Canonical entry | Exact source locator | State |
 |---|---|---|---|
 | Aspect | `phaladeepika-full-graha-drishti-v1` | *Phaladeepika* II.23, Sastri 1950, book p. 18 / scan p. 55 | Selected and implemented for full classical aspects; partial and node aspects stay separate |
-| Conjunction | `same-rasi-distributive-conjunction-v1` | Raman, Chapter X “Borrowing Money,” internal p. 45 / physical PDF p. 49 | Reusable Python/TypeScript primitive implemented with no degree orb; borrowing event effect remains unwired |
+| Conjunction | `same-rasi-distributive-conjunction-v1` | Raman, Chapter X “Borrowing Money,” internal p. 45 / physical PDF p. 49 | Reusable Python/TypeScript primitive implemented with no degree orb; the Borrowing Drik post-screen maps failure to rejection |
 | Benefic Rasi | `benefic-rasi-by-resolved-natural-lord-v1` | Raman, Chapter VIII “Naming the child,” internal p. 22 / physical PDF p. 25; *Phaladeepika* I.6 and II.27 | Selected and implemented as an event-unwired shared primitive; ownership, nature, occupancy and dignity remain separate |
 | Benefic/malefic | `phaladeepika-natural-graha-nature-whole-sign-v1` | *Phaladeepika* II.27, book pp. 19–20 / scan pp. 56–57; corroborating modern BPHS 3.11 witness | Selected, partially implemented for Annaprasana; generic Budha and benefic predicates remain #251 work |
 | Dignity | `phaladeepika-rasi-dignity-v1` | *Phaladeepika* I.6, book pp. 3–4 / scan pp. 40–41 | Selected, partially implemented for Gold; not a strength score |
@@ -73,11 +73,11 @@ shared synthetic oracle covers both sides of the 360°/0° ingress, empty
 samples, malformed input and every precedence branch.
 
 The separately named event policy
-`borrowing-money.same-rasi-conjunction-reject-v1` records that a future
-Borrowing assessor will map a known failure to `reject`. Its status is
-`specified_unwired`: the primitive is not imported by an event evaluator, the
-existing manual check remains visible, and no score, ordering, completion
-count or user-facing result changes in this delivery.
+`borrowing-money.same-rasi-conjunction-reject-v1` maps a known failure to
+`reject` in the Borrowing Drik post-screen. Surya Siddhanta and Vakya return
+`unknown` for this event-chart rule rather than silently borrowing Drik chart
+facts. The event-specific assessor is implemented, while the separate general
+election baseline remains incomplete under issue 284.
 
 ### Natural graha nature
 

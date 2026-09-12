@@ -51,6 +51,12 @@ import { CITY_LOCATIONS } from '../data/cities';
 import { MUHURTA_DAY } from '../data/muhurtas';
 import activityContract from '../data/activity-rules.generated.json';
 import { roleForActivity } from '../scorer/personal-election-screening';
+import {
+  borrowingPurposeContext,
+  borrowingPurposeLabel,
+  manualRowAppliesToBorrowingPurpose,
+  type BorrowingPurpose,
+} from '../scorer/borrowing-context';
 import { enrichElectionChartSlots } from '../scorer/election-chart-enrichment';
 import {
   automatedRulesFor,
@@ -91,9 +97,15 @@ function muManualCheckRows(activity: string): MuManualCheckRow[] {
   return activities[activity]?.manual_checks || [];
 }
 
-export function muRelevantManualChecks(activity: string, vaaram: string) {
+export function muRelevantManualChecks(
+  activity: string,
+  vaaram: string,
+  borrowingPurpose: BorrowingPurpose = 'other_or_unknown',
+) {
   return muManualCheckRows(activity).filter(row =>
-    !row.applicable_varas?.length || row.applicable_varas.includes(vaaram));
+    (!row.applicable_varas?.length || row.applicable_varas.includes(vaaram))
+    && (activity !== 'borrowing_money'
+      || manualRowAppliesToBorrowingPurpose(row.purpose, borrowingPurpose)));
 }
 
 export function muClassifyManualChecks(
@@ -180,6 +192,7 @@ export interface TarabalamProfilesController {
   getParticipants(): JourneyGuestProfile[];
   getSelectedIds(): string[];
   getRoleParticipant(activity: string): JourneyGuestProfile | null;
+  getBorrowingPurpose(): BorrowingPurpose;
   selectProfile(id: string): boolean;
 }
 
@@ -355,6 +368,7 @@ export function initTarabalamProfiles(
   const roleSelections = new Map<string, string>(
     Object.entries(roleSelectionState.selections),
   );
+  let borrowingPurpose: BorrowingPurpose = 'other_or_unknown';
 
   const persistRoleSelection = (activity: string, profileId: string): void => {
     const savedId = snapshot.profiles.some(profile => profile.id === profileId)
@@ -405,7 +419,13 @@ export function initTarabalamProfiles(
     const manual = manualParticipants.filter((candidate, index) =>
       Boolean(tbManualProfile(candidate, index))).length;
     const total = saved + manual;
-    if (!total) return 'No participant screening is selected. Slots will use general Muhurtam rules.';
+    if (!total) {
+      const role = roleForActivity(activitySelect?.value || 'any');
+      if (role?.required) {
+        return `No ${role.label.toLowerCase()} is selected. The source-specific personal check will remain unresolved.`;
+      }
+      return 'No participant screening is selected. Slots will use general Muhurtam rules.';
+    }
     const parts: string[] = [];
     if (saved) parts.push(`${saved} saved`);
     if (manual) parts.push(`${manual} just for this search`);
@@ -665,10 +685,13 @@ export function initTarabalamProfiles(
 
   const renderSavedProfiles = (): void => {
     if (!snapshot.profiles.length) {
+      const role = roleForActivity(activitySelect?.value || 'any');
       root.append(tbNode(
         'p',
         'muhurta-profile-empty',
-        'No saved profiles yet. You can still search without personal screening or add someone for this search.',
+        role?.required
+          ? `No saved profiles yet. Add someone for this search or create a saved profile; the required ${role.label.toLowerCase()} check otherwise remains unresolved.`
+          : 'No saved profiles yet. You can still search without personal screening or add someone for this search.',
       ));
       return;
     }
@@ -750,6 +773,35 @@ export function initTarabalamProfiles(
     root.append(roleBlock);
   };
 
+  const renderBorrowingPurposeSelection = (): void => {
+    const activity = activitySelect?.value || 'any';
+    if (activity !== 'borrowing_money') return;
+    const context = borrowingPurposeContext(borrowingPurpose);
+    const block = tbNode('div', 'muhurta-role-selection muhurta-borrowing-purpose');
+    const prompt = tbNode(
+      'p',
+      'muhurta-role-selection__prompt',
+      'Choose only the broad purpose needed to show the applicable source guidance. Do not enter financial details.',
+    );
+    const label = tbNode('label', 'muhurta-role-selection__field');
+    const labelText = tbNode('span', 'muhurta-role-selection__label', 'Borrowing purpose');
+    const select = tbNode('select') as HTMLSelectElement;
+    select.dataset.borrowingPurpose = '';
+    for (const purpose of [
+      'quick_domestic_or_personal', 'business', 'other_or_unknown',
+    ] as const) {
+      tbAppendOption(select, purpose, borrowingPurposeLabel(purpose));
+    }
+    select.value = context.purpose;
+    select.addEventListener('change', () => {
+      borrowingPurpose = borrowingPurposeContext(select.value).purpose;
+      invalidateMuhurtaSearch();
+    });
+    label.append(labelText, select);
+    block.append(prompt, label);
+    root.append(block);
+  };
+
   const controller: InternalTarabalamProfilesController = {
     render(): void {
       snapshot = store.getSnapshot();
@@ -769,6 +821,7 @@ export function initTarabalamProfiles(
       renderManualProfiles();
       renderProfileActions();
       renderRoleSelection();
+      renderBorrowingPurposeSelection();
       root.dataset.selectedCount = String(participantCount());
     },
     destroy(): void {
@@ -791,6 +844,9 @@ export function initTarabalamProfiles(
       return participants.find(participant => participant.id === selectedId)
         || participants[0]
         || null;
+    },
+    getBorrowingPurpose(): BorrowingPurpose {
+      return borrowingPurpose;
     },
     selectProfile(id: string): boolean {
       invalidateMuhurtaSearch();
@@ -1746,6 +1802,9 @@ function muCurrentSearchFingerprint() {
     lagna: person.lagna,
   }));
   const role = TB_PROFILE_CONTROLLER?.getRoleParticipant(activity) || null;
+  const borrowingPurpose = activity === 'borrowing_money'
+    ? TB_PROFILE_CONTROLLER?.getBorrowingPurpose() || 'other_or_unknown'
+    : null;
   return JSON.stringify({
     activity,
     from: inpEl('tb-from').value || '',
@@ -1755,6 +1814,7 @@ function muCurrentSearchFingerprint() {
     chandraMode: TB_MODE,
     people,
     roleId: role?.id || null,
+    borrowingPurpose,
   });
 }
 
@@ -2483,6 +2543,9 @@ async function findMuhurta() {
   const nDays = Math.min(60, Math.max(1, Math.round((to.getTime() - from.getTime()) / 86400000) + 1));
   const people = tbProfiles();
   const roleProfile = TB_PROFILE_CONTROLLER?.getRoleParticipant(activity) || null;
+  const borrowingPurpose = activity === 'borrowing_money'
+    ? TB_PROFILE_CONTROLLER?.getBorrowingPurpose() || 'other_or_unknown'
+    : 'other_or_unknown';
   const searchFingerprint = muCurrentSearchFingerprint();
   const chandraMode = TB_MODE;  // 'stars' | 'puja_ok' | 'strict' — filters only, never scores
   document.getElementById('mu-context').innerHTML = people.length
@@ -2545,7 +2608,9 @@ async function findMuhurta() {
       const avoidVaraTithiNames = new Set(
         (rules.avoid_vara_tithi_names || []).map(pair => `${pair[0]}|${pair[1]}`));
       const avoidNityaYogas = new Set(rules.avoid_nitya_yogas || []);
-      const manualChecks = muRelevantManualChecks(activity, data.vaaram);
+      const manualChecks = muRelevantManualChecks(
+        activity, data.vaaram, borrowingPurpose,
+      );
       const manualGuidance = muClassifyManualChecks(activity, manualChecks);
       const chartManualRemainder = chartManualRemaindersFor(activity);
       const effectiveChartRemainder = (
@@ -2629,7 +2694,7 @@ async function findMuhurta() {
               avoidTithiNumbers, avoidVaraTithiNames,
             },
             data,
-            people,
+            activity === 'borrowing_money' ? [] : people,
           );
           if (!electionReasons) return;
 
@@ -2787,6 +2852,7 @@ async function findMuhurta() {
       people,
       chandraMode,
       roleProfile,
+      borrowingPurpose,
       context: searchContext,
     };
     renderMuhurta();
@@ -3143,6 +3209,9 @@ export function muChartAssessmentTitle(
     }
     if (activity === 'gold') return 'Gold event-specific chart clauses resolved';
     if (activity === 'court') return 'Court filing chart assessment complete';
+    if (activity === 'borrowing_money') {
+      return 'Borrowing event-specific chart clause resolved';
+    }
   }
   if (activity === 'karnavedha') return 'Karnavedha event checks resolved';
   return 'Exact chart screening applied';
@@ -3179,6 +3248,11 @@ function muResultScopeDetail(activity, chartEnrichment, partialAssessor: boolean
     return muChartAssessorCanClaimComplete(activity, chartEnrichment)
       ? ' · all five Court filing clauses resolved; two mandatory gates, two score-neutral preferences, and one non-ranking information pattern were evaluated'
       : ' · all five Court filing clauses attempted; unresolved, boundary-adjacent, or bounded outcomes remain visibly incomplete';
+  }
+  if (activity === 'borrowing_money') {
+    return muChartAssessorCanClaimComplete(activity, chartEnrichment)
+      ? ' · the Raman same-Rasi Chandra–Kuja/Shani prohibition resolved; purpose-specific qualitative judgment and the shared election baseline remain manual'
+      : ' · the Raman same-Rasi Chandra–Kuja/Shani prohibition was attempted; unresolved or bounded outcomes remain review-gated, and the shared election baseline remains incomplete';
   }
   if (activity === 'karnavedha') {
     if (hasScreeningReview) {
@@ -3630,6 +3704,9 @@ function muEventShareScopeLine(activity: string): string | null {
   }
   if (activity === 'court') {
     return 'Court filing v1 assesses five Raman clauses: two mandatory gates, two score-neutral preferences, and one non-ranking information pattern. It does not predict a legal outcome.';
+  }
+  if (activity === 'borrowing_money') {
+    return 'Borrowing v1 applies the primary borrower Janma-star gate locally and assesses Raman’s same-Rasi Chandra–Kuja/Shani prohibition. Purpose-specific qualitative judgment and the shared election baseline remain manual.';
   }
   return null;
 }

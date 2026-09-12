@@ -20,6 +20,16 @@ ELECTION_CHART_CONVENTIONS: dict[str, dict] = {
             'election_chart.dignity.phaladeepika_1_6',
         ],
     },
+    'same-rasi-distributive-conjunction-v1': {
+        'label': 'Same-Rasi distributive Chandra conjunction v1',
+        'formula': (
+            'R(Chandra) = R(Kuja) OR R(Chandra) = R(Shani); either equality '
+            'fails, both resolved inequalities pass, and no degree orb is used.'
+        ),
+        'method_claims': [
+            'election_chart.same_rasi_distributive_conjunction_policy_v1',
+        ],
+    },
     'court-canonical-local-d1-sidecar-d9-v1': {
         'label': 'Court canonical D1-or-guarded-D9 convention v1',
         'formula': (

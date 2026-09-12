@@ -53,7 +53,7 @@ describe('same-Rasi distributive conjunction v1', () => {
     expect(SAME_RASI_CONJUNCTION_METADATA.source_statement.claim_id).not.toBe(
       SAME_RASI_CONJUNCTION_METADATA.convention.method_claim_id,
     );
-    expect(SAME_RASI_CONJUNCTION_METADATA.event_policy.status).toBe('specified_unwired');
+    expect(SAME_RASI_CONJUNCTION_METADATA.event_policy.status).toBe('implemented');
 
     const entry = interpretations.interpretations[
       SAME_RASI_CONJUNCTION_METADATA.convention.id
@@ -68,7 +68,7 @@ describe('same-Rasi distributive conjunction v1', () => {
       SAME_RASI_CONJUNCTION_METADATA.event_policy.decision_claim_id,
     ]);
     expect(entry.implementation_status).toBe('implemented');
-    expect(entry.event_wiring_status).toBe('specified_unwired');
+    expect(entry.event_wiring_status).toBe('implemented');
   });
 
   test.each(oracle.snapshot_cases)('matches the shared snapshot oracle: $id', caseData => {

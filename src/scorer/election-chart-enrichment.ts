@@ -17,7 +17,10 @@ import {
   evaluateElectionSnapshots,
   type ElectionChartScreening,
 } from './election-chart-screening';
-import { inferCourtTransitionCoverage } from './court-transition-coverage';
+import {
+  inferBorrowingTransitionCoverage,
+  inferCourtTransitionCoverage,
+} from './court-transition-coverage';
 import {
   evaluatePersonalElectionSnapshots,
   roleForActivity,
@@ -485,6 +488,12 @@ async function screenChartChunk<TSlot extends EnrichableMuhurtamSlot>(
               chunk.canonicalLagnaPlans[index],
               !boundaryAffectsGeneric,
             ),
+          }
+          : {}),
+        ...(options.activity === 'borrowing_money'
+          ? {
+            borrowingTransitionCoverage:
+              inferBorrowingTransitionCoverage(canonicalCharts),
           }
           : {}),
       }),

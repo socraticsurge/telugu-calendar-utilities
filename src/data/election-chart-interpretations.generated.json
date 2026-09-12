@@ -101,7 +101,7 @@
         "degree_orb": "none; equality of sidereal Rasi only"
       },
       "precedence": "Either known equality controls a prohibition; pass requires both inequalities to resolve.",
-      "conflict_resolution": "This event-bounded mode is not a global conjunction default. Missing/conflicting facts return unknown; angular-orb traditions remain unresolved. The reusable primitive is implemented, while the borrowing event effect remains unwired.",
+      "conflict_resolution": "This event-bounded mode is not a global conjunction default. Missing/conflicting facts return unknown; angular-orb traditions remain unresolved. The reusable primitive and the Borrowing Drik reject effect are implemented; non-Drik engines return unknown rather than blend chart facts.",
       "alternatives": [
         {
           "id": "degree-orb-conjunction-unresolved",
@@ -119,10 +119,11 @@
         "src/scorer/election-assessors/conjunction.ts"
       ],
       "implementation_status": "implemented",
-      "event_wiring_status": "specified_unwired",
+      "event_wiring_status": "implemented",
       "delivery_issues": [
         250,
-        402
+        402,
+        271
       ]
     },
     "benefic-rasi-by-resolved-natural-lord-v1": {
@@ -704,6 +705,9 @@
     "benefic-rasi-by-resolved-natural-lord-v1": [
       "classical-seven-graha-rasi-lordship-v1",
       "phaladeepika-natural-graha-nature-whole-sign-v1"
+    ],
+    "same-rasi-distributive-conjunction-v1": [
+      "same-rasi-distributive-conjunction-v1"
     ],
     "court-canonical-local-d1-sidecar-d9-v1": [
       "bphs-modality-navamsa-v1"
