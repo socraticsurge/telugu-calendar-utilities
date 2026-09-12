@@ -51,25 +51,25 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     report = build_report('HEAD', commit_limit=20)
 
     assert report['schema_version'] == 1
-    assert report['scope']['source_files'] == 115
+    assert report['scope']['source_files'] == 117
     assert report['scope']['established_source_files'] == 81
-    assert report['scope']['additive_feature_source_files'] == 34
-    assert report['scope']['total_source_files'] == 115
+    assert report['scope']['additive_feature_source_files'] == 36
+    assert report['scope']['total_source_files'] == 117
     assert report['scope']['source_files'] == report['scope']['total_source_files']
     assert report['scope']['source_files'] == (
         report['scope']['established_source_files']
         + report['scope']['additive_feature_source_files']
     )
-    assert report['scope']['computation_records'] == 68
-    assert len(report['output_consumer_map']) == 68
-    assert len({item['id'] for item in report['output_consumer_map']}) == 68
+    assert report['scope']['computation_records'] == 69
+    assert len(report['output_consumer_map']) == 69
+    assert len({item['id'] for item in report['output_consumer_map']}) == 69
     assert {'engines', 'derived-calendar', 'scoring', 'mcp', 'browser-panels'} \
         <= set(report['layers'])
 
     summary = _summary(report)
-    assert 'Production modules: 115' in summary
+    assert 'Production modules: 117' in summary
     assert 'Established production modules: 81' in summary
-    assert 'Additive feature modules: 34' in summary
+    assert 'Additive feature modules: 36' in summary
 
 
 def test_karnavedha_assessors_extend_architecture_additively():
@@ -105,6 +105,15 @@ def test_benefic_pattern_assessors_extend_architecture_additively():
     ) == 'additive-feature'
     assert source_scope_class(
         'telugu_panchangam/personal/election_assessors/benefic_patterns.py'
+    ) == 'additive-feature'
+
+
+def test_benefic_rasi_assessors_extend_architecture_additively():
+    assert source_scope_class(
+        'src/scorer/election-assessors/benefic-rasi.ts'
+    ) == 'additive-feature'
+    assert source_scope_class(
+        'telugu_panchangam/personal/election_assessors/benefic_rasi.py'
     ) == 'additive-feature'
 
 

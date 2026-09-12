@@ -24,6 +24,7 @@ owner-accepted, versioned and tested.
 |---|---|---|---|
 | Aspect | `phaladeepika-full-graha-drishti-v1` | *Phaladeepika* II.23, Sastri 1950, book p. 18 / scan p. 55 | Selected and implemented for full classical aspects; partial and node aspects stay separate |
 | Conjunction | `same-rasi-distributive-conjunction-v1` | Raman, Chapter X “Borrowing Money,” internal p. 45 / physical PDF p. 49 | Reusable Python/TypeScript primitive implemented with no degree orb; borrowing event effect remains unwired |
+| Benefic Rasi | `benefic-rasi-by-resolved-natural-lord-v1` | Raman, Chapter VIII “Naming the child,” internal p. 22 / physical PDF p. 25; *Phaladeepika* I.6 and II.27 | Selected and implemented as an event-unwired shared primitive; ownership, nature, occupancy and dignity remain separate |
 | Benefic/malefic | `phaladeepika-natural-graha-nature-whole-sign-v1` | *Phaladeepika* II.27, book pp. 19–20 / scan pp. 56–57; corroborating modern BPHS 3.11 witness | Selected, partially implemented for Annaprasana; generic Budha and benefic predicates remain #251 work |
 | Dignity | `phaladeepika-rasi-dignity-v1` | *Phaladeepika* I.6, book pp. 3–4 / scan pp. 40–41 | Selected, partially implemented for Gold; not a strength score |
 | Strength | `bounded-graha-strength-unresolved-v1` | Raman, Chapter XV “Surgical Operations,” internal pp. 64–65 / physical PDF pp. 68–69 | Unresolved; neither dignity alone nor an incomplete Shadbala may be relabelled strength |
@@ -84,6 +85,30 @@ Surya, Kuja, Shani, mean Rahu and mean Ketu are fixed malefics; Guru and Shukra
 are fixed benefics. Chandra follows `raman-180-degree-paksha-v1`. Budha becomes
 malefic only under the selected same-Rasi association policy. Functional
 lordship is a different, currently unresolved fact.
+
+### Benefic Rasi by resolved natural lord
+
+For a target Rasi `S`, derive `L = classical_lord(S)` from the registered
+seven-graha ownership table and then classify `L` with the existing natural-
+graha-nature convention. A resolved natural benefic passes, a resolved natural
+malefic fails, and unresolved Chandra or Budha nature returns `unknown`.
+
+This is the smallest versioned interpretation of Raman's Naming phrase
+“Lagna falls in a benefic Rasi.” It does not treat a benefic occupant, dignity,
+own-sign status, nodes or functional lordship as synonyms. The primitive has no
+event-specific `reject`, `qualify` or `prefer` effect and remains
+`specified_unwired` until a consumer selects one.
+
+The complete registered Raman artifact and the registered ownership, dignity
+and natural-nature authorities were compared before selecting this meaning:
+
+| Candidate | Decision | Boundary |
+|---|---|---|
+| Rasi owned by a resolved natural benefic | Selected | Reuses two separately registered facts and preserves conditional Chandra/Budha nature |
+| Fixed benefic-lord list | Unselected | Would erase the registered conditional natures |
+| Benefic occupant | Unselected | Occupancy is not a Rasi classification |
+| Exaltation, own sign or dignity | Unselected | Dignity is a separate fact and the source does not select this blend |
+| Functional benefic or another sign taxonomy | Unresolved/unselected | Depends on Lagna or an authority/formula not supplied by this phrase |
 
 ### Exact-chart combustion
 

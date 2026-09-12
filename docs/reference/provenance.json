@@ -851,6 +851,17 @@
       "last_reviewed": "2026-09-09"
     },
     {
+      "id": "election_chart.benefic_rasi_lord_nature_policy_v1",
+      "surface": "muhurtam",
+      "implementation": "telugu_panchangam/personal/election_assessors/benefic_rasi.py",
+      "evidence_class": "project_heuristic",
+      "verification_state": "heuristic",
+      "source_ids": [],
+      "locator": "benefic-rasi-by-resolved-natural-lord-v1; the Naming phrase, classical ownership table and natural-nature rules remain independently registered",
+      "scope": "Operationalizes a Rasi 'falling in a benefic Rasi' as a target Rasi whose classical seven-graha lord resolves as a natural benefic in the current canonical chart. All twelve Rasis use the registered ownership table; Chandra and Budha retain their conditional natural-nature semantics. Benefic occupancy, dignity, functional lordship, nodes and event-specific reject, qualify or prefer effects are not blended. Missing or conflicting facts return unknown. The primitive remains event-unwired in issue 408.",
+      "last_reviewed": "2026-09-12"
+    },
+    {
       "id": "election_chart.same_rasi_distributive_conjunction_policy_v1",
       "surface": "muhurtam",
       "implementation": "docs/reference/election-chart-interpretations.json",
