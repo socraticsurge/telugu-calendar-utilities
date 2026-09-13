@@ -52,7 +52,13 @@ def _load_smoke_module():
         raise RuntimeError(f'Cannot load browser fixtures from {SMOKE_PATH}')
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
+    # Direct script execution places tools/, not the repository, on sys.path.
+    # The smoke facade now imports its shared tests.browser_smoke package.
+    sys.path.insert(0, str(REPO_ROOT))
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.path.pop(0)
     return module
 
 
