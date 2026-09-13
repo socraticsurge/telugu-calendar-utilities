@@ -25,7 +25,7 @@ def test_documentation_uses_only_local_font_stacks() -> None:
 
 
 def test_legacy_tarabalam_templates_escape_profile_names() -> None:
-    panel = (ROOT / "src/panels/tarabalam.ts").read_text(encoding="utf-8")
+    panel = (ROOT / "src/panels/tarabalam-journey.ts").read_text(encoding="utf-8")
 
     assert "days are favourable for ${htmlEsc(who)}" in panel
     assert "No favourable days for ${htmlEsc(who)} in this range, and none found" in panel
@@ -34,7 +34,13 @@ def test_legacy_tarabalam_templates_escape_profile_names() -> None:
 
 
 def test_every_builtin_personal_share_omits_saved_profile_names() -> None:
-    tarabalam = (ROOT / "src/panels/tarabalam.ts").read_text(encoding="utf-8")
+    tarabalam = "\n".join(
+        (ROOT / path).read_text(encoding="utf-8")
+        for path in (
+            "src/panels/tarabalam-journey.ts",
+            "src/panels/muhurta-presentation.ts",
+        )
+    )
     gochara = (ROOT / "src/panels/gochara.ts").read_text(encoding="utf-8")
 
     assert "profiles.map(pr => `${pr.name}: ${pr.nak}`).join(' · ')" not in tarabalam

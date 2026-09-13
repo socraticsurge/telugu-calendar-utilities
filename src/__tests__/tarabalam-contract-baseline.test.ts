@@ -4,6 +4,34 @@ import { describe, expect, test } from 'vitest';
 
 const sourcePath = resolve('src/panels/tarabalam.ts');
 const source = readFileSync(sourcePath, 'utf8');
+const implementationSource = [
+  source,
+  readFileSync(resolve('src/panels/tarabalam-profile-controller.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/tarabalam-journey.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-contracts.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-presentation.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-result-state.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-astronomy.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-day-rules.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-scoring.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-day-pipeline.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-format.ts'), 'utf8'),
+  readFileSync(resolve('src/panels/muhurta-search.ts'), 'utf8'),
+].join('\n');
+
+const extractedModules = [
+  'tarabalam-profile-controller.ts',
+  'tarabalam-journey.ts',
+  'muhurta-contracts.ts',
+  'muhurta-presentation.ts',
+  'muhurta-result-state.ts',
+  'muhurta-astronomy.ts',
+  'muhurta-day-rules.ts',
+  'muhurta-scoring.ts',
+  'muhurta-day-pipeline.ts',
+  'muhurta-format.ts',
+  'muhurta-search.ts',
+];
 
 function exportedNames(text: string): string[] {
   const names = new Set(
@@ -14,7 +42,7 @@ function exportedNames(text: string): string[] {
       match => match[1],
     ),
   );
-  for (const block of text.matchAll(/export\s*\{([^}]+)\}/gs)) {
+  for (const block of text.matchAll(/export\s*(?:type\s*)?\{([^}]+)\}/gs)) {
     for (const item of block[1].split(',')) {
       const name = item.trim().split(/\s+/)[0];
       if (name) names.add(name);
@@ -101,9 +129,11 @@ describe('Tarabalam extraction baseline', () => {
       'TB_MODE',
       'MU_SEARCH_SEQUENCE',
       'MU_CHART_ABORT',
-      'MU_LAST',
+      'lastMuhurtaResult',
     ]) {
-      expect(source).toMatch(new RegExp(`let ${stateName}(?:\\s|:)`));
+      expect(implementationSource).toMatch(
+        new RegExp(`let ${stateName}(?:\\s|:)`),
+      );
     }
     for (const storageContract of [
       'GUEST_BIRTH_PROFILE_STORAGE_KEY',
@@ -111,7 +141,7 @@ describe('Tarabalam extraction baseline', () => {
       'GUEST_PROFILE_STORAGE_KEY',
       "'tc-tb-mode'",
     ]) {
-      expect(source).toContain(storageContract);
+      expect(implementationSource).toContain(storageContract);
     }
   });
 
@@ -131,11 +161,11 @@ describe('Tarabalam extraction baseline', () => {
       'mu-result-announcement',
       'tp-city',
     ]) {
-      expect(source).toContain(`'${id}'`);
+      expect(implementationSource).toContain(`'${id}'`);
     }
-    expect(source).toContain('`tb-${field}-${index}`');
+    expect(implementationSource).toContain('`tb-${field}-${index}`');
     for (const eventType of ['click', 'change', 'input']) {
-      expect(source).toContain(`addEventListener('${eventType}'`);
+      expect(implementationSource).toContain(`addEventListener('${eventType}'`);
     }
   });
 
@@ -151,12 +181,36 @@ describe('Tarabalam extraction baseline', () => {
       'profile details are intentionally omitted from this share.',
       'Every slot is clear of Rahu Kalam, Varjyam and all inauspicious windows.',
     ]) {
-      expect(source).toContain(message);
+      expect(implementationSource).toContain(message);
     }
-    expect(source.match(/https:\/\/wa\.me\/\?text=/g)).toHaveLength(2);
-    expect(source.match(/gcEvent\('share-(?:tarabalam|slots)'\)/g)).toHaveLength(2);
-    expect(source).toContain(
+    expect(implementationSource.match(/https:\/\/wa\.me\/\?text=/g)).toHaveLength(2);
+    expect(implementationSource.match(/gcEvent\('share-(?:tarabalam|slots)'\)/g)).toHaveLength(2);
+    expect(implementationSource).toContain(
       "const MU_CHART_METHOD_URL = '/docs/reference/54-muhurtam-election-chart-screening'",
     );
+  });
+
+  test('keeps extracted modules independent of the composition facade', () => {
+    for (const moduleName of extractedModules) {
+      const moduleSource = readFileSync(resolve('src/panels', moduleName), 'utf8');
+      expect(moduleSource, moduleName).not.toMatch(/from ['"]\.\/tarabalam['"]/);
+    }
+  });
+
+  test('keeps the day pipeline free of UI and infrastructure dependencies', () => {
+    const pipeline = readFileSync(
+      resolve('src/panels/muhurta-day-pipeline.ts'),
+      'utf8',
+    );
+    for (const prohibited of [
+      './muhurta-presentation',
+      '../lib/dom',
+      'localStorage',
+      '../lib/analytics',
+      '../lib/feed-loader',
+      '../lib/lagna-loader',
+    ]) {
+      expect(pipeline).not.toContain(prohibited);
+    }
   });
 });

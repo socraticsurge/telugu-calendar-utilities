@@ -57,10 +57,10 @@ No export may disappear during extraction. Temporary re-exports from
 
 | State | Current owner | Required owner after extraction |
 | --- | --- | --- |
-| `TB_DAYS`, `TB_EVENTS` | Tarabalam calculation and rendering | Final panel composition only; pass immutable results to render/share adapters |
+| `TB_DAYS`, `TB_EVENTS` | Tarabalam calculation and rendering | `tarabalam-journey.ts` |
 | `TB_PROFILE_CONTROLLER`, `TB_MANUAL_SEQUENCE`, `TB_LEGACY_ROWS` | Profile UI and legacy adapter | Profile module |
 | `TB_SHOW_ALL`, `TB_MODE` | Tarabalam display preferences | Tarabalam render/controller module |
-| `MU_SEARCH_SEQUENCE`, `MU_CHART_ABORT`, `MU_LAST` | Muhurtam async orchestration | Search coordinator only |
+| `MU_SEARCH_SEQUENCE`, `MU_CHART_ABORT`, `MU_LAST` | Muhurtam async orchestration | Search coordinator plus isolated result-state module |
 | Rule constants and generated activity contract | Muhurtam calculation | Decision/scoring modules; immutable imports |
 
 The extracted pure modules must not read the DOM, browser storage, or these
@@ -116,11 +116,12 @@ authority if this map and a test ever disagree.
 
 1. `tarabalam-profile-controller.ts` takes profile UI, legacy compatibility,
    persistence adapters, and profile-facing DOM listeners.
-2. `muhurta-decision-primitives.ts` takes pure day drops, windows, participant
-   scoring, slot scoring, doctrinal reasons, and ranking.
+2. `muhurta-astronomy.ts`, `muhurta-day-rules.ts`, and `muhurta-scoring.ts`
+   take astronomy validation, day drops, windows, participant scoring, slot
+   scoring, doctrinal reasons, and ranking.
 3. `muhurta-day-pipeline.ts` takes `processDay` and receives all dependencies as
    a context object; it returns candidates and day-context evidence.
-4. `tarabalam-presentation.ts` and `muhurta-presentation.ts` take rendering,
+4. `tarabalam-journey.ts` and `muhurta-presentation.ts` take rendering,
    announcements, chart status, and WhatsApp payload assembly.
 5. `tarabalam.ts` becomes composition only and preserves the public exports.
 
@@ -129,8 +130,8 @@ Allowed direction:
 ```text
 tarabalam.ts (composition)
   -> profile controller
-  -> Tarabalam presentation
-  -> Muhurtam day pipeline -> decision primitives -> existing scorer/data modules
+  -> Tarabalam journey
+  -> Muhurtam day pipeline -> day rules/scoring/astronomy -> existing scorer/data modules
   -> Muhurtam presentation
 ```
 
@@ -151,5 +152,15 @@ Each extraction issue must pass its targeted Vitest files, `npm test`,
 Before commit, run the CodeScene pre-commit safeguard. Before a pull request,
 run the branch change-set analysis against `origin/master`.
 
-Owner sign-off on this seam map is required before issue #550 moves production
-code.
+## Implemented result
+
+- `tarabalam.ts` is a 259-line composition facade with Code Health **10.0**.
+- `findMuhurta.processDay` no longer exists; `processMuhurtaDay` delegates to
+  explicit rule, scoring, evidence, and slot stages.
+- The day pipeline scores **10.0** and has no CodeScene findings.
+- The asynchronous search coordinator scores **10.0** and has no CodeScene findings.
+- Every extracted production module scores at least **6.62**.
+- No extracted module imports the composition facade, and an executable
+  dependency-direction test protects the day pipeline from UI and loaders.
+- The existing public export, browser state, persistence, rendered-message,
+  analytics, and share contracts remain characterized in the baseline test.

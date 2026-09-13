@@ -36,7 +36,8 @@ def test_inventory_covers_public_computation_families_and_browser_mirrors():
         for implementation in record['implementations']
         if implementation['role'] == 'mirror'
     }
-    assert 'src/panels/tarabalam.ts' in mirror_paths
+    assert 'src/panels/tarabalam-journey.ts' in mirror_paths
+    assert 'src/panels/muhurta-day-pipeline.ts' in mirror_paths
     assert 'src/panels/gochara.ts' in mirror_paths
     assert 'src/panels/today.ts' in mirror_paths
 

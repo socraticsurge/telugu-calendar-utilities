@@ -264,6 +264,36 @@
         "reason": "Accessible browser-local profile management UI; it owns no Panchangam computation."
       },
       {
+        "path": "src/panels/tarabalam.ts",
+        "kind": "orchestration",
+        "reason": "Compatibility facade that composes extracted Tarabalam and Muhurtam modules."
+      },
+      {
+        "path": "src/panels/tarabalam-profile-controller.ts",
+        "kind": "ui-only",
+        "reason": "Browser-local profile controller, persistence adapter, and legacy UI compatibility."
+      },
+      {
+        "path": "src/panels/muhurta-contracts.ts",
+        "kind": "data-model",
+        "reason": "Manual-review contract classification and disclosure structures."
+      },
+      {
+        "path": "src/panels/muhurta-format.ts",
+        "kind": "serialization",
+        "reason": "Muhurtam time display formatting only."
+      },
+      {
+        "path": "src/panels/muhurta-presentation.ts",
+        "kind": "ui-only",
+        "reason": "Muhurtam result rendering, accessibility announcements, and sharing."
+      },
+      {
+        "path": "src/panels/muhurta-result-state.ts",
+        "kind": "data-model",
+        "reason": "Isolated browser result state holder with no domain calculation."
+      },
+      {
         "path": "src/selection-store.ts",
         "kind": "ui-only",
         "reason": "Browser selection state only."
@@ -823,7 +853,7 @@
       "claim_kind": "textual-rule",
       "implementations": [
         {"path": "telugu_panchangam/special_yogas.py", "symbol": "get_special_yogas", "role": "owner"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "muSpecialYogasAt", "role": "mirror"}
+        {"path": "src/panels/muhurta-astronomy.ts", "symbol": "muSpecialYogasAt", "role": "mirror"}
       ],
       "inputs": ["Vaaram", "Tithi", "Nakshatra"],
       "outputs": ["list of applicable special Yoga names"],
@@ -1584,7 +1614,7 @@
       "claim_kind": "deterministic-fact",
       "implementations": [
         {"path": "telugu_panchangam/engines/base.py", "symbol": "PanchangamEngine.facts_at", "role": "owner"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "muFactsAt", "role": "mirror"}
+        {"path": "src/panels/muhurta-astronomy.ts", "symbol": "muFactsAt", "role": "mirror"}
       ],
       "inputs": ["instant", "location", "engine longitude functions", "sunrise-anchored Vaaram"],
       "outputs": ["slot-time Panchangam facts"],
@@ -1744,7 +1774,7 @@
         {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "chandra_position", "role": "owner"},
         {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "chandra_verdict", "role": "owner"},
         {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "rasi_from_nakshatra", "role": "owner"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "chandraOf", "role": "mirror"},
+        {"path": "src/panels/tarabalam-journey.ts", "symbol": "tbChandraOf", "role": "mirror"},
         {"path": "src/data/rasis.ts", "symbol": "rasiFromStar", "role": "mirror"}
       ],
       "inputs": ["Janma Rashi or birth Nakshatra/Pada", "day lunar Rashi"],
@@ -1773,7 +1803,7 @@
         {"path": "telugu_panchangam/personal/homa.py", "symbol": "homahuti_group", "role": "owner"},
         {"path": "telugu_panchangam/personal/homa.py", "symbol": "agnivasa_remainder", "role": "owner"},
         {"path": "telugu_panchangam/personal/homa.py", "symbol": "homa_election", "role": "owner"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "muHomaElection", "role": "mirror"}
+        {"path": "src/panels/muhurta-astronomy.ts", "symbol": "muHomaElection", "role": "mirror"}
       ],
       "inputs": ["solar Nakshatra", "lunar Nakshatra", "Tithi", "Vaaram"],
       "outputs": ["Homahuti group/lord", "Agnivasa remainder", "admission guidance"],
@@ -1884,7 +1914,7 @@
         {"path": "telugu_panchangam/personal/borrowing.py", "symbol": "resolve_borrowing_mode", "role": "owner"},
         {"path": "telugu_panchangam/personal/activity_check_contract.py", "symbol": "build_activity_check_contract", "role": "owner"},
         {"path": "tools/export_activity_rules.py", "symbol": "main", "role": "mirror"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "MU_ACTIVITY", "role": "mirror"}
+        {"path": "src/panels/muhurta-day-pipeline.ts", "symbol": "MU_ACTIVITY", "role": "mirror"}
       ],
       "inputs": ["activity identifier"],
       "outputs": ["automated constraints", "ranking preferences", "manual checks", "structured check classifications", "provenance identifier"],
@@ -1915,9 +1945,10 @@
         {"path": "telugu_panchangam/personal/election_assessors/karnavedha.py", "symbol": "evaluate_karnavedha_daylight", "role": "owner"},
         {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_tara", "role": "owner"},
         {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_chandra", "role": "owner"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "findMuhurta", "role": "mirror"},
+        {"path": "src/panels/muhurta-search.ts", "symbol": "findMuhurta", "role": "mirror"},
         {"path": "src/scorer/borrowing-context.ts", "symbol": "borrowingPurposeContext", "role": "mirror"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "muAssignTiers", "role": "mirror"},
+        {"path": "src/panels/muhurta-scoring.ts", "symbol": "muAssignTiers", "role": "mirror"},
+        {"path": "src/panels/muhurta-day-rules.ts", "symbol": "muDayDrop", "role": "mirror"},
         {"path": "src/muhurta-scorer.ts", "symbol": "computePersonalDosha", "role": "mirror"},
         {"path": "src/muhurta-scorer.ts", "symbol": "computeDayDosha", "role": "mirror"},
         {"path": "telugu_panchangam/personal/election_chart_rules.py", "symbol": "ELECTION_CHART_RULES", "role": "owner"},
@@ -2347,7 +2378,7 @@
         {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "tara_number", "role": "owner"},
         {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "tara_name", "role": "owner"},
         {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "taras_for_day", "role": "owner"},
-        {"path": "src/panels/tarabalam.ts", "symbol": "taraOf", "role": "mirror"}
+        {"path": "src/panels/tarabalam-journey.ts", "symbol": "tbTaraOf", "role": "mirror"}
       ],
       "inputs": ["Janma Nakshatra", "day or slot Nakshatra"],
       "outputs": ["Tara number", "Tara name", "favourability"],
