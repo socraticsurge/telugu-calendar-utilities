@@ -9,14 +9,14 @@ def _read(path: str) -> str:
 
 
 def test_legacy_muhurta_writer_preserves_additive_profile_identity():
-    source = _read('src/panels/tarabalam.ts')
+    source = _read('src/panels/tarabalam-profile-controller.ts')
 
     assert 'const existing = readLegacyGuestProfileRows(localStorage);' in source
     assert 'const row = mergeLegacyGuestProfileRow(previous, {' in source
 
 
 def test_legacy_consumers_read_corrupt_storage_safely_and_escape_names():
-    tarabalam = _read('src/panels/tarabalam.ts')
+    tarabalam = _read('src/panels/tarabalam-profile-controller.ts')
     gochara = _read('src/panels/gochara.ts')
 
     assert tarabalam.count('readLegacyGuestProfileRows(localStorage)') >= 3

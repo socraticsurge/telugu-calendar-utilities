@@ -34,7 +34,9 @@ _TS_DEFINITION_RE = re.compile(
 
 _ACTIVITY_RULES_ARTIFACT = 'src/data/activity-rules.generated.json'
 _PANCHANGAM_NAMES = 'telugu_panchangam/panchangam_names.py'
-_TARABALAM_PANEL = 'src/panels/tarabalam.ts'
+_MUHURTA_ASTRONOMY = 'src/panels/muhurta-astronomy.ts'
+_MUHURTA_DAY_PIPELINE = 'src/panels/muhurta-day-pipeline.ts'
+_MUHURTA_SCORING = 'src/panels/muhurta-scoring.ts'
 
 # Schema v1 keeps ``scope.source_files`` as the total production-source count.
 # Feature-side helpers are additions around the established computation layer:
@@ -91,7 +93,7 @@ _DUPLICATE_CONTRACTS = {
         'locations': [
             ('telugu_panchangam/personal/activity_rules.py', 'ACTIVITY_RULES'),
             (_ACTIVITY_RULES_ARTIFACT, '"rules"'),
-            (_TARABALAM_PANEL, 'MU_ACTIVITY'),
+            (_MUHURTA_DAY_PIPELINE, 'MU_ACTIVITY'),
         ],
     },
     'rashi_vocabulary': {
@@ -115,15 +117,15 @@ _DUPLICATE_CONTRACTS = {
         'locations': [
             (_PANCHANGAM_NAMES, 'YOGA_NAMES'),
             ('telugu_panchangam/personal/nitya_yoga.py', 'NITYA_AUSPICIOUS'),
-            (_TARABALAM_PANEL, 'MU_YOGA_NAMES_27'),
-            (_TARABALAM_PANEL, 'MU_NITYA_AUSPICIOUS'),
+            (_MUHURTA_ASTRONOMY, 'MU_YOGA_NAMES_27'),
+            (_MUHURTA_SCORING, 'MU_NITYA_AUSPICIOUS'),
         ],
     },
     'special_yoga_tables': {
         'strategy': 'manual-mirror',
         'locations': [
             ('telugu_panchangam/special_yogas.py', '_SARVARTHA_SIDDHI'),
-            (_TARABALAM_PANEL, 'MU_SARVARTHA'),
+            (_MUHURTA_ASTRONOMY, 'MU_SARVARTHA'),
         ],
     },
     'hora_tables': {
@@ -137,7 +139,7 @@ _DUPLICATE_CONTRACTS = {
         'strategy': 'manual-mirror',
         'locations': [
             ('telugu_panchangam/personal/homa.py', 'HOMAHUTI_GROUP_LORDS'),
-            (_TARABALAM_PANEL, 'MU_HOMAHUTI_LORDS'),
+            (_MUHURTA_ASTRONOMY, 'MU_HOMAHUTI_LORDS'),
         ],
     },
     'named_shani_conditions': {
