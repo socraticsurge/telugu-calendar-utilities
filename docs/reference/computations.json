@@ -229,6 +229,46 @@
         "reason": "Browser-local guest profile state, validation, and storage migration; it owns no Panchangam computation."
       },
       {
+        "path": "src/lib/guest-profile/types.ts",
+        "kind": "ui-only",
+        "reason": "Extracted guest-profile storage contracts and unchanged schema identifiers."
+      },
+      {
+        "path": "src/lib/guest-profile/values.ts",
+        "kind": "ui-only",
+        "reason": "Guest-profile input guards and storage identifier generation; no Panchangam computation."
+      },
+      {
+        "path": "src/lib/guest-profile/birth-normalization.ts",
+        "kind": "ui-only",
+        "reason": "Validates supplied birth-profile facts without calculating a chart."
+      },
+      {
+        "path": "src/lib/guest-profile/birth-ownership.ts",
+        "kind": "ui-only",
+        "reason": "Strict field-ownership checks for existing browser-local birth records."
+      },
+      {
+        "path": "src/lib/guest-profile/profiles.ts",
+        "kind": "ui-only",
+        "reason": "Guest-profile normalization, readiness and serialization using existing canonical helpers."
+      },
+      {
+        "path": "src/lib/guest-profile/legacy.ts",
+        "kind": "ui-only",
+        "reason": "Preserves legacy browser-local profile adapters and storage access."
+      },
+      {
+        "path": "src/lib/guest-profile/migration.ts",
+        "kind": "ui-only",
+        "reason": "Migrates existing guest-profile rows without changing calculation outputs."
+      },
+      {
+        "path": "src/lib/guest-profile/orphan-recovery.ts",
+        "kind": "ui-only",
+        "reason": "Recognizes owned incomplete profile-storage transactions; no Panchangam computation."
+      },
+      {
         "path": "src/lib/profile-selection.ts",
         "kind": "ui-only",
         "reason": "Stable browser-local journey selection and compatibility migration; it owns no Panchangam computation."
