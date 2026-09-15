@@ -94,8 +94,10 @@ The legacy browser suite builds with an explicit `false` flag, preserving its
 offline ICS fixtures. The separate structured browser suite builds with `true`
 and uses ordinary URLs without query overrides. It verifies Today and Muhurta
 at two viewport widths, plus missing, invalid and network-failure fallback.
-The current hosted frontend job runs the legacy suite; run the structured suite
-locally as a release gate until a separately approved workflow update includes it.
+The hosted frontend job runs both suites as separate required steps, rebuilding
+for each flag setting. A workflow contract test prevents silently dropping or
+making the enabled-pilot step optional. This CI-only update was separately approved;
+deployment workflows, permissions and CNAME remain unchanged.
 
 The full September 2026 generation covers 22 cities, three systems and 36,102 days.
 Every structured day was compared with the existing description parser.

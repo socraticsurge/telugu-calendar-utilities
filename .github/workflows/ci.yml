@@ -123,9 +123,13 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Run browser smoke tests
-        # The session-scoped fixture runs the production build once, then all
-        # browser cases exercise the exact dist/ bytes deployed to Pages.
+        # Preserve the legacy compatibility lane with its flag-disabled build.
         run: uv run --no-sync --no-build python -m pytest tests/test_browser_smoke.py -v
+
+      - name: Run enabled structured-calendar browser tests
+        # Rebuild with the production flag enabled; cover both viewport sizes
+        # and missing, invalid and failed-sidecar fallback without query overrides.
+        run: uv run --no-sync --no-build python -m pytest tests/test_structured_calendar_browser.py -v
 
       - name: Lint TypeScript
         run: npm run lint
