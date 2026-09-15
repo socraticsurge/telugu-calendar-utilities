@@ -14,4 +14,5 @@ def test_production_build_enables_both_guest_calculation_journeys():
     assert settings == {
         'VITE_BIRTH_PROFILE_API_ENABLED=true',
         'VITE_ELECTION_CHART_API_ENABLED=true',
+        'VITE_STRUCTURED_CALENDAR_ENABLED=true',
     }

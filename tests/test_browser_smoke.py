@@ -7,8 +7,10 @@ expects. A real browser load surfaces those errors immediately as
 `ReferenceError` in the JS console.
 
 The fixture runs `npm run build` (tsc --noEmit + vite build) so the
-tests exercise the exact bytes deploy-landing.yml publishes — NOT a
-source checkout. Pre-Vite this file served the old docs/index.html
+tests exercise a deployment artifact, with the structured-data flag
+disabled to preserve the legacy compatibility lane. The structured
+calendar browser tests cover the enabled production lane.
+Pre-Vite this file served the old docs/index.html
 mega-page; that page is deleted and this net now watches dist/.
 
 This test is conditionally skipped when Playwright or npm is not
@@ -24,6 +26,7 @@ Install (one-time, ~120 MB):
 from __future__ import annotations
 
 import http.server
+import os
 import shutil
 import socket
 import socketserver
@@ -69,8 +72,7 @@ playwright_sync = pytest.importorskip(
 
 sync_playwright = playwright_sync.sync_playwright
 
-@pytest.fixture(scope='module')
-def vite_build():
+def build_site_artifact(*, structured_calendar: bool = False):
     """Build the site into dist/ with the same command the deploy
     workflows use. Skips (not fails) when npm is unavailable so
     Python-only dev environments keep a green `pytest`; a FAILING
@@ -81,8 +83,9 @@ def vite_build():
     if not (REPO_ROOT / 'node_modules').is_dir():
         subprocess.run([npm, 'ci', '--ignore-scripts'], cwd=REPO_ROOT, check=True,
                        capture_output=True, text=True)
+    build_env = {**os.environ, 'VITE_STRUCTURED_CALENDAR_ENABLED': str(structured_calendar).lower()}
     proc = subprocess.run([npm, 'run', 'build'], cwd=REPO_ROOT, check=False,
-                          capture_output=True, text=True)
+                          capture_output=True, text=True, env=build_env)
     assert proc.returncode == 0, (
         f'`npm run build` failed (exit {proc.returncode}) — the smoke '
         f'tests exercise dist/, so a broken build is a broken site.\n'
@@ -93,6 +96,11 @@ def vite_build():
         'check vite.config.ts build.outDir.'
     )
     return DIST_DIR
+
+
+@pytest.fixture(scope='module')
+def vite_build():
+    return build_site_artifact()
 
 def _pick_free_port() -> int:
     with socket.socket() as s:
