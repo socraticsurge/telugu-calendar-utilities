@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/ci.yml"
 DEPENDABOT = ROOT / ".github/dependabot.yml"
@@ -65,3 +67,15 @@ def test_browser_fallback_install_disables_lifecycle_scripts():
     browser_smoke = BROWSER_SMOKE.read_text()
 
     assert "[npm, 'ci', '--ignore-scripts']" in browser_smoke
+
+
+def test_enabled_calendar_browser_suite_is_a_required_frontend_step():
+    workflow = yaml.safe_load(WORKFLOW.read_text())
+    frontend = workflow['jobs']['frontend-and-browser']
+    command = 'uv run --no-sync --no-build python -m pytest tests/test_structured_calendar_browser.py -v'
+    pilot_steps = [step for step in frontend['steps'] if step.get('run') == command]
+
+    assert len(pilot_steps) == 1
+    assert 'if' not in pilot_steps[0]
+    assert pilot_steps[0].get('continue-on-error', False) is False
+    assert frontend.get('continue-on-error', False) is False
