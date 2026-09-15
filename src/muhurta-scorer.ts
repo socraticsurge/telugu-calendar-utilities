@@ -1,11 +1,10 @@
+import sharedTables from './data/shared-calendar-tables.generated.json';
 // Muhurta scoring helpers — pure functions, no DOM.
 // Unit-tested by src/scorer/__tests__/muhurta-scorer.test.ts (Vitest);
 // behaviour is pinned to the Python originals in telugu_panchangam/
 // personal/{muhurta,lagna_position,chandrabalam}.py.
 
-export const MU_RASHI_NAMES = ['Mesha','Vrishabha','Mithuna','Karka','Simha',
-                        'Kanya','Tula','Vrischika','Dhanu','Makara',
-                        'Kumbha','Meena'];
+export const MU_RASHI_NAMES = sharedTables.rashiNames;
 
 export const MU_LAGNA_KENDRA = new Set([1, 4, 7, 10]);
 export const MU_LAGNA_TRIKONA = new Set([1, 5, 9]);

@@ -1,7 +1,7 @@
+import sharedTables from '../data/shared-calendar-tables.generated.json';
 import {
   MU_CHANDRA_GOOD,
   MU_CHANDRA_PUJA,
-  MU_TIER_NAMES,
   computeDayDosha,
   muCanonicalNakshatra,
   muEndsBySolarNoon,
@@ -10,7 +10,6 @@ import {
   muLagnaPosition,
   muLagnaVerdict,
   muLagnasInClass,
-  muRelativeTier,
   muScoreTithiClass,
 } from '../muhurta-scorer';
 import { lagnaDayFor } from '../lib/lagna-loader';
@@ -53,35 +52,15 @@ const MU_YOGA_PENALTY = { 'Visha Yoga': -2, 'Dagdha Yoga': -2 };
 // Tier each slot relative to the min/max score in this batch — mirror
 // telugu_panchangam/personal/muhurta.assign_tiers. "Excellent" means
 // the best of what turned up in this search, not a fixed bar.
-export function muAssignTiers(slots) {
-  if (!slots.length) return;
-  let ceiling = -Infinity, floor = Infinity;
-  for (const s of slots) {
-    if (s.score > ceiling) ceiling = s.score;
-    if (s.score < floor) floor = s.score;
-  }
-  for (const s of slots) {
-    let tier = muRelativeTier(s.score, ceiling, floor);
-    if ((s.personalDosha || s.dayDosha) && tier === 'Excellent') tier = 'Good';
-    s.tier = tier;
-  }
-}
+export { muAssignTiers, muRankCandidateSlots } from '../scorer/ranking';
 
 // Nitya Yoga scoring — mirror telugu_panchangam/personal/nitya_yoga.py
-const MU_NITYA_HARD_AVOID = new Set(['Vyatipata', 'Vaidhriti']);
-const MU_NITYA_HARD_PENALTY = -2;
-const MU_NITYA_PARTIAL_WINDOW_MIN = {  // dosha-window minutes from yoga start
-  'Vishkambha': 3 * 24, 'Atiganda': 6 * 24, 'Shoola': 5 * 24,
-  'Ganda': 6 * 24, 'Vyaghata': 9 * 24, 'Parigha': 5 * 24,
-};
-const MU_NITYA_PARTIAL_PENALTY = -1;
-const MU_NITYA_AUSPICIOUS = new Set([
-  'Preeti', 'Ayushman', 'Saubhagya', 'Shobhana',
-  'Sukarma', 'Dhriti', 'Vriddhi', 'Dhruva',
-  'Harshana', 'Siddhi', 'Shiva', 'Siddha',
-  'Sadhya', 'Shubha', 'Shukla', 'Brahma', 'Indra',
-]);
-const MU_NITYA_AUSPICIOUS_BONUS = 1;
+const MU_NITYA_HARD_AVOID = new Set(sharedTables.nitya.hardAvoid);
+const MU_NITYA_HARD_PENALTY = sharedTables.nitya.hardPenalty;
+const MU_NITYA_PARTIAL_WINDOW_MIN = sharedTables.nitya.partialMinutes;
+const MU_NITYA_PARTIAL_PENALTY = sharedTables.nitya.partialPenalty;
+const MU_NITYA_AUSPICIOUS = new Set(sharedTables.nitya.auspicious);
+const MU_NITYA_AUSPICIOUS_BONUS = sharedTables.nitya.auspiciousBonus;
 
 export function muParticipantLabel(person, index: number): string {
   return `#${index + 1} (${person.name || person.nak})`;
@@ -542,14 +521,4 @@ export function muActivityNeedsLagna(activity: string, rules): boolean {
     || rules.skip_on_combust?.length
     || automatedRulesFor(activity).length
   );
-}
-
-export function muRankCandidateSlots(slots): void {
-  muAssignTiers(slots);
-  slots.sort((a, b) => MU_TIER_NAMES.indexOf(b.tier) - MU_TIER_NAMES.indexOf(a.tier)
-    || b.score - a.score
-    || (b.personalPreferencePasses || 0) - (a.personalPreferencePasses || 0)
-    || (Number(!!a.personalDosha) - Number(!!b.personalDosha))
-    || a.d - b.d
-    || a.s0 - b.s0);
 }

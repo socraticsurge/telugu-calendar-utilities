@@ -1,0 +1,12 @@
+{
+  "contract_version": 1,
+  "scope": "Shared ranking semantics only; browser and MCP eligibility and supported activities remain surface-specific.",
+  "absolute": [[-1,"Avoid"],[0,"Avoid"],[1,"Fair"],[3,"Fair"],[4,"Good"],[6,"Good"],[7,"Excellent"]],
+  "relative": [[0,8,0,"Avoid"],[1,8,0,"Avoid"],[2,8,0,"Fair"],[4,8,0,"Good"],[6,8,0,"Excellent"],[7,7,7,"Excellent"],[0,0,0,"Avoid"]],
+  "batches": [
+    {"scores":[],"personal":[],"day":[],"expected":[]},
+    {"scores":[0,2,4,6,8],"personal":[null,null,null,null,null],"day":[null,null,null,null,null],"expected":["Avoid","Fair","Good","Excellent","Excellent"]},
+    {"scores":[0,8,8],"personal":[null,"ashtama_chandra",null],"day":[null,null,"rikta_tithi"],"expected":["Avoid","Good","Good"]},
+    {"scores":[4,4],"personal":[null,null],"day":[null,null],"expected":["Good","Good"]}
+  ]
+}

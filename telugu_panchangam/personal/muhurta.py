@@ -24,6 +24,10 @@ from telugu_panchangam.personal.election_assessors.karnavedha import (
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.lagna_position import lagna_class_of, lagnas_in_class
 from telugu_panchangam.personal.nitya_yoga import NITYA_HARD_AVOID
+from telugu_panchangam.personal.search_contract import (
+    LagnaContribution,
+    ScoreContribution,
+)
 from telugu_panchangam.personal.slot_scorers import (
     YOGA_PENALTY,
     _DayContext,
@@ -567,8 +571,9 @@ def _muhurta_nature_bonus(mu) -> int:
 
 
 def _activity_overlap_bonus(
-    s, e, block, facts, ctx: _DayContext, slot_quality, activity_match
-) -> int:
+    s, e, block, facts, ctx: _DayContext
+) -> ScoreContribution:
+    slot_quality, activity_match = [], []
     bonus = 0
     if facts.nakshatra in ctx.prefer_nakshatras:
         bonus += 1
@@ -598,12 +603,12 @@ def _activity_overlap_bonus(
         )
     for karana_name in ctx.avoid_karana_names:
         activity_match.append(f'{karana_name} karana avoided')
-    return bonus
+    return ScoreContribution(bonus, tuple(slot_quality), tuple(activity_match))
 
 
-def _hora_bonus(s, ctx: _DayContext, activity_match) -> int:
+def _hora_bonus(s, ctx: _DayContext) -> ScoreContribution:
     if not ctx.horas or not ctx.prefer_varas:
-        return 0
+        return ScoreContribution()
     from telugu_panchangam.panchangam_names import VAARAM_NAMES
 
     ruler_indexes = {
@@ -622,16 +627,17 @@ def _hora_bonus(s, ctx: _DayContext, activity_match) -> int:
                 ruler_index is not None
                 and VAARAM_NAMES[ruler_index] in ctx.prefer_varas
             ):
-                activity_match.append(f'{hora.name} favoured for {ctx.label} (+1)')
-                return 1
-            return 0
-    return 0
+                return ScoreContribution(
+                    1, activity_match=(f'{hora.name} favoured for {ctx.label} (+1)',))
+            return ScoreContribution()
+    return ScoreContribution()
 
 
 _DISALLOWED_LAGNA = object()
 
 
-def _lagna_score(s, ctx: _DayContext, activity_match, group_fit):
+def _lagna_score(s, ctx: _DayContext):
+    activity_match, group_fit = [], []
     cur_lagna = slot_lagna_name(ctx.lagnas, s)
     if ctx.allowed_lagnas and cur_lagna not in ctx.allowed_lagnas:
         return _DISALLOWED_LAGNA
@@ -665,7 +671,10 @@ def _lagna_score(s, ctx: _DayContext, activity_match, group_fit):
     if activity_reason:
         bonus += activity_bonus
         activity_match.append(activity_reason)
-    return bonus, cur_lagna, ashtama_names
+    return LagnaContribution(
+        ScoreContribution(bonus, activity_match=tuple(activity_match),
+                          group_fit=tuple(group_fit)),
+        cur_lagna, tuple(ashtama_names))
 
 
 def _slot_quality_reasons(mu, block, base, nature_bonus) -> list[str]:
@@ -798,17 +807,19 @@ def _evaluate_slot(
         tithi_activity_reason,
         preferred_number_tithi_reason,
     )
-    score += _activity_overlap_bonus(
-        s, e, block, facts, ctx, slot_quality, activity_match
-    )
+    overlap = _activity_overlap_bonus(s, e, block, facts, ctx)
+    hora = _hora_bonus(s, ctx)
+    score += overlap.score + hora.score
+    slot_quality.extend(overlap.slot_quality)
+    activity_match.extend(overlap.activity_match + hora.activity_match)
 
-    score += _hora_bonus(s, ctx, activity_match)
-
-    lagna_result = _lagna_score(s, ctx, activity_match, group_fit)
+    lagna_result = _lagna_score(s, ctx)
     if lagna_result is _DISALLOWED_LAGNA:
         return None
-    lagna_bonus, cur_lagna, lagna_ashtama_names = lagna_result
-    score += lagna_bonus
+    cur_lagna, lagna_ashtama_names = lagna_result.lagna, lagna_result.ashtama_names
+    score += lagna_result.contribution.score
+    activity_match.extend(lagna_result.contribution.activity_match)
+    group_fit.extend(lagna_result.contribution.group_fit)
 
     panchaka_penalty, panchaka_reason = _panchaka_penalty(facts, cur_lagna, ctx)
     score += panchaka_penalty

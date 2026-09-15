@@ -1,8 +1,9 @@
+import sharedTables from '../data/shared-calendar-tables.generated.json';
 // The 12 rasis in order — shared by tarabalam, gochara and muhurta UI.
 
-export const RASI_NAMES = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
+export const RASI_NAMES = sharedTables.rashiNames;
 
-export const NAKSHATRA_NAMES = ['Ashvini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+export const NAKSHATRA_NAMES = sharedTables.nakshatraNames;
 
 /**
  * Janma rasi from birth star (+ optional padam). Each nakshatra spans

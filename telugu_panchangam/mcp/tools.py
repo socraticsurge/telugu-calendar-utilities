@@ -1,7 +1,6 @@
 import calendar
 import json
 import logging
-from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from inspect import signature
 from typing import Optional
@@ -27,14 +26,14 @@ from telugu_panchangam.graha_yuddha import YUDDHA_PLANETS, graha_yuddha_periods
 from telugu_panchangam.ingress import INGRESS_PLANETS, rashi_ingresses
 from telugu_panchangam.maudhya_calendar import PLANET_NAMES, combustion_periods
 from telugu_panchangam.mcp.location import resolve_location, timezone_for_coordinates
+from telugu_panchangam.mcp.muhurta_request import (
+    FindMuhurtaRequest as _FindMuhurtaRequest,
+)
+from telugu_panchangam.mcp.muhurta_response import muhurta_response
 from telugu_panchangam.models.panchangam_day import Location, PanchangamDay
 from telugu_panchangam.panchanga_shuddhi import assess_shuddhi
 from telugu_panchangam.panchangam_names import GANDA_MOOLA_NAKSHATRAS
 from telugu_panchangam.panchangam_provenance import panchangam_provenance
-from telugu_panchangam.personal.activity_rules import (
-    ACTIVITY_ALIASES,
-    get_activity_rules,
-)
 from telugu_panchangam.personal.chandrabalam import (
     _rasi_index,
     chandra_position,
@@ -43,13 +42,10 @@ from telugu_panchangam.personal.chandrabalam import (
 from telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions
 from telugu_panchangam.personal.muhurta import (
     ACTIVITIES,
-    TIER_NAMES,
-    assign_tiers,
-    day_slots,
-    diagnose_day,
-    night_slots,
 )
+from telugu_panchangam.personal.muhurta_search import search_muhurta
 from telugu_panchangam.personal.phalalu import rasi_phalalu
+from telugu_panchangam.personal.search_contract import SearchOptions, SearchPeriod
 from telugu_panchangam.personal.tarabalam import _nak_index, taras_for_day
 
 _CALCULATION_FAILED_ERROR = (
@@ -94,37 +90,6 @@ _TIMEZONE_COUNTRY = {
     'Asia/Dubai': 'UAE',
 }
 
-_MUHURTA_DISCLAIMER = (
-    'Slots intersect good choghadiya blocks with every inauspicious '
-    'window removed (Rahu Kalam, Gulika, Yamagandam, Varjyam, '
-    'Durmuhurtham). Scoring: tarabalam +/-1 per person, chandrabalam '
-    '+/-1 per person, tithi class (preferred +1 / activity-avoided -1 / '
-    'Rikta -2; Pushya nakshatra cancels Rikta entirely, '
-    'Sarvartha/Amrita Siddhi partially offsets it to -1), vara match +1, '
-    'special-yoga bonuses (Sarvartha/Amrita Siddhi +2, Siddha Yoga +1, '
-    'Dvipushkara/Tripushkara +1, Visha/Dagdha -2), '
-    'Nitya yoga (auspicious +1, Vyatipata/Vaidhriti -2 + samskara skip, '
-    'dosha-window -1), Abhijit/Amrita +2, activity bias +1. '
-    'Eclipse days are skipped outright. '
-    'Each slot carries a tier (Excellent/Good/Fair/Avoid), assigned '
-    'relative to the highest/lowest score found across this search '
-    '(so "Excellent" means the best of what turned up, not a fixed '
-    'absolute bar), and a reason_groups breakdown '
-    '(slot_quality, day_quality, group_fit, '
-    'activity_match, notes) for transparent reasoning. '
-    'personal_dosha (ashtama_chandra/chandra_avoid/chandra_remedial/null) '
-    'flags an unrectified personal Moon caution, and day_dosha '
-    '(rikta_tithi/visha_dagdha_yoga/vyatipata_vaidhriti/null) flags a '
-    'day-level dosha: either keeps a slot capped below Excellent, and '
-    'slots are ranked tier-first (Excellent > Good > '
-    'Fair > Avoid), then by score, then preferring dosha-free slots. '
-    'Tiers are relative to this search, not a universal standard — '
-    '"Good"/"Fair" slots with personal_dosha and day_dosha both null are '
-    'workable choices, not just runner-ups. When presenting results, '
-    'surface personal_dosha/day_dosha and notes regardless of tier, and '
-    'for weddings, major samskaras, or any caution the devotee is unsure '
-    'about, recommend consulting their purohit.'
-)
 
 
 def _parse_date(date_str: str) -> date:
@@ -1118,306 +1083,30 @@ def _validate_muhurta_inputs(
     _validate_aligned_rashis('janma_lagnas', janma_lagnas, janma_nakshatras)
 
 
-def _precalculate_muhurta_days(
-    start: date,
-    days: int,
-    extra: int,
-    loc: Location,
-    engine: object,
-) -> dict[int, object]:
-    end_date = start + timedelta(days=days - 1)
-    jd_start = local_midnight_jd(start, loc.timezone)
-    jd_end = local_midnight_jd(end_date + timedelta(days=1 + extra), loc.timezone)
-    eclipses = list_eclipses_in_range(jd_start, jd_end)
-    calculated = {}
-    for index in range(days + extra):
-        current = start + timedelta(days=index)
-        day = engine.calculate(current, loc, include_eclipse=False)
-        day.eclipse = get_eclipse_from_precomputed(current, eclipses, loc)
-        calculated[index] = day
-    return calculated
-
-
-def _muhurta_day_results(
-    index,
-    calculated_days,
-    activity,
-    janma_nakshatras,
-    janma_rasis,
-    janma_lagnas,
-    chandra_mode,
-    travel_direction,
-    include_night,
-    engine,
-):
-    day = calculated_days[index]
-    daylight_assessment = None
-    if activity == 'karnavedha':
-        from telugu_panchangam.personal.muhurta import (
-            karnavedha_daylight_assessment,
-        )
-
-        daylight_assessment = karnavedha_daylight_assessment(
-            day, get_activity_rules(activity), activity
-        )
-    day_results = day_slots(
-        day,
-        activity=activity,
-        janma_nakshatras=janma_nakshatras,
-        janma_rasis=janma_rasis,
-        janma_lagnas=janma_lagnas,
-        chandra_mode=chandra_mode,
-        travel_direction=travel_direction,
-        engine=engine,
-        _daylight_assessment=daylight_assessment,
-    )
-    night_results = []
-    if include_night:
-        night_results = night_slots(
-            day,
-            calculated_days[index + 1],
-            activity=activity,
-            janma_nakshatras=janma_nakshatras,
-            janma_rasis=janma_rasis,
-            janma_lagnas=janma_lagnas,
-            chandra_mode=chandra_mode,
-            travel_direction=travel_direction,
-            engine=engine,
-        )
-    return day, daylight_assessment, day_results, night_results
-
-
-def _dropped_muhurta_day(
-    day,
-    activity,
-    janma_nakshatras,
-    janma_rasis,
-    chandra_mode,
-    travel_direction,
-    daylight_assessment,
-):
-    reason = diagnose_day(
-        day,
-        activity=activity,
-        janma_nakshatras=janma_nakshatras,
-        janma_rasis=janma_rasis,
-        chandra_mode=chandra_mode,
-        travel_direction=travel_direction,
-        _daylight_assessment=daylight_assessment,
-    )
-    if not reason:
-        return None
-    dropped = {'date': day.date.isoformat(), 'reason': reason}
-    if daylight_assessment is not None:
-        dropped['daylight_outcomes'] = daylight_assessment['outcomes']
-    return dropped
-
-
-def _formatted_muhurta_slots(results, timezone):
-    return [
-        {
-            **slot,
-            'start': _fmt_time(slot['start'], timezone),
-            'end': _fmt_time(slot['end'], timezone),
-        }
-        for slot in results
-    ]
-
-
-def _gather_muhurta_slots(
-    start: date,
-    days: int,
-    loc: Location,
-    engine: object,
-    activity: str,
-    janma_nakshatras: Optional[list],
-    janma_rasis: Optional[list],
-    chandra_mode: str,
-    janma_lagnas: Optional[list] = None,
-    travel_direction: Optional[str] = None,
-    include_night: bool = False,
-) -> tuple[list, list]:
-    slots = []
-    dropped_days = []
-    # When include_night=True we need the day after the last requested day
-    # to get next_sunrise for the final night's blocks.
-    extra = 1 if include_night else 0
-    calculated_days = _precalculate_muhurta_days(start, days, extra, loc, engine)
-
-    for index in range(days):
-        day, daylight_assessment, day_results, night_results = _muhurta_day_results(
-            index,
-            calculated_days,
-            activity,
-            janma_nakshatras,
-            janma_rasis,
-            janma_lagnas,
-            chandra_mode,
-            travel_direction,
-            include_night,
-            engine,
-        )
-        if not day_results and not night_results:
-            dropped = _dropped_muhurta_day(
-                day,
-                activity,
-                janma_nakshatras,
-                janma_rasis,
-                chandra_mode,
-                travel_direction,
-                daylight_assessment,
-            )
-            if dropped is not None:
-                dropped_days.append(dropped)
-        slots.extend(
-            _formatted_muhurta_slots(day_results + night_results, loc.timezone)
-        )
-    return slots, dropped_days
-
-
-@dataclass(frozen=True)
-class _FindMuhurtaRequest:
-    start_date: str
-    days: int = 7
-    activity: str = 'any'
-    city: str = 'Hyderabad'
-    system: str = 'drik'
-    janma_nakshatras: Optional[list] = None
-    janma_rasis: Optional[list] = None
-    janma_lagnas: Optional[list] = None
-    chandra_mode: str = 'stars'
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    timezone: Optional[str] = None
-    ayanamsa: str = 'lahiri'
-    travel_direction: Optional[str] = None
-    include_night: bool = False
-
-
 def _run_find_muhurta(request: _FindMuhurtaRequest) -> str:
-    start_date = request.start_date
-    days = request.days
-    activity = request.activity
-    city = request.city
-    system = request.system
-    janma_nakshatras = request.janma_nakshatras
-    janma_rasis = request.janma_rasis
-    janma_lagnas = request.janma_lagnas
-    chandra_mode = request.chandra_mode
-    latitude = request.latitude
-    longitude = request.longitude
-    timezone = request.timezone
-    ayanamsa = request.ayanamsa
-    travel_direction = request.travel_direction
-    include_night = request.include_night
-
     try:
         _validate_muhurta_inputs(
-            days, activity, chandra_mode, janma_nakshatras, janma_rasis, janma_lagnas
+            request.days, request.activity, request.chandra_mode,
+            request.janma_nakshatras, request.janma_rasis, request.janma_lagnas,
         )
-        start = _parse_date(start_date)
-        _validate_system(system)
-        loc = _resolve_city(city, latitude, longitude, timezone)
-        engine = _get_engine(system, ayanamsa)
-
-        slots, dropped_days = _gather_muhurta_slots(
-            start,
-            days,
-            loc,
-            engine,
-            activity,
-            janma_nakshatras,
-            janma_rasis,
-            chandra_mode,
-            janma_lagnas=janma_lagnas,
-            travel_direction=travel_direction,
-            include_night=include_night,
+        start = _parse_date(request.start_date)
+        _validate_system(request.system)
+        loc = _resolve_city(
+            request.city, request.latitude, request.longitude, request.timezone)
+        engine = _get_engine(request.system, request.ayanamsa)
+        options = SearchOptions(
+            activity=request.activity, janma_nakshatras=request.janma_nakshatras,
+            janma_rasis=request.janma_rasis, janma_lagnas=request.janma_lagnas,
+            chandra_mode=request.chandra_mode, travel_direction=request.travel_direction,
+            include_night=request.include_night,
         )
-
-        # Re-tier across the whole search, not just one day — "Excellent"
-        # means the best of what turned up over the full date range.
-        assign_tiers(slots)
-        slots.sort(
-            key=lambda x: (
-                -TIER_NAMES.index(x['tier']),
-                -x['score'],
-                x['personal_dosha'] is not None,
-                x['date'],
-                x['start'],
-            )
-        )
-        rules = get_activity_rules(activity)
-        constraint_fields = (
-            'allowed_maasams',
-            'allowed_maasa_solar_pairs',
-            'allowed_varas',
-            'avoid_vara_paksha',
-            'allowed_solar_classes',
-            'allowed_nakshatras',
-            'avoid_nakshatras',
-            'prefer_nakshatras',
-            'allowed_tithi_numbers',
-            'prefer_tithi_numbers',
-            'avoid_tithi_numbers',
-            'required_lagna_class',
-            'allowed_lagnas',
-            'prefer_lagnas',
-            'caution_lagna_solar',
-            'daytime_only',
-            'forenoon_only',
-            'allowed_pakshams',
-            'allowed_solar_signs',
-            'allowed_tithi_names',
-            'skip_on_combust',
-            'avoid_janma_nakshatra',
-            'avoid_vara_tithi_names',
-            'avoid_nitya_yogas',
-            'require_homa_election',
-            'require_single_daylight_tithi',
-            'require_single_daylight_nakshatra',
-        )
-        resolved_activity = ACTIVITY_ALIASES.get(activity, activity)
-        source_scope = None
-        if resolved_activity == 'annaprasana':
-            source_scope = {
-                'panchangam_profile': 'python_and_mcp',
-                'exact_election_chart_assessor': 'drik_browser_only',
-                'event_chart_policy': (
-                    'election_chart.annaprasana.raman_transcription_policy_v1'
-                ),
-                'general_election_chart_baseline': 'open_issue_284',
-            }
-        return json.dumps(
-            {
-                'start_date': start_date,
-                'days': days,
-                'activity': activity,
-                'resolved_activity': resolved_activity,
-                'city': city,
-                'system': system,
-                'chandra_mode': chandra_mode,
-                'ayanamsa': ayanamsa,
-                'slots': slots[:12],
-                'dropped_days': dropped_days,
-                'activity_profile': {
-                    'alias_of': ACTIVITY_ALIASES.get(activity),
-                    'source_claim': rules.get('source_claim'),
-                    'audit_claim': rules.get('audit_claim'),
-                    'heuristic_claim': rules.get('heuristic_claim'),
-                    'related_claims': rules.get('related_claims', []),
-                    'source_scope': rules.get('source_scope'),
-                    'manual_prerequisites': rules.get('manual_prerequisites', False),
-                    **({'source_scope': source_scope} if source_scope else {}),
-                    'automated_constraints': {
-                        field: rules[field]
-                        for field in constraint_fields
-                        if field in rules
-                    },
-                    'manual_checks': rules.get('manual_checks', []),
-                },
-                'disclaimer': _MUHURTA_DISCLAIMER,
-            }
-        )
+        result = search_muhurta(SearchPeriod(start, request.days), loc, engine, options)
+        slots = [
+            {**slot, 'start': _fmt_time(slot['start'], loc.timezone),
+             'end': _fmt_time(slot['end'], loc.timezone)}
+            for slot in result.slots
+        ]
+        return muhurta_response(request, slots, result.dropped_days)
     except ValueError as e:
         return json.dumps({'error': str(e)})
     except Exception:

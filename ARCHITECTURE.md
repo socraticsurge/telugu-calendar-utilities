@@ -1,5 +1,10 @@
 # Architecture
 
+The current maintenance repair is documented in
+[ADR 0003: calculation boundaries](docs/decisions/0003-calculation-boundaries.md).
+MCP search now delegates to a transport-independent personal-layer service;
+shared browser tables are generated, and versioned day data has an opt-in browser pilot.
+
 How the project is layered and where each module sits. This is the
 mental model for "where should I add X?" and for understanding the
 engine-core refactor designed but parked in [improvement-plan Phase 6](docs/tracking/improvement-plan.md).
