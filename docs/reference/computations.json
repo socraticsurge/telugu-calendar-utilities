@@ -63,6 +63,14 @@
       {"path": "scripts", "extensions": [".py"]}
     ],
     "exclusions": [
+      {"path": "src/scorer/search-contract.ts", "kind": "data-model", "reason": "Typed browser request snapshot, interval limit and stale-result fingerprint."},
+      {"path": "src/lib/calendar-data.ts", "kind": "adapter", "reason": "Validates structured day data and isolates the legacy description adapter."},
+      {"path": "src/lib/calendar-loader.ts", "kind": "orchestration", "reason": "Loads versioned calendar data with a subscriber-feed compatibility fallback."},
+      {"path": "telugu_panchangam/generators/calendar_data.py", "kind": "serialization", "reason": "Projects existing engine outputs into the versioned browser day contract."},
+      {"path": "telugu_panchangam/mcp/muhurta_request.py", "kind": "data-model", "reason": "Preserves the public MCP request signature and defaults."},
+      {"path": "telugu_panchangam/mcp/muhurta_response.py", "kind": "serialization", "reason": "Projects ranked decisions into the existing MCP response format."},
+      {"path": "telugu_panchangam/personal/muhurta_search.py", "kind": "orchestration", "reason": "Coordinates existing day/night scorers and whole-search ranking."},
+      {"path": "telugu_panchangam/personal/search_contract.py", "kind": "data-model", "reason": "Typed search inputs, results and immutable score contributions."},
       {
         "path": "telugu_panchangam/__init__.py",
         "kind": "package-marker",
@@ -1987,7 +1995,8 @@
         {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_chandra", "role": "owner"},
         {"path": "src/panels/muhurta-search.ts", "symbol": "findMuhurta", "role": "mirror"},
         {"path": "src/scorer/borrowing-context.ts", "symbol": "borrowingPurposeContext", "role": "mirror"},
-        {"path": "src/panels/muhurta-scoring.ts", "symbol": "muAssignTiers", "role": "mirror"},
+        {"path": "src/scorer/ranking.ts", "symbol": "muAssignTiers", "role": "mirror"},
+        {"path": "src/panels/muhurta-scoring.ts", "symbol": "muInitialSlotScore", "role": "mirror"},
         {"path": "src/panels/muhurta-day-rules.ts", "symbol": "muDayDrop", "role": "mirror"},
         {"path": "src/muhurta-scorer.ts", "symbol": "computePersonalDosha", "role": "mirror"},
         {"path": "src/muhurta-scorer.ts", "symbol": "computeDayDosha", "role": "mirror"},
