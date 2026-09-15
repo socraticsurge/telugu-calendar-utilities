@@ -1,6 +1,7 @@
 import { selEl, inpEl } from '../lib/dom';
+import { browserSearchWindow, searchFingerprint } from '../scorer/search-contract';
 import { getSelection } from '../selection-store';
-import { loadFeed } from '../lib/feed-loader';
+import { loadCalendarFeed } from '../lib/calendar-loader';
 import { stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { loadLagna } from '../lib/lagna-loader';
@@ -69,7 +70,7 @@ function muCurrentSearchFingerprint() {
   const borrowingPurpose = activity === 'borrowing_money'
     ? tbBorrowingPurpose()
     : null;
-  return JSON.stringify({
+  return searchFingerprint({
     activity,
     from: inpEl('tb-from').value || '',
     to: inpEl('tb-to').value || '',
@@ -164,9 +165,9 @@ function muBeginSearch() {
   box.setAttribute('aria-busy', 'true');
   muSetResultMessage(box, 'Searching…');
   const activity = selEl('mu-activity').value;
-  const from = new Date(inpEl('tb-from').value + 'T00:00:00');
-  const to = new Date(inpEl('tb-to').value + 'T00:00:00');
-  const nDays = Math.min(60, Math.max(1, Math.round((to.getTime() - from.getTime()) / 86400000) + 1));
+  const { from, nDays } = browserSearchWindow(
+    inpEl('tb-from').value, inpEl('tb-to').value,
+  );
   const people = tbProfiles();
   const roleProfile = tbRoleParticipant(activity);
   const borrowingPurpose = activity === 'borrowing_money'
@@ -207,7 +208,7 @@ async function muLoadSearchData(search) {
     toIso: inpEl('tb-to').value,
     fingerprint: search.searchFingerprint,
   };
-  const events = getLoadedEvents() || await loadFeed(city, system);
+  const events = getLoadedEvents() || await loadCalendarFeed(city, system);
   const activityRules = MU_ACTIVITY[search.activity] || MU_ACTIVITY.any;
   const activityNeedsLagna = muActivityNeedsLagna(search.activity, activityRules);
   const lagnaCityData = (search.people.length || activityNeedsLagna)

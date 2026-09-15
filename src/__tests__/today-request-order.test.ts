@@ -14,10 +14,8 @@ vi.mock('../selection-store', () => ({
   getSelection: () => harness.selection,
 }));
 
-vi.mock('../lib/feed-loader', () => ({
-  FEED_BASE_URL: 'https://example.invalid/feeds/',
-  loadFeed: harness.loadFeed,
-  slug: value => value.toLowerCase().replace(/\s+/g, '-'),
+vi.mock('../lib/calendar-loader', () => ({
+  loadCalendarFeed: harness.loadFeed,
 }));
 
 vi.mock('../lib/lagna-loader', () => ({

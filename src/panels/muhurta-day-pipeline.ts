@@ -1,5 +1,6 @@
 import { muCanonicalNakshatra } from '../muhurta-scorer';
-import { parseDescription } from '../lib/parse-description';
+import { type RankedCandidate } from '../scorer/ranking';
+import { calendarEventDay, type CalendarEvent } from '../lib/calendar-data';
 import { stampOf } from '../lib/format';
 import {
   automatedRulesFor,
@@ -46,7 +47,7 @@ import { muToT } from './muhurta-format';
 const MU_ACTIVITY = activityContract.rules;
 
 export interface MuhurtaPipelineState {
-  slots: unknown[];
+  slots: Array<RankedCandidate & Record<string, unknown>>;
   slotsPerDay: Map<string, number>;
   droppedDays: unknown[];
   droppedEclipseDays: number;
@@ -403,8 +404,8 @@ function muProcessSlot(input) {
   state.slotsPerDay.set(isoDate, (state.slotsPerDay.get(isoDate) || 0) + 1);
 }
 
-export function processMuhurtaDay(context, state: MuhurtaPipelineState, day, event): void {
-  const data = parseDescription(event.description);
+export function processMuhurtaDay(context, state: MuhurtaPipelineState, day, event: CalendarEvent): void {
+  const data = calendarEventDay(event);
   const isoDate = stampOf(day).replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
   const ruleContext = muRuleContext(
     context.activity, data, context.borrowingPurpose,

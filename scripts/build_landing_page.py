@@ -16,7 +16,7 @@ subprocess.run(["npm", "run", "build"], check=True)
 os.makedirs('dist/feeds', exist_ok=True)
 count = 0
 for f in os.listdir('feeds'):
-    if f.endswith('.ics'):
+    if f.endswith(('.ics', '.days-v1.json')):
         shutil.copy(os.path.join('feeds', f), os.path.join('dist/feeds', f))
         count += 1
 

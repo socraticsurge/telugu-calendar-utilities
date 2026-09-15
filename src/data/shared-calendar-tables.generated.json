@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "rashiNames": [
+    "Mesha",
+    "Vrishabha",
+    "Mithuna",
+    "Karka",
+    "Simha",
+    "Kanya",
+    "Tula",
+    "Vrischika",
+    "Dhanu",
+    "Makara",
+    "Kumbha",
+    "Meena"
+  ],
+  "nakshatraNames": [
+    "Ashvini",
+    "Bharani",
+    "Krittika",
+    "Rohini",
+    "Mrigashira",
+    "Ardra",
+    "Punarvasu",
+    "Pushya",
+    "Ashlesha",
+    "Magha",
+    "Purva Phalguni",
+    "Uttara Phalguni",
+    "Hasta",
+    "Chitra",
+    "Swati",
+    "Vishakha",
+    "Anuradha",
+    "Jyeshtha",
+    "Mula",
+    "Purva Ashadha",
+    "Uttara Ashadha",
+    "Shravana",
+    "Dhanishtha",
+    "Shatabhisha",
+    "Purva Bhadrapada",
+    "Uttara Bhadrapada",
+    "Revati"
+  ],
+  "varaNames": [
+    "Adivaram",
+    "Somavaram",
+    "Mangalavaram",
+    "Budhavaram",
+    "Guruvaram",
+    "Shukravaram",
+    "Shanivaram"
+  ],
+  "browserYogaNames": [
+    "Vishkambha",
+    "Priti",
+    "Ayushman",
+    "Saubhagya",
+    "Shobhana",
+    "Atiganda",
+    "Sukarma",
+    "Dhriti",
+    "Shula",
+    "Ganda",
+    "Vriddhi",
+    "Dhruva",
+    "Vyaghata",
+    "Harshana",
+    "Vajra",
+    "Siddhi",
+    "Vyatipata",
+    "Variyana",
+    "Parigha",
+    "Shiva",
+    "Siddha",
+    "Sadhya",
+    "Shubha",
+    "Shukla",
+    "Brahma",
+    "Indra",
+    "Vaidhriti"
+  ],
+  "nitya": {
+    "hardAvoid": [
+      "Vaidhriti",
+      "Vyatipata"
+    ],
+    "hardPenalty": -2,
+    "partialMinutes": {
+      "Vishkambha": 72,
+      "Atiganda": 144,
+      "Shoola": 120,
+      "Ganda": 144,
+      "Vyaghata": 216,
+      "Parigha": 120
+    },
+    "partialPenalty": -1,
+    "auspicious": [
+      "Ayushman",
+      "Brahma",
+      "Dhriti",
+      "Dhruva",
+      "Harshana",
+      "Indra",
+      "Preeti",
+      "Sadhya",
+      "Saubhagya",
+      "Shiva",
+      "Shobhana",
+      "Shubha",
+      "Shukla",
+      "Siddha",
+      "Siddhi",
+      "Sukarma",
+      "Vriddhi"
+    ],
+    "auspiciousBonus": 1
+  },
+  "specialYoga": {
+    "sarvartha": {
+      "Adivaram": [
+        "Anuradha",
+        "Ashvini",
+        "Hasta",
+        "Mula",
+        "Punarvasu",
+        "Pushya",
+        "Revati",
+        "Shravana"
+      ],
+      "Somavaram": [
+        "Anuradha",
+        "Mrigashira",
+        "Pushya",
+        "Rohini",
+        "Shravana"
+      ],
+      "Mangalavaram": [
+        "Ashlesha",
+        "Ashvini",
+        "Krittika",
+        "Uttara Ashadha",
+        "Uttara Bhadrapada",
+        "Uttara Phalguni"
+      ],
+      "Budhavaram": [
+        "Anuradha",
+        "Hasta",
+        "Krittika",
+        "Mrigashira",
+        "Rohini"
+      ],
+      "Guruvaram": [
+        "Anuradha",
+        "Ashvini",
+        "Punarvasu",
+        "Pushya",
+        "Revati",
+        "Swati"
+      ],
+      "Shukravaram": [
+        "Anuradha",
+        "Ashvini",
+        "Punarvasu",
+        "Pushya",
+        "Revati",
+        "Shravana"
+      ],
+      "Shanivaram": [
+        "Rohini",
+        "Shravana",
+        "Swati"
+      ]
+    },
+    "amrita": {
+      "Adivaram": "Hasta",
+      "Somavaram": "Mrigashira",
+      "Mangalavaram": "Ashvini",
+      "Budhavaram": "Anuradha",
+      "Guruvaram": "Pushya",
+      "Shukravaram": "Revati",
+      "Shanivaram": "Rohini"
+    },
+    "visha": {
+      "Adivaram": 5,
+      "Somavaram": 6,
+      "Mangalavaram": 7,
+      "Budhavaram": 8,
+      "Guruvaram": 9,
+      "Shukravaram": 10,
+      "Shanivaram": 11
+    },
+    "dagdha": {
+      "Adivaram": [
+        12
+      ],
+      "Somavaram": [
+        11
+      ],
+      "Mangalavaram": [
+        5
+      ],
+      "Budhavaram": [
+        2,
+        3
+      ],
+      "Guruvaram": [
+        6
+      ],
+      "Shukravaram": [
+        8
+      ],
+      "Shanivaram": [
+        9
+      ]
+    },
+    "pushkaraVaras": [
+      "Adivaram",
+      "Mangalavaram",
+      "Shanivaram"
+    ],
+    "dviTithis": [
+      2,
+      7,
+      12
+    ],
+    "dviNakshatras": [
+      "Chitra",
+      "Dhanishtha",
+      "Mrigashira"
+    ],
+    "triTithis": [
+      2,
+      7,
+      12
+    ],
+    "triNakshatras": [
+      "Krittika",
+      "Punarvasu",
+      "Purva Bhadrapada",
+      "Uttara Ashadha",
+      "Uttara Phalguni",
+      "Vishakha"
+    ]
+  },
+  "horaLords": [
+    "Sun",
+    "Venus",
+    "Mercury",
+    "Moon",
+    "Saturn",
+    "Jupiter",
+    "Mars"
+  ],
+  "horaWeekdayStarts": [
+    0,
+    3,
+    6,
+    2,
+    5,
+    1,
+    4
+  ],
+  "homaLords": [
+    "Surya",
+    "Budha",
+    "Shukra",
+    "Shani",
+    "Chandra",
+    "Mangala",
+    "Guru",
+    "Rahu",
+    "Ketu"
+  ],
+  "homaBenefics": [
+    "Budha",
+    "Chandra",
+    "Guru",
+    "Shukra"
+  ],
+  "shaniConditions": [
+    "Sade Sati (peak phase)",
+    "Sade Sati (setting phase)",
+    null,
+    "Ardhastama Shani",
+    null,
+    null,
+    null,
+    "Ashtama Shani",
+    null,
+    null,
+    null,
+    "Sade Sati (rising phase)"
+  ]
+}

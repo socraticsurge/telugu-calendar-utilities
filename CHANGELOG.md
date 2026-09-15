@@ -7,6 +7,15 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+### Maintenance — 1.18.15
+
+- Separate Muhurta search from MCP response formatting while preserving signatures and output bytes.
+- Add typed search/ranking boundaries and returned score contributions.
+- Generate shared calendar tables from Python owners with explicit browser compatibility aliases.
+- Add versioned calendar-data sidecars and an opt-in Today/Muhurta browser pilot with legacy fallback.
+- Add shared boundary cases, a 48-day cross-runtime corpus and built-browser pilot verification.
+- Preserve engine code, ICS subscriber format, source claims, profile storage and deployment workflows.
+
 ### Fixed
 
 - Prepare MCP/PyPI patch metadata `1.18.13` while adding the reusable,

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "release": "1.18.15",
+  "parent_release": "1.18.14",
+  "activity": "calculation-boundaries",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [],
+  "semantic_deltas": [],
+  "protected_source_transforms": [
+    {
+      "path": "telugu_panchangam/personal/muhurta.py",
+      "scope": "calculation-boundaries_behavior_preserving_refactor",
+      "transforms": [
+        {
+          "before": "    evaluate_karnavedha_daylight,\n    karnavedha_daylight_drop_reason,\n)\nfrom telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions\nfrom telugu_panchangam.personal.lagna_position import lagna_class_of, lagnas_in_class\nfrom telugu_panchangam.personal.nitya_yoga import NITYA_HARD_AVOID\nfrom telugu_panchangam.personal.slot_scorers import (\n    YOGA_PENALTY,\n    _DayContext,\n    anandadi_day_modifier,\n    doctrinal_notes,\n    score_chandra,\n",
+          "after": "    evaluate_karnavedha_daylight,\n    karnavedha_daylight_drop_reason,\n)\nfrom telugu_panchangam.personal.lagna_hora import get_horas, get_lagna_transitions\nfrom telugu_panchangam.personal.lagna_position import lagna_class_of, lagnas_in_class\nfrom telugu_panchangam.personal.nitya_yoga import NITYA_HARD_AVOID\nfrom telugu_panchangam.personal.search_contract import (\n    LagnaContribution,\n    ScoreContribution,\n)\nfrom telugu_panchangam.personal.slot_scorers import (\n    YOGA_PENALTY,\n    _DayContext,\n    anandadi_day_modifier,\n    doctrinal_notes,\n    score_chandra,\n"
+        },
+        {
+          "before": "    if mu['is_abhijit'] or mu['is_brahma']:\n        return 2\n    return 1 if mu['nature'] == 'auspicious' else -2\n\n\ndef _activity_overlap_bonus(\n    s, e, block, facts, ctx: _DayContext, slot_quality, activity_match\n) -> int:\n    bonus = 0\n    if facts.nakshatra in ctx.prefer_nakshatras:\n        bonus += 1\n        activity_match.append(\n            f'{facts.nakshatra} specifically favoured for {ctx.label} (+1)'\n        )\n",
+          "after": "    if mu['is_abhijit'] or mu['is_brahma']:\n        return 2\n    return 1 if mu['nature'] == 'auspicious' else -2\n\n\ndef _activity_overlap_bonus(\n    s, e, block, facts, ctx: _DayContext\n) -> ScoreContribution:\n    slot_quality, activity_match = [], []\n    bonus = 0\n    if facts.nakshatra in ctx.prefer_nakshatras:\n        bonus += 1\n        activity_match.append(\n            f'{facts.nakshatra} specifically favoured for {ctx.label} (+1)'\n        )\n"
+        },
+        {
+          "before": "        bonus += ctx.prefer_chog[1]\n        activity_match.append(\n            f'{block.name} favoured for {ctx.label} (+{ctx.prefer_chog[1]})'\n        )\n    for karana_name in ctx.avoid_karana_names:\n        activity_match.append(f'{karana_name} karana avoided')\n    return bonus\n\n\ndef _hora_bonus(s, ctx: _DayContext, activity_match) -> int:\n    if not ctx.horas or not ctx.prefer_varas:\n        return 0\n    from telugu_panchangam.panchangam_names import VAARAM_NAMES\n\n    ruler_indexes = {\n        'Sun': 0,\n        'Moon': 1,\n        'Mars': 2,\n",
+          "after": "        bonus += ctx.prefer_chog[1]\n        activity_match.append(\n            f'{block.name} favoured for {ctx.label} (+{ctx.prefer_chog[1]})'\n        )\n    for karana_name in ctx.avoid_karana_names:\n        activity_match.append(f'{karana_name} karana avoided')\n    return ScoreContribution(bonus, tuple(slot_quality), tuple(activity_match))\n\n\ndef _hora_bonus(s, ctx: _DayContext) -> ScoreContribution:\n    if not ctx.horas or not ctx.prefer_varas:\n        return ScoreContribution()\n    from telugu_panchangam.panchangam_names import VAARAM_NAMES\n\n    ruler_indexes = {\n        'Sun': 0,\n        'Moon': 1,\n        'Mars': 2,\n"
+        },
+        {
+          "before": "        if hora.start <= s < hora.end:\n            ruler_index = ruler_indexes.get(hora.name.split(' ')[0])\n            if (\n                ruler_index is not None\n                and VAARAM_NAMES[ruler_index] in ctx.prefer_varas\n            ):\n                activity_match.append(f'{hora.name} favoured for {ctx.label} (+1)')\n                return 1\n            return 0\n    return 0\n\n\n_DISALLOWED_LAGNA = object()\n\n\ndef _lagna_score(s, ctx: _DayContext, activity_match, group_fit):\n    cur_lagna = slot_lagna_name(ctx.lagnas, s)\n    if ctx.allowed_lagnas and cur_lagna not in ctx.allowed_lagnas:\n        return _DISALLOWED_LAGNA\n    if ctx.required_lagna_class and cur_lagna not in lagnas_in_class(\n        ctx.required_lagna_class\n    ):\n",
+          "after": "        if hora.start <= s < hora.end:\n            ruler_index = ruler_indexes.get(hora.name.split(' ')[0])\n            if (\n                ruler_index is not None\n                and VAARAM_NAMES[ruler_index] in ctx.prefer_varas\n            ):\n                return ScoreContribution(\n                    1, activity_match=(f'{hora.name} favoured for {ctx.label} (+1)',))\n            return ScoreContribution()\n    return ScoreContribution()\n\n\n_DISALLOWED_LAGNA = object()\n\n\ndef _lagna_score(s, ctx: _DayContext):\n    activity_match, group_fit = [], []\n    cur_lagna = slot_lagna_name(ctx.lagnas, s)\n    if ctx.allowed_lagnas and cur_lagna not in ctx.allowed_lagnas:\n        return _DISALLOWED_LAGNA\n    if ctx.required_lagna_class and cur_lagna not in lagnas_in_class(\n        ctx.required_lagna_class\n    ):\n"
+        },
+        {
+          "before": "    activity_bonus, activity_reason = score_lagna_activity(\n        ctx.prefer_lagna_class, cur_lagna, ctx.label\n    )\n    if activity_reason:\n        bonus += activity_bonus\n        activity_match.append(activity_reason)\n    return bonus, cur_lagna, ashtama_names\n\n\ndef _slot_quality_reasons(mu, block, base, nature_bonus) -> list[str]:\n    mu_label = mu['name']\n    if mu['is_abhijit']:\n        mu_label += ' (Abhijit)'\n",
+          "after": "    activity_bonus, activity_reason = score_lagna_activity(\n        ctx.prefer_lagna_class, cur_lagna, ctx.label\n    )\n    if activity_reason:\n        bonus += activity_bonus\n        activity_match.append(activity_reason)\n    return LagnaContribution(\n        ScoreContribution(bonus, activity_match=tuple(activity_match),\n                          group_fit=tuple(group_fit)),\n        cur_lagna, tuple(ashtama_names))\n\n\ndef _slot_quality_reasons(mu, block, base, nature_bonus) -> list[str]:\n    mu_label = mu['name']\n    if mu['is_abhijit']:\n        mu_label += ' (Abhijit)'\n"
+        },
+        {
+          "before": "        anandadi_reason,\n        tithi_day_reason,\n        election_reasons,\n        tithi_activity_reason,\n        preferred_number_tithi_reason,\n    )\n    score += _activity_overlap_bonus(\n        s, e, block, facts, ctx, slot_quality, activity_match\n    )\n\n    score += _hora_bonus(s, ctx, activity_match)\n\n    lagna_result = _lagna_score(s, ctx, activity_match, group_fit)\n    if lagna_result is _DISALLOWED_LAGNA:\n        return None\n    lagna_bonus, cur_lagna, lagna_ashtama_names = lagna_result\n    score += lagna_bonus\n\n    panchaka_penalty, panchaka_reason = _panchaka_penalty(facts, cur_lagna, ctx)\n    score += panchaka_penalty\n    if panchaka_reason:\n        day_quality.append(panchaka_reason)\n\n",
+          "after": "        anandadi_reason,\n        tithi_day_reason,\n        election_reasons,\n        tithi_activity_reason,\n        preferred_number_tithi_reason,\n    )\n    overlap = _activity_overlap_bonus(s, e, block, facts, ctx)\n    hora = _hora_bonus(s, ctx)\n    score += overlap.score + hora.score\n    slot_quality.extend(overlap.slot_quality)\n    activity_match.extend(overlap.activity_match + hora.activity_match)\n\n    lagna_result = _lagna_score(s, ctx)\n    if lagna_result is _DISALLOWED_LAGNA:\n        return None\n    cur_lagna, lagna_ashtama_names = lagna_result.lagna, lagna_result.ashtama_names\n    score += lagna_result.contribution.score\n    activity_match.extend(lagna_result.contribution.activity_match)\n    group_fit.extend(lagna_result.contribution.group_fit)\n\n    panchaka_penalty, panchaka_reason = _panchaka_penalty(facts, cur_lagna, ctx)\n    score += panchaka_penalty\n    if panchaka_reason:\n        day_quality.append(panchaka_reason)\n\n"
+        }
+      ]
+    },
+    {
+      "path": "src/muhurta-scorer.ts",
+      "scope": "calculation-boundaries_behavior_preserving_refactor",
+      "transforms": [
+        {
+          "before": "// Muhurta scoring helpers \u2014 pure functions, no DOM.\n// Unit-tested by src/scorer/__tests__/muhurta-scorer.test.ts (Vitest);\n// behaviour is pinned to the Python originals in telugu_panchangam/\n// personal/{muhurta,lagna_position,chandrabalam}.py.\n\nexport const MU_RASHI_NAMES = ['Mesha','Vrishabha','Mithuna','Karka','Simha',\n                        'Kanya','Tula','Vrischika','Dhanu','Makara',\n                        'Kumbha','Meena'];\n\nexport const MU_LAGNA_KENDRA = new Set([1, 4, 7, 10]);\nexport const MU_LAGNA_TRIKONA = new Set([1, 5, 9]);\n\nexport const MU_LAGNA_CHARA = new Set(['Mesha', 'Karka', 'Tula', 'Makara']);\nexport const MU_LAGNA_STHIRA = new Set(['Vrishabha', 'Simha', 'Vrischika', 'Kumbha']);\n",
+          "after": "import sharedTables from './data/shared-calendar-tables.generated.json';\n// Muhurta scoring helpers \u2014 pure functions, no DOM.\n// Unit-tested by src/scorer/__tests__/muhurta-scorer.test.ts (Vitest);\n// behaviour is pinned to the Python originals in telugu_panchangam/\n// personal/{muhurta,lagna_position,chandrabalam}.py.\n\nexport const MU_RASHI_NAMES = sharedTables.rashiNames;\n\nexport const MU_LAGNA_KENDRA = new Set([1, 4, 7, 10]);\nexport const MU_LAGNA_TRIKONA = new Set([1, 5, 9]);\n\nexport const MU_LAGNA_CHARA = new Set(['Mesha', 'Karka', 'Tula', 'Makara']);\nexport const MU_LAGNA_STHIRA = new Set(['Vrishabha', 'Simha', 'Vrischika', 'Kumbha']);\n"
+        }
+      ]
+    }
+  ]
+}

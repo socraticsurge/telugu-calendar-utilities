@@ -38,10 +38,10 @@
   ],
   "computation_inventory": {
     "record_count": 69,
-    "implementation_count": 211,
+    "implementation_count": 212,
     "owner_count": 153,
-    "mirror_count": 58,
-    "audited_source_file_count": 138
+    "mirror_count": 59,
+    "audited_source_file_count": 147
   },
   "muhurta_activities": {
     "canonical_count": 35,

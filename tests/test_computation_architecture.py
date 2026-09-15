@@ -1,4 +1,6 @@
 """Contracts for reproducible computation-architecture evidence."""
+import json
+import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -14,6 +16,14 @@ from tools.benchmark_computation_paths import benchmark
 
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / 'docs' / 'decisions' / '0002-computation-layer-organization.md'
+
+
+def _committed_inventory_count():
+    # The report deliberately reads an immutable Git revision, not the working
+    # tree. Compare its count to that revision's independently maintained ledger.
+    contents = subprocess.check_output(
+        ['git', 'show', 'HEAD:docs/reference/project-facts.json'], cwd=ROOT, text=True)
+    return json.loads(contents)['computation_inventory']['audited_source_file_count']
 
 
 @pytest.mark.parametrize(
@@ -51,10 +61,11 @@ def test_architecture_report_maps_modules_consumers_and_layers():
     report = build_report('HEAD', commit_limit=20)
 
     assert report['schema_version'] == 1
-    assert report['scope']['source_files'] == 138
+    source_count = _committed_inventory_count()
+    assert report['scope']['source_files'] == source_count
     assert report['scope']['established_source_files'] == 92
-    assert report['scope']['additive_feature_source_files'] == 46
-    assert report['scope']['total_source_files'] == 138
+    assert report['scope']['additive_feature_source_files'] == source_count - 92
+    assert report['scope']['total_source_files'] == source_count
     assert report['scope']['source_files'] == report['scope']['total_source_files']
     assert report['scope']['source_files'] == (
         report['scope']['established_source_files']
@@ -67,9 +78,9 @@ def test_architecture_report_maps_modules_consumers_and_layers():
         <= set(report['layers'])
 
     summary = _summary(report)
-    assert 'Production modules: 138' in summary
+    assert f'Production modules: {source_count}' in summary
     assert 'Established production modules: 92' in summary
-    assert 'Additive feature modules: 46' in summary
+    assert f'Additive feature modules: {source_count - 92}' in summary
 
 
 def test_karnavedha_assessors_extend_architecture_additively():
@@ -210,9 +221,12 @@ def test_architecture_report_tracks_generation_and_manual_mirrors():
 
     assert len(groups) == 8
     assert groups['activity_profiles']['strategy'] == 'generated-from-python'
+    exported = subprocess.run(
+        ['git', 'cat-file', '-e', 'HEAD:src/data/shared-calendar-tables.generated.json'],
+        cwd=ROOT, capture_output=True, check=False).returncode == 0
     assert sum(
         item['strategy'] == 'manual-mirror' for item in groups.values()
-    ) == 7
+    ) == (0 if exported else 7)
     assert all(
         location['line'] is not None
         for item in groups.values()

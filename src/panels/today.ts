@@ -1,3 +1,4 @@
+import sharedTables from '../data/shared-calendar-tables.generated.json';
 // typing lands with the component rewrite, not the move.
 //
 // Today panel: the daily panchangam preview (day header, anga rows,
@@ -6,8 +7,9 @@
 
 import { getSelection } from '../selection-store';
 import { selEl } from '../lib/dom';
-import { parseDescription, TIME_PART } from '../lib/parse-description';
-import { loadFeed } from '../lib/feed-loader';
+import { TIME_PART } from '../lib/parse-description';
+import { calendarEventDay } from '../lib/calendar-data';
+import { loadCalendarFeed } from '../lib/calendar-loader';
 import { fmtT, fmtRange, fmtPlain, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
@@ -90,7 +92,7 @@ function nightChoghadiya(weekday, sunset, nextSunrise) {
 // Lagna: requires Swiss Ephemeris, so it's precomputed by
 // scripts/build_lagna_json.py and served as feeds/<slug>-lagna.json.
 
-const HORA_LORDS = ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'];
+const HORA_LORDS = sharedTables.horaLords;
 const HORA_GLYPH = { Sun: '☉', Venus: '♀', Mercury: '☿', Moon: '☽', Saturn: '♄', Jupiter: '♃', Mars: '♂' };
 const HORA_PALETTE_CLASS = { Sun: 'sun', Venus: 'venus', Mercury: 'mercury', Moon: 'moon', Saturn: 'saturn', Jupiter: 'jupiter', Mars: 'mars' };
 // Benefic / neutral / malefic — used by the site palette to encode
@@ -100,10 +102,10 @@ const HORA_PALETTE_CLASS = { Sun: 'sun', Venus: 'venus', Mercury: 'mercury', Moo
 const HORA_FAVOURABILITY = { Sun: '', Venus: 'benefic', Mercury: 'benefic', Moon: 'benefic', Jupiter: 'benefic', Saturn: 'malefic', Mars: 'malefic' };
 // JS Date.getDay() index -> starting hora lord. Order matches
 // _WEEKDAY_TO_LORD_START in telugu_panchangam/personal/lagna_hora.py.
-const WEEKDAY_TO_LORD_IDX = [0, 3, 6, 2, 5, 1, 4];  // Sun, Mon, Tue, Wed, Thu, Fri, Sat
+const WEEKDAY_TO_LORD_IDX = sharedTables.horaWeekdayStarts;
 
 const RASHI_ELEMENT = ['fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'];
-const RASHI_NAMES_JS = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
+const RASHI_NAMES_JS = sharedTables.rashiNames;
 
 function computeHoras(weekday, sunrise, sunset, nextSunrise) {
   // weekday: 0..6 (Sun..Sat). All times are 'HH:MM'.
@@ -448,7 +450,7 @@ function loadLagnaRibbon(city, isoDate, renderSequence, renderKey) {
 }
 
 function renderPreview(container, event, events, renderSequence, renderKey) {
-  const data = parseDescription(event.description);
+  const data = calendarEventDay(event);
   const isoDate = selectedIsoDate();
   const special = specialBadge(event.summary);
   const metaLines = renderMetaLines(data);
@@ -497,7 +499,7 @@ function observanceChips(event, data) {
 function observanceEntry(events, date, today, year) {
   const event = events.get(stampOf(date));
   if (!event || !(event.summary.includes('⚡') || event.summary.includes('🪔'))) return null;
-  const chips = observanceChips(event, parseDescription(event.description));
+  const chips = observanceChips(event, calendarEventDay(event));
   if (!chips) return null;
   const month = date.getMonth();
   const isToday = date.getTime() === today.getTime();
@@ -630,7 +632,7 @@ async function loadPreview() {
   upcoming.setAttribute('aria-busy', 'true');
   upcoming.innerHTML = '<p class="preview-note" role="status">Updating upcoming dates…</p>';
   try {
-    const events = await loadFeed(city, system);
+    const events = await loadCalendarFeed(city, system);
     if (requestSequence !== PREVIEW_REQUEST_SEQUENCE || requestKey !== currentPreviewKey()) return;
     LAST_EVENTS = events;
     LAST_EVENTS_KEY = feedKey;
@@ -698,7 +700,7 @@ function shareExtraLines(data, festivals) {
 }
 
 function buildShareText(event) {
-  const data = parseDescription(event.description);
+  const data = calendarEventDay(event);
   const d = selectedDate();
   const dateLabel = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   const citySel = selEl('tp-city');

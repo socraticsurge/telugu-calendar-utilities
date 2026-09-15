@@ -1,3 +1,4 @@
+import sharedTables from '../data/shared-calendar-tables.generated.json';
 import { MU_RASHI_NAMES, muLagnaAtMin } from '../muhurta-scorer';
 import { TIME_PART } from '../lib/parse-description';
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../data/rasis';
@@ -180,41 +181,21 @@ const MU_TITHI_LIST_FULL = (() => {
   return shukla.concat(krishna);
 })();
 
-const MU_YOGA_NAMES_27 = [
-  'Vishkambha','Priti','Ayushman','Saubhagya','Shobhana','Atiganda',
-  'Sukarma','Dhriti','Shula','Ganda','Vriddhi','Dhruva','Vyaghata',
-  'Harshana','Vajra','Siddhi','Vyatipata','Variyana','Parigha','Shiva',
-  'Siddha','Sadhya','Shubha','Shukla','Brahma','Indra','Vaidhriti',
-];
+const MU_YOGA_NAMES_27 = sharedTables.browserYogaNames;
 
 const MU_KARANA_REPEATING = ['Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti'];
 const MU_KARANA_FIXED = { 0: 'Kinstughna', 57: 'Shakuni', 58: 'Chatushpada', 59: 'Naga' };
 
 // Special yogas — mirror telugu_panchangam/special_yogas.py
-const MU_SARVARTHA = {
-  Adivaram:    new Set(['Hasta','Mula','Pushya','Ashvini','Punarvasu','Anuradha','Shravana','Revati']),
-  Somavaram:   new Set(['Shravana','Rohini','Mrigashira','Pushya','Anuradha']),
-  Mangalavaram:new Set(['Ashvini','Krittika','Ashlesha','Uttara Ashadha','Uttara Phalguni','Uttara Bhadrapada']),
-  Budhavaram:  new Set(['Krittika','Rohini','Hasta','Anuradha','Mrigashira']),
-  Guruvaram:   new Set(['Ashvini','Punarvasu','Anuradha','Revati','Pushya','Swati']),
-  Shukravaram: new Set(['Revati','Anuradha','Ashvini','Pushya','Shravana','Punarvasu']),
-  Shanivaram:  new Set(['Swati','Rohini','Shravana']),
-};
-const MU_AMRITA_SIDDHI = {
-  Adivaram:'Hasta', Somavaram:'Mrigashira', Mangalavaram:'Ashvini',
-  Budhavaram:'Anuradha', Guruvaram:'Pushya', Shukravaram:'Revati', Shanivaram:'Rohini',
-};
-const MU_VISHA_TITHI = { Adivaram:5, Somavaram:6, Mangalavaram:7, Budhavaram:8,
-                         Guruvaram:9, Shukravaram:10, Shanivaram:11 };
-const MU_DAGDHA_TITHI = { Adivaram:new Set([12]), Somavaram:new Set([11]),
-                          Mangalavaram:new Set([5]), Budhavaram:new Set([2,3]),
-                          Guruvaram:new Set([6]), Shukravaram:new Set([8]), Shanivaram:new Set([9]) };
-const MU_PUSHKARA_VARAS = new Set(['Adivaram','Mangalavaram','Shanivaram']);
-const MU_DVI_TITHIS = new Set([2,7,12]);
-const MU_DVI_NAKS   = new Set(['Mrigashira','Chitra','Dhanishtha']);
-const MU_TRI_TITHIS = new Set([2,7,12]);
-const MU_TRI_NAKS   = new Set(['Krittika','Punarvasu','Uttara Phalguni',
-                                'Vishakha','Uttara Ashadha','Purva Bhadrapada']);
+const MU_SARVARTHA = Object.fromEntries(Object.entries(sharedTables.specialYoga.sarvartha).map(([day, names]) => [day, new Set(names)]));
+const MU_AMRITA_SIDDHI = sharedTables.specialYoga.amrita;
+const MU_VISHA_TITHI = sharedTables.specialYoga.visha;
+const MU_DAGDHA_TITHI = Object.fromEntries(Object.entries(sharedTables.specialYoga.dagdha).map(([day, numbers]) => [day, new Set(numbers)]));
+const MU_PUSHKARA_VARAS = new Set(sharedTables.specialYoga.pushkaraVaras);
+const MU_DVI_TITHIS = new Set(sharedTables.specialYoga.dviTithis);
+const MU_DVI_NAKS = new Set(sharedTables.specialYoga.dviNakshatras);
+const MU_TRI_TITHIS = new Set(sharedTables.specialYoga.triTithis);
+const MU_TRI_NAKS = new Set(sharedTables.specialYoga.triNakshatras);
 
 export function muSpecialYogasAt(vaaram, tithiName, nakshatraName) {
   const yogas = [];
@@ -304,13 +285,9 @@ export function muFactsAt(dt, vaaram) {
   return { nakshatra, solarNakshatra, tithi, yoga, karana, lunarSign, vaaram, specialYogas };
 }
 
-const MU_HOMAHUTI_LORDS = [
-  'Surya', 'Budha', 'Shukra', 'Shani', 'Chandra',
-  'Mangala', 'Guru', 'Rahu', 'Ketu'];
-const MU_HOMAHUTI_BENEFICS = new Set(['Budha', 'Shukra', 'Chandra', 'Guru']);
-const MU_VAARAM_LIST = [
-  'Adivaram', 'Somavaram', 'Mangalavaram', 'Budhavaram',
-  'Guruvaram', 'Shukravaram', 'Shanivaram'];
+const MU_HOMAHUTI_LORDS = sharedTables.homaLords;
+const MU_HOMAHUTI_BENEFICS = new Set(sharedTables.homaBenefics);
+const MU_VAARAM_LIST = sharedTables.varaNames;
 
 export function muHomaElection(facts) {
   const sunIdx = MU_NAKSHATRA_LIST.indexOf(facts.solarNakshatra);

@@ -17,6 +17,7 @@ from telugu_panchangam.generators.anga_variants import (
     generate_festivals_feed,
     generate_tithi_observances_feed,
 )
+from telugu_panchangam.generators.calendar_data import calendar_json
 from telugu_panchangam.generators.ics import ICSGenerator
 
 ENGINES = {
@@ -68,6 +69,9 @@ def generate_feeds(
             raw = generator.generate(days, system)
             with open(os.path.join(output_dir, f'{base}.ics'), 'wb') as f:
                 f.write(raw)
+
+            with open(os.path.join(output_dir, f'{base}.days-v1.json'), 'w') as f:
+                f.write(calendar_json(days, system, raw))
 
             with open(os.path.join(output_dir, f'{base}-festivals.ics'), 'wb') as f:
                 f.write(generate_festivals_feed(days, system))

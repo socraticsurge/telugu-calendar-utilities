@@ -43,6 +43,15 @@ _MUHURTA_SCORING = 'src/panels/muhurta-scoring.ts'
 # they still appear in the module graph, history, and blast-radius evidence,
 # while the two subsets are also reported explicitly.
 _ADDITIVE_FEATURE_SOURCES = frozenset({
+    'src/lib/calendar-data.ts',
+    'src/lib/calendar-loader.ts',
+    'src/scorer/ranking.ts',
+    'src/scorer/search-contract.ts',
+    'telugu_panchangam/generators/calendar_data.py',
+    'telugu_panchangam/mcp/muhurta_request.py',
+    'telugu_panchangam/mcp/muhurta_response.py',
+    'telugu_panchangam/personal/muhurta_search.py',
+    'telugu_panchangam/personal/search_contract.py',
     'src/lib/birth-profile-api.ts',
     'src/lib/election-chart-api.ts',
     'src/lib/guest-profile-store.ts',
@@ -525,8 +534,11 @@ def _duplicate_contracts(ref: str) -> list[dict]:
     groups = []
     for name, config in _DUPLICATE_CONTRACTS.items():
         locations = []
+        strategy = config['strategy']
         for path, symbol in config['locations']:
             content = _read_at(ref, path)
+            if 'import sharedTables from ' in content:
+                strategy = 'generated-from-python'
             symbol_pattern = re.compile(
                 rf'^\s*(?:(?:export\s+)?(?:def|function|class)\s+'
                 rf'{re.escape(symbol)}\b|(?:export\s+)?'
@@ -542,7 +554,7 @@ def _duplicate_contracts(ref: str) -> list[dict]:
             locations.append({'path': path, 'symbol': symbol, 'line': line})
         groups.append({
             'name': name,
-            'strategy': config['strategy'],
+            'strategy': strategy,
             'locations': locations,
         })
     return groups

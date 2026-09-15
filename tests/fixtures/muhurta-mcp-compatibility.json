@@ -1,0 +1,81 @@
+{
+  "baseline": "e05eb3b",
+  "signature": "(start_date: str, days: int = 7, activity: str = 'any', city: str = 'Hyderabad', system: str = 'drik', janma_nakshatras: Optional[list] = None, janma_rasis: Optional[list] = None, janma_lagnas: Optional[list] = None, chandra_mode: str = 'stars', latitude: Optional[float] = None, longitude: Optional[float] = None, timezone: Optional[str] = None, ayanamsa: str = 'lahiri', travel_direction: Optional[str] = None, include_night: bool = False) -> str",
+  "cases": [
+    {
+      "request": {
+        "start_date": "2026-07-18",
+        "days": 2
+      },
+      "sha256": "410aeceb42d0691e7e7da5c7e20d1d8e215d381a24637763a6525dae3a0be5a0"
+    },
+    {
+      "request": {
+        "start_date": "2026-07-18",
+        "days": 2,
+        "include_night": true,
+        "city": "New York"
+      },
+      "sha256": "f7489190e8f36d3f0778f0ed9f12539816893804e566fce6cdc36a1bc83db390"
+    },
+    {
+      "request": {
+        "start_date": "2026-06-17",
+        "days": 1,
+        "system": "surya_siddhanta"
+      },
+      "sha256": "5a4ff3171f235608f3b4beef1608f647d4086cf15e492c62cb97cd297ec142fd"
+    },
+    {
+      "request": {
+        "start_date": "2026-06-17",
+        "days": 1,
+        "system": "vakya"
+      },
+      "sha256": "6106cb8b09dbc6a0374f80dee216c6f3addafa73351bc2008aaf0091b2b37c14"
+    },
+    {
+      "request": {
+        "start_date": "2026-07-18",
+        "days": 2,
+        "activity": "karnavedha"
+      },
+      "sha256": "3467f81f6c31f32ccb9da4ccce39a024510c85858b5dc24a8116649071d0c19e"
+    },
+    {
+      "request": {
+        "start_date": "2026-07-18",
+        "days": 2,
+        "activity": "annaprasana",
+        "janma_nakshatras": [
+          "Ashvini"
+        ],
+        "janma_rasis": [
+          "Mesha"
+        ],
+        "chandra_mode": "strict"
+      },
+      "sha256": "603e05190f73b3bc4ba9279a6cb3998c5c823b3bcc8c4bba504e196d68a9ffa1"
+    },
+    {
+      "request": {
+        "start_date": "2026-07-18",
+        "days": 0
+      },
+      "sha256": "1e8b817fc83e97ba7eb01d4dd65b4311cb5d5c4ecec31aacac770c73f37450fb"
+    },
+    {
+      "request": {
+        "start_date": "invalid"
+      },
+      "sha256": "0f02668dfd0162916bab93ac76eee5b15358871dfc20054f275c7f560df137f0"
+    },
+    {
+      "request": {
+        "start_date": "2026-07-18",
+        "activity": "invalid"
+      },
+      "sha256": "ab5dc4e6d85a767f9bb2dced852f13965aadd10446cd513b893be6e7341c2772"
+    }
+  ]
+}
