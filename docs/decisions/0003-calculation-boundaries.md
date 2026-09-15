@@ -1,6 +1,6 @@
 # ADR 0003: Incremental calculation-boundary repair
 
-Status: implemented on the maintenance branch; structured-data rollout is opt-in.
+Status: repair merged; production pilot enabled through `.env.production` after sidecar publication is verified.
 Owner approval: architecture repair and structural inventory-test updates approved.
 Baseline: `e05eb3ba32be613e53832092588e996bb56558fe`.
 
@@ -73,8 +73,9 @@ The browser and Python implementations remain distinct.
 
 ## Rollout and rollback
 
-The pilot is disabled in ordinary builds until its sidecars have been published.
-This prevents speculative missing-file requests on existing installations.
+The repair landed with the pilot disabled; the activation release sets the flag
+in `.env.production` only after verifying published sidecars for every city/system.
+This separates feed publication from activation without changing workflows or CNAME.
 
 1. Generate feeds with the existing `python -m telugu_panchangam.generate` entry point.
    The existing feed-publication script copies both ICS and day JSON; workflows and CNAME remain untouched.
@@ -83,6 +84,22 @@ This prevents speculative missing-file requests on existing installations.
    An explicit `false` disables it, including local query overrides.
 4. For local browser inspection only, use `?calendarData=structured#today` or `#tarabalam` on loopback.
 5. Roll back by building with the flag disabled; subscriber feeds and stored profiles are unchanged.
+
+The production flag is committed in `.env.production`; ordinary production builds
+therefore preserve activation during future feed regeneration. A flag-only change
+does not match the landing workflow's path filter: dispatch `deploy-landing.yml`
+after merging it and verify the published asset. Do not change workflow protections.
+
+The legacy browser suite builds with an explicit `false` flag, preserving its
+offline ICS fixtures. The separate structured browser suite builds with `true`
+and uses ordinary URLs without query overrides. It verifies Today and Muhurta
+at two viewport widths, plus missing, invalid and network-failure fallback.
+The current hosted frontend job runs the legacy suite; run the structured suite
+locally as a release gate until a separately approved workflow update includes it.
+
+The full September 2026 generation covers 22 cities, three systems and 36,102 days.
+Every structured day was compared with the existing description parser.
+This proves compatibility, not independent astronomical accuracy or faster downloads.
 
 No public activation, workflow dispatch or feed publication is implied by local verification.
 Broad replacement of remaining panels, engine unification and API feature parity are outside this repair.

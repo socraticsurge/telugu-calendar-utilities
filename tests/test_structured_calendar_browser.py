@@ -6,10 +6,15 @@ from pathlib import Path
 import pytest
 
 from tests.test_browser_smoke import browser as browser
+from tests.test_browser_smoke import build_site_artifact
 from tests.test_browser_smoke import docs_server as docs_server
-from tests.test_browser_smoke import vite_build as vite_build
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(scope='module')
+def vite_build():
+    return build_site_artifact(structured_calendar=True)
 
 
 @pytest.mark.parametrize('width', [390, 1440])
@@ -28,7 +33,7 @@ def test_daily_view_uses_structured_facts_without_description_parsing(browser, d
     page.route('**/feeds/*.days-v1.json', lambda route: route.fulfill(json=fixture))
     page.route('**/feeds/*-lagna.json', lambda route: route.fulfill(json={'days': []}))
     try:
-        page.goto(f'{docs_server}/?calendarData=structured#today')
+        page.goto(f'{docs_server}/#today')
         page.locator('#tp-result .preview-card').wait_for()
         text = page.locator('#tp-result').inner_text()
         assert 'Shukla Panchami' in text
@@ -50,5 +55,44 @@ def test_daily_view_uses_structured_facts_without_description_parsing(browser, d
         assert not ics_requests
         assert not errors
         page.screenshot(path=str(output / f'structured-muhurta-{width}.png'), full_page=True)
+    finally:
+        context.close()
+
+
+@pytest.mark.parametrize('failure', ['missing', 'invalid', 'network'])
+def test_enabled_build_falls_back_to_legacy_feed(browser, docs_server, failure):
+    """A failed sidecar must not remove the existing Today/Muhurta journeys."""
+    context = browser.new_context(timezone_id='Asia/Kolkata')
+    page = context.new_page()
+    page.clock.set_fixed_time(datetime(2026, 6, 11, 6, tzinfo=timezone.utc))
+    errors, ics_requests = [], []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.on('request', lambda request: ics_requests.append(request.url) if request.url.endswith('.ics') else None)
+    responses = {
+        'missing': lambda route: route.fulfill(status=404),
+        'invalid': lambda route: route.fulfill(json={'schemaVersion': 999}),
+        'network': lambda route: route.abort(),
+    }
+    page.route('**/feeds/*.days-v1.json', responses[failure])
+    page.route('**/feeds/*.ics', lambda route: route.fulfill(
+        content_type='text/calendar',
+        body=(ROOT / 'tests/fixtures/golden_hyderabad_drik_2026-06-11_3d.ics').read_text(),
+    ))
+    page.route('**/feeds/*-lagna.json', lambda route: route.fulfill(json={'days': []}))
+    try:
+        page.goto(f'{docs_server}/#today')
+        page.locator('#tp-result .preview-card').wait_for()
+        text = page.locator('#tp-result').inner_text()
+        assert 'Parama Ekadashi' in text
+        assert 'Revati' in text
+        assert ics_requests
+        page.evaluate("window.switchTool('tarabalam')")
+        page.select_option('#mu-activity', 'any')
+        page.fill('#tb-from', '2026-06-11')
+        page.fill('#tb-to', '2026-06-12')
+        page.get_by_role('button', name='Show Slots', exact=True).click()
+        page.locator('#mu-result .mu-slot').first.wait_for()
+        assert page.locator('#mu-result').get_attribute('aria-busy') == 'false'
+        assert not errors
     finally:
         context.close()
