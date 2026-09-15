@@ -12,7 +12,7 @@ license = "AGPL-3.0-or-later"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 keywords = ["panchangam", "vedic", "astrology", "mcp", "calendar"]
 dependencies = [
-    "mcp>=1.0,<2.0",
+    "mcp>=1.0,<3.0",
     "pyswisseph==2.10.3.2",
     "pytz>=2024.1",
     "geopy",
