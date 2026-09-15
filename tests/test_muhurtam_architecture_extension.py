@@ -18,7 +18,15 @@ def test_chart_screen_helpers_are_visible_without_reclassifying_the_core():
     )
     assert report['scope']['additive_feature_source_files'] == len(additive)
     assert additive
+    # Owner-approved boundary adapters; engine ownership remains unchanged.
+    boundary_adapters = {
+        'telugu_panchangam/generators/calendar_data.py',
+        'telugu_panchangam/mcp/muhurta_request.py',
+        'telugu_panchangam/mcp/muhurta_response.py',
+    }
+    assert boundary_adapters <= additive
     assert all(
         path.startswith(('src/', 'telugu_panchangam/personal/'))
+        or path in boundary_adapters
         for path in additive
     )

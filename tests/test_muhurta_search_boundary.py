@@ -34,5 +34,7 @@ def test_search_does_not_import_transport_or_serialize_responses():
 
 @pytest.mark.parametrize('count', [0, 15])
 def test_search_limit_is_enforced_before_engine_work(count):
+    period = SearchPeriod(date(2026, 7, 18), count)
+    options = SearchOptions()
     with pytest.raises(ValueError, match='between 1 and 14'):
-        search_muhurta(SearchPeriod(date(2026, 7, 18), count), CITIES[0], None, SearchOptions())
+        search_muhurta(period, CITIES[0], None, options)
