@@ -51,7 +51,8 @@ The hosted historical analysis is separate; these are not dashboard-rerun result
 
 Snapshots establish compatibility, not independent astronomical correctness.
 Frozen calculation assertions remain unchanged.
-Owner approval covers exactly the package-version and audited-source-count assertions.
+Owner approval covers the package-version and audited-source-count assertions,
+plus adding the new serializer to the explicit architecture boundary-adapter allow-list.
 The new serializer remains visible in the computation inventory and architecture graph.
 
 ## Verification and review
