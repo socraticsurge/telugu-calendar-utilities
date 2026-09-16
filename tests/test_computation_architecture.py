@@ -110,6 +110,10 @@ def test_borrowing_context_extends_architecture_additively():
     ) == 'additive-feature'
 
 
+def test_tara_chandra_rules_extend_architecture_additively():
+    assert source_scope_class('src/scorer/tara-chandra.ts') == 'additive-feature'
+
+
 def test_lordship_assessors_extend_architecture_additively():
     assert source_scope_class(
         'src/scorer/election-assessors/lordship.ts'
