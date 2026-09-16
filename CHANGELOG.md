@@ -7,6 +7,13 @@ PyPI version tracks this file's most recent release entry.
 
 ## [Unreleased]
 
+### Maintenance — 1.18.16
+
+- Share MCP calendar-response formatting and daily request orchestration.
+- Centralize date, planet, coordinate and name validation without changing input precedence or error text.
+- Preserve all 17 MCP signatures and pin pre-refactor response bytes in regression tests.
+- Leave calculation engines, ICS feeds, browser UI and deployment workflows unchanged.
+
 ### Maintenance — 1.18.15
 
 - Separate Muhurta search from MCP response formatting while preserving signatures and output bytes.

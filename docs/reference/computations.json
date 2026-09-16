@@ -69,6 +69,7 @@
       {"path": "telugu_panchangam/generators/calendar_data.py", "kind": "serialization", "reason": "Projects existing engine outputs into the versioned browser day contract."},
       {"path": "telugu_panchangam/mcp/muhurta_request.py", "kind": "data-model", "reason": "Preserves the public MCP request signature and defaults."},
       {"path": "telugu_panchangam/mcp/muhurta_response.py", "kind": "serialization", "reason": "Projects ranked decisions into the existing MCP response format."},
+      {"path": "telugu_panchangam/mcp/calendar_response.py", "kind": "serialization", "reason": "Shares existing computed-day projections across MCP tools without owning calculations."},
       {"path": "telugu_panchangam/personal/muhurta_search.py", "kind": "orchestration", "reason": "Coordinates existing day/night scorers and whole-search ranking."},
       {"path": "telugu_panchangam/personal/search_contract.py", "kind": "data-model", "reason": "Typed search inputs, results and immutable score contributions."},
       {

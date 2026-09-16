@@ -5,6 +5,11 @@ The current maintenance repair is documented in
 MCP search now delegates to a transport-independent personal-layer service;
 shared browser tables are generated, and versioned day data has an opt-in browser pilot.
 
+MCP daily tools share one request/calculation/error boundary in `mcp/tools.py`.
+Their computed-day projections live in `mcp/calendar_response.py`, which never
+calls an engine; calculation ownership and runtime location are unchanged.
+See the [MCP cleanup evidence](docs/tracking/2026-09-16-mcp-code-health.md).
+
 How the project is layered and where each module sits. This is the
 mental model for "where should I add X?" and for understanding the
 engine-core refactor designed but parked in [improvement-plan Phase 6](docs/tracking/improvement-plan.md).
