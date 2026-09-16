@@ -21,6 +21,7 @@ def test_chart_screen_helpers_are_visible_without_reclassifying_the_core():
     # Owner-approved boundary adapters; engine ownership remains unchanged.
     boundary_adapters = {
         'telugu_panchangam/generators/calendar_data.py',
+        'telugu_panchangam/mcp/calendar_response.py',
         'telugu_panchangam/mcp/muhurta_request.py',
         'telugu_panchangam/mcp/muhurta_response.py',
     }

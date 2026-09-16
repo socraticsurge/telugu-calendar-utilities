@@ -51,6 +51,7 @@ _ADDITIVE_FEATURE_SOURCES = frozenset({
     'telugu_panchangam/generators/calendar_data.py',
     'telugu_panchangam/mcp/muhurta_request.py',
     'telugu_panchangam/mcp/muhurta_response.py',
+    'telugu_panchangam/mcp/calendar_response.py',
     'telugu_panchangam/personal/muhurta_search.py',
     'telugu_panchangam/personal/search_contract.py',
     'src/lib/birth-profile-api.ts',
