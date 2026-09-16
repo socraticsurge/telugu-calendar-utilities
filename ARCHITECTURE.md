@@ -10,6 +10,14 @@ Their computed-day projections live in `mcp/calendar_response.py`, which never
 calls an engine; calculation ownership and runtime location are unchanged.
 See the [MCP cleanup evidence](docs/tracking/2026-09-16-mcp-code-health.md).
 
+Muhurta's personal-layer public API now coordinates three internal owners:
+`muhurta_eligibility.py` owns admission policies, `muhurta_slot_scoring.py` composes
+score contributions, and `muhurta_explanations.py` assembles cautions and notes.
+Day/night orchestration and public ranking remain in `muhurta.py`; atomic scorers
+remain in `slot_scorers.py`. Dependencies point inward, never back to MCP or UI.
+This does not move computation between browser and backend or change engine rules.
+See the [Muhurta cleanup evidence](docs/tracking/2026-09-16-muhurta-code-health.md).
+
 How the project is layered and where each module sits. This is the
 mental model for "where should I add X?" and for understanding the
 engine-core refactor designed but parked in [improvement-plan Phase 6](docs/tracking/improvement-plan.md).

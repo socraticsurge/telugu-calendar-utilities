@@ -1,0 +1,50 @@
+{
+  "baseline": "f8fa03da823fa915156e50ab658b8269acbab77e",
+  "signatures": {
+    "day_slots": "(day: telugu_panchangam.models.panchangam_day.PanchangamDay, activity: str = 'any', janma_nakshatras: list[str] | None = None, janma_rasis: list[str | None] | None = None, janma_lagnas: list[str | None] | None = None, chandra_mode: str = 'stars', travel_direction: str | None = None, *, engine=None, _daylight_assessment=None) -> list[dict]",
+    "night_slots": "(day: telugu_panchangam.models.panchangam_day.PanchangamDay, next_day: telugu_panchangam.models.panchangam_day.PanchangamDay, activity: str = 'any', janma_nakshatras: list[str] | None = None, janma_rasis: list[str | None] | None = None, janma_lagnas: list[str | None] | None = None, chandra_mode: str = 'stars', travel_direction: str | None = None, *, engine=None) -> list[dict]",
+    "diagnose_day": "(day, activity='any', janma_nakshatras=None, janma_rasis=None, chandra_mode='stars', travel_direction: str | None = None, *, _daylight_assessment=None)",
+    "assign_tiers": "(slots: list[dict]) -> None",
+    "score_tier": "(score: int) -> str",
+    "relative_tier": "(score: int, ceiling: int, floor: int) -> str",
+    "karnavedha_daylight_assessment": "(day, rules, activity)"
+  },
+  "scenarios": {
+    "drik/Hyderabad/2026-07-18": {
+      "sha256": "fc2bd4f526f91cd75864f0f7335fca334517078e8f6595dd25029748357b5fcf",
+      "requests": 216,
+      "day_slots": 369,
+      "night_slots": 747
+    },
+    "drik/London/2026-03-29": {
+      "sha256": "2e72c02e5b309ce0c4dc7ebc9268cf549d232ade84ccf36128838974d7d422e1",
+      "requests": 216,
+      "day_slots": 348,
+      "night_slots": 599
+    },
+    "drik/London/2026-10-25": {
+      "sha256": "c6a37a1fe2852aa14a59670b1ae68357a06078efdff5d9788f8c022a00f1315e",
+      "requests": 216,
+      "day_slots": 462,
+      "night_slots": 871
+    },
+    "surya_siddhanta/Hyderabad/2026-06-17": {
+      "sha256": "353700863730fbac850c0fae8d66f5a8b75dd50eebbdc2c4612b56ba5e502ed5",
+      "requests": 216,
+      "day_slots": 166,
+      "night_slots": 548
+    },
+    "vakya/Hyderabad/2026-07-18": {
+      "sha256": "434f27aad48f5765486991eee10a774b9d5ee5330765bfd17691832c156c92aa",
+      "requests": 216,
+      "day_slots": 402,
+      "night_slots": 1026
+    },
+    "surya_siddhanta/London/2026-10-25": {
+      "sha256": "46fbbf4cf20a57af307ac9414527a6684a9858b00bbd2cbb9c7965696a6510f8",
+      "requests": 216,
+      "day_slots": 462,
+      "night_slots": 871
+    }
+  }
+}

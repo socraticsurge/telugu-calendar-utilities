@@ -53,6 +53,9 @@ _ADDITIVE_FEATURE_SOURCES = frozenset({
     'telugu_panchangam/mcp/muhurta_response.py',
     'telugu_panchangam/mcp/calendar_response.py',
     'telugu_panchangam/personal/muhurta_search.py',
+    'telugu_panchangam/personal/muhurta_eligibility.py',
+    'telugu_panchangam/personal/muhurta_slot_scoring.py',
+    'telugu_panchangam/personal/muhurta_explanations.py',
     'telugu_panchangam/personal/search_contract.py',
     'src/lib/birth-profile-api.ts',
     'src/lib/election-chart-api.ts',
@@ -224,6 +227,9 @@ def _is_test(path: str) -> bool:
 
 _LAYERS_BY_EXACT_PATH = {
     'telugu_panchangam/personal/muhurta.py': 'scoring',
+    'telugu_panchangam/personal/muhurta_eligibility.py': 'scoring',
+    'telugu_panchangam/personal/muhurta_slot_scoring.py': 'scoring',
+    'telugu_panchangam/personal/muhurta_explanations.py': 'scoring',
     'telugu_panchangam/personal/slot_scorers.py': 'scoring',
     'telugu_panchangam/generate.py': 'build',
 }
