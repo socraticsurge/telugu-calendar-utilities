@@ -1822,7 +1822,7 @@
         {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "chandra_position", "role": "owner"},
         {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "chandra_verdict", "role": "owner"},
         {"path": "telugu_panchangam/personal/chandrabalam.py", "symbol": "rasi_from_nakshatra", "role": "owner"},
-        {"path": "src/panels/tarabalam-journey.ts", "symbol": "tbChandraOf", "role": "mirror"},
+        {"path": "src/scorer/tara-chandra.ts", "symbol": "tbChandraOf", "role": "mirror"},
         {"path": "src/data/rasis.ts", "symbol": "rasiFromStar", "role": "mirror"}
       ],
       "inputs": ["Janma Rashi or birth Nakshatra/Pada", "day lunar Rashi"],
@@ -1830,7 +1830,7 @@
       "time_basis": "Day or slot lunar Rashi relative to natal Moon sign.",
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Python/browser behavior is tested; exact source locators for the full verdict vocabulary remain open."},
-      "tests": ["tests/test_chandrabalam.py", "tests/test_activity_surface_parity.py"],
+      "tests": ["tests/test_chandrabalam.py", "tests/test_activity_surface_parity.py", "src/scorer/__tests__/tara-chandra.test.ts"],
       "limitations": ["Nakshatra-to-Rashi without Pada can be ambiguous at sign boundaries."],
       "method": {
         "kind": "formula",
@@ -2427,14 +2427,15 @@
         {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "tara_number", "role": "owner"},
         {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "tara_name", "role": "owner"},
         {"path": "telugu_panchangam/personal/tarabalam.py", "symbol": "taras_for_day", "role": "owner"},
-        {"path": "src/panels/tarabalam-journey.ts", "symbol": "tbTaraOf", "role": "mirror"}
+        {"path": "src/scorer/tara-chandra.ts", "symbol": "tbTaraOf", "role": "mirror"},
+        {"path": "src/panels/tarabalam-journey.ts", "symbol": "calcTarabalam", "role": "mirror"}
       ],
       "inputs": ["Janma Nakshatra", "day or slot Nakshatra"],
       "outputs": ["Tara number", "Tara name", "favourability"],
       "time_basis": "Active day or slot Nakshatra relative to birth Nakshatra.",
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Formula and browser parity are tested; a claim-specific exact locator is not yet registered."},
-      "tests": ["tests/test_tarabalam.py", "tests/test_activity_surface_parity.py"],
+      "tests": ["tests/test_tarabalam.py", "tests/test_activity_surface_parity.py", "src/scorer/__tests__/tara-chandra.test.ts"],
       "limitations": ["Tarabalam is one personal factor and should not be presented as a complete Muhurta judgment."],
       "method": {
         "kind": "formula",

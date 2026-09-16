@@ -17,8 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
         (
             ('tools/check_computation_inventory.py',),
             (
-                    'Computation inventory valid: 69 records, 212 implementations, '
-                    '147 audited source files, 69/69 methods documented.\n'
+                    'Computation inventory valid: 69 records, 213 implementations, '
+                    '148 audited source files, 69/69 methods documented.\n'
             ),
         ),
         (
