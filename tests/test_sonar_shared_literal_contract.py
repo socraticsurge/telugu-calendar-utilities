@@ -55,7 +55,7 @@ EXPECTED_CONSTANTS = {
         ),
         "_KUJA_OUTSIDE_EIGHTH": "Mangala (Kuja) is outside the 8th house",
     },
-    "telugu_panchangam/personal/muhurta.py": {
+    "telugu_panchangam/personal/muhurta_eligibility.py": {
         "_ADHIKA_PREFIX": "Adhika ",
     },
     "telugu_panchangam/personal/slot_scorers.py": {
