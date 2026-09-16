@@ -10,7 +10,7 @@ import {
   karnavedhaDaylightDropReason,
 } from '../scorer/election-assessors/karnavedha-daylight';
 import { muAvoidKaranaWindows, muMin } from './muhurta-astronomy';
-import { tbChandraOf } from './tarabalam-journey';
+import { tbChandraOf } from '../scorer/tara-chandra';
 
 const MU_NITYA_HARD_AVOID = new Set(['Vyatipata', 'Vaidhriti']);
 

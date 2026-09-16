@@ -30,6 +30,19 @@ flowchart TD
 The arrows describe responsibility and data flow, not a new shared runtime.
 The browser and Python implementations remain distinct.
 
+### Browser Tara/Chandra boundary
+
+`src/scorer/tara-chandra.ts` owns the five shared browser Tara/Chandra helpers.
+Scoring and day-rule evaluation import it directly, rather than importing the
+UI journey. The journey retains its original exports as compatibility re-exports.
+Calculations still execute in the browser; no server, request or data transfer is added.
+
+The pure module is strictly type-checked and tested without a browser environment.
+Compatibility tests cover all 729 star pairs and 144 sign pairs, invalid names and
+out-of-range values. A dependency guard checks the module's dependency graph for
+UI, browser storage and network access, and pins the two direct scoring consumers.
+UI rendering, stored mode selection, calculation policies and Python engines are unchanged.
+
 ## Completed repair sequence
 
 1. Pin shared ranking boundaries with one hand-authored corpus consumed by both runtimes.

@@ -5,38 +5,16 @@ import { parseDescription } from '../lib/parse-description';
 import { fmtT, stampOf } from '../lib/format';
 import { htmlEsc } from '../lib/html';
 import { gcEvent } from '../lib/analytics';
-import { RASI_NAMES, NAKSHATRA_NAMES } from '../data/rasis';
+import { NAKSHATRA_NAMES } from '../data/rasis';
+import { tbTaraOf, tbTaraIsGood, tbTaraLabel, tbChandraOf } from '../scorer/tara-chandra';
+export { tbTaraOf, tbTaraIsGood, tbTaraLabel, tbChandraOf, tbChandraVerdict } from '../scorer/tara-chandra';
 import { getLoadedEvents } from './today';
 import { tbProfiles } from './tarabalam-profile-controller';
 
 const TB_NAKSHATRAS = NAKSHATRA_NAMES;
-const TARA_NAMES = ['Janma','Sampat','Vipat','Kshema','Pratyak','Sadhana','Naidhana','Mitra','Parama Mitra'];
-const TARA_GOOD = new Set([2,4,6,8,9]);
-const TB_RASIS = RASI_NAMES;
-const CHANDRA_GOOD = new Set([1,3,6,7,10,11]);
-const CHANDRA_PUJA = new Set([2,5,9]);
 
 let TB_DAYS = null;    // last computed result rows
 let TB_EVENTS = null;  // feed events used for the last calculation
-
-export function tbTaraOf(janmaName, dayName) {
-  const j = TB_NAKSHATRAS.indexOf(janmaName), d = TB_NAKSHATRAS.indexOf(dayName);
-  if (j < 0 || d < 0) return null;
-  return ((d - j + 27) % 27) % 9 + 1;
-}
-
-export function tbChandraVerdict(pos: number): string {
-  if (CHANDRA_GOOD.has(pos)) return 'good';
-  if (CHANDRA_PUJA.has(pos)) return 'puja';
-  return 'bad';
-}
-
-export function tbChandraOf(janmaRasi, dayRasi) {
-  const j = TB_RASIS.indexOf(janmaRasi), d = TB_RASIS.indexOf(dayRasi);
-  if (j < 0 || d < 0) return null;
-  const pos = ((d - j + 12) % 12) + 1;
-  return { pos, verdict: tbChandraVerdict(pos) };
-}
 
 export async function calcTarabalam() {
   const profiles = tbProfiles();
@@ -75,7 +53,7 @@ export async function calcTarabalam() {
           good: boolean;
           chandra?: ReturnType<typeof tbChandraOf>;
         } =
-          { who: pr.name, tara: t, label: TARA_NAMES[t-1], good: TARA_GOOD.has(t) };
+          { who: pr.name, tara: t, label: tbTaraLabel(t), good: tbTaraIsGood(t) };
         if (pr.rasi && data.lunarSign) entry.chandra = tbChandraOf(pr.rasi, data.lunarSign);
         return entry;
       });
@@ -139,12 +117,12 @@ function tbCycleHasGoodDay(profiles) {
   // real cycle is nakshatra x rashi, so only declare impossibility on the
   // star check alone — the look-ahead handles the rest.
   return TB_NAKSHATRAS.some(n =>
-    profiles.every(pr => TARA_GOOD.has(tbTaraOf(pr.nak, n))));
+    profiles.every(pr => tbTaraIsGood(tbTaraOf(pr.nak, n))));
 }
 
 function tbDayGoodForAll(profiles, nak, moonRasi) {
   return profiles.every(pr => {
-    if (!TARA_GOOD.has(tbTaraOf(pr.nak, nak))) return false;
+    if (!tbTaraIsGood(tbTaraOf(pr.nak, nak))) return false;
     if (TB_MODE !== 'stars' && pr.rasi && moonRasi) {
       const c = tbChandraOf(pr.rasi, moonRasi);
       if (c?.verdict === 'bad') return false;
@@ -366,14 +344,6 @@ export function shareTarabalamOnWhatsApp() {
 
 // --- Gochara tool ---
 
-
-export function tbTaraIsGood(tara: number): boolean {
-  return TARA_GOOD.has(tara);
-}
-
-export function tbTaraLabel(tara: number): string {
-  return TARA_NAMES[tara - 1];
-}
 
 export function tbMode(): string {
   return TB_MODE;

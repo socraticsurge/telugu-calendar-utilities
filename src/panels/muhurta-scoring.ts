@@ -29,7 +29,7 @@ import {
   tbTaraIsGood,
   tbTaraLabel,
   tbTaraOf,
-} from './tarabalam-journey';
+} from '../scorer/tara-chandra';
 
 function taroOfSafe(janma, dayNak) {
   try { return tbTaraOf(janma, dayNak); } catch (_error) { return 1; }
