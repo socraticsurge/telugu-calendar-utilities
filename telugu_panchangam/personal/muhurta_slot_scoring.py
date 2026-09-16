@@ -1,7 +1,9 @@
 """Compose atomic scorer contributions for one candidate window."""
 
 from dataclasses import dataclass
+from datetime import datetime
 
+from telugu_panchangam.models.panchangam_day import SlotFacts, Window
 from telugu_panchangam.panchaka import evaluate_panchaka
 from telugu_panchangam.personal.activity_rules import ACTIVITY_RULES
 from telugu_panchangam.personal.lagna_position import lagnas_in_class
@@ -12,6 +14,7 @@ from telugu_panchangam.personal.muhurta_eligibility import (
 )
 from telugu_panchangam.personal.muhurta_explanations import (
     _append_manual_notes,
+    _CalendarReasons,
     _day_dosha,
     _initial_reason_buckets,
     _personal_dosha,
@@ -38,6 +41,16 @@ from telugu_panchangam.personal.slot_scorers import (
 _DISALLOWED_LAGNA = object()
 
 
+@dataclass(frozen=True)
+class _SlotCandidate:
+    start: datetime
+    end: datetime
+    block: Window
+    base: int
+    facts: SlotFacts
+    muhurta: dict
+
+
 @dataclass
 class _CalendarScore:
     score: int
@@ -61,14 +74,8 @@ def _panchaka_conflicts(avoid_key, activity_label):
 def _panchaka_penalty(facts, cur_lagna, ctx: _DayContext) -> tuple[int, str | None]:
     if cur_lagna is None:
         return 0, None
-    try:
-        panchaka = evaluate_panchaka(
-            tithi_name=facts.tithi,
-            vaaram_name=facts.vaaram,
-            nakshatra_name=facts.nakshatra,
-            lagna_name=cur_lagna,
-        )
-    except (ValueError, KeyError):
+    panchaka = _panchaka_at(facts, cur_lagna)
+    if panchaka is None:
         return 0, None
     if panchaka.name == 'Mrityu':
         return -3, 'Mrityu Panchaka · universal samskara avoidance (-3)'
@@ -79,6 +86,18 @@ def _panchaka_penalty(facts, cur_lagna, ctx: _DayContext) -> tuple[int, str | No
         if _panchaka_conflicts(avoid_key, activity_label):
             return -2, (f'{panchaka.name} Panchaka conflicts with {ctx.label} (-2)')
     return 0, None
+
+
+def _panchaka_at(facts, cur_lagna):
+    try:
+        return evaluate_panchaka(
+            tithi_name=facts.tithi,
+            vaaram_name=facts.vaaram,
+            nakshatra_name=facts.nakshatra,
+            lagna_name=cur_lagna,
+        )
+    except (ValueError, KeyError):
+        return None
 
 
 def _muhurta_nature_bonus(mu) -> int:
@@ -111,25 +130,47 @@ def _nakshatra_mukha_bonus(ctx):
     )
 
 
-def _activity_overlap_bonus(s, e, block, facts, ctx: _DayContext) -> ScoreContribution:
+def _nakshatra_preference(nakshatra, ctx):
+    if nakshatra in ctx.prefer_nakshatras:
+        return ScoreContribution(
+            1,
+            activity_match=(f'{nakshatra} specifically favoured for {ctx.label} (+1)',),
+        )
+    return ScoreContribution()
+
+
+def _amrita_overlap_bonus(s, e, ctx):
+    if any(_overlaps(s, e, a.start, a.end) for a in ctx.amrita):
+        return ScoreContribution(2, slot_quality=('overlaps Amrita Kalam (+2)',))
+    return ScoreContribution()
+
+
+def _choghadiya_preference(block, ctx):
+    if ctx.prefer_chog and block.name == ctx.prefer_chog[0]:
+        return ScoreContribution(
+            ctx.prefer_chog[1],
+            activity_match=(
+                f'{block.name} favoured for {ctx.label} (+{ctx.prefer_chog[1]})',
+            ),
+        )
+    return ScoreContribution()
+
+
+def _activity_overlap_bonus(candidate, ctx: _DayContext) -> ScoreContribution:
+    s, e = candidate.start, candidate.end
+    contributions = (
+        _nakshatra_preference(candidate.facts.nakshatra, ctx),
+        _amrita_overlap_bonus(s, e, ctx),
+        _bhadra_overlap_bonus(s, e, ctx),
+        _nakshatra_mukha_bonus(ctx),
+        _choghadiya_preference(candidate.block, ctx),
+    )
     slot_quality, activity_match = [], []
     bonus = 0
-    if facts.nakshatra in ctx.prefer_nakshatras:
-        bonus += 1
-        activity_match.append(
-            f'{facts.nakshatra} specifically favoured for {ctx.label} (+1)'
-        )
-    if any(_overlaps(s, e, a.start, a.end) for a in ctx.amrita):
-        bonus += 2
-        slot_quality.append('overlaps Amrita Kalam (+2)')
-    for contribution in (_bhadra_overlap_bonus(s, e, ctx), _nakshatra_mukha_bonus(ctx)):
+    for contribution in contributions:
         bonus += contribution.score
+        slot_quality.extend(contribution.slot_quality)
         activity_match.extend(contribution.activity_match)
-    if ctx.prefer_chog and block.name == ctx.prefer_chog[0]:
-        bonus += ctx.prefer_chog[1]
-        activity_match.append(
-            f'{block.name} favoured for {ctx.label} (+{ctx.prefer_chog[1]})'
-        )
     for karana_name in ctx.avoid_karana_names:
         activity_match.append(f'{karana_name} karana avoided')
     return ScoreContribution(bonus, tuple(slot_quality), tuple(activity_match))
@@ -211,6 +252,12 @@ def _lagna_score(s, ctx: _DayContext):
     )
 
 
+def _preferred_tithi(number, name, ctx):
+    if number in ctx.prefer_tithi_numbers:
+        return 1, f'{name} specifically favoured for {ctx.label} (+1)'
+    return 0, None
+
+
 def _calendar_score(s, facts, ctx: _DayContext, election_reasons):
     day = ctx.day
 
@@ -248,12 +295,10 @@ def _calendar_score(s, facts, ctx: _DayContext, election_reasons):
         special_yogas=facts.special_yogas,
         avoid_tithi_class=ctx.avoid_tithi_class,
     )
-    preferred_number_tithi_reason = None
-    if active_tithi_number in ctx.prefer_tithi_numbers:
-        tithi_bonus += 1
-        preferred_number_tithi_reason = (
-            f'{facts.tithi} specifically favoured for {ctx.label} (+1)'
-        )
+    preference_bonus, preferred_number_tithi_reason = _preferred_tithi(
+        active_tithi_number, facts.tithi, ctx
+    )
+    tithi_bonus += preference_bonus
 
     # Nitya yoga
     skip_on_nitya_hard = bool(ctx.skip_yogas)
@@ -267,14 +312,16 @@ def _calendar_score(s, facts, ctx: _DayContext, election_reasons):
     anandadi_bonus, anandadi_reason = anandadi_day_modifier(day)
 
     day_quality, activity_match = _initial_reason_buckets(
-        yoga_reasons,
-        nitya_reasons,
         ctx,
-        anandadi_reason,
-        tithi_day_reason,
-        election_reasons,
-        tithi_activity_reason,
-        preferred_number_tithi_reason,
+        _CalendarReasons(
+            yoga_reasons,
+            nitya_reasons,
+            anandadi_reason,
+            tithi_day_reason,
+            election_reasons,
+            tithi_activity_reason,
+            preferred_number_tithi_reason,
+        ),
     )
     return _CalendarScore(
         ctx.vara_bonus
@@ -296,9 +343,11 @@ def _calendar_score(s, facts, ctx: _DayContext, election_reasons):
 
 
 def _evaluate_slot(
-    s, e, block, base, facts, ctx: _DayContext, mu, election_reasons=()
+    candidate: _SlotCandidate, ctx: _DayContext, election_reasons=()
 ) -> dict | None:
     day = ctx.day
+    s, e, facts = candidate.start, candidate.end, candidate.facts
+    mu, block, base = candidate.muhurta, candidate.block, candidate.base
     calendar = _calendar_score(s, facts, ctx, election_reasons)
     if calendar is None:
         return None
@@ -307,7 +356,7 @@ def _evaluate_slot(
     slot_quality = _slot_quality_reasons(mu, block, base, nature_bonus)
     group_fit = calendar.group_fit
     day_quality, activity_match = calendar.day_quality, calendar.activity_match
-    overlap = _activity_overlap_bonus(s, e, block, facts, ctx)
+    overlap = _activity_overlap_bonus(candidate, ctx)
     hora = _hora_bonus(s, ctx)
     score += overlap.score + hora.score
     slot_quality.extend(overlap.slot_quality)
@@ -344,9 +393,8 @@ def _evaluate_slot(
     reasons = slot_quality + group_fit + day_quality + activity_match
 
     personal_dosha = _personal_dosha(
-        calendar.chandra_avoid_names,
+        (calendar.chandra_avoid_names, calendar.chandra_puja_names),
         lagna_ashtama_names,
-        calendar.chandra_puja_names,
         calendar.tara_unfav_names,
         facts.special_yogas,
     )

@@ -26,7 +26,11 @@ from telugu_panchangam.personal.muhurta_eligibility import (
     _night_unavailable,
     _overlaps,
 )
-from telugu_panchangam.personal.muhurta_slot_scoring import _evaluate_slot
+from telugu_panchangam.personal.muhurta_slot_scoring import (
+    _evaluate_slot,
+    _SlotCandidate,
+)
+from telugu_panchangam.personal.search_contract import SearchOptions
 from telugu_panchangam.personal.slot_scorers import _DayContext
 
 GOOD_CHOGHADIYA = {'Amrit': 3, 'Shubh': 2, 'Labh': 2, 'Char': 1}
@@ -211,10 +215,12 @@ def diagnose_day(
     return _day_skip_reason(
         day,
         rules,
-        activity,
-        travel_direction,
-        janma_rasis,
-        chandra_mode,
+        SearchOptions(
+            activity=activity,
+            travel_direction=travel_direction,
+            janma_rasis=janma_rasis,
+            chandra_mode=chandra_mode,
+        ),
         _daylight_assessment,
     )
 
@@ -294,10 +300,12 @@ def _daylight_gate(
     reason = _day_skip_reason(
         day,
         rules,
-        activity,
-        travel_direction,
-        janma_rasis,
-        chandra_mode,
+        SearchOptions(
+            activity=activity,
+            travel_direction=travel_direction,
+            janma_rasis=janma_rasis,
+            chandra_mode=chandra_mode,
+        ),
         daylight_assessment,
     )
     return daylight_assessment, reason
@@ -431,13 +439,15 @@ def _evaluate_candidate(mu, run: _SlotEvaluation, blocks):
     if not admitted:
         return None
     return _evaluate_slot(
-        start,
-        end,
-        block,
-        GOOD_CHOGHADIYA.get(block.name, 0),
-        facts,
+        _SlotCandidate(
+            start,
+            end,
+            block,
+            GOOD_CHOGHADIYA.get(block.name, 0),
+            facts,
+            {**mu, 'chog_straddle': straddle},
+        ),
         run.ctx,
-        {**mu, 'chog_straddle': straddle},
         election_reasons,
     )
 

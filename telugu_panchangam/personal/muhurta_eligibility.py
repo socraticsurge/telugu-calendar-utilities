@@ -6,6 +6,7 @@ from telugu_panchangam.personal.election_assessors.karnavedha import (
 )
 from telugu_panchangam.personal.lagna_position import lagna_class_of
 from telugu_panchangam.personal.nitya_yoga import NITYA_HARD_AVOID
+from telugu_panchangam.personal.search_contract import SearchOptions
 from telugu_panchangam.personal.slot_scorers import _DayContext
 from telugu_panchangam.personal.tithi_class import tithi_number
 
@@ -28,18 +29,47 @@ def _month_admitted(day, rules) -> bool:
     )
 
 
+def _first_rejection(day, rules, checks):
+    for check in checks:
+        reason = check(day, rules)
+        if reason is not None:
+            return reason
+    return None
+
+
 def _calendar_profile_skip_reason(day, rules) -> str | None:
+    return _first_rejection(
+        day,
+        rules,
+        (
+            _month_profile_skip_reason,
+            _weekday_profile_skip_reason,
+            _paksha_profile_skip_reason,
+            _solar_profile_skip_reason,
+        ),
+    )
+
+
+def _month_profile_skip_reason(day, rules):
     if not _month_admitted(day, rules):
         return (
             f'{day.maasam} Maasa · {rules["label"]} source profile '
             'does not admit this lunar month'
         )
+    return None
+
+
+def _weekday_profile_skip_reason(day, rules):
     allowed_varas = rules.get('allowed_varas')
     if allowed_varas and day.vaaram not in allowed_varas:
         return (
             f'{day.vaaram} · {rules["label"]} source profile '
             'does not admit this weekday'
         )
+    return None
+
+
+def _paksha_profile_skip_reason(day, rules):
     allowed_pakshams = rules.get('allowed_pakshams')
     if allowed_pakshams and day.paksham not in allowed_pakshams:
         return (
@@ -52,7 +82,7 @@ def _calendar_profile_skip_reason(day, rules) -> str | None:
             f'{day.vaaram} during {day.paksham} Paksha · '
             f'{rules["label"]} source profile rejects this combination'
         )
-    return _solar_profile_skip_reason(day, rules)
+    return None
 
 
 def _solar_profile_skip_reason(day, rules) -> str | None:
@@ -103,27 +133,53 @@ def _chandra_position_rejection(positions, chandra_mode) -> str | None:
 
 
 def _traditional_calendar_skip_reason(day, rules) -> str | None:
+    return _first_rejection(
+        day,
+        rules,
+        (
+            _panchaka_nakshatra_skip_reason,
+            _khar_maasa_skip_reason,
+            _adhika_skip_reason,
+            _pitru_paksha_skip_reason,
+            _simha_guru_skip_reason,
+        ),
+    )
+
+
+def _panchaka_nakshatra_skip_reason(day, rules):
     if rules.get('skip_on_panchaka_nakshatra') and day.in_panchaka_nakshatra:
         return (
             f'Panchaka Nakshatra ({day.nakshatra.name}) · '
             f'{rules["label"]} traditionally avoided'
         )
+    return None
+
+
+def _khar_maasa_skip_reason(day, rules):
     if rules.get('skip_on_khar_maasa') and day.is_khar_maasa:
         return (
             f'Khar-Maasa ({day.khar_maasa_name} Maasa) · '
             f'{rules["label"]} traditionally avoided'
         )
-    return _traditional_month_skip_reason(day, rules)
+    return None
 
 
-def _traditional_month_skip_reason(day, rules) -> str | None:
+def _adhika_skip_reason(day, rules):
     if rules.get('skip_on_adhika') and day.maasam.startswith(_ADHIKA_PREFIX):
         return f'Adhika Maasa · {rules["label"]} traditionally avoided'
+    return None
+
+
+def _pitru_paksha_skip_reason(day, rules):
     if rules.get('skip_on_pitru_paksha') and day.is_pitru_paksha:
         return (
             'Pitru Paksha (Bhadrapada Krishna paksha) · '
             f'{rules["label"]} traditionally avoided'
         )
+    return None
+
+
+def _simha_guru_skip_reason(day, rules):
     if rules.get('skip_on_simha_stha_guru') and day.simha_stha_guru:
         return (
             'Simha-Stha Guru · '
@@ -179,10 +235,7 @@ def _travel_skip_reason(day, activity, travel_direction) -> str | None:
 def _day_skip_reason(
     day,
     rules,
-    activity,
-    travel_direction,
-    janma_rasis,
-    chandra_mode,
+    options: SearchOptions,
     daylight_assessment=None,
 ) -> str | None:
     """Return a reason string if the day should be skipped, else None.
@@ -201,13 +254,13 @@ def _day_skip_reason(
     if reason := _calendar_profile_skip_reason(day, rules):
         return reason
 
-    if reason := _travel_skip_reason(day, activity, travel_direction):
+    if reason := _travel_skip_reason(day, options.activity, options.travel_direction):
         return reason
 
     if reason := _traditional_skip_reason(day, rules):
         return reason
 
-    return _chandra_skip_reason(day, janma_rasis, chandra_mode)
+    return _chandra_skip_reason(day, options.janma_rasis, options.chandra_mode)
 
 
 def _nakshatra_admitted(nakshatra, ctx: _DayContext) -> bool:

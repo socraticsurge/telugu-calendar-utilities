@@ -29,21 +29,21 @@ Local CodeScene MCP reviews on 2026-09-16, with unchanged metric configuration:
 | Module | Before | After |
 |---|---:|---:|
 | `personal/muhurta.py` | 4.95 | 9.38 |
-| `personal/muhurta_eligibility.py` | New | 9.09 |
-| `personal/muhurta_slot_scoring.py` | New | 9.09 |
-| `personal/muhurta_explanations.py` | New | 9.68 |
+| `personal/muhurta_eligibility.py` | New | 10.00 |
+| `personal/muhurta_slot_scoring.py` | New | 10.00 |
+| `personal/muhurta_explanations.py` | New | 10.00 |
 
 The origin and every extraction are measured; none hides relocated low-health code.
 Remaining argument-count warnings include deliberately preserved public signatures.
 These are local reviews, not a claim about an as-yet-unrun hosted analysis.
 
-The local change safeguard does **not** pass: it treats residual warnings in new
-files as introduced debt. Eligibility and scoring retain moderate mean complexity;
-the three new files retain some argument-count warnings. This is a reviewed
-tradeoff, not a suppressed check: all extracted owners exceed 9, long/complex
-functions are removed, and public interfaces remain compatible. No metric rules,
-exclusions or thresholds were changed. The original file's improvement alone
-must not be presented as a clean whole-change safeguard.
+The first local and hosted change reviews failed the configured new-file gate:
+each new file must score 10. The follow-up groups candidate facts and explanation
+inputs, reuses the existing search-options contract, and gives each ordered
+calendar/traditional policy and preference contribution a named owner.
+All three extracted modules now score 10 without changing metric rules,
+exclusions, thresholds or public signatures. The final whole-change gate result
+is recorded on the PR; the first failed gate is retained as review evidence.
 
 ## Compatibility and approval
 
@@ -79,6 +79,10 @@ The initial full run found the moved daylight test hook; it was restored without
 changing its assertion. The protected-source failure was resolved with the approved
 append-only audit. An initial concurrent documentation build conflicted over `dist/`;
 the standalone rerun passed. No failed check was removed or loosened.
+
+After the new-file gate refinements, the full 2,030-test suite and rebuilt
+wheel/sdist verification passed again. The local pre-commit CodeScene safeguard
+also passed; hosted checks must confirm the final commit before merge.
 
 Browser-journey investigation and API-client cleanup remain separate follow-up tasks.
 Completing this task does not complete the wider maintenance backlog.

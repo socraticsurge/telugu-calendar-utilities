@@ -1,16 +1,26 @@
 """Ordered reason groups and disclosed dosha annotations."""
 
+from dataclasses import dataclass
+
 from telugu_panchangam.personal.nitya_yoga import NITYA_HARD_AVOID
 from telugu_panchangam.personal.slot_scorers import YOGA_PENALTY, _DayContext
 
 
+@dataclass
+class _CalendarReasons:
+    yoga: list[str]
+    nitya: list[str]
+    anandadi: str | None
+    tithi_day: str | None
+    election: tuple[str, ...]
+    tithi_activity: str | None
+    preferred_tithi: str | None
+
+
 def _personal_dosha(
-    chandra_avoid_names,
-    lagna_ashtama_names,
-    chandra_puja_names,
-    tara_unfav_names,
-    special_yogas,
-) -> str | None:
+    chandra_names, lagna_ashtama_names, tara_unfav_names, special_yogas
+):
+    chandra_avoid_names, chandra_puja_names = chandra_names
     if chandra_avoid_names:
         return (
             'ashtama_chandra'
@@ -79,30 +89,21 @@ def _slot_quality_reasons(mu, block, base, nature_bonus) -> list[str]:
     ]
 
 
-def _initial_reason_buckets(
-    yoga_reasons,
-    nitya_reasons,
-    ctx: _DayContext,
-    anandadi_reason,
-    tithi_day_reason,
-    election_reasons,
-    tithi_activity_reason,
-    preferred_number_tithi_reason,
-) -> tuple[list[str], list[str]]:
-    day_quality = list(yoga_reasons) + list(nitya_reasons)
+def _initial_reason_buckets(ctx: _DayContext, reasons: _CalendarReasons):
+    day_quality = list(reasons.yoga) + list(reasons.nitya)
     if ctx.simha_stha_shukra_penalty:
         day_quality.append(
             f'Simha-Stha Shukra (Venus in Simha) ({ctx.simha_stha_shukra_penalty})'
         )
-    if anandadi_reason:
-        day_quality.append(anandadi_reason)
-    if tithi_day_reason:
-        day_quality.append(tithi_day_reason)
-    activity_match = list(election_reasons)
-    if tithi_activity_reason:
-        activity_match.append(tithi_activity_reason)
-    if preferred_number_tithi_reason:
-        activity_match.append(preferred_number_tithi_reason)
+    if reasons.anandadi:
+        day_quality.append(reasons.anandadi)
+    if reasons.tithi_day:
+        day_quality.append(reasons.tithi_day)
+    activity_match = list(reasons.election)
+    if reasons.tithi_activity:
+        activity_match.append(reasons.tithi_activity)
+    if reasons.preferred_tithi:
+        activity_match.append(reasons.preferred_tithi)
     if ctx.vara_reason:
         activity_match.append(ctx.vara_reason)
     return day_quality, activity_match
