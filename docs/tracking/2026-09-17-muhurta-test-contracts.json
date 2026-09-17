@@ -1,0 +1,857 @@
+{
+  "base": "614cc2f2893ab066c72118c7bcc811738e5bc657",
+  "description": "One-time preservation audit, not a permanent lock on future tests. Hashes describe original Python function source including decorators, and original TypeScript test declarations. All assertion expressions and expected values remain unchanged. The refinements below split inherited complex cases without weakening checks.",
+  "refinements": {
+    "python_cases_after": 102,
+    "browser_cases_after": 58,
+    "preserved_python_assertion_asts": 254,
+    "preserved_browser_expectation_statements": 281,
+    "python": {
+      "test_partial_avoid_nitya_dosha_window": "Fresh vyaghata_windows fixture; separate test_outside_nitya_dosha_window_has_no_penalty retains the outside-window checks.",
+      "test_reason_groups_categorise_correctly": "Fresh _inventory_reason_groups setup; separate test_reason_groups_separate_day_group_and_activity_evidence retains day, group and activity checks.",
+      "test_reason_groups_score_consistency": "Extract _reason_group_total with the original independent regex sum; retain the original score assertion.",
+      "_expected_tier": "Replace compound condition with equivalent early returns; differential checked across score ranges and None, False, zero and named doshas."
+    },
+    "browser": {
+      "keeps extracted search orchestration boundaries callable": [
+        "keeps day admission and dropped-day contracts callable",
+        "keeps slot scoring and election contracts callable",
+        "keeps ranking and result-scope contracts callable"
+      ],
+      "keeps extracted result fragments text- and markup-equivalent": [
+        "preserves escaped removal and provenance fragments",
+        "preserves day context and dropped outcome fragments",
+        "preserves chart review and validation fragments",
+        "preserves safety, personal and timing labels",
+        "preserves event-specific disposition wording"
+      ],
+      "feeds the canonical Sydney boundary plan into conservative chart decisions": [
+        "retains the Hyderabad single-minute boundary evidence",
+        "caps the Sydney boundary-edge candidate conservatively",
+        "rejects the Sydney full-band candidate on chart evidence"
+      ]
+    }
+  },
+  "python": {
+    "source": "tests/test_muhurta_finder.py",
+    "source_sha256": "57e53fa268567bf08367e9352890650f0d06035830beb329a92827035ea6ddb9",
+    "collected_cases": 100,
+    "tests": [
+      {
+        "name": "test_slots_never_overlap_inauspicious_windows",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 1,
+        "sha256": "432115d018618c7c7fbb5b062d2c19a6576ca7cb352bf6d6f5c0f79102e64dd7"
+      },
+      {
+        "name": "test_every_slot_is_a_named_muhurta",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 3,
+        "sha256": "6ef1994e124bf04edbdf9599d08b2259513a073add93600a8b69ef5bc93460a8"
+      },
+      {
+        "name": "test_ranked_by_score_and_carries_reasons",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 3,
+        "sha256": "0fde0cc530cfdaf3249134e6eb386f41596a46cfea8d1af93969acca710be605"
+      },
+      {
+        "name": "test_travel_avoids_vishti",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 2,
+        "sha256": "aae15f32d5db4e936431870147e6908fc74618c71ac0004fbc1e59bd7b6aeef2"
+      },
+      {
+        "name": "test_tarabalam_favourable_adds_per_person_bonus",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 2,
+        "sha256": "fc430027567c34c830009085bb85e45d23b8ad91fbddd5d616d5025465f00dba"
+      },
+      {
+        "name": "test_tarabalam_unfavourable_keeps_day_but_penalises",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 2,
+        "sha256": "da9deda877363115e33d2cce2e04e5866f27169992944eb5d45789871ea41ff2"
+      },
+      {
+        "name": "test_tarabalam_mixed_group_nets_correctly",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 3,
+        "sha256": "95e5b2719f008ea902cb83d693d6b10ef1eb97a491507c80f2bde280d0b0e9ef"
+      },
+      {
+        "name": "test_chandrabalam_good_adds_bonus_in_default_mode",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 2,
+        "sha256": "895c488f9b1614328d3b1e1272e0936c0940ba3ae264a28158c171716828e0bc"
+      },
+      {
+        "name": "test_chandrabalam_remedial_annotates_no_score",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 3,
+        "sha256": "218364f0f8c3adb41379a3315affa5a2776a30a5721f617f53d7b1ba8b36e9aa"
+      },
+      {
+        "name": "test_chandrabalam_avoid_subtracts",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 2,
+        "sha256": "46f16ea02622df340362fc5c402b2377637506f46b6a9d63f104b83ccfc061ab"
+      },
+      {
+        "name": "test_chandra_mode_strict_filters_remedial_and_avoid_days",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 4,
+        "sha256": "b20991a8def6c56a5d6454b94a133fe1d67f55e22a1e725a6be4b0c3caa7e2d8"
+      },
+      {
+        "name": "test_chandrabalam_scores_identical_across_modes",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 5,
+        "sha256": "3f8e8cb0aa59bb9e34d79e3552424241f2ebaa1b51705e519a3296181a3ba17f"
+      },
+      {
+        "name": "test_eclipse_day_returns_no_slots",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 2,
+        "sha256": "1ef28ecfc1ebe8016f7a365837a2e05d35af04b7cb0caa3fb9fba32b76f2de93"
+      },
+      {
+        "name": "test_invalid_activity_raises",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 0,
+        "sha256": "b42137a32153314faa76198a631a91d32384185d589a0285d04b2fed90fc704a"
+      },
+      {
+        "name": "test_all_36_activities_callable",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 8,
+        "sha256": "ffffd093275ead1c831622a705b8f22dd6f5f2ec1b38a66c2c475758ef5a0553"
+      },
+      {
+        "name": "test_wedding_skips_dagdha_day",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "f29df5c5020359c6f59c0aa874a05c96754352521da715913abc72442539eb3c"
+      },
+      {
+        "name": "test_vehicle_applies_labh_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "2f0efc220bf55f2075948e734d3bca28000dd9504d6abd9a172860bb36970d94"
+      },
+      {
+        "name": "test_surgery_avoids_vishti",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "83c13b113ad8bbacae74db44140e8852afe8c3d63e61b6e4ed64cbe59ef0f99e"
+      },
+      {
+        "name": "test_pilgrimage_avoids_vishti",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "89b02edae462a96eb2926d2b8bf8cb1eae50211d34754c24fd47eaa1cae60033"
+      },
+      {
+        "name": "test_naming_uses_shubh_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 1,
+        "sha256": "4cb70c590393a55869d5041ce4a3f85051058d657671049cedbcd32d7297c865"
+      },
+      {
+        "name": "test_court_uses_exact_source_gates_not_tithi_family_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "9750027fce44ad052699bd9628b3fbc588dee103b035725d0f238f6a314acd3c"
+      },
+      {
+        "name": "test_tithi_family_classification",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 12,
+        "sha256": "1884453cf90a367733c8a719a80d820799564d920a25cc7aa9dd2e037ea537d1"
+      },
+      {
+        "name": "test_rikta_tithi_universal_penalty",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "4c0419f685ae8c127efd818a49820ede4d782b30bd67ef892f01f028b9228d52"
+      },
+      {
+        "name": "test_rikta_penalty_applies_to_generic_activity",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 1,
+        "sha256": "acd39a52d202f1d94fb76324da9a944cbbde1bad1a6580f5440babdbb0f21a52"
+      },
+      {
+        "name": "test_pournami_rejected_for_wedding_instead_of_purna_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 1,
+        "sha256": "e1480ee1f7423bf7e15bc78a46ec7e583dc4f8753c807ebeb5d2c5b2cb99489a"
+      },
+      {
+        "name": "test_court_does_not_inherit_jaya_tithi_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "defb8b1a4cf3bca84649577e16759563a3a46dc2f69708e1c6e4f553a4eaafe6"
+      },
+      {
+        "name": "test_gruhapravesha_uses_exact_source_gates_not_tithi_family_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "0e81eedf68a647dc26336f4d81c9eb952571bd06e45a2d832cf5480bcc452c8e"
+      },
+      {
+        "name": "test_vara_bonus_thursday_wedding",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "7a4b05e8be6d77b88ce636b996629d5fecf236ef3cbaa77418185ac5e3dc34b0"
+      },
+      {
+        "name": "test_vara_bonus_friday_vehicle",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "f2088edc784777f96b774f0c19bbd34e70d5fb4fbf11742e49e31782770c5afe"
+      },
+      {
+        "name": "test_vara_and_tithi_class_stack",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "dc47aacc1b5917e0a6f21fabaed5484e3bf84a2bd54fd613e85d46c6fe8bad5b"
+      },
+      {
+        "name": "test_tuesday_is_rejected_for_court_filing",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 1,
+        "sha256": "091cb22f675b782d69e79f0fcf59864e6ab36dc1a6390a5e3d277fbc6713a9a5"
+      },
+      {
+        "name": "test_no_vara_match_no_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "30b1c1a21d0fc13997b4fccddca6be54192d427f51061ff774b146a20550ca7b"
+      },
+      {
+        "name": "test_vaidhriti_defers_wedding",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 4,
+        "sha256": "e03db28b8fbaa0593599f1eed9415b5c291a42da938c10f3865df400254adf25"
+      },
+      {
+        "name": "test_vaidhriti_penalises_non_samskara",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "f850250f926c301ce9e24ab034ea3e8df457a666db06834795b3569b879c7073"
+      },
+      {
+        "name": "test_auspicious_nitya_yoga_bonus",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "45e1d963f3eccb03baa9ef1017b1a60ad3789551beded0ddfbdc648cfe09c0ab"
+      },
+      {
+        "name": "test_partial_avoid_nitya_dosha_window",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "498cb1128579d99ed0611fc5e7fbb941056c835ff5a74426437820cbc4e0926c"
+      },
+      {
+        "name": "test_neutral_nitya_yoga_no_score",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "db4f8dcdb920f8c8932be59c9e51a90d979d7ac9f0225d7e1e8fc8feb73d4332"
+      },
+      {
+        "name": "test_reason_groups_present_with_expected_keys",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 3,
+        "sha256": "3cb18d72c486fdebe9a6d41b2fda3e6acbd3d815fb04eaaf94c22066c04ab68c"
+      },
+      {
+        "name": "test_reason_groups_categorise_correctly",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 8,
+        "sha256": "7bd33de81b83a68dd4f86a435d0c8513aeb21646260c3d2a5b8975465b79d9a6"
+      },
+      {
+        "name": "test_doctrinal_note_sarvartha_rectifies_tara",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 2,
+        "sha256": "cf73c2dc416857bd76206237608c87784dc8f660a7cd2ceb4a3b674ba0fe53c8"
+      },
+      {
+        "name": "test_doctrinal_note_chandra_dosha_not_rectified",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 2,
+        "sha256": "5f144510e45708a8fd03df1e1a761b031060f88b2f4ba514589b53b2d9809ba5"
+      },
+      {
+        "name": "test_no_notes_on_clean_day",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 2,
+        "sha256": "edd401b2cfa117e12b0ab4c7dd3e8d055592cc90b70e31d6ca73699484575506"
+      },
+      {
+        "name": "test_reason_groups_score_consistency",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 2,
+        "sha256": "388bbc2050c8c402f50c4c1c94970d4dabfd31bb2c6076ed56231eda1f35777f"
+      },
+      {
+        "name": "test_score_tier_thresholds",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 8,
+        "sha256": "87a0a52695a8d20535424069ff0c0611a545284d8a2ea7cc90d8c50f27d37203"
+      },
+      {
+        "name": "test_each_slot_carries_a_tier",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 3,
+        "sha256": "94f021947bcb1543c6b35a66a3d08b0305e48925abb1670e3cd253424aa09603"
+      },
+      {
+        "name": "test_personal_dosha_none_when_chandra_and_tara_clean",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 2,
+        "sha256": "db78075a6373ed281bbe5b45413cbfbd06397ddcd04b59e1172325f9e606bf18"
+      },
+      {
+        "name": "test_personal_dosha_tara_dosha_caps_tier",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 3,
+        "sha256": "4d73ce174f4113fcd7464d58c509afa2c8ce08feb797edd3c178a6308da2a3d1"
+      },
+      {
+        "name": "test_personal_dosha_chandra_avoid_caps_tier",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 5,
+        "sha256": "5008836d7d80f19b596dd45fd09eb46bac70aafdc2a9f041842c7f427c30c62e"
+      },
+      {
+        "name": "test_personal_dosha_chandra_remedial_caps_tier_when_excellent",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 3,
+        "sha256": "48ceb44010a7d532fa58d1de616e6cf538c3cd9e8cb46810d03b54b0b0732b7a"
+      },
+      {
+        "name": "test_sort_tiebreaker_prefers_personally_clean_slot",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 2,
+        "sha256": "6db165f21a8cb93f31b41bd53f9fc9e22c62673853181ad1cedb217e0496decd"
+      },
+      {
+        "name": "test_day_dosha_rikta_tithi_caps_tier_when_excellent",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 4,
+        "sha256": "f0995ef21c091589c747c00565653f1c6da3d732cd067471f1414cd7d96bee03"
+      },
+      {
+        "name": "test_day_dosha_amavasya_caps_tier_when_excellent",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 4,
+        "sha256": "0bd7e32cd9cbdb6777134d7aa0ecaf888776293c27a6722525e14c1e188c1eb1"
+      },
+      {
+        "name": "test_day_dosha_none_on_clean_day",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 2,
+        "sha256": "d4cd001b6af3589d0b70f5dc7314b29b94b7e5a69d2f8a821d9872a5000762a2"
+      },
+      {
+        "name": "test_diagnose_day_eclipse",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 2,
+        "sha256": "1b3151b51d10c3c1bfb3c62e62124763439a46d03ab8b51778e0f47ae0f6adec"
+      },
+      {
+        "name": "test_diagnose_day_samskara_skip_on_dagdha",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 2,
+        "sha256": "c0ad040ad2022e72e8f67d964a9a73a971bf8f8d8a083d6dbdf3f8f40f31a5b4"
+      },
+      {
+        "name": "test_diagnose_day_samskara_skip_on_vaidhriti",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 2,
+        "sha256": "7a17a77937fa5c6fe9734c7b7fb48cd0055aac34bc52e6cd0ec567f1a76f0e68"
+      },
+      {
+        "name": "test_diagnose_day_returns_none_when_clear",
+        "target": "tests/test_muhurta_finder_explanations.py",
+        "assertions": 1,
+        "sha256": "3db4dfda52f0a7b7ea6137b1d0f0cbb5d451ed8d801617de4652d3d1741ea9d6"
+      },
+      {
+        "name": "test_mcp_find_muhurta_emits_dropped_days",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 6,
+        "sha256": "15672a3c90e89b55bf32d0d24bb5fa85c7c607d80c5457a4590ff7a80f374434"
+      },
+      {
+        "name": "test_mcp_find_muhurta_emits_tier_on_each_slot",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 2,
+        "sha256": "f275c8cc751e4e2cec1408af63a93b9bd9420d421310e85f6904a49519fe5237"
+      },
+      {
+        "name": "test_mcp_find_muhurta_exposes_janma_rasis_janma_lagnas_chandra_mode",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 3,
+        "sha256": "6228220c463efd458ff0c3b2472e8fcc8365a0e08790b828e7ca749541faab69"
+      },
+      {
+        "name": "test_find_muhurta_python_and_mcp_signatures_are_stable",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 6,
+        "sha256": "910fc4b67311af5e4f05763eddced2398190d52810f7ce2eabe59ca576a52a62"
+      },
+      {
+        "name": "test_score_chandra_preserves_per_person_results",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 1,
+        "sha256": "02df0e261c643428f79e9c30e6856302c2cb64677132150880eb1779b764fab4"
+      },
+      {
+        "name": "test_score_chandra_ignores_unknown_rashis",
+        "target": "tests/test_muhurta_finder_personal_scoring.py",
+        "assertions": 1,
+        "sha256": "44b77a6f2c7568b776c026edb01a8e5f731362c133db99724f35c06758391234"
+      },
+      {
+        "name": "test_unknown_tithi_name_does_not_explode",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 1,
+        "sha256": "f69a1cee0826b55529f88e88e7a127a40cbf4531e482ede40d47dfc5fd939ac9"
+      },
+      {
+        "name": "test_is_rikta_unknown_tithi_returns_false",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 1,
+        "sha256": "4d3351b163919f7b6e8a89ba855fd7d013982ab6c1612c5152fbb26d0b3fb0e3"
+      },
+      {
+        "name": "test_engine_kwarg_changes_late_slot_nakshatra",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 1,
+        "sha256": "b6c1361c884886b46a510551cdae5aaed8a953f3e62af7e87c81adac9bce1385"
+      },
+      {
+        "name": "test_engine_kwarg_preserves_early_slot_tara",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 1,
+        "sha256": "860264ff18134fb7809b462479c61215a5bfd176678f09d1de823561faf65833"
+      },
+      {
+        "name": "test_sarvartha_lapses_for_late_slot",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 2,
+        "sha256": "22d2c7ac75840554e17adc129adf2394a4126dfd21575e725866ced06b7d301f"
+      },
+      {
+        "name": "test_sarvartha_active_for_early_slot",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 2,
+        "sha256": "41d17f5268b872b6e23b603bd80acc0a35f573c39f01ded2981e71b7d2827961"
+      },
+      {
+        "name": "test_score_tithi_class_avoid_gives_minus_one",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 6,
+        "sha256": "d084369d67547c0f4b71727441d7014ef5f88ebda0176b60eebd3d3a2117eaa3"
+      },
+      {
+        "name": "test_score_tithi_class_avoid_no_effect_on_non_matching",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "513577c2267b5cf660203d0da98215d89a703cda08e9878b7b62a50dbf9aa2bd"
+      },
+      {
+        "name": "test_score_tithi_class_prefer_wins_over_neutral_avoid_list",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "e07727d6c157fa8f225ff2a0b2597280b44c37f54430698de347099ea3a518b2"
+      },
+      {
+        "name": "test_score_tithi_class_rikta_unaffected_by_avoid",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 2,
+        "sha256": "5740b7f08cfe7f5e9641f09b570d1b243d5e0713d62fa6b14d6512261462849d"
+      },
+      {
+        "name": "test_shukla_tritiya_admitted_for_wedding_without_jaya_penalty",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "4f828ed9a7497013b97b678c102559ea9faa0111ee4d0bd60a924af0c152a797"
+      },
+      {
+        "name": "test_litigation_alias_matches_court_results",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 1,
+        "sha256": "ff58b2e529713b8c80303d11add0e15fbf887f3abe07a105b41efeab6bac67ce"
+      },
+      {
+        "name": "test_tithi_class_scorer_still_supports_preferred_class",
+        "target": "tests/test_muhurta_finder_activity_rules.py",
+        "assertions": 3,
+        "sha256": "8d9e3f748ee0d50e8b5ffb959f96be06a0d877b0553311d5949a9c482fdad599"
+      },
+      {
+        "name": "test_engine_kwarg_does_not_break_mcp_path",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 2,
+        "sha256": "43edd9598b3cda7c411fa4d398c0520152fef0b03e7692fa356ff5573229731d"
+      },
+      {
+        "name": "test_invalid_chandra_mode_raises",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 0,
+        "sha256": "dcf6f9e0780f3344788cab5ae36374acbe3b8343a21ce756082eb852a5f43840"
+      },
+      {
+        "name": "test_misaligned_rasis_raise",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 0,
+        "sha256": "7d465c600cc9c14cfda3880a7ac8b70c13f120b800371e9e22635f9964c55dcd"
+      },
+      {
+        "name": "test_mcp_find_muhurta",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 5,
+        "sha256": "b643318b6dbb1dc78a8aaec0eb9f0b870b206af26958349bef574dba5626ef19"
+      },
+      {
+        "name": "test_mcp_find_muhurta_with_chandra_mode",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 2,
+        "sha256": "c0aff6c7b0c1ad3ea92e80a5b65c48581c19b6ff6fb057436b6a0995325b4cfa"
+      },
+      {
+        "name": "test_mcp_find_muhurta_validates",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 4,
+        "sha256": "b50153f5cc6522db35d28f50a072c754dbf4448f99b67a0bf0e86447b774c688"
+      },
+      {
+        "name": "test_night_slots_timing_between_sunset_and_next_sunrise",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 3,
+        "sha256": "597c90d4dcbd4dc266514aad15517332a238bdccdc1d510ab92429c6ceded9ed"
+      },
+      {
+        "name": "test_night_slots_are_named_night_muhurtas",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 3,
+        "sha256": "cc78c4a441e263f047fab0b466b80a4f8bdf9eaab22c3624c00ff8c7b5235a1d"
+      },
+      {
+        "name": "test_night_slots_do_not_overlap_varjyam",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 1,
+        "sha256": "af0cb764d3316e81540a729e96a16d8aa0a29476fdfc83e7721e7cdcc5885cd5"
+      },
+      {
+        "name": "test_night_slots_exclude_rahu_gulika_yamagandam",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 1,
+        "sha256": "a9282e5fad3cdbd2cd468ba117c518c7265e00227b21c56d9ad01aec4646eb8f"
+      },
+      {
+        "name": "test_night_slots_brahma_muhurta_bonus",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 2,
+        "sha256": "47781bcb16f37cf7bae9be93db36aa2fa6dfcddc8933499ae39fe7bef9e501dc"
+      },
+      {
+        "name": "test_night_slots_nishita_kala_bonus",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 2,
+        "sha256": "96fed7f2ddeb0509b59730af120bab99cd95e4fba547c1099573b9ff61f7110a"
+      },
+      {
+        "name": "test_night_slots_no_abhijit_bonus",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 1,
+        "sha256": "ba2f4af1ff0b4f1dd37a5d3b30f0da6d27a62e6f226cd769d9f8f4c46087fe61"
+      },
+      {
+        "name": "test_night_slots_amrita_kalam_bonus_if_present",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 1,
+        "sha256": "f9c3985f3331b10e341bb0cf7a2b02aafe99e7f6fd873f3fc77441257ce3f10c"
+      },
+      {
+        "name": "test_night_slots_reason_groups_have_slot_quality",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 6,
+        "sha256": "cdec19d8fe0cf9d2cc23b56cd28aa45f95693637fc41d1e93b6e25124c626da8"
+      },
+      {
+        "name": "test_night_slots_sorted_by_tier_then_score",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 2,
+        "sha256": "dd944f4dc7961eb53ed13eaca91136251bcfd63c1f26d72f7febccb35b507042"
+      },
+      {
+        "name": "test_night_slots_eclipse_returns_empty",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 1,
+        "sha256": "b167cf5fbbe7ea414a524b677055ffa50b9d955db5088f670856a6782f635a94"
+      },
+      {
+        "name": "test_mcp_find_muhurta_include_night",
+        "target": "tests/test_muhurta_finder_mcp.py",
+        "assertions": 3,
+        "sha256": "0d40384f82a3a58df94d6d8f3b249ebadd2b6acc3b141b5db89fa6193c5c2ae2"
+      },
+      {
+        "name": "test_day_slots_are_muhurtas_of_equal_length",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 1,
+        "sha256": "95ec97588d1830c3de7b381c5fd40433e4c74eed0ead6a9cd2ba9720238665c0"
+      },
+      {
+        "name": "test_night_slots_are_at_most_48_minutes",
+        "target": "tests/test_muhurta_finder_night.py",
+        "assertions": 1,
+        "sha256": "cda5b78faac0bc272d6c6d82e0bcd9dc52c9db5233352a2c253e54fbe84cfcd1"
+      },
+      {
+        "name": "test_day_slot_starts_align_to_muhurta_grid",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 1,
+        "sha256": "74f3406c353d1e0aa8bfda973d893cdf45f00d0418e4f9c7eeab2fda9218da0e"
+      },
+      {
+        "name": "test_day_produces_at_most_fifteen_distinct_muhurtas",
+        "target": "tests/test_muhurta_finder.py",
+        "assertions": 2,
+        "sha256": "bf362ee246eb2110ee25e42cc63fb1fb73d0ae557133d0ab89979b645374217e"
+      }
+    ]
+  },
+  "browser": {
+    "source": "src/__tests__/muhurta-profile-panel.test.ts",
+    "source_sha256": "dc998e291ef8a880c184d05d19cd1a658e01d27853a037481893c46d97ef3e3b",
+    "collected_cases": 50,
+    "tests": [
+      {
+        "name": "keeps extracted search orchestration boundaries callable",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "9af4bb1d390f25e5ca4d8f63a98a6fc515e4a8ed7c0719a3ab3d1d77dcf03be8"
+      },
+      {
+        "name": "preserves Tarabalam group scoring and participant evidence",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "931c8e9bdfa5f742c3e16d7babd00334dddd2d8fd5188dbfa2f9b9574200ade9"
+      },
+      {
+        "name": "preserves Chandrabalam modes, remedial evidence and Ashtama flags",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "3c1fa6d4c3ce03cce730c2ad293a94950d0620e2386c3c5427c3b61bb07ff61f"
+      },
+      {
+        "name": "preserves dual natal-reference Lagna scoring",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "658ce6ab7066af45630f82cfdee86d61572f39833033e0e45634b86ba142ffb6"
+      },
+      {
+        "name": "preserves required, admitted and preferred activity-Lagna gates",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "ca118a34ac3a89a98be95f5eeff0060632f6ec1d2b18bb1b02229bbe3efaa759"
+      },
+      {
+        "name": "uses the generated contract instead of presentation-time regex inference",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "0ed4c27e0b13d7fd22a845da6e9fcfa95302a3c3afa83dd4ae093f1b1ecb79a5"
+      },
+      {
+        "name": "filters only manual rows with explicit Vara applicability",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "f08d78d151c9db33b7b3ba2739187396989bf550d3949fdf2cd4c4921313887a"
+      },
+      {
+        "name": "keeps purchase and lineage rows visible regardless of weekday text",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "08c190687e7def0060d5566ba78664771cc7d31e6e1ace9dea7ba51a86a4b641"
+      },
+      {
+        "name": "selects safety overrides by structured purpose",
+        "target": "src/__tests__/muhurta-profile-scoring.test.ts",
+        "sha256": "865198821f378c67297d700b1f85d760c6960da5f8fd8c34275d27a862fa2549"
+      },
+      {
+        "name": "claims partial event clauses only after actual chart screening",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "05c847d21d26bb4389b0b3f6cebb17ed24fddea7750da66d0b0e78e87e841299"
+      },
+      {
+        "name": "uses event-specific completion wording without closing baseline 284",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "885370868496fc36b66b8f943fc2940c3478145a15027c1dbd2318ccc028af6f"
+      },
+      {
+        "name": "describes partial chart screening without claiming it was skipped",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "d5e1b61c8b0a8487fbba447ddb897b94c8ef447dd9ec2eacdfd6a04336b3d769"
+      },
+      {
+        "name": "keeps renderer status wording stable across every chart state",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "3b22788a652cfcee3d4b81ab8ee96089bd20fd182f7c74e44078307f5600f653"
+      },
+      {
+        "name": "keeps computed chart outcome labels stable",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "09520906d27801d362b48b88dda444800dde84b97fc3c3437053baf9406395d3"
+      },
+      {
+        "name": "keeps chart boundary explanations stable",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "00e007a19be82bd14b0a6f4ad334254b0903243df6a61205898dc450fb176156"
+      },
+      {
+        "name": "keeps daylight and profile-specific labels stable",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "5e451cf004b0483119d91f3649f7e27f67025bddf9c412c195bb8eeb1bf60a24"
+      },
+      {
+        "name": "keeps extracted result fragments text- and markup-equivalent",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "37f094398621f52a3f55a01af8916a90b3417727904489f5ea3f8e6c2c062010"
+      },
+      {
+        "name": "keeps profile identity and natal evidence out of Muhurtam shares",
+        "target": "src/__tests__/muhurta-profile-presentation.test.ts",
+        "sha256": "79b0a1ed25a66fa433c66fc1347fb0694195af6d91b5db7c6a47cc48e64f47b4"
+      },
+      {
+        "name": "samples both sides of every Lagna transition inside a slot",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "078804acf1da77686d844fc2ad3bb41f718afec72326a6af92e7db687f286828"
+      },
+      {
+        "name": "feeds the canonical Sydney boundary plan into conservative chart decisions",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "072257f9a236031e719d05ffcf98ed4ed8e0684a1a4fd8bce4464e7c12802ce9"
+      },
+      {
+        "name": "rejects malformed Lagna day evidence %#",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "d15a97be9b2821d428d65f853c723661df61888d4587fe443d986db573e0aece"
+      },
+      {
+        "name": "accepts a validated second-cycle tail from current generated data",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "6305bf3878b855670ca3c0af468baa7b219a8c48f781f6b4e4b447586d9eeaec"
+      },
+      {
+        "name": "accepts the published Hyderabad terminal transition at exclusive cycle end",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "251deaebe50482cb39f85cacde791332bf3e92f745ee4af8893b37f53c61930f"
+      },
+      {
+        "name": "accepts a published Sydney second-cycle terminal transition",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "838fbc399724bf4adc426f3adc6394bfe4d0a7d3ca03004d30d7d2e516169999"
+      },
+      {
+        "name": "rejects invalid terminal or post-cycle Lagna transitions %#",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "d5305c6020fcf6ba538aa0b3e21243f8262a5cb0b0a9b2fc2e8dba1c764bde8e"
+      },
+      {
+        "name": "accepts a first transition rounded to the sunrise minute",
+        "target": "src/__tests__/muhurta-profile-chart-boundaries.test.ts",
+        "sha256": "688094c6286d484fcad22458808619aa0e813d490c17816774ed44c805cf5d9f"
+      },
+      {
+        "name": "feeds only checked, ready stable-ID adapters to the existing calculation seam",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "d1e3bd13b1bff7e023b60ad0be6ce58eab67ab2270ebd056a649e8109631ae40"
+      },
+      {
+        "name": "contextually selects a ready profile without disturbing the current search",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "1a3b6f657bd7f18aacd10d6b204b32d41a077f82c6d4115ae3a812c2cfd71599"
+      },
+      {
+        "name": "asks for the source-specific primary role and restores its stable saved ID",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "1fefd93a0fd7670cbf280300d14125cc16f9ba0f59120df151062c1725fdbd78"
+      },
+      {
+        "name": "keeps the Borrowing purpose ephemeral and shows only active guidance",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "3a286dbf10e1135cc6480c29463605d925c2bdc439768fb5949eabae6abeea08"
+      },
+      {
+        "name": "labels a missing required Borrowing participant as unresolved",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "803d2ee245e2c8211886858c68b15fc1bdb391d0ab376198ac3dc3c98b6094b5"
+      },
+      {
+        "name": "refuses missing and incomplete contextual profiles without persisting a choice",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "4c5f888141d018ba1dd2d2a5250b93e11b8b481fb64c4ce9eeb6c20fe728699a"
+      },
+      {
+        "name": "enforces the aggregate four-person limit during contextual selection",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "01e46a44d757d67b92f0b18c0b4c5c385079c5e998df0775a5432f381a60ac00"
+      },
+      {
+        "name": "restores keyboard focus after saved and manual selection rerenders",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "5881e41ae6425e134dbf466bd7a7321721dfb0f673849898b33ee8db9428a124"
+      },
+      {
+        "name": "keeps the no-profile path and supports a labelled, session-only person",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "0f2487eb4d221cbf0b53f66686a9bcfe1876fd6a542b910c9a56796e3f7f64bb"
+      },
+      {
+        "name": "caps saved and manual participants at four in total",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "256845f6af6fbfff45a496c06acfc35c809675569a5d70ed4adf70913bec64c5"
+      },
+      {
+        "name": "survives reorder and edits, then removes only a deleted stable ID",
+        "target": "src/__tests__/muhurta-profile-panel.test.ts",
+        "sha256": "dc12cc3664e5fb77d46b4beea5770cec7ac7068946a355bce6c1685dc423de9f"
+      },
+      {
+        "name": "surfaces storage failure while keeping current-page participants usable",
+        "target": "src/__tests__/muhurta-profile-storage.test.ts",
+        "sha256": "909621d36488502cdbc71c8f9186c5e9660c88285361ff153b064181e32493e1"
+      },
+      {
+        "name": "surfaces unavailable profile storage without crashing the no-profile path",
+        "target": "src/__tests__/muhurta-profile-storage.test.ts",
+        "sha256": "7f9ec06b550e488bac9e1069e0546d6058493be50d06f7829f4c4b40ea66c0f5"
+      },
+      {
+        "name": "renders hostile saved names as inert text and wires contextual actions",
+        "target": "src/__tests__/muhurta-profile-storage.test.ts",
+        "sha256": "b1b0656a0ebde719af277b1bae9504593a5d2fd077b747d8a8f364fe787361f5"
+      },
+      {
+        "name": "clear selection never deletes profiles or Gochara preferences",
+        "target": "src/__tests__/muhurta-profile-storage.test.ts",
+        "sha256": "7008e2d8a8bdba60e24ee107d85b011634fbd15d08a4f2b8dc004cfa720e4cba"
+      },
+      {
+        "name": "keeps the controller-absent compatibility form additive and inert",
+        "target": "src/__tests__/muhurta-profile-storage.test.ts",
+        "sha256": "cc451fc846caefa7f2bde5d08f705617f7219eb713f8a6740e6d81487584499f"
+      },
+      {
+        "name": "fails closed for controller-absent mutations and reserves deletion for reset all",
+        "target": "src/__tests__/muhurta-profile-storage.test.ts",
+        "sha256": "1def5023ef1e34efe4dca9e68ae9cd6076f69f40b2f20346b8d328835587e280"
+      },
+      {
+        "name": "keeps controller-absent mutation inert when storage reads are denied",
+        "target": "src/__tests__/muhurta-profile-storage.test.ts",
+        "sha256": "256e3fb2ed81babb7281bd6548ae40fa1941fc0ac84c826df4e876ebd45cff1b"
+      }
+    ]
+  }
+}
