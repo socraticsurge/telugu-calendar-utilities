@@ -98,8 +98,9 @@ def test_history_empty_and_equal_rank_ordering():
 def test_repository_rejects_unsupported_commands_before_execution(tmp_path, monkeypatch, args):
     calls = []
     monkeypatch.setattr(repository.subprocess, 'run', lambda *a, **kw: calls.append((a, kw)))
+    repo = repository.GitRepository(tmp_path)
     with pytest.raises(ValueError):
-        repository.GitRepository(tmp_path).git(*args)
+        repo.git(*args)
     assert calls == []
 
 
@@ -127,16 +128,18 @@ def test_repository_pins_ref_without_shell_and_reads_that_revision(tmp_path, mon
 def test_repository_rejects_unsafe_refs_before_execution(tmp_path, monkeypatch, ref):
     calls = []
     monkeypatch.setattr(repository.subprocess, 'run', lambda *a, **kw: calls.append((a, kw)))
+    repo = repository.GitRepository(tmp_path)
     with pytest.raises(ValueError, match='unsupported Git ref'):
-        repository.GitRepository(tmp_path).resolve_ref(ref)
+        repo.resolve_ref(ref)
     assert calls == []
 
 
 def test_repository_rejects_a_non_commit_resolution(tmp_path, monkeypatch):
     monkeypatch.setattr(repository.subprocess, 'run',
                         lambda *a, **kw: SimpleNamespace(stdout='not-a-sha\n'))
+    repo = repository.GitRepository(tmp_path)
     with pytest.raises(ValueError, match='did not resolve to a commit'):
-        repository.GitRepository(tmp_path).resolve_ref('HEAD')
+        repo.resolve_ref('HEAD')
 
 
 @pytest.mark.parametrize(('symbol', 'line'), [
