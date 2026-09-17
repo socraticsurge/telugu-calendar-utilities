@@ -1,0 +1,23 @@
+{
+  "description": "Pre-refactor CLI byte hashes, captured using the analyzer at da4600b9803ba48c2aab137c032f58944e19469c; UTF-8, sorted/indented JSON or text summary, including the trailing newline. Re-run against the fixed commits with the stated history limits. Full Git history is required.",
+  "cases": [
+    {
+      "commit": "da4600b9803ba48c2aab137c032f58944e19469c",
+      "history_limit": 1,
+      "json_sha256": "12f8114855b3035a82eb53e7699185151e8ed36dcf7a4eaaeddbd6a0ddb642a7",
+      "summary_sha256": "c3c39dd3024762fa4e647d18294f434b760d0e137353d0bcd52c0bcfd3363300"
+    },
+    {
+      "commit": "614cc2f2893ab066c72118c7bcc811738e5bc657",
+      "history_limit": 20,
+      "json_sha256": "106f967b4e439dbfd93295c03231680ade3ba2ff952326eba39af2fd30be25df",
+      "summary_sha256": "56b73eb996bbf781af88a4762fd5001a6a1bff425b54ef184376c0293e26db37"
+    },
+    {
+      "commit": "4feb25a2cdd1689851a4f2a50568267b38858b39",
+      "history_limit": 200,
+      "json_sha256": "5b9f2733906b456805d1bbe5c116e9ec968463cbb2b30860b0253f0b79c3336b",
+      "summary_sha256": "a3684d051821d0ca0d42213512242b9c49ab5b7c172b1ec488be67877cb5cdab"
+    }
+  ]
+}
