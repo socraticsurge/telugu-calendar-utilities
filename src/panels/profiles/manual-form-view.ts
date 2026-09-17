@@ -1,7 +1,6 @@
 import type { GuestProfile } from '../../lib/guest-profile-store';
 import { element, button, appendOption } from './elements';
-import { appendExistingProfiles } from './form-view';
-import { manualIntroText, nakshatraHelpText } from './form-view';
+import { appendExistingProfiles, buildNameField, manualIntroText, nakshatraHelpText } from './form-view';
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../../data/rasis';
 import type { ProfilePanelHost, ProfileFormRequest, ResolvedProfilesPanelContext } from './contracts';
 
@@ -45,7 +44,9 @@ export function buildManualFormView(host: ProfilePanelHost, request: ProfileForm
   const form = element('form', 'profiles-form');
   form.noValidate = true;
 
-  const { nameGroup, nameInput, nameError, duplicate } = buildNameField(profile);
+  const { nameGroup, nameInput, nameError, duplicate } = buildNameField(
+    'Use the name you will recognize in personalized tools.', profile,
+  );
 
   const { nakshatraGroup, nakshatraSelect, nakshatraError } = buildNakshatraField(context, profile);
 
@@ -72,33 +73,6 @@ export function buildManualFormView(host: ProfilePanelHost, request: ProfileForm
     padaSelect, padaError, lagnaSelect,
     formError, cancel,
   };
-}
-
-function buildNameField(profile?: GuestProfile) {
-  const nameGroup = element('div', 'profiles-field');
-  const nameLabel = element('label', 'profiles-field__label', 'Name');
-  nameLabel.htmlFor = 'profile-name';
-  const nameInput = element('input', 'profiles-field__control');
-  nameInput.id = 'profile-name';
-  nameInput.name = 'name';
-  nameInput.type = 'text';
-  nameInput.required = true;
-  nameInput.maxLength = 80;
-  nameInput.autocomplete = 'name';
-  nameInput.value = profile?.name || '';
-  nameInput.setAttribute('aria-describedby', 'profile-name-help profile-name-error profile-name-duplicate');
-  const nameHelp = element('p', 'profiles-field__help', 'Use the name you will recognize in personalized tools.');
-  nameHelp.id = 'profile-name-help';
-  const nameError = element('p', 'profiles-field__error');
-  nameError.id = 'profile-name-error';
-  nameError.hidden = true;
-  const duplicate = element('p', 'profiles-field__warning');
-  duplicate.id = 'profile-name-duplicate';
-  duplicate.setAttribute('role', 'status');
-  duplicate.hidden = true;
-  nameGroup.append(nameLabel, nameInput, nameHelp, nameError, duplicate);
-
-  return { nameGroup, nameInput, nameError, duplicate };
 }
 
 function buildNakshatraField(context: ResolvedProfilesPanelContext, profile?: GuestProfile) {
