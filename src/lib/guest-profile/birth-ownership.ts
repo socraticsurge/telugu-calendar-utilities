@@ -1,5 +1,5 @@
 import { NAKSHATRA_NAMES, RASI_NAMES } from '../../data/rasis';
-import { BIRTH_CHART_PLANET_NAMES, fixedGrahaFactsMatch, roundedMoonMatchesBirthFacts, wholeSignHousesMatch } from '../birth-profile-api';
+import { BIRTH_CHART_PLANET_NAMES, fixedGrahaFactsMatch, roundedMoonMatchesBirthFacts, wholeSignHousesMatch } from '../chart-contracts';
 import { normalizeBirthDetails, normalizeCalculation, normalizeNatalChart, normalizePlanet } from './birth-normalization';
 import { type StoredBirthProfileRecord } from './types';
 import { canonical, hasExactKeys, pada, isRecord } from './values';

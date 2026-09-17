@@ -1,8 +1,9 @@
 import {
   BirthProfileApiError, type BirthPlaceCandidate, type BirthProfileDerivation,
-} from '../../lib/birth-profile-api';
+} from '../../lib/remote-api/contracts';
 import { type GuestProfileDraft } from '../../lib/guest-profile-store';
-import { ElectionChartApiError, localWallTimeToInstant } from '../../lib/election-chart-api';
+import { ElectionChartApiError } from '../../lib/remote-api/contracts';
+import { localWallTimeToInstant } from '../../lib/local-chart-time';
 
 export function isoDateInTimeZone(now: Date, timeZone: string): string | null {
   try {
