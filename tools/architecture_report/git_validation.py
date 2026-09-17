@@ -63,7 +63,7 @@ def _validate_blob(blob: str) -> None:
 
 
 def _validate_count_option(option: str) -> None:
-    match = re.fullmatch(r'--max-count=([1-9][0-9]{0,4})', option)
+    match = re.fullmatch(r'--max-count=([1-9]\d{0,4})', option, flags=re.ASCII)
     if match is None:
         raise ValueError('unsupported Git history limit option')
     validate_history_limit(int(match.group(1)))

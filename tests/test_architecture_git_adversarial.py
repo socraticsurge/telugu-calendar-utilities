@@ -26,8 +26,21 @@ def test_named_reads_reject_unpinned_commits_before_git(tmp_path, monkeypatch, o
     method, args = operation
     calls = []
     monkeypatch.setattr(subprocess, 'run', lambda *a, **kw: calls.append((a, kw)))
+    read = getattr(GitRepository(tmp_path), method)
     with pytest.raises(ValueError):
-        getattr(GitRepository(tmp_path), method)(commit, *args)
+        read(commit, *args)
+    assert calls == []
+
+
+@pytest.mark.parametrize('count', ['1\u0660', '1\uff10', '01', '+1', '1.0', '10001'])
+def test_history_count_tokens_remain_ascii_and_canonical(tmp_path, monkeypatch, count):
+    calls = []
+    monkeypatch.setattr(subprocess, 'run', lambda *a, **kw: calls.append((a, kw)))
+    repo = GitRepository(tmp_path)
+    command = ('log', '--no-merges', f'--max-count={count}', '--format=COMMIT\t%H',
+               '--numstat', COMMIT, '--', 'telugu_panchangam', 'scripts', 'src')
+    with pytest.raises(ValueError):
+        repo.git(*command)
     assert calls == []
 
 
