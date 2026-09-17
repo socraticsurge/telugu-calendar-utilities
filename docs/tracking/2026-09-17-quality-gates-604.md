@@ -57,4 +57,25 @@ The built-in small-change exception for coverage/duplication remains visible; ex
 
 ## Completion evidence
 
-Pending controlled hosted verification and gated release; this document does not claim completion.
+The initial implementation merged in [PR #605](https://github.com/socraticsurge/telugu-calendar-utilities/pull/605).
+Its clean PR and deliberately unmerged negative control proved the required checks enforce the intended policy.
+[Release evidence](https://github.com/socraticsurge/telugu-calendar-utilities/issues/604#issuecomment-5712244979) records the exact revisions and results.
+Post-merge master coverage was 79.2819%, below the unchanged 80% new-code requirement.
+The master baseline covers code since August 13, unlike the narrower PR analysis.
+Task #604 remains open until the follow-up passes hosted post-merge acceptance.
+
+## Coverage acceptance follow-up
+
+Add 107 regression cases in three new test modules; existing assertions and production files are unchanged.
+Exercise malformed inventory evidence, missing implementation/test links, invalid exclusions, scan failures, baseline drift, and explicit update behavior.
+Temporary fixture paths isolate all baseline writes from the repository's governed baselines.
+The targeted run passes 139 tests, including existing validator contracts.
+The full local Python suite passes 2,331 tests; frontend coverage tests pass all 1,733 cases.
+Combined line/branch coverage of the three validators is approximately 99%; each retains only its script-entry line and branch as uncovered.
+CodeScene's pre-commit safeguard checks all three new files and passes without findings.
+
+Master's measured denominator is 19,162 new lines plus conditions, with 3,970 uncovered.
+The three validators previously contributed 185 uncovered lines and 103 uncovered conditions.
+The targeted tests reduce those to three lines and three conditions, projecting master coverage near 80.75% if other results remain unchanged.
+This is a pre-merge estimate, not a substitute for the hosted post-merge result.
+No coverage threshold, baseline date, source exclusion, or issue disposition is changed.
