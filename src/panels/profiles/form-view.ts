@@ -6,6 +6,32 @@ export function displayName(profile: GuestProfile): string {
   return profile.name || 'Unnamed profile';
 }
 
+export function buildNameField(helpText: string, profile?: GuestProfile) {
+  const nameGroup = element('div', 'profiles-field');
+  const nameLabel = element('label', 'profiles-field__label', 'Name');
+  nameLabel.htmlFor = 'profile-name';
+  const nameInput = element('input', 'profiles-field__control');
+  nameInput.id = 'profile-name';
+  nameInput.name = 'name';
+  nameInput.type = 'text';
+  nameInput.required = true;
+  nameInput.maxLength = 80;
+  nameInput.autocomplete = 'name';
+  nameInput.value = profile?.name || '';
+  nameInput.setAttribute('aria-describedby', 'profile-name-help profile-name-error profile-name-duplicate');
+  const nameHelp = element('p', 'profiles-field__help', helpText);
+  nameHelp.id = 'profile-name-help';
+  const nameError = element('p', 'profiles-field__error');
+  nameError.id = 'profile-name-error';
+  nameError.hidden = true;
+  const duplicate = element('p', 'profiles-field__warning');
+  duplicate.id = 'profile-name-duplicate';
+  duplicate.setAttribute('role', 'status');
+  duplicate.hidden = true;
+  nameGroup.append(nameLabel, nameInput, nameHelp, nameError, duplicate);
+  return { nameGroup, nameInput, nameError, duplicate };
+}
+
 export function normalizedName(value: string): string {
   return value.trim().toLocaleLowerCase();
 }

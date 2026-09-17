@@ -1,6 +1,6 @@
 import type { GuestProfile } from '../../lib/guest-profile-store';
 import { element, button } from './elements';
-import { appendExistingProfiles } from './form-view';
+import { appendExistingProfiles, buildNameField } from './form-view';
 import type { BirthPlaceCandidate, BirthProfileDerivation } from '../../lib/birth-profile-api';
 import type { ProfilePanelHost, ProfileFormRequest } from './contracts';
 
@@ -23,7 +23,9 @@ export function buildBirthFormView(host: ProfilePanelHost, request: ProfileFormR
   const form = element('form', 'profiles-form profiles-birth-form');
   form.noValidate = true;
 
-  const { nameGroup, nameInput, nameError, duplicate } = buildNameField(profile);
+  const { nameGroup, nameInput, nameError, duplicate } = buildNameField(
+    'This label stays local and is never included in the calculation request.', profile,
+  );
 
   const {
     knownDetails, dateInput, dateError,
@@ -77,37 +79,6 @@ export function buildBirthFormView(host: ProfilePanelHost, request: ProfileFormR
     reviewHost, formError, save,
     saveHelp, cancel,
   };
-}
-
-function buildNameField(profile?: GuestProfile) {
-  const nameGroup = element('div', 'profiles-field');
-  const nameLabel = element('label', 'profiles-field__label', 'Name');
-  nameLabel.htmlFor = 'profile-name';
-  const nameInput = element('input', 'profiles-field__control');
-  nameInput.id = 'profile-name';
-  nameInput.name = 'name';
-  nameInput.type = 'text';
-  nameInput.required = true;
-  nameInput.maxLength = 80;
-  nameInput.autocomplete = 'name';
-  nameInput.value = profile?.name || '';
-  nameInput.setAttribute('aria-describedby', 'profile-name-help profile-name-error profile-name-duplicate');
-  const nameHelp = element(
-    'p',
-    'profiles-field__help',
-    'This label stays local and is never included in the calculation request.',
-  );
-  nameHelp.id = 'profile-name-help';
-  const nameError = element('p', 'profiles-field__error');
-  nameError.id = 'profile-name-error';
-  nameError.hidden = true;
-  const duplicate = element('p', 'profiles-field__warning');
-  duplicate.id = 'profile-name-duplicate';
-  duplicate.setAttribute('role', 'status');
-  duplicate.hidden = true;
-  nameGroup.append(nameLabel, nameInput, nameHelp, nameError, duplicate);
-
-  return { nameGroup, nameInput, nameError, duplicate };
 }
 
 function buildBirthFields(initialPlace: BirthPlaceCandidate | null, profile?: GuestProfile) {

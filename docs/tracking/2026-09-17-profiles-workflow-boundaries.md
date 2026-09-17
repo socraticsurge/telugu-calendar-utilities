@@ -65,7 +65,13 @@ Local health is not a claim of hosted post-merge improvement.
 
 ## Release gate
 
-Owner screenshot sign-off is requested before any push.
-PR review, required hosted checks, merge and hosted analysis remain pending.
+The owner approved the desktop/mobile screenshots and publication.
+PR [#587](https://github.com/socraticsurge/telugu-calendar-utilities/pull/587)
+records the release checks and subsequent merge/hosted-analysis status.
+Its first hosted CodeScene check passed; SonarCloud identified duplicated test
+fixtures and name-field markup. Those now have shared helpers, with the distinct
+help text preserved and every existing behavioural assertion unchanged.
+No quality threshold, exclusion or snapshot was changed to resolve the finding.
+Required hosted checks, merge and hosted analysis remain release gates.
 No PyPI release or version change is required for this browser-only task.
 The API clients, Today panel and other hotspots remain separate follow-ups.
