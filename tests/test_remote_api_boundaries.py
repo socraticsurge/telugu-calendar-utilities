@@ -1,7 +1,7 @@
 """Guard browser API dependency direction without changing runtime contracts."""
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 import pytest
 
