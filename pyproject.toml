@@ -43,6 +43,9 @@ llm = [
 
 [dependency-groups]
 # Workflow-only tools are locked without becoming package dependencies.
+coverage = [
+    "coverage>=7.10,<8",
+]
 audit = [
     "pip-audit>=2.9,<3",
 ]
