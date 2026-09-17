@@ -60,9 +60,5 @@ def parse_history(output: str, source_paths: set[str]) -> tuple[list[dict], dict
 
 
 def _history(snapshot: SourceSnapshot, source_paths: set[str], commit_limit: int):
-    output = snapshot.repository.git(
-        'log', '--no-merges', f'--max-count={commit_limit}',
-        '--format=COMMIT\t%H', '--numstat', snapshot.commit, '--',
-        'telugu_panchangam', 'scripts', 'src',
-    )
+    output = snapshot.repository.read_history(snapshot.commit, commit_limit)
     return parse_history(output, source_paths)
