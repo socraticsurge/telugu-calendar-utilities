@@ -181,6 +181,29 @@ re-enforces this at release time.
 
 ## Test architecture
 
+### Browser remote API boundary
+
+Browser journeys call the existing `birth-profile-api.ts` and
+`election-chart-api.ts` facades; those import endpoint parsers and shared
+HTTP primitives from `src/lib/remote-api/`.
+Chart invariants belong to `src/lib/chart-contracts.ts`, which persistence
+and both parsers consume without importing a network client.
+Civil-time conversion belongs to `src/lib/local-chart-time.ts`.
+
+```text
+Profiles / Muhurta -> API facades -> trusted HTTP -> existing DashaFlow server
+                           |
+                     response parsers -> chart contracts <- persistence
+Profiles validation -> local civil-time conversion
+```
+
+Astronomical computations remain on the existing server; validation and
+civil-time conversion remain in the browser.
+Public exports, payloads, activation, trusted hosts, timeouts, error identities,
+and intentionally different cancellation policies remain compatible.
+No storage migration, deployment topology change, or frozen-engine change is
+part of this boundary refactor.
+
 1,290+ Python tests plus frontend contract tests pin behaviour. Three
 philosophies are in use:
 

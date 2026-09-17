@@ -6,7 +6,7 @@ import {
   BIRTH_PROFILE_ENGINE_NAME,
   isContractRoundedDegree,
   type BirthChartPlanet,
-} from '../birth-profile-api';
+} from '../chart-contracts';
 import { type GuestBirthDetails, type GuestNatalChart, type GuestProfileCalculation } from './types';
 import {
   exactCanonical,

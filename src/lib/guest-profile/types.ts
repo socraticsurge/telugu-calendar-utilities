@@ -1,4 +1,4 @@
-import { type BirthChartPlanet, type BirthProfileEngine } from '../birth-profile-api';
+import { type BirthChartPlanet, type BirthProfileEngine } from '../chart-contracts';
 
 
 export const GUEST_PROFILE_STORAGE_KEY = 'tc-tb-profiles';

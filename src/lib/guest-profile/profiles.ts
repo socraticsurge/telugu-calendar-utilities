@@ -1,5 +1,5 @@
 import { NAKSHATRA_NAMES, RASI_NAMES, rasiFromStar } from '../../data/rasis';
-import { fixedGrahaFactsMatch, roundedMoonMatchesBirthFacts, wholeSignHousesMatch } from '../birth-profile-api';
+import { fixedGrahaFactsMatch, roundedMoonMatchesBirthFacts, wholeSignHousesMatch } from '../chart-contracts';
 import { normalizeBirthDetails, normalizeCalculation, normalizeNatalChart } from './birth-normalization';
 import {
   GUEST_PROFILE_SCHEMA_VERSION,

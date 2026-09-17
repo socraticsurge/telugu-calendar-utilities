@@ -63,6 +63,15 @@
       {"path": "scripts", "extensions": [".py"]}
     ],
     "exclusions": [
+      {"path": "src/lib/chart-contracts.ts", "kind": "adapter", "reason": "Network-independent validation of externally calculated chart facts; no astronomical engine ownership."},
+      {"path": "src/lib/local-chart-time.ts", "kind": "adapter", "reason": "Preserves the existing civil-time request conversion and rejects ambiguous or nonexistent local minutes."},
+      {"path": "src/lib/remote-api/contracts.ts", "kind": "data-model", "reason": "Guest gateway request and response types and stable endpoint error identities."},
+      {"path": "src/lib/remote-api/base.ts", "kind": "adapter", "reason": "Restricts guest gateway URLs to the existing trusted production and loopback policy."},
+      {"path": "src/lib/remote-api/http.ts", "kind": "adapter", "reason": "Shared privacy-safe JSON request options and bounded HTTP error metadata."},
+      {"path": "src/lib/remote-api/values.ts", "kind": "adapter", "reason": "Strict gateway response value decoding without owning calculations."},
+      {"path": "src/lib/remote-api/birth-response.ts", "kind": "adapter", "reason": "Validates the externally owned birth-profile response contract."},
+      {"path": "src/lib/remote-api/places-response.ts", "kind": "adapter", "reason": "Validates place search results and provider attribution allowlists."},
+      {"path": "src/lib/remote-api/election-response.ts", "kind": "adapter", "reason": "Validates election batch inputs and externally calculated chart responses."},
       {"path": "src/scorer/search-contract.ts", "kind": "data-model", "reason": "Typed browser request snapshot, interval limit and stale-result fingerprint."},
       {"path": "src/lib/calendar-data.ts", "kind": "adapter", "reason": "Validates structured day data and isolates the legacy description adapter."},
       {"path": "src/lib/calendar-loader.ts", "kind": "orchestration", "reason": "Loads versioned calendar data with a subscriber-feed compatibility fallback."},
