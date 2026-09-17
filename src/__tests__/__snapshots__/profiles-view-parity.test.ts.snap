@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`baseline markup: false / +0 profiles / 'create' 1`] = `"6c70495700ae0726b4d40dd34a2ff003e1864af43dc3a0a7cde68d54aecb2adc"`;
+
+exports[`baseline markup: false / +0 profiles / 'edit' 1`] = `"a61e4b60a8a0a76bf471ab9dd693079e30e426214976e08e41f21a61a814f391"`;
+
+exports[`baseline markup: false / +0 profiles / 'list' 1`] = `"a61e4b60a8a0a76bf471ab9dd693079e30e426214976e08e41f21a61a814f391"`;
+
+exports[`baseline markup: false / +0 profiles / 'view' 1`] = `"869f5459ba73432559cd80949aeae85012a89139ac1f6244d1ecc59384a98c3a"`;
+
+exports[`baseline markup: false / 1 profiles / 'create' 1`] = `"6fcf085098c544d888705126a2767dc5c32bff4858e4db78e63301adf4c9ebdf"`;
+
+exports[`baseline markup: false / 1 profiles / 'edit' 1`] = `"b1b959b887f057d17ee996e9f33644410f1eef8f1ec1294ad2d9614c92ec9b72"`;
+
+exports[`baseline markup: false / 1 profiles / 'list' 1`] = `"6bce5ca3b17aa1272bc335d448f8ecef126479d433ad2548dc298b5e702bdebd"`;
+
+exports[`baseline markup: false / 1 profiles / 'view' 1`] = `"6eef3201b93dd9c40d3e58a7fbd642e644838766d658cd328977a9e15388fb4f"`;
+
+exports[`baseline markup: false / 4 profiles / 'create' 1`] = `"f73eead263c9930a760ea6caa97da2061d77349e60f58a78f8ce3f0e96faa492"`;
+
+exports[`baseline markup: false / 4 profiles / 'edit' 1`] = `"d72c04e8aff467549ff3104a11110868e9b8918b9ec1217923fce3d551f2c30c"`;
+
+exports[`baseline markup: false / 4 profiles / 'list' 1`] = `"f73eead263c9930a760ea6caa97da2061d77349e60f58a78f8ce3f0e96faa492"`;
+
+exports[`baseline markup: false / 4 profiles / 'view' 1`] = `"54b29524e064aef76b2ee8fd4a7ba0a133510bcc20a2062270b751c1e200d4cc"`;
+
+exports[`baseline markup: true / +0 profiles / 'create' 1`] = `"ca4a03e92ac13e588cc35722b929d958830ca24546936d75d8c467076a861fec"`;
+
+exports[`baseline markup: true / +0 profiles / 'edit' 1`] = `"290537650482ad10db9da315c920c0a9f2872e4061ff7f2e5d88f12f2d66a6e2"`;
+
+exports[`baseline markup: true / +0 profiles / 'list' 1`] = `"290537650482ad10db9da315c920c0a9f2872e4061ff7f2e5d88f12f2d66a6e2"`;
+
+exports[`baseline markup: true / +0 profiles / 'view' 1`] = `"274106c922a3ef819c99d0f2e085f3d9f6cf4cf5b790ee4874a4c14b75f94a5e"`;
+
+exports[`baseline markup: true / 1 profiles / 'create' 1`] = `"6b1193bfdf68ba7474fa3d4fe32acb832aa21da0db1509ddd7ade4480caeddcf"`;
+
+exports[`baseline markup: true / 1 profiles / 'edit' 1`] = `"f93da94c04b59b772752ddcf809c0533740eacf9b2b79e52161656406da75f00"`;
+
+exports[`baseline markup: true / 1 profiles / 'list' 1`] = `"c528a14910f7bff3f6fc24258607964791a8ca97eba0a939dbadf9978e6bf6dc"`;
+
+exports[`baseline markup: true / 1 profiles / 'view' 1`] = `"6eef3201b93dd9c40d3e58a7fbd642e644838766d658cd328977a9e15388fb4f"`;
+
+exports[`baseline markup: true / 4 profiles / 'create' 1`] = `"dc1b1607dbcf7d26286fb26a7e51d22b6af64ce0ae890cfcd7ae690e2f6cbc19"`;
+
+exports[`baseline markup: true / 4 profiles / 'edit' 1`] = `"deff286266fa7aefd9449727fd343d4038aaf508c72e4446c7633b18fc93d591"`;
+
+exports[`baseline markup: true / 4 profiles / 'list' 1`] = `"dc1b1607dbcf7d26286fb26a7e51d22b6af64ce0ae890cfcd7ae690e2f6cbc19"`;
+
+exports[`baseline markup: true / 4 profiles / 'view' 1`] = `"54b29524e064aef76b2ee8fd4a7ba0a133510bcc20a2062270b751c1e200d4cc"`;
