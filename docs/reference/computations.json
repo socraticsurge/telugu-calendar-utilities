@@ -313,6 +313,81 @@
         "reason": "Accessible browser-local profile management UI; it owns no Panchangam computation."
       },
       {
+        "path": "src/panels/profiles/birth-form.ts",
+        "kind": "ui-only",
+        "reason": "Birth profile request sequencing, review and save workflow; delegates calculation to the existing API."
+      },
+      {
+        "path": "src/panels/profiles/birth-form-view.ts",
+        "kind": "ui-only",
+        "reason": "Accessible birth input and review controls; no Panchangam computation."
+      },
+      {
+        "path": "src/panels/profiles/birth-validation.ts",
+        "kind": "adapter",
+        "reason": "Birth input and wall-time validation using the existing API time conversion contract."
+      },
+      {
+        "path": "src/panels/profiles/contracts.ts",
+        "kind": "data-model",
+        "reason": "Internal profile panel types and explicit workflow dependencies."
+      },
+      {
+        "path": "src/panels/profiles/detail-sections.ts",
+        "kind": "ui-only",
+        "reason": "Saved profile facts and journey readiness presentation."
+      },
+      {
+        "path": "src/panels/profiles/detail-view.ts",
+        "kind": "ui-only",
+        "reason": "Saved profile detail composition and focus restoration."
+      },
+      {
+        "path": "src/panels/profiles/elements.ts",
+        "kind": "ui-only",
+        "reason": "Profile DOM elements and native confirmation dialogs."
+      },
+      {
+        "path": "src/panels/profiles/form-view.ts",
+        "kind": "ui-only",
+        "reason": "Shared profile labels, duplicate warnings and contextual readiness presentation."
+      },
+      {
+        "path": "src/panels/profiles/list-view.ts",
+        "kind": "ui-only",
+        "reason": "Profile roster and confirmed local deletion controls."
+      },
+      {
+        "path": "src/panels/profiles/manual-form.ts",
+        "kind": "ui-only",
+        "reason": "Manual profile validation and save workflow using the existing guest-profile store."
+      },
+      {
+        "path": "src/panels/profiles/manual-form-view.ts",
+        "kind": "ui-only",
+        "reason": "Accessible manual profile controls and method selection."
+      },
+      {
+        "path": "src/panels/profiles/natal-view.ts",
+        "kind": "ui-only",
+        "reason": "Presentation of saved or remotely calculated natal facts; no calculation."
+      },
+      {
+        "path": "src/panels/profiles/navigation.ts",
+        "kind": "ui-only",
+        "reason": "Profile journey focus and return navigation helpers."
+      },
+      {
+        "path": "src/panels/profiles/notices.ts",
+        "kind": "ui-only",
+        "reason": "Local profile storage notices and explicit recovery confirmation."
+      },
+      {
+        "path": "src/panels/profiles/profile-save.ts",
+        "kind": "ui-only",
+        "reason": "Profile persistence delegation and save-failure presentation; no storage format changes."
+      },
+      {
         "path": "src/panels/tarabalam.ts",
         "kind": "orchestration",
         "reason": "Compatibility facade that composes extracted Tarabalam and Muhurtam modules."
