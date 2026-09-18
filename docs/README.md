@@ -71,8 +71,12 @@ Computation documentation additionally records:
 - whether Python, MCP, browser, generated-data, or calendar representations
   mirror the same owner.
 
-The canonical machine-readable fields and completeness rules will be defined by
-[issue #165](https://github.com/socraticsurge/telugu-calendar-utilities/issues/165).
+The canonical machine-readable fields are defined by
+[`computations.schema.json`](reference/computations.schema.json), with records in
+[`computations.json`](reference/computations.json).
+[`check_computation_inventory.py`](../tools/check_computation_inventory.py)
+enforces schema and inventory completeness; see the
+[inventory reference](reference/09-computation-inventory.md).
 Human-readable pages should link to those records rather than duplicate live
 catalogue counts by hand.
 
@@ -171,9 +175,9 @@ way.
   and owner sign-off before publishing.
 - Historical files are not silently rewritten to look current. Add a status
   note or promote the still-valid guidance into a maintained page.
-- Documentation freshness and inventory coverage gates belong in the canonical
-  verifier; [issue #169](https://github.com/socraticsurge/telugu-calendar-utilities/issues/169)
-  owns that enforcement work.
+- The canonical verifier runs `tools/check_computation_inventory.py` and
+  `tools/check_documentation_freshness.py`; production builds also validate
+  documentation source and generated output.
 
 ## Projection and hosting
 
@@ -182,19 +186,24 @@ projection decision is recorded in
 [ADR 0001](decisions/0001-documentation-projection.md): use a local VitePress
 projection while keeping the source renderer-neutral.
 
-When publication is approved, the generated documentation belongs on the
-existing site at `https://panchangam.astrochaganti.com/docs/`. It is built into
+The generated documentation is published on the existing site at
+`https://panchangam.astrochaganti.com/docs/`. It is built into
 `dist/docs/` as an atomic part of the landing-site build and published by the
 existing landing deployment. Do not add another independent `gh-pages` writer:
 that branch is already a layered product-data surface shared by several frozen
 workflows.
 
-The landing workflow will eventually need to notice canonical documentation
-source changes. That is a frozen-workflow change and therefore remains an
-explicit owner-approval gate. The approved design must preserve the current
-CNAME, generated feeds, Gochara, Lagna, and Rasi Phalalu artifacts.
+The landing workflow now triggers on `master` changes under `docs/**` and
+`.vitepress/**`, and on the documentation generation, source-validation,
+composition and output-validation tools listed in its path filters. This
+implements the trigger contract tracked by
+[issue #204](https://github.com/socraticsurge/telugu-calendar-utilities/issues/204).
+Confirm the resulting deployment succeeds before calling a docs-only change
+live; a passing pull-request build alone is not publication evidence.
+Future workflow changes still require explicit owner approval and must preserve
+the current CNAME, generated feeds, Gochara, Lagna and Rasi Phalalu artifacts.
 
-Publication is a later, explicit decision. The sequence is:
+For publication of documentation-site changes, the review sequence remains:
 
 1. build the selected content locally from committed source;
 2. verify links, search, Mermaid, accessibility, and representative mobile and

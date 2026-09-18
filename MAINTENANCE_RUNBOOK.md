@@ -5,7 +5,7 @@ Read this when you sit down after weeks away and don't remember the
 muscle memory.
 
 > See also: [`ARCHITECTURE.md`](ARCHITECTURE.md) for the layer cake,
-> [`CLAUDE.md`](CLAUDE.md) for the working agreement,
+> [`AGENTS.md`](AGENTS.md) for the working agreement,
 > [`docs/reference/06-roadmap-and-backlog.md`](docs/reference/06-roadmap-and-backlog.md)
 > for architectural roadmap context. The live work queue is the
 > [GitHub Project](https://github.com/users/socraticsurge/projects/2), backed by
@@ -20,7 +20,7 @@ muscle memory.
 3. [The CI event model](#the-ci-event-model)
 4. [Add a city](#add-a-city)
 5. [Add a festival](#add-a-festival)
-6. [Verify against Drik Panchang](#verify-against-drik-panchang)
+6. [Compare Drik calculations against Drik Panchang](#compare-drik-calculations-against-drik-panchang)
 7. [Respond to a Dependabot PR](#respond-to-a-dependabot-pr)
 8. [Respond to a pip-audit CVE finding](#respond-to-a-pip-audit-cve-finding)
 9. [Fix a broken deploy](#fix-a-broken-deploy)
@@ -30,49 +30,62 @@ muscle memory.
 
 ## Release a new version
 
-The publish workflow is **automated end-to-end from a tag push**, with
-two gates that fail fast if anything is out of sync. You only need to
-bump three files and push a tag.
+A version bump on a development branch does not publish a package.
+Publication starts when a release tag is pushed and the publish workflow passes.
+For the current recorded development and published versions, see
+[`CHANGELOG.md`](CHANGELOG.md).
 
-### Pre-flight (~5 minutes)
+### Pre-flight
 
-1. **Promote `[Unreleased]` -> `[<version>]` in `CHANGELOG.md`**, adding
-   the date (yyyy-mm-dd). The Keep-a-Changelog sections (Added /
-   Changed / Fixed / Performance / Security) should all carry PR links
-   for traceability. Reset `[Unreleased]` to empty above it.
-2. **Bump `pyproject.toml:7` `version`** to the new value.
-3. **Bump `server.json`** — both `version` (top-level, line 9) AND
-   `packages[0].version` (line 15). They must match.
-4. Run the suite locally: `python -m pytest tests/ -q`. Must be green.
-5. Commit all three on master (or via PR if you want a review trail).
+1. Prepare the release on a feature branch from current `master`; follow
+   [`CONTRIBUTING.md`](CONTRIBUTING.md) for the locked development environment.
+2. Promote `[Unreleased]` to `[<version>]` in `CHANGELOG.md`, adding the date
+   (yyyy-mm-dd) and PR links for traceability; leave a new empty `[Unreleased]`
+   section above it.
+3. Set `project.version` in `pyproject.toml` and both `version` and
+   `packages[0].version` in `server.json` to the release version.
+   Run `uv lock` and include the root-package version change in `uv.lock`.
+4. Run `uv run python tools/verify_project.py`; every gate must pass.
+   This includes the required full `python -m pytest tests/` suite, frontend
+   coverage, lint, documentation checks and the production build.
+5. Review the manifest, lockfile and changelog diff, then open a PR and merge
+   only after the required checks pass; do not commit directly to `master`.
 
-### Tag and push
+### Tag and publish
+
+After the release PR is merged and its `master` checks pass, fetch the merged
+revision and verify its version and changelog before tagging it:
 
 ```bash
-git tag vX.Y.Z
-git push origin master --tags
+git fetch origin master
+git tag vX.Y.Z origin/master
+git push origin refs/tags/vX.Y.Z
 ```
 
-That triggers `.github/workflows/publish.yml`. The workflow will:
+Push only the intended release tag. `.github/workflows/publish.yml` will:
 
 1. Verify the tag shape is `vMAJOR.MINOR.PATCH`.
-2. Assert `pyproject.toml.version == server.json.version == server.json.packages[0].version == tag (stripped of "v")`.
-3. Extract the `## [<version>]` section from `CHANGELOG.md` (fails if
-   missing or empty).
-4. Run `pytest tests/`.
-5. `python -m build` (creates `dist/*.whl` + `dist/*.tar.gz`).
-6. OIDC-publish to PyPI as `mcp-server-panchangam`.
-7. Create a GitHub Release with the CHANGELOG section as the body and
-   the wheel + sdist attached.
+2. Check that the tag matches all three manifest version fields.
+3. Extract a nonempty `## [<version>]` section from `CHANGELOG.md`.
+4. Install locked dependencies and run `pytest tests/`.
+5. Build the wheel and sdist, then run `tools/verify_release_artifacts.py`.
+6. Publish `mcp-server-panchangam` to PyPI using OIDC.
+7. Create a GitHub Release with the changelog section and distribution files.
+
+Confirm the workflow succeeded and both PyPI and GitHub show the intended
+version; a pushed tag alone is not publication evidence.
 
 ### If a gate fails
 
-- **Version mismatch** — fix the offending manifest, commit, re-tag:
-  `git tag -d vX.Y.Z; git push --delete origin vX.Y.Z; <fix>; git tag vX.Y.Z; git push --tags`.
-- **CHANGELOG missing/empty** — promote `[Unreleased]` -> the version,
-  commit, re-tag.
-- **Tests fail** — the most likely culprit is something that wasn't
-  exercised locally (Playwright smoke). Reproduce locally, fix, re-tag.
+- **Version mismatch or missing changelog** — correct the source on a feature
+  branch, rerun verification, and merge the fix before attempting publication.
+- **Tests or artifact verification fail** — reproduce the failing step locally
+  and correct it through the same review path.
+- **Publication partially succeeds** — inspect PyPI and the GitHub Release before
+  retrying; an uploaded PyPI version cannot be replaced.
+- Do not delete or move an existing release tag as routine recovery.
+  Use a new patch version for corrected published artifacts; an unchanged
+  workflow may be rerun for a transient failure after checking what succeeded.
 
 ### Patch vs minor vs major
 
@@ -137,7 +150,9 @@ The matrix job names remain `test (3.10)` through `test (3.13)`, so the four
 backend compatibility contexts are unchanged. Node, the production Vite build,
 Vitest, Chromium, and the browser smoke suite run once in the separate required
 `frontend-and-browser` context. Security supplies the other required contexts:
-`CodeQL (Python)` and `pip-audit (requirements.txt)`.
+`CodeQL (Python)` and `pip-audit (requirements.txt)`. The protected quality
+gates also include CodeScene, `Sonar analysis`, and the SonarCloud gate; consult
+the current branch-protection settings for their exact context names.
 
 When introducing or renaming a job, push the branch and wait for the new check
 to pass before adding its exact name to branch protection. Do not merge while a
@@ -154,13 +169,11 @@ the pull-request event should complete the protected suite.
 
 1. Find the canonical city name, latitude, longitude, timezone.
    Cross-reference with Wikipedia / Google for accuracy.
-2. Add an entry to the `CITIES` table (search `cities.py` or
-   `telugu_panchangam/mcp/cities.py` — whichever holds the 22-city
-   list).
-3. Add an entry to `CITY_GROUPS` in `src/main.ts` so it appears in
-   the city selector and the Subscribe card.
-4. Add a test: pick the city, run `engine.calculate(date, city)` for a
-   recent date, eyeball the output. Cross-check at least sunrise/sunset
+2. Add a `Location` entry to `CITIES` in `telugu_panchangam/cities.py`.
+3. Add the city to `CITY_GROUPS` and its coordinates/timezone to `CITY_LOCATIONS`
+   in `src/data/cities.ts`; preserve parity with the Python table.
+4. Add a test using `engine.calculate(date, location)` with that `Location`.
+   Cross-check at least sunrise/sunset on several dates and more than one city
    against [drikpanchang.com](https://drikpanchang.com) for that
    city + date.
 5. Confirm the next monthly cron will pick it up (it iterates the
@@ -225,10 +238,12 @@ a website label as textual authority.
 
    ```python
    from datetime import date
-   from telugu_panchangam.engines import DrikGanitaEngine
-   day = DrikGanitaEngine().calculate(date(2026, 6, 15), 'Hyderabad')
-   print(day.tithi.name, day.tithi.end_time)
-   print(day.nakshatra.name, day.nakshatra.end_time)
+   from telugu_panchangam.cities import CITIES
+   from telugu_panchangam.engines.drik import DrikGanitaEngine
+   hyderabad = next(city for city in CITIES if city.name == 'Hyderabad')
+   day = DrikGanitaEngine().calculate(date(2026, 6, 15), hyderabad)
+   print(day.tithi.name, day.tithi.end)
+   print(day.nakshatra.name, day.nakshatra.end)
    ```
 
 4. Compare. Tolerances:
@@ -257,8 +272,9 @@ Actions dependencies. The flow:
    where. Major bumps need more care than patch/minor.
 2. **Read the changelog link** — Dependabot includes one. Look for
    breaking changes mentioned.
-3. **Check CI** — the matrix runs on 3.10–3.13. CodeQL + pip-audit
-   also run.
+3. **Check all required checks** — Python 3.10–3.13, frontend/browser,
+   CodeQL, pip-audit, Sonar and CodeScene must pass. Check lockfile consistency
+   and coupled dependencies, such as Vitest and its coverage provider.
 4. If CI is green and the changelog reads clean, **merge with
    squash**. Dependabot auto-deletes its branch (the
    `delete-branch-on-merge` setting handles it).
@@ -269,7 +285,9 @@ Actions dependencies. The flow:
 ### For GitHub Actions bumps specifically
 
 Actions are pinned to SHAs with the tag in a comment (see PR #84).
-Dependabot bumps both the SHA and the comment together. Just merge.
+Dependabot bumps both the SHA and the comment together. Review compatibility
+and required checks; workflow changes still require explicit owner approval
+under `AGENTS.md`.
 
 ---
 
@@ -336,7 +354,7 @@ The site hasn't loaded / the feeds are stale. Diagnostic order:
 ## See also
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — module layering, engine API contract
-- [`CLAUDE.md`](CLAUDE.md) — working agreement
+- [`AGENTS.md`](AGENTS.md) — working agreement
 - [`SECURITY.md`](SECURITY.md) — vulnerability disclosure policy
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution flow
 - [`docs/tracking/improvement-plan.md`](docs/tracking/improvement-plan.md) — phased roadmap

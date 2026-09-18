@@ -33,8 +33,6 @@ engine-core refactor designed but parked in [improvement-plan Phase 6](docs/trac
 
 ## The layer cake
 
-```
-
 This diagram is a placement model, not a literal acyclic import graph. The
 current engines aggregate additive fields into `PanchangamDay`, so
 `engines/base.py` imports derived modules for Ghati, Karana windows, Panchaka,
@@ -42,6 +40,8 @@ special Yogas and other classifications. Derived calendar modules also import
 Julian-Day/sunrise helpers from `engines/utils.py`. The reproducible actual
 import graph, consumer map and current boundary decision are in
 [ADR 0002](docs/decisions/0002-computation-layer-organization.md).
+
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │ Consumers (no internal coupling — they read PanchangamDay /       │
 │            SlotFacts / name-tables only)                          │
@@ -62,9 +62,9 @@ import graph, consumer map and current boundary decision are in
 └──────────────────────────────────────────────────────────────────┘
                                 ▲
                                 │ public API:
-                                │   • engine.calculate(date, city) → PanchangamDay
-                                │   • engine.calculate_bulk(dates, city) → list[PanchangamDay]
-                                │   • engine.facts_at(jd) → SlotFacts
+                                │   • engine.calculate(date, location) → PanchangamDay
+                                │   • engine.calculate_bulk(start, count, location) → list[PanchangamDay]
+                                │   • engine.facts_at(instant, location) → SlotFacts
                                 │   • RASHI_NAMES, NAKSHATRA_NAMES, VAARAM_NAMES, ...
                                 │
 ┌──────────────────────────────────────────────────────────────────┐
@@ -141,10 +141,13 @@ Consumers reach engine instances through three behavioral entry points:
 from telugu_panchangam.engines.drik import DrikGanitaEngine
 engine = DrikGanitaEngine()
 
-day = engine.calculate(date, city)           # PanchangamDay
-days = engine.calculate_bulk(start, count, city)  # list[PanchangamDay]
-slot = engine.facts_at(instant, city)         # SlotFacts at a datetime
+day = engine.calculate(date, location)           # PanchangamDay
+days = engine.calculate_bulk(start, count, location)  # list[PanchangamDay]
+slot = engine.facts_at(instant, location)         # SlotFacts at a datetime
 ```
+
+`location` is a `Location` object, not a city-name string; `instant` is a
+`datetime`. `facts_at` also accepts the optional Panchangam-day `vaaram`.
 
 There is no package-root engine façade today: `engines/__init__.py` is empty,
 and current consumers import concrete engine modules. ADR 0002 records that as
@@ -204,8 +207,9 @@ and intentionally different cancellation policies remain compatible.
 No storage migration, deployment topology change, or frozen-engine change is
 part of this boundary refactor.
 
-1,290+ Python tests plus frontend contract tests pin behaviour. Three
-philosophies are in use:
+Python, browser and frontend contract tests pin behaviour; current totals
+come from the verifier and CI reports rather than a hand-maintained count.
+Three philosophies are in use:
 
 - **Golden-output**: most engine tests verify against pre-computed
   values cross-checked with [drikpanchang.com](https://drikpanchang.com).
@@ -230,7 +234,7 @@ prerequisite for the parked `EngineCore` refactor.
 | A new per-user calculation (e.g. compatibility) | `telugu_panchangam/personal/<feature>.py` | Personal layer is intended for this — consume `PanchangamDay` / name tables only |
 | A new MCP tool | `telugu_panchangam/mcp/tools.py` (logic) + `mcp/server.py` (signature) | Both need to stay in sync; the audit caught a drift case in Phase 7 |
 | A new ICS feed shape | `telugu_panchangam/generators/<name>.py` | The existing `ics.py` is the dense daily; new shapes (weekly digest, Ekadashi-only) belong as siblings |
-| A new city | `telugu_panchangam/cities.py` (or wherever the 22-city table lives) + a test | Verify timezone, lat/long, and at least one DP cross-check |
+| A new city | `telugu_panchangam/cities.py` + `src/data/cities.ts` + parity tests | Verify timezone, lat/long, and at least one DP cross-check |
 | A landing-page change | Root `index.html` + the relevant `src/` module (Vite) | Anything visible needs screenshots, live browser verification and owner sign-off per the UI review rule |
 
 ## See also
