@@ -13,6 +13,14 @@ on:
       - 'package-lock.json'
       - 'vite.config.ts'
       - 'tsconfig.json'
+      - 'docs/**'
+      - '.vitepress/**'
+      - 'tools/generate-docs-computations.mjs'
+      - 'tools/check-docs-source.mjs'
+      - 'tools/markdown-mermaid-fences.mjs'
+      - 'tools/compose-docs-data.mjs'
+      - 'tools/check-docs-output.mjs'
+      - '.github/workflows/deploy-landing.yml'
   workflow_dispatch:
 
 # Singleton across every workflow that publishes to gh-pages
