@@ -3,9 +3,23 @@
 All notable changes to this project are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project uses
 [SemVer](https://semver.org/spec/v2.0.0.html). The `mcp-server-panchangam`
-PyPI version tracks this file's most recent release entry.
+published PyPI version corresponds to a tagged release entry, while development
+manifest versions may advance under `[Unreleased]`.
+
+As checked on 2026-09-18, the development manifests declare `1.18.17`; the
+latest published PyPI package and GitHub Release are `1.18.0`. The maintenance
+headings below record development changes, not intervening published releases.
+Recheck this status when preparing the next release.
 
 ## [Unreleased]
+
+### Maintenance — 1.18.17
+
+- Separate Muhurta admission policies, score composition and explanations while
+  preserving day/night orchestration, public ranking and calculation behavior
+  ([#585](https://github.com/socraticsurge/telugu-calendar-utilities/pull/585)).
+- Prepare matching package, MCP manifest and lockfile metadata; the source audit
+  records the unchanged engine, ICS, UI and deployment boundaries.
 
 ### Maintenance — 1.18.16
 
