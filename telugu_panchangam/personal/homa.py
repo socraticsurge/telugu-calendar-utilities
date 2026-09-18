@@ -44,13 +44,14 @@ def solar_nakshatra_at(dt: datetime, engine) -> str:
 
 def homa_election(tithi_name: str, vaaram: str, lunar_nakshatra: str,
                   solar_nakshatra: str) -> tuple[bool, list[str]]:
-    """Apply both hard gates and return transparent pass reasons."""
+    """Apply both hard gates and explain each gate independently."""
     lord, group = homahuti_group(solar_nakshatra, lunar_nakshatra)
     remainder = agnivasa_remainder(tithi_name, vaaram)
     admitted = lord in HOMAHUTI_BENEFIC_LORDS and remainder in {0, 3}
+    residence = 'resides on earth' if remainder in {0, 3} else 'does not reside on earth'
     reasons = [
         f'Homahuti group {group}: {solar_nakshatra} to {lunar_nakshatra} '
         f'falls to {lord}',
-        f'Agnivasa remainder {remainder}: Agni resides on earth',
+        f'Agnivasa remainder {remainder}: Agni {residence}',
     ]
     return admitted, reasons

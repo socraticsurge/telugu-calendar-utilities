@@ -39,6 +39,10 @@ Recheck this status when preparing the next release.
 
 ### Fixed
 
+- Correct Agnivasa failure reasons for remainders 1 and 2 in Python and browser
+  low-level Homa election output without changing either admission gate; cover
+  all four remainders with both Homahuti outcomes ([#179](https://github.com/socraticsurge/telugu-calendar-utilities/issues/179)).
+
 - Prepare MCP/PyPI patch metadata `1.18.13` while adding the reusable,
   event-unwired Benefic-Rasi-by-resolved-natural-lord convention with guarded
   Python/TypeScript parity, explicit alternative interpretations, and no
