@@ -1,0 +1,130 @@
+[
+  {
+    "name": "remainder 0, Budha group",
+    "facts": {
+      "tithi": "Shukla Dwitiya",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ardra",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": true,
+      "reasons": [
+        "Homahuti group 2: Ashvini to Ardra falls to Budha",
+        "Agnivasa remainder 0: Agni resides on earth"
+      ]
+    }
+  },
+  {
+    "name": "remainder 0, Surya group",
+    "facts": {
+      "tithi": "Shukla Dwitiya",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ashvini",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": false,
+      "reasons": [
+        "Homahuti group 1: Ashvini to Ashvini falls to Surya",
+        "Agnivasa remainder 0: Agni resides on earth"
+      ]
+    }
+  },
+  {
+    "name": "remainder 1, Budha group",
+    "facts": {
+      "tithi": "Shukla Tritiya",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ardra",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": false,
+      "reasons": [
+        "Homahuti group 2: Ashvini to Ardra falls to Budha",
+        "Agnivasa remainder 1: Agni does not reside on earth"
+      ]
+    }
+  },
+  {
+    "name": "remainder 1, Surya group",
+    "facts": {
+      "tithi": "Shukla Tritiya",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ashvini",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": false,
+      "reasons": [
+        "Homahuti group 1: Ashvini to Ashvini falls to Surya",
+        "Agnivasa remainder 1: Agni does not reside on earth"
+      ]
+    }
+  },
+  {
+    "name": "remainder 2, Budha group",
+    "facts": {
+      "tithi": "Shukla Chaturthi",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ardra",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": false,
+      "reasons": [
+        "Homahuti group 2: Ashvini to Ardra falls to Budha",
+        "Agnivasa remainder 2: Agni does not reside on earth"
+      ]
+    }
+  },
+  {
+    "name": "remainder 2, Surya group",
+    "facts": {
+      "tithi": "Shukla Chaturthi",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ashvini",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": false,
+      "reasons": [
+        "Homahuti group 1: Ashvini to Ashvini falls to Surya",
+        "Agnivasa remainder 2: Agni does not reside on earth"
+      ]
+    }
+  },
+  {
+    "name": "remainder 3, Budha group",
+    "facts": {
+      "tithi": "Shukla Pratipat",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ardra",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": true,
+      "reasons": [
+        "Homahuti group 2: Ashvini to Ardra falls to Budha",
+        "Agnivasa remainder 3: Agni resides on earth"
+      ]
+    }
+  },
+  {
+    "name": "remainder 3, Surya group",
+    "facts": {
+      "tithi": "Shukla Pratipat",
+      "vaaram": "Adivaram",
+      "nakshatra": "Ashvini",
+      "solarNakshatra": "Ashvini"
+    },
+    "expected": {
+      "admitted": false,
+      "reasons": [
+        "Homahuti group 1: Ashvini to Ashvini falls to Surya",
+        "Agnivasa remainder 3: Agni resides on earth"
+      ]
+    }
+  }
+]

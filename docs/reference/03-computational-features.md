@@ -210,10 +210,10 @@ compared astronomical cell must remain visibly different assurances.
   owns the public-contract decision.
 - Heliacal events use fixed atmospheric inputs and calibrated visibility
   parameters; eclipse visibility currently ignores observer altitude.
-- The Homahuti/Agnivasa calculation is source-verified, but consumers should
-  display pass and fail reasons accurately rather than treating a computed
-  remainder as an automatic “Agni resides on earth” statement; the correction
-  is tracked in [issue #179](https://github.com/socraticsurge/telugu-calendar-utilities/issues/179).
+- The Homahuti/Agnivasa calculation is source-verified; each reason describes
+  its own gate. Remainders 0 and 3 report earth residence; 1 and 2 report
+  non-earth residence. An earth-resident result can still fail the independent
+  Homahuti gate, so consumers must use the combined `admitted` boolean.
 
 These boundaries belong in tracked work. They are not permission to change a
 frozen engine or silently alter a public contract.

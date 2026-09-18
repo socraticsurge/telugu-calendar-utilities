@@ -297,11 +297,13 @@ export function muHomaElection(facts) {
   const tithiOrdinal = MU_TITHI_LIST_FULL.indexOf(facts.tithi) + 1;
   const varaOrdinal = MU_VAARAM_LIST.indexOf(facts.vaaram) + 1;
   const remainder = (tithiOrdinal + 1 + varaOrdinal) % 4;
+  const residence = remainder === 0 || remainder === 3
+    ? 'resides on earth' : 'does not reside on earth';
   return {
     admitted: MU_HOMAHUTI_BENEFICS.has(lord) && (remainder === 0 || remainder === 3),
     reasons: [
       `Homahuti group ${group + 1}: ${facts.solarNakshatra} to ${facts.nakshatra} falls to ${lord}`,
-      `Agnivasa remainder ${remainder}: Agni resides on earth`],
+      `Agnivasa remainder ${remainder}: Agni ${residence}`],
   };
 }
 

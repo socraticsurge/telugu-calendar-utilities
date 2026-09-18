@@ -32,6 +32,14 @@ Both tests are recomputed at each slot start using the selected Panchangam
 engine's Sun and Moon model. Passing slots disclose the group lord and the
 Agnivasa remainder in `activity_match`.
 
+The low-level Python and browser APIs explain Agnivasa independently: remainders
+0 and 3 say `Agni resides on earth`; 1 and 2 say `Agni does not reside on earth`.
+An earth-resident result may still be rejected by the Homahuti group, so the
+combined `admitted` boolean is authoritative for admission. Both runtimes are
+checked against the same eight-case fixture covering all four remainders with
+both a benefic and non-benefic Homahuti group. Current MCP and browser search
+results omit rejected candidates, so their passing-slot reason text is unchanged.
+
 ## Boundary
 
 This verifies an election for a fire offering, not a universal election for
