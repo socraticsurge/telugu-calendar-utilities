@@ -2,7 +2,7 @@
   "description": "Exact C901 hotspot scores; every change requires intentional review.",
   "hotspots": {},
   "max_complexity": 10,
-  "ruff_version": "0.16.6",
+  "ruff_version": "0.16.7",
   "schema_version": 1,
   "targets": [
     "telugu_panchangam",
