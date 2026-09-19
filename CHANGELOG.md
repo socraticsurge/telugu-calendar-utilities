@@ -12,6 +12,12 @@ separate published releases.
 
 ## [Unreleased]
 
+## [1.18.19] — 2026-09-21
+
+### Fixed
+
+- Generate the remaining browser Tithi and Karana vocabulary from existing Python owners, preserving all names, aliases, order and scoring behavior (#184).
+
 ## [1.18.18] — 2026-09-19
 
 ### Fixed
@@ -47,7 +53,6 @@ separate published releases.
 - Canonicalize Nitya Yoga identity at the browser scoring boundary, restoring
   Priti/Preeti bonuses and Shula/Shoola partial-window and exclusion behavior
   while preserving historical display aliases ([#183](https://github.com/socraticsurge/telugu-calendar-utilities/issues/183)).
-- Generate the remaining browser Tithi and Karana vocabulary from existing Python owners, preserving all names, aliases, order and scoring behavior (#184).
 
 - Correct Agnivasa failure reasons for remainders 1 and 2 in Python and browser
   low-level Homa election output without changing either admission gate; cover
