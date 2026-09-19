@@ -29,6 +29,7 @@ def build_export() -> dict:
         "nakshatraNames": NAKSHATRA_NAMES,
         "varaNames": VAARAM_NAMES,
         "browserYogaNames": [browser_yoga_names.get(name, name) for name in YOGA_NAMES],
+        "canonicalYogaNames": YOGA_NAMES,
         "nitya": {
             "hardAvoid": sorted(nitya_yoga.NITYA_HARD_AVOID),
             "hardPenalty": nitya_yoga.NITYA_HARD_PENALTY,

@@ -39,6 +39,10 @@ Recheck this status when preparing the next release.
 
 ### Fixed
 
+- Canonicalize Nitya Yoga identity at the browser scoring boundary, restoring
+  Priti/Preeti bonuses and Shula/Shoola partial-window and exclusion behavior
+  while preserving historical display aliases ([#183](https://github.com/socraticsurge/telugu-calendar-utilities/issues/183)).
+
 - Correct Agnivasa failure reasons for remainders 1 and 2 in Python and browser
   low-level Homa election output without changing either admission gate; cover
   all four remainders with both Homahuti outcomes ([#179](https://github.com/socraticsurge/telugu-calendar-utilities/issues/179)).

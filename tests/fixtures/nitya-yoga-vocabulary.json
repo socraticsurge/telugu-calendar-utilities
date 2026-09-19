@@ -1,0 +1,164 @@
+[
+  {
+    "index": 0,
+    "canonical": "Vishkambha",
+    "browser": "Vishkambha",
+    "score": -1
+  },
+  {
+    "index": 1,
+    "canonical": "Preeti",
+    "browser": "Priti",
+    "score": 1
+  },
+  {
+    "index": 2,
+    "canonical": "Ayushman",
+    "browser": "Ayushman",
+    "score": 1
+  },
+  {
+    "index": 3,
+    "canonical": "Saubhagya",
+    "browser": "Saubhagya",
+    "score": 1
+  },
+  {
+    "index": 4,
+    "canonical": "Shobhana",
+    "browser": "Shobhana",
+    "score": 1
+  },
+  {
+    "index": 5,
+    "canonical": "Atiganda",
+    "browser": "Atiganda",
+    "score": -1
+  },
+  {
+    "index": 6,
+    "canonical": "Sukarma",
+    "browser": "Sukarma",
+    "score": 1
+  },
+  {
+    "index": 7,
+    "canonical": "Dhriti",
+    "browser": "Dhriti",
+    "score": 1
+  },
+  {
+    "index": 8,
+    "canonical": "Shoola",
+    "browser": "Shula",
+    "score": -1
+  },
+  {
+    "index": 9,
+    "canonical": "Ganda",
+    "browser": "Ganda",
+    "score": -1
+  },
+  {
+    "index": 10,
+    "canonical": "Vriddhi",
+    "browser": "Vriddhi",
+    "score": 1
+  },
+  {
+    "index": 11,
+    "canonical": "Dhruva",
+    "browser": "Dhruva",
+    "score": 1
+  },
+  {
+    "index": 12,
+    "canonical": "Vyaghata",
+    "browser": "Vyaghata",
+    "score": -1
+  },
+  {
+    "index": 13,
+    "canonical": "Harshana",
+    "browser": "Harshana",
+    "score": 1
+  },
+  {
+    "index": 14,
+    "canonical": "Vajra",
+    "browser": "Vajra",
+    "score": 0
+  },
+  {
+    "index": 15,
+    "canonical": "Siddhi",
+    "browser": "Siddhi",
+    "score": 1
+  },
+  {
+    "index": 16,
+    "canonical": "Vyatipata",
+    "browser": "Vyatipata",
+    "score": -2
+  },
+  {
+    "index": 17,
+    "canonical": "Variyan",
+    "browser": "Variyana",
+    "score": 0
+  },
+  {
+    "index": 18,
+    "canonical": "Parigha",
+    "browser": "Parigha",
+    "score": -1
+  },
+  {
+    "index": 19,
+    "canonical": "Shiva",
+    "browser": "Shiva",
+    "score": 1
+  },
+  {
+    "index": 20,
+    "canonical": "Siddha",
+    "browser": "Siddha",
+    "score": 1
+  },
+  {
+    "index": 21,
+    "canonical": "Sadhya",
+    "browser": "Sadhya",
+    "score": 1
+  },
+  {
+    "index": 22,
+    "canonical": "Shubha",
+    "browser": "Shubha",
+    "score": 1
+  },
+  {
+    "index": 23,
+    "canonical": "Shukla",
+    "browser": "Shukla",
+    "score": 1
+  },
+  {
+    "index": 24,
+    "canonical": "Brahma",
+    "browser": "Brahma",
+    "score": 1
+  },
+  {
+    "index": 25,
+    "canonical": "Indra",
+    "browser": "Indra",
+    "score": 1
+  },
+  {
+    "index": 26,
+    "canonical": "Vaidhriti",
+    "browser": "Vaidhriti",
+    "score": -2
+  }
+]
