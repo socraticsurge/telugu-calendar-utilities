@@ -2488,14 +2488,16 @@
       "claim_kind": "textual-rule",
       "implementations": [
         {"path": "telugu_panchangam/personal/nitya_yoga.py", "symbol": "nitya_disposition", "role": "owner"},
-        {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_nitya_yoga", "role": "owner"}
+        {"path": "telugu_panchangam/personal/slot_scorers.py", "symbol": "score_nitya_yoga", "role": "owner"},
+        {"path": "src/panels/muhurta-scoring.ts", "symbol": "muScoreNityaYoga", "role": "mirror"},
+        {"path": "src/scorer/nitya-yoga-names.ts", "symbol": "canonicalYogaName", "role": "mirror"}
       ],
       "inputs": ["Nitya Yoga name", "slot start", "Yoga span"],
       "outputs": ["disposition", "score adjustment", "hard/partial caution"],
       "time_basis": "Active Yoga and candidate slot instant.",
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["needs_locator"], "claim_ids": ["panchangam.derived_classifications"], "note": "Disposition and partial-window behavior are tested; exact claim locators remain open."},
-      "tests": ["tests/test_muhurta_finder.py"],
+      "tests": ["tests/test_muhurta_finder.py", "tests/test_nitya_yoga_vocabulary.py", "src/panels/__tests__/nitya-yoga-vocabulary.test.ts"],
       "limitations": ["Disposition is one input to Muhurta ranking, not a standalone election verdict; partial-dosha windows currently use a fixed 24 civil minutes per Ghati rather than the proportional sunrise-to-sunrise Ghati clock."],
       "method": {
         "kind": "decision-table",
