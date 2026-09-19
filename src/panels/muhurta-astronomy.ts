@@ -172,19 +172,12 @@ export function muChartBoundaryNeedsReview(
 
 const MU_NAKSHATRA_LIST = NAKSHATRA_NAMES;
 
-const MU_TITHI_LIST_FULL = (() => {
-  const last = ['Pratipat','Dwitiya','Tritiya','Chaturthi','Panchami',
-                'Shashthi','Saptami','Ashtami','Navami','Dashami',
-                'Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Pournami'];
-  const shukla = last.slice(0, 14).map(n => `Shukla ${n}`).concat(['Pournami']);
-  const krishna = last.slice(0, 14).map(n => `Krishna ${n}`).concat(['Amavasya']);
-  return shukla.concat(krishna);
-})();
+const MU_TITHI_LIST_FULL = sharedTables.tithiNames;
 
 const MU_YOGA_NAMES_27 = sharedTables.browserYogaNames;
 
-const MU_KARANA_REPEATING = ['Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti'];
-const MU_KARANA_FIXED = { 0: 'Kinstughna', 57: 'Shakuni', 58: 'Chatushpada', 59: 'Naga' };
+const MU_KARANA_REPEATING = sharedTables.karanaRepeating;
+const MU_KARANA_FIXED = sharedTables.karanaFixed;
 
 // Special yogas — mirror telugu_panchangam/special_yogas.py
 const MU_SARVARTHA = Object.fromEntries(Object.entries(sharedTables.specialYoga.sarvartha).map(([day, names]) => [day, new Set(names)]));
@@ -314,12 +307,8 @@ export function muHomaElection(facts) {
 // CHANDRA bad = {4, 8, 12} (the complement).
 
 // Tithi family — mirror telugu_panchangam/personal/tithi_class.py
-const TITHI_NAMES_ORDER = [
-  'Pratipat', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
-  'Shashthi', 'Saptami', 'Ashtami', 'Navami',    'Dashami',
-  'Ekadashi', 'Dwadashi','Trayodashi','Chaturdashi','Pournami',
-];
-const TITHI_ALIASES = { Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15 };
+const TITHI_NAMES_ORDER = sharedTables.tithiWithinPakshaNames;
+const TITHI_ALIASES = sharedTables.tithiAliases;
 export function activityTithiNumber(name) {
   if (!name) return null;
   const last = name.trim().split(/\s+/).pop();
