@@ -1,6 +1,7 @@
 # Design
 
-Captured from the live site (index.html tokens), July 2026. Identity-preserving: these are the committed brand values, not aspirations. The one-shell redesign keeps this visual language and changes structure, not voice.
+Maintained against the product surface, September 2026. Shared tokens live in
+`src/styles/tokens.css`; the original palette aliases remain in `index.html`. Identity-preserving: these are the committed brand values, not aspirations. The one-shell redesign keeps this visual language and changes structure, not voice.
 
 ## Theme
 
@@ -27,10 +28,11 @@ Semantic tone triple (green/amber/maroon) carries jyotisha meaning — auspiciou
 
 ## Typography
 
-- **Display**: `Libre Baskerville`, `Fraunces`, Georgia, serif — brand name, panel headings, the shloka. Italic for devotional/Sanskrit voice.
-- **Body/UI**: `Inter`, system-ui, sans-serif — everything functional.
+- **Display**: Georgia, `Times New Roman`, serif — brand name, editorial headings, the shloka. Italic for devotional/Sanskrit voice.
+- **Body/UI**: `-apple-system`, `BlinkMacSystemFont`, `Segoe UI`, system-ui, sans-serif — functional labels, data and controls.
 - Pairing is serif-display over sans-body; keep this contrast axis.
-- Body line-height 1.6; content column max-width 760px.
+- Body line-height 1.6; desktop shell is at most 880px including 2rem side padding.
+  Profiles use a 760px register; prose uses a 68ch reading measure.
 - Transliterated terms (Tithi, Varjyam, Choghadiya) set in body face, not italicized.
 
 ## Layout
@@ -62,3 +64,29 @@ Minimal and calm: smooth scroll, no entrance theatrics. Any added motion must be
 - Settings recede behind a one-line summary ("All times in <city> local
   time · <system> · <fmt>h" + Change chip); pickers expand on demand.
   City/system persist in localStorage — set once, forget.
+
+
+## Shared scale and states
+
+The bounded type scale is 0.75, 0.875, 1, 1.25 and 2rem; compact display uses
+1.45rem. Shared spacing is 0.25, 0.5, 0.75, 1, 1.5 and 2rem. New equivalent
+values use these tokens; existing specialized layouts are not globally rewritten.
+Functional data and disclosure labels use the sans face; serif remains editorial.
+
+| State | Treatment |
+|---|---|
+| Hover | Restrained brand tint; never the sole indication of interactivity |
+| Focus | Visible two-pixel brand outline, offset three pixels; inverse focus on dark headers |
+| Active/selected | Brand text and a light brand tint, plus semantic current/pressed state |
+| Disabled | Native disabled behavior with reduced opacity; not color alone |
+| Loading | Existing status text and busy state, with current context retained |
+| Success | Green text with explicit confirmation |
+| Warning | Amber with descriptive text |
+| Error | Maroon with a corrective message |
+
+Navigation uses one-color vector masks at a consistent 24-unit viewbox and
+1.6-unit stroke. Icons are decorative and hidden from assistive technology;
+visible text provides each destination's accessible name. Legacy icon spans
+remain compatible with the existing document contract, but do not render emoji.
+The palette stays light-only; contrast and target sizes are checked on rendered
+surfaces. Contrast is not inferred from token names.
