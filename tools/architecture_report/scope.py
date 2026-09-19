@@ -7,6 +7,7 @@ _ADDITIVE_FEATURE_SOURCES = frozenset({
     'src/lib/calendar-data.ts',
     'src/lib/calendar-loader.ts',
     'src/scorer/ranking.ts',
+    'src/scorer/nitya-yoga-names.ts',
     'src/scorer/search-contract.ts',
     'src/scorer/tara-chandra.ts',
     'telugu_panchangam/generators/calendar_data.py',

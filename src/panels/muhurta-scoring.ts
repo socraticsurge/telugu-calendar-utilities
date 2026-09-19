@@ -1,3 +1,4 @@
+import { canonicalYogaName, avoidsYoga } from '../scorer/nitya-yoga-names';
 import sharedTables from '../data/shared-calendar-tables.generated.json';
 import {
   MU_CHANDRA_GOOD,
@@ -291,23 +292,23 @@ export function muScoreSpecialYogas(facts, skipYogas) {
 }
 
 export function muScoreNityaYoga(facts, data, skipYogas, avoidNityaYogas, startMinute: number) {
-  const yoga = facts.yoga;
-  if (avoidNityaYogas.has(yoga)) return null;
+  const yoga = canonicalYogaName(facts.yoga);
+  if (avoidsYoga(yoga, avoidNityaYogas)) return null;
   if (MU_NITYA_HARD_AVOID.has(yoga)) {
     if (skipYogas.size) return null;
-    return { score: MU_NITYA_HARD_PENALTY, reason: `${yoga} yoga (${MU_NITYA_HARD_PENALTY})` };
+    return { score: MU_NITYA_HARD_PENALTY, reason: `${facts.yoga} yoga (${MU_NITYA_HARD_PENALTY})` };
   }
   if (MU_NITYA_PARTIAL_WINDOW_MIN[yoga] !== undefined && data.yoga) {
     const windowMin = MU_NITYA_PARTIAL_WINDOW_MIN[yoga];
-    const yogaStartMin = yoga === data.yoga.name
+    const yogaStartMin = yoga === canonicalYogaName(data.yoga.name)
       ? muMin(data.yoga.start, data.yoga.sflag)
       : muMin(data.yoga.end, data.yoga.eflag);
     return startMinute - yogaStartMin <= windowMin
-      ? { score: MU_NITYA_PARTIAL_PENALTY, reason: `${yoga} yoga dosha-window (${MU_NITYA_PARTIAL_PENALTY})` }
+      ? { score: MU_NITYA_PARTIAL_PENALTY, reason: `${facts.yoga} yoga dosha-window (${MU_NITYA_PARTIAL_PENALTY})` }
       : { score: 0, reason: null };
   }
   return MU_NITYA_AUSPICIOUS.has(yoga)
-    ? { score: MU_NITYA_AUSPICIOUS_BONUS, reason: `${yoga} yoga (+${MU_NITYA_AUSPICIOUS_BONUS})` }
+    ? { score: MU_NITYA_AUSPICIOUS_BONUS, reason: `${facts.yoga} yoga (+${MU_NITYA_AUSPICIOUS_BONUS})` }
     : { score: 0, reason: null };
 }
 
