@@ -6,12 +6,17 @@ All notable changes to this project are documented here. Format follows
 published PyPI version corresponds to a tagged release entry, while development
 manifest versions may advance under `[Unreleased]`.
 
-As checked on 2026-09-18, the development manifests declare `1.18.17`; the
-latest published PyPI package and GitHub Release are `1.18.0`. The maintenance
-headings below record development changes, not intervening published releases.
-Recheck this status when preparing the next release.
+The `1.18.18` release notes include the accumulated maintenance history below.
+Maintenance subheadings `1.18.13`–`1.18.17` describe development changes, not
+separate published releases.
 
 ## [Unreleased]
+
+## [1.18.18] — 2026-09-19
+
+### Fixed
+
+- Label next Gochara ingress dates as IST across MCP, generated data and the website; use exact ingress dates instead of the next Hyderabad sunrise snapshot (1.18.18, #180).
 
 ### Maintenance — 1.18.17
 
@@ -42,7 +47,6 @@ Recheck this status when preparing the next release.
 - Canonicalize Nitya Yoga identity at the browser scoring boundary, restoring
   Priti/Preeti bonuses and Shula/Shoola partial-window and exclusion behavior
   while preserving historical display aliases ([#183](https://github.com/socraticsurge/telugu-calendar-utilities/issues/183)).
-- Label next Gochara ingress dates as IST across MCP, generated data and the website; use exact ingress dates instead of the next Hyderabad sunrise snapshot (1.18.18, #180).
 
 - Correct Agnivasa failure reasons for remainders 1 and 2 in Python and browser
   low-level Homa election output without changing either admission gate; cover
