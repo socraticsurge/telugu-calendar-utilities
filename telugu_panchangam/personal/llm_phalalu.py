@@ -257,7 +257,7 @@ def _format_sky(positions: list[dict]) -> str:
     for p in positions:
         retro = ' (retrograde)' if p.get('retrograde') else ''
         ingress = (
-            f', moves to {p["next_rasi"]} on {p["rasi_until"]}'
+            f', moves to {p["next_rasi"]} on {p["rasi_until"]} (IST)'
             if p.get('rasi_until')
             else ''
         )

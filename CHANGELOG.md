@@ -42,6 +42,7 @@ Recheck this status when preparing the next release.
 - Canonicalize Nitya Yoga identity at the browser scoring boundary, restoring
   Priti/Preeti bonuses and Shula/Shoola partial-window and exclusion behavior
   while preserving historical display aliases ([#183](https://github.com/socraticsurge/telugu-calendar-utilities/issues/183)).
+- Label next Gochara ingress dates as IST across MCP, generated data and the website; use exact ingress dates instead of the next Hyderabad sunrise snapshot (1.18.18, #180).
 
 - Correct Agnivasa failure reasons for remainders 1 and 2 in Python and browser
   low-level Homa election output without changing either admission gate; cover

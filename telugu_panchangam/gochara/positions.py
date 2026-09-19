@@ -68,6 +68,10 @@ def graha_positions(jd: float, ayanamsa: str = 'lahiri') -> list[dict]:
     """All nine grahas at instant `jd` (UT): longitude, rasi, nakshatra,
     pada, retrograde, and the date (IST) the graha enters its next rasi.
 
+    `rasi_until` is an ISO calendar date in Asia/Kolkata (UTC+05:30),
+    regardless of the location used to choose `jd`; it is not an exact instant.
+    The existing field name and response shape are retained for compatibility.
+
     Parameters
     ----------
     jd : float
