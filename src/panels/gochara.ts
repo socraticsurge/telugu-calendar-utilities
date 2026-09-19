@@ -331,12 +331,20 @@ function goDateIndex() {
 }
 
 function goTill(idx, gi) {
+  if (GO_DATA.ingressTimeBasis === 'Asia/Kolkata' && GO_DATA.ingresses) {
+    const ingress = GO_DATA.ingresses[idx]?.[gi];
+    return ingress ? {
+      date: new Date(ingress[0] + 'T00:00:00'),
+      next: GO_DATA.rasis[ingress[1]],
+      basis: 'IST',
+    } : null;
+  }
   const cur = GO_DATA.days[idx][gi];
   for (let j = idx + 1; j < GO_DATA.days.length; j++) {
     if (GO_DATA.days[j][gi] !== cur) {
       const d = new Date(GO_DATA.start + 'T00:00:00');
       d.setDate(d.getDate() + j);
-      return { date: d, next: GO_DATA.rasis[GO_DATA.days[j][gi]] };
+      return { date: d, next: GO_DATA.rasis[GO_DATA.days[j][gi]], basis: 'Hyderabad sunrise sample' };
     }
   }
   return null;
@@ -680,7 +688,7 @@ function transitTitle(row, grahaIndex, rasi, janmaRasi, verdict, transition) {
   }
   if (transition) {
     const date = transition.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    title += ` · till ${date}`;
+    title += ` · till ${date} (${transition.basis})`;
   }
   return title;
 }
@@ -761,7 +769,7 @@ function renderUpcomingMoves(index) {
     if (moveIndex) movesBox.append(goElement('span', 'go-move-sep', '  ·  '));
     const item = goElement('span', 'go-move', `${move.graha} → ${move.transition.next} `);
     const date = move.transition.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    item.append(goElement('b', '', date));
+    item.append(goElement('b', '', `${date} (${move.transition.basis})`));
     movesBox.append(item);
   });
   root.replaceChildren(movesBox);

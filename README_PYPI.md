@@ -136,7 +136,7 @@ All solar and lunar eclipses in a date range with per-city visibility and Sutak 
 
 #### `get_graha_positions(date, city, ayanamsa="lahiri", ...)`
 
-Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, nakshatra, pada, retrograde flag, plus `rasi_until` and `next_rasi` — when each graha next changes sign. Transit groundwork for gochara queries.
+Sidereal (Lahiri) positions of all nine grahas at sunrise: longitude, rasi, nakshatra, pada, retrograde flag, plus `rasi_until` and `next_rasi` — the next sign-change calendar date in **IST (Asia/Kolkata)**, even when the requested city uses another timezone. The date is not a city-local date or an exact instant. Transit groundwork for gochara queries.
 
 #### `get_gochara(date, janma_rasi, city, ayanamsa="lahiri", ...)`
 
