@@ -1681,12 +1681,12 @@
         "summary": "Convert local civil midnight to UT Julian day and ask Swiss Ephemeris for the next Sun or Moon rise/set event using fixed observer and atmosphere parameters.",
         "steps": ["Localize 00:00 on the requested date in the IANA timezone and convert it to UTC Julian day.", "Call swe.rise_trans for Sun or Moon with CALC_RISE or CALC_SET.", "Use [longitude, latitude, 0 metres], pressure 1013.25 hPa, temperature 15 C, and Swiss default upper-limb/refraction behavior.", "Search sunset from sunrise and next sunrise from the following local midnight.", "Convert tret[0] to a whole-second UTC datetime."],
         "worked_examples": [{"label": "Hyderabad, 2026-06-11", "inputs": ["Location: Hyderabad, Asia/Kolkata", "Altitude forced to 0 metres", "Swiss default rise/set flags and atmosphere"], "calculation": ["Search the next solar rise after local midnight, then solar set after that rise.", "Search the next lunar rise and set after local midnight."], "result": ["Sunrise: 05:41:11 IST; sunset: 18:50:12 IST", "Moonrise: 01:55:18 IST; moonset: 14:53:44 IST"]}],
-        "notes": ["Swiss return codes are ignored; polar no-event cases are not represented safely.", "The Hindu disc-centre/no-refraction convention remains unresolved."]
+        "notes": ["Swiss return codes are ignored; polar no-event cases are not represented safely.", "Decision 0005 retains the astronomical upper-limb/refraction solar convention; the Hindu disc-centre/no-refraction alternative was compared, not adopted."]
       },
       "surfaces": ["python-library", "mcp", "ics", "website"],
-      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.rise_set_convention", "drik.sidereal_positions"], "note": "Swiss Ephemeris documents the current astronomical-default behavior; issue 177 tracks the Hindu-calendar convention decision and multi-city comparisons."},
-      "tests": ["tests/test_utils.py", "tests/test_drik_engine.py"],
-      "limitations": ["All engines use the astronomical upper-limb/refraction default, ignore Location.alt and return codes, and lack a registered multi-city decision fixture for the intended public convention."]
+      "provenance": {"evidence_classes": ["astronomical"], "verification_states": ["partially_verified"], "claim_ids": ["panchangam.rise_set_convention", "drik.sidereal_positions"], "note": "Decision 0005 retains the solar upper-limb/refraction default; four day pages across two cities agree within 35 seconds. Eight labeled Moon events expose a 231–381-second discrepancy; topocentric disc-centre/no-refraction agrees within 33 seconds but requires an owner-reviewed frozen-core correction."},
+      "tests": ["tests/test_utils.py", "tests/test_drik_engine.py", "tests/test_rise_set_convention.py", "tests/test_moon_rise_set_convention.py"],
+      "limitations": ["All engines currently use the astronomical upper-limb/refraction default and ignore Location.alt and return codes. Lunar correction remains open under #177; the fixtures do not certify Moon day assignment or polar output safety."]
     },
     {
       "id": "panchangam.samvatsara",

@@ -1,0 +1,61 @@
+{
+  "unresolved_visual_numeric_cells": [],
+  "qualification": "No visually unreadable numeric cells remain after high-resolution review; the internal source discrepancy remains unresolved and is not silently corrected. This is a single-transcriber research artifact, not independent double-entry certification.",
+  "issues": [
+    {
+      "id": "source-consistency-100-148",
+      "kind": "internal_source_discrepancy",
+      "days": [
+        100,
+        148
+      ],
+      "cells": [
+        "arcminute"
+      ],
+      "readings": [
+        "8r 1deg 17min",
+        "4r 26deg 17min"
+      ],
+      "locators": [
+        {
+          "physical_pdf_page": 165,
+          "printed_page": 128,
+          "row_on_page": 21
+        },
+        {
+          "physical_pdf_page": 167,
+          "printed_page": 130,
+          "row_on_page": 16
+        }
+      ],
+      "status": "unresolved_source_authority",
+      "explanation": "Both minute fields visibly read 17. Their sum modulo a full circle is 0r 27deg 34min, ten arcminutes below the p134 verification target 0r 27deg 44min. No corrected value is assigned; discrepancy does not establish which cell is wrong."
+    },
+    {
+      "id": "running-header-170",
+      "kind": "pagination_label_conflict",
+      "physical_pdf_page": 170,
+      "printed_page": 133,
+      "printed_running_header": "208-232",
+      "body_day_range": [
+        208,
+        234
+      ],
+      "status": "resolved_locator_from_body",
+      "explanation": "27 body rows; printed anchor 230 is fifth from last. Last two rows are 233 and234."
+    },
+    {
+      "id": "running-header-171",
+      "kind": "pagination_label_conflict",
+      "physical_pdf_page": 171,
+      "printed_page": 134,
+      "printed_running_header": "233-248",
+      "body_day_range": [
+        235,
+        248
+      ],
+      "status": "resolved_locator_from_body",
+      "explanation": "14 body rows begin at explicit235 and end at explicit248."
+    }
+  ]
+}

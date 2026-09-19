@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "retrieved_on": "2026-09-19",
+  "source": "Drik Panchang rendered day pages, independently read through Codex browser accessibility and visible DOM text",
+  "published_precision": "minute",
+  "tolerance_seconds": 120,
+  "scope": "Eight labeled Moon events; compare the civil date printed beside each event, not an assumed midnight-based day assignment. The tested alternative is topocentric disc centre without refraction, not the full Hindu-rising flag.",
+  "cases": [
+    {
+      "city": "Hyderabad",
+      "page_date": "2026-01-01",
+      "url": "https://www.drikpanchang.com/panchang/day-panchang.html?geoname-id=1269843&date=01%2F01%2F2026&time-format=24hour",
+      "published": {"moonrise": "2026-01-01T15:43:00+05:30", "moonset": "2026-01-02T05:26:00+05:30"}
+    },
+    {
+      "city": "Hyderabad",
+      "page_date": "2026-03-13",
+      "url": "https://www.drikpanchang.com/panchang/day-panchang.html?geoname-id=1269843&date=13%2F03%2F2026&time-format=24hour",
+      "published": {"moonrise": "2026-03-14T03:02:00+05:30", "moonset": "2026-03-13T13:13:00+05:30"}
+    },
+    {
+      "city": "New York",
+      "page_date": "2026-01-01",
+      "url": "https://www.drikpanchang.com/panchang/day-panchang.html?geoname-id=5128581&date=01%2F01%2F2026&time-format=24hour",
+      "published": {"moonrise": "2026-01-01T14:39:00-05:00", "moonset": "2026-01-02T06:47:00-05:00"}
+    },
+    {
+      "city": "New York",
+      "page_date": "2026-05-04",
+      "url": "https://www.drikpanchang.com/panchang/day-panchang.html?geoname-id=5128581&date=04%2F05%2F2026&time-format=24hour",
+      "published": {"moonrise": "2026-05-04T23:24:00-04:00", "moonset": "2026-05-04T07:03:00-04:00"}
+    }
+  ]
+}
