@@ -1943,15 +1943,15 @@
       "time_basis": "Evaluated for the candidate slot.",
       "surfaces": ["python-library", "mcp", "website"],
       "provenance": {"evidence_classes": ["textual"], "verification_states": ["verified"], "claim_ids": ["muhurta.homahuti"], "note": "The exact Homahuti and Agnivasa rules have registered locators."},
-      "tests": ["tests/test_yajna_evidence_audit.py", "tests/test_activity_surface_parity.py"],
-      "limitations": ["This is election guidance and does not replace ritual prerequisites or a qualified practitioner; the current low-level reason list labels every Agnivasa remainder as earth-resident even when the admission gate fails, so consumers must rely on the admitted boolean until the tracked transparency fix lands."],
+      "tests": ["tests/test_yajna_evidence_audit.py", "tests/test_activity_surface_parity.py", "tests/test_homa_election_reasons.py", "src/panels/__tests__/homa-election-reasons.test.ts"],
+      "limitations": ["This is election guidance and does not replace ritual prerequisites or a qualified practitioner. Reasons describe the two gates independently: Agnivasa remainders 0 and 3 report earth residence, while 1 and 2 report non-earth residence. Earth residence alone does not imply admission; consumers must use the combined admitted boolean."],
       "method": {
         "kind": "formula",
         "summary": "Apply two conjunctive hard gates: the lunar Nakshatra must fall in a benefic three-star Homahuti group counted from Surya, and the Tithi/Vaaram Agnivasa remainder must be zero or three.",
         "steps": ["Count lunar Nakshatra cyclically from solar Nakshatra and divide the 27-star cycle into nine groups of three.", "Map the group to its Graha lord and require Budha, Shukra, Chandra, or Guru.", "Convert full Tithi to ordinal 1-30 and Vaaram to Sunday-based ordinal 1-7.", "Compute the modulo-four Agnivasa remainder and require 0 or 3.", "Admit only when both requirements pass."],
         "formulae": [{"name": "Homahuti and Agnivasa", "expression": "group=floor(((N_moon-N_sun) mod 27)/3)+1; a=(T+1+V) mod 4", "variables": ["T: full Tithi ordinal 1-30", "V: Sunday-based weekday ordinal"]}],
         "worked_examples": [{"label": "Shukla Pratipat on Sunday, Ashvini Sun and Ardra Moon", "inputs": ["Solar Nakshatra: Ashvini", "Lunar Nakshatra: Ardra", "Tithi ordinal: 1", "Vaaram ordinal: 1"], "calculation": ["Ashvini-to-Ardra falls in group 2, ruled by benefic Budha.", "(1 + 1 + 1) mod 4 = 3, an admitted remainder.", "Both hard gates pass."], "result": ["Admitted: true"]}],
-        "notes": ["Consumers must use the admitted boolean; the existing human reason string overstates earth residence when the remainder gate fails."]
+        "notes": ["Consumers must use the admitted boolean: each reason describes its own gate, and Agnivasa earth residence does not override a rejecting Homahuti group."]
       }
     },
     {
