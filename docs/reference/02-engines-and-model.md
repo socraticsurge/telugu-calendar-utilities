@@ -23,7 +23,7 @@ The current high-level evidence states are:
 | Drik sidereal positions | Partially verified | `drik.sidereal_positions` |
 | Surya Siddhanta longitude model | Source-traced in part; output engine-pinned | `surya_siddhanta.mean_motion_manda`, `panchangam.non_drik_engine_outputs` |
 | Vakya longitude model | Provisional and engine-pinned | `vakya.provisional_lunar_model` |
-| Rise/set convention | Implementation traced; target convention unresolved | `panchangam.rise_set_convention` |
+| Rise/set convention | Solar default retained; lunar discrepancy identified | `panchangam.rise_set_convention` |
 | Calendar naming and rollover semantics | Needs criterion-level locators | `panchangam.calendar_semantics` |
 | Daily windows | Mixed, partially verified container | `panchangam.mixed_daily_windows` |
 
@@ -72,12 +72,19 @@ Ephemeris `rise_trans` for all three systems. The call currently uses:
 - the default astronomical upper-limb/refraction convention.
 
 Swiss Ephemeris Programmer's Documentation sections 8.12 and 8.12.1 distinguish
-that default from its Hindu-calendar disc-centre/no-refraction mode. The project
-has not yet recorded a multi-city comparison that decides which convention its
-public Panchangam should promise. That work is tracked in
-[#177](https://github.com/socraticsurge/telugu-calendar-utilities/issues/177).
-Until it is resolved, do not describe these four fields as a verified Hindu
-sunrise convention.
+that default from its Hindu-calendar disc-centre/no-refraction mode.
+The [rise/set decision](../decisions/0005-rise-set-convention.md) retains the
+current default to match Drik Panchang's documented default. Four independently
+revisited day pages cover two cities and several dates; the maximum solar
+rise/set difference is 35 seconds. `tests/test_rise_set_convention.py` reproduces
+those comparisons and atmosphere/no-event experiments. Eight separately labeled
+Moon events differ from the current default by 231–381 seconds; topocentric
+disc-centre/no-refraction comparisons agree within 33 seconds. That candidate
+requires an owner-reviewed frozen-core correction under #177; the full Hindu
+flag is not an equivalent Moon correction. The decision record and
+`tests/test_moon_rise_set_convention.py` preserve the evidence and distinguish
+event timing from day assignment. Polar safety remains unresolved and the broad
+claim stays partially verified. No frozen engine behavior changed.
 
 Technical source: [Swiss Ephemeris Programmer's Documentation](https://www.astro.com/swisseph/swephprg.htm),
 sections 3, 5.8, 8.12, 8.12.1 and 12.2.
@@ -151,7 +158,12 @@ This is a provisional project model. It is not a registered transcription of a
 248-entry lunar-vākya table, and 3,031 days must not be described as a 248-year
 cycle. Source reconstruction and a possible frozen-core correction are tracked
 in [#176](https://github.com/socraticsurge/telugu-calendar-utilities/issues/176).
-Current tests prove range, shape and regression behavior only.
+Engine tests prove range, shape and regression behavior only. The
+[inspected primary-source audit](../operations/vakya-lunar-source-audit-20260919.md)
+locates a genuine 3,031-day reduction followed by a 248-day table lookup;
+it does not justify the nine-offset implementation.
+`tests/test_vakya_source_example.py` separately reproduces the edition's printed
+arithmetic example without changing or validating the frozen engine.
 
 Like Surya Siddhanta, Vakya accepts but does not apply the ayanamsa parameter.
 

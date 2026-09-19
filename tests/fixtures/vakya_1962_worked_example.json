@@ -1,0 +1,102 @@
+{
+  "source_url": "https://www.ebharatisampat.in/pdfs/ebharati-pdf-1644580379VakyaKarana-LaghuParkasikaVyakhya-Ed-KuppannaSastri-SarmaKV-1962.pdf",
+  "source_sha256": "27b4f655dc3ce19727b58df08a8be120c39c3db896eeeb3182fe6ecab57b3eab",
+  "retrieved_on": "2026-09-19",
+  "locator": "Printed pages 253-256 (physical PDF290-293), I.9-17a, examples3-4; AppendixII printed130 (physical167), rows153-154",
+  "scope": "Source arithmetic reproduction only; not a production engine or modern published-output oracle",
+  "units": "angles [signs, degrees, minutes, seconds]; one sign=30 degrees",
+  "kali_day": 1844004,
+  "sodhya_days": 1600984,
+  "divisors_days": [
+    12372,
+    3031,
+    248
+  ],
+  "quotient_angles": [
+    [
+      9,
+      27,
+      48,
+      10
+    ],
+    [
+      11,
+      7,
+      31,
+      1
+    ],
+    [
+      0,
+      27,
+      44,
+      6
+    ]
+  ],
+  "base_angle": [
+    7,
+    2,
+    0,
+    7
+  ],
+  "mnemonic_rows": {
+    "153": [
+      7,
+      7,
+      36,
+      0
+    ],
+    "154": [
+      7,
+      21,
+      48,
+      0
+    ]
+  },
+  "expected_quotients": [
+    19,
+    2,
+    7
+  ],
+  "expected_remainder": 154,
+  "expected_dhruva": [
+    8,
+    19,
+    26,
+    1
+  ],
+  "expected_uncorrected": [
+    4,
+    11,
+    14,
+    1
+  ],
+  "expected_daily_motion": [
+    0,
+    14,
+    12,
+    0
+  ],
+  "reference_daily_motion": [
+    0,
+    13,
+    11,
+    0
+  ],
+  "expected_correction_vinadis": 208,
+  "expected_corrected": [
+    4,
+    11,
+    17,
+    32
+  ],
+  "local_example": {
+    "place": "Pudukkottai",
+    "correction_vinadis": "-34.6",
+    "expected_longitude": [
+      4,
+      11,
+      9,
+      21
+    ]
+  }
+}

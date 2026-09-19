@@ -4,6 +4,28 @@
   "verification_states": ["verified", "partially_verified", "engine_pinned", "needs_locator", "heuristic", "contradicted"],
   "sources": [
     {
+      "id": "VAKYAKARANA-SASTRI-SARMA-1962",
+      "title": "Vakyakarana with Laghuprakasika commentary",
+      "author": "Commentary by Sundararaja; edited by T. S. Kuppanna Sastri and K. V. Sarma",
+      "edition": "Kuppuswami Sastri Research Institute, Madras, 1962",
+      "url": "https://www.ebharatisampat.in/pdfs/ebharati-pdf-1644580379VakyaKarana-LaghuParkasikaVyakhya-Ed-KuppannaSastri-SarmaKV-1962.pdf",
+      "authority_type": "primary_text_edition_with_translation",
+      "inspected_directly": true,
+      "accessed_on": "2026-09-19",
+      "sha256": "27b4f655dc3ce19727b58df08a8be120c39c3db896eeeb3182fe6ecab57b3eab",
+      "byte_size": 11159128,
+      "physical_pdf_page_count": 339,
+      "inspection_boundary": "Printed 253-256, I.9-17a, examples 3-4; Appendix II printed 130, rows 153-154. Supports a research arithmetic fixture, not the current nine-offset engine."
+    },
+    {
+      "id": "DRIK-SUNRISE-DEFINITION",
+      "title": "Sunrise and Sunset definition in Hindu Calendar",
+      "author": "Drik Panchang",
+      "edition": "Online definition, inspected 2026-09-19",
+      "url": "https://www.drikpanchang.com/panchang/sunrise/panchang-sunrise.html",
+      "authority_type": "reference_provider_methodology"
+    },
+    {
       "id": "BS-IYER-1884",
       "title": "The Brihat Samhita",
       "author": "Varahamihira",
@@ -257,10 +279,10 @@
       "implementation": "telugu_panchangam/engines/utils.py",
       "evidence_class": "astronomical",
       "verification_state": "partially_verified",
-      "source_ids": ["SWISSEPH"],
-      "locator": "Swiss Ephemeris Programmer's Documentation sections 8.12 and 8.12.1; convention decision and comparison gap tracked in GitHub issue 177",
-      "scope": "Precisely traces the current astronomical-default rise_trans behavior: upper limb with refraction, fixed 1013.25 hPa and 15 C, and zero-metre altitude passed by all engines. It does not establish that this is the intended Hindu-calendar convention or independently verify multiple city/date cells.",
-      "last_reviewed": "2026-08-27"
+      "source_ids": ["SWISSEPH", "DRIK-SUNRISE-DEFINITION", "DP-DAY-PAGE"],
+      "locator": "Swiss Ephemeris sections 8.12 and 8.12.1; Drik Panchang sunrise definition, upper-edge/refraction default and optional elevation; decision 0005; tests/fixtures/rise_set_convention_oracle.json and moon_rise_set_convention_oracle.json",
+      "scope": "Retains the solar astronomical upper-limb/refraction default: four independently revisited day pages across Hyderabad and New York agree within 35 seconds. Eight labeled Moon events instead differ from the current default by 231–381 seconds; topocentric disc-centre/no-refraction agrees within 33 seconds, an empirical candidate awaiting owner-reviewed frozen-core correction. Moon day assignment and safe polar handling are not certified. Fixed pressure, temperature and zero-altitude behavior is unchanged.",
+      "last_reviewed": "2026-09-19"
     },
     {
       "id": "festivals.forward_year_2027_2028",

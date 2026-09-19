@@ -1,0 +1,82 @@
+{
+  "source_sha256": "27b4f655dc3ce19727b58df08a8be120c39c3db896eeeb3182fe6ecab57b3eab",
+  "scope": "Appendix II lunar longitude numeric columns only; Sanskrit vakya text is not transcribed.",
+  "physical_pdf_pages": [
+    162,
+    171
+  ],
+  "physical_page_numbering": "1-based PDF page; pdf_page_index is 0-based.",
+  "printed_pages": [
+    125,
+    134
+  ],
+  "printed_first_page_note": "Appendix opener has no visible printed numeral;125 follows adjacent printed126 and known book pagination.",
+  "row_on_page": "1-based body row, excluding headings; day numbers interpolate between explicit printed day anchors.",
+  "units": {
+    "rasi": "r column, whole signs",
+    "degree": "degree column",
+    "arcminute": "minute column"
+  },
+  "row_count": 248,
+  "page_ranges": {
+    "162": {
+      "printed_page": 125,
+      "first_day": 1,
+      "last_day": 23
+    },
+    "163": {
+      "printed_page": 126,
+      "first_day": 24,
+      "last_day": 51
+    },
+    "164": {
+      "printed_page": 127,
+      "first_day": 52,
+      "last_day": 79
+    },
+    "165": {
+      "printed_page": 128,
+      "first_day": 80,
+      "last_day": 107
+    },
+    "166": {
+      "printed_page": 129,
+      "first_day": 108,
+      "last_day": 132
+    },
+    "167": {
+      "printed_page": 130,
+      "first_day": 133,
+      "last_day": 157
+    },
+    "168": {
+      "printed_page": 131,
+      "first_day": 158,
+      "last_day": 182
+    },
+    "169": {
+      "printed_page": 132,
+      "first_day": 183,
+      "last_day": 207
+    },
+    "170": {
+      "printed_page": 133,
+      "first_day": 208,
+      "last_day": 234
+    },
+    "171": {
+      "printed_page": 134,
+      "first_day": 235,
+      "last_day": 248
+    }
+  },
+  "method": "Manual visual transcription from140dpi renders; affected/faint cells re-inspected at250/300dpi. PDF text extraction is empty. Printed p134 relation used only as a diagnostic, never to supply or correct source values.",
+  "independent_confirmation": "Root separately confirmed153=7r7deg36min and154=7r21deg48min; this transcription agrees.",
+  "limitations": [
+    "Single-transcriber draft requires independent second transcription before authoritative use.",
+    "Internal discrepancy in100/148 remains unresolved.",
+    "No epoch, ahargana, interpolation or time-of-day model inferred.",
+    "Does not validate the current nine-offset engine; no engine implementation is included."
+  ],
+  "source_url": "https://www.ebharatisampat.in/pdfs/ebharati-pdf-1644580379VakyaKarana-LaghuParkasikaVyakhya-Ed-KuppannaSastri-SarmaKV-1962.pdf"
+}

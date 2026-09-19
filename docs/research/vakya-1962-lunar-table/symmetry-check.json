@@ -1,0 +1,10 @@
+{
+  "method": "Printed p134 verification relation; diagnostic only, never used to fill or correct cells.",
+  "mismatches": [
+    {
+      "day": 100,
+      "paired_day": 148,
+      "residual_arcminutes": -10
+    }
+  ]
+}
