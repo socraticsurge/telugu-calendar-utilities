@@ -1041,6 +1041,7 @@
     /* Flag-strip (festivals/specials chips) tighter */
     body[data-mode="mobile"] .flag-strip { padding: 0.55rem 0.85rem 0.2rem; gap: 0.35rem; }
   </style>
+  <link rel="stylesheet" href="/src/styles/tokens.css">
   <link rel="stylesheet" href="/src/styles/ux-concept.css">
   <link rel="stylesheet" href="/src/styles/ux-audit-hardening.css">
 </head>
@@ -1085,31 +1086,31 @@
       <ul class="sidebar-nav">
         <li>
           <button class="sidebar-item active" id="sidebar-today" aria-current="page" onclick="switchTool('today')">
-            <span class="sidebar-icon">🔆</span>
+            <span class="sidebar-icon-visual" aria-hidden="true"><span class="sidebar-icon">🔆</span></span>
             <span class="sidebar-label">Panchangam</span>
           </button>
         </li>
         <li>
           <button class="sidebar-item" id="sidebar-gochara" onclick="switchTool('gochara')">
-            <span class="sidebar-icon">🪐</span>
+            <span class="sidebar-icon-visual" aria-hidden="true"><span class="sidebar-icon">🪐</span></span>
             <span class="sidebar-label">Daily Horoscope</span>
           </button>
         </li>
         <li>
           <button class="sidebar-item" id="sidebar-tarabalam" onclick="switchTool('tarabalam')">
-            <span class="sidebar-icon">⏰</span>
+            <span class="sidebar-icon-visual" aria-hidden="true"><span class="sidebar-icon">⏰</span></span>
             <span class="sidebar-label">Muhurtam</span>
           </button>
         </li>
         <li>
           <button class="sidebar-item" id="sidebar-profiles" onclick="switchTool('profiles')">
-            <span class="sidebar-icon">♙</span>
+            <span class="sidebar-icon-visual" aria-hidden="true"><span class="sidebar-icon">♙</span></span>
             <span class="sidebar-label">Profiles</span>
           </button>
         </li>
         <li>
           <button class="sidebar-item" id="sidebar-festivals" onclick="switchTool('festivals')">
-            <span class="sidebar-icon">🪔</span>
+            <span class="sidebar-icon-visual" aria-hidden="true"><span class="sidebar-icon">🪔</span></span>
             <span class="sidebar-label">Festivals</span>
           </button>
         </li>
@@ -1120,13 +1121,13 @@
       <ul class="sidebar-nav">
         <li>
           <button class="sidebar-item" id="sidebar-subscribe" onclick="switchTool('subscribe')">
-            <span class="sidebar-icon">📅</span>
+            <span class="sidebar-icon-visual" aria-hidden="true"><span class="sidebar-icon">📅</span></span>
             <span class="sidebar-label">Subscribe</span>
           </button>
         </li>
         <li>
           <a class="sidebar-item" href="/docs/">
-            <span class="sidebar-icon">📖</span>
+            <span class="sidebar-icon-visual" aria-hidden="true"><span class="sidebar-icon">📖</span></span>
             <span class="sidebar-label">Documentation</span>
           </a>
         </li>

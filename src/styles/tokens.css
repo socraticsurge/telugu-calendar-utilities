@@ -1,0 +1,44 @@
+/* Shared, light-only visual vocabulary; values preserve the committed palette. */
+:root {
+  --ux-ground: #f2ecdf;
+  --ux-surface: #fffcf5;
+  --ux-surface-muted: #f8f1e5;
+  --ux-ink: #1f1a17;
+  --ux-muted: #58504a;
+  --ux-hint: #6b6357;
+  --ux-line: #ddd2bc;
+  --ux-line-soft: #e7decc;
+  --ux-brand: #8e2a1f;
+  --ux-brand-deep: #6d1f16;
+  --ux-good: #4f6b2c;
+  --ux-good-bg: #f1f5e9;
+  --ux-bad: #8e2a1f;
+  --ux-bad-bg: #fbefec;
+  --ux-space-1: 0.25rem;
+  --ux-space-2: 0.5rem;
+  --ux-space-3: 0.75rem;
+  --ux-space-4: 1rem;
+  --ux-space-5: 1.5rem;
+  --ux-space-6: 2rem;
+  --ux-text-xs: 0.75rem;
+  --ux-text-sm: 0.875rem;
+  --ux-text-md: 1rem;
+  --ux-text-lg: 1.25rem;
+  --ux-text-xl: 2rem;
+  --ux-text-display-compact: 1.45rem;
+  --ux-focus: var(--ux-brand);
+  --ux-hover: rgba(142, 42, 31, 0.05);
+  --ux-selected: rgba(142, 42, 31, 0.07);
+  --ux-warning: #8f5c18;
+  --ux-error: var(--ux-bad);
+  --ux-success: var(--ux-good);
+  --ux-disabled-opacity: 0.55;
+  --ux-radius-sm: 4px;
+  --ux-radius-md: 8px;
+  --ux-touch-target: 44px;
+  --ux-prose-measure: 68ch;
+}
+
+@media (max-width: 767px) {
+  :root { --ux-text-xl: var(--ux-text-display-compact); }
+}
