@@ -205,7 +205,7 @@ def get_graha_positions(
     timezone: str | None = None,
     ayanamsa: str = 'lahiri',
 ) -> str:
-    """Sidereal positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until + next_rasi; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
+    """Sidereal positions of all nine grahas — Surya, Chandra, Kuja, Budha, Guru, Shukra, Shani, Rahu, Ketu — at sunrise of the given date: longitude, rasi, nakshatra, pada, retrograde flag, and when each graha enters its next rasi (rasi_until is an IST/Asia-Kolkata calendar date regardless of city, not an exact instant; next_rasi names the destination sign; transit/gochara groundwork). Args: date=YYYY-MM-DD, city=city name (or latitude+longitude; timezone derived if omitted), ayanamsa=lahiri|raman|krishnamurti|true_chitrapaksha (default: lahiri)."""
     return tool_get_graha_positions(date, city, latitude, longitude, timezone, ayanamsa)
 
 
