@@ -13,12 +13,15 @@ def build_export() -> dict:
     from telugu_panchangam import special_yogas as yoga
     from telugu_panchangam.gochara.rules import named_conditions
     from telugu_panchangam.panchangam_names import (
+        KARANA_FIXED,
+        KARANA_REPEATING,
         NAKSHATRA_NAMES,
         RASHI_NAMES,
+        TITHI_NAMES,
         VAARAM_NAMES,
         YOGA_NAMES,
     )
-    from telugu_panchangam.personal import homa, lagna_hora, nitya_yoga
+    from telugu_panchangam.personal import homa, lagna_hora, nitya_yoga, tithi_class
 
     # The browser's approximate astronomical path has historically used these
     # spellings. Preserve them here; canonicalizing outputs is a separate change.
@@ -28,6 +31,11 @@ def build_export() -> dict:
         "rashiNames": RASHI_NAMES,
         "nakshatraNames": NAKSHATRA_NAMES,
         "varaNames": VAARAM_NAMES,
+        "tithiNames": TITHI_NAMES,
+        "tithiWithinPakshaNames": tithi_class.TITHI_NAMES,
+        "tithiAliases": tithi_class._ALIASES,
+        "karanaRepeating": KARANA_REPEATING,
+        "karanaFixed": KARANA_FIXED,
         "browserYogaNames": [browser_yoga_names.get(name, name) for name in YOGA_NAMES],
         "canonicalYogaNames": YOGA_NAMES,
         "nitya": {

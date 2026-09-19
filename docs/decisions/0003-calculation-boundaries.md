@@ -118,3 +118,33 @@ This proves compatibility, not independent astronomical accuracy or faster downl
 
 No public activation, workflow dispatch or feed publication is implied by local verification.
 Broad replacement of remaining panels, engine unification and API feature parity are outside this repair.
+
+## Residual Tithi and Karana vocabulary (#184)
+
+The schema-1 shared calendar artifact now also projects the existing Python-owned
+Tithi and Karana vocabulary without changing any calculation or scoring rule:
+
+| Export | Python owner | Browser consumers |
+| --- | --- | --- |
+| `tithiNames` | `panchangam_names.TITHI_NAMES` | Slot-time facts and Homa ordinal lookup |
+| `tithiWithinPakshaNames` | `personal.tithi_class.TITHI_NAMES` | Activity ordinal and Tithi-family lookup |
+| `tithiAliases` | `personal.tithi_class._ALIASES` | Both last-word input classifiers |
+| `karanaRepeating`, `karanaFixed` | `panchangam_names.KARANA_REPEATING`, `KARANA_FIXED` | Slot-time Karana lookup |
+
+The 30 full Tithi names and 15 within-paksha names are distinct contracts.
+`Pournami` and `Amavasya` retain their existing terminal positions; all four
+input aliases and named Ekadashi suffixes remain accepted. JSON object keys for
+fixed Karanas are strings on disk, with unchanged JavaScript numeric indexing.
+These fields are additive under schema version 1; removals, reordering, or changed
+semantics require an explicit compatibility decision, not silent regeneration.
+
+The browser's numeric Tithi-family rule remains an intentional algorithm mirror,
+not vocabulary ownership. Its outputs are checked for all 30 names and aliases.
+The astronomical formulae and their half-Tithi index calculation remain unchanged.
+The 60-row fixture records existing browser outputs from master `8938755`, sampled
+at three-hour intervals during January/February 2026 until every half-Tithi index
+was present. It protects migration behavior, not independent astronomical accuracy;
+selected-engine correctness is separate work in #182. Python checks every fixture
+name against canonical owners, and Vitest checks the complete existing browser
+output at each captured instant. The existing stale-artifact test still requires
+an exact match to the exporter.

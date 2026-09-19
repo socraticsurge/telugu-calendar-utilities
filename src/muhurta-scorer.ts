@@ -33,14 +33,8 @@ export function muCanonicalNakshatra(name: string): string {
   return MU_NAKSHATRA_ALIASES[name] || name;
 }
 
-const MU_TITHI_NAMES = [
-  'Pratipat', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
-  'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',
-  'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Pournami',
-];
-const MU_TITHI_ALIASES: Record<string, number> = {
-  Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15,
-};
+const MU_TITHI_NAMES = sharedTables.tithiWithinPakshaNames;
+const MU_TITHI_ALIASES: Record<string, number> = sharedTables.tithiAliases;
 const MU_TITHI_FAMILIES: Record<number, string> = {
   1: 'Nanda', 6: 'Nanda', 11: 'Nanda',
   2: 'Bhadra', 7: 'Bhadra', 12: 'Bhadra',

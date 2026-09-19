@@ -1,0 +1,842 @@
+[
+  {
+    "halfTithiIndex": 0,
+    "instant": "2026-01-18T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Uttara Ashadha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Pratipat",
+      "yoga": "Vajra",
+      "karana": "Kinstughna",
+      "lunarSign": "Makara",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 1,
+    "instant": "2026-01-19T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Shravana",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Pratipat",
+      "yoga": "Vajra",
+      "karana": "Bava",
+      "lunarSign": "Makara",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 2,
+    "instant": "2026-01-19T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Shravana",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Dwitiya",
+      "yoga": "Siddhi",
+      "karana": "Balava",
+      "lunarSign": "Makara",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 3,
+    "instant": "2026-01-20T12:00:00.000Z",
+    "facts": {
+      "nakshatra": "Dhanishtha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Dwitiya",
+      "yoga": "Siddhi",
+      "karana": "Kaulava",
+      "lunarSign": "Makara",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 4,
+    "instant": "2026-01-21T00:00:00.000Z",
+    "facts": {
+      "nakshatra": "Dhanishtha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Tritiya",
+      "yoga": "Vyatipata",
+      "karana": "Taitila",
+      "lunarSign": "Kumbha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 5,
+    "instant": "2026-01-21T12:00:00.000Z",
+    "facts": {
+      "nakshatra": "Shatabhisha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Tritiya",
+      "yoga": "Vyatipata",
+      "karana": "Garaja",
+      "lunarSign": "Kumbha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 6,
+    "instant": "2026-01-22T00:00:00.000Z",
+    "facts": {
+      "nakshatra": "Shatabhisha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Chaturthi",
+      "yoga": "Variyana",
+      "karana": "Vanija",
+      "lunarSign": "Kumbha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 7,
+    "instant": "2026-01-22T12:00:00.000Z",
+    "facts": {
+      "nakshatra": "Purva Bhadrapada",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Chaturthi",
+      "yoga": "Variyana",
+      "karana": "Vishti",
+      "lunarSign": "Kumbha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 8,
+    "instant": "2026-01-23T00:00:00.000Z",
+    "facts": {
+      "nakshatra": "Purva Bhadrapada",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Panchami",
+      "yoga": "Parigha",
+      "karana": "Bava",
+      "lunarSign": "Kumbha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 9,
+    "instant": "2026-01-23T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Purva Bhadrapada",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Panchami",
+      "yoga": "Parigha",
+      "karana": "Balava",
+      "lunarSign": "Meena",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 10,
+    "instant": "2026-01-23T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Uttara Bhadrapada",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Shukla Shashthi",
+      "yoga": "Shiva",
+      "karana": "Kaulava",
+      "lunarSign": "Meena",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 11,
+    "instant": "2026-01-24T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Revati",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Shashthi",
+      "yoga": "Siddha",
+      "karana": "Taitila",
+      "lunarSign": "Meena",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 12,
+    "instant": "2026-01-24T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Revati",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Saptami",
+      "yoga": "Siddha",
+      "karana": "Garaja",
+      "lunarSign": "Meena",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 13,
+    "instant": "2026-01-25T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Ashvini",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Saptami",
+      "yoga": "Sadhya",
+      "karana": "Vanija",
+      "lunarSign": "Mesha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 14,
+    "instant": "2026-01-25T18:00:00.000Z",
+    "facts": {
+      "nakshatra": "Ashvini",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Ashtami",
+      "yoga": "Sadhya",
+      "karana": "Vishti",
+      "lunarSign": "Mesha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 15,
+    "instant": "2026-01-26T06:00:00.000Z",
+    "facts": {
+      "nakshatra": "Ashvini",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Ashtami",
+      "yoga": "Shubha",
+      "karana": "Bava",
+      "lunarSign": "Mesha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 16,
+    "instant": "2026-01-26T18:00:00.000Z",
+    "facts": {
+      "nakshatra": "Bharani",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Navami",
+      "yoga": "Shubha",
+      "karana": "Balava",
+      "lunarSign": "Mesha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 17,
+    "instant": "2026-01-27T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Bharani",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Navami",
+      "yoga": "Shukla",
+      "karana": "Kaulava",
+      "lunarSign": "Mesha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 18,
+    "instant": "2026-01-27T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Krittika",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Dashami",
+      "yoga": "Shukla",
+      "karana": "Taitila",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 19,
+    "instant": "2026-01-28T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Krittika",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Dashami",
+      "yoga": "Brahma",
+      "karana": "Garaja",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 20,
+    "instant": "2026-01-28T12:00:00.000Z",
+    "facts": {
+      "nakshatra": "Rohini",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Ekadashi",
+      "yoga": "Brahma",
+      "karana": "Vanija",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 21,
+    "instant": "2026-01-29T00:00:00.000Z",
+    "facts": {
+      "nakshatra": "Rohini",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Ekadashi",
+      "yoga": "Indra",
+      "karana": "Vishti",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 22,
+    "instant": "2026-01-29T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Mrigashira",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Dwadashi",
+      "yoga": "Indra",
+      "karana": "Bava",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 23,
+    "instant": "2026-01-29T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Mrigashira",
+      "solarNakshatra": "Shravana",
+      "tithi": "Shukla Dwadashi",
+      "yoga": "Vaidhriti",
+      "karana": "Balava",
+      "lunarSign": "Mithuna",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 24,
+    "instant": "2026-01-01T00:00:00.000Z",
+    "facts": {
+      "nakshatra": "Rohini",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Shukla Trayodashi",
+      "yoga": "Shubha",
+      "karana": "Kaulava",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 25,
+    "instant": "2026-01-01T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Rohini",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Shukla Trayodashi",
+      "yoga": "Shubha",
+      "karana": "Taitila",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 26,
+    "instant": "2026-01-01T18:00:00.000Z",
+    "facts": {
+      "nakshatra": "Mrigashira",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Shukla Chaturdashi",
+      "yoga": "Shukla",
+      "karana": "Garaja",
+      "lunarSign": "Vrishabha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 27,
+    "instant": "2026-01-02T06:00:00.000Z",
+    "facts": {
+      "nakshatra": "Mrigashira",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Shukla Chaturdashi",
+      "yoga": "Shukla",
+      "karana": "Vanija",
+      "lunarSign": "Mithuna",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 28,
+    "instant": "2026-01-02T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Ardra",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Pournami",
+      "yoga": "Brahma",
+      "karana": "Vishti",
+      "lunarSign": "Mithuna",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 29,
+    "instant": "2026-01-03T00:00:00.000Z",
+    "facts": {
+      "nakshatra": "Ardra",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Pournami",
+      "yoga": "Brahma",
+      "karana": "Bava",
+      "lunarSign": "Mithuna",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 30,
+    "instant": "2026-01-03T12:00:00.000Z",
+    "facts": {
+      "nakshatra": "Punarvasu",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Pratipat",
+      "yoga": "Indra",
+      "karana": "Balava",
+      "lunarSign": "Mithuna",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 31,
+    "instant": "2026-01-03T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Punarvasu",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Pratipat",
+      "yoga": "Indra",
+      "karana": "Kaulava",
+      "lunarSign": "Mithuna",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 32,
+    "instant": "2026-01-04T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Punarvasu",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Dwitiya",
+      "yoga": "Vaidhriti",
+      "karana": "Taitila",
+      "lunarSign": "Karka",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 33,
+    "instant": "2026-01-04T18:00:00.000Z",
+    "facts": {
+      "nakshatra": "Pushya",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Dwitiya",
+      "yoga": "Vaidhriti",
+      "karana": "Garaja",
+      "lunarSign": "Karka",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 34,
+    "instant": "2026-01-05T06:00:00.000Z",
+    "facts": {
+      "nakshatra": "Pushya",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Tritiya",
+      "yoga": "Vishkambha",
+      "karana": "Vanija",
+      "lunarSign": "Karka",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 35,
+    "instant": "2026-01-05T18:00:00.000Z",
+    "facts": {
+      "nakshatra": "Ashlesha",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Tritiya",
+      "yoga": "Priti",
+      "karana": "Vishti",
+      "lunarSign": "Karka",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 36,
+    "instant": "2026-01-06T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Ashlesha",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Chaturthi",
+      "yoga": "Priti",
+      "karana": "Bava",
+      "lunarSign": "Karka",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 37,
+    "instant": "2026-01-06T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Magha",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Chaturthi",
+      "yoga": "Ayushman",
+      "karana": "Balava",
+      "lunarSign": "Simha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 38,
+    "instant": "2026-01-07T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Magha",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Panchami",
+      "yoga": "Ayushman",
+      "karana": "Kaulava",
+      "lunarSign": "Simha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 39,
+    "instant": "2026-01-07T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Purva Phalguni",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Panchami",
+      "yoga": "Saubhagya",
+      "karana": "Taitila",
+      "lunarSign": "Simha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 40,
+    "instant": "2026-01-08T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Purva Phalguni",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Shashthi",
+      "yoga": "Saubhagya",
+      "karana": "Garaja",
+      "lunarSign": "Simha",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 41,
+    "instant": "2026-01-08T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Uttara Phalguni",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Shashthi",
+      "yoga": "Shobhana",
+      "karana": "Vanija",
+      "lunarSign": "Kanya",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 42,
+    "instant": "2026-01-09T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Uttara Phalguni",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Saptami",
+      "yoga": "Shobhana",
+      "karana": "Vishti",
+      "lunarSign": "Kanya",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 43,
+    "instant": "2026-01-09T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Hasta",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Saptami",
+      "yoga": "Atiganda",
+      "karana": "Bava",
+      "lunarSign": "Kanya",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 44,
+    "instant": "2026-01-10T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Hasta",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Ashtami",
+      "yoga": "Atiganda",
+      "karana": "Balava",
+      "lunarSign": "Kanya",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 45,
+    "instant": "2026-01-10T18:00:00.000Z",
+    "facts": {
+      "nakshatra": "Chitra",
+      "solarNakshatra": "Purva Ashadha",
+      "tithi": "Krishna Ashtami",
+      "yoga": "Sukarma",
+      "karana": "Kaulava",
+      "lunarSign": "Kanya",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 46,
+    "instant": "2026-01-11T06:00:00.000Z",
+    "facts": {
+      "nakshatra": "Chitra",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Navami",
+      "yoga": "Sukarma",
+      "karana": "Taitila",
+      "lunarSign": "Tula",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 47,
+    "instant": "2026-01-11T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Swati",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Navami",
+      "yoga": "Dhriti",
+      "karana": "Garaja",
+      "lunarSign": "Tula",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 48,
+    "instant": "2026-01-12T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Swati",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Dashami",
+      "yoga": "Dhriti",
+      "karana": "Vanija",
+      "lunarSign": "Tula",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 49,
+    "instant": "2026-01-12T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Vishakha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Dashami",
+      "yoga": "Shula",
+      "karana": "Vishti",
+      "lunarSign": "Tula",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 50,
+    "instant": "2026-01-13T12:00:00.000Z",
+    "facts": {
+      "nakshatra": "Vishakha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Ekadashi",
+      "yoga": "Shula",
+      "karana": "Bava",
+      "lunarSign": "Vrischika",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 51,
+    "instant": "2026-01-14T00:00:00.000Z",
+    "facts": {
+      "nakshatra": "Anuradha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Ekadashi",
+      "yoga": "Ganda",
+      "karana": "Balava",
+      "lunarSign": "Vrischika",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 52,
+    "instant": "2026-01-14T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Anuradha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Dwadashi",
+      "yoga": "Vriddhi",
+      "karana": "Kaulava",
+      "lunarSign": "Vrischika",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 53,
+    "instant": "2026-01-15T03:00:00.000Z",
+    "facts": {
+      "nakshatra": "Jyeshtha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Dwadashi",
+      "yoga": "Vriddhi",
+      "karana": "Taitila",
+      "lunarSign": "Vrischika",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 54,
+    "instant": "2026-01-15T15:00:00.000Z",
+    "facts": {
+      "nakshatra": "Jyeshtha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Trayodashi",
+      "yoga": "Vriddhi",
+      "karana": "Garaja",
+      "lunarSign": "Vrischika",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 55,
+    "instant": "2026-01-16T06:00:00.000Z",
+    "facts": {
+      "nakshatra": "Mula",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Trayodashi",
+      "yoga": "Dhruva",
+      "karana": "Vanija",
+      "lunarSign": "Dhanu",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 56,
+    "instant": "2026-01-16T18:00:00.000Z",
+    "facts": {
+      "nakshatra": "Mula",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Chaturdashi",
+      "yoga": "Vyaghata",
+      "karana": "Vishti",
+      "lunarSign": "Dhanu",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 57,
+    "instant": "2026-01-17T06:00:00.000Z",
+    "facts": {
+      "nakshatra": "Purva Ashadha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Krishna Chaturdashi",
+      "yoga": "Vyaghata",
+      "karana": "Shakuni",
+      "lunarSign": "Dhanu",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 58,
+    "instant": "2026-01-17T21:00:00.000Z",
+    "facts": {
+      "nakshatra": "Purva Ashadha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Amavasya",
+      "yoga": "Harshana",
+      "karana": "Chatushpada",
+      "lunarSign": "Dhanu",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  },
+  {
+    "halfTithiIndex": 59,
+    "instant": "2026-01-18T09:00:00.000Z",
+    "facts": {
+      "nakshatra": "Uttara Ashadha",
+      "solarNakshatra": "Uttara Ashadha",
+      "tithi": "Amavasya",
+      "yoga": "Harshana",
+      "karana": "Naga",
+      "lunarSign": "Dhanu",
+      "vaaram": "Somavara",
+      "specialYogas": []
+    }
+  }
+]

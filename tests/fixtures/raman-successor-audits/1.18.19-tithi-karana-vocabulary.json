@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "release": "1.18.19",
+  "parent_release": "1.18.18",
+  "activity": "tithi-karana-vocabulary",
+  "baseline_fixture": "tests/fixtures/raman-artifact-identity-audit-v1.json",
+  "baseline_fixture_sha256": "f97c70ecd10f11da04f9c81edf11974e80ddf190a5e0dfddc76388ae781625fe",
+  "raman_claim_changes": [],
+  "semantic_deltas": [],
+  "protected_source_transforms": [
+    {
+      "path": "src/muhurta-scorer.ts",
+      "scope": "tithi-karana-vocabulary_exact_existing_table_projection",
+      "transforms": [
+        {
+          "before": "const MU_TITHI_NAMES = [\n  'Pratipat', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',\n  'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',\n  'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Pournami',\n];\nconst MU_TITHI_ALIASES: Record<string, number> = {\n  Pratipada: 1, Prathama: 1, Shashti: 6, Amavasya: 15,\n};\n",
+          "after": "const MU_TITHI_NAMES = sharedTables.tithiWithinPakshaNames;\nconst MU_TITHI_ALIASES: Record<string, number> = sharedTables.tithiAliases;\n"
+        }
+      ]
+    }
+  ]
+}
