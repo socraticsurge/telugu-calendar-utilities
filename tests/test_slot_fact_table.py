@@ -43,8 +43,10 @@ def test_every_minute_matches_selected_public_engine(system, city, iso):
 @pytest.mark.parametrize('seconds', [1, 30, 59])
 def test_non_minute_generation_bounds_are_rejected(seconds):
     start = datetime(2026, 6, 17, tzinfo=timezone.utc)
+    engine = ENGINES['drik']()
+    lower, upper = start + timedelta(seconds=seconds), start + timedelta(days=1)
     with pytest.raises(ValueError, match='whole UTC minute'):
-        build_slot_fact_table(ENGINES['drik'](), 'drik', start + timedelta(seconds=seconds), start + timedelta(days=1))
+        build_slot_fact_table(engine, 'drik', lower, upper)
 
 
 def test_vakya_discontinuity_day_is_evaluated_without_interpolation():
