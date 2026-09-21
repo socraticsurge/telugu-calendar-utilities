@@ -12,6 +12,10 @@ separate published releases.
 
 ## [Unreleased]
 
+### Added
+
+- Stage one compact UTC-minute slot-fact table per calculation system for the existing feed window; preserve the current website until all three datasets are published (#182).
+
 ## [1.18.19] — 2026-09-21
 
 ### Fixed
