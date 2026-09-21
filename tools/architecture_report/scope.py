@@ -11,6 +11,7 @@ _ADDITIVE_FEATURE_SOURCES = frozenset({
     'src/scorer/search-contract.ts',
     'src/scorer/tara-chandra.ts',
     'telugu_panchangam/generators/calendar_data.py',
+    'telugu_panchangam/generators/slot_facts.py',
     'telugu_panchangam/mcp/muhurta_request.py',
     'telugu_panchangam/mcp/muhurta_response.py',
     'telugu_panchangam/mcp/calendar_response.py',

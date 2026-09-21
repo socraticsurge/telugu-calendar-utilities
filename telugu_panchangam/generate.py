@@ -1,8 +1,9 @@
 # src/generate.py
 """Entry point: generate all Panchangam ICS feeds."""
+import json
 import os
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from telugu_panchangam.cities import CITIES
 from telugu_panchangam.eclipses import (
@@ -19,6 +20,7 @@ from telugu_panchangam.generators.anga_variants import (
 )
 from telugu_panchangam.generators.calendar_data import calendar_json
 from telugu_panchangam.generators.ics import ICSGenerator
+from telugu_panchangam.generators.slot_facts import build_slot_fact_table
 
 ENGINES = {
     'drik': DrikGanitaEngine,
@@ -54,6 +56,13 @@ def generate_feeds(
             print(f'Unknown system: {system}', file=sys.stderr)
             continue
         engine = ENGINES[system]()
+        table = build_slot_fact_table(
+            engine, system,
+            datetime.combine(start - timedelta(days=1), datetime.min.time(), timezone.utc),
+            datetime.combine(end + timedelta(days=2), datetime.min.time(), timezone.utc),
+        )
+        with open(os.path.join(output_dir, f'{system}.slot-facts-v1.json'), 'w') as stream:
+            json.dump(table, stream, separators=(',', ':'))
         for location in locations:
             print(f'  Generating {location.name} / {system}...')
             days = []
