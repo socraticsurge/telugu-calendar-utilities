@@ -78,5 +78,6 @@ def test_swiss_polar_moon_no_event_uses_the_same_status_contract(event):
 
 
 def test_swiss_invalid_body_raises_instead_of_returning_an_event():
+    jd = swe.julday(2026, 1, 1)
     with pytest.raises(swe.Error):
-        swe.rise_trans(swe.julday(2026, 1, 1), -999, swe.CALC_RISE, (0, 0, 0))
+        swe.rise_trans(jd, -999, swe.CALC_RISE, (0, 0, 0))
