@@ -1,0 +1,630 @@
+{
+  "date": "2026-10-22",
+  "model_used": "gemini-3.1-flash-lite",
+  "provenance": {
+    "claim_id": "daily_horoscope.llm_interpretation",
+    "engine_verified": [
+      "transits_cited.graha",
+      "transits_cited.position",
+      "transits_cited.verdict"
+    ],
+    "model_interpretation": [
+      "text",
+      "advice"
+    ]
+  },
+  "rashis": {
+    "Mesha": {
+      "text": "Today brings a sense of social expansion for you as Chandra moves through your eleventh house, brightening your connections with friends and community. However, you may feel a bit of internal friction as Surya, Budha, and Shukra occupy your seventh house, suggesting that your focus on partnerships could be met with minor misunderstandings. Kuja in your fourth house might stir up some restlessness regarding your home environment or personal comfort. Guru also sits in your fourth house, adding a layer of introspection to your domestic life. Shani moving through your twelfth house pulls your attention inward, asking you to find peace in solitude rather than seeking validation from the outside world. Because you are in the rising phase of Sade Sati, you may find that patience is your greatest ally when dealing with delays. Rahu in your eleventh house offers a stroke of luck in your social circles, while Ketu in your fifth house encourages you to be mindful of your creative impulses. Take a moment to breathe deeply and release any tension you are holding in your shoulders. Remember that even when the stars feel demanding, your own resilience remains your strongest asset. Trust that this period of adjustment is merely paving the way for a more stable future. Stay grounded in your values and keep moving forward with kindness.",
+      "advice": "Prioritize quiet reflection over engaging in debates with partners today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shani",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Ketu",
+          "position": 5,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Vrishabha": {
+      "text": "Your day looks promising as Chandra glides through your tenth house, highlighting your professional efforts and public standing. Surya and Budha in your sixth house provide you with the clarity needed to handle daily tasks with efficiency and precision. Kuja in your third house grants you the courage to take initiative in your personal projects. Shani in your eleventh house brings a steady influence to your long-term goals and social connections. Rahu in your tenth house adds a touch of ambition to your current path, helping you stand out in your endeavors. Meanwhile, Guru in your third house and Shukra in your sixth house suggest that you should be careful not to overextend yourself in your daily routines. Ketu in your fourth house reminds you to keep your home life peaceful and avoid unnecessary clutter. While things are moving in your favor, try to maintain a balanced pace to avoid burnout. It is a wonderful time to focus on your strengths and refine your daily habits. Trust in your ability to manage the details of your life with grace. Keep your heart open and your mind focused on the positive progress you are making.",
+      "advice": "Focus your energy on completing pending tasks today, as the planetary alignment supports your efficiency.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 10,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Budha",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 3,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 6,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shani",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Rahu",
+          "position": 10,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Ketu",
+          "position": 4,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Mithuna": {
+      "text": "Today invites you to look inward as Chandra moves through your ninth house, encouraging a reflective and spiritual mindset. Guru in your second house provides a stable foundation for your values and resources, helping you feel more secure in your choices. Ketu in your third house gives you a unique perspective on your daily communications, allowing you to see things others might miss. However, Surya, Budha, and Shukra in your fifth house suggest that you should be mindful of how you express your creativity and emotions, as there may be some minor obstacles. Kuja in your second house asks you to be careful with your words to avoid unnecessary friction. Shani in your tenth house reminds you that professional success requires patience and a long-term view. Rahu in your ninth house might bring some unexpected philosophical questions to the surface. Take this time to nurture your inner wisdom and seek solace in quiet contemplation. Avoid rushing into decisions that require deep thought. Your ability to adapt is your greatest strength, so allow yourself to flow with the day's energy. Stay patient with yourself and others as you navigate these influences. You are doing better than you think.",
+      "advice": "Practice mindful communication today to keep your interactions harmonious.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 2,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shukra",
+          "position": 5,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shani",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 3,
+          "verdict": "favourable"
+        }
+      ]
+    },
+    "Karka": {
+      "text": "The energy today calls for deep emotional grounding as Chandra moves through your eighth house, suggesting a day for quiet reflection rather than outward action. Budha and Shukra in your fourth house offer a pleasant atmosphere at home, helping you find comfort in your familiar surroundings. However, Surya in your fourth house and Kuja in your first house indicate that you might feel a bit more sensitive or reactive than usual. Guru in your first house adds a layer of self-awareness, though it may also bring a sense of pressure to perform. Shani in your ninth house encourages you to stick to your principles even when things feel challenging. Rahu in your eighth house suggests that you should be careful with your energy levels and avoid overthinking. Ketu in your second house asks you to be mindful of your speech and how you handle your resources. Take time to rest and recharge your spirit away from the noise of the world. It is perfectly okay to step back and prioritize your well-being today. Trust that this emotional intensity will pass and leave you with greater clarity. Be gentle with your heart and keep your intentions pure.",
+      "advice": "Make space for solitude and avoid making major decisions that feel emotionally charged.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 4,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 4,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 2,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Simha": {
+      "text": "You may find today quite dynamic as Chandra moves through your seventh house, bringing your focus to your relationships and partnerships. Surya and Shukra in your third house provide you with the charm and energy to communicate effectively with those around you. However, you are currently experiencing Ashtama Shani, which means you should approach challenges with extra patience and avoid unnecessary risks. Kuja and Guru in your twelfth house suggest that you might feel a need to retreat or spend time in private reflection. Budha in your third house supports your intellectual pursuits, though you should be careful with how you express your ideas. Rahu in your seventh house might bring some unexpected turns in your interactions, while Ketu in your first house asks you to stay true to your authentic self. It is a day to balance your public presence with your need for inner peace. Do not let the intensity of the day overwhelm your natural confidence. Remember that your strength lies in your ability to remain steady amidst change. Take small steps and trust the process. You are capable of navigating any situation with grace and dignity.",
+      "advice": "Listen more than you speak today to maintain balance in your relationships.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 7,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 3,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 1,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Kanya": {
+      "text": "Today brings a sense of productivity as Chandra moves through your sixth house, helping you tackle your daily responsibilities with ease. Kuja and Guru in your eleventh house are working in your favor, supporting your social connections and long-term aspirations. Budha in your second house brings clarity to your thoughts and communication regarding your personal values. Rahu in your sixth house helps you overcome any obstacles that may arise in your daily routine. However, Surya in your second house and Shukra in your second house, which is blocked by Shani, suggest that you should be mindful of your spending and how you express your resources. Shani in your seventh house asks you to be patient and fair in your partnerships. Ketu in your twelfth house encourages you to let go of any lingering worries or past burdens. It is a day to focus on what truly matters and keep your efforts consistent. You have the support of the stars to make meaningful progress if you remain disciplined. Trust in your ability to organize your life and move forward with confidence. Your hard work is beginning to pay off in subtle but significant ways.",
+      "advice": "Focus on your daily goals and avoid impulsive spending today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Budha",
+          "position": 2,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shukra",
+          "position": 2,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shani",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Ketu",
+          "position": 12,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Tula": {
+      "text": "Today invites you to express your creativity as Chandra moves through your fifth house, though you may feel a need to be cautious with your energy. Shukra in your first house brings a sense of personal charm and harmony to your day, helping you feel more at ease with yourself. Shani in your sixth house provides you with the discipline to manage your daily tasks effectively. Ketu in your eleventh house encourages you to be selective about your social circle and focus on quality connections. However, Surya and Budha in your first house, along with Kuja and Guru in your tenth house, suggest that you might face some professional or personal pressures that require patience. Rahu in your fifth house asks you to be mindful of your creative impulses and avoid unnecessary risks. It is a day to find balance between your personal desires and your responsibilities. Do not let the expectations of others cloud your own judgment. Take time to nurture your inner self and stay true to your path. You have the inner strength to handle whatever comes your way with grace. Keep a positive outlook and trust in your own potential.",
+      "advice": "Focus on self-care and maintain a steady rhythm in your work today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 1,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 6,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Rahu",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 11,
+          "verdict": "favourable"
+        }
+      ]
+    },
+    "Vrischika": {
+      "text": "Today calls for a bit of patience as Chandra moves through your fourth house, suggesting that your focus should be on your home and inner peace. Guru in your ninth house brings a sense of wisdom and guidance to your life, while Shukra in your twelfth house encourages you to find beauty in solitude and reflection. Ketu in your tenth house helps you maintain a unique perspective on your professional path. However, Surya and Budha in your twelfth house, along with Kuja in your ninth house and Shani in your fifth house, indicate that you might feel a bit restless or challenged in your pursuits. Rahu in your fourth house asks you to be mindful of your home environment and avoid unnecessary stress. It is a day to step back and focus on your spiritual well-being rather than seeking external validation. Trust that this period of reflection is necessary for your growth. Do not rush into decisions that require time and patience. Stay grounded and keep your heart open to the lessons of the day. You have the inner strength to navigate these challenges with grace and wisdom.",
+      "advice": "Spend time in quiet reflection and avoid making major changes at home today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 9,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shukra",
+          "position": 12,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 10,
+          "verdict": "favourable"
+        }
+      ]
+    },
+    "Dhanu": {
+      "text": "Today brings a sense of clarity and purpose as Chandra moves through your third house, encouraging you to communicate your ideas with confidence. Surya, Budha, and Shukra in your eleventh house are working in your favor, supporting your social connections and long-term goals. Rahu in your third house adds a touch of excitement to your daily interactions. However, you are experiencing Ardhastama Shani, which means you should approach your home and personal life with extra care and patience. Kuja and Guru in your eighth house suggest that you should be mindful of your energy levels and avoid unnecessary risks in your personal affairs. Ketu in your ninth house asks you to stay true to your principles and seek wisdom in your journey. It is a day to focus on your strengths and keep moving forward with a positive mindset. Do not let the challenges of the day dampen your spirit. You have the support of the stars to make meaningful progress if you remain disciplined. Trust in your ability to navigate these influences with grace. Stay grounded and keep your heart open.",
+      "advice": "Use your natural communication skills to build positive connections today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 11,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 4,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Ketu",
+          "position": 9,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Makara": {
+      "text": "Today brings a sense of focus as Chandra moves through your second house, encouraging you to reflect on your personal values and resources. Surya and Budha in your tenth house are working in your favor, supporting your professional efforts and public standing. Shani in your third house provides you with the discipline to communicate effectively and manage your daily tasks. However, Kuja in your seventh house and Guru in your seventh house, which is blocked by Shani, suggest that you should be mindful of your partnerships and avoid unnecessary conflicts. Shukra in your tenth house might bring some professional challenges that require patience. Rahu in your second house asks you to be careful with your resources and avoid impulsive decisions. Ketu in your eighth house encourages you to let go of any lingering worries or past burdens. It is a day to focus on your strengths and keep your efforts consistent. You have the support of the stars to make meaningful progress if you remain disciplined. Trust in your ability to manage your life with grace. Keep a positive outlook and stay focused on your goals.",
+      "advice": "Focus on your professional goals and be mindful of your words in partnerships today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 10,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Chandra",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 7,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 10,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Guru",
+          "position": 7,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shukra",
+          "position": 10,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shani",
+          "position": 3,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Rahu",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 8,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Kumbha": {
+      "text": "Today brings a sense of self-awareness as Chandra moves through your first house, encouraging you to focus on your own needs and growth. Shukra in your ninth house brings a sense of harmony and wisdom to your day, helping you feel more at ease with your life path. However, you are in the setting phase of Sade Sati, which means you should approach your personal and professional life with extra patience. Surya and Budha in your ninth house, along with Kuja in your sixth house, which is blocked by Surya, and Guru in your sixth house, suggest that you might face some challenges that require careful navigation. Shani in your second house asks you to be mindful of your resources and values. Rahu in your first house might bring some unexpected turns in your personal journey, while Ketu in your seventh house asks you to be fair in your partnerships. It is a day to focus on your inner strength and keep moving forward with a positive mindset. Trust that you have the capacity to handle whatever comes your way. Stay grounded and keep your heart open.",
+      "advice": "Prioritize your own well-being and stay patient with yourself today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 1,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Kuja",
+          "position": 6,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Budha",
+          "position": 9,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Guru",
+          "position": 6,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Shukra",
+          "position": 9,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shani",
+          "position": 2,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 7,
+          "verdict": "adverse"
+        }
+      ]
+    },
+    "Meena": {
+      "text": "Today calls for a bit of patience as Chandra moves through your twelfth house, suggesting that your focus should be on your inner peace and spiritual well-being. Guru in your fifth house brings a sense of wisdom and creativity to your life, while Ketu in your sixth house helps you overcome any daily obstacles. However, you are in the peak phase of Sade Sati, which means you should approach your life with extra care and patience. Surya in your eighth house, Budha in your eighth house, which is blocked by Shani, and Shukra in your eighth house, which is blocked by Kuja, suggest that you might face some challenges that require careful navigation. Shani in your first house asks you to be mindful of your personal journey and stay true to your principles. Rahu in your twelfth house asks you to be careful with your energy levels and avoid unnecessary stress. It is a day to step back and focus on your inner self rather than seeking external validation. Trust that this period of reflection is necessary for your growth. Do not rush into decisions that require time and patience. Stay grounded and keep your heart open.",
+      "advice": "Focus on quiet contemplation and avoid unnecessary stress today.",
+      "transits_cited": [
+        {
+          "graha": "Surya",
+          "position": 8,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Chandra",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Kuja",
+          "position": 5,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Budha",
+          "position": 8,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Guru",
+          "position": 5,
+          "verdict": "favourable"
+        },
+        {
+          "graha": "Shukra",
+          "position": 8,
+          "verdict": "blocked"
+        },
+        {
+          "graha": "Shani",
+          "position": 1,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Rahu",
+          "position": 12,
+          "verdict": "adverse"
+        },
+        {
+          "graha": "Ketu",
+          "position": 6,
+          "verdict": "favourable"
+        }
+      ]
+    }
+  }
+}
